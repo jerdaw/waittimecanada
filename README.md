@@ -2,9 +2,11 @@
 
 > A clinically defensible "Health Systems Observatory" that audits and standardizes Canadian emergency room wait time data across provinces.
 
-**Status:** Planning Phase → Implementation Starting
+**Status:** 🚧 Active Development (Week 1 Complete)
 **Live Site:** Coming Soon
 **Documentation:** [docs/](./docs/)
+
+**Latest:** Quebec scraper MVP complete with 24 passing tests ✓
 
 ---
 
@@ -42,11 +44,12 @@ Every measurement is tagged with metadata:
 
 ## Tech Stack
 
-- **Backend:** Python 3.12 scrapers via GitHub Actions (serverless, 15-min cron)
-- **Database:** Supabase (PostgreSQL 15+ with PostGIS and strict enums)
-- **Frontend:** Next.js 14 + Mapbox GL + React Query
+- **Backend:** Python 3.12+ with psycopg2, BeautifulSoup, Pydantic
+- **Database:** Neon PostgreSQL 17 (serverless with autoscaling)
+- **Scraper Execution:** GitHub Actions (15-min cron) or local CLI
+- **Frontend:** Next.js 14 + Mapbox GL + React Query (planned)
+- **Testing:** pytest with 56% coverage (24 unit tests)
 - **CI/CD:** GitHub Actions + Vercel
-- **Monitoring:** Sentry + Heartbeat system
 
 ---
 
@@ -55,9 +58,8 @@ Every measurement is tagged with metadata:
 ### Prerequisites
 
 - Python 3.12+
-- Node.js 20.x LTS
-- pnpm 8.x
-- Supabase account
+- Node.js 20.x LTS (for frontend, later)
+- Neon PostgreSQL account (free tier: [neon.tech](https://neon.tech))
 
 ### Setup
 
@@ -67,27 +69,29 @@ git clone https://github.com/YOUR_USERNAME/waittime-canada.git
 cd waittime-canada
 
 # Set up environment variables
-cp scrapers/.env.example scrapers/.env
-cp frontend/.env.local.example frontend/.env.local
-# Edit .env files with your credentials
+cd backend
+cp .env.example .env.local
+# Edit .env.local with your Neon DATABASE_URL
 
-# Initialize database
-psql $SUPABASE_URL -f database/migrations/001_initial_schema.sql
-psql $SUPABASE_URL -f database/migrations/002_add_heartbeat.sql
-psql $SUPABASE_URL -f database/migrations/003_add_indexes.sql
-psql $SUPABASE_URL -f database/seed/sources.sql
-
-# Install and run scrapers
-cd scrapers
-python -m venv .venv && source .venv/bin/activate
+# Create virtual environment and install dependencies
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-python -m src.main
 
-# Install and run frontend
-cd ../frontend
-pnpm install
-pnpm dev
-# Open http://localhost:3000
+# Test database connection
+python test_connection.py
+
+# Run migrations
+python run_migrations.py
+
+# Run tests
+pytest tests/unit/ -v
+
+# Test Quebec scraper (dry run)
+python -m waittime.cli.scraper --source quebec-msss --dry-run
+
+# List available scrapers
+python -m waittime.cli.scraper --list
 ```
 
 ---
@@ -96,23 +100,28 @@ pnpm dev
 
 ```
 waittime-canada/
-├── docs/                    # Implementation documentation
-│   ├── IMPLEMENTATION.md    # Tech stack & setup guide
-│   ├── DATABASE.md          # Schema & migrations
-│   ├── API.md               # Endpoint specifications
-│   └── ROADMAP.md           # Week-by-week plan
-├── scrapers/                # Python scraper service
-│   └── src/
-│       ├── scrapers/        # Provincial scrapers
-│       └── core/            # Shared utilities
-├── frontend/                # Next.js application
-│   └── src/
-│       ├── app/             # Pages (App Router)
-│       ├── components/      # React components
-│       └── lib/             # API & utilities
-├── database/                # SQL migrations & seed data
-│   └── migrations/
-└── .github/workflows/       # CI/CD pipelines
+├── backend/                      # Python scraper service
+│   ├── src/waittime/            # Main package
+│   │   ├── core/                # Domain models & ontology
+│   │   ├── scrapers/            # Provincial scrapers
+│   │   │   ├── base.py          # BaseScraper abstract class
+│   │   │   └── quebec.py        # Quebec MSSS scraper
+│   │   ├── services/            # Database & external services
+│   │   └── cli/                 # Command-line interface
+│   ├── tests/                   # Test suite
+│   │   ├── unit/                # Fast, no I/O
+│   │   ├── integration/         # Database, HTTP
+│   │   └── e2e/                 # Full workflows
+│   ├── migrations/              # SQL migrations
+│   └── pyproject.toml           # Dependencies & tooling
+├── frontend/                    # Next.js app (planned)
+├── docs/                        # MkDocs Material documentation
+│   ├── architecture/            # Database, API specs
+│   ├── development/             # Setup guides
+│   ├── planning/                # Roadmap, strategic plan
+│   └── adr/                     # Architecture Decision Records
+├── .github/workflows/           # CI/CD pipelines
+└── mkdocs.yml                   # Documentation config
 ```
 
 ---
@@ -187,14 +196,20 @@ pnpm type-check
 ### Running Scrapers Locally
 
 ```bash
-cd scrapers
+cd backend
 source .venv/bin/activate
 
+# List available scrapers
+python -m waittime.cli.scraper --list
+
+# Dry run (no database writes)
+python -m waittime.cli.scraper --source quebec-msss --dry-run
+
 # Run single scraper
-python -m src.scrapers.quebec
+python -m waittime.cli.scraper --source quebec-msss
 
 # Run all scrapers
-python -m src.main
+python -m waittime.cli.scraper --all
 ```
 
 ---

@@ -2,6 +2,11 @@
 
 Provincial ER wait time scrapers and core domain models.
 
+**Status:** MVP Complete ✓
+**Tests:** 24 passing (56% coverage)
+**Database:** Neon PostgreSQL 17
+**Scrapers:** Quebec (complete), Alberta/ON/MB/BC (planned)
+
 ## Installation
 
 ```bash

@@ -324,7 +324,12 @@ class QuebecScraper(BaseScraper):
                 return hospital_id
 
         # Generate ID from name if not in mapping (will need verification)
-        slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+        # Normalize accents: ô→o, é→e, à→a, etc.
+        import unicodedata
+        normalized = unicodedata.normalize("NFKD", name)
+        ascii_name = normalized.encode("ascii", "ignore").decode("ascii")
+        slug = re.sub(r"[^a-z0-9]+", "-", ascii_name.lower()).strip("-")
+
         if slug:
             logger.warning(
                 f"Unknown hospital '{name}' - generated ID 'ca-qc-{slug}'. "

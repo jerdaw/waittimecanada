@@ -87,3 +87,7 @@ key.txt
 
 # Migration backups
 backup-*/
+
+# Claude AI / Agent files
+.claude/
+.agents/

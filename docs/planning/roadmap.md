@@ -1,5 +1,21 @@
 # Implementation Roadmap
 
+## Current Status (Updated 2026-01-30)
+
+**Progress:** Week 1 infrastructure complete ✓
+
+- ✅ Repository modernized with proper Python package structure
+- ✅ Database schema created on Neon PostgreSQL
+- ✅ Core models with metric ontology implemented
+- ✅ Quebec scraper MVP with 3 parsing strategies
+- ✅ Database service layer (psycopg2)
+- ✅ CLI tool for running scrapers
+- ✅ 24 unit tests passing (56% coverage)
+
+**Next:** Additional provincial scrapers, frontend initialization
+
+---
+
 ## Overview
 
 This roadmap breaks down the 4-week implementation plan into granular, actionable tasks with clear dependencies and acceptance criteria.
