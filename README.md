@@ -3,10 +3,11 @@
 > A clinically defensible "Health Systems Observatory" that audits and standardizes Canadian emergency room wait time data across provinces.
 
 **Status:** 🚧 Active Development (Week 1 Complete)
+**Primary Focus:** 🎯 Ontario (one province at a time)
 **Live Site:** Coming Soon
 **Documentation:** [docs/](./docs/)
 
-**Latest:** Quebec scraper MVP complete with 24 passing tests ✓
+**Latest:** Infrastructure complete, starting Ontario scraper ✓
 
 ---
 

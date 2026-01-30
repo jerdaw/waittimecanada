@@ -6,7 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is the **WaitTime Canada** project - a "Health Systems Observatory" designed to audit and standardize Canadian emergency room wait time data across provinces. This is **NOT a simple wait time app**, but rather a clinically defensible auditing platform that exposes methodological inconsistencies in healthcare reporting.
 
-**Current Status:** Pre-implementation planning phase. The codebase will be built according to the comprehensive specification in `er-times-plan.md`.
+**Current Status:** Active development, Week 1 complete. **PRIMARY FOCUS: Ontario** (one province at a time).
+
+**Current Architecture:**
+- Database: Neon PostgreSQL 17 (not Supabase)
+- Backend: Python 3.12+ with psycopg2, pytest (24 tests passing)
+- Quebec scraper: MVP complete (needs real URL)
+- **Ontario scraper: Next priority** ← Focus here
 
 ## Core Architecture (Planned)
 
