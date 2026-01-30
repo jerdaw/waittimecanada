@@ -1,0 +1,70 @@
+name: Database Migrations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'database/migrations/**'
+  workflow_dispatch:
+    inputs:
+      migration_file:
+        description: 'Specific migration file to run (optional)'
+        required: false
+
+jobs:
+  migrate:
+    name: Apply Migrations
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link to Supabase project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: |
+          supabase link --project-ref $SUPABASE_PROJECT_ID
+
+      - name: Run migrations
+        if: github.event.inputs.migration_file == ''
+        run: |
+          supabase db push
+
+      - name: Run specific migration
+        if: github.event.inputs.migration_file != ''
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        run: |
+          psql $SUPABASE_URL -f database/migrations/${{ github.event.inputs.migration_file }}
+
+      - name: Verify migration
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        run: |
+          # Query schema version or run simple health check
+          psql $SUPABASE_URL -c "SELECT COUNT(*) FROM sources;"
+          echo "Migration completed successfully"
+
+      - name: Notify on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.ALERT_EMAIL_USER }}
+          password: ${{ secrets.ALERT_EMAIL_PASSWORD }}
+          subject: '[WaitTime Canada] Database Migration Failed'
+          to: ${{ secrets.ALERT_EMAIL_TO }}
+          from: WaitTime Canada Monitoring
+          body: |
+            Database migration failed at ${{ github.run_id }}.
+
+            View logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            CRITICAL: Manual intervention required.

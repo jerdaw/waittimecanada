@@ -1,0 +1,79 @@
+name: Heartbeat Monitor (Dead Man's Switch)
+
+# Check every hour if scrapers are running
+on:
+  schedule:
+    - cron: '0 * * * *'  # Every hour
+  workflow_dispatch:
+
+jobs:
+  check-heartbeat:
+    name: Check Scraper Health
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Supabase client
+        run: pip install supabase
+
+      - name: Check scraper status
+        id: check
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python - <<EOF
+          import os
+          from datetime import datetime, timedelta
+          from supabase import create_client
+
+          supabase = create_client(
+              os.getenv("SUPABASE_URL"),
+              os.getenv("SUPABASE_SERVICE_KEY")
+          )
+
+          # Get latest heartbeat
+          result = supabase.table("scraper_status").select("*").order("last_run", desc=True).limit(1).execute()
+
+          if not result.data:
+              print("::set-output name=status::no_data")
+              exit(1)
+
+          last_run = datetime.fromisoformat(result.data[0]["last_run"].replace("Z", "+00:00"))
+          minutes_ago = (datetime.now(last_run.tzinfo) - last_run).total_seconds() / 60
+
+          print(f"Last scraper run: {minutes_ago:.1f} minutes ago")
+
+          if minutes_ago > 60:
+              print(f"::set-output name=status::stale")
+              print(f"::set-output name=minutes::{int(minutes_ago)}")
+              exit(1)
+          else:
+              print("::set-output name=status::healthy")
+          EOF
+
+      - name: Send alert if unhealthy
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.ALERT_EMAIL_USER }}
+          password: ${{ secrets.ALERT_EMAIL_PASSWORD }}
+          subject: '[WaitTime Canada] ⚠️ Scraper Heartbeat Failure'
+          to: ${{ secrets.ALERT_EMAIL_TO }}
+          from: WaitTime Canada Monitoring
+          body: |
+            WARNING: Scraper heartbeat is stale.
+
+            Last successful run: ${{ steps.check.outputs.minutes }} minutes ago (threshold: 60 minutes)
+
+            Check scraper logs: https://github.com/${{ github.repository }}/actions/workflows/scraper-cron.yml
+
+            This is an automated Dead Man's Switch alert.

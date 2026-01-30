@@ -1,0 +1,166 @@
+site_name: WaitTime Canada
+site_url: https://waittime-canada.github.io/docs
+site_description: A clinically defensible Health Systems Observatory for Canadian ER wait times
+site_author: Your Name
+repo_url: https://github.com/YOUR_USERNAME/waittime-canada
+repo_name: waittime-canada
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: red
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: red
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+  icon:
+    repo: fontawesome/brands/github
+
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.indexes
+    - toc.follow
+    - toc.integrate
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - header.autohide
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+
+plugins:
+  - search:
+      lang: en
+
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
+
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/YOUR_USERNAME
+    - icon: fontawesome/brands/linkedin
+      link: https://linkedin.com/in/YOUR_PROFILE
+
+nav:
+  - Home: index.md
+
+  - Getting Started:
+    - getting-started/index.md
+    - Quick Start: getting-started/quick-start.md
+    - Installation: getting-started/installation.md
+    - First Scraper: getting-started/first-scraper.md
+
+  - Architecture:
+    - architecture/index.md
+    - Overview: architecture/overview.md
+    - Data Ontology: architecture/data-ontology.md
+    - Database: architecture/database.md
+    - API: architecture/api.md
+    - Scrapers: architecture/scrapers.md
+
+  - Development:
+    - development/index.md
+    - Environment Setup: development/setup.md
+    - Testing: development/testing.md
+    - Code Style: development/code-style.md
+    - Contributing: development/contributing.md
+    - Debugging: development/debugging.md
+
+  - Deployment:
+    - deployment/index.md
+    - CI/CD: deployment/ci-cd.md
+    - Monitoring: deployment/monitoring.md
+    - Scaling: deployment/scaling.md
+
+  - Reference:
+    - Database Schema: reference/database-schema.md
+    - Environment Variables: reference/environment-variables.md
+
+  - ADRs:
+    - adr/index.md
+    - "0001: Use Supabase": adr/0001-use-supabase.md
+    - "0002: Metric Ontology": adr/0002-metric-ontology.md
+    - "0003: Serverless Scrapers": adr/0003-serverless-scrapers.md
+
+  - Planning:
+    - Roadmap: planning/roadmap.md
+    - Strategic Plan: planning/strategic-plan.md
+
+  - Guides:
+    - Adding a Province: guides/adding-province.md
+    - Database Migrations: guides/database-migrations.md
+    - Troubleshooting: guides/troubleshooting.md
+
+copyright: Copyright &copy; 2024-2026 Your Name

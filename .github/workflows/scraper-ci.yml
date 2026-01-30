@@ -1,0 +1,103 @@
+name: Scraper CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'scrapers/**'
+      - '.github/workflows/scraper-ci.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'scrapers/**'
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  lint:
+    name: Lint (Ruff)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Run Ruff linter
+        working-directory: ./scrapers
+        run: ruff check src/
+
+      - name: Run Ruff formatter check
+        working-directory: ./scrapers
+        run: ruff format --check src/
+
+  type-check:
+    name: Type Check (mypy)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        working-directory: ./scrapers
+        run: |
+          pip install -e ".[dev]"
+
+      - name: Run mypy
+        working-directory: ./scrapers
+        run: mypy src/
+
+  test:
+    name: Test (pytest)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        working-directory: ./scrapers
+        run: |
+          pip install -e ".[dev]"
+
+      - name: Run tests with coverage
+        working-directory: ./scrapers
+        run: |
+          pytest --cov=src --cov-report=xml --cov-report=term
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./scrapers/coverage.xml
+          flags: scrapers
+          name: scraper-coverage
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Bandit security scan
+        uses: PyCQA/bandit-action@v1
+        with:
+          path: scrapers/src/
