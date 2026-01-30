@@ -3,7 +3,8 @@
 -- See ADR-0002 for rationale
 
 -- What is being measured?
-CREATE TYPE metric_family_enum AS ENUM (
+DO $$ BEGIN
+    CREATE TYPE metric_family_enum AS ENUM (
     'TIME_TO_PROVIDER',
     'TOTAL_LOS',
     'STRETCHER_OCCUPANCY'

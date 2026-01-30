@@ -4,7 +4,7 @@ These models enforce the metric ontology at the application layer,
 complementing the database-level constraints.
 """
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Self
 
 from pydantic import BaseModel, Field, model_validator
@@ -30,7 +30,7 @@ class Measurement(BaseModel):
     )
     value: float = Field(gt=0, description="The measured value (usually minutes)")
     timestamp_utc: datetime = Field(
-        default_factory=datetime.utcnow,
+        default_factory=lambda: datetime.now(UTC),
         description="When this measurement was recorded",
     )
 
