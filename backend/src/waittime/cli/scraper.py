@@ -17,7 +17,7 @@ from waittime.scrapers import (
     create_ontario_source,
     create_quebec_source,
 )
-from waittime.services import DatabaseService
+from waittime.services import DatabaseService, GeocodingService
 
 # Configure logging
 logging.basicConfig(
@@ -34,6 +34,34 @@ SCRAPERS = {
     # Add more as implemented:
     # "alberta-ahs": (AlbertaScraper, create_alberta_source),
 }
+
+
+def hospital_id_to_name(hospital_id: str) -> str:
+    """Convert hospital ID slug to searchable name.
+
+    Args:
+        hospital_id: ID like "ca-on-cheo" or "ca-on-ottawa-hospital-civic"
+
+    Returns:
+        Human-readable name like "CHEO" or "Ottawa Hospital Civic"
+
+    Example:
+        >>> hospital_id_to_name("ca-on-cheo")
+        "CHEO"
+        >>> hospital_id_to_name("ca-on-ottawa-hospital-the-civic-site")
+        "Ottawa Hospital The Civic Site"
+    """
+    # Remove country-province prefix (e.g., "ca-on-")
+    parts = hospital_id.split("-")
+    if len(parts) >= 3 and parts[0] == "ca":
+        # Remove "ca" and province code
+        name_parts = parts[2:]
+    else:
+        name_parts = parts
+
+    # Convert kebab-case to Title Case
+    # "ottawa-hospital-civic" -> "Ottawa Hospital Civic"
+    return " ".join(word.title() for word in name_parts)
 
 
 def run_scraper(source_id: str, dry_run: bool = False) -> int:
@@ -72,30 +100,55 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
 
         # Write to database
         db = DatabaseService()
+        geocoder = GeocodingService()
 
         # Step 1: Upsert hospitals (create if they don't exist)
         # Extract unique hospital IDs
         unique_hospital_ids = {m.hospital_id for m in measurements}
         logger.info(f"Upserting {len(unique_hospital_ids)} unique hospitals")
 
+        geocoded_count = 0
         for hospital_id in unique_hospital_ids:
-            # Find first measurement to get source info
-            sample = next(m for m in measurements if m.hospital_id == hospital_id)
+            # Convert hospital_id to searchable name
+            hospital_name = hospital_id_to_name(hospital_id)
 
-            # Create hospital with unverified status
-            # Use placeholder values - admin will update during verification
+            # Try to geocode
+            geocoding_result = geocoder.geocode_hospital(
+                hospital_name, province=source.province
+            )
+
+            if geocoding_result and geocoding_result.confidence > 0.5:
+                # Use geocoded data
+                city = geocoding_result.city
+                latitude = geocoding_result.latitude
+                longitude = geocoding_result.longitude
+                geocoded_count += 1
+            else:
+                # Fall back to placeholders
+                logger.warning(
+                    f"Failed to geocode {hospital_name} - using placeholders"
+                )
+                city = "Unknown"
+                latitude = 0.0
+                longitude = 0.0
+
+            # Create hospital with geocoded or placeholder data
             hospital = Hospital(
                 id=hospital_id,
-                name=hospital_id,  # Use ID as name for now, admin will update
+                name=hospital_name,  # Use converted name
                 province=source.province,
-                city="Unknown",  # Placeholder
-                latitude=0.0,  # Placeholder
-                longitude=0.0,  # Placeholder
-                is_verified=False,  # Requires manual verification
+                city=city,
+                latitude=latitude,
+                longitude=longitude,
+                is_verified=False,  # Still requires manual verification
                 is_visible=False,  # Hidden until verified
                 source_id=source_id,
             )
             db.upsert_hospital(hospital)
+
+        logger.info(
+            f"✅ Geocoded {geocoded_count}/{len(unique_hospital_ids)} hospitals"
+        )
 
         # Step 2: Insert measurements
         count = db.insert_measurements(measurements)
