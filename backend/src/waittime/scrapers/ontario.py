@@ -178,6 +178,11 @@ class OntarioScraper(BaseScraper):
         # First cell: hospital name
         hospital_name = cells[0].get_text(strip=True)
 
+        # Filter out date values (e.g., "202411", "202412")
+        # Pattern: 6 digits (YYYYMM format)
+        if re.match(r"^\d{6}$", hospital_name):
+            return None
+
         # Second cell: wait time (likely in hours)
         wait_time_text = cells[1].get_text(strip=True)
         wait_time_hours = self._extract_wait_time_hours(wait_time_text)

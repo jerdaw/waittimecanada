@@ -10,6 +10,7 @@ import logging
 import sys
 from typing import NoReturn
 
+from waittime.core import Hospital
 from waittime.scrapers import (
     OntarioScraper,
     QuebecScraper,
@@ -71,7 +72,35 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
 
         # Write to database
         db = DatabaseService()
+
+        # Step 1: Upsert hospitals (create if they don't exist)
+        # Extract unique hospital IDs
+        unique_hospital_ids = {m.hospital_id for m in measurements}
+        logger.info(f"Upserting {len(unique_hospital_ids)} unique hospitals")
+
+        for hospital_id in unique_hospital_ids:
+            # Find first measurement to get source info
+            sample = next(m for m in measurements if m.hospital_id == hospital_id)
+
+            # Create hospital with unverified status
+            # Use placeholder values - admin will update during verification
+            hospital = Hospital(
+                id=hospital_id,
+                name=hospital_id,  # Use ID as name for now, admin will update
+                province=source.province,
+                city="Unknown",  # Placeholder
+                latitude=0.0,  # Placeholder
+                longitude=0.0,  # Placeholder
+                is_verified=False,  # Requires manual verification
+                is_visible=False,  # Hidden until verified
+                source_id=source_id,
+            )
+            db.upsert_hospital(hospital)
+
+        # Step 2: Insert measurements
         count = db.insert_measurements(measurements)
+
+        # Step 3: Update heartbeat
         db.update_heartbeat(
             source_id=source_id,
             status="healthy",
