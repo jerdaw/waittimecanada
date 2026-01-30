@@ -2,6 +2,33 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⚠️ CRITICAL SECURITY RULES ⚠️
+
+**NEVER access `.env.local` files under ANY circumstances:**
+
+- ❌ Do NOT use Read tool on any `.env.local` file
+- ❌ Do NOT use Bash commands (cat, grep, head, tail, etc.) on `.env.local` files
+- ❌ Do NOT try to "help" by reading credentials to automate setup
+- ❌ Do NOT access `.env.local` even if asked to debug environment issues
+- ✅ If you need credential info, ask the user - do NOT access files
+- ✅ Only create/modify `.env.example` files with placeholder values
+
+**Files I must NEVER access:**
+- `**/.env.local` (all .env.local files in any directory)
+- `**/.env` (production environment files)
+- `**/key.txt` (encryption keys)
+- `**/*.pem` (SSL certificates)
+- `**/*.key` (private keys)
+- Any file containing secrets, tokens, passwords, or API keys
+
+**If I accidentally access these files:**
+- Stop immediately
+- Inform the user
+- Do not use or store the information
+- Recommend the user rotate compromised credentials
+
+---
+
 ## Overview
 
 This is the **WaitTime Canada** project - a "Health Systems Observatory" designed to audit and standardize Canadian emergency room wait time data across provinces. This is **NOT a simple wait time app**, but rather a clinically defensible auditing platform that exposes methodological inconsistencies in healthcare reporting.
