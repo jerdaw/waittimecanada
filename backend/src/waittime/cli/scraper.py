@@ -109,16 +109,24 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
 
         geocoded_count = 0
         for hospital_id in unique_hospital_ids:
-            # Convert hospital_id to searchable name
-            hospital_name = hospital_id_to_name(hospital_id)
+            # Try to get official name from scraper's mapping
+            hospital_name = None
+            if hasattr(scraper_class, "HOSPITAL_MAPPING"):
+                # Reverse lookup: find the key that maps to this hospital_id
+                reverse_map = {v: k for k, v in scraper_class.HOSPITAL_MAPPING.items()}
+                hospital_name = reverse_map.get(hospital_id)
 
-            # Try to geocode
+            # Fall back to converting ID to name
+            if not hospital_name:
+                hospital_name = hospital_id_to_name(hospital_id)
+
+            # Try to geocode using the hospital name
             geocoding_result = geocoder.geocode_hospital(
                 hospital_name, province=source.province
             )
 
-            if geocoding_result and geocoding_result.confidence > 0.5:
-                # Use geocoded data
+            if geocoding_result and geocoding_result.confidence > 0.8:
+                # Use geocoded data (higher confidence threshold)
                 city = geocoding_result.city
                 latitude = geocoding_result.latitude
                 longitude = geocoding_result.longitude
@@ -126,7 +134,7 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
             else:
                 # Fall back to placeholders
                 logger.warning(
-                    f"Failed to geocode {hospital_name} - using placeholders"
+                    f"Failed to geocode {hospital_name} ({hospital_id}) - using placeholders"
                 )
                 city = "Unknown"
                 latitude = 0.0
@@ -135,7 +143,7 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
             # Create hospital with geocoded or placeholder data
             hospital = Hospital(
                 id=hospital_id,
-                name=hospital_name,  # Use converted name
+                name=hospital_name,  # Use official or converted name
                 province=source.province,
                 city=city,
                 latitude=latitude,
