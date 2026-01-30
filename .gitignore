@@ -84,3 +84,6 @@ secrets/
 *.pem
 *.key
 key.txt
+
+# Migration backups
+backup-*/

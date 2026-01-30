@@ -4,12 +4,12 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'scrapers/**'
+      - 'backend/**'
       - '.github/workflows/scraper-ci.yml'
   pull_request:
     branches: [main, develop]
     paths:
-      - 'scrapers/**'
+      - 'backend/**'
 
 env:
   PYTHON_VERSION: '3.12'
@@ -86,7 +86,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          files: ./scrapers/coverage.xml
+          files: ./backend/coverage.xml
           flags: scrapers
           name: scraper-coverage
 
@@ -100,4 +100,4 @@ jobs:
       - name: Run Bandit security scan
         uses: PyCQA/bandit-action@v1
         with:
-          path: scrapers/src/
+          path: backend/src/
