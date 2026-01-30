@@ -129,17 +129,18 @@ waittime-canada/
 
 ## Documentation
 
-**For Developers:**
-- [Implementation Guide](./docs/IMPLEMENTATION.md) - Detailed tech setup
-- [Database Schema](./docs/DATABASE.md) - Complete schema with RLS policies
-- [API Specification](./docs/API.md) - Endpoint contracts
-- [Roadmap](./docs/ROADMAP.md) - 4-week implementation plan
+**Project Planning:**
+- [ROADMAP.md](./ROADMAP.md) - **Start here** - Master task list with milestones
+- [Expansion Strategy](./docs/planning/expansion-roadmap.md) - Provincial rollout plan
+
+**Technical Reference:**
+- [Implementation Guide](./docs/development/setup.md) - Development environment setup
+- [Database Schema](./docs/architecture/database.md) - Schema and migrations
+- [API Specification](./docs/architecture/api.md) - Endpoint contracts
+- [Strategic Plan](./docs/planning/strategic-plan.md) - Original specification
 
 **For AI Assistants:**
 - [CLAUDE.md](./CLAUDE.md) - Codebase guidance for Claude Code
-
-**Strategic Context:**
-- [er-times-plan.md](./er-times-plan.md) - Original strategic specification
 
 ---
 
