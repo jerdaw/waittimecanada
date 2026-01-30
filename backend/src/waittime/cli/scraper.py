@@ -10,7 +10,12 @@ import logging
 import sys
 from typing import NoReturn
 
-from waittime.scrapers import QuebecScraper, create_quebec_source
+from waittime.scrapers import (
+    OntarioScraper,
+    QuebecScraper,
+    create_ontario_source,
+    create_quebec_source,
+)
 from waittime.services import DatabaseService
 
 # Configure logging
@@ -23,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 # Registry of available scrapers
 SCRAPERS = {
+    "ontario-health": (OntarioScraper, create_ontario_source),
     "quebec-msss": (QuebecScraper, create_quebec_source),
     # Add more as implemented:
     # "alberta-ahs": (AlbertaScraper, create_alberta_source),
