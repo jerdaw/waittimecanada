@@ -91,3 +91,9 @@ backup-*/
 # Claude AI / Agent files
 .claude/
 .agents/
+
+# Reference documents (not for version control)
+*.docx
+*.doc
+*.url
+.github/skills/
