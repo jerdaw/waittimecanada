@@ -315,7 +315,7 @@ class DatabaseService:
                     """,
                     (retention_days,),
                 )
-                deleted_count = cur.rowcount
+                deleted_count = cur.rowcount or 0
                 logger.info(
                     f"Cleaned up {deleted_count} measurements older than {retention_days} days"
                 )

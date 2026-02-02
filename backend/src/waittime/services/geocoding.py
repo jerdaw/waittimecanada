@@ -113,7 +113,7 @@ class GeocodingService:
         # Try each query until we get a result
         for query in queries_to_try:
             try:
-                params = {
+                params: dict[str, str | int] = {
                     "q": query,
                     "format": "json",
                     "limit": 1,
@@ -303,18 +303,18 @@ class GeocodingService:
     def _extract_city(self, feature: dict) -> str:
         """Extract city name from geocoding feature context."""
         # Try place_name first (often includes city)
-        place_name = feature.get("place_name", "")
+        place_name: str = feature.get("place_name", "")
         if "," in place_name:
             # Format: "Hospital Name, City, Province, Country"
             parts = [p.strip() for p in place_name.split(",")]
             if len(parts) >= 2:
-                return parts[1]  # Second part is usually city
+                return str(parts[1])  # Second part is usually city
 
         # Try context array
         context = feature.get("context", [])
         for ctx in context:
-            ctx_id = ctx.get("id", "")
+            ctx_id: str = ctx.get("id", "")
             if ctx_id.startswith("place."):
-                return ctx.get("text", "Unknown")
+                return str(ctx.get("text", "Unknown"))
 
         return "Unknown"

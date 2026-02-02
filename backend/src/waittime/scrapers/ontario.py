@@ -105,7 +105,7 @@ class OntarioScraper(BaseScraper):
                 page.wait_for_timeout(2000)
 
                 # Get rendered HTML
-                html = page.content()
+                html: str = page.content()
 
                 browser.close()
 
