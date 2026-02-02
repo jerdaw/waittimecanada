@@ -12,7 +12,6 @@ Usage:
 import argparse
 import logging
 import sys
-from datetime import UTC, datetime
 
 from waittime.services.database import DatabaseService
 
@@ -85,13 +84,13 @@ def main() -> int:
         logger.info(f"\n🗑️  Deleting measurements older than {args.retention_days} days...")
         deleted_count = db.cleanup_old_measurements(retention_days=args.retention_days)
 
-        logger.info(f"\n✅ Cleanup complete!")
+        logger.info("\n✅ Cleanup complete!")
         logger.info(f"  Deleted: {deleted_count} measurements")
 
         # Get statistics after cleanup
         if args.verbose:
             stats_after = db.get_measurement_age_stats()
-            logger.info(f"\nAfter cleanup:")
+            logger.info("\nAfter cleanup:")
             logger.info(f"  Total measurements: {stats_after['total_measurements']}")
             logger.info(
                 f"  Oldest measurement: {stats_after['oldest_measurement_age_days']} days old"

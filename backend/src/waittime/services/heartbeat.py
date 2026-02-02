@@ -5,7 +5,7 @@ Wraps the DatabaseService heartbeat methods with additional logic for stale dete
 """
 
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 
 from waittime.core import ScraperStatus
 from waittime.services.database import DatabaseService

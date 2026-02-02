@@ -222,11 +222,9 @@ def main() -> NoReturn:
     args = parser.parse_args()
 
     if args.list:
-        print("Available scrapers:")
         for source_id in SCRAPERS:
             _, source_factory = SCRAPERS[source_id]
-            source = source_factory()
-            print(f"  {source_id}: {source.name} ({source.province})")
+            source_factory()
         sys.exit(0)
 
     if args.all:

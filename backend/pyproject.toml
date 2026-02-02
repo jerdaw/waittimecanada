@@ -27,6 +27,7 @@ dev = [
     "mypy>=1.7.0",
     "pre-commit>=3.6.0",
     "types-requests>=2.31.0",
+    "types-psycopg2>=2.9.0",
 ]
 
 [build-system]

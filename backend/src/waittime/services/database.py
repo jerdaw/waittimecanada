@@ -8,10 +8,10 @@ Handles all database operations including:
 
 import logging
 import os
+from collections.abc import Generator
 from contextlib import contextmanager
-from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Generator
+from typing import Any
 
 import psycopg2
 import psycopg2.extras

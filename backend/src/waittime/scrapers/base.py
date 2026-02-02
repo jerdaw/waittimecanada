@@ -65,7 +65,7 @@ class BaseScraper(ABC):
             },
         )
 
-    def __enter__(self) -> "BaseScraper":
+    def __enter__(self) -> BaseScraper:
         return self
 
     def __exit__(self, *args: object) -> None:
