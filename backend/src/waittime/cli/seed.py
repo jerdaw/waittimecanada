@@ -213,7 +213,7 @@ Examples:
 
         # Summary
         print(f"\n{'─' * 60}")
-        print(f"Summary:")
+        print("Summary:")
         print(f"  Inserted: {inserted}")
         print(f"  Skipped:  {skipped}")
         print(f"  Total:    {len(hospitals)}")
