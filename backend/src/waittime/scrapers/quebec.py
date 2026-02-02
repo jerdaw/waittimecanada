@@ -84,26 +84,19 @@ class QuebecScraper(BaseScraper):
 
         # Try multiple parsing strategies
         # Strategy 1: Look for data table with hospital rows
-        measurements.extend(
-            self._parse_table_format(soup, payload_hash, payload_snippet)
-        )
+        measurements.extend(self._parse_table_format(soup, payload_hash, payload_snippet))
 
         # Strategy 2: Look for embedded JSON data
         if not measurements:
-            measurements.extend(
-                self._parse_json_format(soup, payload_hash, payload_snippet)
-            )
+            measurements.extend(self._parse_json_format(soup, payload_hash, payload_snippet))
 
         # Strategy 3: Look for card/list format
         if not measurements:
-            measurements.extend(
-                self._parse_card_format(soup, payload_hash, payload_snippet)
-            )
+            measurements.extend(self._parse_card_format(soup, payload_hash, payload_snippet))
 
         if not measurements:
             logger.warning(
-                f"No measurements found for {self.source.id}. "
-                "HTML structure may have changed."
+                f"No measurements found for {self.source.id}. HTML structure may have changed."
             )
 
         return measurements
@@ -121,9 +114,7 @@ class QuebecScraper(BaseScraper):
             for row in rows:
                 cells = row.find_all(["td", "th"])
                 if len(cells) >= 2:
-                    measurement = self._extract_from_row(
-                        cells, payload_hash, payload_snippet
-                    )
+                    measurement = self._extract_from_row(cells, payload_hash, payload_snippet)
                     if measurement:
                         measurements.append(measurement)
 
@@ -141,6 +132,7 @@ class QuebecScraper(BaseScraper):
             if script.string:
                 try:
                     import json
+
                     data = json.loads(script.string)
                     measurements.extend(
                         self._extract_from_json(data, payload_hash, payload_snippet)
@@ -224,9 +216,7 @@ class QuebecScraper(BaseScraper):
         if isinstance(data, list):
             for item in data:
                 if isinstance(item, dict):
-                    measurement = self._extract_from_json_item(
-                        item, payload_hash, payload_snippet
-                    )
+                    measurement = self._extract_from_json_item(item, payload_hash, payload_snippet)
                     if measurement:
                         measurements.append(measurement)
         elif isinstance(data, dict):
@@ -234,9 +224,7 @@ class QuebecScraper(BaseScraper):
             for key in ["hospitals", "data", "results", "urgences", "etablissements"]:
                 if key in data and isinstance(data[key], list):
                     measurements.extend(
-                        self._extract_from_json(
-                            data[key], payload_hash, payload_snippet
-                        )
+                        self._extract_from_json(data[key], payload_hash, payload_snippet)
                     )
 
         return measurements
@@ -326,6 +314,7 @@ class QuebecScraper(BaseScraper):
         # Generate ID from name if not in mapping (will need verification)
         # Normalize accents: ô→o, é→e, à→a, etc.
         import unicodedata
+
         normalized = unicodedata.normalize("NFKD", name)
         ascii_name = normalized.encode("ascii", "ignore").decode("ascii")
         slug = re.sub(r"[^a-z0-9]+", "-", ascii_name.lower()).strip("-")

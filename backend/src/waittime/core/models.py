@@ -149,9 +149,7 @@ def generate_divergence_brief(a: Measurement, b: Measurement) -> str | None:
     differences: list[str] = []
 
     if a.metric_family != b.metric_family:
-        differences.append(
-            f"Different metrics: {a.metric_family.value} vs {b.metric_family.value}"
-        )
+        differences.append(f"Different metrics: {a.metric_family.value} vs {b.metric_family.value}")
 
     if a.start_event != b.start_event:
         differences.append(
@@ -159,9 +157,7 @@ def generate_divergence_brief(a: Measurement, b: Measurement) -> str | None:
         )
 
     if a.end_event != b.end_event:
-        differences.append(
-            f"Different end points: {a.end_event.value} vs {b.end_event.value}"
-        )
+        differences.append(f"Different end points: {a.end_event.value} vs {b.end_event.value}")
 
     if a.statistic_type != b.statistic_type:
         differences.append(

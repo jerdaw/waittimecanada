@@ -138,7 +138,9 @@ class GeocodingService:
                 importance = result.get("importance", 0.0)
                 confidence = min(importance, 1.0)
 
-                logger.info(f"✅ Nominatim: {hospital_name} → ({latitude:.4f}, {longitude:.4f}) {city}")
+                logger.info(
+                    f"✅ Nominatim: {hospital_name} → ({latitude:.4f}, {longitude:.4f}) {city}"
+                )
 
                 return GeocodingResult(
                     latitude=latitude,
@@ -232,8 +234,16 @@ class GeocodingService:
 
         # Common Ontario cities to look for
         known_cities = [
-            "Ottawa", "Toronto", "Hamilton", "London", "Kingston",
-            "Windsor", "Mississauga", "Brampton", "Kitchener", "Waterloo"
+            "Ottawa",
+            "Toronto",
+            "Hamilton",
+            "London",
+            "Kingston",
+            "Windsor",
+            "Mississauga",
+            "Brampton",
+            "Kitchener",
+            "Waterloo",
         ]
 
         for part in parts:

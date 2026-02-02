@@ -24,9 +24,7 @@ logger = logging.getLogger(__name__)
 
 def main() -> int:
     """Run database cleanup."""
-    parser = argparse.ArgumentParser(
-        description="Clean up old measurements from the database"
-    )
+    parser = argparse.ArgumentParser(description="Clean up old measurements from the database")
     parser.add_argument(
         "--retention-days",
         type=int,
@@ -56,21 +54,15 @@ def main() -> int:
 
         logger.info("Database Statistics:")
         logger.info(f"  Total measurements: {stats_before['total_measurements']}")
-        logger.info(
-            f"  Oldest measurement: {stats_before['oldest_measurement_age_days']} days old"
-        )
-        logger.info(
-            f"  Newest measurement: {stats_before['newest_measurement_age_days']} days old"
-        )
+        logger.info(f"  Oldest measurement: {stats_before['oldest_measurement_age_days']} days old")
+        logger.info(f"  Newest measurement: {stats_before['newest_measurement_age_days']} days old")
         logger.info(
             f"  Measurements older than 30 days: {stats_before['measurements_older_than_30_days']}"
         )
 
         # Calculate what would be deleted
         if args.retention_days != 30:
-            logger.info(
-                f"\nUsing custom retention period: {args.retention_days} days"
-            )
+            logger.info(f"\nUsing custom retention period: {args.retention_days} days")
 
         if args.dry_run:
             logger.info("\n🔍 DRY RUN MODE - No data will be deleted")

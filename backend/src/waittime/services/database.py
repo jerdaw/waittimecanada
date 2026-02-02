@@ -47,8 +47,7 @@ class DatabaseService:
 
         if not self.database_url:
             raise ValueError(
-                "Database URL required. Set DATABASE_URL environment variable "
-                "or pass it directly."
+                "Database URL required. Set DATABASE_URL environment variable or pass it directly."
             )
 
     @contextmanager
@@ -64,9 +63,7 @@ class DatabaseService:
         finally:
             conn.close()
 
-    def get_cursor(
-        self, conn: psycopg2.extensions.connection
-    ) -> psycopg2.extras.RealDictCursor:
+    def get_cursor(self, conn: psycopg2.extensions.connection) -> psycopg2.extras.RealDictCursor:
         """Get a cursor that returns rows as dictionaries."""
         return conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 

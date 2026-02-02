@@ -121,9 +121,7 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
                 hospital_name = hospital_id_to_name(hospital_id)
 
             # Try to geocode using the hospital name
-            geocoding_result = geocoder.geocode_hospital(
-                hospital_name, province=source.province
-            )
+            geocoding_result = geocoder.geocode_hospital(hospital_name, province=source.province)
 
             if geocoding_result and geocoding_result.confidence > 0.8:
                 # Use geocoded data (higher confidence threshold)
@@ -154,9 +152,7 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
             )
             db.upsert_hospital(hospital)
 
-        logger.info(
-            f"✅ Geocoded {geocoded_count}/{len(unique_hospital_ids)} hospitals"
-        )
+        logger.info(f"✅ Geocoded {geocoded_count}/{len(unique_hospital_ids)} hospitals")
 
         # Step 2: Insert measurements
         count = db.insert_measurements(measurements)

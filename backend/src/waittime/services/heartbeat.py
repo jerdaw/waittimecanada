@@ -62,8 +62,7 @@ class HeartbeatService:
         )
 
         logger.info(
-            f"Heartbeat recorded for {source_id}: "
-            f"{measurements_count} measurements, status=healthy"
+            f"Heartbeat recorded for {source_id}: {measurements_count} measurements, status=healthy"
         )
 
         return status

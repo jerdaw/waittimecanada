@@ -146,16 +146,13 @@ class OntarioScraper(BaseScraper):
                 cells = row.find_all(["td", "th"])
 
                 if len(cells) >= 2:  # Need at least hospital name + wait time
-                    measurement = self._extract_from_row(
-                        cells, payload_hash, payload_snippet
-                    )
+                    measurement = self._extract_from_row(cells, payload_hash, payload_snippet)
                     if measurement:
                         measurements.append(measurement)
 
         if not measurements:
             logger.warning(
-                f"No measurements found for {self.source.id}. "
-                "HTML structure may have changed."
+                f"No measurements found for {self.source.id}. HTML structure may have changed."
             )
 
         return measurements
