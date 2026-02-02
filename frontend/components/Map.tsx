@@ -49,6 +49,57 @@ function formatRelativeTime(dateString: string | undefined): string {
   return date.toLocaleDateString();
 }
 
+// Format methodology for display
+function formatMethodology(hospital: Hospital): string {
+  if (!hospital.metric_family) return "";
+
+  const parts = [];
+
+  // Start event
+  if (hospital.start_event) {
+    const startMap: Record<string, string> = {
+      TRIAGE: "Triage",
+      REGISTRATION: "Registration",
+      DOOR: "Door",
+      UNKNOWN: "Arrival",
+    };
+    parts.push(startMap[hospital.start_event] || hospital.start_event);
+  }
+
+  // Arrow
+  parts.push("→");
+
+  // End event
+  if (hospital.end_event) {
+    const endMap: Record<string, string> = {
+      PHYSICIAN: "Physician",
+      PROVIDER: "Provider",
+      DISCHARGE: "Discharge",
+      FIRST_ASSESSMENT: "First Assessment",
+    };
+    parts.push(endMap[hospital.end_event] || hospital.end_event);
+  }
+
+  return parts.join(" ");
+}
+
+// Format statistic type for display
+function formatStatistic(statType: string | undefined): string {
+  if (!statType) return "";
+
+  const statMap: Record<string, string> = {
+    P90: "90th percentile",
+    MEAN: "Average",
+    MEDIAN: "Median",
+    P95: "95th percentile",
+    POINT_ESTIMATE: "Current estimate",
+    ROLLING_AVG: "Rolling average",
+    ALGORITHMIC: "Calculated estimate",
+  };
+
+  return statMap[statType] || statType;
+}
+
 // Custom marker component
 function HospitalMarker({
   waitTime,
@@ -212,6 +263,27 @@ function HospitalPopup({
             </div>
           )}
         </div>
+
+        {/* Methodology information */}
+        {hasData && hospital.metric_family && (
+          <div className="px-4 pb-3 border-t border-slate-100 pt-3">
+            <div className="text-xs text-slate-500 mb-1.5 font-medium">
+              METHODOLOGY
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center text-xs text-slate-600">
+                <span className="font-medium mr-1">Measure:</span>
+                <span>{formatMethodology(hospital)}</span>
+              </div>
+              {hospital.statistic_type && (
+                <div className="flex items-center text-xs text-slate-600">
+                  <span className="font-medium mr-1">Type:</span>
+                  <span>{formatStatistic(hospital.statistic_type)}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="px-4 pb-4 flex items-center justify-between text-xs text-slate-500">

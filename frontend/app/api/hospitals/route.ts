@@ -19,6 +19,12 @@ export interface Hospital {
   source_id: string;
   current_wait_time?: number; // in minutes
   last_updated?: string;
+  // Methodology fields
+  metric_family?: string;
+  start_event?: string;
+  end_event?: string;
+  statistic_type?: string;
+  patient_scope?: string;
 }
 
 export async function GET(request: Request) {
@@ -26,7 +32,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const province = searchParams.get("province");
 
-    // Query hospitals with their most recent measurement
+    // Query hospitals with their most recent measurement including methodology
     let query = `
       SELECT
         h.id,
@@ -39,10 +45,22 @@ export async function GET(request: Request) {
         h.is_visible,
         h.source_id,
         m.value as current_wait_time,
-        m.timestamp_utc as last_updated
+        m.timestamp_utc as last_updated,
+        m.metric_family,
+        m.start_event,
+        m.end_event,
+        m.statistic_type,
+        m.patient_scope
       FROM hospitals h
       LEFT JOIN LATERAL (
-        SELECT value, timestamp_utc
+        SELECT
+          value,
+          timestamp_utc,
+          metric_family,
+          start_event,
+          end_event,
+          statistic_type,
+          patient_scope
         FROM measurements
         WHERE hospital_id = h.id
         ORDER BY timestamp_utc DESC
