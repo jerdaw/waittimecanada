@@ -2,7 +2,7 @@
 
 > **Philosophy:** Vertical slices, not horizontal layers. Each milestone delivers working, shippable functionality.
 
-**Last Updated:** 2026-02-01
+**Last Updated:** 2026-02-02
 **Approach:** Iterative development, one province at a time
 **Current Phase:** Infrastructure Complete ✓ → Ontario Implementation In Progress
 
@@ -12,10 +12,10 @@
 
 | Component | Status | Tests | Coverage |
 |-----------|--------|-------|----------|
-| Backend Infrastructure | ✅ Complete | 127 tests | 67% |
-| Frontend Infrastructure | ✅ Complete | 73 tests | 100% pass |
+| Backend Infrastructure | ✅ Complete | 143 tests | 57% |
+| Frontend Infrastructure | ✅ Complete | 78 tests | 100% pass |
 | Database Schema | ✅ Complete | Migrated | Full schema |
-| Integration Tests | ✅ Complete | 14 tests | End-to-end |
+| Integration Tests | ✅ Complete | 21 tests | End-to-end |
 | Documentation | ✅ Complete | Comprehensive | Methodology docs |
 
 ---
@@ -88,25 +88,25 @@
 - [x] Verified end-to-end integration with real data
 - Status: Complete with methodology display
 
+**2.4 Comparison Feature Testing** ✅
+- [x] Created 7 integration tests for comparison service
+- [x] Tested with real Ontario hospital data (identical methodology)
+- [x] Tested with test data (different methodologies)
+- [x] Verified divergence brief generation
+- [x] Verified error handling (hospital not found, unverified)
+- [x] Created manual test script (test-comparison-api.js)
+- [x] Verified end-to-end comparison workflow
+- [x] All 143 backend tests passing (57% coverage)
+- [x] All 78 frontend tests passing
+- [x] ComparisonService: 100% coverage
+- Status: Complete with comprehensive testing
+
 ### In Progress
 
 **2.1 Ontario Scraper Production** 🔄
 - Ontario scraper functional with Playwright
 - Needs: Real URL verification and testing
 - Status: Code complete, awaiting production testing
-
-### Next Up
-
-**2.4 Comparison Feature Testing**
-- Test cross-hospital comparisons with real data
-- Verify divergence warnings work correctly
-- Test with Ontario hospitals (same methodology)
-- Test with mixed Ontario + Quebec data (different methodology)
-
-**2.4 Comparison Feature Testing**
-- Test cross-hospital comparisons
-- Verify divergence warnings work correctly
-- Test with real Ontario + Quebec data
 
 ---
 
@@ -221,18 +221,19 @@ Key decisions made:
 ## Test Statistics
 
 **Backend:**
-- Total: 136 tests passing
-- Unit tests: 122 tests (includes 9 new seed CLI tests)
-- Integration tests: 14 tests
-- Coverage: 50% overall (new CLI tools added)
+- Total: 143 tests passing
+- Unit tests: 122 tests (includes 9 seed CLI tests)
+- Integration tests: 21 tests (includes 7 comparison tests)
+- Coverage: 57% overall
+  - ComparisonService: 100%
   - Core models: 96%
-  - Services: 85-100%
+  - DatabaseService: 85%
   - Scrapers: 73-96%
   - Seed CLI: 46%
 
 **Frontend:**
 - Total: 78 tests passing
-- Unit tests: 78 tests (includes Map integration tests)
+- Unit tests: 78 tests (includes Map and Comparison tests)
 - E2E tests: Configured for CI only
 - Coverage: 100% pass rate
 
