@@ -19,34 +19,43 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Supabase client
-        run: pip install supabase
+      - name: Install database client
+        run: pip install psycopg2-binary
 
       - name: Check scraper status
         id: check
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           python - <<EOF
           import os
-          from datetime import datetime, timedelta
-          from supabase import create_client
+          import psycopg2
+          from datetime import datetime, timedelta, timezone
 
-          supabase = create_client(
-              os.getenv("SUPABASE_URL"),
-              os.getenv("SUPABASE_SERVICE_KEY")
-          )
+          conn = psycopg2.connect(os.getenv("DATABASE_URL"))
+          cur = conn.cursor()
 
           # Get latest heartbeat
-          result = supabase.table("scraper_status").select("*").order("last_run", desc=True).limit(1).execute()
+          cur.execute("""
+              SELECT last_run, status
+              FROM scraper_status
+              ORDER BY last_run DESC
+              LIMIT 1
+          """)
 
-          if not result.data:
+          result = cur.fetchone()
+          cur.close()
+          conn.close()
+
+          if not result:
               print("::set-output name=status::no_data")
               exit(1)
 
-          last_run = datetime.fromisoformat(result.data[0]["last_run"].replace("Z", "+00:00"))
-          minutes_ago = (datetime.now(last_run.tzinfo) - last_run).total_seconds() / 60
+          last_run = result[0]
+          if last_run.tzinfo is None:
+              last_run = last_run.replace(tzinfo=timezone.utc)
+
+          minutes_ago = (datetime.now(timezone.utc) - last_run).total_seconds() / 60
 
           print(f"Last scraper run: {minutes_ago:.1f} minutes ago")
 

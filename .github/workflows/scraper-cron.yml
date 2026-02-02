@@ -26,26 +26,24 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
-        working-directory: ./scrapers
+        working-directory: ./backend
         run: |
           python -m pip install --upgrade pip
           pip install -e .
 
       - name: Run scrapers
-        working-directory: ./scrapers
+        working-directory: ./backend
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           ENVIRONMENT: production
         run: |
-          python -m src.main
+          python -m waittime.cli.scraper --all
 
       - name: Check scraper health
         if: failure()
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           # Query scraper_status table for failures
           # This could trigger alerts if multiple failures detected
