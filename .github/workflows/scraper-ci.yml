@@ -100,4 +100,4 @@ jobs:
       - name: Run Bandit security scan
         uses: PyCQA/bandit-action@v1
         with:
-          path: backend/src/
+          targets: backend/src/
