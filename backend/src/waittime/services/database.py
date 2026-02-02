@@ -166,6 +166,33 @@ class DatabaseService:
                 row = cur.fetchone()
                 return self._row_to_hospital(dict(row))
 
+    def insert_hospital(self, hospital: Hospital) -> Hospital:
+        """Insert a new hospital (raises error if already exists)."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO hospitals (
+                        id, name, province, city, latitude, longitude,
+                        is_verified, is_visible, source_id
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    RETURNING *
+                    """,
+                    (
+                        hospital.id,
+                        hospital.name,
+                        hospital.province,
+                        hospital.city,
+                        hospital.latitude,
+                        hospital.longitude,
+                        hospital.is_verified,
+                        hospital.is_visible,
+                        hospital.source_id,
+                    ),
+                )
+                row = cur.fetchone()
+                return self._row_to_hospital(dict(row))
+
     def list_hospitals(
         self, province: str | None = None, visible_only: bool = False
     ) -> list[Hospital]:
@@ -182,6 +209,16 @@ class DatabaseService:
                     query += " AND is_visible = true AND is_verified = true"
 
                 cur.execute(query, params)
+                return [self._row_to_hospital(dict(row)) for row in cur.fetchall()]
+
+    def get_hospitals_by_source(self, source_id: str) -> list[Hospital]:
+        """Get all hospitals for a specific data source."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    "SELECT * FROM hospitals WHERE source_id = %s ORDER BY name",
+                    (source_id,),
+                )
                 return [self._row_to_hospital(dict(row)) for row in cur.fetchall()]
 
     def verify_hospital(self, hospital_id: str, make_visible: bool = True) -> Hospital:

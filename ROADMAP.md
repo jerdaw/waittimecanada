@@ -33,9 +33,10 @@
 - [x] BaseScraper abstract class with retry logic
 - [x] Quebec scraper (BeautifulSoup-based)
 - [x] Ontario scraper (Playwright-based for dynamic content)
-- [x] CLI tools (scraper runner, database cleanup)
+- [x] CLI tools (scraper runner, database cleanup, seeding)
+- [x] Data seeding system (sources, hospitals, test data)
 - [x] Data retention policy (30-day cleanup)
-- [x] Unit tests: 113 passing, high coverage
+- [x] Unit tests: 122 passing, 50% coverage
 - [x] Integration tests: 14 passing, full stack verification
 
 **Frontend**
@@ -65,6 +66,18 @@
 
 ## Current Focus: Ontario Implementation
 
+### Completed
+
+**2.2 Hospital Data Seeding** ✅
+- [x] Created seed data format (JSON)
+- [x] Built CLI tools for seeding sources and hospitals
+- [x] Seeded Ontario source (ontario-health)
+- [x] Seeded 213 Ontario hospitals
+- [x] Generated 530 test measurements
+- [x] Added 9 unit tests for seeding functionality
+- [x] Comprehensive seeding documentation
+- Status: Complete with tooling and test data
+
 ### In Progress
 
 **2.1 Ontario Scraper Production** 🔄
@@ -72,17 +85,13 @@
 - Needs: Real URL verification and testing
 - Status: Code complete, awaiting production testing
 
-**2.2 Hospital Data Seeding**
-- Need to seed verified Ontario hospitals
-- Need to run scrapers and populate measurements
-- Status: Database ready, awaiting data
-
 ### Next Up
 
 **2.3 Frontend Map Integration**
 - Connect frontend map to database
 - Display Ontario hospitals with real data
 - Show methodology tags on popups
+- Test with 213 seeded hospitals
 
 **2.4 Comparison Feature Testing**
 - Test cross-hospital comparisons
@@ -202,13 +211,14 @@ Key decisions made:
 ## Test Statistics
 
 **Backend:**
-- Total: 127 tests passing
-- Unit tests: 113 tests
+- Total: 136 tests passing
+- Unit tests: 122 tests (includes 9 new seed CLI tests)
 - Integration tests: 14 tests
-- Coverage: 67% overall
+- Coverage: 50% overall (new CLI tools added)
   - Core models: 96%
   - Services: 85-100%
   - Scrapers: 73-96%
+  - Seed CLI: 46%
 
 **Frontend:**
 - Total: 73 tests passing

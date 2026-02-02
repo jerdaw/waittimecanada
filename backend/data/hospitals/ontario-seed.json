@@ -1,0 +1,85 @@
+{
+  "source_id": "ontario-health",
+  "hospitals": [
+    {
+      "id": "ca-on-ottawa-civic",
+      "name": "The Ottawa Hospital - Civic Campus",
+      "province": "ON",
+      "city": "Ottawa",
+      "latitude": 45.3982,
+      "longitude": -75.7370,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-on-ottawa-general",
+      "name": "The Ottawa Hospital - General Campus",
+      "province": "ON",
+      "city": "Ottawa",
+      "latitude": 45.4033,
+      "longitude": -75.6578,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-on-queensway-carleton",
+      "name": "Queensway Carleton Hospital",
+      "province": "ON",
+      "city": "Ottawa",
+      "latitude": 45.3181,
+      "longitude": -75.7869,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-on-montfort",
+      "name": "Montfort Hospital",
+      "province": "ON",
+      "city": "Ottawa",
+      "latitude": 45.4389,
+      "longitude": -75.6370,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-on-toronto-general",
+      "name": "Toronto General Hospital",
+      "province": "ON",
+      "city": "Toronto",
+      "latitude": 43.6590,
+      "longitude": -79.3876,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-on-michael-garron",
+      "name": "Michael Garron Hospital",
+      "province": "ON",
+      "city": "Toronto",
+      "latitude": 43.6886,
+      "longitude": -79.3177,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-on-north-york-general",
+      "name": "North York General Hospital",
+      "province": "ON",
+      "city": "Toronto",
+      "latitude": 43.7675,
+      "longitude": -79.4144,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-on-sunnybrook",
+      "name": "Sunnybrook Health Sciences Centre",
+      "province": "ON",
+      "city": "Toronto",
+      "latitude": 43.7233,
+      "longitude": -79.3764,
+      "is_verified": true,
+      "is_visible": true
+    }
+  ]
+}
