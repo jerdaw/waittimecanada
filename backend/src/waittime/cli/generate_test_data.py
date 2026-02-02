@@ -28,9 +28,7 @@ from waittime.services.database import DatabaseService
 logger = logging.getLogger(__name__)
 
 
-def generate_measurement_for_hospital(
-    hospital_id: str, source_id: str
-) -> Measurement:
+def generate_measurement_for_hospital(hospital_id: str, source_id: str) -> Measurement:
     """Generate a synthetic measurement for a hospital.
 
     Args:
@@ -85,9 +83,7 @@ def generate_test_data(
         logger.error(f"No hospitals found for source: {source_id}")
         return 0
 
-    logger.info(
-        f"Generating {count} measurement(s) for {len(hospitals)} hospital(s)..."
-    )
+    logger.info(f"Generating {count} measurement(s) for {len(hospitals)} hospital(s)...")
 
     total_generated = 0
 
@@ -96,9 +92,7 @@ def generate_test_data(
             measurement = generate_measurement_for_hospital(hospital.id, source_id)
 
             if dry_run:
-                logger.info(
-                    f"[DRY RUN] Would insert: {hospital.id} - {measurement.value:.0f} min"
-                )
+                logger.info(f"[DRY RUN] Would insert: {hospital.id} - {measurement.value:.0f} min")
             else:
                 db.insert_measurement(measurement)
                 logger.info(
@@ -165,9 +159,7 @@ Examples:
         if args.dry_run:
             logger.info("[DRY RUN MODE - No changes will be made]\n")
 
-        generated = generate_test_data(
-            db, args.source, count=args.count, dry_run=args.dry_run
-        )
+        generated = generate_test_data(db, args.source, count=args.count, dry_run=args.dry_run)
 
         print(f"\n{'─' * 60}")
         print(f"✓ Generated {generated} test measurements")

@@ -88,9 +88,7 @@ def seed_hospitals(
             # Check if hospital already exists
             existing = db.get_hospital(hospital.id)
             if existing:
-                logger.warning(
-                    f"Hospital {hospital.id} already exists, skipping"
-                )
+                logger.warning(f"Hospital {hospital.id} already exists, skipping")
                 skipped += 1
                 continue
 
@@ -123,9 +121,7 @@ def list_hospitals_by_source(db: DatabaseService, source_id: str) -> None:
     for hospital in hospitals:
         status = "✓ visible" if hospital.is_visible else "○ hidden"
         verified = "✓" if hospital.is_verified else "✗"
-        print(
-            f"  [{verified}] {hospital.id:<30} {hospital.name:<50} {status}"
-        )
+        print(f"  [{verified}] {hospital.id:<30} {hospital.name:<50} {status}")
 
 
 def main() -> int:
