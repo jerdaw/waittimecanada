@@ -25,6 +25,9 @@ export interface Hospital {
   end_event?: string;
   statistic_type?: string;
   patient_scope?: string;
+  // Telehealth fields (from sources)
+  telehealth_name?: string;
+  telehealth_number?: string;
 }
 
 export async function GET(request: Request) {
@@ -32,7 +35,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const province = searchParams.get("province");
 
-    // Query hospitals with their most recent measurement including methodology
+    // Query hospitals with their most recent measurement including methodology and telehealth info
     let query = `
       SELECT
         h.id,
@@ -44,6 +47,8 @@ export async function GET(request: Request) {
         h.is_verified,
         h.is_visible,
         h.source_id,
+        s.telehealth_name,
+        s.telehealth_number,
         m.value as current_wait_time,
         m.timestamp_utc as last_updated,
         m.metric_family,
@@ -52,6 +57,7 @@ export async function GET(request: Request) {
         m.statistic_type,
         m.patient_scope
       FROM hospitals h
+      LEFT JOIN sources s ON s.id = h.source_id
       LEFT JOIN LATERAL (
         SELECT
           value,

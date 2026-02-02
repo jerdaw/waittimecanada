@@ -285,6 +285,51 @@ function HospitalPopup({
           </div>
         )}
 
+        {/* Telehealth information */}
+        {hospital.telehealth_name && hospital.telehealth_number && (
+          <div className="px-4 pb-3 border-t border-slate-100 pt-3">
+            <div className="flex items-start gap-2">
+              <div className="flex-shrink-0 mt-0.5">
+                <svg
+                  className="w-4 h-4 text-blue-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <div className="text-xs text-slate-600 mb-1">
+                  <span className="font-medium">Need medical advice?</span>
+                </div>
+                <div className="text-xs text-slate-900">
+                  Call <span className="font-semibold">{hospital.telehealth_name}</span>
+                </div>
+                <a
+                  href={`tel:${hospital.telehealth_number}`}
+                  className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700 mt-1"
+                >
+                  {hospital.telehealth_number}
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Footer */}
         <div className="px-4 pb-4 flex items-center justify-between text-xs text-slate-500">
           <span>Updated {formatRelativeTime(hospital.last_updated)}</span>

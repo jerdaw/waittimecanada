@@ -13,7 +13,7 @@
 | Component | Status | Tests | Coverage |
 |-----------|--------|-------|----------|
 | Backend Infrastructure | ✅ Complete | 143 tests | 57% |
-| Frontend Infrastructure | ✅ Complete | 78 tests | 100% pass |
+| Frontend Infrastructure | ✅ Complete | 79 tests | 100% pass |
 | Database Schema | ✅ Complete | Migrated | Full schema |
 | Integration Tests | ✅ Complete | 21 tests | End-to-end |
 | Documentation | ✅ Complete | Comprehensive | Methodology docs |
@@ -140,15 +140,15 @@
 
 ---
 
-## Milestone 5: Polish & Documentation (Pending)
+## Milestone 5: Polish & Documentation (In Progress)
 
 **Goal:** Portfolio-ready presentation
 
 ### Tasks
 
-- [ ] **5.1** Create public `/methods` page
-- [ ] **5.2** Display comparability matrix
-- [ ] **5.3** Add telehealth routing information
+- [x] **5.1** Create public `/methods` page ✅ (Already implemented)
+- [x] **5.2** Display comparability matrix ✅ (Already implemented)
+- [x] **5.3** Add telehealth routing information ✅ (Complete - Feb 2)
 - [ ] **5.4** Update README with live site URL
 - [ ] **5.5** Write LinkedIn launch post
 - [ ] **5.6** Final review of all documentation
@@ -232,8 +232,8 @@ Key decisions made:
   - Seed CLI: 46%
 
 **Frontend:**
-- Total: 78 tests passing
-- Unit tests: 78 tests (includes Map and Comparison tests)
+- Total: 79 tests passing
+- Unit tests: 79 tests (includes Map, Comparison, and Telehealth tests)
 - E2E tests: Configured for CI only
 - Coverage: 100% pass rate
 
