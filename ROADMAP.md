@@ -4,8 +4,9 @@
 
 **Last Updated:** 2026-02-02
 **Milestone 5:** ✅ Complete - Ready for Production Deployment
+**Milestone 3:** 📋 Planning - Deployment Decisions Required
 **Approach:** Iterative development, one province at a time
-**Current Phase:** Infrastructure Complete ✓ → Ontario Implementation In Progress
+**Current Phase:** Documentation Complete ✓ → Production Deployment Planning
 
 ---
 
@@ -111,19 +112,31 @@
 
 ---
 
-## Milestone 3: Production Deployment (Pending)
+## Milestone 3: Production Deployment 📋 (Planning)
 
 **Goal:** Automated scraping and public frontend
+**Planning Document:** [docs/production-deployment-plan.md](docs/production-deployment-plan.md)
 
-### Tasks
+### Infrastructure Already Built
+- [x] **Backend:** GitHub Actions scraper cron configured (15-minute schedule)
+- [x] **Monitoring:** Heartbeat monitor workflow configured (hourly checks)
+- [x] **Alerts:** Failure notification workflow configured (email alerts)
+- [x] **Database:** Neon PostgreSQL in production
+- [x] **Frontend:** Next.js 14 application ready to deploy
 
-- [ ] **3.1** Configure DATABASE_URL secret in GitHub
-- [ ] **3.2** Update GitHub Actions for scraper cron (15-minute schedule)
-- [ ] **3.3** Deploy frontend to Vercel
-- [ ] **3.4** Configure environment variables (MAPBOX_TOKEN, DATABASE_URL)
-- [ ] **3.5** Monitor first 24 hours for errors
-- [ ] **3.6** Set up heartbeat stale checks
-- [ ] **3.7** Configure failure notifications
+### Decisions Required (See Planning Doc)
+- [ ] **Platform Selection:** Choose frontend hosting (Vercel/Netlify/Railway/Other)
+- [ ] **Domain:** Default platform domain or custom domain?
+- [ ] **Alerts:** Configure email notifications or GitHub Actions only?
+- [ ] **Monitoring:** Enable platform analytics/Sentry?
+
+### After Decisions Made
+- [ ] **3.1** Add DATABASE_URL secret to GitHub repository
+- [ ] **3.2** Deploy frontend to chosen platform
+- [ ] **3.3** Configure environment variables (MAPBOX_TOKEN, DATABASE_URL)
+- [ ] **3.4** Verify deployment (frontend, API, scrapers)
+- [ ] **3.5** Monitor first 24-48 hours for errors
+- [ ] **3.6** Update README and LinkedIn post with live URL
 
 ---
 
