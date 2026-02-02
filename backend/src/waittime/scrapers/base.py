@@ -4,15 +4,22 @@ All provincial scrapers inherit from BaseScraper and implement
 the parse() method to extract measurements from their data source.
 """
 
+from __future__ import annotations
+
 import hashlib
 import logging
 from abc import ABC, abstractmethod
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from waittime.core import Measurement, Source
+
+if TYPE_CHECKING:
+    from waittime.services.database import DatabaseService
+    from waittime.services.heartbeat import HeartbeatService
 
 logger = logging.getLogger(__name__)
 
@@ -27,15 +34,30 @@ class BaseScraper(ABC):
     - HTTP fetching with retries
     - Payload hashing (for storage safety)
     - Error handling and logging
+    - Heartbeat recording (when db is provided)
     """
 
-    def __init__(self, source: Source) -> None:
+    def __init__(
+        self,
+        source: Source,
+        db: DatabaseService | None = None,
+    ) -> None:
         """Initialize scraper with source configuration.
 
         Args:
             source: Provincial data source configuration
+            db: Optional DatabaseService for persistence and heartbeat recording
         """
         self.source = source
+        self.db = db
+        self._heartbeat: HeartbeatService | None = None
+
+        # Initialize heartbeat service if database is provided
+        if db is not None:
+            from waittime.services.heartbeat import HeartbeatService
+
+            self._heartbeat = HeartbeatService(db)
+
         self.client = httpx.Client(
             timeout=30.0,
             headers={
@@ -116,25 +138,52 @@ class BaseScraper(ABC):
         """
         return content[:max_length]
 
-    def run(self) -> list[Measurement]:
-        """Execute full scrape cycle: fetch → parse → return.
+    def run(self, save_to_db: bool = True) -> list[Measurement]:
+        """Execute full scrape cycle: fetch → parse → save → heartbeat.
+
+        Args:
+            save_to_db: If True and db is configured, save measurements to database
 
         Returns:
             List of parsed measurements
 
         Raises:
-            Exception: If fetch or parse fails
+            Exception: If fetch or parse fails (heartbeat records the failure)
         """
         logger.info(f"Starting scrape for {self.source.id}")
         start_time = datetime.now(UTC)
 
-        html = self.fetch()
-        measurements = self.parse(html)
+        try:
+            html = self.fetch()
+            measurements = self.parse(html)
 
-        elapsed = (datetime.now(UTC) - start_time).total_seconds()
-        logger.info(
-            f"Completed scrape for {self.source.id}: "
-            f"{len(measurements)} measurements in {elapsed:.2f}s"
-        )
+            # Save measurements to database if configured
+            if save_to_db and self.db is not None and measurements:
+                self.db.insert_measurements(measurements)
+                logger.info(f"Saved {len(measurements)} measurements to database")
 
-        return measurements
+            # Record successful heartbeat
+            if self._heartbeat is not None:
+                self._heartbeat.record_success(
+                    source_id=self.source.id,
+                    measurements_count=len(measurements),
+                )
+
+            elapsed = (datetime.now(UTC) - start_time).total_seconds()
+            logger.info(
+                f"Completed scrape for {self.source.id}: "
+                f"{len(measurements)} measurements in {elapsed:.2f}s"
+            )
+
+            return measurements
+
+        except Exception as e:
+            # Record failure heartbeat
+            if self._heartbeat is not None:
+                self._heartbeat.record_failure(
+                    source_id=self.source.id,
+                    error_message=str(e),
+                )
+
+            logger.error(f"Scrape failed for {self.source.id}: {e}")
+            raise

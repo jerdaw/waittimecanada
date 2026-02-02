@@ -1,0 +1,46 @@
+name: Database Cleanup
+
+# Run daily at 2 AM UTC to clean up old measurements (30-day retention policy)
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          pip install -e .
+
+      - name: Run database cleanup
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python -m waittime.cli.cleanup --verbose
+
+      - name: Report cleanup results
+        if: success()
+        run: |
+          echo "✅ Database cleanup completed successfully"
+          echo "Old measurements (>30 days) have been purged"
+          echo "This maintains our storage safety policy"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Database cleanup failed!"
+          echo "Manual investigation required"

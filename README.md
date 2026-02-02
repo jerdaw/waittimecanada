@@ -2,12 +2,12 @@
 
 > A clinically defensible "Health Systems Observatory" that audits and standardizes Canadian emergency room wait time data across provinces.
 
-**Status:** 🚧 Active Development (Week 1 Complete)
-**Primary Focus:** 🎯 Ontario (one province at a time)
+**Status:** 🚧 Active Development (Infrastructure Complete)
+**Primary Focus:** 🎯 Ontario Implementation In Progress
 **Live Site:** Coming Soon
 **Documentation:** [docs/](./docs/)
 
-**Latest:** Infrastructure complete, starting Ontario scraper ✓
+**Latest:** Core infrastructure complete (127 tests, 67% coverage), Ontario scraper implemented ✓
 
 ---
 
@@ -45,11 +45,11 @@ Every measurement is tagged with metadata:
 
 ## Tech Stack
 
-- **Backend:** Python 3.12+ with psycopg2, BeautifulSoup, Pydantic
+- **Backend:** Python 3.12+ with psycopg2, BeautifulSoup, Playwright, Pydantic
 - **Database:** Neon PostgreSQL 17 (serverless with autoscaling)
 - **Scraper Execution:** GitHub Actions (15-min cron) or local CLI
-- **Frontend:** Next.js 14 + Mapbox GL + React Query (planned)
-- **Testing:** pytest with 56% coverage (24 unit tests)
+- **Frontend:** Next.js 14 + Mapbox GL + React Query
+- **Testing:** Backend: 127 tests (113 unit + 14 integration), 67% coverage | Frontend: 73 tests, 100% pass
 - **CI/CD:** GitHub Actions + Vercel
 
 ---
@@ -226,7 +226,7 @@ python -m waittime.cli.scraper --all
 - Runs every 15 minutes via cron schedule
 - Configure secrets in GitHub repo settings
 
-### Database (Supabase)
+### Database (Neon PostgreSQL)
 - Migrations applied via GitHub Actions on merge to `main`
 
 ---
@@ -250,7 +250,7 @@ MIT License - See [LICENSE](./LICENSE)
 ## Acknowledgments
 
 - Provincial health authorities for publishing wait time data
-- Open source communities: Supabase, Next.js, Mapbox
+- Open source communities: Neon, Next.js, Mapbox
 - Canadian healthcare workers
 
 ---

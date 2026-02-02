@@ -89,6 +89,41 @@ class DatabaseService:
                 cur.execute("SELECT * FROM sources")
                 return [self._row_to_source(dict(row)) for row in cur.fetchall()]
 
+    def upsert_source(self, source: Source) -> Source:
+        """Insert or update a source."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO sources (
+                        id, name, province, url, methodology_url,
+                        telehealth_name, telehealth_number,
+                        default_metric_family, default_start_event,
+                        default_end_event, default_statistic_type
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (id) DO UPDATE SET
+                        name = EXCLUDED.name,
+                        url = EXCLUDED.url,
+                        updated_at = NOW()
+                    RETURNING *
+                    """,
+                    (
+                        source.id,
+                        source.name,
+                        source.province,
+                        source.url,
+                        source.methodology_url,
+                        source.telehealth_name,
+                        source.telehealth_number,
+                        source.default_metric_family.value,
+                        source.default_start_event.value,
+                        source.default_end_event.value,
+                        source.default_statistic_type.value,
+                    ),
+                )
+                row = cur.fetchone()
+                return self._row_to_source(dict(row))
+
     # ─────────────────────────────────────────────────────────────────
     # Hospitals
     # ─────────────────────────────────────────────────────────────────
@@ -255,6 +290,81 @@ class DatabaseService:
                 )
                 row = cur.fetchone()
                 return self._row_to_measurement(dict(row)) if row else None
+
+    def cleanup_old_measurements(self, retention_days: int = 30) -> int:
+        """Delete measurements older than retention period.
+
+        IMPORTANT: This implements the storage safety policy from strategic plan.
+        We only keep raw measurements for retention_days, then delete them to prevent
+        database bloat. Aggregated analytics should be computed before deletion.
+
+        Args:
+            retention_days: Number of days to retain raw measurements (default: 30)
+
+        Returns:
+            Number of measurements deleted
+
+        Example:
+            >>> db = DatabaseService()
+            >>> deleted = db.cleanup_old_measurements(retention_days=30)
+            >>> logger.info(f"Deleted {deleted} old measurements")
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    DELETE FROM measurements
+                    WHERE timestamp_utc < NOW() - INTERVAL '%s days'
+                    """,
+                    (retention_days,),
+                )
+                deleted_count = cur.rowcount
+                logger.info(
+                    f"Cleaned up {deleted_count} measurements older than {retention_days} days"
+                )
+                return deleted_count
+
+    def get_measurement_age_stats(self) -> dict[str, Any]:
+        """Get statistics about measurement ages for monitoring retention policy.
+
+        Returns:
+            Dict with oldest_measurement_age_days, newest_measurement_age_days,
+            total_measurements, and measurements_older_than_30_days
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT
+                        EXTRACT(EPOCH FROM (NOW() - MIN(timestamp_utc))) / 86400 as oldest_age_days,
+                        EXTRACT(EPOCH FROM (NOW() - MAX(timestamp_utc))) / 86400 as newest_age_days,
+                        COUNT(*) as total_measurements,
+                        COUNT(*) FILTER (
+                            WHERE timestamp_utc < NOW() - INTERVAL '30 days'
+                        ) as measurements_older_than_30_days
+                    FROM measurements
+                    """
+                )
+                row = cur.fetchone()
+
+                if not row or row["total_measurements"] == 0:
+                    return {
+                        "oldest_measurement_age_days": None,
+                        "newest_measurement_age_days": None,
+                        "total_measurements": 0,
+                        "measurements_older_than_30_days": 0,
+                    }
+
+                return {
+                    "oldest_measurement_age_days": round(float(row["oldest_age_days"]), 1)
+                    if row["oldest_age_days"]
+                    else None,
+                    "newest_measurement_age_days": round(float(row["newest_age_days"]), 1)
+                    if row["newest_age_days"]
+                    else None,
+                    "total_measurements": row["total_measurements"],
+                    "measurements_older_than_30_days": row["measurements_older_than_30_days"],
+                }
 
     # ─────────────────────────────────────────────────────────────────
     # Scraper Status (Heartbeat)

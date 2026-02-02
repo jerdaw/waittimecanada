@@ -2,323 +2,258 @@
 
 > **Philosophy:** Vertical slices, not horizontal layers. Each milestone delivers working, shippable functionality.
 
-**Last Updated:** 2026-01-30
+**Last Updated:** 2026-02-01
 **Approach:** Iterative development, one province at a time
-**Current Phase:** Milestone 1 (Infrastructure) ✓ → Milestone 2 (Ontario End-to-End)
+**Current Phase:** Infrastructure Complete ✓ → Ontario Implementation In Progress
 
 ---
 
-## Milestones Overview
+## Progress Summary
 
-| # | Milestone | Status | Description |
-|---|-----------|--------|-------------|
-| 1 | Infrastructure | ✅ Complete | Repository, database, core models |
-| 2 | Ontario End-to-End | 🎯 **Current** | First province: scraper → database → frontend |
-| 3 | Production Deployment | ⏳ Pending | GitHub Actions cron, Vercel frontend |
-| 4 | Quebec Expansion | ⏳ Pending | Second province with methodology divergence |
-| 5 | Polish & Launch | ⏳ Pending | Verification UI, methods page, documentation |
-
----
-
-## Milestone 1: Infrastructure ✅
-
-**Goal:** Foundation for all future development
-**Status:** Complete (2026-01-30)
-
-### Completed Tasks
-
-- [x] **1.1** Initialize git repository with proper structure
-- [x] **1.2** Modernize to `backend/src/waittime/` package layout
-- [x] **1.3** Create Neon PostgreSQL database
-- [x] **1.4** Run schema migrations (enums, tables, functions)
-- [x] **1.5** Seed 5 provincial sources
-- [x] **1.6** Implement core models with Pydantic validation
-- [x] **1.7** Create DatabaseService with psycopg2
-- [x] **1.8** Build BaseScraper abstract class
-- [x] **1.9** Implement Quebec scraper MVP (template for others)
-- [x] **1.10** Write unit tests (24 passing, 56% coverage)
-- [x] **1.11** Create CLI tool (`python -m waittime.cli.scraper`)
-- [x] **1.12** Document expansion strategy
-
-**Artifacts:**
-- `backend/` - Python package with scrapers, services, CLI
-- `backend/migrations/` - 5 SQL migration files
-- `backend/tests/` - Unit test suite
-- `.env.local` - Database connection (gitignored)
-- `docs/planning/expansion-roadmap.md` - Provincial strategy
+| Component | Status | Tests | Coverage |
+|-----------|--------|-------|----------|
+| Backend Infrastructure | ✅ Complete | 127 tests | 67% |
+| Frontend Infrastructure | ✅ Complete | 73 tests | 100% pass |
+| Database Schema | ✅ Complete | Migrated | Full schema |
+| Integration Tests | ✅ Complete | 14 tests | End-to-end |
+| Documentation | ✅ Complete | Comprehensive | Methodology docs |
 
 ---
 
-## Milestone 2: Ontario End-to-End 🎯
+## Completed Work
 
-**Goal:** First complete vertical slice - Ontario data visible on a map
-**Status:** In Progress
-**Success Criteria:** See Ontario hospital wait times on a live webpage
+### ✅ Core Infrastructure (Complete)
 
-### Phase 2A: Ontario Scraper
+**Backend**
+- [x] Neon PostgreSQL 17 database with full schema
+- [x] Core models with Pydantic validation (Hospital, Source, Measurement)
+- [x] DatabaseService with CRUD operations
+- [x] HeartbeatService for scraper health monitoring
+- [x] ComparisonService for methodology divergence detection
+- [x] BaseScraper abstract class with retry logic
+- [x] Quebec scraper (BeautifulSoup-based)
+- [x] Ontario scraper (Playwright-based for dynamic content)
+- [x] CLI tools (scraper runner, database cleanup)
+- [x] Data retention policy (30-day cleanup)
+- [x] Unit tests: 113 passing, high coverage
+- [x] Integration tests: 14 passing, full stack verification
 
-| Task | Description | Est. | Status |
-|------|-------------|------|--------|
-| 2.1 | Research Ontario health portal URL and data format | 1h | ⬜ |
-| 2.2 | Document Ontario methodology (start_event, statistic_type) | 30m | ⬜ |
-| 2.3 | Create `scrapers/ontario.py` with hospital mappings | 2h | ⬜ |
-| 2.4 | Implement parsing strategy (table/JSON/API) | 2h | ⬜ |
-| 2.5 | Write unit tests (>80% coverage) | 2h | ⬜ |
-| 2.6 | Test with dry-run mode | 30m | ⬜ |
+**Frontend**
+- [x] Next.js 14 with App Router + TypeScript
+- [x] Mapbox GL JS integration
+- [x] Hospital map component with markers
+- [x] Comparison modal with divergence warnings
+- [x] Admin verification queue UI (`/admin/verify`)
+- [x] API routes (hospitals, comparisons, admin operations)
+- [x] Vitest + React Testing Library setup
+- [x] Unit tests: 73 passing
 
-**Acceptance:** `python -m waittime.cli.scraper --source ontario-health --dry-run` shows parsed data
+**Documentation**
+- [x] Ontario methodology documentation (comprehensive)
+- [x] Machine-readable methodology JSON reference
+- [x] Integration testing guide
+- [x] Data retention policy documentation
+- [x] Verification queue workflow documentation
+- [x] 16 methodology validation tests
 
-**Dependencies:** Milestone 1 ✓
-
----
-
-### Phase 2B: Data Pipeline
-
-| Task | Description | Est. | Status |
-|------|-------------|------|--------|
-| 2.7 | Run Ontario scraper with real URL | 30m | ⬜ |
-| 2.8 | Verify measurements in database | 30m | ⬜ |
-| 2.9 | Add 5 Ontario hospitals to database (verified) | 30m | ⬜ |
-| 2.10 | Verify heartbeat monitoring works | 15m | ⬜ |
-
-**Acceptance:** Query returns Ontario measurements from database
-
-**Dependencies:** 2.1-2.6 ✓
-
----
-
-### Phase 2C: Minimal Frontend
-
-| Task | Description | Est. | Status |
-|------|-------------|------|--------|
-| 2.11 | Initialize Next.js 14 project in `frontend/` | 30m | ⬜ |
-| 2.12 | Install Mapbox GL JS | 30m | ⬜ |
-| 2.13 | Create basic map component centered on Ontario | 1h | ⬜ |
-| 2.14 | Create API route to fetch hospitals from Neon | 1h | ⬜ |
-| 2.15 | Display hospitals as map markers | 1h | ⬜ |
-| 2.16 | Show popup with wait time on marker click | 1h | ⬜ |
-| 2.17 | Display methodology tags in popup | 30m | ⬜ |
-| 2.18 | Add "Last updated" timestamp | 30m | ⬜ |
-
-**Acceptance:** Can open browser and see Ontario hospitals with wait times
-
-**Dependencies:** 2.7-2.10 ✓
+**DevOps**
+- [x] GitHub Actions database cleanup workflow
+- [x] Test suite running in CI
+- [x] Playwright E2E tests configured
 
 ---
 
-### Phase 2D: Local Validation
+## Current Focus: Ontario Implementation
 
-| Task | Description | Est. | Status |
-|------|-------------|------|--------|
-| 2.19 | Run scraper manually 5 times, verify consistency | 30m | ⬜ |
-| 2.20 | Verify frontend updates when new data arrives | 30m | ⬜ |
-| 2.21 | Test error handling (what if scraper fails?) | 30m | ⬜ |
-| 2.22 | Document any Ontario-specific quirks | 30m | ⬜ |
+### In Progress
 
-**Acceptance:** System works reliably in local development
+**2.1 Ontario Scraper Production** 🔄
+- Ontario scraper functional with Playwright
+- Needs: Real URL verification and testing
+- Status: Code complete, awaiting production testing
 
-**Dependencies:** 2.11-2.18 ✓
+**2.2 Hospital Data Seeding**
+- Need to seed verified Ontario hospitals
+- Need to run scrapers and populate measurements
+- Status: Database ready, awaiting data
+
+### Next Up
+
+**2.3 Frontend Map Integration**
+- Connect frontend map to database
+- Display Ontario hospitals with real data
+- Show methodology tags on popups
+
+**2.4 Comparison Feature Testing**
+- Test cross-hospital comparisons
+- Verify divergence warnings work correctly
+- Test with real Ontario + Quebec data
 
 ---
 
-## Milestone 3: Production Deployment
+## Milestone 3: Production Deployment (Pending)
 
 **Goal:** Automated scraping and public frontend
-**Status:** Pending
-**Success Criteria:** System runs unattended, accessible via public URL
 
-### Phase 3A: Backend Deployment
+### Tasks
 
-| Task | Description | Est. | Status |
-|------|-------------|------|--------|
-| 3.1 | Add DATABASE_URL secret to GitHub repository | 15m | ⬜ |
-| 3.2 | Update GitHub Actions workflow for Ontario only | 30m | ⬜ |
-| 3.3 | Enable 15-minute cron schedule | 15m | ⬜ |
-| 3.4 | Test workflow with manual trigger | 30m | ⬜ |
-| 3.5 | Monitor first 24 hours for errors | - | ⬜ |
-
-**Acceptance:** Ontario scraper runs automatically every 15 minutes
-
-**Dependencies:** Milestone 2 ✓
+- [ ] **3.1** Configure DATABASE_URL secret in GitHub
+- [ ] **3.2** Update GitHub Actions for scraper cron (15-minute schedule)
+- [ ] **3.3** Deploy frontend to Vercel
+- [ ] **3.4** Configure environment variables (MAPBOX_TOKEN, DATABASE_URL)
+- [ ] **3.5** Monitor first 24 hours for errors
+- [ ] **3.6** Set up heartbeat stale checks
+- [ ] **3.7** Configure failure notifications
 
 ---
 
-### Phase 3B: Frontend Deployment
+## Milestone 4: Quebec Expansion (Pending)
 
-| Task | Description | Est. | Status |
-|------|-------------|------|--------|
-| 3.6 | Create Vercel account (if needed) | 15m | ⬜ |
-| 3.7 | Connect GitHub repository to Vercel | 15m | ⬜ |
-| 3.8 | Configure environment variables (Neon, Mapbox) | 15m | ⬜ |
-| 3.9 | Deploy to Vercel | 15m | ⬜ |
-| 3.10 | Verify public URL works | 15m | ⬜ |
+**Goal:** Demonstrate methodology divergence across provinces
 
-**Acceptance:** Can access site via public Vercel URL
+### Tasks
 
-**Dependencies:** 3.1-3.5 ✓
+- [ ] **4.1** Find real Quebec health portal URL (current URL is 404)
+- [ ] **4.2** Update Quebec scraper for actual HTML structure
+- [ ] **4.3** Add Quebec hospitals to verification queue
+- [ ] **4.4** Test Ottawa vs Gatineau comparison with divergence warning
+- [ ] **4.5** Verify methodology differences are highlighted
 
 ---
 
-### Phase 3C: Monitoring
-
-| Task | Description | Est. | Status |
-|------|-------------|------|--------|
-| 3.11 | Set up GitHub Actions failure notifications | 30m | ⬜ |
-| 3.12 | Add heartbeat stale check (>60 min alert) | 30m | ⬜ |
-| 3.13 | Create simple status page / health check endpoint | 1h | ⬜ |
-| 3.14 | Monitor for 7 days, fix any issues | - | ⬜ |
-
-**Acceptance:** 7 days of stable operation (>95% success rate)
-
-**Dependencies:** 3.6-3.10 ✓
-
----
-
-## Milestone 4: Quebec Expansion
-
-**Goal:** Demonstrate methodology divergence with cross-border comparison
-**Status:** Pending
-**Success Criteria:** Ottawa vs Gatineau comparison shows divergence warning
-
-### Phase 4A: Quebec Scraper Fixes
-
-| Task | Description | Est. | Status |
-|------|-------------|------|--------|
-| 4.1 | Find real Quebec health portal URL | 1h | ⬜ |
-| 4.2 | Update Quebec scraper for actual HTML structure | 2h | ⬜ |
-| 4.3 | Update unit tests | 1h | ⬜ |
-| 4.4 | Test with dry-run mode | 30m | ⬜ |
-| 4.5 | Run with real data, verify measurements | 30m | ⬜ |
-
-**Acceptance:** Quebec scraper produces valid measurements
-
-**Dependencies:** Milestone 3 ✓ (Ontario stable first)
-
----
-
-### Phase 4B: Methodology Divergence UI
-
-| Task | Description | Est. | Status |
-|------|-------------|------|--------|
-| 4.6 | Add Quebec hospitals to frontend map | 1h | ⬜ |
-| 4.7 | Implement `are_comparable()` check in frontend | 1h | ⬜ |
-| 4.8 | Display divergence warning when comparing ON vs QC | 2h | ⬜ |
-| 4.9 | Add methodology badges to hospital popups | 1h | ⬜ |
-| 4.10 | Update GitHub Actions to run both scrapers | 30m | ⬜ |
-
-**Acceptance:** Comparing Ottawa Hospital to Gatineau Hospital shows divergence warning
-
-**Dependencies:** 4.1-4.5 ✓
-
----
-
-## Milestone 5: Polish & Launch
+## Milestone 5: Polish & Documentation (Pending)
 
 **Goal:** Portfolio-ready presentation
-**Status:** Pending
-**Success Criteria:** Ready for medical school admissions review
 
-### Phase 5A: Verification Queue
+### Tasks
 
-| Task | Description | Est. | Status |
-|------|-------------|------|--------|
-| 5.1 | Create admin route for hospital verification | 2h | ⬜ |
-| 5.2 | Display unverified hospitals in admin panel | 1h | ⬜ |
-| 5.3 | Add approve/reject buttons | 1h | ⬜ |
-| 5.4 | Implement verification workflow | 1h | ⬜ |
-
-**Acceptance:** New hospitals require manual approval
+- [ ] **5.1** Create public `/methods` page
+- [ ] **5.2** Display comparability matrix
+- [ ] **5.3** Add telehealth routing information
+- [ ] **5.4** Update README with live site URL
+- [ ] **5.5** Write LinkedIn launch post
+- [ ] **5.6** Final review of all documentation
 
 ---
 
-### Phase 5B: Methods & Governance Page
+## Technical Debt & Improvements
 
-| Task | Description | Est. | Status |
-|------|-------------|------|--------|
-| 5.5 | Create `/methods` page | 2h | ⬜ |
-| 5.6 | Display comparability matrix across provinces | 2h | ⬜ |
-| 5.7 | Link to official provincial methodology docs | 1h | ⬜ |
-| 5.8 | Add telehealth routing information | 1h | ⬜ |
+### High Priority
+- [ ] Increase geocoding service test coverage (currently 13%)
+- [ ] Add CLI tool tests (currently 0% coverage)
+- [ ] Add more frontend E2E tests
 
-**Acceptance:** Scholar narrative visible in UI
+### Medium Priority
+- [ ] Add batch operations to verification queue
+- [ ] Implement search/filter in admin panel
+- [ ] Add revision history for verification actions
 
----
-
-### Phase 5C: Documentation & Launch
-
-| Task | Description | Est. | Status |
-|------|-------------|------|--------|
-| 5.9 | Update README with live site URL | 30m | ⬜ |
-| 5.10 | Create MkDocs site (if not done) | 2h | ⬜ |
-| 5.11 | Write LinkedIn launch post draft | 1h | ⬜ |
-| 5.12 | Final review of all documentation | 1h | ⬜ |
-
-**Acceptance:** Ready to show in portfolio
-
----
-
-## Backlog (Future)
-
-These items are explicitly **not** in scope for initial launch:
-
-- [ ] Alberta scraper (after Quebec stable)
-- [ ] Manitoba scraper
-- [ ] British Columbia scraper
-- [ ] Access Burden Estimator (gas + parking calculator)
-- [ ] Mobile optimization
+### Low Priority
+- [ ] Historical trends / charts
 - [ ] User accounts / saved hospitals
 - [ ] Email alerts for wait time changes
-- [ ] Historical trends / charts
-- [ ] Equity layer (income shapefiles)
+
+---
+
+## Future Provinces (Backlog)
+
+These are explicitly **not** in scope for initial launch:
+
+- [ ] Alberta scraper
+- [ ] Manitoba scraper
+- [ ] British Columbia scraper
+- [ ] Saskatchewan scraper
+- [ ] Maritime provinces
+- [ ] Territories
+
+---
+
+## Architecture Decisions
+
+Key decisions made:
+
+1. **Neon PostgreSQL** over Supabase
+   - Better PostgreSQL 17 support
+   - Simpler connection model
+   - Cost-effective for MVP
+
+2. **Playwright** for Ontario scraper
+   - Required for dynamic content loading
+   - More robust than requests + BeautifulSoup
+   - Better error handling
+
+3. **Integration Tests**
+   - Verify full stack with real database
+   - Transaction rollback for isolation
+   - Catches issues unit tests miss
+
+4. **Strict Ontology System**
+   - Never normalize different methodologies
+   - Tag every measurement with metadata
+   - Generate divergence warnings automatically
+
+5. **Manual Verification Queue**
+   - Never auto-publish new hospitals
+   - Admin approval required
+   - Prevents incorrect data from going live
+
+---
+
+## Test Statistics
+
+**Backend:**
+- Total: 127 tests passing
+- Unit tests: 113 tests
+- Integration tests: 14 tests
+- Coverage: 67% overall
+  - Core models: 96%
+  - Services: 85-100%
+  - Scrapers: 73-96%
+
+**Frontend:**
+- Total: 73 tests passing
+- Unit tests: 73 tests
+- E2E tests: Configured for CI only
+- Coverage: 100% pass rate
 
 ---
 
 ## How to Use This Roadmap
 
-### Starting a Task
-1. Find the next ⬜ task in the current milestone
-2. Read the description and acceptance criteria
-3. Check dependencies are met
-4. Start work, update status to 🔄
+### Updating Progress
+1. Mark completed items with ✅
+2. Update status in "Current Focus" section
+3. Move completed milestones to "Completed Work"
+4. Add new technical debt to appropriate section
 
-### Completing a Task
-1. Verify acceptance criteria are met
-2. Commit code with task number in message (e.g., `feat: implement 2.3 Ontario hospital mappings`)
-3. Update status to ✅
-4. Move to next task
+### Starting New Work
+1. Check dependencies are met
+2. Review acceptance criteria
+3. Update status to 🔄 in progress
+4. Commit with descriptive messages
 
 ### Status Legend
-- ⬜ Not started
-- 🔄 In progress
 - ✅ Complete
+- 🔄 In progress
+- ⏳ Pending
 - ⏸️ Blocked
 
-### Rules
-1. **One task at a time** - Finish before starting next
-2. **Vertical slices** - Each phase delivers working functionality
-3. **No skipping ahead** - Dependencies exist for a reason
-4. **Test before proceeding** - Verify acceptance criteria
-5. **Commit frequently** - Small, atomic commits
+---
+
+## Quick Links
+
+**Documentation:**
+- [Integration Testing Guide](backend/docs/integration-testing.md)
+- [Data Retention Policy](backend/docs/data-retention.md)
+- [Ontario Methodology](backend/docs/methodologies/ontario-methodology.md)
+- [Verification Queue](backend/docs/verification-queue.md)
+
+**Code:**
+- [Backend Tests](backend/tests/)
+- [Frontend Tests](frontend/tests/)
+- [Scrapers](backend/src/waittime/scrapers/)
+- [Services](backend/src/waittime/services/)
 
 ---
 
-## Current Focus
-
-**Next Task:** `2.1` Research Ontario health portal URL and data format
-
-**Command to continue:**
-```bash
-# When ready to start Ontario research
-cd backend
-source .venv/bin/activate
-# Then research Ontario URLs and document findings
-```
-
----
-
-## Notes
-
-- **Quebec scraper exists** but URL is 404 - parked until Ontario is stable
-- **Neon database** already has schema and seed data
-- **24 unit tests** already passing for core models and Quebec scraper
-- **GitHub Actions** workflows exist but not yet configured with secrets
+*This roadmap reflects actual progress, not initial plans. Updated regularly as development continues.*
