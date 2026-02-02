@@ -78,6 +78,16 @@
 - [x] Comprehensive seeding documentation
 - Status: Complete with tooling and test data
 
+**2.3 Frontend Map Integration** ✅
+- [x] Enhanced hospitals API with methodology fields
+- [x] Updated Map component to display methodology
+- [x] Show metric family, start/end events, statistic type
+- [x] User-friendly formatting (Triage → Physician, 90th percentile)
+- [x] Tested with 213 seeded Ontario hospitals
+- [x] Added Map component tests (78 frontend tests passing)
+- [x] Verified end-to-end integration with real data
+- Status: Complete with methodology display
+
 ### In Progress
 
 **2.1 Ontario Scraper Production** 🔄
@@ -87,11 +97,11 @@
 
 ### Next Up
 
-**2.3 Frontend Map Integration**
-- Connect frontend map to database
-- Display Ontario hospitals with real data
-- Show methodology tags on popups
-- Test with 213 seeded hospitals
+**2.4 Comparison Feature Testing**
+- Test cross-hospital comparisons with real data
+- Verify divergence warnings work correctly
+- Test with Ontario hospitals (same methodology)
+- Test with mixed Ontario + Quebec data (different methodology)
 
 **2.4 Comparison Feature Testing**
 - Test cross-hospital comparisons
@@ -221,8 +231,8 @@ Key decisions made:
   - Seed CLI: 46%
 
 **Frontend:**
-- Total: 73 tests passing
-- Unit tests: 73 tests
+- Total: 78 tests passing
+- Unit tests: 78 tests (includes Map integration tests)
 - E2E tests: Configured for CI only
 - Coverage: 100% pass rate
 
