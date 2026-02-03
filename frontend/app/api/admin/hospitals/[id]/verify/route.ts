@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { getDb } from "@/utils/db";
 
 interface VerifyRequestBody {
   makeVisible?: boolean;
