@@ -2,11 +2,7 @@ import { ComparabilityMatrix } from "@/components/methods/ComparabilityMatrix";
 import { ProvinceMethodologyCard } from "@/components/methods/ProvinceMethodologyCard";
 import { OntologyExplainer } from "@/components/methods/OntologyExplainer";
 import { FAQ } from "@/components/methods/FAQ";
-import postgres from "postgres";
-
-const sql = postgres(process.env.DATABASE_URL!, {
-  ssl: "require",
-});
+import { getDb } from "@/utils/db";
 
 interface Source {
   id: string;
@@ -38,6 +34,7 @@ const PROVINCE_NAMES: Record<string, string> = {
 
 async function getSources(): Promise<Source[]> {
   try {
+    const sql = getDb();
     const result = await sql<Source[]>`
       SELECT
         id,
