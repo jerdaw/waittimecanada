@@ -31,6 +31,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .
 
+      - name: Install Playwright browsers
+        working-directory: ./backend
+        run: |
+          playwright install chromium
+
       - name: Run scrapers
         working-directory: ./backend
         env:
