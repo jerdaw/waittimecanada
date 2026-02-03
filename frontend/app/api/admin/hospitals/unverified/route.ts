@@ -1,9 +1,5 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
-
-const sql = postgres(process.env.DATABASE_URL!, {
-  ssl: "require",
-});
+import { getDb } from "@/lib/db";
 
 export interface UnverifiedHospital {
   id: string;
@@ -25,6 +21,7 @@ export interface UnverifiedHospital {
  */
 export async function GET() {
   try {
+    const sql = getDb();
     const hospitals = await sql<UnverifiedHospital[]>`
       SELECT
         id,

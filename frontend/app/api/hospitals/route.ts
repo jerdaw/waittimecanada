@@ -1,11 +1,5 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
-
-// Initialize Postgres client
-// Note: DATABASE_URL should be set in .env.local (copied from backend)
-const sql = postgres(process.env.DATABASE_URL!, {
-  ssl: "require",
-});
+import { getDb } from "@/lib/db";
 
 export interface Hospital {
   id: string;
@@ -32,6 +26,7 @@ export interface Hospital {
 
 export async function GET(request: Request) {
   try {
+    const sql = getDb();
     const { searchParams } = new URL(request.url);
     const province = searchParams.get("province");
 

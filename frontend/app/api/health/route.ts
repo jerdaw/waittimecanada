@@ -1,9 +1,5 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
-
-const sql = postgres(process.env.DATABASE_URL!, {
-  ssl: "require",
-});
+import { getDb } from "@/lib/db";
 
 export interface SourceHealth {
   source_id: string;
@@ -26,6 +22,7 @@ const STALE_THRESHOLD_MINUTES = 60;
 
 export async function GET() {
   try {
+    const sql = getDb();
     // Get latest heartbeat for each source
     const result = await sql`
       SELECT

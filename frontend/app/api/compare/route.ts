@@ -1,9 +1,5 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
-
-const sql = postgres(process.env.DATABASE_URL!, {
-  ssl: "require",
-});
+import { getDb } from "@/lib/db";
 
 interface Methodology {
   metric_family: string;
@@ -67,6 +63,7 @@ function generateDivergenceBrief(a: Methodology, b: Methodology): string | null 
 }
 
 async function getHospitalWithMeasurement(hospitalId: string) {
+  const sql = getDb();
   const result = await sql`
     SELECT
       h.id,

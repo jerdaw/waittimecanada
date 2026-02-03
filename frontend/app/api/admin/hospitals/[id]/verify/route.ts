@@ -1,9 +1,5 @@
 import { NextResponse } from "next/server";
-import postgres from "postgres";
-
-const sql = postgres(process.env.DATABASE_URL!, {
-  ssl: "require",
-});
+import { getDb } from "@/lib/db";
 
 interface VerifyRequestBody {
   makeVisible?: boolean;
@@ -19,6 +15,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    const sql = getDb();
     const hospitalId = params.id;
     const body: VerifyRequestBody = await request.json().catch(() => ({}));
     const makeVisible = body.makeVisible ?? true;
@@ -72,6 +69,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const sql = getDb();
     const hospitalId = params.id;
 
     // Delete the hospital
