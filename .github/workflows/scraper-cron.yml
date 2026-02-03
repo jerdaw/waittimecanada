@@ -49,20 +49,16 @@ jobs:
           # This could trigger alerts if multiple failures detected
           echo "Scraper run failed - check logs"
 
-      - name: Notify on failure
+      - name: Send Pushover alert on failure
         if: failure()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.ALERT_EMAIL_USER }}
-          password: ${{ secrets.ALERT_EMAIL_PASSWORD }}
-          subject: '[WaitTime Canada] Scraper Failure Alert'
-          to: ${{ secrets.ALERT_EMAIL_TO }}
-          from: WaitTime Canada Monitoring
-          body: |
-            Scraper cron job failed at ${{ github.run_id }}.
-
-            View logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-            This is an automated alert from the Dead Man's Switch.
+        env:
+          PUSHOVER_USER_KEY: ${{ secrets.PUSHOVER_USER_KEY }}
+          PUSHOVER_API_TOKEN: ${{ secrets.PUSHOVER_API_TOKEN }}
+        run: |
+          curl -s \
+            --form-string "token=$PUSHOVER_API_TOKEN" \
+            --form-string "user=$PUSHOVER_USER_KEY" \
+            --form-string "title=🚨 Scraper Failure" \
+            --form-string "message=Scraper cron job failed. View logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --form-string "priority=1" \
+            https://api.pushover.net/1/messages.json

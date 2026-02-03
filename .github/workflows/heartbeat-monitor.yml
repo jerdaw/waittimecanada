@@ -67,22 +67,16 @@ jobs:
               print("::set-output name=status::healthy")
           EOF
 
-      - name: Send alert if unhealthy
+      - name: Send Pushover alert if unhealthy
         if: failure()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.ALERT_EMAIL_USER }}
-          password: ${{ secrets.ALERT_EMAIL_PASSWORD }}
-          subject: '[WaitTime Canada] ⚠️ Scraper Heartbeat Failure'
-          to: ${{ secrets.ALERT_EMAIL_TO }}
-          from: WaitTime Canada Monitoring
-          body: |
-            WARNING: Scraper heartbeat is stale.
-
-            Last successful run: ${{ steps.check.outputs.minutes }} minutes ago (threshold: 60 minutes)
-
-            Check scraper logs: https://github.com/${{ github.repository }}/actions/workflows/scraper-cron.yml
-
-            This is an automated Dead Man's Switch alert.
+        env:
+          PUSHOVER_USER_KEY: ${{ secrets.PUSHOVER_USER_KEY }}
+          PUSHOVER_API_TOKEN: ${{ secrets.PUSHOVER_API_TOKEN }}
+        run: |
+          curl -s \
+            --form-string "token=$PUSHOVER_API_TOKEN" \
+            --form-string "user=$PUSHOVER_USER_KEY" \
+            --form-string "title=⚠️ Scraper Heartbeat Failure" \
+            --form-string "message=Scraper heartbeat is stale. Last run: ${{ steps.check.outputs.minutes }} minutes ago (threshold: 60 min). Check: https://github.com/${{ github.repository }}/actions/workflows/scraper-cron.yml" \
+            --form-string "priority=1" \
+            https://api.pushover.net/1/messages.json

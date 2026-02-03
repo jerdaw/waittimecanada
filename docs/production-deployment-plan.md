@@ -1,7 +1,8 @@
 # Production Deployment Plan - Milestone 3
 
-**Status:** Planning - Decisions Required
-**Date:** February 2, 2026
+**Status:** In Progress - Render Selected
+**Date:** February 3, 2026
+**Platform:** Render (account created)
 
 ---
 
@@ -101,13 +102,13 @@
 
 ---
 
-## Recommended Approach (Option A)
+## Selected Approach: Render
 
-For a portfolio project and MVP, **Option A (Static/SSG)** makes the most sense:
+**Platform:** Render (container-based hosting)
 
-1. **Frontend on Vercel** (or Netlify/Cloudflare Pages)
-   - Next.js native support
-   - Free tier sufficient
+1. **Frontend on Render**
+   - Next.js support via Web Service
+   - Free tier available (with limitations)
    - Auto-deploy from GitHub
    - Environment variables: `NEXT_PUBLIC_MAPBOX_TOKEN`, `DATABASE_URL`
 
@@ -120,36 +121,32 @@ For a portfolio project and MVP, **Option A (Static/SSG)** makes the most sense:
    - Free tier: 512MB storage
    - Auto-pause when idle
 
-**Total Cost:** $0/month on free tiers
+**Total Cost:** $0/month on free tiers (Render free tier has spin-down on inactivity)
 
 ---
 
-## Required User Decisions
-
-Please confirm or adjust the following:
+## Decisions Made
 
 ### 1. Frontend Hosting Platform
-- [ ] **Option A:** Vercel (recommended - Next.js native)
-- [ ] **Option B:** Netlify
-- [ ] **Option C:** Cloudflare Pages
-- [ ] **Option D:** Railway (container-based)
-- [ ] **Option E:** Something else: _________________
+- [x] **Render** (account created)
 
 ### 2. Custom Domain
-- [ ] Use default platform domain (e.g., `project-name.vercel.app`)
-- [ ] Use custom domain: _________________
-  - If yes, where is DNS managed? _________________
+- [x] Use default Render domain (`*.onrender.com`) for now
+- Custom domain may be purchased later
 
-### 3. Email Alerts for Scraper Failures
-- [ ] Yes, configure email notifications
-  - Gmail address: _________________
-  - Alert destination: _________________
-- [ ] No, skip email alerts (monitor via GitHub Actions UI only)
+### 3. Alerts for Scraper Failures
+- [x] **Pushover notifications** (mobile push notifications)
+- Required secrets: `PUSHOVER_USER_KEY`, `PUSHOVER_API_TOKEN`
 
-### 4. Monitoring/Analytics
-- [ ] Enable built-in platform analytics (Vercel Analytics, etc.)
+### 4. Hosting Tier
+- [x] **Free tier** (instances spin down after 15 min inactivity)
+- First request after spin-down will be slow (~30s cold start)
+- Upgrade to paid ($7/month) later if needed
+
+### 5. Monitoring/Analytics
+- [ ] Enable Render metrics dashboard (optional)
 - [ ] Set up Sentry error tracking (optional)
-- [ ] No additional monitoring for now
+- [x] Monitor via GitHub Actions + Pushover alerts for now
 
 ---
 
@@ -163,9 +160,14 @@ Add to repository Settings → Secrets → Actions:
 | Secret Name | Value | Required |
 |-------------|-------|----------|
 | `DATABASE_URL` | Neon connection string | Yes |
-| `ALERT_EMAIL_USER` | Gmail address | If email alerts |
-| `ALERT_EMAIL_PASSWORD` | Gmail app password | If email alerts |
-| `ALERT_EMAIL_TO` | Alert recipient | If email alerts |
+| `PUSHOVER_USER_KEY` | Pushover user key | Yes |
+| `PUSHOVER_API_TOKEN` | Pushover API token | Yes |
+
+**Getting Pushover credentials:**
+1. Create account at [pushover.net](https://pushover.net)
+2. Install Pushover app on your phone
+3. Your **User Key** is on the dashboard after login
+4. Create an **Application** → get the **API Token**
 
 ### Step 2: Deploy Frontend
 Instructions will depend on platform chosen (see platform-specific guides below).
@@ -182,7 +184,29 @@ Instructions will depend on platform chosen (see platform-specific guides below)
 
 ## Platform-Specific Deployment Instructions
 
-### If Vercel Selected:
+### Render (Selected)
+
+1. Go to [dashboard.render.com](https://dashboard.render.com) → Sign in
+2. "New" → "Web Service" → Connect GitHub repo
+3. Configure service:
+   - **Name:** `waittime-canada` (or preferred name)
+   - **Root Directory:** `frontend`
+   - **Environment:** Node
+   - **Build Command:** `npm install && npm run build`
+   - **Start Command:** `npm start`
+4. Add environment variables:
+   - `NEXT_PUBLIC_MAPBOX_TOKEN` = (Mapbox token)
+   - `DATABASE_URL` = (Neon connection string)
+5. Deploy
+
+**Notes:**
+- Free tier instances spin down after 15 minutes of inactivity (first request may be slow)
+- Paid tier ($7/month) keeps instance running continuously
+- Auto-deploy on push to main branch
+
+---
+
+### If Vercel Selected (Alternative):
 
 1. Go to [vercel.com](https://vercel.com) → Sign in
 2. "Add New" → "Project" → Import GitHub repo
@@ -295,22 +319,15 @@ If deployment fails or has critical issues:
 
 ---
 
-## Open Questions
+## All Decisions Complete
 
-Before proceeding, please clarify:
+All deployment decisions have been made. Ready to proceed with deployment:
 
-1. **Have you already deployed the frontend somewhere?**
-   - If yes, where? What configuration exists?
-
-2. **Do you have a hosting platform preference?**
-   - Based on prior experience, cost concerns, or other factors?
-
-3. **Is there existing infrastructure I should be aware of?**
-   - Domains, hosting accounts, deployment pipelines?
-
-4. **Timeline expectations?**
-   - Immediate deployment needed or can wait for decisions?
+1. ✅ **Platform:** Render (free tier)
+2. ✅ **Domain:** Default `*.onrender.com`
+3. ✅ **Alerts:** Pushover notifications
+4. ✅ **Tier:** Free (with spin-down)
 
 ---
 
-*This planning document replaces premature deployment implementation. User decisions required before proceeding.*
+*All decisions made. Ready for deployment.*

@@ -8,6 +8,12 @@
 **Date:** December 26, 2025
 **Objective:** To build a rigorous, clinically defensible "Health Systems Observatory" that demonstrates "Physician-Innovator" competency.
 
+> **Note (Feb 2026):** This document is the original strategic vision. Some implementation details have evolved:
+> - **Database:** Now uses **Neon PostgreSQL** (not Supabase)
+> - **Hosting:** Frontend on **Render** (not Vercel)
+> - **Alerts:** Uses **Pushover** (not email)
+> - **Current status:** See `ROADMAP.md` for up-to-date progress
+
 ---
 
 ## Part 1: Strategic Context & The "Auditor" Narrative

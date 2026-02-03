@@ -38,27 +38,28 @@ This is the **WaitTime Canada** project - a "Health Systems Observatory" designe
 **Current Architecture:**
 - **Database**: Neon PostgreSQL 17 with full schema (sources, hospitals, measurements, scraper_status)
 - **Backend**: Python 3.12+ with psycopg2, pytest
-  - **Tests**: 127 passing (113 unit + 14 integration), 67% coverage
+  - **Tests**: 143 passing (122 unit + 21 integration), 57% coverage
   - Quebec scraper: Complete
   - Ontario scraper: Complete (Playwright-based for dynamic content)
   - Services: DatabaseService, HeartbeatService, ComparisonService
-  - CLI tools: scraper runner, database cleanup
+  - CLI tools: scraper runner, database cleanup, seeding
 - **Frontend**: Next.js 14 + TypeScript + Mapbox GL JS
-  - **Tests**: 73 passing (Vitest + React Testing Library)
-  - Map component with hospital markers
+  - **Tests**: 79 passing (Vitest + React Testing Library)
+  - Map component with hospital markers and methodology display
   - Comparison modal with methodology divergence warnings
   - Admin verification queue UI (`/admin/verify`)
+  - Methods & governance page (`/methods`)
   - API routes for hospitals, comparisons, health checks
 
 ## Core Architecture
 
 ### Technology Stack
 
-- **Backend:** Python 3.12+ scrapers via GitHub Actions (planned: 15-minute cron)
+- **Backend:** Python 3.12+ scrapers via GitHub Actions (15-minute cron configured)
 - **Database:** Neon PostgreSQL 17 with strict schema constraints
 - **Frontend:** Next.js 14 App Router + TypeScript + Mapbox GL JS
 - **Testing:** pytest (backend), Vitest (frontend), Playwright (E2E in CI)
-- **Hosting:** Planned - Vercel (frontend) + GitHub Actions (scrapers)
+- **Hosting:** Render (frontend) + GitHub Actions (scrapers)
 
 ### The Metric Ontology System
 
@@ -230,10 +231,12 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 
 ## Documentation Reference
 
-The master specification is in `er-times-plan.md`. Treat this as the authoritative source for:
+The master specification is in `docs/planning/strategic-plan.md` (the "Master Implementation Bible"). Treat this as the authoritative source for:
 - Complete ontology definitions
 - Table schemas with SQL DDL
 - Feature requirements and narrative justification
 - Risk register and compliance considerations
+
+Note: The strategic plan references "Supabase" in some places - the project now uses **Neon PostgreSQL**.
 
 This is a **physician-innovator portfolio project** optimized for medical school admissions committee review. Every technical decision must map to a narrative competency (Scholar, Professional, Advocate, Leader).

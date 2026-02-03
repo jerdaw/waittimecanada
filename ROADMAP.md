@@ -2,11 +2,11 @@
 
 > **Philosophy:** Vertical slices, not horizontal layers. Each milestone delivers working, shippable functionality.
 
-**Last Updated:** 2026-02-02
+**Last Updated:** 2026-02-03
 **Milestone 5:** ✅ Complete - Ready for Production Deployment
-**Milestone 3:** 📋 Planning - Deployment Decisions Required
+**Milestone 3:** 🔄 In Progress - Render Deployment
 **Approach:** Iterative development, one province at a time
-**Current Phase:** Documentation Complete ✓ → Production Deployment Planning
+**Current Phase:** Documentation Complete ✓ → Production Deployment on Render
 
 ---
 
@@ -103,18 +103,24 @@
 - [x] ComparisonService: 100% coverage
 - Status: Complete with comprehensive testing
 
-### In Progress
+### Pending Cleanup
 
-**2.1 Ontario Scraper Production** 🔄
+**Uncommitted Working Files**
+- `frontend/test-comparison-api.js` - Modified test script
+- `frontend/test-telehealth-api.js` - Modified test script
+- `scripts/migrate-structure.sh` - Modified migration script
+
+**2.1 Ontario Scraper Production** ⏳
 - Ontario scraper functional with Playwright
-- Needs: Real URL verification and testing
-- Status: Code complete, awaiting production testing
+- Needs: Real URL verification in production environment
+- Status: Code complete, awaiting production deployment to test with live data
 
 ---
 
-## Milestone 3: Production Deployment 📋 (Planning)
+## Milestone 3: Production Deployment 🔄 (In Progress)
 
 **Goal:** Automated scraping and public frontend
+**Platform:** Render (account created)
 **Planning Document:** [docs/production-deployment-plan.md](docs/production-deployment-plan.md)
 
 ### Infrastructure Already Built
@@ -124,19 +130,24 @@
 - [x] **Database:** Neon PostgreSQL in production
 - [x] **Frontend:** Next.js 14 application ready to deploy
 
-### Decisions Required (See Planning Doc)
-- [ ] **Platform Selection:** Choose frontend hosting (Vercel/Netlify/Railway/Other)
-- [ ] **Domain:** Default platform domain or custom domain?
-- [ ] **Alerts:** Configure email notifications or GitHub Actions only?
-- [ ] **Monitoring:** Enable platform analytics/Sentry?
+### Decisions Made
+- [x] **Platform Selection:** Render (account created)
+- [x] **Domain:** Default Render domain (`*.onrender.com`) - custom domain later
+- [x] **Alerts:** Pushover notifications for scraper failures
+- [x] **Tier:** Free tier (with spin-down on inactivity)
+- [ ] **Monitoring:** Enable platform analytics/Sentry? (optional)
 
-### After Decisions Made
-- [ ] **3.1** Add DATABASE_URL secret to GitHub repository
-- [ ] **3.2** Deploy frontend to chosen platform
-- [ ] **3.3** Configure environment variables (MAPBOX_TOKEN, DATABASE_URL)
-- [ ] **3.4** Verify deployment (frontend, API, scrapers)
-- [ ] **3.5** Monitor first 24-48 hours for errors
-- [ ] **3.6** Update README and LinkedIn post with live URL
+### Deployment Tasks
+- [ ] **3.1** Add secrets to GitHub repository:
+  - `DATABASE_URL` - Neon connection string
+  - `PUSHOVER_USER_KEY` - Pushover user key
+  - `PUSHOVER_API_TOKEN` - Pushover API token
+- [ ] **3.2** Deploy frontend to Render
+- [ ] **3.3** Configure environment variables on Render (MAPBOX_TOKEN, DATABASE_URL)
+- [ ] **3.4** Configure Pushover notifications in GitHub Actions workflows
+- [ ] **3.5** Verify deployment (frontend, API, scrapers)
+- [ ] **3.6** Monitor first 24-48 hours for errors
+- [ ] **3.7** Update README and LinkedIn post with live URL
 
 ---
 
@@ -187,6 +198,9 @@
 - [ ] Historical trends / charts
 - [ ] User accounts / saved hospitals
 - [ ] Email alerts for wait time changes
+- [ ] Access Burden Estimator (distance × gas price + parking with disclaimer)
+- [ ] Equity layer overlay (income shapefiles)
+- [ ] Mobile optimization
 
 ---
 
