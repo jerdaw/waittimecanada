@@ -12,8 +12,8 @@ INSERT INTO sources (
     'quebec-msss',
     'Ministère de la Santé et des Services sociaux',
     'QC',
-    'https://www.quebec.ca/sante/systeme-et-services-de-sante/urgences',
-    'https://www.quebec.ca/sante/systeme-et-services-de-sante/urgences/methodologie',
+    'https://www.quebec.ca/en/health/health-system-and-services/service-organization/quebec-health-system-and-its-services/situation-in-emergency-rooms-in-quebec',
+    NULL,  -- Methodology URL not available on new page
     'Info-Santé 811',
     '811',
     'TIME_TO_PROVIDER',

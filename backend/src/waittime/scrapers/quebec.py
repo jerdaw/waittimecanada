@@ -1,7 +1,11 @@
 """Quebec MSSS wait time scraper.
 
 Source: Ministère de la Santé et des Services sociaux
-URL: https://www.quebec.ca/sante/systeme-et-services-de-sante/urgences
+URL: https://www.quebec.ca/en/health/health-system-and-services/service-organization/quebec-health-system-and-its-services/situation-in-emergency-rooms-in-quebec
+
+NOTE: Quebec changed their URL and data format in 2026. The page now uses a dynamic
+searchable interface instead of a simple HTML table. This scraper may need updating
+to use Playwright or find the underlying API endpoint.
 
 Methodology (per ADR-0002):
 - metric_family: TIME_TO_PROVIDER
