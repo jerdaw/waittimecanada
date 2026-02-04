@@ -48,40 +48,6 @@
 
 ---
 
-### Option 2: ER-Watch (Third-Party - Easiest to Scrape)
-
-**URL:** https://www.er-watch.ca/
-
-**Pros:**
-- ✅ Real-time data (updates every 15 minutes)
-- ✅ 140+ hospitals across Ontario
-- ✅ Embedded JSON in page source (easy to extract)
-- ✅ More metrics: patients waiting, patients in treatment
-- ✅ Already scraping HQOntario data (acts as aggregator)
-
-**Cons:**
-- ⚠️ Third-party source (not official)
-- ⚠️ Reliability depends on their scraper
-- ⚠️ Could shut down or change structure
-- ⚠️ Still requires JavaScript rendering (Next.js app)
-
-**Technical Requirements:**
-- Playwright/Selenium OR
-- Direct JSON extraction from page HTML
-
-**Data Structure:**
-```json
-{
-  "name": "Hospital Name",
-  "estimated_wait_time": 185,
-  "patients_waiting": 12,
-  "patients_in_treatment": 8,
-  "status": "online",
-  "coordinates": [lat, lon]
-}
-```
-
----
 
 ### Option 3: Ontario.ca (Informational Only)
 
@@ -209,7 +175,7 @@ with sync_playwright() as p:
 | Risk | Probability | Impact | Mitigation |
 |------|-------------|--------|------------|
 | HQOntario changes HTML structure | Medium | High | Version parser, add structure detection |
-| Playwright install issues | Low | Medium | Fallback: Use ER-Watch simple scraper |
+| Playwright install issues | Low | Medium | Use fallback scraping method |
 | Data not updated regularly | Low | Low | Check timestamps, alert if stale |
 | Hospital names don't match mapping | High | Low | Fuzzy matching (already have from Quebec) |
 
@@ -219,7 +185,7 @@ with sync_playwright() as p:
 
 - [Ontario Government - Emergency Department Wait Times](https://www.ontario.ca/page/time-spent-emergency-department)
 - [Health Quality Ontario - Time Spent in Emergency Departments](https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments)
-- [ER Watch - Real-Time Ontario Emergency Room Wait Times](https://www.er-watch.ca/)
+
 - [Hamilton Emergency Wait Times](https://www.hamiltonemergencywaittimes.ca/)
 - [Niagara Health - Emergency Department Wait Times](https://www.niagarahealth.on.ca/site/waiting-times)
 - [CIHI - NACRS Emergency Department Visits](https://www.cihi.ca/en/nacrs-emergency-department-visits-and-lengths-of-stay)

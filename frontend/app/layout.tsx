@@ -1,10 +1,25 @@
 import type { Metadata } from "next";
+import { ThemeProvider } from "next-themes";
+import { EmergencyBanner } from "@/components/EmergencyBanner";
 import "./globals.css";
+
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { InstallPrompt } from "@/components/InstallPrompt";
+import { StructuredData } from "./structured-data";
 
 export const metadata: Metadata = {
   title: "WaitTime Canada - ER Wait Time Observatory",
   description:
     "A health systems observatory auditing emergency room wait times across Canada with methodological transparency.",
+  manifest: "/manifest.json",
+  other: {
+    'geo.region': 'CA-ON',
+    'geo.placename': 'Ontario',
+    'geo.position': '43.6532;-79.3832',
+    'revisit-after': '1 day',
+    'category': 'health',
+    'classification': 'Healthcare Information',
+  }
 };
 
 export default function RootLayout({
@@ -13,8 +28,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="antialiased">{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className="antialiased bg-background text-foreground transition-colors duration-300">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <StructuredData />
+          <EmergencyBanner />
+          <ServiceWorkerRegister />
+          <InstallPrompt />
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

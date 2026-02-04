@@ -212,7 +212,7 @@ class TestScraperDatabase:
             id="test-on-scraper",
             name="Test Ontario Source",
             province="ON",
-            url="https://www.er-watch.ca/",
+            url="https://example.com/ontario-realtime",
             methodology_url="https://example.com/methods",
             telehealth_name="Health Connect Ontario",
             telehealth_number="811",

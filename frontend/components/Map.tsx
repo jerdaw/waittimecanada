@@ -5,6 +5,7 @@ import MapGL, { Marker, Popup, NavigationControl } from "react-map-gl";
 import type { Hospital } from "@/app/api/hospitals/route";
 import { ComparisonModal } from "./ComparisonModal";
 import { DivergenceWarning } from "./DivergenceWarning";
+import { TrendChart } from "./TrendChart";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -264,6 +265,13 @@ function HospitalPopup({
           )}
         </div>
 
+        {/* Trend Chart (only if we have an ID) */}
+        {hospital.id && (
+           <div className="px-4 mb-3">
+             <TrendChart hospitalId={hospital.id} />
+           </div>
+        )}
+
         {/* Methodology information */}
         {hasData && hospital.metric_family && (
           <div className="px-4 pb-3 border-t border-slate-100 pt-3">
@@ -491,53 +499,38 @@ function MissingTokenError() {
   );
 }
 
-// Main Map component
-export default function Map() {
-  const [hospitals, setHospitals] = useState<Hospital[]>([]);
-  const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [lastUpdate, setLastUpdate] = useState<string | null>(null);
-  const [isStale, setIsStale] = useState(false);
+interface MapProps {
+  hospitals: Hospital[];
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
+  lastUpdate: string | null;
+  isStale: boolean;
+  loading: boolean;
+  error: string | null;
+  className?: string;
+}
 
+// Main Map component
+export default function Map({
+  hospitals,
+  selectedId,
+  onSelect,
+  lastUpdate,
+  isStale,
+  loading,
+  error,
+  className,
+}: MapProps) {
   // Comparison mode state
   const [comparisonMode, setComparisonMode] = useState(false);
   const [selectedForComparison, setSelectedForComparison] = useState<Hospital[]>([]);
   const [showComparisonModal, setShowComparisonModal] = useState(false);
 
-  // Fetch hospitals
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [hospitalsRes, healthRes] = await Promise.all([
-          fetch("/api/hospitals"),
-          fetch("/api/health"),
-        ]);
-
-        const hospitalsData = await hospitalsRes.json();
-        if (!hospitalsData.success) {
-          throw new Error(hospitalsData.message || "Failed to fetch hospitals");
-        }
-        setHospitals(hospitalsData.data);
-
-        // Check health status
-        const healthData = await healthRes.json();
-        setLastUpdate(healthData.last_update);
-        setIsStale(!healthData.healthy);
-
-        setLoading(false);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-        setLoading(false);
-      }
-    }
-
-    fetchData();
-
-    // Refresh every 60 seconds
-    const interval = setInterval(fetchData, 60000);
-    return () => clearInterval(interval);
-  }, []);
+  // Find selected hospital object
+  const selectedHospital = useMemo(
+    () => hospitals.find((h) => h.id === selectedId) || null,
+    [hospitals, selectedId]
+  );
 
   // Handle marker click
   const handleMarkerClick = useCallback((hospital: Hospital) => {
@@ -555,22 +548,22 @@ export default function Map() {
         return [...prev, hospital];
       });
     } else {
-      // Normal mode - show popup
-      setSelectedHospital(hospital);
+      // Normal mode - trigger parent select
+      onSelect(hospital.id);
     }
-  }, [comparisonMode]);
+  }, [comparisonMode, onSelect]);
 
   // Close popup
   const handleClosePopup = useCallback(() => {
-    setSelectedHospital(null);
-  }, []);
+    onSelect(null);
+  }, [onSelect]);
 
   // Toggle comparison mode
   const toggleComparisonMode = useCallback(() => {
     setComparisonMode((prev) => !prev);
     setSelectedForComparison([]);
-    setSelectedHospital(null);
-  }, []);
+    onSelect(null);
+  }, [onSelect]);
 
   // Open comparison modal
   const handleCompare = useCallback(() => {
@@ -608,14 +601,14 @@ export default function Map() {
   if (error) return <MapError message={error} />;
 
   return (
-    <div className="relative h-screen w-full">
+    <div className={`relative h-full w-full ${className || ""}`}>
       <MapGL
         initialViewState={initialViewState}
         mapboxAccessToken={MAPBOX_TOKEN}
         mapStyle="mapbox://styles/mapbox/light-v11"
         style={{ width: "100%", height: "100%" }}
         attributionControl={false}
-        onClick={() => setSelectedHospital(null)}
+        onClick={() => onSelect(null)}
       >
         <NavigationControl position="bottom-right" showCompass={false} />
 

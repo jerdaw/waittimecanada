@@ -28,7 +28,7 @@ This file provides guidance to automated developer tools when working with code 
 - Recommend the user rotate compromised credentials
 
 **Authorship and Attribution:**
-- ❌ NEVER list an automated developer tool, agent, or AI as an author, co-author, or contributor.
+- ❌ NEVER list an AI assistant, or any other automated developer tool, or agent as an author, co-author, or contributor.
 - ❌ NEVER use `Co-Authored-By` trailers in git commits that reference an AI or automated tool.
 - ✅ ONLY humans should be listed as authors or contributors in any part of this repository.
 - ✅ Use generic terms like "automated tool" or "agent" if you need to reference your own actions in documentation.
@@ -39,7 +39,7 @@ This file provides guidance to automated developer tools when working with code 
 
 This is the **WaitTime Canada** project - a "Health Systems Observatory" designed to audit and standardize Canadian emergency room wait time data across provinces. This is **NOT a simple wait time app**, but rather a clinically defensible auditing platform that exposes methodological inconsistencies in healthcare reporting.
 
-**Current Status:** Active development, significant infrastructure complete. **PRIMARY FOCUS: Core infrastructure ✓, Ontario & Quebec scrapers live ✓, Geocoding manual override live ✓**.
+**Current Status:** Core features complete. **PRIMARY FOCUS: Ontario & Quebec scrapers live, infrastructure verified, UX/SEO polish implemented**.
 
 **Current Architecture:**
 - **Database**: Neon PostgreSQL 17 with full schema (sources, hospitals, measurements, scraper_status)
@@ -202,48 +202,15 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 6. **Attribution** - Always link back to official provincial sources
 7. **Human Authorship Only** - Never attribute work to AI or non-human agents
 
-## 4-Week Implementation Roadmap
+## Implementation Roadmap
 
-### Week 1: Database Foundation
-- Setup Supabase project
-- Create tables with CHECK constraints on ontology enums
-- Build Quebec scraper (simplest starting point)
-- Implement heartbeat endpoint
+- [x] **Week 1: Database Foundation** - Neon PostgreSQL setup, Quebec scraper MVP.
+- [x] **Week 2: Multi-Province & Geocoding** - Ontario scraper (Playwright), geocoding manual overrides.
+- [x] **Week 3: Frontend & Analytics** - Mapbox integration, wait time trends, methods page.
+- [x] **Week 4: UX Polish & SEO** - Skeleton loading, search/filter, structured data, live indicators.
 
-### Week 2: Multi-Province Heterogeneity
-- Add Alberta scraper (different `start_event` than Quebec)
-- Add Manitoba scraper (different `statistic_type`)
-- Build verification queue UI
-- Populate `sources` table with telehealth data
-- Test divergence detection service generates divergence briefs correctly
+---
 
-### Week 3: Frontend "Scholar" UI
-- Next.js app with Mapbox integration
-- Methodology divergence warnings
-- Province-aware banner system
-- `/methods` page explaining comparability logic
+Note: This project uses **Neon PostgreSQL** as its primary database.
 
-### Week 4: Polish & Launch
-- Mobile optimization
-- Equity layer (income shapefiles overlay)
-- Stakeholder interview (1 nurse or ED staff)
-- Launch + LinkedIn post
-
-## Risk Mitigations
-
-- **Misinterpretation Risk:** Always show methodology warnings, never raw comparison tables
-- **Silent Failure Risk:** Heartbeat monitor + dead man's switch alerts
-- **Storage Risk:** Hash-only storage + 30-day retention policy
-- **Liability Risk:** NO symptom router, only province-aware telehealth directory
-
-## Documentation Reference
-
-The master specification is in `docs/planning/strategic-plan.md` (the "Master Implementation Bible"). Treat this as the authoritative source for:
-- Complete ontology definitions
-- Table schemas with SQL DDL
-- Feature requirements and narrative justification
-- Risk register and compliance considerations
-
-Note: The strategic plan references "Supabase" in some places - the project now uses **Neon PostgreSQL**.
-
-This is a **physician-innovator portfolio project** optimized for medical school admissions committee review. Every technical decision must map to a narrative competency (Scholar, Professional, Advocate, Leader).
+This is a **physician-innovator portfolio project** optimized for medical school admissions committee review. Every technical decision maps to a narrative competency (Scholar, Professional, Advocate, Leader).

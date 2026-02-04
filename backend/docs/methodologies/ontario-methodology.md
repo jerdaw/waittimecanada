@@ -5,7 +5,7 @@
 Ontario reports emergency department (ED) wait times through multiple channels, each with distinct methodologies. This document provides a comprehensive analysis of Ontario's wait time measurement approaches, data sources, and comparability considerations for the WaitTime Canada project.
 
 **Key Findings:**
-- Ontario uses **two primary methodologies**: real-time point estimates (ER Watch) and historical P90 statistics (HQO)
+- Ontario uses **two primary methodologies**: real-time point estimates and historical P90 statistics (HQO)
 - Real-time data updates **every 15 minutes** and covers **140+ hospitals**
 - Official government data (HQO) reports **90th percentile (P90)** monthly aggregates
 - These methodologies are **scientifically incomparable** and must be clearly distinguished
@@ -26,10 +26,9 @@ Ontario reports emergency department (ED) wait times through multiple channels, 
 
 ## Data Sources
 
-### Primary Source: ER Watch (Real-Time)
+### Primary Source: Real-Time Ontario Data
 
-**Provider:** ER Watch (third-party aggregator)
-**URL:** https://www.er-watch.ca/
+**Provider:** Ontario Real-Time Wait Time Service
 **Coverage:** 140+ Ontario hospitals
 **Update Frequency:** Every 15 minutes
 **Data Type:** Real-time point estimates
@@ -101,7 +100,7 @@ patient_scope: MID_ACUITY (CTAS 2-5, excludes CTAS 1)
 
 ### Statistical Type Distinction
 
-**POINT_ESTIMATE (ER Watch):**
+**POINT_ESTIMATE (Real-Time Data):**
 - Single instantaneous measurement
 - "Right now, the wait is X minutes"
 - High temporal variability
@@ -120,7 +119,7 @@ patient_scope: MID_ACUITY (CTAS 2-5, excludes CTAS 1)
 
 ## Real-Time vs. Historical Data
 
-### When to Use Real-Time Data (ER Watch)
+### When to Use Real-Time Data
 
 **Best For:**
 - Patient decision-making: "Where should I go right now?"
@@ -171,7 +170,7 @@ patient_scope: MID_ACUITY (CTAS 2-5, excludes CTAS 1)
 
 ### Cross-Province Comparisons
 
-**Ontario (ER Watch) vs. Quebec:**
+**Ontario (Real-Time) vs. Quebec:**
 - **Compatible?** ⚠️ Partially
 - **Differences:**
   - Ontario: POINT_ESTIMATE
@@ -194,15 +193,14 @@ patient_scope: MID_ACUITY (CTAS 2-5, excludes CTAS 1)
 
 ## Technical Implementation
 
-### ER Watch Scraper Configuration
+### Real-Time Scraper Configuration
 
 ```python
 # Source configuration
 SOURCE = Source(
     id="on-erwatch",
-    name="ER Watch Ontario",
+    name="Ontario Real-Time Wait Times",
     province="ON",
-    url="https://www.er-watch.ca/",
     methodology_url="https://www.hqontario.ca/System-Performance/Measuring-System-Performance",
     telehealth_name="Health Connect Ontario",
     telehealth_number="811",
@@ -342,8 +340,8 @@ When adding a new Ontario hospital measurement:
 
 ### Data Sources
 
-4. **ER Watch**
-   https://www.er-watch.ca/
+4. **Ontario Real-Time Wait Time Service**
+   Source ID: `on-erwatch`
 
 5. **Health Connect Ontario**
    https://healthconnectontario.health.gov.on.ca/

@@ -1,18 +1,19 @@
 /**
- * Tests for Map component with real data integration
+ * Tests for Map component with prop-based data
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
 import Map from "@/components/Map";
+import { Hospital } from "@/app/api/hospitals/route";
 
 // Mock MapboxGL
 vi.mock("react-map-gl", () => ({
-  default: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="mapbox-map">{children}</div>
+  default: ({ children, onClick }: { children: React.ReactNode, onClick: () => void }) => (
+    <div data-testid="mapbox-map" onClick={onClick}>{children}</div>
   ),
-  Marker: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="map-marker">{children}</div>
+  Marker: ({ children, onClick }: { children: React.ReactNode, onClick: (e: any) => void }) => (
+    <div data-testid="map-marker" onClick={(e) => onClick({ originalEvent: { stopPropagation: () => {} } })}>{children}</div>
   ),
   Popup: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="map-popup">{children}</div>
@@ -26,248 +27,85 @@ vi.mock("mapbox-gl/dist/mapbox-gl.css", () => ({}));
 // Mock environment variable
 vi.stubEnv("NEXT_PUBLIC_MAPBOX_TOKEN", "pk.test_token");
 
+// Mock TrendChart to avoid complex rendering in Map tests
+vi.mock("@/components/TrendChart", () => ({
+  TrendChart: () => <div data-testid="trend-chart">Trend Chart Mock</div>,
+}));
+
 describe("Map Component", () => {
-  beforeEach(() => {
-    // Reset fetch mocks
-    global.fetch = vi.fn();
-  });
+  const mockHospitals: Hospital[] = [
+    {
+      id: "test-hospital",
+      name: "Test Hospital",
+      province: "ON",
+      city: "TestCity",
+      latitude: 45.0,
+      longitude: -75.0,
+      is_verified: true,
+      is_visible: true,
+      source_id: "test-source",
+      current_wait_time: 90,
+      last_updated: new Date().toISOString(),
+      metric_family: "TIME_TO_PROVIDER",
+      start_event: "TRIAGE",
+      end_event: "PHYSICIAN",
+      statistic_type: "P90",
+      patient_scope: "ALL",
+    },
+  ];
 
-  it("renders loading state initially", () => {
-    // Mock fetch to never resolve
-    global.fetch = vi.fn(() => new Promise(() => {}));
+  const defaultProps = {
+    hospitals: [],
+    selectedId: null,
+    onSelect: vi.fn(),
+    lastUpdate: null,
+    isStale: false,
+    loading: false,
+    error: null,
+  };
 
-    render(<Map />);
-
+  it("renders loading state", () => {
+    render(<Map {...defaultProps} loading={true} />);
     expect(screen.getByText("Loading hospitals...")).toBeInTheDocument();
   });
 
-  it("renders error state when API fails", async () => {
-    global.fetch = vi.fn(() =>
-      Promise.resolve({
-        json: () =>
-          Promise.resolve({
-            success: false,
-            message: "Database connection failed",
-          }),
-      })
-    );
-
-    render(<Map />);
-
-    await waitFor(() => {
-      expect(screen.getByText("Unable to load map")).toBeInTheDocument();
-    });
+  it("renders error state", () => {
+    render(<Map {...defaultProps} error="Failed to load" />);
+    expect(screen.getByText("Unable to load map")).toBeInTheDocument();
+    expect(screen.getByText("Failed to load")).toBeInTheDocument();
   });
 
-  it("renders hospitals with methodology information", async () => {
-    const mockHospitals = [
-      {
-        id: "ca-on-ottawa-civic",
-        name: "The Ottawa Hospital - Civic Campus",
-        province: "ON",
-        city: "Ottawa",
-        latitude: 45.3982,
-        longitude: -75.737,
-        is_verified: true,
-        is_visible: true,
-        source_id: "ontario-health",
-        current_wait_time: 120,
-        last_updated: new Date().toISOString(),
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-        patient_scope: "ALL",
-        telehealth_name: "Health811",
-        telehealth_number: "811",
-      },
-    ];
-
-    global.fetch = vi.fn((url) => {
-      if (url.includes("/api/hospitals")) {
-        return Promise.resolve({
-          json: () =>
-            Promise.resolve({
-              success: true,
-              count: 1,
-              data: mockHospitals,
-            }),
-        });
-      }
-      if (url.includes("/api/health")) {
-        return Promise.resolve({
-          json: () =>
-            Promise.resolve({
-              healthy: true,
-              last_update: new Date().toISOString(),
-              stale_threshold_minutes: 60,
-              sources: [],
-            }),
-        });
-      }
-      return Promise.reject(new Error("Unknown URL"));
-    });
-
-    render(<Map />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId("mapbox-map")).toBeInTheDocument();
-    });
-
-    // Check that hospital count is displayed
-    await waitFor(() => {
-      expect(screen.getByText("1")).toBeInTheDocument();
-      expect(screen.getByText("hospitals")).toBeInTheDocument();
-    });
+  it("renders map with markers when data is provided", () => {
+    render(<Map {...defaultProps} hospitals={mockHospitals} />);
+    expect(screen.getByTestId("mapbox-map")).toBeInTheDocument();
+    expect(screen.getByText("1")).toBeInTheDocument(); // Count badge
+    expect(screen.getByTestId("map-marker")).toBeInTheDocument();
   });
 
-  it("displays methodology information correctly", async () => {
-    const mockHospitals = [
-      {
-        id: "test-hospital",
-        name: "Test Hospital",
-        province: "ON",
-        city: "TestCity",
-        latitude: 45.0,
-        longitude: -75.0,
-        is_verified: true,
-        is_visible: true,
-        source_id: "test-source",
-        current_wait_time: 90,
-        last_updated: new Date().toISOString(),
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-        telehealth_name: "Health811",
-        telehealth_number: "811",
-      },
-    ];
-
-    global.fetch = vi.fn((url) => {
-      if (url.includes("/api/hospitals")) {
-        return Promise.resolve({
-          json: () =>
-            Promise.resolve({
-              success: true,
-              count: 1,
-              data: mockHospitals,
-            }),
-        });
-      }
-      if (url.includes("/api/health")) {
-        return Promise.resolve({
-          json: () =>
-            Promise.resolve({
-              healthy: true,
-              last_update: new Date().toISOString(),
-              sources: [],
-            }),
-        });
-      }
-      return Promise.reject(new Error("Unknown URL"));
-    });
-
-    render(<Map />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId("mapbox-map")).toBeInTheDocument();
-    });
-
-    // Map component renders markers with methodology data
-    const markers = screen.getAllByTestId("map-marker");
-    expect(markers.length).toBeGreaterThan(0);
+  it("calls onSelect when marker is clicked", () => {
+    const onSelect = vi.fn();
+    render(<Map {...defaultProps} hospitals={mockHospitals} onSelect={onSelect} />);
+    
+    fireEvent.click(screen.getByTestId("map-marker"));
+    expect(onSelect).toHaveBeenCalledWith("test-hospital");
   });
 
-  it("displays data freshness indicator", async () => {
-    global.fetch = vi.fn((url) => {
-      if (url.includes("/api/hospitals")) {
-        return Promise.resolve({
-          json: () =>
-            Promise.resolve({
-              success: true,
-              count: 0,
-              data: [],
-            }),
-        });
-      }
-      if (url.includes("/api/health")) {
-        return Promise.resolve({
-          json: () =>
-            Promise.resolve({
-              healthy: true,
-              last_update: new Date().toISOString(),
-              sources: [],
-            }),
-        });
-      }
-      return Promise.reject(new Error("Unknown URL"));
-    });
-
-    render(<Map />);
-
-    await waitFor(() => {
-      // Check for data freshness indicator elements
-      expect(screen.getByTestId("mapbox-map")).toBeInTheDocument();
-    });
+  it("calls onSelect(null) when map background is clicked", () => {
+    const onSelect = vi.fn();
+    render(<Map {...defaultProps} hospitals={mockHospitals} onSelect={onSelect} />);
+    
+    fireEvent.click(screen.getByTestId("mapbox-map"));
+    expect(onSelect).toHaveBeenCalledWith(null);
   });
 
-  it("displays telehealth information when available", async () => {
-    const mockHospitals = [
-      {
-        id: "test-hospital-telehealth",
-        name: "Test Hospital with Telehealth",
-        province: "ON",
-        city: "TestCity",
-        latitude: 45.0,
-        longitude: -75.0,
-        is_verified: true,
-        is_visible: true,
-        source_id: "test-source",
-        current_wait_time: 90,
-        last_updated: new Date().toISOString(),
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-        telehealth_name: "Health811",
-        telehealth_number: "811",
-      },
-    ];
+  it("shows popup when hospital is selected", () => {
+    render(<Map {...defaultProps} hospitals={mockHospitals} selectedId="test-hospital" />);
+    expect(screen.getByTestId("map-popup")).toBeInTheDocument();
+    expect(screen.getByText("Test Hospital")).toBeInTheDocument();
+  });
 
-    global.fetch = vi.fn((url) => {
-      if (url.includes("/api/hospitals")) {
-        return Promise.resolve({
-          json: () =>
-            Promise.resolve({
-              success: true,
-              count: 1,
-              data: mockHospitals,
-            }),
-        });
-      }
-      if (url.includes("/api/health")) {
-        return Promise.resolve({
-          json: () =>
-            Promise.resolve({
-              healthy: true,
-              last_update: new Date().toISOString(),
-              sources: [],
-            }),
-        });
-      }
-      return Promise.reject(new Error("Unknown URL"));
-    });
-
-    render(<Map />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId("mapbox-map")).toBeInTheDocument();
-    });
-
-    // Verify telehealth data is present in the component
-    // (actual popup display would require clicking markers, which is complex to test)
-    const markers = screen.getAllByTestId("map-marker");
-    expect(markers.length).toBeGreaterThan(0);
+  it("displays freshness indicator", () => {
+    render(<Map {...defaultProps} lastUpdate="2023-01-01" isStale={true} />);
+    expect(screen.getByText("Data may be stale")).toBeInTheDocument();
   });
 });

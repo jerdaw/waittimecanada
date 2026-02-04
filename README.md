@@ -53,9 +53,21 @@ When comparing two hospitals, the system automatically:
 ### 🏥 Telehealth Routing
 Province-specific healthcare guidance in every hospital popup:
 - **Ontario:** "Need medical advice? Call Health811 - 811"
-- **Quebec:** "Call Info-Santé 811 - 811" (when implemented)
-- **Alberta:** "Call Health Link 811 - 811" (when implemented)
+- **Quebec:** "Call Info-Santé 811 - 811"
+- **Alberta:** "Call Health Link 811 - 811"
 - Mobile-friendly with one-tap tel: links
+
+### 📈 Wait Time Trends
+Historical data visualization integrated into hospital details:
+- **Timeframes:** 24 Hours, 7 Days, 30 Days
+- **Aggregation:** Hourly or daily averages
+- **Visuals:** Interactive line charts with tooltips
+
+### 📱 Progressive Web App (PWA)
+Installable application with offline support:
+- **Offline Access:** Caches static assets and API responses (stale-while-revalidate)
+- **Installability:** Custom install prompt for eligible devices
+- **Experience:** Splash screens, app icons, and standalone mode
 
 ### 🔬 The Metric Ontology
 
@@ -481,12 +493,12 @@ class OntarioScraper(BaseScraper):
 - Ontology enforcement (strict enums vs tags)
 - Verification workflow (manual vs automatic)
 
----
-
 **Latest Update (Feb 4, 2026):**
-- ✅ Milestone 6 Complete: Geocoding coverage (100%), CLI tests (92%), E2E tests passing
-- ✅ Manual geocoding override system fully populated for Ontario (100% accuracy)
-- ✅ Admin verification queue with "Reject & Delete" functionality tested
+- ✅ Milestone 7 Complete: UX Polish & SEO enhancements implemented
+- ✅ Skeleton screens and real-time hospital search/filter live
+- ✅ Browser geolocation sorting and distance display live
+- ✅ Schema.org structured data and healthcare meta tags added
+- ✅ Geocoding coverage (100%), 150+ unit tests passing
 
 ---
 
@@ -496,13 +508,12 @@ class OntarioScraper(BaseScraper):
 - [ ] **Regional Scaling**: Implement Alberta and British Columbia scrapers
 - [ ] **Admin Enhancements**: Batch operations and search/filter for verification queue
 - [ ] **Data Insights**: Historical trend charts and aggregate data export
-- [ ] **Burden Estimator**: Access burden calculator (logistics, parking, and gas estimates)
 
 ### 🎯 Future Backlog
-- [ ] Mobile application (React Native / Expo)
-- [ ] Equity Layer: Socio-economic overlays for access analysis
-- [ ] Proactive Alerts: Email/Push notifications for significant wait time spikes
-- [ ] Personalization: User accounts for "Saved Hospitals" and regional defaults
+- [ ] **Burden Estimator**: Access burden calculator (logistics, parking, and gas estimates)
+- [ ] **Proactive Alerts**: Email/Push notifications for significant wait time spikes
+- [ ] **Mobile App**: Dedicated mobile application (React Native / Expo)
+- [ ] **Equity Layer**: Socio-economic overlays for access analysis
 
 ---
 

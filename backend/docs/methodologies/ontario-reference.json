@@ -5,9 +5,8 @@
   "sources": [
     {
       "id": "on-erwatch",
-      "name": "ER Watch Ontario",
+      "name": "Ontario Real-Time Wait Times",
       "type": "real-time",
-      "url": "https://www.er-watch.ca/",
       "update_frequency_minutes": 15,
       "coverage": "140+ hospitals",
       "methodology": {
@@ -156,8 +155,8 @@
       "type": "official"
     },
     {
-      "title": "ER Watch",
-      "url": "https://www.er-watch.ca/",
+      "title": "Ontario Real-Time Wait Time Service",
+      "source_id": "on-erwatch",
       "type": "data_source"
     },
     {

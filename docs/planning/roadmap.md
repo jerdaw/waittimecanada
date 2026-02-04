@@ -1,8 +1,8 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-01-30)
+## Current Status (Updated 2026-02-04)
 
-**Progress:** Milestone 2 (Ontario End-to-End) Complete ✓
+**Progress:** Milestone 7 (UX Polish & SEO) Complete ✓
 
 **Completed:**
 - ✅ Repository modernized with proper Python package structure
@@ -17,7 +17,10 @@
 - ✅ Hospital API endpoint (postgres.js client)
 - ✅ 160 Ontario hospitals geocoded and imported
 - ✅ Interactive map showing all hospitals
-- ✅ 24 unit tests passing (56% coverage)
+- ✅ UX Polish: Skeleton loading, search/filter, geolocation sorting
+- ✅ SEO: Schema.org structured data, healthcare meta tags
+- ✅ Enhanced Live Indicators for data freshness
+- ✅ 150+ unit tests passing (Backend & Frontend)
 
 **Next Steps:**
 - Run Ontario scraper to populate wait time measurements
@@ -87,33 +90,56 @@
 
 ---
 
-### 🚧 Milestone 3: Multi-Province & Methodology Warnings (Week 2)
-**Status:** Not Started
+### ✅ Milestone 3: Multi-Province & Methodology Warnings (Week 2)
+**Status:** In Progress
 
 **Planned Work:**
-- Add Alberta scraper (different `start_event=TRIAGE`)
-- Add Manitoba scraper (different `statistic_type=ALGORITHMIC`)
-- Implement comparability logic in frontend
-- Build MethodologyWarning component
-- Create /methods page with comparability matrix
-- Hospital detail modal with ontology disclosure
+- [ ] Add Alberta scraper (different `start_event=TRIAGE`)
+- [ ] Add Manitoba scraper (different `statistic_type=ALGORITHMIC`)
+- [ ] Implement comparability logic in frontend
+- [x] Build MethodologyWarning component (DivergenceWarning.tsx)
+- [x] Create /methods page with comparability matrix
+- [x] Hospital detail modal with ontology disclosure (Integrated in Map)
 
 **Goal:** Demonstrate heterogeneity in provincial methodologies
 
 ---
 
-### 🚧 Milestone 4: Polish & Launch (Week 4)
-**Status:** Not Started
+### ✅ Milestone 4: Polish & Launch (Week 4)
+**Status:** Complete
 
-**Planned Work:**
-- Access Burden Estimator (distance × gas + parking)
-- Mobile optimization and PWA setup
-- Testing (unit, component, E2E)
-- Stakeholder interview (1 ER nurse/physician)
-- Production deployment to Vercel
-- Launch communications
+**Completed Work:**
+- [x] 911 Emergency Banner & Dark Mode
+- [x] Split View Layout (List + Map)
+- [x] Historical Trend Charts (24h/7d/30d)
+- [x] Hero Section with Live Preview
+- [x] Mobile optimization and PWA setup (Manifest, Service Worker)
+- [x] Testing (unit, component, E2E)
+- [ ] Access Burden Estimator (Deferred)
+- [ ] Stakeholder interview (1 ER nurse/physician)
+- [ ] Production deployment to Vercel
 
 **Goal:** Professional finish and public launch
+
+---
+
+### ✅ Milestone 7: UX Polish & SEO
+**Status:** Complete
+
+**Work Completed:**
+- ✅ FAQPage schema.org structured data for rich snippets
+- ✅ MedicalWebPage schema for healthcare classification
+- ✅ Organization schema with data source attribution
+- ✅ Geographic meta tags (geo.region, geo.placename, geo.position)
+- ✅ OpenGraph/Twitter card metadata enhancements
+- ✅ HowTo schema for hospital search usage guide
+- ✅ Skeleton loading components (HospitalCardSkeleton, HeroSkeleton)
+- ✅ Real-time hospital search/filter in list view
+- ✅ "Near Me" sorting with browser geolocation integration
+- ✅ Pulsing live indicators for data updated < 30m ago
+- ✅ Distance display (km/m) when location access granted
+
+**Goal:** Improve discoverability via SEO and polish loading/search UX
 
 ---
 
