@@ -262,7 +262,7 @@ Enhanced navigation:
 
 **For Developers:**
 - ROADMAP.md
-- CLAUDE.md
+- AGENTS.md
 - Ontario Methodology docs
 - Task Summaries
 

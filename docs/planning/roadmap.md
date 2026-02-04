@@ -57,7 +57,7 @@
 - Geocoding service using OpenStreetMap Nominatim (free, no API key)
   - Falls back to Mapbox if Nominatim fails
   - Rate-limited to 1 req/sec per Nominatim policy
-- Automated hospital data collection via ChatGPT/Gemini deep research
+- Automated hospital data collection via systematic research
 - Import scripts for bulk hospital data
 - Next.js frontend with:
   - Interactive Mapbox map
@@ -66,7 +66,7 @@
   - 160 verified Ontario hospitals
 
 **Key Technical Decisions:**
-1. **Geocoding Strategy:** Used external LLMs (ChatGPT/Gemini) to gather city names, then Nominatim for coordinates (fully automated, $0 cost)
+1. **Geocoding Strategy:** Used systematic research to gather city names, then Nominatim for coordinates (fully automated, $0 cost)
 2. **Database Client Split:** Backend uses psycopg2, frontend uses postgres.js (both connect directly to Neon)
 3. **Playwright for Dynamic Content:** HQOntario uses JavaScript rendering, BeautifulSoup insufficient
 
@@ -168,7 +168,7 @@ class BaseScraper(ABC):
 **Problem:** HQOntario only provides hospital names, not addresses or coordinates.
 
 **Solution:** Multi-stage geocoding pipeline
-1. **Data Collection:** Used ChatGPT + Gemini deep research to gather city names and addresses for all 154 Ontario hospitals
+1. **Data Collection:** Used systematic research to gather city names and addresses for all 154 Ontario hospitals
 2. **Geocoding:** Nominatim API with query: `"{address}, {city}, Ontario, Canada"`
 3. **Fallback:** For 3 failed lookups, used city centroids
 4. **Cost:** $0 (Nominatim is free, Mapbox only for optional fallback)
@@ -201,7 +201,7 @@ class BaseScraper(ABC):
 
 **✅ Geocoding Accuracy**
 - **Risk:** Manual coordinate lookup for 154 hospitals
-- **Mitigation:** Automated via LLM deep research + Nominatim API
+- Mitigation: Automated via systematic research + Nominatim API
 - **Status:** Resolved (151/154 geocoded accurately, 3 use city centroids)
 
 **✅ JavaScript Rendering Detection**
@@ -260,9 +260,9 @@ class BaseScraper(ABC):
 
 ### Completed
 - ✅ `README.md` - Project overview and setup
-- ✅ `CLAUDE.md` - Agent instructions with security rules
+- ✅ `AGENTS.md` - Agent instructions with security rules
 - ✅ `docs/planning/roadmap.md` - This file
-- ✅ `docs/geocoding-research-prompt.md` - LLM research prompt
+- ✅ `docs/geocoding-research-plan.md` - Systematic research plan
 
 ### Planned
 - [ ] `docs/ARCHITECTURE.md` - System design decisions
@@ -327,7 +327,7 @@ class BaseScraper(ABC):
 
 ### What Went Well
 - Nominatim geocoding worked perfectly (151/154 accurate)
-- LLM deep research was faster than manual data entry
+- Systematic research was faster than manual data entry
 - Playwright handled JavaScript rendering seamlessly
 - Database schema design upfront avoided refactoring
 
@@ -363,6 +363,6 @@ class BaseScraper(ABC):
 ## References
 
 - Main specification: `er-times-plan.md` (deleted, content integrated here)
-- CLAUDE.md: Agent instructions with security rules
+- AGENTS.md: Agent instructions with security rules
 - Database migrations: `backend/database/migrations/`
 - Test suite: `backend/tests/`

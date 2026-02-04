@@ -6,7 +6,7 @@ The Verification Queue UI allows administrators to review and approve hospitals 
 
 ## Why This Matters
 
-From CLAUDE.md:
+From AGENTS.md:
 > "**NEVER auto-publish new hospitals.** All discovered facilities must go through verification"
 
 This verification gate prevents:
@@ -248,7 +248,7 @@ Potential v2 improvements:
 
 ## Related Documentation
 
-- **Main project requirements:** `/home/jer/localsync/waittimecanada/CLAUDE.md`
+- **Main project requirements:** `/home/jer/localsync/waittimecanada/AGENTS.md`
 - **Database schema:** `/home/jer/localsync/waittimecanada/backend/docs/data-retention.md`
 - **Ontario methodology:** `/home/jer/localsync/waittimecanada/backend/docs/methodologies/ontario-methodology.md`
 

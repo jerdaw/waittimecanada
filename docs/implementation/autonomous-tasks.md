@@ -360,7 +360,7 @@ WHERE is_active = true;
 ## 3. Verification Queue UI
 
 ### Overview
-Admin interface for reviewing and approving newly discovered hospitals. Implements the verification gate pattern from CLAUDE.md.
+Admin interface for reviewing and approving newly discovered hospitals. Implements the verification gate pattern from AGENTS.md.
 
 ### Route: `frontend/app/admin/verify/page.tsx`
 
@@ -702,7 +702,7 @@ Implement the 30-day retention policy: delete raw measurement rows older than 30
 
 ```python
 """
-Data retention service - cleans up old measurements per CLAUDE.md policy.
+Data retention service - cleans up old measurements per AGENTS.md policy.
 """
 from datetime import datetime, timezone, timedelta
 import logging
@@ -2086,7 +2086,7 @@ Each task is complete when:
 1. **Code**: Implemented, linted, type-checked
 2. **Tests**: Relevant tests passing
 3. **Documentation**: Updated if applicable
-4. **Review**: Self-reviewed for CLAUDE.md compliance
+4. **Review**: Self-reviewed for AGENTS.md compliance
 
 ---
 

@@ -20,22 +20,22 @@ def load_csv(filepath: Path) -> list[dict]:
         return list(reader)
 
 
-def merge_hospital_data(chatgpt_data: list[dict], gemini_data: list[dict]) -> list[dict]:
-    """Merge hospital data, preferring ChatGPT but adding Gemini lat/long where available."""
-    # Index Gemini data by hospital name for quick lookup
-    gemini_by_name = {h["hospital_name"]: h for h in gemini_data}
+def merge_hospital_data(primary_data: list[dict], secondary_data: list[dict]) -> list[dict]:
+    """Merge hospital data, preferring primary source but adding secondary lat/long where available."""
+    # Index secondary data by hospital name for quick lookup
+    secondary_by_name = {h["hospital_name"]: h for h in secondary_data}
 
     merged = []
-    for hospital in chatgpt_data:
+    for hospital in primary_data:
         name = hospital["hospital_name"]
         result = hospital.copy()
 
-        # If ChatGPT doesn't have lat/long but Gemini does, use Gemini's
-        if not hospital.get("latitude") and name in gemini_by_name:
-            gemini_hospital = gemini_by_name[name]
-            if gemini_hospital.get("latitude") and gemini_hospital.get("longitude"):
-                result["latitude"] = gemini_hospital["latitude"]
-                result["longitude"] = gemini_hospital["longitude"]
+        # If primary source doesn't have lat/long but secondary does, use secondary's
+        if not hospital.get("latitude") and name in secondary_by_name:
+            secondary_hospital = secondary_by_name[name]
+            if secondary_hospital.get("latitude") and secondary_hospital.get("longitude"):
+                result["latitude"] = secondary_hospital["latitude"]
+                result["longitude"] = secondary_hospital["longitude"]
 
         merged.append(result)
 
@@ -117,23 +117,23 @@ def main():
     # Paths
     base_dir = Path(__file__).parent.parent.parent
     docs_dir = base_dir / "docs"
-    chatgpt_csv = docs_dir / "hospital-data-chatgpt.csv"
-    gemini_csv = docs_dir / "hospital-data-gemini.csv"
+    chatgpt_csv = docs_dir / "hospital-data-primary.csv"
+    gemini_csv = docs_dir / "hospital-data-secondary.csv"
     output_csv = docs_dir / "hospitals-geocoded.csv"
 
     print("Loading CSV files...")
     chatgpt_data = load_csv(chatgpt_csv)
     gemini_data = load_csv(gemini_csv)
 
-    print(f"  ChatGPT: {len(chatgpt_data)} hospitals")
-    print(f"  Gemini: {len(gemini_data)} hospitals")
+    print(f"  Primary source: {len(chatgpt_data)} hospitals")
+    print(f"  Secondary source: {len(gemini_data)} hospitals")
 
-    print("\nMerging data (ChatGPT primary, Gemini lat/long where available)...")
+    print("\nMerging data...")
     merged_data = merge_hospital_data(chatgpt_data, gemini_data)
 
     # Count how many already have coordinates
     with_coords = sum(1 for h in merged_data if h.get("latitude") and h.get("longitude"))
-    print(f"  {with_coords} hospitals already have coordinates from Gemini")
+    print(f"  {with_coords} hospitals already have coordinates from fallback source")
 
     print("\nGeocoding hospitals (1 request per second)...")
     results = []

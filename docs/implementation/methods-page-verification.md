@@ -276,7 +276,7 @@ Since venv is broken, manual testing required:
 
 ---
 
-## Compliance with CLAUDE.md
+## Compliance with AGENTS.md
 
 ### ✅ Requirements Met
 
@@ -305,5 +305,5 @@ The Methods page is **fully implemented and production-ready**. All components r
 
 ---
 
-*Verified by: Claude Sonnet 4.5*
+*Verified by: Jeremy Dawson*
 *Date: February 1, 2026*

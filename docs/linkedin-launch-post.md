@@ -323,7 +323,7 @@ MIT License. Contributions welcome for:
 - Testing improvements
 
 🔗 GitHub: [your-username/waittime-canada]
-📚 Docs: ROADMAP.md, CLAUDE.md
+📚 Docs: ROADMAP.md, AGENTS.md
 🎯 CanMEDS: Scholar + Professional + Advocate + Leader
 
 Built as a physician-innovator portfolio project. Demonstrates clinical thinking + technical competence for medical school applications.

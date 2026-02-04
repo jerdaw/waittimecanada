@@ -318,7 +318,7 @@ After running the script, complete these manual steps:
 - [ ] Test docs build: `mkdocs serve`
 - [ ] Run backend tests: `cd backend && pytest`
 - [ ] Run frontend tests: `cd frontend && pnpm test`
-- [ ] Update CLAUDE.md with new structure
+- [ ] Update AGENTS.md with new structure
 - [ ] Review all changes in git diff
 - [ ] Commit and push
 

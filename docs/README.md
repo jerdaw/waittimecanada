@@ -36,7 +36,7 @@ This directory contains the detailed implementation plan for WaitTime Canada.
 ### Reference Documents
 
 - **[../er-times-plan.md](../er-times-plan.md)** - Original strategic specification
-- **[../CLAUDE.md](../CLAUDE.md)** - AI assistant guidance for the codebase
+- **[../AGENTS.md](../AGENTS.md)** - AI assistant guidance for the codebase
 
 ## Implementation Philosophy
 

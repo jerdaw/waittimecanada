@@ -1579,7 +1579,7 @@ indent_style = tab
 - [ ] Update imports in all Python files
 - [ ] Update paths in GitHub Actions workflows
 - [ ] Update README.md with new structure
-- [ ] Update CLAUDE.md with new structure
+- [ ] Update AGENTS.md with new structure
 
 ---
 

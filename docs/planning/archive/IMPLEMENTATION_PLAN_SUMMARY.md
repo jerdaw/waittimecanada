@@ -104,7 +104,7 @@ We transformed the high-level strategic document (`er-times-plan.md`) into a **c
 17. **[docs/README.md](./docs/README.md)**
     - Documentation structure and navigation
 
-18. **[CLAUDE.md](./CLAUDE.md)** (Updated)
+18. **[AGENTS.md](./AGENTS.md)** (Updated)
     - AI assistant guidance for codebase
 
 ---
@@ -223,8 +223,8 @@ We transformed the high-level strategic document (`er-times-plan.md`) into a **c
 3. **Code Reviews:** Enforce standards from IMPLEMENTATION.md
 4. **Retrospectives:** Adjust roadmap based on velocity
 
-### For AI Assistant (Claude Code):
-1. **Context:** Read CLAUDE.md first
+### For Automated Developer Tools (automated developer tools):
+1. **Context:** Read AGENTS.md first
 2. **Reference:** Consult IMPLEMENTATION.md for patterns
 3. **Schema:** Check DATABASE.md for exact table structure
 4. **API:** Check API.md for endpoint contracts

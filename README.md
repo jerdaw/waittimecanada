@@ -250,7 +250,7 @@ waittime-canada/
 │   └── database-cleanup.yml     # 30-day data retention
 │
 ├── ROADMAP.md                   # Master task list with milestones
-├── CLAUDE.md                    # Guidance for Claude Code
+├── AGENTS.md                    # Guidance for automated developer tools
 └── README.md                    # This file
 ```
 
@@ -475,7 +475,7 @@ class OntarioScraper(BaseScraper):
 
 ### For Developers
 - **[ROADMAP.md](./ROADMAP.md)** - Master task list with milestones
-- **[CLAUDE.md](./CLAUDE.md)** - Guidance for Claude Code
+- **[AGENTS.md](./AGENTS.md)** - Guidance for automated developer tools
 - **[Ontario Methodology](./docs/methodologies/ontario-methodology.md)** - Detailed methodology docs
 - **[Task Summaries](./docs/implementation/)** - Implementation completion docs
 
@@ -572,10 +572,10 @@ You are free to use, modify, and distribute this code for educational and commer
 - **Advocate:** Healthcare transparency, access barriers, system monitoring
 - **Leader:** Project planning, technical execution, documentation
 
-**Author:** [Your Name]
-**GitHub:** [github.com/your-username/waittime-canada](https://github.com/)
-**LinkedIn:** [Your LinkedIn]
-**Email:** [Your Email]
+**Author:** Jeremy Dawson
+**GitHub:** [github.com/jerdaw/waittimecanada](https://github.com/jerdaw/waittimecanada)
+**LinkedIn:** [linkedin.com/in/jeremyjdawson](https://www.linkedin.com/in/jeremyjdawson/)
+**Email:** jeremyjdawson@gmail.com
 
 ---
 

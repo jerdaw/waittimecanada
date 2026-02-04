@@ -1,6 +1,4 @@
-# Hospital Data Research Prompt
-
-Use this prompt with ChatGPT or Google Gemini deep research to get complete hospital location data.
+# Hospital Data Research Plan
 
 ---
 

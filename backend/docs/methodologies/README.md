@@ -212,7 +212,7 @@ For methodology questions, consult:
 1. This README
 2. The specific provincial methodology document
 3. The `/methods` page on the frontend
-4. The `CLAUDE.md` file in the repository root
+4. The `AGENTS.md` file in the repository root
 
 ---
 

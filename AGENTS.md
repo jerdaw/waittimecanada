@@ -208,7 +208,7 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 - Add Manitoba scraper (different `statistic_type`)
 - Build verification queue UI
 - Populate `sources` table with telehealth data
-- Test auto-researcher generates divergence briefs correctly
+- Test divergence detection service generates divergence briefs correctly
 
 ### Week 3: Frontend "Scholar" UI
 - Next.js app with Mapbox integration

@@ -234,7 +234,7 @@ waittime-canada/
 ├── .gitignore
 ├── .pre-commit-config.yaml
 ├── er-times-plan.md                  # Original strategic doc
-└── CLAUDE.md                         # AI assistant guidance
+└── AGENTS.md                         # AI assistant guidance
 ```
 
 ---
@@ -896,5 +896,5 @@ After setting up your development environment:
 ## Questions or Issues?
 
 - Check [../er-times-plan.md](../er-times-plan.md) for strategic context
-- Reference [../CLAUDE.md](../CLAUDE.md) for codebase guidance
+- Reference [../AGENTS.md](../AGENTS.md) for codebase guidance
 - Review risk mitigations in strategic plan Part 6

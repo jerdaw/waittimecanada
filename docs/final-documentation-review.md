@@ -16,7 +16,7 @@ Comprehensive review of all project documentation confirms the project is **port
 ### Core Documentation (5 files)
 - ✅ `README.md` - Comprehensive (584 lines), up-to-date statistics
 - ✅ `ROADMAP.md` - Current, reflects actual progress
-- ✅ `CLAUDE.md` - Complete guidance for Claude Code
+- ✅ `AGENTS.md` - Complete guidance for automated developer tools
 - ✅ `docs/linkedin-launch-post.md` - 5 options with usage guide
 - ✅ `docs/final-documentation-review.md` - This document
 
@@ -149,7 +149,7 @@ Comprehensive review of all project documentation confirms the project is **port
 
 **Internal Links:**
 - ✅ README → ROADMAP.md (working)
-- ✅ README → CLAUDE.md (working)
+- ✅ README → AGENTS.md (working)
 - ✅ README → docs/ (working)
 - ✅ ROADMAP → implementation docs (working)
 - ✅ Implementation docs cross-reference correctly
@@ -305,8 +305,8 @@ Comprehensive review of all project documentation confirms the project is **port
 - **Statistics:** Current test counts
 - **Grade:** A+ (Clear project management)
 
-### CLAUDE.md ✅ EXCELLENT
-- **Guidance:** Comprehensive for Claude Code
+### AGENTS.md ✅ EXCELLENT
+- **Guidance:** Comprehensive for automated developer tools
 - **Security:** Critical rules for .env.local
 - **Architecture:** Core principles explained
 - **Grade:** A+ (Essential for AI collaboration)
@@ -414,7 +414,7 @@ Minor personalization tasks (name, URLs) can be addressed just before deployment
 **Before Deployment:**
 - 🔲 Replace placeholder text (name, GitHub URL, email)
 - 🔲 Choose LinkedIn post version
-- 🔲 Review CLAUDE.md for any project-specific guidance
+- 🔲 Review AGENTS.md for any project-specific guidance
 
 **After Deployment:**
 - 🔲 Add live demo URL to README

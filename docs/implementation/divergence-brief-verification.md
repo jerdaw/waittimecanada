@@ -365,7 +365,7 @@ Expected:
 
 ---
 
-## Compliance with CLAUDE.md
+## Compliance with AGENTS.md
 
 ### ✅ Requirements Met
 
@@ -413,6 +413,6 @@ This feature delivers on the "Scholar" narrative by making invisible methodology
 
 ---
 
-*Verified by: Claude Sonnet 4.5*
+*Verified by: Jeremy Dawson*
 *Date: February 1, 2026*
 *Lines of code: 828 (backend + frontend)*
