@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to automated developer tools when working with code in this repository.
 
 ## ⚠️ CRITICAL SECURITY RULES ⚠️
 
@@ -33,7 +33,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is the **WaitTime Canada** project - a "Health Systems Observatory" designed to audit and standardize Canadian emergency room wait time data across provinces. This is **NOT a simple wait time app**, but rather a clinically defensible auditing platform that exposes methodological inconsistencies in healthcare reporting.
 
-**Current Status:** Active development, significant infrastructure complete. **PRIMARY FOCUS: Core infrastructure ✓, Ontario implementation in progress**.
+**Current Status:** Active development, significant infrastructure complete. **PRIMARY FOCUS: Core infrastructure ✓, Ontario & Quebec scrapers live ✓, Geocoding manual override live ✓**.
 
 **Current Architecture:**
 - **Database**: Neon PostgreSQL 17 with full schema (sources, hospitals, measurements, scraper_status)

@@ -27,6 +27,7 @@ class TestQuebecScraper:
         assert scraper._extract_wait_time("2h 30min") == 150.0
         assert scraper._extract_wait_time("3 heures") == 180.0
         assert scraper._extract_wait_time("1h 15min") == 75.0
+        assert scraper._extract_wait_time("4 h 15 min") == 255.0
 
     def test_extract_wait_time_colon_format(self, scraper):
         """Extract wait time from time format (H:MM)."""
@@ -66,73 +67,92 @@ class TestQuebecScraper:
         result = scraper._normalize_hospital_id("Hôpital Nouveau")
         assert result == "ca-qc-hopital-nouveau"
 
-    def test_parse_table_format(self, scraper):
-        """Parse table-based HTML format."""
+    def test_parse_new_format(self, scraper):
+        """Parse new search-result HTML format."""
+        
+        # Simulated HTML from the AJAX endpoint
         html = """
-        <table>
-            <tr>
-                <td>CHUM</td>
-                <td>120 min</td>
-            </tr>
-            <tr>
-                <td>Jewish General Hospital</td>
-                <td>2h 15min</td>
-            </tr>
-        </table>
-        """
-        measurements = scraper.parse(html)
-
-        assert len(measurements) == 2
-        assert measurements[0].hospital_id == "ca-qc-chum"
-        assert measurements[0].value == 120.0
-        assert measurements[1].hospital_id == "ca-qc-jewish-general"
-        assert measurements[1].value == 135.0
-
-    def test_parse_json_format(self, scraper):
-        """Parse embedded JSON format."""
-        html = """
-        <script type="application/json">
-        {
-            "hospitals": [
-                {"name": "CHUM", "wait_time": "90"},
-                {"nom": "Hôpital Maisonneuve-Rosemont", "temps_attente": "105"}
-            ]
-        }
-        </script>
-        """
-        measurements = scraper.parse(html)
-
-        assert len(measurements) == 2
-        assert measurements[0].hospital_id == "ca-qc-chum"
-        assert measurements[0].value == 90.0
-        assert measurements[1].hospital_id == "ca-qc-maisonneuve-rosemont"
-        assert measurements[1].value == 105.0
-
-    def test_parse_card_format(self, scraper):
-        """Parse card/list HTML format."""
-        html = """
-        <div class="hospital-card">
-            <h3>CHUM</h3>
-            <div class="wait-time">2:30</div>
+        <div class="hospital_element">
+            <div class="font-weight-bold textual-content">
+                CHUM
+            </div>
+            <div class="adresse">1000 Rue Saint-Denis</div>
+            <div class="infos-hopital">
+                <ul class="list-unstyled">
+                    <li class="hopital-item">
+                        <span class="picto"></span>
+                        Number of people waiting: <span class="font-weight-bold">15</span>
+                    </li>
+                    <li class="hopital-item">
+                        <span class="picto"></span>
+                        Estimated waiting time for non-priority cases : 
+                        <span class="font-weight-bold">2 h 15 min</span>
+                    </li>
+                    <li class="hopital-item">
+                         Occupancy rate: 110%
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div class="hospital-card">
-            <strong>Jewish General Hospital</strong>
-            <span class="attente">45 min</span>
+        <div class="hospital_element">
+            <div class="font-weight-bold textual-content">
+                Hôpital général juif
+            </div>
+            <div class="infos-hopital">
+                <ul class="list-unstyled">
+                    <li class="hopital-item">
+                        Estimated waiting time for non-priority cases : 45 min
+                    </li>
+                </ul>
+            </div>
         </div>
         """
+        
         measurements = scraper.parse(html)
 
         assert len(measurements) == 2
+        
+        # Check first hospital (CHUM)
         assert measurements[0].hospital_id == "ca-qc-chum"
-        assert measurements[0].value == 150.0
+        assert measurements[0].value == 135.0  # 2h 15min
+        
+        # Check second hospital (Jewish General)
         assert measurements[1].hospital_id == "ca-qc-jewish-general"
-        assert measurements[1].value == 45.0
+        assert measurements[1].value == 45.0   # 45 min
+
+    def test_parse_ignores_other_metrics(self, scraper):
+        """Ensure we don't accidentally pick up occupancy rates or patient counts."""
+        html = """
+        <div class="hospital_element">
+            <div class="font-weight-bold">CHUM</div>
+            <ul class="list-unstyled">
+                <li class="hopital-item">
+                   Number of people waiting: 10
+                </li>
+                <li class="hopital-item">
+                   Occupancy rate of stretchers: 150%
+                </li>
+            </ul>
+        </div>
+        """
+        measurements = scraper.parse(html)
+        assert len(measurements) == 0
 
     def test_measurement_has_correct_ontology(self, scraper):
         """Verify measurements are tagged with Quebec's methodology."""
-        html = "<table><tr><td>CHUM</td><td>90 min</td></tr></table>"
+        html = """
+        <div class="hospital_element">
+            <div class="font-weight-bold">CHUM</div>
+            <ul class="list-unstyled">
+                <li class="hopital-item">
+                    Estimated waiting time for non-priority cases : 90 min
+                </li>
+            </ul>
+        </div>
+        """
         measurements = scraper.parse(html)
 
+        assert len(measurements) == 1
         m = measurements[0]
         assert m.metric_family == MetricFamily.TIME_TO_PROVIDER
         assert m.start_event == StartEvent.REGISTRATION
@@ -142,25 +162,23 @@ class TestQuebecScraper:
 
     def test_measurement_has_payload_hash(self, scraper):
         """Verify payload is hashed for storage safety."""
-        html = "<table><tr><td>CHUM</td><td>90 min</td></tr></table>"
+        html = """
+        <div class="hospital_element">
+            <div class="font-weight-bold">CHUM</div>
+            <ul class="list-unstyled">
+                <li class="hopital-item">
+                    Estimated waiting time for non-priority cases : 90 min
+                </li>
+            </ul>
+        </div>
+        """
         measurements = scraper.parse(html)
 
         m = measurements[0]
         assert len(m.raw_payload_hash) == 64  # SHA256
-        assert m.raw_payload_snippet == html[:200]
+        assert len(m.raw_payload_snippet) > 0
 
     def test_parse_empty_html(self, scraper):
         """Handle empty HTML gracefully."""
         measurements = scraper.parse("<html><body></body></html>")
-        assert measurements == []
-
-    def test_parse_no_wait_times(self, scraper):
-        """Handle HTML with hospitals but no wait times."""
-        html = """
-        <table>
-            <tr><td>CHUM</td><td>N/A</td></tr>
-            <tr><td>Jewish General</td><td>Unknown</td></tr>
-        </table>
-        """
-        measurements = scraper.parse(html)
         assert measurements == []

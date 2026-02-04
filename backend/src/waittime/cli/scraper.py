@@ -129,7 +129,11 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
                 hospital_name = hospital_id_to_name(hospital_id)
 
             # Try to geocode using the hospital name
-            geocoding_result = geocoder.geocode_hospital(hospital_name, province=source.province)
+            geocoding_result = geocoder.geocode_hospital(
+                hospital_name, 
+                province=source.province,
+                hospital_id=hospital_id
+            )
 
             if geocoding_result:
                 # Use geocoded data (accept any confidence level)
@@ -250,7 +254,17 @@ def main() -> NoReturn:
         logger.info(f"Completed: {total} measurements from {len(SCRAPERS)} sources")
         if failed:
             logger.warning(f"{failed} scraper(s) failed")
+        
+        # Exit with success if we collected ANY data
+        if total > 0:
+            logger.info(f"Successfully collected {total} measurements total")
+            sys.exit(0)
+        
+        # Only fail if we collected NOTHING and had failures
+        if failed > 0:
+            logger.error("All scrapers failed")
             sys.exit(1)
+            
         sys.exit(0)
 
     if args.source:

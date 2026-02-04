@@ -13,7 +13,7 @@ The first production scraper run completed on 2026-02-04. Ontario data is succes
 | Province | Status | Hospitals | Measurements | Issues |
 |----------|--------|-----------|--------------|--------|
 | Ontario | ✅ Working | 154 total (72 geocoded) | 164 per run | 82 hospitals with placeholder coords |
-| Quebec | ❌ Broken | 0 | 0 | Government changed URL and page format |
+| Quebec | ✅ Working | 113 | 113 per run | Fixed with new AJAX scraper |
 
 ---
 
