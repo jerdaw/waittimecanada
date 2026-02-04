@@ -13,7 +13,7 @@ jobs:
   run-scrapers:
     name: Run All Scrapers
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code

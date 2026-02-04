@@ -67,15 +67,22 @@ class GeocodingService:
         """
         # Try Nominatim first (free, no API key needed)
         result = self._geocode_with_nominatim(hospital_name, province, country)
-        if result and result.confidence > 0.7:
+        if result:
+            # Accept any Nominatim result (even low confidence is better than placeholder)
+            if result.confidence > 0.7:
+                return result
+            # For low confidence, try Mapbox if available
+            if self.mapbox_token:
+                logger.info(f"Low confidence Nominatim result for {hospital_name}, trying Mapbox")
+                mapbox_result = self._geocode_with_mapbox(hospital_name, province, country)
+                if mapbox_result:
+                    return mapbox_result
+            # Return Nominatim result even with low confidence (better than nothing)
+            logger.info(f"Using Nominatim result for {hospital_name} (confidence={result.confidence:.2f})")
             return result
 
-        # Fall back to Mapbox if available
-        if self.mapbox_token:
-            logger.info(f"Nominatim failed for {hospital_name}, trying Mapbox")
-            return self._geocode_with_mapbox(hospital_name, province, country)
-
-        logger.warning(f"Failed to geocode {hospital_name} (no Mapbox fallback)")
+        # Only fail if Nominatim returned nothing
+        logger.warning(f"Failed to geocode {hospital_name}")
         return None
 
     def _geocode_with_nominatim(

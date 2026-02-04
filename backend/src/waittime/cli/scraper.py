@@ -108,7 +108,15 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
         logger.info(f"Upserting {len(unique_hospital_ids)} unique hospitals")
 
         geocoded_count = 0
+        skipped_count = 0
         for hospital_id in unique_hospital_ids:
+            # Check if hospital already exists with valid coordinates
+            existing_hospital = db.get_hospital(hospital_id)
+            if existing_hospital and existing_hospital.latitude != 0.0 and existing_hospital.longitude != 0.0:
+                # Hospital already has valid coordinates, skip geocoding
+                skipped_count += 1
+                continue
+
             # Try to get official name from scraper's mapping
             hospital_name = None
             if hasattr(scraper_class, "HOSPITAL_MAPPING"):
@@ -123,12 +131,16 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
             # Try to geocode using the hospital name
             geocoding_result = geocoder.geocode_hospital(hospital_name, province=source.province)
 
-            if geocoding_result and geocoding_result.confidence > 0.8:
-                # Use geocoded data (higher confidence threshold)
+            if geocoding_result:
+                # Use geocoded data (accept any confidence level)
                 city = geocoding_result.city
                 latitude = geocoding_result.latitude
                 longitude = geocoding_result.longitude
                 geocoded_count += 1
+                logger.info(
+                    f"Geocoded {hospital_name}: ({latitude:.4f}, {longitude:.4f}) "
+                    f"confidence={geocoding_result.confidence:.2f}"
+                )
             else:
                 # Fall back to placeholders
                 logger.warning(
@@ -152,7 +164,10 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
             )
             db.upsert_hospital(hospital)
 
-        logger.info(f"✅ Geocoded {geocoded_count}/{len(unique_hospital_ids)} hospitals")
+        logger.info(
+            f"✅ Geocoded {geocoded_count} new hospitals, "
+            f"skipped {skipped_count} existing (total {len(unique_hospital_ids)})"
+        )
 
         # Step 2: Insert measurements
         count = db.insert_measurements(measurements)
