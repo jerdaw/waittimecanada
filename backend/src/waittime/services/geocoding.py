@@ -109,11 +109,11 @@ class GeocodingService:
             return result
         
         # 2. Try Nominatim (free, no API key needed)
-        result = self._geocode_with_nominatim(hospital_name, province, country)
-        if result:
+        nom_result = self._geocode_with_nominatim(hospital_name, province, country)
+        if nom_result:
             # Accept any Nominatim result (even low confidence is better than placeholder)
-            if result.confidence > 0.7:
-                return result
+            if nom_result.confidence > 0.7:
+                return nom_result
             # For low confidence, try Mapbox if available
             if self.mapbox_token:
                 logger.info(f"Low confidence Nominatim result for {hospital_name}, trying Mapbox")

@@ -74,11 +74,8 @@ class QuebecScraper(BaseScraper):
         "Hôpital Fleury": "ca-qc-fleury",
     }
 
-    def run(self) -> list[Measurement]:
-        """Run the scraper.
-        
-        Overridden to handle pagination directly since we need to make multiple requests.
-        """
+    def run(self, save_to_db: bool = True) -> list[Measurement]:
+        """Fetch all pages of measurements."""
         measurements: list[Measurement] = []
         
         # We need to iterate through pages.

@@ -77,7 +77,9 @@ class DatabaseService:
             with self.get_cursor(conn) as cur:
                 cur.execute("SELECT * FROM sources WHERE id = %s", (source_id,))
                 row = cur.fetchone()
-                return self._row_to_source(dict(row)) if row else None
+                if row is None:
+                    return None
+                return self._row_to_source(dict(row))
 
     def list_sources(self) -> list[Source]:
         """List all data sources."""
@@ -119,6 +121,8 @@ class DatabaseService:
                     ),
                 )
                 row = cur.fetchone()
+                if row is None:
+                    raise ValueError(f"Failed to upsert source {source.id}")
                 return self._row_to_source(dict(row))
 
     # ─────────────────────────────────────────────────────────────────
@@ -131,7 +135,9 @@ class DatabaseService:
             with self.get_cursor(conn) as cur:
                 cur.execute("SELECT * FROM hospitals WHERE id = %s", (hospital_id,))
                 row = cur.fetchone()
-                return self._row_to_hospital(dict(row)) if row else None
+                if row is None:
+                    return None
+                return self._row_to_hospital(dict(row))
 
     def upsert_hospital(self, hospital: Hospital) -> Hospital:
         """Insert or update a hospital."""
@@ -164,6 +170,8 @@ class DatabaseService:
                     ),
                 )
                 row = cur.fetchone()
+                if row is None:
+                    raise ValueError(f"Failed to upsert hospital {hospital.id}")
                 return self._row_to_hospital(dict(row))
 
     def insert_hospital(self, hospital: Hospital) -> Hospital:
@@ -191,6 +199,8 @@ class DatabaseService:
                     ),
                 )
                 row = cur.fetchone()
+                if row is None:
+                    raise ValueError(f"Failed to insert hospital {hospital.id}")
                 return self._row_to_hospital(dict(row))
 
     def list_hospitals(
@@ -235,6 +245,8 @@ class DatabaseService:
                     (make_visible, hospital_id),
                 )
                 row = cur.fetchone()
+                if row is None:
+                    raise ValueError(f"Failed to verify hospital {hospital_id}")
                 return self._row_to_hospital(dict(row))
 
     # ─────────────────────────────────────────────────────────────────
@@ -269,7 +281,10 @@ class DatabaseService:
                         measurement.parser_version,
                     ),
                 )
-                return dict(cur.fetchone())
+                row = cur.fetchone()
+                if row is None:
+                    raise ValueError("Failed to insert measurement")
+                return dict(row)
 
     def insert_measurements(self, measurements: list[Measurement]) -> int:
         """Insert multiple measurements in batch."""
@@ -323,7 +338,9 @@ class DatabaseService:
                     (hospital_id,),
                 )
                 row = cur.fetchone()
-                return self._row_to_measurement(dict(row)) if row else None
+                if row is None:
+                    return None
+                return self._row_to_measurement(dict(row))
 
     def cleanup_old_measurements(self, retention_days: int = 30) -> int:
         """Delete measurements older than retention period.
@@ -429,13 +446,16 @@ class DatabaseService:
                     """,
                     (source_id, status, error_message, measurements_count),
                 )
-                row = dict(cur.fetchone())
+                row = cur.fetchone()
+                if row is None:
+                    raise ValueError(f"Failed to update heartbeat for {source_id}")
+                row_dict = dict(row)
                 return ScraperStatus(
-                    source_id=row["source_id"],
-                    last_run=row["last_run"],
-                    status=row["status"],
-                    error_message=row.get("error_message"),
-                    measurements_count=row["measurements_count"],
+                    source_id=row_dict["source_id"],
+                    last_run=row_dict["last_run"],
+                    status=row_dict["status"],
+                    error_message=row_dict.get("error_message"),
+                    measurements_count=row_dict["measurements_count"],
                 )
 
     def get_stale_scrapers(self, threshold_minutes: int = 60) -> list[ScraperStatus]:
