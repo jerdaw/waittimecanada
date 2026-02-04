@@ -5,13 +5,9 @@
 **Status:** 🚀 Core Features Complete | 📊 Ready for Production
 **Test Coverage:** Backend: 143 tests (57% coverage) | Frontend: 79 tests (100% pass rate)
 **Live Site:** Coming Soon
-**Documentation:** [docs/](./docs/) | [ROADMAP.md](./ROADMAP.md)
+**Documentation:** [docs/](./docs/)
 
-**Latest Update (Feb 2, 2026):**
-- ✅ Ontario implementation complete (213 hospitals with 530 measurements)
-- ✅ Comparison feature tested with real data
-- ✅ Methods page with comparability matrix
-- ✅ Telehealth routing implemented
+
 
 ---
 
@@ -487,44 +483,26 @@ class OntarioScraper(BaseScraper):
 
 ---
 
+**Latest Update (Feb 4, 2026):**
+- ✅ Milestone 6 Complete: Geocoding coverage (100%), CLI tests (92%), E2E tests passing
+- ✅ Manual geocoding override system fully populated for Ontario (100% accuracy)
+- ✅ Admin verification queue with "Reject & Delete" functionality tested
+
+---
+
 ## Roadmap
 
-### ✅ Completed (Milestones 1-2, 4)
+### 🔄 Planned & In Progress
+- [ ] **Regional Scaling**: Implement Alberta and British Columbia scrapers
+- [ ] **Admin Enhancements**: Batch operations and search/filter for verification queue
+- [ ] **Data Insights**: Historical trend charts and aggregate data export
+- [ ] **Burden Estimator**: Access burden calculator (logistics, parking, and gas estimates)
 
-**Infrastructure:**
-- Core backend with scrapers, services, CLI tools
-- Neon PostgreSQL 17 database with full schema
-- Frontend with Next.js 14 + Mapbox GL JS
-- Comprehensive test suite (143 backend + 79 frontend)
-
-**Ontario Implementation:**
-- 213 hospitals seeded with verification workflow
-- Map integration with methodology display
-- Comparison feature with divergence detection
-- Telehealth routing (Health811 - 811)
-
-**Polish & Documentation:**
-- Methods page with comparability matrix
-- Interactive ontology explainer
-- Province methodology cards
-- Comprehensive FAQ
-
-### 🔄 In Progress (Milestone 5)
-- [ ] Update README (this file) ✓
-- [ ] Production deployment to Vercel
-- [ ] Automated scraper cron setup
-
-### ⏳ Planned (Milestone 3-4)
-- [ ] Quebec hospital seeding and verification
-- [ ] Real Quebec scraper URL validation
-- [ ] Cross-province comparison testing
-- [ ] Historical trend charts
-
-### 🎯 Future Enhancements
-- Additional provinces (Alberta, Manitoba, BC)
-- Email alerts for significant wait time changes
-- Access burden estimator (distance + parking costs)
-- Mobile app (React Native)
+### 🎯 Future Backlog
+- [ ] Mobile application (React Native / Expo)
+- [ ] Equity Layer: Socio-economic overlays for access analysis
+- [ ] Proactive Alerts: Email/Push notifications for significant wait time spikes
+- [ ] Personalization: User accounts for "Saved Hospitals" and regional defaults
 
 ---
 

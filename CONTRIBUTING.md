@@ -29,7 +29,7 @@ This project adheres to a Code of Conduct. By participating, you are expected to
 - Node.js 20.x LTS
 - pnpm 8.x
 - Git
-- A Supabase account (for database access)
+- A Neon account (for database access)
 
 ### Initial Setup
 
@@ -67,7 +67,7 @@ cp backend/.env.example backend/.env
 cp frontend/.env.local.example frontend/.env.local
 
 # Edit with your credentials
-# You'll need Supabase URL and keys
+# You'll need Neon DATABASE_URL
 ```
 
 4. **Verify Setup**
@@ -510,7 +510,7 @@ ADRs are submitted via pull request like code changes.
 ### Example ADRs
 
 See existing ADRs for examples:
-- [ADR-0001: Use Supabase](docs/adr/0001-use-supabase.md)
+- [ADR-0001: Use Neon PostgreSQL](docs/adr/0001-use-neon.md)
 - [ADR-0002: Metric Ontology](docs/adr/0002-metric-ontology.md)
 - [ADR-0003: Serverless Scrapers](docs/adr/0003-serverless-scrapers.md)
 

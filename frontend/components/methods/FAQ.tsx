@@ -110,7 +110,7 @@ export function FAQ() {
           If you have questions or feedback, we&apos;d love to hear from you.
         </p>
         <a
-          href="https://github.com/anthropics/waittimecanada/issues"
+          href="https://github.com/jerdaw/waittimecanada/issues"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"

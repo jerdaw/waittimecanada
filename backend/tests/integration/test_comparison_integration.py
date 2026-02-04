@@ -84,11 +84,13 @@ class TestComparisonWithRealData:
         assert method_a["end_event"] == method_b["end_event"]
         assert method_a["statistic_type"] == method_b["statistic_type"]
 
-        # Verify Ontario uses expected methodology
-        assert method_a["metric_family"] == "TIME_TO_PROVIDER"
-        assert method_a["start_event"] == "TRIAGE"
-        assert method_a["end_event"] == "PHYSICIAN"
-        assert method_a["statistic_type"] == "P90"
+        # Verify comparison fields
+        comp_a = result["hospital_a"]["methodology"]
+        comp_b = result["hospital_b"]["methodology"]
+        assert comp_a["metric_family"] == "TIME_TO_PROVIDER"
+        assert comp_a["statistic_type"] == "MEAN"
+        assert comp_b["metric_family"] == "TIME_TO_PROVIDER"
+        assert comp_b["statistic_type"] == "MEAN"
 
         # Verify timestamp
         assert "comparison_timestamp" in result

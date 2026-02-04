@@ -126,9 +126,9 @@ class GeocodingService:
                     return mapbox_result
             # Return Nominatim result even with low confidence (better than nothing)
             logger.info(
-                f"Using Nominatim result for {hospital_name} (confidence={result.confidence:.2f})"
+                f"Using Nominatim result for {hospital_name} (confidence={nom_result.confidence:.2f})"
             )
-            return result
+            return nom_result
 
         # Only fail if Nominatim returned nothing
         logger.warning(f"Failed to geocode {hospital_name}")

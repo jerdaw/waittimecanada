@@ -117,19 +117,19 @@ def main():
     # Paths
     base_dir = Path(__file__).parent.parent.parent
     docs_dir = base_dir / "docs"
-    chatgpt_csv = docs_dir / "hospital-data-primary.csv"
-    gemini_csv = docs_dir / "hospital-data-secondary.csv"
+    primary_csv = docs_dir / "hospital-data-primary.csv"
+    secondary_csv = docs_dir / "hospital-data-secondary.csv"
     output_csv = docs_dir / "hospitals-geocoded.csv"
 
     print("Loading CSV files...")
-    chatgpt_data = load_csv(chatgpt_csv)
-    gemini_data = load_csv(gemini_csv)
+    primary_data = load_csv(primary_csv)
+    secondary_data = load_csv(secondary_csv)
 
-    print(f"  Primary source: {len(chatgpt_data)} hospitals")
-    print(f"  Secondary source: {len(gemini_data)} hospitals")
+    print(f"  Primary source: {len(primary_data)} hospitals")
+    print(f"  Secondary source: {len(secondary_data)} hospitals")
 
     print("\nMerging data...")
-    merged_data = merge_hospital_data(chatgpt_data, gemini_data)
+    merged_data = merge_hospital_data(primary_data, secondary_data)
 
     # Count how many already have coordinates
     with_coords = sum(1 for h in merged_data if h.get("latitude") and h.get("longitude"))
