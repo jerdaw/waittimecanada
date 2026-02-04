@@ -15,11 +15,8 @@ This directory contains project planning documents following best practices for 
   - Current: Milestone 2 (Ontario End-to-End)
 
 ### Implementation Planning
-- **[implementation-plan-m2-ontario.md](implementation-plan-m2-ontario.md)** - **CURRENT** Detailed implementation plan
-  - Version: 1.0.0
-  - Status: Draft - Awaiting Approval
-  - Scope: Milestone 2 complete implementation
-  - 5 phases with detailed steps, risks, and success criteria
+- **[implementation-plan-m2-ontario.md](archive/implementation-plan-m2-ontario.md)** - [COMPLETE] Milestone 2 implementation plan
+- **[Archive](archive/)** - Historical planning summaries and completed milestones
 
 ## Document Hierarchy
 
@@ -31,13 +28,12 @@ Tactical (Medium-term)
 └─ ROADMAP.md - What milestones, what order?
 
 Implementation (Short-term)
-└─ implementation-plan-m2-ontario.md - How do we build M2?
-   ├─ Phase 0: Research
-   ├─ Phase 1: Scraper
-   ├─ Phase 2: Testing
-   ├─ Phase 3: Database Integration
-   ├─ Phase 4: Frontend
-   └─ Phase 5: Validation
+└─ [New Milestone Plan] - How do we build the next milestone?
+
+Archive (Historical)
+├─ implementation-plan-m2-ontario.md
+├─ IMPLEMENTATION_PLAN_SUMMARY.md
+└─ REPO_MODERNIZATION_SUMMARY.md
 ```
 
 ## How to Use These Documents
@@ -99,14 +95,12 @@ Example:
 4. **Document learnings** - Add quirks, gotchas to appendices
 5. **Revise if needed** - If plan doesn't match reality, update it (increment version)
 
-## Current Status
-
-**Active Plan:** implementation-plan-m2-ontario.md v1.0.0
+**Active Plan:** [None - Milestone 2 Complete]
 
 **Next Steps:**
-1. Review implementation plan
-2. Approve or request changes
-3. Begin Phase 0 (Research Ontario data source)
+1. Define scope for Milestone 3 (Production Deployment)
+2. Create new implementation plan for M3
+3. Begin Phase 0 (Production Infrastructure Research)
 
 ---
 
