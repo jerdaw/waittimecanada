@@ -2,11 +2,12 @@
 
 > **Philosophy:** Vertical slices, not horizontal layers. Each milestone delivers working, shippable functionality.
 
-**Last Updated:** 2026-02-03
+**Last Updated:** 2026-02-04
 **Milestone 5:** ✅ Complete - Ready for Production Deployment
-**Milestone 3:** 🔄 In Progress - Render Deployment
+**Milestone 3:** ✅ Complete - GitHub Actions Scrapers Running
+**Milestone 4:** 🔄 In Progress - Quebec Scraper Rewrite
 **Approach:** Iterative development, one province at a time
-**Current Phase:** Documentation Complete ✓ → Production Deployment on Render
+**Current Phase:** Ontario Live ✓ → Quebec Scraper Rewrite
 
 ---
 
@@ -19,6 +20,17 @@
 | Database Schema | ✅ Complete | Migrated | Full schema |
 | Integration Tests | ✅ Complete | 21 tests | End-to-end |
 | Documentation | ✅ Complete | Comprehensive | Methodology docs |
+| **Ontario Scraper** | ✅ **Live** | 164 measurements | 154 hospitals |
+| **Quebec Scraper** | ❌ **Broken** | 0 | URL changed |
+
+### Live Scraper Status (2026-02-04)
+
+| Province | Status | Hospitals | Geocoded | Notes |
+|----------|--------|-----------|----------|-------|
+| Ontario | ✅ Working | 154 | 72 (47%) | 82 need manual coordinates |
+| Quebec | ❌ Broken | 0 | 0 | Government changed URL/format |
+
+**Detailed Status:** [docs/planning/scraper-status-2026-02-04.md](docs/planning/scraper-status-2026-02-04.md)
 
 ---
 
@@ -117,51 +129,85 @@
 
 ---
 
-## Milestone 3: Production Deployment 🔄 (In Progress)
+## Milestone 3: Production Deployment ✅ (Complete - 2026-02-04)
 
 **Goal:** Automated scraping and public frontend
-**Platform:** Render (account created)
-**Planning Document:** [docs/production-deployment-plan.md](docs/production-deployment-plan.md)
+**Platform:** GitHub Actions (scrapers) + Netlify (frontend)
+**Status:** Ontario scraper running in production, frontend deployed
 
-### Infrastructure Already Built
-- [x] **Backend:** GitHub Actions scraper cron configured (15-minute schedule)
-- [x] **Monitoring:** Heartbeat monitor workflow configured (hourly checks)
-- [x] **Alerts:** Failure notification workflow configured (email alerts)
-- [x] **Database:** Neon PostgreSQL in production
-- [x] **Frontend:** Next.js 14 application ready to deploy
-
-### Decisions Made
-- [x] **Platform Selection:** Render (account created)
-- [x] **Domain:** Default Render domain (`*.onrender.com`) - custom domain later
+### Infrastructure Complete
+- [x] **Scrapers:** GitHub Actions cron running every 15 minutes
+- [x] **Monitoring:** Heartbeat monitor workflow configured
 - [x] **Alerts:** Pushover notifications for scraper failures
-- [x] **Tier:** Free tier (with spin-down on inactivity)
-- [ ] **Monitoring:** Enable platform analytics/Sentry? (optional)
+- [x] **Database:** Neon PostgreSQL with 164 Ontario measurements
+- [x] **Frontend:** Next.js deployed to Netlify
+- [x] **Secrets:** DATABASE_URL, PUSHOVER keys configured
 
-### Deployment Tasks
-- [ ] **3.1** Add secrets to GitHub repository:
-  - `DATABASE_URL` - Neon connection string
-  - `PUSHOVER_USER_KEY` - Pushover user key
-  - `PUSHOVER_API_TOKEN` - Pushover API token
-- [ ] **3.2** Deploy frontend to Render
-- [ ] **3.3** Configure environment variables on Render (MAPBOX_TOKEN, DATABASE_URL)
-- [ ] **3.4** Configure Pushover notifications in GitHub Actions workflows
-- [ ] **3.5** Verify deployment (frontend, API, scrapers)
-- [ ] **3.6** Monitor first 24-48 hours for errors
-- [ ] **3.7** Update README and LinkedIn post with live URL
+### Deployment Verification
+- [x] **3.1** Add secrets to GitHub repository ✅
+- [x] **3.2** Deploy frontend to Netlify ✅
+- [x] **3.3** Configure environment variables ✅
+- [x] **3.4** Configure Pushover notifications ✅
+- [x] **3.5** Verify Ontario scraper working ✅ (164 measurements)
+- [ ] **3.6** Verify 72 geocoded hospitals on map
+- [ ] **3.7** Admin verification of hospitals in queue
+
+### Known Issues (2026-02-04)
+- Quebec scraper broken (URL changed) - see Milestone 4
+- 82 Ontario hospitals have placeholder coordinates (0.0, 0.0)
+- All hospitals need admin verification before public visibility
 
 ---
 
-## Milestone 4: Quebec Expansion (Pending)
+## Milestone 4: Quebec Scraper Rewrite 🔄 (In Progress)
 
-**Goal:** Demonstrate methodology divergence across provinces
+**Goal:** Fix Quebec scraper after government website changes
+**Blocking Issue:** Quebec government changed URL and page format in 2026
+**Detailed Analysis:** [docs/planning/scraper-status-2026-02-04.md](docs/planning/scraper-status-2026-02-04.md)
+
+### The Problem
+
+| Attribute | Old (Broken) | New |
+|-----------|--------------|-----|
+| URL | `quebec.ca/sante/.../urgences` (404) | `quebec.ca/en/health/.../situation-in-emergency-rooms-in-quebec` |
+| Format | HTML table | Dynamic searchable interface |
+| Parser | BeautifulSoup | Requires Playwright or API |
+
+### Implementation Options
+
+**Option A: Playwright-based Scraper (Recommended)**
+- Similar to Ontario scraper
+- Wait for JavaScript to load facility cards
+- Parse card content for wait times
+- Effort: Medium | Reliability: High
+
+**Option B: Find API Endpoint**
+- Inspect network requests on the new page
+- Call underlying JSON API directly
+- Effort: Low (if found) | Reliability: Variable
+
+**Option C: Provincial Open Data**
+- Check MSSS data portal
+- Look for official health data APIs
+- Effort: High | Reliability: High
 
 ### Tasks
 
-- [ ] **4.1** Find real Quebec health portal URL (current URL is 404)
-- [ ] **4.2** Update Quebec scraper for actual HTML structure
-- [ ] **4.3** Add Quebec hospitals to verification queue
-- [ ] **4.4** Test Ottawa vs Gatineau comparison with divergence warning
-- [ ] **4.5** Verify methodology differences are highlighted
+- [x] **4.1** Find new Quebec URL ✅ (URL updated in codebase)
+- [ ] **4.2** Investigate new page structure (API vs JavaScript)
+- [ ] **4.3** Rewrite QuebecScraper for new format
+- [ ] **4.4** Update test fixtures for new HTML/JSON structure
+- [ ] **4.5** Add Quebec hospitals to verification queue
+- [ ] **4.6** Test Ottawa vs Gatineau comparison with divergence warning
+- [ ] **4.7** Verify methodology differences are highlighted
+
+### Files Requiring Changes
+
+| File | Change |
+|------|--------|
+| `backend/src/waittime/scrapers/quebec.py` | Rewrite parser |
+| `backend/tests/unit/scrapers/test_quebec_scraper.py` | Update fixtures |
+| `backend/migrations/004_seed_sources.sql` | ✅ URL updated |
 
 ---
 
@@ -182,17 +228,60 @@
 
 ---
 
+## Milestone 4.5: Geocoding Improvements (Pending)
+
+**Goal:** Fix the 82 Ontario hospitals with placeholder coordinates
+**Impact:** 53% of hospitals won't appear correctly on map
+
+### Current Status
+
+| Category | Count | Percentage |
+|----------|-------|------------|
+| Successfully geocoded | 72 | 47% |
+| Placeholder coordinates (0,0) | 82 | 53% |
+
+### Improvement Options
+
+| Option | Effort | Cost | Expected Accuracy |
+|--------|--------|------|-------------------|
+| Manual coordinates CSV | Medium | Free | 100% |
+| Add MAPBOX_TOKEN | Low | ~$5/month | 80%+ |
+| Improve name parsing | Medium | Free | 60%+ |
+| Google Places API | Low | Pay per use | 95%+ |
+
+### Recommended Approach: Manual Coordinates CSV
+
+Create `backend/data/ontario_hospital_coordinates.csv`:
+```csv
+hospital_id,latitude,longitude,city
+ca-on-georgian-bay-general-hosp-midland-site,44.7457,-79.8829,Midland
+ca-on-bluewater-health-charlotte-eleanor-englehart-petrolia,42.8778,-82.1363,Petrolia
+```
+
+### Tasks
+
+- [ ] **4.5.1** Export list of hospitals with placeholder coordinates
+- [ ] **4.5.2** Research correct coordinates for each hospital
+- [ ] **4.5.3** Create CSV file with manual coordinates
+- [ ] **4.5.4** Update scraper to check CSV before geocoding
+- [ ] **4.5.5** Re-run geocoding for placeholder hospitals
+
+---
+
 ## Technical Debt & Improvements
 
 ### High Priority
+- [ ] Fix 82 Ontario hospitals with placeholder coordinates (see Milestone 4.5)
 - [ ] Increase geocoding service test coverage (currently 13%)
 - [ ] Add CLI tool tests (currently 0% coverage)
 - [ ] Add more frontend E2E tests
+- [ ] Make workflow tolerant of partial scraper failures
 
 ### Medium Priority
 - [ ] Add batch operations to verification queue
 - [ ] Implement search/filter in admin panel
 - [ ] Add revision history for verification actions
+- [ ] Add MAPBOX_TOKEN for better geocoding fallback
 
 ### Low Priority
 - [ ] Historical trends / charts
@@ -292,6 +381,10 @@ Key decisions made:
 ---
 
 ## Quick Links
+
+**Planning & Status:**
+- [Scraper Status Report (2026-02-04)](docs/planning/scraper-status-2026-02-04.md) - Current scraper implementation status
+- [Production Deployment Plan](docs/production-deployment-plan.md) - Original deployment planning
 
 **Documentation:**
 - [Integration Testing Guide](backend/docs/integration-testing.md)
