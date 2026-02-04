@@ -76,40 +76,40 @@ class QuebecScraper(BaseScraper):
     def run(self, save_to_db: bool = True) -> list[Measurement]:
         """Fetch all pages of measurements."""
         measurements: list[Measurement] = []
-        
+
         # We need to iterate through pages.
         # There are typically ~12 pages (116 results, 10 per page).
         # We'll stop when we get no results or hit a safety limit.
         max_pages = 20
-        
+
         for page in range(1, max_pages + 1):
             try:
                 logger.info(f"Fetching page {page}...")
                 html = self._fetch_page(page)
-                
+
                 # Check if we got valid content (if page is out of range, it might return empty or error)
                 if not html or "hospital_element" not in html:
                     if page > 1:
                         logger.info(f"No results on page {page}, stopping.")
                         break
-                
+
                 page_measurements = self.parse(html)
                 if not page_measurements:
                     if page > 1:
                         logger.info(f"No measurements on page {page}, stopping.")
                         break
-                
+
                 measurements.extend(page_measurements)
-                
+
                 # Be nice to the server
                 time.sleep(1)
-                
+
             except Exception as e:
                 logger.error(f"Error fetching page {page}: {e}")
-                # Don't break immediately on one error, try next page? 
+                # Don't break immediately on one error, try next page?
                 # Or stop? Let's stop to be safe.
                 break
-                
+
         return measurements
 
     def _fetch_page(self, page_num: int) -> str:
@@ -120,9 +120,9 @@ class QuebecScraper(BaseScraper):
             "tx_solr[pt]": "",
             "tx_solr[sfield]": "geolocation_location",
             "tx_solr[page]": str(page_num),
-            "type": "7382"
+            "type": "7382",
         }
-        
+
         # Use existing session if available (from base class context manager)
         # But BaseScraper doesn't expose the session directly easily if we don't assume requests.
         # We'll just plain requests here for simplicity as we aren't using the BaseScraper.fetch mechanism
@@ -148,7 +148,7 @@ class QuebecScraper(BaseScraper):
 
         # Container is div.hospital_element
         facilities = soup.find_all("div", class_="hospital_element")
-        
+
         for facility in facilities:
             measurement = self._extract_from_facility(facility, payload_hash, payload_snippet)
             if measurement:
@@ -160,53 +160,51 @@ class QuebecScraper(BaseScraper):
         self, facility: Tag, payload_hash: str, payload_snippet: str
     ) -> Measurement | None:
         """Extract measurement from a facility card."""
-        
+
         # 1. Extract Name
         # <div class="font-weight-bold textual-content">Name</div>
         name_div = facility.find("div", class_="font-weight-bold")
         if not name_div:
             return None
-        
+
         hospital_name = name_div.get_text(strip=True)
-        
+
         # 2. Extract Wait Time
         # The metrics are in a list <ul> with class "list-unstyled"
         # Each item is <li> class "hopital-item"
         # We need the one that says "Estimated waiting time for non-priority cases"
         # Since it's bilingual or French, we should look for keywords or specific structure.
-        
+
         wait_time_val = None
-        
+
         items = facility.find_all("li", class_="hopital-item")
         for item in items:
             text = item.get_text(" ", strip=True).lower()
-            
+
             # Look for wait time keywords (English or French)
             if (
-                "waiting time" in text 
-                or "temps d'attente" in text
-                or "attente estimé" in text
+                "waiting time" in text or "temps d'attente" in text or "attente estimé" in text
             ) and ("stretcher" not in text and "civiere" not in text):
                 # Found the wait time line.
                 # The value is usually in a span, but let's parse the whole line text.
                 # Example: "Estimated waiting time for non-priority cases : 4 h 15 min"
-                
+
                 # Extract the value part (after the colon usually)
                 if ":" in text:
                     value_text = text.split(":", 1)[1]
                 else:
                     value_text = text
-                
+
                 wait_time_val = self._extract_wait_time(value_text)
                 break
-        
+
         if wait_time_val is not None:
-             hospital_id = self._normalize_hospital_id(hospital_name)
-             if hospital_id:
-                 return self._create_measurement(
-                     hospital_id, wait_time_val, payload_hash, payload_snippet
-                 )
-        
+            hospital_id = self._normalize_hospital_id(hospital_name)
+            if hospital_id:
+                return self._create_measurement(
+                    hospital_id, wait_time_val, payload_hash, payload_snippet
+                )
+
         return None
 
     def _extract_wait_time(self, text: str) -> float | None:
@@ -219,7 +217,7 @@ class QuebecScraper(BaseScraper):
         - "4 h 15 min"
         """
         text = text.strip().lower()
-        
+
         # Pattern: "X h Y min" or "Xh Ymin" with optional spaces
         match = re.search(r"(\d+)\s*h(?:eure)?s?\s*(\d+)?\s*m?i?n?", text)
         if match:

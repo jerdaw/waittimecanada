@@ -45,7 +45,7 @@ class GeocodingService:
 
         # Rate limiting for Nominatim (1 request/second)
         self._last_nominatim_request = 0.0
-        
+
         # Load manual overrides
         self._manual_overrides: dict[str, GeocodingResult] = self._load_manual_overrides()
 
@@ -57,18 +57,18 @@ class GeocodingService:
             # This handles running from any directory
             base_dir = Path(__file__).resolve().parents[3]
             csv_path = base_dir / "data" / "ontario_hospital_coordinates.csv"
-            
+
             if not csv_path.exists():
                 logger.warning(f"Manual geocoding file not found at {csv_path}")
                 return {}
-                
+
             with open(csv_path, encoding="utf-8") as f:
                 reader = csv.DictReader(f)
                 for row in reader:
                     hospital_id = row.get("hospital_id")
                     if not hospital_id:
                         continue
-                        
+
                     try:
                         overrides[hospital_id] = GeocodingResult(
                             latitude=float(row["latitude"]),
@@ -78,16 +78,20 @@ class GeocodingService:
                         )
                     except (ValueError, KeyError):
                         logger.warning(f"Invalid row in manual geocoding CSV: {row}")
-                        
+
             logger.info(f"Loaded {len(overrides)} manual geocoding overrides")
             return overrides
-            
+
         except Exception as e:
             logger.error(f"Failed to load manual geocoding overrides: {e}")
             return {}
 
     def geocode_hospital(
-        self, hospital_name: str, province: str, country: str = "Canada", hospital_id: str | None = None
+        self,
+        hospital_name: str,
+        province: str,
+        country: str = "Canada",
+        hospital_id: str | None = None,
     ) -> GeocodingResult | None:
         """Geocode a hospital name to coordinates.
 
@@ -107,7 +111,7 @@ class GeocodingService:
             result = self._manual_overrides[hospital_id]
             logger.info(f"✅ Using manual override for {hospital_name} ({hospital_id})")
             return result
-        
+
         # 2. Try Nominatim (free, no API key needed)
         nom_result = self._geocode_with_nominatim(hospital_name, province, country)
         if nom_result:
@@ -121,7 +125,9 @@ class GeocodingService:
                 if mapbox_result:
                     return mapbox_result
             # Return Nominatim result even with low confidence (better than nothing)
-            logger.info(f"Using Nominatim result for {hospital_name} (confidence={result.confidence:.2f})")
+            logger.info(
+                f"Using Nominatim result for {hospital_name} (confidence={result.confidence:.2f})"
+            )
             return result
 
         # Only fail if Nominatim returned nothing
