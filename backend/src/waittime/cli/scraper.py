@@ -112,7 +112,11 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
         for hospital_id in unique_hospital_ids:
             # Check if hospital already exists with valid coordinates
             existing_hospital = db.get_hospital(hospital_id)
-            if existing_hospital and existing_hospital.latitude != 0.0 and existing_hospital.longitude != 0.0:
+            if (
+                existing_hospital
+                and existing_hospital.latitude != 0.0
+                and existing_hospital.longitude != 0.0
+            ):
                 # Hospital already has valid coordinates, skip geocoding
                 skipped_count += 1
                 continue
@@ -130,9 +134,7 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
 
             # Try to geocode using the hospital name
             geocoding_result = geocoder.geocode_hospital(
-                hospital_name, 
-                province=source.province,
-                hospital_id=hospital_id
+                hospital_name, province=source.province, hospital_id=hospital_id
             )
 
             if geocoding_result:
@@ -254,17 +256,17 @@ def main() -> NoReturn:
         logger.info(f"Completed: {total} measurements from {len(SCRAPERS)} sources")
         if failed:
             logger.warning(f"{failed} scraper(s) failed")
-        
+
         # Exit with success if we collected ANY data
         if total > 0:
             logger.info(f"Successfully collected {total} measurements total")
             sys.exit(0)
-        
+
         # Only fail if we collected NOTHING and had failures
         if failed > 0:
             logger.error("All scrapers failed")
             sys.exit(1)
-            
+
         sys.exit(0)
 
     if args.source:
