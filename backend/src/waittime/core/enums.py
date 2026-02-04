@@ -6,10 +6,10 @@ Every measurement must be tagged with these values to enable comparability analy
 See ADR-0002 for the full rationale behind this design decision.
 """
 
-from enum import Enum
+from enum import StrEnum
 
 
-class MetricFamily(str, Enum):
+class MetricFamily(StrEnum):
     """What is being measured?"""
 
     TIME_TO_PROVIDER = "TIME_TO_PROVIDER"
@@ -22,7 +22,7 @@ class MetricFamily(str, Enum):
     """Current occupancy rate of ED stretchers."""
 
 
-class StartEvent(str, Enum):
+class StartEvent(StrEnum):
     """When does the clock start?"""
 
     TRIAGE = "TRIAGE"
@@ -38,7 +38,7 @@ class StartEvent(str, Enum):
     """Source doesn't specify start point."""
 
 
-class EndEvent(str, Enum):
+class EndEvent(StrEnum):
     """When does the clock stop?"""
 
     PHYSICIAN = "PHYSICIAN"
@@ -54,7 +54,7 @@ class EndEvent(str, Enum):
     """First clinical contact of any kind."""
 
 
-class StatisticType(str, Enum):
+class StatisticType(StrEnum):
     """How is the value calculated?"""
 
     P90 = "P90"
@@ -76,7 +76,7 @@ class StatisticType(str, Enum):
     """Current real-time value."""
 
 
-class PatientScope(str, Enum):
+class PatientScope(StrEnum):
     """Which patients are included in the metric?"""
 
     ALL = "ALL"

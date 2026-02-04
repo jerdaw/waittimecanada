@@ -13,7 +13,6 @@ Methodology (per ADR-0002):
 import logging
 import re
 import time
-from typing import Iterator
 
 import requests
 from bs4 import BeautifulSoup, Tag

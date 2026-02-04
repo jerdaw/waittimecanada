@@ -62,7 +62,7 @@ class GeocodingService:
                 logger.warning(f"Manual geocoding file not found at {csv_path}")
                 return {}
                 
-            with open(csv_path, "r", encoding="utf-8") as f:
+            with open(csv_path, encoding="utf-8") as f:
                 reader = csv.DictReader(f)
                 for row in reader:
                     hospital_id = row.get("hospital_id")
