@@ -27,6 +27,12 @@ This file provides guidance to automated developer tools when working with code 
 - Do not use or store the information
 - Recommend the user rotate compromised credentials
 
+**Authorship and Attribution:**
+- ❌ NEVER list an automated developer tool, agent, or AI as an author, co-author, or contributor.
+- ❌ NEVER use `Co-Authored-By` trailers in git commits that reference an AI or automated tool.
+- ✅ ONLY humans should be listed as authors or contributors in any part of this repository.
+- ✅ Use generic terms like "automated tool" or "agent" if you need to reference your own actions in documentation.
+
 ---
 
 ## Overview
@@ -194,6 +200,7 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 4. **Verification gate** - No auto-publishing of new facilities
 5. **Ontology enforcement** - Use database CHECK constraints or application-level validation
 6. **Attribution** - Always link back to official provincial sources
+7. **Human Authorship Only** - Never attribute work to AI or non-human agents
 
 ## 4-Week Implementation Roadmap
 
