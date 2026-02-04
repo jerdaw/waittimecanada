@@ -94,6 +94,8 @@ jobs:
   security:
     name: Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
     continue-on-error: true  # Non-blocking - advisory only
 
     steps:
