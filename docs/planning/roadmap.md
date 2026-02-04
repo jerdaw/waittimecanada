@@ -2,31 +2,20 @@
 
 ## Current Status (Updated 2026-02-04)
 
-**Progress:** Milestone 7 (UX Polish & SEO) Complete ✓
+**Progress:** Phase 8 (UX & Geolocation) Complete ✓
 
-**Completed:**
-- ✅ Repository modernized with proper Python package structure
-- ✅ Database schema created on Neon PostgreSQL (5 tables with RLS)
-- ✅ Core models with metric ontology implemented
-- ✅ Quebec scraper MVP with 3 parsing strategies
-- ✅ Ontario scraper with Playwright for JavaScript-rendered pages
-- ✅ Database service layer (psycopg2)
-- ✅ Geocoding service (Nominatim with Mapbox fallback)
-- ✅ CLI tool for running scrapers
-- ✅ Next.js frontend with Mapbox map
-- ✅ Hospital API endpoint (postgres.js client)
-- ✅ 160 Ontario hospitals geocoded and imported
-- ✅ Interactive map showing all hospitals
-- ✅ UX Polish: Skeleton loading, search/filter, geolocation sorting
-- ✅ SEO: Schema.org structured data, healthcare meta tags
-- ✅ Enhanced Live Indicators for data freshness
-- ✅ 150+ unit tests passing (Backend & Frontend)
+**Recently Completed:**
+- ✅ Auto-Geolocation with IP Fallback (server-side proxy)
+- ✅ Responsive Split View (stacks on mobile, side-by-side on desktop)
+- ✅ "Nearest ER" Hero Card with distance badge
+- ✅ Distance-based auto-sorting (Near Me default)
+- ✅ Project maintenance: guidelines, documentation audit, cleanup
 
 **Next Steps:**
-- Run Ontario scraper to populate wait time measurements
-- Add methodology warnings for incomparable data
+- Add methodology warnings for incomparable data (Phase 3)
 - Build hospital detail modal
 - Create /methods page
+- Refine mobile map interactions
 
 ---
 
@@ -127,19 +116,59 @@
 **Status:** Complete
 
 **Work Completed:**
-- ✅ FAQPage schema.org structured data for rich snippets
-- ✅ MedicalWebPage schema for healthcare classification
-- ✅ Organization schema with data source attribution
-- ✅ Geographic meta tags (geo.region, geo.placename, geo.position)
-- ✅ OpenGraph/Twitter card metadata enhancements
-- ✅ HowTo schema for hospital search usage guide
-- ✅ Skeleton loading components (HospitalCardSkeleton, HeroSkeleton)
-- ✅ Real-time hospital search/filter in list view
-- ✅ "Near Me" sorting with browser geolocation integration
-- ✅ Pulsing live indicators for data updated < 30m ago
-- ✅ Distance display (km/m) when location access granted
+- [x] FAQPage schema.org structured data for rich snippets
+- [x] MedicalWebPage schema for healthcare classification
+- [x] Organization schema with data source attribution
+- [x] Geographic meta tags (geo.region, geo.placename, geo.position)
+- [x] OpenGraph/Twitter card metadata enhancements
+- [x] HowTo schema for hospital search usage guide
+- [x] Skeleton loading components (HospitalCardSkeleton, HeroSkeleton)
+- [x] Real-time hospital search/filter in list view
+- [x] "Near Me" sorting with browser geolocation integration
+- [x] Pulsing live indicators for data updated < 30m ago
+- [x] Distance display (km/m) when location access granted
+- [x] Auto-geolocation with server-side IP fallback
 
 **Goal:** Improve discoverability via SEO and polish loading/search UX
+
+---
+
+### ✅ Milestone 8: UX Enhancements (Inspired by Market Leaders)
+**Status:** Complete
+**Reference:** Analysis document in `docs/planning/competitor-design-analysis.md`
+
+**Phase 1: Expandable Hospital Cards (High Priority)**
+- [x] Independent expand/collapse state for hospital cards
+- [x] Expanded view shows methodology, last updated, telehealth info
+- [x] Quick action buttons (Directions, Website, Call)
+- [x] Chevron icon with rotation animation
+- [x] Smooth height transition
+
+**Phase 2: FAQ Page (High Priority)**
+- [x] Create `/faq` route with accordion UI
+- [x] Add common questions about wait times and methodology
+- [x] Link to /methods for deeper info
+- [x] FAQPage schema.org structured data for SEO
+- [x] Add FAQ link to navigation header
+
+**Phase 3: Quick Actions & Polish (Medium Priority)**
+- [x] Quick action buttons in map popup (Directions, Call, Website)
+- [x] "Live Data Only" toggle filter
+- [x] Hospital count with live data subset
+
+**Deferred to Phase 4 (Backend Required):**
+- [ ] Occupancy stats ("X waiting, Y in treatment") - requires scraper changes
+- [ ] Enhanced search with geocoding autocomplete
+
+**Files to Modify/Create:**
+- `frontend/components/HospitalList.tsx` - expandable cards
+- `frontend/components/ExpandedCardDetails.tsx` - new component
+- `frontend/app/faq/page.tsx` - new FAQ page
+- `frontend/components/FAQAccordion.tsx` - new accordion component
+- `frontend/components/Header.tsx` - add FAQ link
+- `frontend/components/Map.tsx` - quick actions in popup
+
+**Goal:** Improve user experience with quick access to hospital details
 
 ---
 
@@ -339,12 +368,12 @@ class BaseScraper(ABC):
 
 ## Next Session Priorities
 
-1. **Run Ontario Scraper** - Populate measurements for 160 hospitals
-2. **Test Map** - Verify color-coded markers work with real data
-3. **Hospital Detail Modal** - Click marker → show wait time
-4. **Methodology Warning** - Implement comparability logic
-5. **Run Tests** - Ensure all passing before commit
-6. **Update Documentation** - ADR for geocoding decision
+1. **Expandable Hospital Cards** - Phase 1 of Milestone 8
+2. **FAQ Page** - Phase 2 of Milestone 8 (high SEO value)
+3. **Quick Action Buttons** - Phase 3 of Milestone 8
+4. **Run Ontario Scraper** - Ensure fresh data for testing
+5. **Test All Components** - Ensure all passing before commit
+6. **Update Documentation** - ADR for UX features
 7. **Commit & Push** - Clean working tree
 
 ---

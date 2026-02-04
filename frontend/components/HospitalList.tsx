@@ -1,10 +1,10 @@
 import { Hospital } from "@/app/api/hospitals/route";
-import { FixedSizeList as List } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
 import { clsx } from "clsx";
 import { HospitalCardSkeleton } from "./skeletons/HospitalCardSkeleton";
-
+import { ExpandedCardDetails } from "./ExpandedCardDetails";
 import { calculateDistance } from "@/utils/distance";
+import { useState, useRef, useEffect } from "react";
+import { isRecent } from "@/utils/date";
 
 interface HospitalListProps {
   hospitals: Hospital[];
@@ -18,14 +18,16 @@ interface HospitalListProps {
   sortByDistance?: boolean;
   onSortChange?: (enabled: boolean) => void;
   onRequestLocation?: () => void;
+  showLiveOnly?: boolean;
+  onToggleLiveOnly?: (enabled: boolean) => void;
 }
 
 // Helper to determine status color
 function getStatusColor(minutes: number | undefined) {
-  if (minutes === undefined) return "bg-gray-500";
-  if (minutes < 60) return "bg-emerald-500";
-  if (minutes < 120) return "bg-amber-500";
-  return "bg-red-600";
+  if (minutes === undefined) return "bg-muted-foreground";
+  if (minutes < 60) return "bg-success";
+  if (minutes < 120) return "bg-warning";
+  return "bg-danger";
 }
 
 function formatWaitTime(minutes: number | undefined) {
@@ -36,15 +38,6 @@ function formatWaitTime(minutes: number | undefined) {
 function formatDistance(dist: number) {
   if (dist < 1) return `${(dist * 1000).toFixed(0)}m`;
   return `${dist.toFixed(1)}km`;
-}
-
-// Helper to determine if data is fresh (< 30 mins)
-function isRecent(dateStr: string | undefined | null) {
-  if (!dateStr) return false;
-  const updated = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - updated.getTime();
-  return diffMs < 30 * 60 * 1000; // 30 mins
 }
 
 export function HospitalList({
@@ -59,175 +52,221 @@ export function HospitalList({
   sortByDistance,
   onSortChange,
   onRequestLocation,
+  showLiveOnly = false,
+  onToggleLiveOnly,
 }: HospitalListProps) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const Row = ({ index, style }: { index: number; style: any }) => {
-    if (loading) {
-      return (
-        <div style={style}>
-          <HospitalCardSkeleton />
-        </div>
-      );
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to selected item if it changes from outside (e.g. map click)
+  useEffect(() => {
+    if (selectedId && listRef.current) {
+      const el = document.getElementById(`hospital-card-${selectedId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        setExpandedId(selectedId);
+      }
     }
+  }, [selectedId]);
 
-    const hospital = hospitals[index];
-    const isSelected = hospital.id === selectedId;
-    const color = getStatusColor(hospital.current_wait_time);
-    const showLiveBadge = isRecent(hospital.last_updated);
-    
-    // Calculate distance if user location is available
-    const distance = userLocation ? calculateDistance(
-      userLocation.lat, userLocation.lon, 
-      hospital.lat, hospital.lon
-    ) : null;
-
-    return (
-      <div style={style} className="px-4 py-2">
-        <button
-          onClick={() => onSelect(hospital.id)}
-          className={clsx(
-            "w-full text-left p-4 rounded-xl border transition-all duration-200 group flex items-start justify-between gap-4",
-            isSelected
-              ? "bg-primary/5 border-primary shadow-sm"
-              : "bg-card border-border hover:border-primary/50 hover:shadow-sm"
-          )}
-        >
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h3
-                className={clsx(
-                  "font-semibold truncate pr-2",
-                  isSelected ? "text-primary" : "text-card-foreground group-hover:text-primary"
-                )}
-              >
-                {hospital.name}
-              </h3>
-              {showLiveBadge && (
-                <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded-full border border-emerald-500/20">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                  </span>
-                  LIVE
-                </span>
-              )}
-            </div>
-            <div className="text-sm text-muted-foreground truncate flex items-center gap-2">
-              <span>{hospital.city}, {hospital.province}</span>
-              {distance !== null && (
-                <span className="text-xs bg-muted px-1.5 py-0.5 rounded-md font-medium">
-                  📍 {formatDistance(distance)}
-                </span>
-              )}
-            </div>
-            {/* Added details for larger cards */}
-            {isSelected && (
-              <div className="mt-2 text-xs text-muted-foreground animate-in slide-in-from-top-1 fade-in duration-200">
-                <p>Updated {new Date(hospital.last_updated || "").toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                {hospital.telehealth_number && <p className="mt-1">📞 {hospital.telehealth_number}</p>}
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-col items-end flex-shrink-0">
-            <div className={clsx("flex items-center gap-1.5 px-2.5 py-1 rounded-full text-white text-sm font-bold shadow-sm", color)}>
-              <span>{formatWaitTime(hospital.current_wait_time)}</span>
-              <span className="text-xs font-medium opacity-90">min</span>
-            </div>
-          </div>
-        </button>
-      </div>
-    );
+  const handleCardClick = (id: string) => {
+    onSelect(id);
+    setExpandedId(expandedId === id ? null : id);
   };
 
-  return (
-    <div className={clsx("h-full bg-muted/30 flex flex-col", className)}>
-      {/* Search Header */}
-      <div className="p-4 bg-background border-b border-border shadow-sm z-10 space-y-3">
-        <div className="relative">
-          <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search by name or city..."
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-muted/50 focus:bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 outline-none"
-            value={searchQuery}
-            onChange={(e) => onSearchChange?.(e.target.value)}
-          />
-        </div>
+  const displayedHospitals = hospitals;
 
-        {/* Sort Controls - Only show if functions are provided */}
-        {onSortChange && (
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
-             <button
-              onClick={() => onSortChange(false)}
-              className={clsx(
-                "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap",
-                !sortByDistance
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              )}
-            >
-              Default Sort
-            </button>
+  return (
+    <div className={clsx("h-full flex flex-col", className)}>
+      {/* Compact Filter Bar */}
+      <div className="p-3 bg-background/80 backdrop-blur-sm border-b border-border/50 z-10 shrink-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Sort Controls */}
+          {onSortChange && (
+            <div className="flex items-center bg-muted/50 rounded-lg p-0.5">
+              <button
+                onClick={() => onSortChange(false)}
+                className={clsx(
+                  "px-2.5 py-1 rounded-md text-xs font-medium transition-all",
+                  !sortByDistance
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Default
+              </button>
+              <button
+                onClick={() => {
+                  if (!userLocation && onRequestLocation) {
+                    onRequestLocation();
+                  } else {
+                    onSortChange(true);
+                  }
+                }}
+                className={clsx(
+                  "px-2.5 py-1 rounded-md text-xs font-medium transition-all flex items-center gap-1",
+                  sortByDistance
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                </svg>
+                Near Me
+              </button>
+            </div>
+          )}
+
+          {/* Live Only Toggle */}
+          {onToggleLiveOnly && (
             <button
-              onClick={() => {
-                if (!userLocation && onRequestLocation) {
-                  onRequestLocation();
-                } else {
-                  onSortChange(true);
-                }
-              }}
+              onClick={() => onToggleLiveOnly(!showLiveOnly)}
               className={clsx(
-                "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap flex items-center gap-1.5",
-                sortByDistance
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                "px-2.5 py-1 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 border",
+                showLiveOnly
+                  ? "bg-success/10 border-success/30 text-success"
+                  : "bg-background border-border text-muted-foreground hover:bg-muted/50"
               )}
             >
-              <span>Verify Location</span>
-              <span>Near Me</span>
+              <span className="relative flex h-1.5 w-1.5">
+                <span className={clsx(
+                  "absolute inline-flex h-full w-full rounded-full opacity-75",
+                  showLiveOnly ? "animate-ping bg-success" : "bg-muted-foreground"
+                )} />
+                <span className={clsx(
+                  "relative inline-flex rounded-full h-1.5 w-1.5",
+                  showLiveOnly ? "bg-success" : "bg-muted-foreground"
+                )} />
+              </span>
+              Live Only
             </button>
-          </div>
-        )}
+          )}
+
+          {/* Results count */}
+          <span className="text-xs text-muted-foreground ml-auto">
+            {displayedHospitals.length} results
+          </span>
+        </div>
       </div>
 
-      <div className="flex-1">
-        {!loading && hospitals.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-8 text-center">
-            <p>No hospitals found matching "{searchQuery}"</p>
-            <button 
-              onClick={() => onSearchChange?.("")}
-              className="mt-2 text-primary hover:underline text-sm"
-            >
-              Clear search
-            </button>
+      {/* Scrollable List */}
+      <div className="flex-1 overflow-y-auto" ref={listRef}>
+        {!loading && displayedHospitals.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-6 text-center min-h-[150px]">
+            <svg className="w-8 h-8 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <p className="text-sm font-medium">No hospitals found</p>
+            {searchQuery && (
+              <button 
+                onClick={() => onSearchChange?.("")}
+                className="mt-2 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors"
+              >
+                Clear search
+              </button>
+            )}
+          </div>
+        ) : loading ? (
+          <div className="p-3 space-y-2">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <HospitalCardSkeleton key={i} />
+            ))}
           </div>
         ) : (
-          <AutoSizer>
-            {({ height, width }) => (
-              <List
-                height={height}
-                itemCount={loading ? 10 : hospitals.length}
-                itemSize={100} // Height of each card + padding
-                width={width}
-                initialScrollOffset={
-                  !loading && selectedId
-                    ? Math.max(0, hospitals.findIndex((h) => h.id === selectedId) * 100 - height / 2 + 50)
-                    : 0
-                }
-              >
-                {Row}
-              </List>
-            )}
-          </AutoSizer>
+          <div className="p-2 space-y-1">
+            {displayedHospitals.map((hospital) => {
+              const isSelected = hospital.id === selectedId;
+              const isExpanded = hospital.id === expandedId;
+              const color = getStatusColor(hospital.current_wait_time);
+              const showLiveBadge = isRecent(hospital.last_updated);
+              
+              // Calculate distance if user location is available
+              const distance = userLocation ? calculateDistance(
+                userLocation.lat, userLocation.lon, 
+                hospital.latitude, hospital.longitude
+              ) : null;
+
+              return (
+                <div 
+                  key={hospital.id} 
+                  id={`hospital-card-${hospital.id}`}
+                  className={clsx(
+                    "rounded-lg border transition-all duration-200 overflow-hidden",
+                    isSelected || isExpanded
+                      ? "bg-card border-primary/50 ring-1 ring-primary/20 shadow-md"
+                      : "bg-card/50 border-border/30 hover:bg-card hover:border-border/50"
+                  )}
+                >
+                  {/* Compact Card Row */}
+                  <button
+                    onClick={() => handleCardClick(hospital.id)}
+                    className="w-full text-left px-3 py-2.5 flex items-center gap-3"
+                  >
+                    {/* Status Indicator */}
+                    <div className={clsx("w-1.5 h-8 rounded-full shrink-0", color)} />
+
+                    {/* Name & Location */}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className={clsx(
+                          "font-medium text-sm truncate",
+                          (isSelected || isExpanded) ? "text-primary" : "text-foreground"
+                        )}>
+                          {hospital.name}
+                        </h3>
+                        {showLiveBadge && (
+                          <span className="shrink-0 flex items-center gap-0.5 text-[9px] font-bold text-success bg-success/10 px-1 py-0.5 rounded">
+                            <span className="w-1 h-1 rounded-full bg-success animate-pulse" />
+                            LIVE
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-2">
+                        <span className="truncate">{hospital.city}</span>
+                        {distance !== null && (
+                          <span className="shrink-0 text-[10px] bg-muted/50 px-1 py-0.5 rounded font-medium">
+                            {formatDistance(distance)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Wait Time */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="text-right">
+                        <span className="text-lg font-bold tabular-nums">{formatWaitTime(hospital.current_wait_time)}</span>
+                        <span className="text-xs text-muted-foreground ml-0.5">min</span>
+                      </div>
+                      <svg 
+                        className={clsx(
+                          "w-4 h-4 text-muted-foreground transition-transform duration-200",
+                          isExpanded && "rotate-180"
+                        )} 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </button>
+
+                  {/* Expanded Content */}
+                  <div 
+                    className={clsx(
+                      "grid transition-[grid-template-rows] duration-300 ease-out",
+                      isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                    )}
+                  >
+                    <div className="overflow-hidden px-3 pb-3">
+                      <ExpandedCardDetails hospital={hospital} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>

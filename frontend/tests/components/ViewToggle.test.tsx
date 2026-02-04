@@ -12,12 +12,13 @@ describe("ViewToggle", () => {
 
   it("highlights the active mode", () => {
     render(<ViewToggle mode="list" onChange={() => {}} />);
-    const listBtn = screen.getByText("List");
-    expect(listBtn.className).toContain("bg-background");
-    expect(listBtn.className).toContain("shadow-sm");
+    // Text is now inside a span, so we need to find the parent button
+    const listBtn = screen.getByText("List").closest("button");
+    expect(listBtn?.className).toContain("bg-background");
+    expect(listBtn?.className).toContain("shadow-sm");
     
-    const mapBtn = screen.getByText("Map");
-    expect(mapBtn.className).not.toContain("shadow-sm");
+    const mapBtn = screen.getByText("Map").closest("button");
+    expect(mapBtn?.className).not.toContain("shadow-sm");
   });
 
   it("calls onChange when clicked", () => {

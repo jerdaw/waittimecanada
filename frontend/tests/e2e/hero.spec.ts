@@ -5,14 +5,14 @@ test.describe("Hero Section & User Flow", () => {
     await page.goto("/");
     
     // Hero should be visible initially
-    await expect(page.getByText("Find the Fastest ER")).toBeVisible();
+    await expect(page.getByText("Ontario ER Wait Time")).toBeVisible();
     await expect(page.getByRole("button", { name: "Explore Hospitals" })).toBeVisible();
     
     // Click Explore
     await page.click('button:text("Explore Hospitals")');
     
     // Hero should disappear
-    await expect(page.getByText("Find the Fastest ER")).not.toBeVisible();
+    await expect(page.getByText("Ontario ER Wait Time")).not.toBeVisible();
     
     // Map/List should be main content
     // Check for map or list element

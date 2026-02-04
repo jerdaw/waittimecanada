@@ -157,6 +157,7 @@
     {
       "title": "Ontario Real-Time Wait Time Service",
       "source_id": "on-erwatch",
+      "url": "https://example.com/data-sources",
       "type": "data_source"
     },
     {

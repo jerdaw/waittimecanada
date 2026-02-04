@@ -61,22 +61,22 @@ export function StructuredData() {
   const howToSchema = {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    "name": "How to find the fastest ER near you",
+    "name": "How to explore Ontario ER wait time data",
     "step": [
       {
         "@type": "HowToStep",
         "name": "Allow location access",
-        "text": "Enable browser geolocation to see hospitals sorted by distance."
+        "text": "Optionally enable browser geolocation to see hospitals sorted by distance."
       },
       {
         "@type": "HowToStep",
-        "name": "Compare wait times",
-        "text": "Review the current estimated wait times for nearby hospitals on the map or list view."
+        "name": "Browse wait time data",
+        "text": "Explore the publicly reported wait times from official provincial health sources."
       },
       {
         "@type": "HowToStep",
-        "name": "Check methodology",
-        "text": "Click on a hospital to see exactly how its wait time is measured (e.g., Triage to Physician)."
+        "name": "Understand the methodology",
+        "text": "Click on a hospital to learn how its wait time is measured and reported by provincial authorities."
       }
     ]
   };

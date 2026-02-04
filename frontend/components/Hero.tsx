@@ -1,33 +1,68 @@
 
 import type { Hospital } from "@/app/api/hospitals/route";
 import { clsx } from "clsx";
+import Link from "next/link";
+import { calculateDistance } from "@/utils/distance";
 
 interface HeroProps {
   hospitals: Hospital[];
   onExplore: () => void;
   className?: string;
+  userLocation?: { lat: number; lon: number } | null;
 }
 
-export function Hero({ hospitals, onExplore, className }: HeroProps) {
-  // Find hospital with shortest valid wait time
-  const shortestWait = hospitals
-    .filter(
+export function Hero({ hospitals, onExplore, className, userLocation }: HeroProps) {
+  // Find the featured hospital based on location
+  const featuredHospital = (() => {
+    const hospitalsWithData = hospitals.filter(
       (h) => h.current_wait_time !== null && h.current_wait_time !== undefined
-    )
-    .sort(
+    );
+    
+    if (hospitalsWithData.length === 0) return null;
+    
+    // If we have location, show the nearest hospital
+    if (userLocation) {
+      const sorted = [...hospitalsWithData].sort((a, b) => {
+        const distA = calculateDistance(userLocation.lat, userLocation.lon, a.latitude, a.longitude);
+        const distB = calculateDistance(userLocation.lat, userLocation.lon, b.latitude, b.longitude);
+        return distA - distB;
+      });
+      return {
+        hospital: sorted[0],
+        type: "nearest" as const,
+        distance: calculateDistance(userLocation.lat, userLocation.lon, sorted[0].latitude, sorted[0].longitude)
+      };
+    }
+    
+    // Otherwise show shortest wait (fallback)
+    const sorted = [...hospitalsWithData].sort(
       (a, b) => (a.current_wait_time ?? 999) - (b.current_wait_time ?? 999)
-    )[0];
+    );
+    return { hospital: sorted[0], type: "shortest" as const, distance: null };
+  })();
+
+  const formatDistance = (km: number) => {
+    if (km < 1) return `${Math.round(km * 1000)}m`;
+    return `${km.toFixed(1)}km`;
+  };
 
   return (
     <section
       className={clsx(
-        "relative py-12 px-4 md:py-20 lg:py-24 bg-gradient-to-b from-muted/50 to-background border-b border-border",
+        "relative py-12 px-4 md:py-16 lg:py-20 overflow-hidden",
+        "bg-gradient-to-b from-muted/40 via-muted/20 to-transparent",
         className
       )}
     >
-      <div className="container max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+      {/* Subtle background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+      </div>
+
+      <div className="container max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-10 lg:gap-16 relative">
         <div className="flex-1 text-center lg:text-left space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold animate-in fade-in slide-in-from-bottom-4 duration-700 border border-primary/20">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
@@ -36,85 +71,130 @@ export function Hero({ hospitals, onExplore, className }: HeroProps) {
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground animate-in fade-in slide-in-from-bottom-5 duration-700 delay-100">
-            Find the <span className="text-primary">Fastest ER</span> <br />
-            Near You
+            Ontario <span className="text-primary">ER Wait Time</span> <br />
+            Observatory
           </h1>
 
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
-            Make informed decisions when every minute counts. View live wait times
-            across <strong>{hospitals.length || "..."}</strong> Ontario hospitals
-            instantly.
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200 leading-relaxed">
+            Explore publicly reported wait time data from official provincial sources.
+            Browse <strong className="text-foreground">{hospitals.length || "..."}</strong> Ontario hospitals
+            and compare methodologies.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start animate-in fade-in slide-in-from-bottom-7 duration-700 delay-300">
             <button
               onClick={onExplore}
-              className="px-8 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-105 transition-all duration-200 active:scale-95"
+              className="group px-8 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:bg-primary-hover hover:scale-[1.02] transition-all duration-200 active:scale-[0.98]"
             >
-              Explore Hospitals
+              <span className="flex items-center gap-2">
+                Explore Hospitals
+                <svg
+                  className="w-5 h-5 group-hover:translate-x-0.5 transition-transform"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </span>
             </button>
-            <a
-              href="#"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            <Link
+              href="/methods"
+              className="text-muted-foreground hover:text-foreground font-medium flex items-center gap-1.5 transition-colors"
             >
-              How data is collected →
-            </a>
+              Understand Methodologies
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </Link>
           </div>
         </div>
 
-        {/* Live Preview Card */}
-        <div className="w-full max-w-sm lg:w-[400px] animate-in fade-in slide-in-from-right-8 duration-1000 delay-200">
-          <div className="bg-card rounded-3xl shadow-xl border border-border/50 p-6 relative overflow-hidden group hover:shadow-2xl transition-all duration-300">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-primary to-blue-500"></div>
-
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-                Shortest Wait Time
-              </span>
-              <span className="flex items-center gap-1.5 text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-full text-xs font-bold ring-1 ring-inset ring-emerald-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                LIVE
-              </span>
-            </div>
-
-            {shortestWait ? (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-xl font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
-                    {shortestWait.name}
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    {shortestWait.city}, {shortestWait.province}
-                  </p>
-                </div>
-
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-black text-foreground tracking-tight">
-                    {Math.round(shortestWait.current_wait_time ?? 0)}
+        {/* Featured Hospital Card */}
+        <div className="w-full max-w-sm lg:w-[380px] animate-in fade-in slide-in-from-right-8 duration-1000 delay-200">
+          <div className="relative group">
+            {/* Card glow effect */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500" />
+            
+            <div className="relative bg-card rounded-2xl shadow-xl border border-border/50 overflow-hidden">
+              {/* Gradient top bar */}
+              <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary" />
+              
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-5">
+                  <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    {featuredHospital?.type === "nearest" ? "Nearest ER" : "Featured"}
                   </span>
-                  <span className="text-xl font-medium text-muted-foreground">
-                    minutes
+                  <span className="flex items-center gap-1.5 text-success bg-success/10 px-2.5 py-1 rounded-full text-xs font-bold ring-1 ring-inset ring-success/20">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success" />
+                    </span>
+                    LIVE
                   </span>
                 </div>
 
-                <div className="pt-4 border-t border-border">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Performance (P90)</span>
-                    <span>Updated just now</span>
+                {featuredHospital ? (
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
+                        {featuredHospital.hospital.name}
+                      </h3>
+                      <div className="flex items-center gap-2 text-sm mt-0.5">
+                        <span className="text-muted-foreground">
+                          {featuredHospital.hospital.city}, {featuredHospital.hospital.province}
+                        </span>
+                        {featuredHospital.distance !== null && (
+                          <span className="text-xs bg-muted px-2 py-0.5 rounded-full font-medium">
+                            {formatDistance(featuredHospital.distance)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-5xl font-black text-foreground tracking-tight tabular-nums">
+                        {Math.round(featuredHospital.hospital.current_wait_time ?? 0)}
+                      </span>
+                      <span className="text-xl font-medium text-muted-foreground">
+                        min
+                      </span>
+                    </div>
+
+                    <div className="pt-4 border-t border-border/50">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1.5">
+                          <span className="w-1 h-1 rounded-full bg-success" />
+                          P90 Performance
+                        </span>
+                        <span>Updated just now</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-40 space-y-3 text-muted-foreground">
+                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    <span className="text-sm">Loading hospital data...</span>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-40 space-y-3 text-muted-foreground">
-                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                <span className="text-sm">Finding fastest ER...</span>
-              </div>
-            )}
+            </div>
           </div>
-
-          {/* Decorative elements behind card */}
-          <div className="absolute -z-10 top-10 -right-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl opacity-50"></div>
-          <div className="absolute -z-10 -bottom-10 -left-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl opacity-50"></div>
         </div>
       </div>
     </section>

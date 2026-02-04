@@ -108,4 +108,18 @@ describe("Map Component", () => {
     render(<Map {...defaultProps} lastUpdate="2023-01-01" isStale={true} />);
     expect(screen.getByText("Data may be stale")).toBeInTheDocument();
   });
+
+  it("displays quick action buttons in popup", () => {
+    const hospitalWithInfo = {
+      ...mockHospitals[0],
+      website_url: "https://example.com",
+      phone_number: "123-456-7890",
+    };
+    render(<Map {...defaultProps} hospitals={[hospitalWithInfo]} selectedId="test-hospital" />);
+    
+    expect(screen.getByText("Directions")).toBeInTheDocument();
+    expect(screen.getByText("Website")).toBeInTheDocument();
+    expect(screen.getByText("Call")).toBeInTheDocument();
+  });
 });
+

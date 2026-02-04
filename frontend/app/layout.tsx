@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { EmergencyBanner } from "@/components/EmergencyBanner";
 import "./globals.css";
@@ -6,6 +7,12 @@ import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { StructuredData } from "./structured-data";
+
+const inter = Inter({ 
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "WaitTime Canada - ER Wait Time Observatory",
@@ -28,8 +35,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="antialiased bg-background text-foreground transition-colors duration-300">
+    <html lang="en" suppressHydrationWarning className={inter.variable}>
+      <body className="font-sans antialiased bg-background text-foreground transition-colors duration-300">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <StructuredData />
           <EmergencyBanner />
@@ -41,3 +48,4 @@ export default function RootLayout({
     </html>
   );
 }
+

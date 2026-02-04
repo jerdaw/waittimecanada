@@ -45,8 +45,7 @@ describe("Hero Component", () => {
 
   it("renders correctly", () => {
     render(<Hero hospitals={mockHospitals} onExplore={() => {}} />);
-    expect(screen.getByText(/Find the/i)).toBeInTheDocument();
-    expect(screen.getByText(/Fastest ER/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Ontario.*ER.*Wait Time.*Observatory/i })).toBeInTheDocument();
   });
 
   it("calculates and displays the shortest wait time", () => {
@@ -70,6 +69,6 @@ describe("Hero Component", () => {
 
   it("handles empty data gracefully", () => {
     render(<Hero hospitals={[]} onExplore={() => {}} />);
-    expect(screen.getByText("Finding fastest ER...")).toBeInTheDocument();
+    expect(screen.getByText("Loading hospital data...")).toBeInTheDocument();
   });
 });
