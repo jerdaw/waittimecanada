@@ -15,8 +15,6 @@ interface HospitalListProps {
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
   userLocation?: { lat: number; lon: number } | null;
-  onSearchChange?: (query: string) => void;
-  userLocation?: { lat: number; lon: number } | null;
   onRequestLocation?: () => void;
   showLiveOnly?: boolean;
   onToggleLiveOnly?: (enabled: boolean) => void;

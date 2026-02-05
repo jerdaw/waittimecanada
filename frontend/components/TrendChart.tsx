@@ -60,8 +60,11 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
     return date.toLocaleDateString([], { month: "short", day: "numeric" });
   };
 
-  const formatTooltip = (value: number) => [`${value} min`, "Wait Time"];
-  const formatTooltipLabel = (label: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formatTooltip = (value: any) => [`${value} min`, "Wait Time"];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formatTooltipLabel = (label: any) => {
+    if (!label) return "";
     const date = new Date(label);
     return date.toLocaleString();
   };

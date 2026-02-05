@@ -110,16 +110,16 @@ describe("Map Component", () => {
   });
 
   it("displays quick action buttons in popup", () => {
+    // @ts-ignore
     const hospitalWithInfo = {
       ...mockHospitals[0],
-      website_url: "https://example.com",
-      phone_number: "123-456-7890",
+      telehealth_number: "123-456-7890",
     };
     render(<Map {...defaultProps} hospitals={[hospitalWithInfo]} selectedId="test-hospital" />);
     
     expect(screen.getByText("Directions")).toBeInTheDocument();
-    expect(screen.getByText("Website")).toBeInTheDocument();
-    expect(screen.getByText("Call")).toBeInTheDocument();
+    // Website button removed
+    expect(screen.getByText("Call Health Info")).toBeInTheDocument();
   });
 });
 
