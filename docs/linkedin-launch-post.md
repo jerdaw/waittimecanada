@@ -28,7 +28,7 @@ Rather than claiming to "fix" inconsistent data, WaitTime Canada **audits** it:
 **Tech Stack:**
 - Backend: Python 3.12 + Neon PostgreSQL 17
 - Frontend: Next.js 14 + Mapbox GL JS
-- Testing: 143 backend tests (57% coverage) + 79 frontend tests (100% pass rate)
+- Testing: 143 backend tests (57% coverage) + 135 frontend tests (100% pass rate)
 - Current Coverage: 213 Ontario hospitals with real seeded data
 
 **Key Features:**
@@ -43,8 +43,8 @@ Healthcare systems are complex, and measurement choices affect outcomes. Without
 **Portfolio Project:**
 This project demonstrates the Scholar role of the CanMEDS framework — research methodology, data auditing, and ontology design applied to real-world healthcare data.
 
-🔗 [GitHub Repository Link]
-📚 [Live Demo - Coming Soon]
+🔗 GitHub: https://github.com/jerdaw/waittimecanada
+📚 Live Demo: [Coming Soon - Deploy to Render]
 
 #HealthcareInnovation #DataScience #CanMEDS #MedicalSchool #EmergencyMedicine #HealthIT #Python #NextJS #PostgreSQL
 
@@ -84,7 +84,7 @@ Rather than hide these differences, we expose them:
 - Neon PostgreSQL 17 with strict ontology enforcement
 - Next.js 14 frontend with Mapbox GL JS
 - Python scrapers with BeautifulSoup and Playwright
-- Comprehensive test suite: 222 tests total (143 backend + 79 frontend)
+- Comprehensive test suite: 278 tests total (143 backend + 135 frontend)
 
 **Current Status:**
 📍 213 Ontario hospitals with real measurements
@@ -155,7 +155,7 @@ Ottawa vs. Gatineau (border communities):
 **Technical Implementation:**
 - 213 Ontario hospitals seeded (165 verified and visible)
 - Strict ontology: metric_family, start_event, end_event, statistic_type
-- Comprehensive testing: 143 backend + 79 frontend tests
+- Comprehensive testing: 143 backend + 135 frontend tests
 - Built with Python, PostgreSQL, Next.js, Mapbox
 
 **Impact:**
@@ -230,7 +230,7 @@ Build a "Health Systems Observatory" that doesn't just show wait times, but audi
 - Prevents incorrect data from going live
 
 **Current Metrics:**
-📊 222 total tests (143 backend + 79 frontend)
+📊 278 total tests (143 backend + 135 frontend)
 🎯 ComparisonService: 100% test coverage
 📍 213 Ontario hospitals seeded
 📚 Comprehensive documentation with task summaries
@@ -293,8 +293,8 @@ Auto-generates divergence warnings when methodologies don't match.
 **Tech Stack:**
 - Backend: Python 3.12, Neon PostgreSQL 17, BeautifulSoup4, Playwright
 - Frontend: Next.js 14, Mapbox GL JS, Tailwind CSS
-- Testing: 143 backend tests (pytest), 79 frontend tests (Vitest)
-- Infrastructure: GitHub Actions (scrapers), Vercel (frontend)
+- Testing: 143 backend tests (pytest), 135 frontend tests (Vitest)
+- Infrastructure: GitHub Actions (scrapers), Render (frontend)
 
 **Architecture Highlights:**
 - LATERAL joins for most recent measurement per hospital
@@ -310,7 +310,7 @@ Auto-generates divergence warnings when methodologies don't match.
 - Province-specific telehealth routing
 
 **Code Quality:**
-✅ 222 tests total (100% frontend pass rate)
+✅ 278 tests total (100% frontend pass rate)
 ✅ ComparisonService: 100% coverage
 ✅ Comprehensive documentation
 ✅ Strict typing (Pydantic + TypeScript)

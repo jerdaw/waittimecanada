@@ -240,10 +240,10 @@ This milestone ensures the project is presentable for medical school application
 - [ ] Add testimonial section if obtained
 
 **Phase 4: Launch Materials**
-- [ ] Finalize LinkedIn launch post (draft exists in `docs/linkedin-launch-post.md`)
-- [ ] Create 2-3 screenshots for social sharing
-- [ ] Write GitHub repo description and topics
-- [ ] Prepare 1-paragraph summary for applications
+- [x] Finalize LinkedIn launch post (draft exists in `docs/linkedin-launch-post.md`)
+- [x] Create screenshot guide for social sharing (`docs/screenshot-guide.md`)
+- [x] Write GitHub repo description and topics (updated README with badges)
+- [x] Prepare 1-paragraph summary for applications (`docs/application-summary.md`)
 
 **Deliverables:**
 - Live production URL
