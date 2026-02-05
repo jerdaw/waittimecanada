@@ -1,0 +1,115 @@
+"""Alert service for scraper health notifications."""
+import os
+import httpx
+from dataclasses import dataclass
+from typing import Optional
+
+
+@dataclass
+class AlertConfig:
+    """Configuration for alert service."""
+
+    pushover_user_key: str
+    pushover_api_token: str
+    enabled: bool = True
+
+
+class AlertService:
+    """Service for sending operational alerts via Pushover."""
+
+    PUSHOVER_API_URL = "https://api.pushover.net/1/messages.json"
+
+    def __init__(self, config: Optional[AlertConfig] = None):
+        """
+        Initialize alert service.
+
+        Args:
+            config: Optional AlertConfig. If not provided, reads from environment.
+        """
+        self.config = config or AlertConfig(
+            pushover_user_key=os.environ.get("PUSHOVER_USER_KEY", ""),
+            pushover_api_token=os.environ.get("PUSHOVER_API_TOKEN", ""),
+            enabled=bool(os.environ.get("ALERTS_ENABLED", "true").lower() == "true"),
+        )
+
+    def send_alert(
+        self,
+        title: str,
+        message: str,
+        priority: int = 0,
+        url: Optional[str] = None,
+    ) -> bool:
+        """
+        Send an alert via Pushover.
+
+        Args:
+            title: Alert title
+            message: Alert body
+            priority: -2 (lowest) to 2 (emergency, requires acknowledgment)
+            url: Optional URL to include
+
+        Returns:
+            True if sent successfully, False otherwise
+        """
+        if not self.config.enabled:
+            print(f"[ALERT DISABLED] {title}: {message}")
+            return True
+
+        if not self.config.pushover_user_key or not self.config.pushover_api_token:
+            print(f"[ALERT NO CONFIG] {title}: {message}")
+            return False
+
+        payload = {
+            "token": self.config.pushover_api_token,
+            "user": self.config.pushover_user_key,
+            "title": title,
+            "message": message,
+            "priority": priority,
+        }
+        if url:
+            payload["url"] = url
+            payload["url_title"] = "View Details"
+
+        try:
+            response = httpx.post(self.PUSHOVER_API_URL, data=payload, timeout=10.0)
+            response.raise_for_status()
+            return True
+        except Exception as e:
+            print(f"[ALERT FAILED] {e}")
+            return False
+
+    def alert_scraper_stale(self, source_id: str, age_minutes: int) -> bool:
+        """
+        Alert that a scraper hasn't run recently.
+
+        Args:
+            source_id: ID of the stale scraper source
+            age_minutes: How long since last heartbeat
+
+        Returns:
+            True if alert sent successfully
+        """
+        return self.send_alert(
+            title=f"⚠️ Scraper Stale: {source_id}",
+            message=f"No heartbeat for {age_minutes} minutes. Check GitHub Actions.",
+            priority=1,  # High priority
+            url="https://github.com/jerdaw/waittimecanada/actions",
+        )
+
+    def alert_scraper_error(self, source_id: str, error: str) -> bool:
+        """
+        Alert that a scraper encountered an error.
+
+        Args:
+            source_id: ID of the scraper that errored
+            error: Error message (truncated to 200 chars)
+
+        Returns:
+            True if alert sent successfully
+        """
+        return self.send_alert(
+            title=f"🚨 Scraper Error: {source_id}",
+            message=f"Error: {error[:200]}",
+            priority=1,  # High priority
+            url="https://github.com/jerdaw/waittimecanada/actions",
+        )

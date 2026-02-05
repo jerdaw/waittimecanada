@@ -3,11 +3,11 @@
 > A clinically defensible "Health Systems Observatory" that audits and standardizes Canadian emergency room wait time data across provinces.
 
 **Status:** 🚀 Core Features Complete | 📊 Ready for Production
-**Test Coverage:** Backend: 143 tests (57% coverage) | Frontend: 175 tests (100% pass rate)
+**Test Coverage:** Backend: 143 tests (57% coverage) | Frontend: 182 tests (100% pass rate)
 **Live Site:** Coming Soon
 **Documentation:** [docs/](./docs/)
 
-[![Tests](https://img.shields.io/badge/tests-318%20passing-success)](./tests)
+[![Tests](https://img.shields.io/badge/tests-325%20passing-success)](./tests)
 [![Coverage](https://img.shields.io/badge/coverage-57%25-yellow)](./coverage)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12-blue)](./backend)

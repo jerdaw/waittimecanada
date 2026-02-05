@@ -2,14 +2,14 @@
 
 ## Current Status (Updated 2026-02-05)
 
-**Progress:** Milestone 12, Phase 1 (Citation Export) Complete ✓
+**Progress:** Milestone 12, Phases 1 & 2 Complete ✓
 
 **Recently Completed:**
+- ✅ **M12 Phase 2:** Dead Man's Switch Alerts (AlertService, CLI command, GitHub Action, SystemStatus component, 7 tests)
 - ✅ **M12 Phase 1:** Citation-Ready Data Export (API endpoint, DataExport component, 19 tests, API documentation)
 - ✅ **M11 Phase 1:** Access Burden Estimator (fuel cost + parking, 21 tests, ADR-0005)
 - ✅ **M9 Phase 2:** About Section (physician-innovator narrative, 8 tests)
 - ✅ **M9 Phase 4:** Launch Materials (LinkedIn post, screenshot guide, application summary)
-- ✅ **M8 Complete:** UX Polish (Hero landing page, distance sorting, high-density layout)
 
 **Next Milestones:**
 - **Milestone 9:** Portfolio-Ready Launch (MUST-DO before submission)
@@ -333,7 +333,7 @@ These features demonstrate awareness of healthcare access barriers.
 ---
 
 ### 🎯 Milestone 12: Research Infrastructure
-**Status:** Phase 1 Complete
+**Status:** Phases 1 & 2 Complete ✅
 **Priority:** MEDIUM (enhances "Scholar" narrative)
 **Estimated Effort:** 3-4 days
 **Implementation Plan:** `docs/planning/implementation/milestone-12-research.md`
@@ -350,12 +350,13 @@ These features position the project as research infrastructure, not just a consu
 - [x] Document API in `docs/API.md` with usage examples (Python, R, JavaScript)
 - [x] Write 19 comprehensive tests for DataExport component
 
-**Phase 2: Dead Man's Switch Alerts**
-- [ ] Enhance heartbeat monitoring in scraper_status table
-- [ ] Create GitHub Action that checks heartbeat age
-- [ ] If heartbeat > 60 minutes, send Pushover notification
-- [ ] Add "System Status" indicator to footer (green/yellow/red)
-- [ ] Create `/api/health` endpoint for monitoring
+**Phase 2: Dead Man's Switch Alerts** ✅
+- [x] Create AlertService with Pushover integration (backend/src/waittime/services/alerts.py)
+- [x] Create check_heartbeat CLI command (backend/src/waittime/cli/check_heartbeat.py)
+- [x] Update GitHub Action to use CLI command (runs every 30 minutes)
+- [x] Add SystemStatus component for frontend health display
+- [x] Integrate with existing `/api/health` endpoint (already implemented)
+- [x] Write 7 comprehensive tests for SystemStatus component
 
 **Phase 3: Occupancy Statistics (If Data Available)**
 - [ ] Research if Ontario Health provides "patients waiting" / "in treatment" counts

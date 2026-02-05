@@ -1,9 +1,9 @@
 name: Heartbeat Monitor (Dead Man's Switch)
 
-# Check every hour if scrapers are running
+# Check every 30 minutes if scrapers are running
 on:
   schedule:
-    - cron: '0 * * * *'  # Every hour
+    - cron: '*/30 * * * *'  # Every 30 minutes
   workflow_dispatch:
 
 jobs:
@@ -19,64 +19,16 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install database client
-        run: pip install psycopg2-binary
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -e .
 
-      - name: Check scraper status
-        id: check
+      - name: Check heartbeats
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          python - <<EOF
-          import os
-          import psycopg2
-          from datetime import datetime, timedelta, timezone
-
-          conn = psycopg2.connect(os.getenv("DATABASE_URL"))
-          cur = conn.cursor()
-
-          # Get latest heartbeat
-          cur.execute("""
-              SELECT last_run, status
-              FROM scraper_status
-              ORDER BY last_run DESC
-              LIMIT 1
-          """)
-
-          result = cur.fetchone()
-          cur.close()
-          conn.close()
-
-          if not result:
-              print("::set-output name=status::no_data")
-              exit(1)
-
-          last_run = result[0]
-          if last_run.tzinfo is None:
-              last_run = last_run.replace(tzinfo=timezone.utc)
-
-          minutes_ago = (datetime.now(timezone.utc) - last_run).total_seconds() / 60
-
-          print(f"Last scraper run: {minutes_ago:.1f} minutes ago")
-
-          if minutes_ago > 60:
-              print(f"::set-output name=status::stale")
-              print(f"::set-output name=minutes::{int(minutes_ago)}")
-              exit(1)
-          else:
-              print("::set-output name=status::healthy")
-          EOF
-
-      - name: Send Pushover alert if unhealthy
-        if: failure()
-        env:
           PUSHOVER_USER_KEY: ${{ secrets.PUSHOVER_USER_KEY }}
           PUSHOVER_API_TOKEN: ${{ secrets.PUSHOVER_API_TOKEN }}
         run: |
-          curl -s \
-            --form-string "token=$PUSHOVER_API_TOKEN" \
-            --form-string "user=$PUSHOVER_USER_KEY" \
-            --form-string "title=⚠️ Scraper Heartbeat Failure" \
-            --form-string "message=Scraper heartbeat is stale. Last run: ${{ steps.check.outputs.minutes }} minutes ago (threshold: 60 min). Check: https://github.com/${{ github.repository }}/actions/workflows/scraper-cron.yml" \
-            --form-string "priority=1" \
-            https://api.pushover.net/1/messages.json
+          cd backend
+          python -m waittime.cli.check_heartbeat --max-age 60
