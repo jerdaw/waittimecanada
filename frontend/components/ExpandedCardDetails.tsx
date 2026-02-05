@@ -1,17 +1,25 @@
 import { Hospital } from "@/app/api/hospitals/route";
 import { clsx } from "clsx";
+import { AccessBurdenEstimator } from "./AccessBurdenEstimator";
+import { calculateDistance } from "@/utils/distance";
 
 interface ExpandedCardDetailsProps {
   hospital: Hospital;
+  userLocation?: { lat: number; lon: number } | null;
 }
 
-export function ExpandedCardDetails({ hospital }: ExpandedCardDetailsProps) {
+export function ExpandedCardDetails({ hospital, userLocation }: ExpandedCardDetailsProps) {
   // Format dates
   const updatedDate = hospital.last_updated ? new Date(hospital.last_updated) : null;
   const timeString = updatedDate ? updatedDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : "--";
-  
+
   const isLive = updatedDate && (new Date().getTime() - updatedDate.getTime() < 30 * 60 * 1000);
-  
+
+  // Calculate distance
+  const distance = userLocation
+    ? calculateDistance(userLocation.lat, userLocation.lon, hospital.latitude, hospital.longitude)
+    : null;
+
   // Methodology labels
   const getMethodologyLabel = () => {
     if (hospital.province === "QC") return "Registration to Doctor";
@@ -52,6 +60,17 @@ export function ExpandedCardDetails({ hospital }: ExpandedCardDetailsProps) {
           Call <span className="font-bold text-foreground">{hospital.telehealth_number || "811"}</span> to speak with a registered nurse 24/7.
         </p>
       </div>
+
+      {/* Access Burden Estimator - Only show if user location is available */}
+      {userLocation && distance && distance > 0 && (
+        <div className="mb-4">
+          <AccessBurdenEstimator
+            distanceKm={distance}
+            province={hospital.province}
+            hospitalType="urban" // Could be enhanced with hospital.hospital_type field
+          />
+        </div>
+      )}
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

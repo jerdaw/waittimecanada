@@ -301,14 +301,14 @@ This milestone proves the metric ontology works across provinces with different 
 These features demonstrate awareness of healthcare access barriers.
 
 **Phase 1: Access Burden Estimator**
-- [ ] Design collapsible "Planning Lens" UI component
-- [ ] Implement distance calculation (already have user location)
-- [ ] Add gas price estimate (static provincial averages or API)
-- [ ] Add parking cost field (manual input or hospital-specific defaults)
-- [ ] Calculate total: `(Distance × Gas Price) + Parking`
-- [ ] Add prominent disclaimer: "Logistical estimate only. Never delay care for cost."
-- [ ] Write tests for calculation logic
-- [ ] Add ADR documenting design decisions
+- [x] Design collapsible "Planning Lens" UI component
+- [x] Implement distance calculation (already have user location)
+- [x] Add gas price estimate (static provincial averages - 13 provinces/territories)
+- [x] Add parking cost estimates (urban/suburban/rural hospital types)
+- [x] Calculate total: `(Distance × Gas Price × Fuel Consumption) + Parking`
+- [x] Add prominent disclaimer: "Logistical estimate only. Never delay care for cost."
+- [x] Write tests for calculation logic (21 comprehensive tests)
+- [x] Add ADR documenting design decisions (ADR-0005)
 
 **Phase 2: Equity Layer (Socioeconomic Overlays)**
 - [ ] Research available Canadian socioeconomic shapefiles (StatsCan census data)

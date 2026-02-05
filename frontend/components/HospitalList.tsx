@@ -212,14 +212,14 @@ export function HospitalList({
                   </button>
 
                   {/* Expanded Content */}
-                  <div 
+                  <div
                     className={clsx(
                       "grid transition-[grid-template-rows] duration-300 ease-out",
                       isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
                     )}
                   >
                     <div className="overflow-hidden px-3 pb-3">
-                      <ExpandedCardDetails hospital={hospital} />
+                      <ExpandedCardDetails hospital={hospital} userLocation={userLocation} />
                     </div>
                   </div>
                 </div>
