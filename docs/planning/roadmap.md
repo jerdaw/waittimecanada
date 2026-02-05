@@ -226,11 +226,11 @@ This milestone ensures the project is presentable for medical school application
 - [ ] Test production site end-to-end
 
 **Phase 2: About/Story Section**
-- [ ] Add "About This Project" section to homepage (collapsible or dedicated route)
-- [ ] Write physician-innovator narrative (why I built this)
-- [ ] Add author bio with photo placeholder
-- [ ] Link to LinkedIn/GitHub profiles
-- [ ] Ensure story is visible without navigating away from main page
+- [x] Add "About This Project" section to homepage (collapsible or dedicated route)
+- [x] Write physician-innovator narrative (why I built this)
+- [x] Add author bio with photo placeholder
+- [x] Link to LinkedIn/GitHub profiles
+- [x] Ensure story is visible without navigating away from main page
 
 **Phase 3: Stakeholder Validation**
 - [ ] Contact 1-2 ER nurses/physicians for 15-minute interview

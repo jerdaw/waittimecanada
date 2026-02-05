@@ -12,6 +12,7 @@ import { HeroSkeleton } from "@/components/skeletons/HeroSkeleton";
 import { calculateDistance } from "@/utils/distance";
 
 import { Hero } from "@/components/Hero";
+import { AboutSection } from "@/components/AboutSection";
 
 import { isRecent } from "@/utils/date";
 
@@ -187,6 +188,7 @@ export default function Home() {
         {showHero && (
           <div className="flex-shrink-0 animate-in fade-in slide-in-from-top-10 duration-500">
              {loading ? <HeroSkeleton /> : <Hero hospitals={hospitals} onExplore={handleExplore} userLocation={userLocation} />}
+             {!loading && <AboutSection />}
           </div>
         )}
 
