@@ -11,11 +11,54 @@
 - ✅ Codebase Maintenance: Fixing Vitest/Playwright conflicts, symlink fixing
 - ✅ Documentation Audit: ADRs updated and attribution verified
 
-**Next Steps:**
-- Add methodology warnings for incomparable data (Phase 3)
-- Create /methods page with comparability matrix
-- Refine mobile map interactions
-- Production deployment to Vercel
+**Next Milestones:**
+- **Milestone 9:** Portfolio-Ready Launch (MUST-DO before submission)
+- **Milestone 10:** Multi-Province Expansion (Alberta/BC scrapers)
+- **Milestone 11:** Access & Equity Features (Burden Estimator, Equity Layer)
+- **Milestone 12:** Research Infrastructure (Citation export, Alerts, Occupancy)
+
+---
+
+## Strategic Context: Admissions Committee Appeal
+
+Each feature maps to CanMEDS competencies that medical school admissions committees value:
+
+| Competency | Features That Demonstrate It |
+|------------|------------------------------|
+| **Scholar** | Metric ontology, comparability matrix, citation export, methodology transparency |
+| **Professional** | Clinical defensibility, divergence warnings, verification queue, data stewardship |
+| **Health Advocate** | Access Burden Estimator, equity layer, socioeconomic overlays |
+| **Leader** | Multi-province scaling, systems architecture, stakeholder engagement |
+| **Collaborator** | Province-aware telehealth routing, stakeholder interviews, testimonials |
+
+**Key Differentiators vs Competitors (e.g., ER Watch):**
+1. We audit data, not just aggregate it
+2. We expose methodology inconsistencies instead of hiding them
+3. We provide clinical defensibility through the metric ontology
+4. We think at the pan-Canadian system level
+
+---
+
+## Milestone Summary & Timeline
+
+| Milestone | Priority | Est. Days | Key Deliverables | Admissions Appeal |
+|-----------|----------|-----------|------------------|-------------------|
+| **M9: Portfolio Launch** | CRITICAL | 3-4 | Live URL, About section, stakeholder interview, LinkedIn post | Leader, Collaborator |
+| **M10: Multi-Province** | HIGH | 4-5 | Alberta scraper, province filter, cross-province warnings | Scholar, Leader |
+| **M11: Equity Features** | HIGH | 5-6 | Access Burden Estimator, income overlay, equity insights | Health Advocate |
+| **M12: Research Infra** | MEDIUM | 3-4 | Citation export, heartbeat alerts, API docs | Scholar, Leader |
+
+**Recommended Order:** M9 → M10 → M11 → M12
+
+**Total Estimated Effort:** 15-19 days
+
+### Implementation Plans
+
+Each milestone has a detailed implementation plan:
+- `docs/planning/implementation/milestone-9-launch.md` - Production deployment & stakeholder validation
+- `docs/planning/implementation/milestone-10-provinces.md` - Alberta scraper & multi-province support
+- `docs/planning/implementation/milestone-11-equity.md` - Access Burden Estimator & equity layer
+- `docs/planning/implementation/milestone-12-research.md` - Citation export & alert system
 
 ---
 
@@ -164,6 +207,171 @@
 - [x] Faint dot grid textures for visual depth
 
 **Goal:** Improve user experience with quick access to hospital details and modern "landing page" feel
+
+---
+
+### 🎯 Milestone 9: Portfolio-Ready Launch (CRITICAL)
+**Status:** Not Started
+**Priority:** MUST-DO before portfolio submission
+**Estimated Effort:** 3-4 days
+**Implementation Plan:** `docs/planning/implementation/milestone-9-launch.md`
+
+This milestone ensures the project is presentable for medical school applications.
+
+**Phase 1: Production Deployment**
+- [ ] Deploy frontend to Render/Vercel with production DATABASE_URL
+- [ ] Configure GitHub Actions for automated scraper runs (15-min cron)
+- [ ] Set up Pushover/email alerts for heartbeat failures ("Dead Man's Switch")
+- [ ] Verify all environment variables in production
+- [ ] Test production site end-to-end
+
+**Phase 2: About/Story Section**
+- [ ] Add "About This Project" section to homepage (collapsible or dedicated route)
+- [ ] Write physician-innovator narrative (why I built this)
+- [ ] Add author bio with photo placeholder
+- [ ] Link to LinkedIn/GitHub profiles
+- [ ] Ensure story is visible without navigating away from main page
+
+**Phase 3: Stakeholder Validation**
+- [ ] Contact 1-2 ER nurses/physicians for 15-minute interview
+- [ ] Prepare interview questions (methodology usefulness, UI feedback)
+- [ ] Document feedback and incorporate suggestions
+- [ ] Request testimonial quote for site (optional but high-value)
+- [ ] Add testimonial section if obtained
+
+**Phase 4: Launch Materials**
+- [ ] Finalize LinkedIn launch post (draft exists in `docs/linkedin-launch-post.md`)
+- [ ] Create 2-3 screenshots for social sharing
+- [ ] Write GitHub repo description and topics
+- [ ] Prepare 1-paragraph summary for applications
+
+**Deliverables:**
+- Live production URL
+- "About" section with personal narrative
+- At least 1 stakeholder interview documented
+- LinkedIn post ready to publish
+- Portfolio-ready screenshots
+
+---
+
+### 🎯 Milestone 10: Multi-Province Expansion
+**Status:** Not Started
+**Priority:** HIGH (proves methodology heterogeneity)
+**Estimated Effort:** 4-5 days
+**Implementation Plan:** `docs/planning/implementation/milestone-10-provinces.md`
+
+This milestone proves the metric ontology works across provinces with different methodologies.
+
+**Phase 1: Alberta Scraper**
+- [ ] Research Alberta Health Services ER wait time portal
+- [ ] Document Alberta's methodology (expected: `start_event=TRIAGE`, different from Quebec)
+- [ ] Create `backend/src/waittime/scrapers/alberta.py`
+- [ ] Add Alberta source to `sources` table with correct ontology tags
+- [ ] Geocode Alberta hospitals (Nominatim pipeline)
+- [ ] Write unit tests for Alberta scraper
+- [ ] Verify divergence warnings trigger when comparing AB vs QC
+
+**Phase 2: British Columbia Scraper (Optional)**
+- [ ] Research BC ER wait time availability
+- [ ] Document BC methodology if different from AB/ON
+- [ ] Create scraper if data is accessible
+- [ ] Add to sources table
+
+**Phase 3: Frontend Updates**
+- [ ] Add province filter dropdown to hospital list
+- [ ] Update map to show multi-province data
+- [ ] Ensure methodology cards on /methods page auto-populate from sources table
+- [ ] Test cross-province comparison warnings
+
+**Deliverables:**
+- Alberta scraper running with correct ontology tags
+- 50+ Alberta hospitals in database
+- Divergence warnings working for AB vs QC/ON comparisons
+- Province filter in UI
+- Updated comparability matrix
+
+---
+
+### 🎯 Milestone 11: Access & Equity Features
+**Status:** Not Started
+**Priority:** HIGH (strongest "Health Advocate" features)
+**Estimated Effort:** 5-6 days
+**Implementation Plan:** `docs/planning/implementation/milestone-11-equity.md`
+
+These features demonstrate awareness of healthcare access barriers.
+
+**Phase 1: Access Burden Estimator**
+- [ ] Design collapsible "Planning Lens" UI component
+- [ ] Implement distance calculation (already have user location)
+- [ ] Add gas price estimate (static provincial averages or API)
+- [ ] Add parking cost field (manual input or hospital-specific defaults)
+- [ ] Calculate total: `(Distance × Gas Price) + Parking`
+- [ ] Add prominent disclaimer: "Logistical estimate only. Never delay care for cost."
+- [ ] Write tests for calculation logic
+- [ ] Add ADR documenting design decisions
+
+**Phase 2: Equity Layer (Socioeconomic Overlays)**
+- [ ] Research available Canadian socioeconomic shapefiles (StatsCan census data)
+- [ ] Download income/deprivation index data by census tract
+- [ ] Create Mapbox tileset or GeoJSON layer
+- [ ] Add toggle: "Show Income Overlay"
+- [ ] Color-code areas by income quintile
+- [ ] Add legend explaining the overlay
+- [ ] Write documentation explaining the equity analysis purpose
+
+**Phase 3: Access Insights**
+- [ ] Create summary statistics: "X hospitals within 30km of low-income areas"
+- [ ] Add to /methods or new /insights page
+- [ ] Document methodology for equity analysis
+
+**Deliverables:**
+- Working Access Burden Estimator with disclaimer
+- Socioeconomic overlay on map
+- Equity insights summary
+- ADR for equity feature design
+
+---
+
+### 🎯 Milestone 12: Research Infrastructure
+**Status:** Not Started
+**Priority:** MEDIUM (enhances "Scholar" narrative)
+**Estimated Effort:** 3-4 days
+**Implementation Plan:** `docs/planning/implementation/milestone-12-research.md`
+
+These features position the project as research infrastructure, not just a consumer app.
+
+**Phase 1: Citation-Ready Data Export**
+- [ ] Create `/api/export` endpoint with query params (province, date range)
+- [ ] Return CSV with all methodology tags included
+- [ ] Add citation format suggestion in download
+- [ ] Create "Download Data" button on /methods page
+- [ ] Add terms of use for data (attribution required)
+- [ ] Document API in `docs/API.md`
+
+**Phase 2: Dead Man's Switch Alerts**
+- [ ] Enhance heartbeat monitoring in scraper_status table
+- [ ] Create GitHub Action that checks heartbeat age
+- [ ] If heartbeat > 60 minutes, send Pushover notification
+- [ ] Add "System Status" indicator to footer (green/yellow/red)
+- [ ] Create `/api/health` endpoint for monitoring
+
+**Phase 3: Occupancy Statistics (If Data Available)**
+- [ ] Research if Ontario Health provides "patients waiting" / "in treatment" counts
+- [ ] If available, add to scraper and measurements table
+- [ ] Display as pills in hospital cards: "14 waiting | 26 in treatment"
+- [ ] Add velocity context: "ER clearing fast" vs "ER backing up"
+
+**Phase 4: Proactive Notifications (Future)**
+- [ ] Design notification system architecture
+- [ ] Create user preference storage (local or authenticated)
+- [ ] Implement threshold-based alerts ("Toronto General > 4h")
+- [ ] Add email/push notification delivery
+
+**Deliverables:**
+- CSV export with methodology tags
+- Working heartbeat alerts
+- System status indicator
+- Occupancy stats (if data available)
 
 ---
 
@@ -363,13 +571,41 @@ class BaseScraper(ABC):
 
 ## Next Session Priorities
 
-1. **Expandable Hospital Cards** - Phase 1 of Milestone 8
-2. **FAQ Page** - Phase 2 of Milestone 8 (high SEO value)
-3. **Quick Action Buttons** - Phase 3 of Milestone 8
-4. **Run Ontario Scraper** - Ensure fresh data for testing
-5. **Test All Components** - Ensure all passing before commit
-6. **Update Documentation** - ADR for UX features
-7. **Commit & Push** - Clean working tree
+### Immediate (Milestone 9 - Portfolio Launch)
+1. **Production Deployment** - Get live URL working
+2. **About Section** - Add physician-innovator narrative to UI
+3. **Stakeholder Interview** - Contact ER nurse/physician
+4. **LinkedIn Post** - Finalize and publish
+
+### Short-Term (Milestone 10 - Multi-Province)
+5. **Alberta Scraper** - Research and implement
+6. **Province Filter** - Add UI dropdown
+7. **Cross-Province Warnings** - Verify divergence detection
+
+### Medium-Term (Milestone 11 - Equity)
+8. **Access Burden Estimator** - Distance + cost calculation
+9. **Equity Layer** - Socioeconomic overlays
+
+### Backlog (Milestone 12 - Research)
+10. **Citation Export** - CSV with methodology tags
+11. **Heartbeat Alerts** - Pushover notifications
+12. **Occupancy Stats** - If data available
+
+---
+
+## Quick Start for New Sessions
+
+```bash
+# 1. Check current milestone status
+cat docs/planning/roadmap.md | head -100
+
+# 2. Read the implementation plan for current milestone
+cat docs/planning/implementation/milestone-9-launch.md
+
+# 3. Run tests to verify everything works
+cd backend && pytest tests/ -v
+cd frontend && npm run test:unit
+```
 
 ---
 
