@@ -13,6 +13,7 @@ import { calculateDistance } from "@/utils/distance";
 
 import { Hero } from "@/components/Hero";
 import { AboutSection } from "@/components/AboutSection";
+import { SystemStatus } from "@/components/SystemStatus";
 
 import { isRecent } from "@/utils/date";
 
@@ -255,6 +256,24 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Footer with System Status */}
+      {!showHero && (
+        <footer className="border-t border-border/50 bg-card/30 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-sm text-muted-foreground">
+                <span>WaitTime Canada</span>
+                <span className="mx-2">•</span>
+                <a href="/methods" className="hover:text-foreground transition-colors">
+                  Methodology
+                </a>
+              </div>
+              <SystemStatus />
+            </div>
+          </div>
+        </footer>
+      )}
     </main>
   );
 }
