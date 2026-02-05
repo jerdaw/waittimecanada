@@ -72,3 +72,4 @@ Every measurement is tagged with ontology fields that describe its methodology:
 Two measurements are **comparable** only if all four fields match.
 
 See [ADR-0002](../docs/adr/0002-metric-ontology.md) for the full rationale.
+# Test commit - verifying Netlify ignore rule
