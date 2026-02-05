@@ -1,15 +1,15 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-02-04)
+## Current Status (Updated 2026-02-05)
 
-**Progress:** Milestone 8 (UX Enhancements) Complete ✓
+**Progress:** Milestone 12, Phase 1 (Citation Export) Complete ✓
 
 **Recently Completed:**
-- ✅ Aesthetic Refinement: Clean, spacious "Hero" landing page
-- ✅ Layout Optimization: High-density "Scrolled" view for list/map
-- ✅ Default Sorting: Enforced distance-based sorting (removed alphabetical override)
-- ✅ Codebase Maintenance: Fixing Vitest/Playwright conflicts, symlink fixing
-- ✅ Documentation Audit: ADRs updated and attribution verified
+- ✅ **M12 Phase 1:** Citation-Ready Data Export (API endpoint, DataExport component, 19 tests, API documentation)
+- ✅ **M11 Phase 1:** Access Burden Estimator (fuel cost + parking, 21 tests, ADR-0005)
+- ✅ **M9 Phase 2:** About Section (physician-innovator narrative, 8 tests)
+- ✅ **M9 Phase 4:** Launch Materials (LinkedIn post, screenshot guide, application summary)
+- ✅ **M8 Complete:** UX Polish (Hero landing page, distance sorting, high-density layout)
 
 **Next Milestones:**
 - **Milestone 9:** Portfolio-Ready Launch (MUST-DO before submission)
@@ -333,20 +333,22 @@ These features demonstrate awareness of healthcare access barriers.
 ---
 
 ### 🎯 Milestone 12: Research Infrastructure
-**Status:** Not Started
+**Status:** Phase 1 Complete
 **Priority:** MEDIUM (enhances "Scholar" narrative)
 **Estimated Effort:** 3-4 days
 **Implementation Plan:** `docs/planning/implementation/milestone-12-research.md`
 
 These features position the project as research infrastructure, not just a consumer app.
 
-**Phase 1: Citation-Ready Data Export**
-- [ ] Create `/api/export` endpoint with query params (province, date range)
-- [ ] Return CSV with all methodology tags included
-- [ ] Add citation format suggestion in download
-- [ ] Create "Download Data" button on /methods page
-- [ ] Add terms of use for data (attribution required)
-- [ ] Document API in `docs/API.md`
+**Phase 1: Citation-Ready Data Export** ✅
+- [x] Create `/api/export` endpoint with query params (province, date range, format)
+- [x] Return CSV with all methodology tags included
+- [x] Add JSON export option with metadata
+- [x] Add citation format suggestion in download (HTTP headers + UI)
+- [x] Create "Download Data" button on /methods page with DataExport component
+- [x] Add terms of use for data (CC-BY-4.0 license)
+- [x] Document API in `docs/API.md` with usage examples (Python, R, JavaScript)
+- [x] Write 19 comprehensive tests for DataExport component
 
 **Phase 2: Dead Man's Switch Alerts**
 - [ ] Enhance heartbeat monitoring in scraper_status table

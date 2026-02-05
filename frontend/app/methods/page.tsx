@@ -2,6 +2,7 @@ import { ComparabilityMatrix } from "@/components/methods/ComparabilityMatrix";
 import { ProvinceMethodologyCard } from "@/components/methods/ProvinceMethodologyCard";
 import { OntologyExplainer } from "@/components/methods/OntologyExplainer";
 import { FAQ } from "@/components/methods/FAQ";
+import { DataExport } from "@/components/DataExport";
 import { getDb } from "@/utils/db";
 
 interface Source {
@@ -150,6 +151,21 @@ export default async function MethodsPage() {
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
               <FAQ />
             </div>
+          </section>
+
+          {/* Section 5: Data for Researchers */}
+          <section>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-slate-900 mb-3">
+                Data for Researchers
+              </h2>
+              <p className="text-slate-600 leading-relaxed max-w-3xl">
+                Download wait time data with full methodology tags for research use.
+                All exports include our metric ontology columns to ensure proper
+                attribution and comparability analysis.
+              </p>
+            </div>
+            <DataExport />
           </section>
 
           {/* Footer CTA */}
