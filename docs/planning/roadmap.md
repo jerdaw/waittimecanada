@@ -5,9 +5,12 @@
 **Progress:** Milestone 12, Phases 1 & 2 Complete ✓
 
 **Recently Completed:**
+- ✅ **UI Integration:** SystemStatus component in footer (real-time health display)
+- ✅ **Planning:** Manual tasks queue created (`docs/planning/manual-tasks.md` - 9 tasks tracked)
 - ✅ **M12 Phase 2:** Dead Man's Switch Alerts (AlertService, CLI command, GitHub Action, SystemStatus component, 7 tests)
 - ✅ **M12 Phase 1:** Citation-Ready Data Export (API endpoint, DataExport component, 19 tests, API documentation)
 - ✅ **M11 Phase 1:** Access Burden Estimator (fuel cost + parking, 21 tests, ADR-0005)
+- ✅ **M10 Phase 1 (Partial):** Alberta scraper skeleton (awaiting API endpoint research from manual tasks)
 - ✅ **M9 Phase 2:** About Section (physician-innovator narrative, 8 tests)
 - ✅ **M9 Phase 4:** Launch Materials (LinkedIn post, screenshot guide, application summary)
 
