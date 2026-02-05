@@ -145,12 +145,12 @@ describe('HospitalList', () => {
     // Check if container has visual state indicating expansion
     const card1 = button1!.closest('div'); // The outer container
     expect(card1).toBeDefined();
-    // We check for shadow-md class which indicates expanded state
-    expect(card1?.className).toContain('shadow-md');
+    // We check for shadow-lg class which indicates expanded state
+    expect(card1?.className).toContain('shadow-lg');
     
     // Click again to collapse
     fireEvent.click(button1!);
-    expect(card1?.className).not.toContain('shadow-md');
+    expect(card1?.className).not.toContain('shadow-lg');
   });
 
   it('toggles live data filter callback', () => {

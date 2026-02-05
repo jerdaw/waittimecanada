@@ -1,5 +1,6 @@
 "use client";
 
+import { clsx } from "clsx";
 import { useEffect, useState } from "react";
 import Map from "@/components/Map";
 import { HospitalList } from "@/components/HospitalList";
@@ -32,7 +33,7 @@ export default function Home() {
   
   // Geolocation state
   const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>(null);
-  const [sortByDistance, setSortByDistance] = useState(false);
+  const [sortByDistance, setSortByDistance] = useState(true); // Always default to distance if available
   const [showLiveOnly, setShowLiveOnly] = useState(false);
   const [locationRequested, setLocationRequested] = useState(false);
 
@@ -53,7 +54,7 @@ export default function Home() {
             lat: position.coords.latitude,
             lon: position.coords.longitude,
           });
-          setSortByDistance(true);
+          // sortByDistance is already true
         },
         (error) => {
           console.warn("Geolocation denied or failed, falling back to IP location:", error.message);
@@ -83,7 +84,7 @@ export default function Home() {
           lat: data.location.lat,
           lon: data.location.lon,
         });
-        setSortByDistance(true); // Auto-sort by distance when location is available
+        // sortByDistance is already true
         console.log("Using IP-based location:", data.location.city, data.location.region);
       }
     } catch (err) {
@@ -152,12 +153,14 @@ export default function Home() {
       );
     })
     .sort((a, b) => {
-      if (sortByDistance && userLocation) {
+      // Always sort by distance if location is available
+      if (userLocation) {
         const distA = calculateDistance(userLocation.lat, userLocation.lon, a.latitude, a.longitude);
         const distB = calculateDistance(userLocation.lat, userLocation.lon, b.latitude, b.longitude);
         return distA - distB;
       }
-      return 0;
+      // Fallback to alphabetical if no location
+      return a.name.localeCompare(b.name);
     });
 
   // Count live hospitals
@@ -175,7 +178,10 @@ export default function Home() {
         showStats={!showHero}
       />
       
-      <div className="flex-1 w-full flex flex-col relative overflow-hidden">
+      <div className={clsx(
+        "flex-1 w-full flex flex-col relative",
+        showHero ? "overflow-y-auto" : "overflow-hidden"
+      )}>
         {/* Hero Section */}
         {showHero && (
           <div className="flex-shrink-0 animate-in fade-in slide-in-from-top-10 duration-500">
@@ -184,10 +190,13 @@ export default function Home() {
         )}
 
         {/* Main Split View Content - Responsive with max-width */}
-        <div className="flex-1 min-h-0 p-3 sm:p-4 lg:p-6">
+        <div className={clsx(
+          "flex-1 min-h-0 p-4 sm:p-6 lg:p-8",
+          showHero && "h-[65vh] min-h-[65vh]" // Fixed height when scrolling to constrain map/list
+        )}>
           <div className="h-full max-w-screen-2xl mx-auto">
             {/* Desktop: Side by side | Mobile: Show one view at a time */}
-            <div className="h-full flex gap-3 sm:gap-4 lg:gap-6">
+            <div className="h-full flex gap-4 sm:gap-6 lg:gap-8">
               {/* List View - Hidden on mobile in split mode */}
               {(viewMode === "list" || (viewMode === "split")) && (
                 <div className={`${
@@ -209,8 +218,6 @@ export default function Home() {
                         searchQuery={searchQuery}
                         onSearchChange={setSearchQuery}
                         userLocation={userLocation}
-                        sortByDistance={sortByDistance}
-                        onSortChange={setSortByDistance}
                         onRequestLocation={requestLocation}
                         showLiveOnly={showLiveOnly}
                         onToggleLiveOnly={setShowLiveOnly}

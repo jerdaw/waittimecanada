@@ -15,8 +15,8 @@ interface HospitalListProps {
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
   userLocation?: { lat: number; lon: number } | null;
-  sortByDistance?: boolean;
-  onSortChange?: (enabled: boolean) => void;
+  onSearchChange?: (query: string) => void;
+  userLocation?: { lat: number; lon: number } | null;
   onRequestLocation?: () => void;
   showLiveOnly?: boolean;
   onToggleLiveOnly?: (enabled: boolean) => void;
@@ -49,8 +49,6 @@ export function HospitalList({
   searchQuery = "",
   onSearchChange,
   userLocation,
-  sortByDistance,
-  onSortChange,
   onRequestLocation,
   showLiveOnly = false,
   onToggleLiveOnly,
@@ -79,51 +77,14 @@ export function HospitalList({
   return (
     <div className={clsx("h-full flex flex-col", className)}>
       {/* Compact Filter Bar */}
-      <div className="p-3 bg-background/80 backdrop-blur-sm border-b border-border/50 z-10 shrink-0">
+      <div className="p-4 bg-background/80 backdrop-blur-sm border-b border-border/50 z-10 shrink-0">
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Sort Controls */}
-          {onSortChange && (
-            <div className="flex items-center bg-muted/50 rounded-lg p-0.5">
-              <button
-                onClick={() => onSortChange(false)}
-                className={clsx(
-                  "px-2.5 py-1 rounded-md text-xs font-medium transition-all",
-                  !sortByDistance
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                Default
-              </button>
-              <button
-                onClick={() => {
-                  if (!userLocation && onRequestLocation) {
-                    onRequestLocation();
-                  } else {
-                    onSortChange(true);
-                  }
-                }}
-                className={clsx(
-                  "px-2.5 py-1 rounded-md text-xs font-medium transition-all flex items-center gap-1",
-                  sortByDistance
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                </svg>
-                Near Me
-              </button>
-            </div>
-          )}
-
           {/* Live Only Toggle */}
           {onToggleLiveOnly && (
             <button
               onClick={() => onToggleLiveOnly(!showLiveOnly)}
               className={clsx(
-                "px-2.5 py-1 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 border",
+                "px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 border",
                 showLiveOnly
                   ? "bg-success/10 border-success/30 text-success"
                   : "bg-background border-border text-muted-foreground hover:bg-muted/50"
@@ -144,7 +105,7 @@ export function HospitalList({
           )}
 
           {/* Results count */}
-          <span className="text-xs text-muted-foreground ml-auto">
+          <span className="text-xs text-muted-foreground ml-auto pr-1">
             {displayedHospitals.length} results
           </span>
         </div>
@@ -168,13 +129,13 @@ export function HospitalList({
             )}
           </div>
         ) : loading ? (
-          <div className="p-3 space-y-2">
+          <div className="p-4 space-y-3">
             {Array.from({ length: 8 }).map((_, i) => (
               <HospitalCardSkeleton key={i} />
             ))}
           </div>
         ) : (
-          <div className="p-2 space-y-1">
+          <div className="p-4 space-y-2">
             {displayedHospitals.map((hospital) => {
               const isSelected = hospital.id === selectedId;
               const isExpanded = hospital.id === expandedId;
@@ -192,16 +153,16 @@ export function HospitalList({
                   key={hospital.id} 
                   id={`hospital-card-${hospital.id}`}
                   className={clsx(
-                    "rounded-lg border transition-all duration-200 overflow-hidden",
+                    "rounded-xl border transition-all duration-200 overflow-hidden",
                     isSelected || isExpanded
-                      ? "bg-card border-primary/50 ring-1 ring-primary/20 shadow-md"
-                      : "bg-card/50 border-border/30 hover:bg-card hover:border-border/50"
+                      ? "bg-card border-primary/50 ring-1 ring-primary/20 shadow-lg translate-y-[-1px]"
+                      : "bg-card/50 border-border/30 hover:bg-card hover:border-border/50 hover:shadow-sm"
                   )}
                 >
                   {/* Compact Card Row */}
                   <button
                     onClick={() => handleCardClick(hospital.id)}
-                    className="w-full text-left px-3 py-2.5 flex items-center gap-3"
+                    className="w-full text-left p-4 flex items-center gap-4"
                   >
                     {/* Status Indicator */}
                     <div className={clsx("w-1.5 h-8 rounded-full shrink-0", color)} />

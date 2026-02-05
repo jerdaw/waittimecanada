@@ -23,9 +23,9 @@ export function Header({
   showStats = false,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-30 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
+    <header className="sticky top-0 z-30 w-full border-b border-border/40 bg-background/70 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm transition-all">
       {/* Main Header Row */}
-      <div className="container flex h-14 items-center justify-between px-4 sm:px-6 gap-4">
+      <div className="container flex h-16 items-center justify-between px-4 sm:px-6 gap-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity group shrink-0">
           <div className="relative">

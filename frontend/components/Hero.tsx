@@ -49,19 +49,30 @@ export function Hero({ hospitals, onExplore, className, userLocation }: HeroProp
   return (
     <section
       className={clsx(
-        "relative py-12 px-4 md:py-16 lg:py-20 overflow-hidden",
-        "bg-gradient-to-b from-muted/40 via-muted/20 to-transparent",
+        "relative py-8 px-6 md:py-12 lg:py-14 overflow-hidden min-h-[40vh] flex items-center",
+        "bg-gradient-to-b from-muted/30 via-background to-background",
         className
       )}
     >
-      {/* Subtle background decoration */}
+      {/* Subtle dot grid pattern - inspired by ER-Watch */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-[0.15] dark:opacity-[0.15]"
+        style={{
+          backgroundImage: 'radial-gradient(circle, var(--muted-foreground) 1px, transparent 1px)',
+          backgroundSize: '24px 24px',
+        }}
+      />
+      
+      {/* Soft gradient overlays for depth */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-accent/5 rounded-full blur-3xl" />
+        {/* Subtle vignette */}
+        <div className="absolute inset-0 bg-gradient-to-r from-background/50 via-transparent to-background/50" />
       </div>
 
-      <div className="container max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-10 lg:gap-16 relative">
-        <div className="flex-1 text-center lg:text-left space-y-6">
+      <div className="container max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20 relative">
+        <div className="flex-1 text-center lg:text-left space-y-8">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold animate-in fade-in slide-in-from-bottom-4 duration-700 border border-primary/20">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -81,7 +92,7 @@ export function Hero({ hospitals, onExplore, className, userLocation }: HeroProp
             and compare methodologies.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start animate-in fade-in slide-in-from-bottom-7 duration-700 delay-300">
+          <div className="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start animate-in fade-in slide-in-from-bottom-7 duration-700 delay-300 pt-2">
             <button
               onClick={onExplore}
               className="group px-8 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:bg-primary-hover hover:scale-[1.02] transition-all duration-200 active:scale-[0.98]"
@@ -125,18 +136,18 @@ export function Hero({ hospitals, onExplore, className, userLocation }: HeroProp
           </div>
         </div>
 
-        {/* Featured Hospital Card */}
-        <div className="w-full max-w-sm lg:w-[380px] animate-in fade-in slide-in-from-right-8 duration-1000 delay-200">
+        {/* Featured Hospital Card - Floating widget style */}
+        <div className="w-full max-w-sm lg:w-[400px] animate-in fade-in slide-in-from-right-10 duration-1000 delay-300">
           <div className="relative group">
-            {/* Card glow effect */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500" />
+            {/* Enhanced card glow effect for floating appearance */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-primary/25 via-accent/20 to-primary/25 rounded-3xl blur-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-500" />
             
-            <div className="relative bg-card rounded-2xl shadow-xl border border-border/50 overflow-hidden">
+            <div className="relative bg-card rounded-2xl shadow-2xl border border-border/40 overflow-hidden">
               {/* Gradient top bar */}
               <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary" />
               
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-5">
+              <div className="p-7">
+                <div className="flex justify-between items-center mb-6">
                   <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                     {featuredHospital?.type === "nearest" ? "Nearest ER" : "Featured"}
                   </span>

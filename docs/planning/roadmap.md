@@ -2,20 +2,20 @@
 
 ## Current Status (Updated 2026-02-04)
 
-**Progress:** Phase 8 (UX & Geolocation) Complete ✓
+**Progress:** Milestone 8 (UX Enhancements) Complete ✓
 
 **Recently Completed:**
-- ✅ Auto-Geolocation with IP Fallback (server-side proxy)
-- ✅ Responsive Split View (stacks on mobile, side-by-side on desktop)
-- ✅ "Nearest ER" Hero Card with distance badge
-- ✅ Distance-based auto-sorting (Near Me default)
-- ✅ Project maintenance: guidelines, documentation audit, cleanup
+- ✅ Aesthetic Refinement: Clean, spacious "Hero" landing page
+- ✅ Layout Optimization: High-density "Scrolled" view for list/map
+- ✅ Default Sorting: Enforced distance-based sorting (removed alphabetical override)
+- ✅ Codebase Maintenance: Fixing Vitest/Playwright conflicts, symlink fixing
+- ✅ Documentation Audit: ADRs updated and attribution verified
 
 **Next Steps:**
 - Add methodology warnings for incomparable data (Phase 3)
-- Build hospital detail modal
-- Create /methods page
+- Create /methods page with comparability matrix
 - Refine mobile map interactions
+- Production deployment to Vercel
 
 ---
 
@@ -156,19 +156,14 @@
 - [x] "Live Data Only" toggle filter
 - [x] Hospital count with live data subset
 
-**Deferred to Phase 4 (Backend Required):**
-- [ ] Occupancy stats ("X waiting, Y in treatment") - requires scraper changes
-- [ ] Enhanced search with geocoding autocomplete
+**Phase 4: Aesthetic Refinement & High-Density Layout**
+- [x] Clean, spacious "Hero" landing page with background textures
+- [x] Responsive "Scrolled" layout (traditional landing page flow)
+- [x] Distance-based auto-sorting (removed manual alphabetical override)
+- [x] Tighter vertical spacing for higher information density in app view
+- [x] Faint dot grid textures for visual depth
 
-**Files to Modify/Create:**
-- `frontend/components/HospitalList.tsx` - expandable cards
-- `frontend/components/ExpandedCardDetails.tsx` - new component
-- `frontend/app/faq/page.tsx` - new FAQ page
-- `frontend/components/FAQAccordion.tsx` - new accordion component
-- `frontend/components/Header.tsx` - add FAQ link
-- `frontend/components/Map.tsx` - quick actions in popup
-
-**Goal:** Improve user experience with quick access to hospital details
+**Goal:** Improve user experience with quick access to hospital details and modern "landing page" feel
 
 ---
 
