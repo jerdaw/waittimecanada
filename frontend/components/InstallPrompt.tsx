@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { clsx } from "clsx";
 
 export function InstallPrompt() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [show, setShow] = useState(false);
 

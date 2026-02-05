@@ -1,7 +1,7 @@
 "use client";
 
 import { clsx } from "clsx";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Map from "@/components/Map";
 import { HospitalList } from "@/components/HospitalList";
 import { ViewToggle, ViewMode } from "@/components/ViewToggle";
@@ -43,7 +43,28 @@ export default function Home() {
   };
   
   // Request geolocation - called on page load
-  const requestLocation = () => {
+  // IP-based geolocation fallback (uses server-side proxy to avoid CORS)
+  const fetchIPLocation = useCallback(async () => {
+    try {
+      const res = await fetch("/api/geolocation");
+      const data = await res.json();
+      
+      if (data.success && data.location) {
+        setUserLocation({
+          lat: data.location.lat,
+          lon: data.location.lon,
+        });
+        // sortByDistance is already true
+        console.log("Using IP-based location:", data.location.city, data.location.region);
+      }
+    } catch (err) {
+      console.warn("IP geolocation failed:", err);
+      // Just use default Canada center, no location available
+    }
+  }, []);
+
+  // Request geolocation - called on page load
+  const requestLocation = useCallback(() => {
     if (locationRequested) return;
     setLocationRequested(true);
     
@@ -71,32 +92,12 @@ export default function Home() {
       // Browser doesn't support geolocation, use IP fallback
       fetchIPLocation();
     }
-  };
+  }, [locationRequested, fetchIPLocation]);
   
-  // IP-based geolocation fallback (uses server-side proxy to avoid CORS)
-  const fetchIPLocation = async () => {
-    try {
-      const res = await fetch("/api/geolocation");
-      const data = await res.json();
-      
-      if (data.success && data.location) {
-        setUserLocation({
-          lat: data.location.lat,
-          lon: data.location.lon,
-        });
-        // sortByDistance is already true
-        console.log("Using IP-based location:", data.location.city, data.location.region);
-      }
-    } catch (err) {
-      console.warn("IP geolocation failed:", err);
-      // Just use default Canada center, no location available
-    }
-  };
-
   // Request location on mount
   useEffect(() => {
     requestLocation();
-  }, []);
+  }, [requestLocation]);
 
   // Fetch data
   useEffect(() => {

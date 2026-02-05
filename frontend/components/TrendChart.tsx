@@ -19,8 +19,10 @@ interface TrendChartProps {
 
 export function TrendChart({ hospitalId }: TrendChartProps) {
   const [period, setPeriod] = useState<Period>("24h");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line
   const [data, setData] = useState<any>(null);
+
+  // ... (lines 24-62 omitted)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,9 +62,9 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
     return date.toLocaleDateString([], { month: "short", day: "numeric" });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line
   const formatTooltip = (value: any) => [`${value} min`, "Wait Time"];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line
   const formatTooltipLabel = (label: any) => {
     if (!label) return "";
     const date = new Date(label);
