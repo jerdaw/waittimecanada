@@ -3,11 +3,12 @@
 > A clinically defensible "Health Systems Observatory" that audits and standardizes Canadian emergency room wait time data across provinces.
 
 **Status:** 🚀 Core Features Complete | 📊 Ready for Production
-**Test Coverage:** Backend: 143 tests (57% coverage) | Frontend: 182 tests (100% pass rate)
+**Test Coverage:** Backend: 155 tests (57% coverage) | Frontend: 87 tests (100% pass rate)
+**Provinces:** Ontario, Quebec, British Columbia
 **Live Site:** Coming Soon
 **Documentation:** [docs/](./docs/)
 
-[![Tests](https://img.shields.io/badge/tests-325%20passing-success)](./tests)
+[![Tests](https://img.shields.io/badge/tests-242%20passing-success)](./tests)
 [![Coverage](https://img.shields.io/badge/coverage-57%25-yellow)](./coverage)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12-blue)](./backend)
@@ -34,11 +35,13 @@ WaitTime Canada is **not** a typical wait time aggregator. It's a research-grade
 ## Core Features
 
 ### 🗺️ Interactive Map
-- Live wait times for 213+ Ontario hospitals
+- Live wait times across 3 provinces (ON, QC, BC)
+- Province filter dropdown for quick switching
 - Color-coded markers (< 60 min: green, 60-120 min: amber, > 120 min: red)
 - Hospital popups with methodology transparency
 - Province-specific telehealth routing
 - Data freshness indicators
+- Access insights dashboard with cost estimates
 
 ### ⚖️ Methodology Comparability
 When comparing two hospitals, the system automatically:
@@ -60,8 +63,16 @@ When comparing two hospitals, the system automatically:
 Province-specific healthcare guidance in every hospital popup:
 - **Ontario:** "Need medical advice? Call Health811 - 811"
 - **Quebec:** "Call Info-Santé 811 - 811"
-- **Alberta:** "Call Health Link 811 - 811"
+- **British Columbia:** "Call HealthLink BC - 811"
 - Mobile-friendly with one-tap tel: links
+
+### 💰 Access Insights Dashboard
+Aggregate statistics showing healthcare access burden:
+- **ERs Within 30km:** Count of nearby emergency departments
+- **Average Access Cost:** Fuel + parking estimates (province-aware gas pricing)
+- **Nearest ER:** Distance to closest facility
+- Prominent safety disclaimer: "Never delay care for cost"
+- Location-based calculations using Haversine distance
 
 ### 📈 Wait Time Trends
 Historical data visualization integrated into hospital details:

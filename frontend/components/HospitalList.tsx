@@ -5,6 +5,7 @@ import { ExpandedCardDetails } from "./ExpandedCardDetails";
 import { calculateDistance } from "@/utils/distance";
 import { useState, useRef, useEffect } from "react";
 import { isRecent } from "@/utils/date";
+import { ProvinceFilter } from "./ProvinceFilter";
 
 interface HospitalListProps {
   hospitals: Hospital[];
@@ -18,6 +19,8 @@ interface HospitalListProps {
   onRequestLocation?: () => void;
   showLiveOnly?: boolean;
   onToggleLiveOnly?: (enabled: boolean) => void;
+  selectedProvince?: string;
+  onProvinceChange?: (province: string) => void;
 }
 
 // Helper to determine status color
@@ -50,6 +53,8 @@ export function HospitalList({
   onRequestLocation,
   showLiveOnly = false,
   onToggleLiveOnly,
+  selectedProvince = "ON",
+  onProvinceChange,
 }: HospitalListProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -77,6 +82,14 @@ export function HospitalList({
       {/* Compact Filter Bar */}
       <div className="p-4 bg-background/80 backdrop-blur-sm border-b border-border/50 z-10 shrink-0">
         <div className="flex items-center gap-2 flex-wrap">
+          {/* Province Filter */}
+          {onProvinceChange && (
+            <ProvinceFilter
+              selectedProvince={selectedProvince}
+              onProvinceChange={onProvinceChange}
+            />
+          )}
+
           {/* Live Only Toggle */}
           {onToggleLiveOnly && (
             <button

@@ -14,6 +14,7 @@ import { calculateDistance } from "@/utils/distance";
 import { Hero } from "@/components/Hero";
 import { AboutSection } from "@/components/AboutSection";
 import { SystemStatus } from "@/components/SystemStatus";
+import { AccessInsightsSummary } from "@/components/insights/AccessInsightsSummary";
 
 import { isRecent } from "@/utils/date";
 
@@ -24,7 +25,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
   const [isStale, setIsStale] = useState(false);
-  
+
   // UI State
   const [selectedHospitalId, setSelectedHospitalId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("split");
@@ -32,7 +33,10 @@ export default function Home() {
 
   // Search state - lifted to pass to Header
   const [searchQuery, setSearchQuery] = useState("");
-  
+
+  // Province filter state
+  const [selectedProvince, setSelectedProvince] = useState("ON");
+
   // Geolocation state
   const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>(null);
   const [sortByDistance, setSortByDistance] = useState(true); // Always default to distance if available
@@ -104,23 +108,26 @@ export default function Home() {
   // Fetch data
   useEffect(() => {
     async function fetchHospitals() {
+      setLoading(true);
+      setError(null);
+
       try {
-        const res = await fetch("/api/hospitals?province=ON");
+        const res = await fetch(`/api/hospitals?province=${selectedProvince}`);
         const data = await res.json();
-        
+
         if (data.success) {
           setHospitals(data.data);
-          
+
           // Calculate freshness
           if (data.data.length > 0) {
              const updates = data.data
                .map((h: Hospital) => h.last_updated ? new Date(h.last_updated).getTime() : 0)
                .filter((t: number) => t > 0);
-             
+
              if (updates.length > 0) {
                const maxTime = Math.max(...updates);
                setLastUpdate(new Date(maxTime).toISOString());
-               
+
                const fourHoursAgo = Date.now() - (4 * 60 * 60 * 1000);
                setIsStale(maxTime < fourHoursAgo);
              }
@@ -135,9 +142,9 @@ export default function Home() {
         setLoading(false);
       }
     }
-    
+
     fetchHospitals();
-  }, []);
+  }, [selectedProvince]);
 
   // Filter and sort hospitals
   const filteredAndSortedHospitals = [...hospitals]
@@ -193,6 +200,20 @@ export default function Home() {
           </div>
         )}
 
+        {/* Access Insights Section */}
+        {!showHero && !loading && (
+          <div className="flex-shrink-0 px-4 sm:px-6 lg:px-8 pt-6">
+            <div className="max-w-screen-2xl mx-auto">
+              <h2 className="text-lg font-semibold mb-4 text-foreground">Access Insights</h2>
+              <AccessInsightsSummary
+                hospitals={hospitals}
+                userLocation={userLocation}
+                province={selectedProvince}
+              />
+            </div>
+          </div>
+        )}
+
         {/* Main Split View Content - Responsive with max-width */}
         <div className={clsx(
           "flex-1 min-h-0 p-4 sm:p-6 lg:p-8",
@@ -225,6 +246,8 @@ export default function Home() {
                         onRequestLocation={requestLocation}
                         showLiveOnly={showLiveOnly}
                         onToggleLiveOnly={setShowLiveOnly}
+                        selectedProvince={selectedProvince}
+                        onProvinceChange={setSelectedProvince}
                       />
                     )}
                   </div>
