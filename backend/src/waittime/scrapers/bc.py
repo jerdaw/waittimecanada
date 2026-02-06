@@ -74,11 +74,12 @@ class BCScraper(BaseScraper):
         "Surrey Memorial Hospital (Pediatrics Emergency)": "ca-bc-surrey-memorial-pediatrics",
     }
 
-    def fetch(self) -> str:
+    def fetch(self, url: str | None = None) -> str:
         """Fetch the legacy page containing __NEXT_DATA__ JSON."""
+        target_url = url or self.BASE_URL
         try:
             response = requests.get(
-                self.BASE_URL,
+                target_url,
                 timeout=30,
                 headers={
                     "User-Agent": "WaitTimeCanada/1.0 (Health Data Research)"
@@ -112,7 +113,11 @@ class BCScraper(BaseScraper):
 
             # Parse JSON
             try:
-                next_data = json.loads(next_data_script.string)
+                script_content = next_data_script.string
+                if not script_content:
+                    logger.error("__NEXT_DATA__ script tag is empty")
+                    return measurements
+                next_data = json.loads(script_content)
             except json.JSONDecodeError as e:
                 logger.error(f"Failed to parse __NEXT_DATA__ JSON: {e}")
                 return measurements
