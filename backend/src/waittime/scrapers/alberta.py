@@ -6,18 +6,17 @@ Coverage: 6+ cities across Alberta
 """
 
 import re
-from datetime import datetime, timezone
-from typing import Optional
 
-from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
+from playwright.sync_api import TimeoutError as PlaywrightTimeout
+from playwright.sync_api import sync_playwright
 
 from waittime.core import (
     EndEvent,
     Measurement,
     MetricFamily,
+    PatientScope,
     StartEvent,
     StatisticType,
-    PatientScope,
 )
 from waittime.scrapers.base import BaseScraper
 
@@ -111,7 +110,7 @@ class AlbertaScraper(BaseScraper):
 
         return measurements
 
-    def _extract_wait_minutes(self, text: str) -> Optional[int]:
+    def _extract_wait_minutes(self, text: str) -> int | None:
         """
         Extract wait time in minutes from text.
 

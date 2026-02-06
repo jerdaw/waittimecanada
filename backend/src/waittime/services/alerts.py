@@ -1,8 +1,8 @@
 """Alert service for scraper health notifications."""
 import os
-import httpx
 from dataclasses import dataclass
-from typing import Optional
+
+import httpx
 
 
 @dataclass
@@ -19,7 +19,7 @@ class AlertService:
 
     PUSHOVER_API_URL = "https://api.pushover.net/1/messages.json"
 
-    def __init__(self, config: Optional[AlertConfig] = None):
+    def __init__(self, config: AlertConfig | None = None):
         """
         Initialize alert service.
 
@@ -37,7 +37,7 @@ class AlertService:
         title: str,
         message: str,
         priority: int = 0,
-        url: Optional[str] = None,
+        url: str | None = None,
     ) -> bool:
         """
         Send an alert via Pushover.

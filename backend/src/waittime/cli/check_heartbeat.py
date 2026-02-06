@@ -1,10 +1,10 @@
 """Check scraper heartbeat and alert if stale."""
 import argparse
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from waittime.services.database import DatabaseService
 from waittime.services.alerts import AlertService
+from waittime.services.database import DatabaseService
 
 
 def main() -> None:
@@ -66,9 +66,9 @@ def main() -> None:
 
                 last_run = row["last_run"]
                 if last_run.tzinfo is None:
-                    last_run = last_run.replace(tzinfo=timezone.utc)
+                    last_run = last_run.replace(tzinfo=UTC)
 
-                age = datetime.now(timezone.utc) - last_run
+                age = datetime.now(UTC) - last_run
                 age_minutes = int(age.total_seconds() / 60)
 
                 if age_minutes > args.max_age:
