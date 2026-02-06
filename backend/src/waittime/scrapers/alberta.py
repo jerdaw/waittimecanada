@@ -95,7 +95,7 @@ class AlbertaScraper(BaseScraper):
         """
         from bs4 import BeautifulSoup
 
-        soup = BeautifulSoup(content, "html.parser")
+        _soup = BeautifulSoup(content, "html.parser")
         measurements: list[Measurement] = []
 
         # Save HTML snippet for debugging (first run)
