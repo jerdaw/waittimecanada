@@ -7,7 +7,7 @@ from waittime.services.database import DatabaseService
 from waittime.services.alerts import AlertService
 
 
-def main():
+def main() -> None:
     """Check scraper heartbeat and send alerts if stale."""
     parser = argparse.ArgumentParser(
         description="Check scraper heartbeat and alert if stale"

@@ -36,9 +36,12 @@ class AlbertaScraper(BaseScraper):
     STATISTIC_TYPE = StatisticType.POINT_ESTIMATE  # Updated every 2 minutes
     PATIENT_SCOPE = PatientScope.ALL
 
-    def fetch(self) -> str:
+    def fetch(self, url: str | None = None) -> str:
         """
         Fetch wait time data using Playwright.
+
+        Args:
+            url: Optional URL override (defaults to self.URL)
 
         Returns:
             Raw HTML content with rendered wait times
@@ -47,11 +50,12 @@ class AlbertaScraper(BaseScraper):
             AHS uses JavaScript to dynamically load wait times.
             We need Playwright to wait for the content to render.
         """
+        target_url = url or self.URL
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             try:
                 page = browser.new_page()
-                page.goto(self.URL, timeout=30000)
+                page.goto(target_url, timeout=30000)
 
                 # Wait for wait time content to load
                 # The page structure may vary, so we'll wait for common elements
