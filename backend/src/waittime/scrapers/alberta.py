@@ -5,6 +5,7 @@ Methodology: Triage to Physician (estimated, updated every 2 minutes)
 Coverage: 6+ cities across Alberta
 """
 
+import logging
 import re
 
 from playwright.sync_api import TimeoutError as PlaywrightTimeout
@@ -19,6 +20,8 @@ from waittime.core import (
     StatisticType,
 )
 from waittime.scrapers.base import BaseScraper
+
+logger = logging.getLogger(__name__)
 
 
 class AlbertaScraper(BaseScraper):
@@ -65,7 +68,7 @@ class AlbertaScraper(BaseScraper):
                         timeout=15000
                     )
                 except PlaywrightTimeout:
-                    print("Warning: Wait time elements not found, capturing full page")
+                    logger.warning("Wait time elements not found, capturing full page")
 
                 # Give extra time for dynamic content
                 page.wait_for_timeout(2000)
@@ -96,8 +99,7 @@ class AlbertaScraper(BaseScraper):
         measurements: list[Measurement] = []
 
         # Save HTML snippet for debugging (first run)
-        print("Alberta HTML snippet (first 500 chars):")
-        print(content[:500])
+        logger.debug("Alberta HTML snippet (first 500 chars): %s", content[:500])
 
         # TODO: Implement parsing logic once we see the actual structure
         # Expected structure to look for:
@@ -106,7 +108,7 @@ class AlbertaScraper(BaseScraper):
         # - Possible city/region grouping
 
         # For now, return empty list and log for manual inspection
-        print(f"Alberta scraper needs structure analysis. HTML length: {len(content)}")
+        logger.info("Alberta scraper needs structure analysis. HTML length: %d", len(content))
 
         return measurements
 

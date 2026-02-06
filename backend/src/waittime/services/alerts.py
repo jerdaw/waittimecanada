@@ -1,8 +1,11 @@
 """Alert service for scraper health notifications."""
+import logging
 import os
 from dataclasses import dataclass
 
 import httpx
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -52,11 +55,11 @@ class AlertService:
             True if sent successfully, False otherwise
         """
         if not self.config.enabled:
-            print(f"[ALERT DISABLED] {title}: {message}")
+            logger.info("[ALERT DISABLED] %s: %s", title, message)
             return True
 
         if not self.config.pushover_user_key or not self.config.pushover_api_token:
-            print(f"[ALERT NO CONFIG] {title}: {message}")
+            logger.warning("[ALERT NO CONFIG] %s: %s", title, message)
             return False
 
         payload = {
@@ -75,7 +78,7 @@ class AlertService:
             response.raise_for_status()
             return True
         except Exception as e:
-            print(f"[ALERT FAILED] {e}")
+            logger.error("[ALERT FAILED] %s", e)
             return False
 
     def alert_scraper_stale(self, source_id: str, age_minutes: int) -> bool:
