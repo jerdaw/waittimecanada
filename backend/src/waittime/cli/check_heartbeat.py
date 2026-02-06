@@ -1,4 +1,5 @@
 """Check scraper heartbeat and alert if stale."""
+
 import argparse
 import sys
 from datetime import UTC, datetime
@@ -9,9 +10,7 @@ from waittime.services.database import DatabaseService
 
 def main() -> None:
     """Check scraper heartbeat and send alerts if stale."""
-    parser = argparse.ArgumentParser(
-        description="Check scraper heartbeat and alert if stale"
-    )
+    parser = argparse.ArgumentParser(description="Check scraper heartbeat and alert if stale")
     parser.add_argument(
         "--max-age",
         type=int,

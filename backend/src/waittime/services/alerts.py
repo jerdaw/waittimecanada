@@ -1,4 +1,5 @@
 """Alert service for scraper health notifications."""
+
 import logging
 import os
 from dataclasses import dataclass

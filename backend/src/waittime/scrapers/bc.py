@@ -58,7 +58,6 @@ class BCScraper(BaseScraper):
         "UBC Hospital": "ca-bc-ubc",
         "Whistler Health Care Centre": "ca-bc-whistler",
         "Pemberton Health Centre": "ca-bc-pemberton",
-
         # Fraser Health
         "Ridge Meadows Hospital": "ca-bc-ridge-meadows",
         "Burnaby Hospital": "ca-bc-burnaby",
@@ -80,9 +79,7 @@ class BCScraper(BaseScraper):
             response = requests.get(
                 target_url,
                 timeout=30,
-                headers={
-                    "User-Agent": "WaitTimeCanada/1.0 (Health Data Research)"
-                }
+                headers={"User-Agent": "WaitTimeCanada/1.0 (Health Data Research)"},
             )
             response.raise_for_status()
             return response.text
@@ -212,13 +209,13 @@ class BCScraper(BaseScraper):
             Slug suitable for hospital ID
         """
         # Remove special characters, convert to lowercase
-        slug = re.sub(r'[^\w\s-]', '', name.lower())
+        slug = re.sub(r"[^\w\s-]", "", name.lower())
         # Replace spaces with hyphens
-        slug = re.sub(r'[\s_]+', '-', slug)
+        slug = re.sub(r"[\s_]+", "-", slug)
         # Remove duplicate hyphens
-        slug = re.sub(r'-+', '-', slug)
+        slug = re.sub(r"-+", "-", slug)
         # Strip leading/trailing hyphens
-        slug = slug.strip('-')
+        slug = slug.strip("-")
         return slug
 
 

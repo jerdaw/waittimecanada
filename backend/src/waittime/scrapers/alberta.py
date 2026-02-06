@@ -64,8 +64,7 @@ class AlbertaScraper(BaseScraper):
                 try:
                     # Wait for either a table, list, or specific wait time elements
                     page.wait_for_selector(
-                        "table, .wait-time, .facility, [class*='wait']",
-                        timeout=15000
+                        "table, .wait-time, .facility, [class*='wait']", timeout=15000
                     )
                 except PlaywrightTimeout:
                     logger.warning("Wait time elements not found, capturing full page")
