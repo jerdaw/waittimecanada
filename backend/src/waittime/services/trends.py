@@ -172,18 +172,14 @@ class SystemTrendService:
                 province=province,
                 direction="stable",
                 change_pct=0.0,
-                start_mean=(
-                    float(data_points[0]["province_mean"]) if data_points else None
-                ),
+                start_mean=(float(data_points[0]["province_mean"]) if data_points else None),
                 end_mean=float(data_points[-1]["province_mean"]) if data_points else None,
                 lookback=self._lookback_label(lookback_months),
             )
             return {
                 "direction": "stable",
                 "change_percent": 0.0,
-                "start_mean": (
-                    float(data_points[0]["province_mean"]) if data_points else None
-                ),
+                "start_mean": (float(data_points[0]["province_mean"]) if data_points else None),
                 "end_mean": float(data_points[-1]["province_mean"]) if data_points else None,
                 "narrative": narrative,
             }

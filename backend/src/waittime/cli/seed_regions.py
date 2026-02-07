@@ -51,7 +51,9 @@ def load_regions_from_json(
             raise ValueError(f"Region at index {index} is missing fields: {missing_fields}")
 
         hospitals = region.get("hospitals")
-        if not isinstance(hospitals, list) or not all(isinstance(value, str) for value in hospitals):
+        if not isinstance(hospitals, list) or not all(
+            isinstance(value, str) for value in hospitals
+        ):
             raise ValueError(f"Region at index {index} must have 'hospitals' as a list of IDs")
 
         normalized_regions.append(
@@ -110,9 +112,7 @@ def seed_regions(
 
         for hospital_id in region["hospitals"]:
             if dry_run:
-                logger.info(
-                    f"[DRY RUN] Would map hospital {hospital_id} -> {region['id']}"
-                )
+                logger.info(f"[DRY RUN] Would map hospital {hospital_id} -> {region['id']}")
                 mappings_upserted += 1
                 continue
 
@@ -147,10 +147,7 @@ def list_regions_by_province(db: DatabaseService, province: str) -> None:
     print(f"\nRegions for province '{province}' ({len(regions)} total):\n")
     for region in regions:
         hospital_ids = hospitals_by_region.get(str(region["id"]), [])
-        print(
-            f"  {region['code']:<10} {region['name']:<30}"
-            f" hospitals={len(hospital_ids)}"
-        )
+        print(f"  {region['code']:<10} {region['name']:<30} hospitals={len(hospital_ids)}")
 
 
 def main() -> int:

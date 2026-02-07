@@ -12,9 +12,9 @@ Usage:
 import argparse
 import logging
 import sys
+from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Sequence
 
 from waittime.cli.seed_regions import load_regions_from_json, seed_regions
 from waittime.services.aggregation import AggregationService
@@ -106,7 +106,9 @@ def backfill_analytics_aggregates(
 
 def main() -> int:
     """Run analytics bootstrap workflow."""
-    parser = argparse.ArgumentParser(description="Bootstrap analytics schema, seed data, and aggregates")
+    parser = argparse.ArgumentParser(
+        description="Bootstrap analytics schema, seed data, and aggregates"
+    )
     parser.add_argument(
         "--regions-file",
         type=Path,

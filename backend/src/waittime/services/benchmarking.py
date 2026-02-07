@@ -65,9 +65,7 @@ class BenchmarkingService:
                     "hospital_name": row["hospital_name"],
                     "city": row["city"],
                     "current_wait": (
-                        float(row["current_wait"])
-                        if row.get("current_wait") is not None
-                        else None
+                        float(row["current_wait"]) if row.get("current_wait") is not None else None
                     ),
                     "period_mean": period_mean,
                     "percentile": percentile,

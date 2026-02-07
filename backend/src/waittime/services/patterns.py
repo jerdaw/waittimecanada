@@ -134,6 +134,7 @@ class TemporalPatternService:
         populated = [row for row in patterns if row["mean"] is not None]
         sample_count = sum(row["sample_count"] for row in patterns)
 
+        insights: dict[str, Any]
         if not populated:
             insights = {
                 "worst_day": None,
@@ -147,12 +148,13 @@ class TemporalPatternService:
             weekend_means = [
                 float(row["mean"])
                 for row in patterns
-                if row["day_index"] in {5, 6} and row["mean"] is not None
+                if int(row["day_index"]) in {5, 6} and isinstance(row["mean"], (int, float))
             ]
             weekday_means = [
                 float(row["mean"])
                 for row in patterns
-                if row["day_index"] in {0, 1, 2, 3, 4} and row["mean"] is not None
+                if int(row["day_index"]) in {0, 1, 2, 3, 4}
+                and isinstance(row["mean"], (int, float))
             ]
 
             insights = {
@@ -197,7 +199,7 @@ class TemporalPatternService:
         )
         aggregates.sort(key=lambda aggregate: aggregate.period_start)
 
-        patterns = [
+        patterns: list[dict[str, Any]] = [
             {
                 "month": aggregate.period_start.strftime("%Y-%m"),
                 "mean": round(float(aggregate.mean_value), 1),
@@ -211,19 +213,22 @@ class TemporalPatternService:
             for aggregate in aggregates
         ]
 
-        sample_count = sum(row["sample_count"] for row in patterns)
+        sample_count = sum(int(row["sample_count"]) for row in patterns)
+        mean_series = [
+            float(row["mean"]) for row in patterns if isinstance(row.get("mean"), (int, float))
+        ]
 
-        populated = [row for row in patterns if row["mean"] is not None]
-        if len(populated) < 2:
+        insights: dict[str, Any]
+        if len(mean_series) < 2:
             insights = {
                 "direction": "stable",
                 "change_percent": 0.0,
-                "start_mean": populated[0]["mean"] if populated else None,
-                "end_mean": populated[0]["mean"] if populated else None,
+                "start_mean": mean_series[0] if mean_series else None,
+                "end_mean": mean_series[0] if mean_series else None,
             }
         else:
-            start_mean = float(populated[0]["mean"])
-            end_mean = float(populated[-1]["mean"])
+            start_mean = mean_series[0]
+            end_mean = mean_series[-1]
             change_percent = self._percent_change(end_mean, start_mean)
             direction = "stable"
             if change_percent < -5:
