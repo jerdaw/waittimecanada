@@ -6,6 +6,7 @@ import type { Hospital } from "@/app/api/hospitals/route";
 import { ComparisonModal } from "./ComparisonModal";
 import { DivergenceWarning } from "./DivergenceWarning";
 import { TrendChart } from "./TrendChart";
+import { BenchmarkCard } from "./BenchmarkCard";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -271,6 +272,10 @@ function HospitalPopup({
              <TrendChart hospitalId={hospital.id} />
            </div>
         )}
+
+        <div className="px-4 mb-3">
+          <BenchmarkCard hospital={hospital} compact />
+        </div>
 
         {/* Methodology information */}
         {hasData && hospital.metric_family && (

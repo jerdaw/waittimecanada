@@ -6,6 +6,7 @@ import { calculateDistance } from "@/utils/distance";
 import { useState, useRef, useEffect } from "react";
 import { isRecent } from "@/utils/date";
 import { ProvinceFilter } from "./ProvinceFilter";
+import { RegionSelector, type RegionOption } from "./RegionSelector";
 
 interface HospitalListProps {
   hospitals: Hospital[];
@@ -21,6 +22,10 @@ interface HospitalListProps {
   onToggleLiveOnly?: (enabled: boolean) => void;
   selectedProvince?: string;
   onProvinceChange?: (province: string) => void;
+  regionOptions?: RegionOption[];
+  selectedRegionId?: string | null;
+  onRegionChange?: (regionId: string | null) => void;
+  regionsLoading?: boolean;
 }
 
 // Helper to determine status color
@@ -55,6 +60,10 @@ export function HospitalList({
   onToggleLiveOnly,
   selectedProvince = "ON",
   onProvinceChange,
+  regionOptions = [],
+  selectedRegionId = null,
+  onRegionChange,
+  regionsLoading = false,
 }: HospitalListProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -87,6 +96,15 @@ export function HospitalList({
             <ProvinceFilter
               selectedProvince={selectedProvince}
               onProvinceChange={onProvinceChange}
+            />
+          )}
+
+          {onRegionChange && (regionsLoading || regionOptions.length > 0) && (
+            <RegionSelector
+              regions={regionOptions}
+              selectedRegionId={selectedRegionId}
+              onRegionChange={onRegionChange}
+              disabled={regionsLoading}
             />
           )}
 

@@ -717,36 +717,146 @@ A dedicated analytics page bringing together all analytical features:
 
 ---
 
+## Phase 5: Operationalization & Reliability (Day 5)
+
+### 5.1 Runtime Resilience
+
+**File:** `frontend/app/api/analytics/regions/route.ts`
+
+- Detect missing region schema (`42P01`) and return `503` with `setup_required=true`
+- Include concrete setup commands in `setup_steps`
+- Avoid opaque 500 errors during fresh-environment bootstraps
+
+**File:** `frontend/app/api/analytics/trends/route.ts`
+
+- Keep weekly/monthly as primary data source
+- If requested rollups are missing, derive points from daily aggregates
+- Return metadata (`data_source`, `fallback_used`) for transparency
+
+### 5.2 One-Command Bootstrap
+
+**File:** `backend/src/waittime/cli/bootstrap_analytics.py`
+
+- Apply all migrations (`backend/migrations/*.sql`)
+- Seed Ontario regions from `backend/data/regions/ontario-regions.json`
+- Backfill `daily`, `weekly`, and `monthly` aggregates for analytics
+- Support `--dry-run`, `--skip-*`, and `--days` flags
+
+### 5.3 UI Guidance for Incomplete Setup
+
+**File:** `frontend/app/analytics/page.tsx`
+
+- Show inline setup guidance when `/api/analytics/regions` reports `setup_required`
+- Display setup commands directly in dashboard context
+
+### 5.4 Tests
+
+**Backend tests** (`backend/tests/unit/test_bootstrap_analytics_cli.py`):
+- migration execution/dry-run behavior
+- region seed and aggregate backfill orchestration
+- CLI argument validation and happy-path flow
+
+**Frontend tests:**
+- `frontend/tests/api/analytics-regions.test.ts` validates setup-required response
+- `frontend/tests/api/analytics-trends.test.ts` validates daily-rollup fallback
+- `frontend/tests/pages/analytics.test.tsx` validates setup guidance rendering
+
+---
+
+## Phase 6: Region Coverage Expansion (Day 5-6)
+
+### 6.1 Coverage Audit + Auto-Assignment CLI
+
+**File:** `backend/src/waittime/cli/region_mapping.py`
+
+- Add mapping audit command:
+  - total hospitals
+  - mapped/unmapped counts
+  - coverage percentage
+  - per-region distribution
+- Add first-pass auto-assignment:
+  - explicit hospital overrides (highest priority)
+  - city/name token rules
+  - coordinate-based fallback rules
+- Add JSON report export option for repeatable operational checks
+
+**Overrides file:** `backend/data/regions/ontario-region-overrides.json`
+
+### 6.2 API Coverage Telemetry
+
+**File:** `frontend/app/api/analytics/regions/route.ts`
+
+- Add mapping coverage metadata to response:
+  - `mapped_hospital_count`
+  - `province_hospital_total`
+  - `mapping_coverage` object (`mapped_hospitals`, `total_hospitals`, `coverage_percent`)
+
+### 6.3 Regional UI Coverage Badge
+
+**Files:**
+- `frontend/components/RegionDashboard.tsx`
+- `frontend/app/analytics/page.tsx`
+
+- Show mapping coverage badge near Regional Intelligence heading
+- Highlight low coverage states (`<60%`) with warning styling
+
+### 6.4 Tests
+
+**Backend tests:**
+- `backend/tests/unit/test_region_mapping_cli.py`:
+  - override loading
+  - heuristic assignment behavior
+  - coverage report computation
+  - dry-run and write behavior
+
+**Frontend tests:**
+- `frontend/tests/api/analytics-regions.test.ts` validates coverage telemetry
+- `frontend/tests/components/RegionDashboard.test.tsx` validates coverage badge rendering
+
+---
+
 ## Verification Checklist
 
 ### Peer Benchmarking
-- [ ] `/api/analytics/benchmarks` returns correct rankings
-- [ ] Percentile and quartile calculations are accurate
-- [ ] Trend direction computed correctly
-- [ ] BenchmarkCard renders in hospital detail view
-- [ ] Province-wide stats are accurate
+- [x] `/api/analytics/benchmarks` returns correct rankings
+- [x] Percentile and quartile calculations are accurate
+- [x] Trend direction computed correctly
+- [x] BenchmarkCard renders in hospital detail view
+- [x] Province-wide stats are accurate
 
 ### Temporal Patterns
-- [ ] Hour-of-day returns 24 entries with correct stats
-- [ ] Day-of-week returns 7 entries with correct stats
-- [ ] Peak/quiet insights are correct
-- [ ] Weekend vs weekday ratio computed
-- [ ] Charts render correctly with Recharts
-- [ ] Tab switching works
+- [x] Hour-of-day returns 24 entries with correct stats
+- [x] Day-of-week returns 7 entries with correct stats
+- [x] Peak/quiet insights are correct
+- [x] Weekend vs weekday ratio computed
+- [x] Charts render correctly with Recharts
+- [x] Tab switching works
 
 ### Regional Intelligence
-- [ ] Ontario regions seeded correctly
-- [ ] Hospital-region mapping is accurate
-- [ ] Regional aggregate stats computed
-- [ ] RegionDashboard renders region cards
-- [ ] RegionSelector filters hospital list
+- [x] Ontario regions seeded correctly
+- [x] Hospital-region mapping is accurate
+- [x] Regional aggregate stats computed
+- [x] RegionDashboard renders region cards
+- [x] RegionSelector filters hospital list
 
 ### System Trends
-- [ ] Province-wide monthly trend computed
-- [ ] Trend narrative generated correctly
-- [ ] SystemTrendChart renders with confidence band
-- [ ] Period toggles work (3m/6m/1y)
-- [ ] Analytics page brings all features together
+- [x] Province-wide monthly trend computed
+- [x] Trend narrative generated correctly
+- [x] SystemTrendChart renders with confidence band
+- [x] Period toggles work (3m/6m/1y)
+- [x] Analytics page brings all features together
+
+### Operationalization
+- [x] Missing region schema produces actionable setup response (not opaque 500)
+- [x] Trends endpoint falls back to daily rollups when weekly/monthly data is absent
+- [x] Bootstrap CLI applies migrations + seeds regions + backfills analytics aggregates
+- [x] Analytics UI shows setup instructions when region schema is not initialized
+
+### Region Coverage
+- [x] Region mapping audit + auto-assignment CLI available
+- [x] Override file for explicit hospital-to-region mapping precedence
+- [x] Regions API exposes mapping coverage metrics
+- [x] Regional dashboard displays mapping coverage status
 
 ---
 

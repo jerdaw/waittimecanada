@@ -1,0 +1,14 @@
+{
+  "province": "ON",
+  "mappings": {
+    "ca-on-ottawa-civic": "EAST",
+    "ca-on-ottawa-general": "EAST",
+    "ca-on-queensway-carleton": "EAST",
+    "ca-on-montfort": "EAST",
+    "ca-on-toronto-general": "TORONTO",
+    "ca-on-michael-garron": "TORONTO",
+    "ca-on-north-york-general": "TORONTO",
+    "ca-on-sunnybrook": "TORONTO",
+    "ca-on-bluewater-health-charlotte-eleanor-englehart-petrolia": "WEST"
+  }
+}

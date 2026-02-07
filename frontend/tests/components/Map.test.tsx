@@ -32,6 +32,10 @@ vi.mock("@/components/TrendChart", () => ({
   TrendChart: () => <div data-testid="trend-chart">Trend Chart Mock</div>,
 }));
 
+vi.mock("@/components/BenchmarkCard", () => ({
+  BenchmarkCard: () => <div data-testid="benchmark-card">Benchmark Card Mock</div>,
+}));
+
 describe("Map Component", () => {
   const mockHospitals: Hospital[] = [
     {
@@ -122,4 +126,3 @@ describe("Map Component", () => {
     expect(screen.getByText("Call Health Info")).toBeInTheDocument();
   });
 });
-

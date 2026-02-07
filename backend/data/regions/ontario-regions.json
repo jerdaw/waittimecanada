@@ -1,0 +1,55 @@
+{
+  "province": "ON",
+  "regions": [
+    {
+      "id": "ca-on-region-east",
+      "name": "East Health Region",
+      "code": "EAST",
+      "sort_order": 1,
+      "description": "Eastern Ontario communities including Ottawa-area facilities.",
+      "hospitals": [
+        "ca-on-ottawa-civic",
+        "ca-on-ottawa-general",
+        "ca-on-queensway-carleton",
+        "ca-on-montfort"
+      ]
+    },
+    {
+      "id": "ca-on-region-toronto",
+      "name": "Toronto Health Region",
+      "code": "TORONTO",
+      "sort_order": 2,
+      "description": "Toronto-area emergency departments.",
+      "hospitals": [
+        "ca-on-toronto-general",
+        "ca-on-michael-garron",
+        "ca-on-north-york-general",
+        "ca-on-sunnybrook"
+      ]
+    },
+    {
+      "id": "ca-on-region-central",
+      "name": "Central Health Region",
+      "code": "CENTRAL",
+      "sort_order": 3,
+      "description": "Placeholder for additional Central Ontario facilities as they are onboarded.",
+      "hospitals": []
+    },
+    {
+      "id": "ca-on-region-west",
+      "name": "West Health Region",
+      "code": "WEST",
+      "sort_order": 4,
+      "description": "Placeholder for Southwestern Ontario facilities as they are onboarded.",
+      "hospitals": []
+    },
+    {
+      "id": "ca-on-region-north",
+      "name": "North Health Region",
+      "code": "NORTH",
+      "sort_order": 5,
+      "description": "Placeholder for Northern Ontario facilities as they are onboarded.",
+      "hospitals": []
+    }
+  ]
+}

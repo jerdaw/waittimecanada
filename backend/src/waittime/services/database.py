@@ -717,6 +717,218 @@ class DatabaseService:
                 )
                 return [dict(row) for row in cur.fetchall()]
 
+    # ─────────────────────────────────────────────────────────────────
+    # Regions
+    # ─────────────────────────────────────────────────────────────────
+
+    def upsert_region(
+        self,
+        region_id: str,
+        province: str,
+        name: str,
+        code: str,
+        sort_order: int = 0,
+        metadata: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Insert or update a region row."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO regions (id, province, name, code, sort_order, metadata)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (id) DO UPDATE SET
+                        province = EXCLUDED.province,
+                        name = EXCLUDED.name,
+                        code = EXCLUDED.code,
+                        sort_order = EXCLUDED.sort_order,
+                        metadata = EXCLUDED.metadata,
+                        updated_at = NOW()
+                    RETURNING *
+                    """,
+                    (
+                        region_id,
+                        province.upper(),
+                        name,
+                        code.upper(),
+                        sort_order,
+                        psycopg2.extras.Json(metadata or {}),
+                    ),
+                )
+                row = cur.fetchone()
+                if row is None:
+                    raise ValueError(f"Failed to upsert region {region_id}")
+                return dict(row)
+
+    def get_region(self, region_id: str) -> dict[str, Any] | None:
+        """Get a region by ID."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute("SELECT * FROM regions WHERE id = %s", (region_id,))
+                row = cur.fetchone()
+                return dict(row) if row else None
+
+    def list_regions(self, province: str | None = None) -> list[dict[str, Any]]:
+        """List regions, optionally scoped by province."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                if province:
+                    cur.execute(
+                        """
+                        SELECT * FROM regions
+                        WHERE province = %s
+                        ORDER BY sort_order, name
+                        """,
+                        (province.upper(),),
+                    )
+                else:
+                    cur.execute(
+                        """
+                        SELECT * FROM regions
+                        ORDER BY province, sort_order, name
+                        """
+                    )
+                return [dict(row) for row in cur.fetchall()]
+
+    def list_hospital_regions(self, province: str | None = None) -> list[dict[str, Any]]:
+        """List hospital-to-region mappings."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                if province:
+                    cur.execute(
+                        """
+                        SELECT
+                            hr.region_id,
+                            hr.hospital_id,
+                            hr.is_primary,
+                            hr.assigned_at
+                        FROM hospital_regions hr
+                        JOIN regions r ON r.id = hr.region_id
+                        WHERE r.province = %s
+                        ORDER BY r.sort_order, hr.hospital_id
+                        """,
+                        (province.upper(),),
+                    )
+                else:
+                    cur.execute(
+                        """
+                        SELECT
+                            hr.region_id,
+                            hr.hospital_id,
+                            hr.is_primary,
+                            hr.assigned_at
+                        FROM hospital_regions hr
+                        JOIN regions r ON r.id = hr.region_id
+                        ORDER BY r.province, r.sort_order, hr.hospital_id
+                        """
+                    )
+                return [dict(row) for row in cur.fetchall()]
+
+    def clear_hospital_regions_for_province(self, province: str) -> int:
+        """Delete all region mappings for a province."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    DELETE FROM hospital_regions hr
+                    USING regions r
+                    WHERE hr.region_id = r.id
+                      AND r.province = %s
+                    """,
+                    (province.upper(),),
+                )
+                return cur.rowcount or 0
+
+    def upsert_hospital_region(
+        self, region_id: str, hospital_id: str, is_primary: bool = True
+    ) -> dict[str, Any]:
+        """Assign a hospital to a region."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO hospital_regions (region_id, hospital_id, is_primary)
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT (hospital_id) DO UPDATE SET
+                        region_id = EXCLUDED.region_id,
+                        is_primary = EXCLUDED.is_primary,
+                        assigned_at = NOW()
+                    RETURNING *
+                    """,
+                    (region_id, hospital_id, is_primary),
+                )
+                row = cur.fetchone()
+                if row is None:
+                    raise ValueError(
+                        f"Failed to assign hospital {hospital_id} to region {region_id}"
+                    )
+                return dict(row)
+
+    def get_region_benchmark_rows(
+        self,
+        province: str,
+        current_start: datetime,
+        current_end: datetime,
+        previous_start: datetime,
+        previous_end: datetime,
+    ) -> list[dict[str, Any]]:
+        """Return region-level wait stats and trend baselines for a province."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    WITH current_period AS (
+                        SELECT
+                            ma.hospital_id,
+                            AVG(ma.mean_value)::float AS period_mean
+                        FROM measurement_aggregates ma
+                        WHERE ma.period_type = 'daily'
+                          AND ma.period_start >= %s
+                          AND ma.period_start < %s
+                        GROUP BY ma.hospital_id
+                    ),
+                    previous_period AS (
+                        SELECT
+                            ma.hospital_id,
+                            AVG(ma.mean_value)::float AS period_mean
+                        FROM measurement_aggregates ma
+                        WHERE ma.period_type = 'daily'
+                          AND ma.period_start >= %s
+                          AND ma.period_start < %s
+                        GROUP BY ma.hospital_id
+                    )
+                    SELECT
+                        r.id AS region_id,
+                        r.name AS region_name,
+                        r.code AS region_code,
+                        r.sort_order,
+                        COUNT(hr.hospital_id)::int AS hospital_count,
+                        COUNT(cp.hospital_id)::int AS reporting_count,
+                        AVG(cp.period_mean)::float AS period_mean,
+                        PERCENTILE_CONT(0.5) WITHIN GROUP
+                            (ORDER BY cp.period_mean)::float AS period_median,
+                        MIN(cp.period_mean)::float AS best_wait,
+                        MAX(cp.period_mean)::float AS worst_wait,
+                        AVG(pp.period_mean)::float AS previous_period_mean,
+                        ARRAY_AGG(hr.hospital_id ORDER BY hr.hospital_id) AS hospital_ids
+                    FROM regions r
+                    LEFT JOIN hospital_regions hr ON hr.region_id = r.id
+                    LEFT JOIN current_period cp ON cp.hospital_id = hr.hospital_id
+                    LEFT JOIN previous_period pp ON pp.hospital_id = hr.hospital_id
+                    WHERE r.province = %s
+                    GROUP BY r.id, r.name, r.code, r.sort_order
+                    ORDER BY r.sort_order, r.name
+                    """,
+                    (
+                        current_start,
+                        current_end,
+                        previous_start,
+                        previous_end,
+                        province.upper(),
+                    ),
+                )
+                return [dict(row) for row in cur.fetchall()]
+
     def get_all_source_ids(self) -> list[str]:
         """Return all source IDs."""
         with self.get_connection() as conn:

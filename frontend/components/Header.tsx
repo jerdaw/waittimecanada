@@ -102,6 +102,18 @@ export function Header({
               Data Quality
             </Link>
             <Link
+              href="/methods"
+              className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+            >
+              Methods
+            </Link>
+            <Link
+              href="/analytics"
+              className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+            >
+              Analytics
+            </Link>
+            <Link
               href="/faq"
               className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >

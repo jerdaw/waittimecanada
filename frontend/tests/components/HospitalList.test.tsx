@@ -3,6 +3,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { HospitalList } from '@/components/HospitalList';
 import type { Hospital } from '@/app/api/hospitals/route';
 
+vi.mock('@/components/BenchmarkCard', () => ({
+  BenchmarkCard: () => null,
+}));
+
+vi.mock('@/components/TemporalPatterns', () => ({
+  TemporalPatterns: () => null,
+}));
+
 // Mock scrollIntoView since it's not implemented in JSDOM
 // Element.prototype.scrollIntoView = vi.fn();
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
@@ -188,7 +196,32 @@ describe('HospitalList', () => {
     // Check count message (now shows "X results" format)
     expect(screen.getByText(/1 results/)).toBeInTheDocument();
   });
+
+  it('renders region selector and forwards region change', () => {
+    const onRegionChange = vi.fn();
+
+    render(
+      <HospitalList
+        hospitals={mockHospitals}
+        selectedId={null}
+        onSelect={() => {}}
+        regionOptions={[
+          {
+            region_id: 'ca-on-region-east',
+            region_name: 'East Health Region',
+            hospital_count: 2,
+            reporting_count: 2,
+          },
+        ]}
+        selectedRegionId={null}
+        onRegionChange={onRegionChange}
+      />
+    );
+
+    const combobox = screen.getByRole('combobox');
+    fireEvent.change(combobox, { target: { value: 'ca-on-region-east' } });
+
+    expect(onRegionChange).toHaveBeenCalledWith('ca-on-region-east');
+  });
 });
-
-
 

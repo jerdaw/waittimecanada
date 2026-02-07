@@ -6,6 +6,17 @@ from pathlib import Path
 
 from waittime.services import DatabaseService
 
+SAFE_DUPLICATE_ERROR_CODES = {"42710", "42P07", "42723"}
+
+
+def is_safe_duplicate_error(exc: Exception) -> bool:
+    """Return True when migration error indicates the object already exists."""
+    code = getattr(exc, "pgcode", None)
+    if code in SAFE_DUPLICATE_ERROR_CODES:
+        return True
+    message = str(exc).lower()
+    return "already exists" in message or "duplicate object" in message
+
 # Find migration files
 MIGRATIONS_DIR = Path(__file__).parent / "migrations"
 migration_files = sorted(MIGRATIONS_DIR.glob("*.sql"))
@@ -31,6 +42,9 @@ for migration_file in migration_files:
         print(f"  ✓ Success\n")
 
     except Exception as e:
+        if is_safe_duplicate_error(e):
+            print(f"  ⚠ Skipped (already applied): {e}\n")
+            continue
         print(f"  ❌ Failed: {e}\n")
         print("Stopping migrations. You may need to rollback manually.")
         sys.exit(1)

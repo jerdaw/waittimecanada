@@ -1,7 +1,7 @@
 "use client";
 
 import { clsx } from "clsx";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Map from "@/components/Map";
 import { HospitalList } from "@/components/HospitalList";
 import { ViewToggle, ViewMode } from "@/components/ViewToggle";
@@ -15,10 +15,14 @@ import { Hero } from "@/components/Hero";
 import { AboutSection } from "@/components/AboutSection";
 import { SystemStatus } from "@/components/SystemStatus";
 import { AccessInsightsSummary } from "@/components/insights/AccessInsightsSummary";
+import { RegionDashboard, type RegionAnalyticsRow } from "@/components/RegionDashboard";
+import type { RegionOption } from "@/components/RegionSelector";
 
 import { isRecent } from "@/utils/date";
 
 export default function Home() {
+  const REGION_PERIOD = "7d";
+
   // Application State
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +40,10 @@ export default function Home() {
 
   // Province filter state
   const [selectedProvince, setSelectedProvince] = useState("ON");
+  const [selectedRegionId, setSelectedRegionId] = useState<string | null>(null);
+  const [regionRows, setRegionRows] = useState<RegionAnalyticsRow[]>([]);
+  const [provinceRegionMean, setProvinceRegionMean] = useState<number | null>(null);
+  const [regionsLoading, setRegionsLoading] = useState(false);
 
   // Geolocation state
   const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>(null);
@@ -146,9 +154,75 @@ export default function Home() {
     fetchHospitals();
   }, [selectedProvince]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchRegionAnalytics() {
+      setRegionsLoading(true);
+      setSelectedRegionId(null);
+
+      try {
+        const query = new URLSearchParams({
+          province: selectedProvince,
+          period: REGION_PERIOD,
+        });
+        const response = await fetch(`/api/analytics/regions?${query.toString()}`);
+        const payload = await response.json();
+
+        if (!cancelled && payload.success && payload.data) {
+          setRegionRows(payload.data.regions ?? []);
+          setProvinceRegionMean(
+            payload.data.province_mean === null ? null : Number(payload.data.province_mean)
+          );
+        } else if (!cancelled) {
+          setRegionRows([]);
+          setProvinceRegionMean(null);
+        }
+      } catch (err) {
+        console.error("Failed to fetch region analytics:", err);
+        if (!cancelled) {
+          setRegionRows([]);
+          setProvinceRegionMean(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setRegionsLoading(false);
+        }
+      }
+    }
+
+    fetchRegionAnalytics();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedProvince, REGION_PERIOD]);
+
+  const selectedRegionHospitalIds = useMemo(() => {
+    if (!selectedRegionId) return null;
+    const selectedRegion = regionRows.find((region) => region.region_id === selectedRegionId);
+    if (!selectedRegion) return null;
+    return new Set(selectedRegion.hospital_ids);
+  }, [regionRows, selectedRegionId]);
+
+  const regionOptions: RegionOption[] = useMemo(
+    () =>
+      regionRows.map((region) => ({
+        region_id: region.region_id,
+        region_name: region.region_name,
+        hospital_count: region.hospital_count,
+        reporting_count: region.reporting_count,
+      })),
+    [regionRows]
+  );
+
   // Filter and sort hospitals
   const filteredAndSortedHospitals = [...hospitals]
     .filter((hospital) => {
+      // 0. Region Filter
+      if (selectedRegionHospitalIds && !selectedRegionHospitalIds.has(hospital.id)) {
+        return false;
+      }
+
       // 1. Live Only Filter
       if (showLiveOnly && !isRecent(hospital.last_updated)) {
         return false;
@@ -210,6 +284,17 @@ export default function Home() {
                 userLocation={userLocation}
                 province={selectedProvince}
               />
+              <div className="mt-4">
+                <RegionDashboard
+                  province={selectedProvince}
+                  period={REGION_PERIOD}
+                  regions={regionRows}
+                  provinceMean={provinceRegionMean}
+                  loading={regionsLoading}
+                  selectedRegionId={selectedRegionId}
+                  onSelectRegion={setSelectedRegionId}
+                />
+              </div>
             </div>
           </div>
         )}
@@ -248,6 +333,10 @@ export default function Home() {
                         onToggleLiveOnly={setShowLiveOnly}
                         selectedProvince={selectedProvince}
                         onProvinceChange={setSelectedProvince}
+                        regionOptions={regionOptions}
+                        selectedRegionId={selectedRegionId}
+                        onRegionChange={setSelectedRegionId}
+                        regionsLoading={regionsLoading}
                       />
                     )}
                   </div>

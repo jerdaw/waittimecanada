@@ -2,6 +2,13 @@ import { render, screen } from "@testing-library/react";
 import { ExpandedCardDetails } from "@/components/ExpandedCardDetails";
 import { vi } from "vitest";
 
+vi.mock("@/components/BenchmarkCard", () => ({
+  BenchmarkCard: () => <div>Benchmark Mock</div>,
+}));
+vi.mock("@/components/TemporalPatterns", () => ({
+  TemporalPatterns: () => <div>Temporal Patterns Mock</div>,
+}));
+
 const mockHospital = {
   id: "test-hospital",
   name: "Test Hospital",

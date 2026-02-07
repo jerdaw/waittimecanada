@@ -74,6 +74,7 @@ logs/
 tmp/
 temp/
 *.tmp
+backend/data/regions/coverage-report.json
 
 # Database
 *.db

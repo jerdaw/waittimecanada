@@ -1,8 +1,8 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-02-06)
+## Current Status (Updated 2026-02-07)
 
-**Progress:** Milestone 14 Complete | Milestone 15 Next
+**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage)
 
 **Strategic Direction:** Ontario-focused depth over multi-province breadth. The platform is
 transitioning from a real-time snapshot tool into a Health Systems Observatory with longitudinal
@@ -26,52 +26,35 @@ analysis, data quality transparency, and research-grade analytics.
 | **M12: Research Infra** (partial) | Citation-ready data export (19 tests), Dead Man's Switch alerts (7 tests), SystemStatus component |
 | **M13: Aggregation Pipeline** | Permanent hourly/daily/weekly/monthly aggregates, backfill CLI, enhanced trends (90d/6m/1y), extended data export (ADR-0008) |
 | **M14: Data Quality & Anomaly Detection** | DataQualityService, AnomalyDetectionService, MethodologyChangeDetector, /data-quality dashboard, 3 new DB tables (ADR-0009) |
+| **M15: Analytics & Benchmarking** | Peer benchmarking, temporal pattern analysis, regional intelligence mapping, system trend dashboard, dedicated /analytics page |
 
 ---
 
 ## Next Steps
 
-### Immediate: Milestone 15 — Analytics & Benchmarking
-**Priority:** HIGH | **Estimated Effort:** 5-6 days | **Depends On:** M13
-**Implementation Plan:** `docs/planning/implementation/milestone-15-analytics.md`
+### Immediate: M9 Production Completion
+- [ ] Deploy frontend to Render/Vercel with production `DATABASE_URL`
+- [ ] Set required production GitHub Secrets (`DATABASE_URL`, optional alert keys) and verify cron execution
+- [ ] Perform production smoke check for `/`, `/methods`, `/data-quality`, `/analytics`
 
-Produces publishable-quality analysis (peer benchmarking, temporal patterns, regional dashboards).
+### Recently Closed: M15 Analytics & Benchmarking
+**Status:** CLOSED (archived) | **Delivered:** 2026-02-07 | **Depends On:** M13
+**Archived Plan:** `docs/planning/archive/milestone-15-analytics.md`
 
-**Phase 1: Hospital Peer Benchmarking**
-- [ ] Create `BenchmarkingService` (percentile ranking, quartile assignment, trend direction)
-- [ ] Create `/api/analytics/benchmarks` endpoint
-- [ ] Build `BenchmarkCard` component (percentile badge, trend arrow, province context)
-- [ ] Integrate into hospital detail views
-- [ ] Write tests
-
-**Phase 2: Temporal Pattern Analysis**
-- [ ] Create `TemporalPatternService` (hour-of-day, day-of-week, monthly patterns)
-- [ ] Create `/api/analytics/patterns` endpoint
-- [ ] Build `TemporalPatterns` component (tabbed charts: hour/day/month)
-- [ ] Include insights: peak/quiet hours, weekend vs weekday ratio
-- [ ] Write tests
-
-**Phase 3: Ontario Health Region Mapping**
-- [ ] Create region seed data (`ontario-regions.json`)
-- [ ] Create `regions` and `hospital_regions` database tables
-- [ ] Create seed CLI for regions
-- [ ] Create `/api/analytics/regions` endpoint
-- [ ] Build `RegionDashboard` and `RegionSelector` components
-- [ ] Write tests
-
-**Phase 4: System-Wide Trend Dashboard**
-- [ ] Create `SystemTrendService` (province-level trend computation + narrative generation)
-- [ ] Create `/api/analytics/trends` endpoint
-- [ ] Build `SystemTrendChart` component (trend line with confidence band + narrative)
-- [ ] Create `/analytics` page bringing all analytics together
-- [ ] Add navigation link to header
-- [ ] Write tests
+Delivered scope:
+- Peer benchmarking (`/api/analytics/benchmarks` + UI integration)
+- Temporal patterns (`/api/analytics/patterns`)
+- Regional analytics (`regions` + `hospital_regions`, seed CLI, `/api/analytics/regions`)
+- System trends (`/api/analytics/trends`, `/analytics`)
+- Operational hardening (schema-aware setup guidance, daily-rollup fallback)
+- Region coverage expansion (audit CLI, auto-assignment, overrides, coverage telemetry)
 
 ### Short-Term: Complete Partial Milestones
 
 **M9: Portfolio Launch** — remaining items:
 - [ ] Deploy frontend to Render/Vercel with production DATABASE_URL
-- [ ] Configure GitHub Actions for automated scraper runs
+- [x] Configure GitHub Actions for automated scraper runs
+- [ ] Set required production GitHub Secrets (DATABASE_URL, optional alert keys) and verify cron execution
 - [ ] Stakeholder interview (1 ER nurse/physician)
 - [ ] Finalize and publish LinkedIn post
 
@@ -106,13 +89,13 @@ Each feature maps to CanMEDS competencies for medical school admissions:
 ## Implementation Plans
 
 Active milestone plans in `docs/planning/implementation/`:
-- `milestone-15-analytics.md` — Peer benchmarking, temporal patterns, regional dashboards
 - `milestone-9-launch.md` — Production deployment & stakeholder validation
 - `milestone-10-provinces.md` — Alberta scraper & multi-province support
 - `milestone-11-equity.md` — Access Burden Estimator & equity layer
 - `milestone-12-research.md` — Citation export & alert system
 
 Archived (delivered):
+- `docs/planning/archive/milestone-15-analytics.md` — Analytics & benchmarking (M15)
 - `milestone-13-aggregation.md` — Aggregation pipeline (M13)
 - `milestone-14-data-quality.md` — Data quality & anomaly detection (M14)
 
@@ -138,7 +121,7 @@ Archived (delivered):
 
 ## Architecture
 
-### Database Schema (7 tables)
+### Database Schema (9 tables)
 
 | Table | Purpose |
 |-------|---------|
@@ -149,6 +132,8 @@ Archived (delivered):
 | `measurement_aggregates` | Permanent statistical summaries (M13) |
 | `data_quality_snapshots` | Daily scraper reliability metrics (M14) |
 | `methodology_change_events` | Detected methodology shifts (M14) |
+| `regions` | Province region metadata for analytics segmentation (M15) |
+| `hospital_regions` | Hospital-to-region mappings for regional benchmarking (M15) |
 
 ### Key ADRs
 
@@ -162,6 +147,7 @@ Archived (delivered):
 | [0007](../adr/0007-bc-scraper-implementation.md) | BC scraper implementation |
 | [0008](../adr/0008-aggregation-pipeline.md) | Two-tier aggregation pipeline |
 | [0009](../adr/0009-data-quality-anomaly-detection.md) | Data quality & anomaly detection |
+| [0010](../adr/0010-region-mapping-coverage-heuristics.md) | Region mapping coverage audit and heuristic auto-assignment |
 
 ---
 

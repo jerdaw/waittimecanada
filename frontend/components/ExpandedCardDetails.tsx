@@ -1,6 +1,8 @@
 import { Hospital } from "@/app/api/hospitals/route";
 import { clsx } from "clsx";
 import { AccessBurdenEstimator } from "./AccessBurdenEstimator";
+import { BenchmarkCard } from "./BenchmarkCard";
+import { TemporalPatterns } from "./TemporalPatterns";
 import { calculateDistance } from "@/utils/distance";
 
 interface ExpandedCardDetailsProps {
@@ -71,6 +73,14 @@ export function ExpandedCardDetails({ hospital, userLocation }: ExpandedCardDeta
           />
         </div>
       )}
+
+      <div className="mb-4">
+        <BenchmarkCard hospital={hospital} />
+      </div>
+
+      <div className="mb-4">
+        <TemporalPatterns hospitalId={hospital.id} />
+      </div>
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
