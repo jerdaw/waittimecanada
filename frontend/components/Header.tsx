@@ -94,9 +94,15 @@ export function Header({
               <div className="w-px h-5 bg-border hidden sm:block" />
             </>
           )}
-          <nav className="hidden md:flex items-center text-sm font-medium">
-            <Link 
-              href="/faq" 
+          <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
+            <Link
+              href="/data-quality"
+              className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+            >
+              Data Quality
+            </Link>
+            <Link
+              href="/faq"
               className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >
               FAQ

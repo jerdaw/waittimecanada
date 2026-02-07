@@ -157,6 +157,10 @@ class BaseScraper(ABC):
             html = self.fetch()
             measurements = self.parse(html)
 
+            # Check for anomalies before saving
+            if self.db is not None and measurements:
+                self._check_anomalies(measurements)
+
             # Save measurements to database if configured
             if save_to_db and self.db is not None and measurements:
                 self.db.insert_measurements(measurements)
@@ -187,3 +191,32 @@ class BaseScraper(ABC):
 
             logger.error(f"Scrape failed for {self.source.id}: {e}")
             raise
+
+    def _check_anomalies(self, measurements: list[Measurement]) -> None:
+        """Check measurements for anomalies and flag them in-place.
+
+        Anomalies are flagged but never excluded from saving — the flag
+        is metadata that enables data quality transparency.
+        """
+        try:
+            from waittime.services.anomaly_detection import AnomalyDetectionService
+
+            anomaly_service = AnomalyDetectionService(self.db)  # type: ignore[arg-type]
+            for measurement in measurements:
+                result = anomaly_service.check_measurement(
+                    hospital_id=measurement.hospital_id,
+                    value=measurement.value,
+                    timestamp=measurement.timestamp_utc,
+                )
+                if result["is_anomaly"]:
+                    measurement.is_anomaly = True
+                    measurement.anomaly_reason = result["reason"]
+                    logger.warning(
+                        "Anomaly detected: %s value=%.0f (%s)",
+                        measurement.hospital_id,
+                        measurement.value,
+                        result["reason"],
+                    )
+        except Exception:
+            # Never let anomaly detection break the scraper pipeline
+            logger.exception("Anomaly detection failed, continuing without it")
