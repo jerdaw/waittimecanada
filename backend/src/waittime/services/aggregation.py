@@ -112,9 +112,7 @@ class AggregationService:
         hour_end = hour_start + timedelta(hours=1)
         return self.aggregate_period(hospital_id, "hourly", hour_start, hour_end)
 
-    def aggregate_daily(
-        self, hospital_id: str, day_start: datetime
-    ) -> MeasurementAggregate | None:
+    def aggregate_daily(self, hospital_id: str, day_start: datetime) -> MeasurementAggregate | None:
         """Compute aggregate for a full day (00:00 to next 00:00)."""
         day_end = day_start + timedelta(days=1)
         return self.aggregate_period(hospital_id, "daily", day_start, day_end)

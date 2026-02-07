@@ -73,11 +73,11 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
   };
 
   // eslint-disable-next-line
-  const formatTooltip = (value: any, name: string) => {
+  const formatTooltip = (value: any, name: string | undefined) => {
     if (name === "waitTime") return [`${value} min`, isAggregated ? "Mean" : "Wait Time"];
     if (name === "minWaitTime") return [`${value} min`, "Min"];
     if (name === "maxWaitTime") return [`${value} min`, "Max"];
-    return [`${value}`, name];
+    return [`${value}`, name ?? ""];
   };
 
   // eslint-disable-next-line

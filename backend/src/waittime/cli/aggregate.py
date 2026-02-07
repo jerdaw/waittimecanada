@@ -114,7 +114,9 @@ def main() -> int:
         )
 
         total = sum(counts.values())
-        logger.info(f"Aggregation complete: {total} aggregates {'would be ' if args.dry_run else ''}computed")
+        logger.info(
+            f"Aggregation complete: {total} aggregates {'would be ' if args.dry_run else ''}computed"
+        )
         for period_type, count in counts.items():
             if count > 0:
                 logger.info(f"  {period_type}: {count}")

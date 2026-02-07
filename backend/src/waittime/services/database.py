@@ -724,9 +724,7 @@ class DatabaseService:
                 cur.execute("SELECT id FROM sources ORDER BY id")
                 return [row["id"] for row in cur.fetchall()]
 
-    def flag_measurement_anomaly(
-        self, measurement_id: int, reason: str
-    ) -> None:
+    def flag_measurement_anomaly(self, measurement_id: int, reason: str) -> None:
         """Mark a measurement as anomalous in the database.
 
         Args:

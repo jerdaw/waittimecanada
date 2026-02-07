@@ -139,9 +139,7 @@ class MeasurementAggregate(BaseModel):
     source_id: str = Field(description="Data source at time of aggregation")
 
     # Time period
-    period_type: str = Field(
-        description="Granularity: hourly, daily, weekly, or monthly"
-    )
+    period_type: str = Field(description="Granularity: hourly, daily, weekly, or monthly")
     period_start: datetime = Field(description="Start of the aggregation window")
     period_end: datetime = Field(description="End of the aggregation window")
 
@@ -176,8 +174,7 @@ class MeasurementAggregate(BaseModel):
         """Ensure period_type is valid and period_end is after period_start."""
         if self.period_type not in self.VALID_PERIOD_TYPES:
             raise ValueError(
-                f"period_type must be one of {self.VALID_PERIOD_TYPES}, "
-                f"got '{self.period_type}'"
+                f"period_type must be one of {self.VALID_PERIOD_TYPES}, got '{self.period_type}'"
             )
         if self.period_end <= self.period_start:
             raise ValueError("period_end must be after period_start")
