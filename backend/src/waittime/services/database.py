@@ -10,6 +10,7 @@ import logging
 import os
 from collections.abc import Generator
 from contextlib import contextmanager
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -17,7 +18,7 @@ import psycopg2
 import psycopg2.extras
 from dotenv import load_dotenv
 
-from waittime.core import Hospital, Measurement, ScraperStatus, Source
+from waittime.core import Hospital, Measurement, MeasurementAggregate, ScraperStatus, Source
 
 # Load environment variables from .env.local (preferred) or .env
 env_file = Path(__file__).parents[3] / ".env.local"
@@ -262,8 +263,9 @@ class DatabaseService:
                     INSERT INTO measurements (
                         hospital_id, timestamp_utc, value,
                         metric_family, start_event, end_event, statistic_type, patient_scope,
-                        source_id, raw_payload_hash, raw_payload_snippet, parser_version
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        source_id, raw_payload_hash, raw_payload_snippet, parser_version,
+                        is_anomaly, anomaly_reason
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING *
                     """,
                     (
@@ -279,6 +281,8 @@ class DatabaseService:
                         measurement.raw_payload_hash,
                         measurement.raw_payload_snippet,
                         measurement.parser_version,
+                        measurement.is_anomaly,
+                        measurement.anomaly_reason,
                     ),
                 )
                 row = cur.fetchone()
@@ -307,6 +311,8 @@ class DatabaseService:
                         m.raw_payload_hash,
                         m.raw_payload_snippet,
                         m.parser_version,
+                        m.is_anomaly,
+                        m.anomaly_reason,
                     )
                     for m in measurements
                 ]
@@ -317,8 +323,9 @@ class DatabaseService:
                     INSERT INTO measurements (
                         hospital_id, timestamp_utc, value,
                         metric_family, start_event, end_event, statistic_type, patient_scope,
-                        source_id, raw_payload_hash, raw_payload_snippet, parser_version
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        source_id, raw_payload_hash, raw_payload_snippet, parser_version,
+                        is_anomaly, anomaly_reason
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """,
                     data,
                 )
@@ -416,6 +423,439 @@ class DatabaseService:
                     "total_measurements": row["total_measurements"],
                     "measurements_older_than_30_days": row["measurements_older_than_30_days"],
                 }
+
+    # ─────────────────────────────────────────────────────────────────
+    # Measurement Aggregates
+    # ─────────────────────────────────────────────────────────────────
+
+    def get_measurements_in_range(
+        self, hospital_id: str, start: datetime, end: datetime
+    ) -> list[dict[str, Any]]:
+        """Get raw measurement values for a hospital within a time range.
+
+        Args:
+            hospital_id: Hospital to query
+            start: Range start (inclusive)
+            end: Range end (exclusive)
+
+        Returns:
+            List of dicts with 'value' and 'timestamp_utc' keys, ordered chronologically
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT value, timestamp_utc, source_id,
+                           metric_family, start_event, end_event, statistic_type
+                    FROM measurements
+                    WHERE hospital_id = %s
+                      AND timestamp_utc >= %s
+                      AND timestamp_utc < %s
+                    ORDER BY timestamp_utc
+                    """,
+                    (hospital_id, start, end),
+                )
+                return [dict(row) for row in cur.fetchall()]
+
+    def insert_aggregate(self, aggregate: MeasurementAggregate) -> bool:
+        """Insert an aggregate, skipping if a duplicate already exists.
+
+        Uses ON CONFLICT DO NOTHING on the (hospital_id, period_type, period_start)
+        unique constraint.
+
+        Returns:
+            True if inserted, False if it already existed
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO measurement_aggregates (
+                        hospital_id, source_id,
+                        period_type, period_start, period_end,
+                        mean_value, median_value, p90_value,
+                        min_value, max_value, std_dev, sample_count,
+                        metric_family, start_event, end_event, statistic_type
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (hospital_id, period_type, period_start) DO NOTHING
+                    """,
+                    (
+                        aggregate.hospital_id,
+                        aggregate.source_id,
+                        aggregate.period_type,
+                        aggregate.period_start,
+                        aggregate.period_end,
+                        aggregate.mean_value,
+                        aggregate.median_value,
+                        aggregate.p90_value,
+                        aggregate.min_value,
+                        aggregate.max_value,
+                        aggregate.std_dev,
+                        aggregate.sample_count,
+                        aggregate.metric_family,
+                        aggregate.start_event,
+                        aggregate.end_event,
+                        aggregate.statistic_type,
+                    ),
+                )
+                return cur.rowcount > 0
+
+    def get_aggregates(
+        self,
+        hospital_id: str,
+        period_type: str,
+        start: datetime,
+        end: datetime,
+    ) -> list[MeasurementAggregate]:
+        """Query stored aggregates for a hospital, period type, and time range.
+
+        Args:
+            hospital_id: Hospital to query
+            period_type: 'hourly', 'daily', 'weekly', or 'monthly'
+            start: Range start (inclusive)
+            end: Range end (inclusive)
+
+        Returns:
+            List of MeasurementAggregate, ordered by period_start ascending
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT * FROM measurement_aggregates
+                    WHERE hospital_id = %s
+                      AND period_type = %s
+                      AND period_start >= %s
+                      AND period_start <= %s
+                    ORDER BY period_start
+                    """,
+                    (hospital_id, period_type, start, end),
+                )
+                return [self._row_to_aggregate(dict(row)) for row in cur.fetchall()]
+
+    def get_existing_aggregate_periods(
+        self,
+        hospital_id: str,
+        period_type: str,
+        start: datetime,
+        end: datetime,
+    ) -> set[datetime]:
+        """Return period_start values that already have aggregates.
+
+        Used by backfill to skip already-computed periods efficiently.
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT period_start FROM measurement_aggregates
+                    WHERE hospital_id = %s
+                      AND period_type = %s
+                      AND period_start >= %s
+                      AND period_start <= %s
+                    """,
+                    (hospital_id, period_type, start, end),
+                )
+                return {row["period_start"] for row in cur.fetchall()}
+
+    def get_all_hospital_ids(self, visible_only: bool = True) -> list[str]:
+        """Return all hospital IDs.
+
+        Args:
+            visible_only: If True, only return verified and visible hospitals
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                if visible_only:
+                    cur.execute(
+                        "SELECT id FROM hospitals WHERE is_verified = true AND is_visible = true ORDER BY id"
+                    )
+                else:
+                    cur.execute("SELECT id FROM hospitals ORDER BY id")
+                return [row["id"] for row in cur.fetchall()]
+
+    def _row_to_aggregate(self, row: dict[str, Any]) -> MeasurementAggregate:
+        """Convert database row to MeasurementAggregate model."""
+        return MeasurementAggregate(
+            hospital_id=row["hospital_id"],
+            source_id=row["source_id"],
+            period_type=row["period_type"],
+            period_start=row["period_start"],
+            period_end=row["period_end"],
+            mean_value=row["mean_value"],
+            median_value=row.get("median_value"),
+            p90_value=row.get("p90_value"),
+            min_value=row["min_value"],
+            max_value=row["max_value"],
+            std_dev=row.get("std_dev"),
+            sample_count=row["sample_count"],
+            metric_family=row["metric_family"],
+            start_event=row["start_event"],
+            end_event=row["end_event"],
+            statistic_type=row["statistic_type"],
+            created_at=row.get("created_at"),
+        )
+
+    # ─────────────────────────────────────────────────────────────────
+    # Data Quality
+    # ─────────────────────────────────────────────────────────────────
+
+    def get_measurement_timestamps(
+        self, hospital_id: str, start: datetime, end: datetime
+    ) -> list[datetime]:
+        """Get just the timestamps of measurements for gap analysis.
+
+        Args:
+            hospital_id: Hospital to query
+            start: Range start (inclusive)
+            end: Range end (exclusive)
+
+        Returns:
+            List of timestamp_utc values ordered chronologically
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT timestamp_utc FROM measurements
+                    WHERE hospital_id = %s
+                      AND timestamp_utc >= %s
+                      AND timestamp_utc < %s
+                    ORDER BY timestamp_utc
+                    """,
+                    (hospital_id, start, end),
+                )
+                return [row["timestamp_utc"] for row in cur.fetchall()]
+
+    def get_measurement_count_by_hospital(
+        self, source_id: str, start: datetime, end: datetime
+    ) -> dict[str, int]:
+        """Get measurement counts grouped by hospital_id for a source.
+
+        Args:
+            source_id: Source to query
+            start: Range start (inclusive)
+            end: Range end (exclusive)
+
+        Returns:
+            Dict mapping hospital_id to measurement count
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT hospital_id, COUNT(*) as cnt
+                    FROM measurements
+                    WHERE source_id = %s
+                      AND timestamp_utc >= %s
+                      AND timestamp_utc < %s
+                    GROUP BY hospital_id
+                    """,
+                    (source_id, start, end),
+                )
+                return {row["hospital_id"]: row["cnt"] for row in cur.fetchall()}
+
+    def insert_quality_snapshot(self, snapshot: dict[str, Any]) -> bool:
+        """Insert a data quality snapshot (ON CONFLICT DO NOTHING).
+
+        Args:
+            snapshot: Dict with hospital_id, source_id, snapshot_date,
+                      expected_scrapes, actual_scrapes, success_rate,
+                      longest_gap_minutes, mean_gap_minutes
+
+        Returns:
+            True if inserted, False if duplicate
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO data_quality_snapshots (
+                        hospital_id, source_id, snapshot_date,
+                        expected_scrapes, actual_scrapes, success_rate,
+                        longest_gap_minutes, mean_gap_minutes
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (hospital_id, snapshot_date) DO NOTHING
+                    """,
+                    (
+                        snapshot["hospital_id"],
+                        snapshot["source_id"],
+                        snapshot["snapshot_date"],
+                        snapshot["expected_scrapes"],
+                        snapshot["actual_scrapes"],
+                        snapshot["success_rate"],
+                        snapshot.get("longest_gap_minutes"),
+                        snapshot.get("mean_gap_minutes"),
+                    ),
+                )
+                return cur.rowcount > 0
+
+    def get_quality_snapshots(
+        self, hospital_id: str, start_date: datetime, end_date: datetime
+    ) -> list[dict[str, Any]]:
+        """Get cached quality snapshots for a hospital and date range.
+
+        Args:
+            hospital_id: Hospital to query
+            start_date: Start date (inclusive)
+            end_date: End date (inclusive)
+
+        Returns:
+            List of snapshot dicts ordered by date descending
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT * FROM data_quality_snapshots
+                    WHERE hospital_id = %s
+                      AND snapshot_date >= %s
+                      AND snapshot_date <= %s
+                    ORDER BY snapshot_date DESC
+                    """,
+                    (hospital_id, start_date, end_date),
+                )
+                return [dict(row) for row in cur.fetchall()]
+
+    def get_all_source_ids(self) -> list[str]:
+        """Return all source IDs."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute("SELECT id FROM sources ORDER BY id")
+                return [row["id"] for row in cur.fetchall()]
+
+    def flag_measurement_anomaly(
+        self, measurement_id: int, reason: str
+    ) -> None:
+        """Mark a measurement as anomalous in the database.
+
+        Args:
+            measurement_id: The measurement's primary key
+            reason: Human-readable explanation
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    UPDATE measurements
+                    SET is_anomaly = TRUE, anomaly_reason = %s
+                    WHERE id = %s
+                    """,
+                    (reason, measurement_id),
+                )
+
+    def get_recent_anomalies(
+        self, source_id: str | None = None, days: int = 7
+    ) -> list[dict[str, Any]]:
+        """Get recent anomalous measurements with hospital info.
+
+        Args:
+            source_id: Optional filter by source
+            days: Lookback period (default 7)
+
+        Returns:
+            List of anomaly dicts with hospital name, value, reason, etc.
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                query = """
+                    SELECT m.id, m.hospital_id, m.value, m.timestamp_utc,
+                           m.anomaly_reason, m.source_id,
+                           h.name as hospital_name, h.province
+                    FROM measurements m
+                    JOIN hospitals h ON h.id = m.hospital_id
+                    WHERE m.is_anomaly = TRUE
+                      AND m.timestamp_utc >= NOW() - INTERVAL '%s days'
+                """
+                params: list[Any] = [days]
+
+                if source_id is not None:
+                    query += " AND m.source_id = %s"
+                    params.append(source_id)
+
+                query += " ORDER BY m.timestamp_utc DESC"
+
+                cur.execute(query, params)
+                return [dict(row) for row in cur.fetchall()]
+
+    # ─────────────────────────────────────────────────────────────────
+    # Methodology Change Events
+    # ─────────────────────────────────────────────────────────────────
+
+    def insert_methodology_change(self, event: dict[str, Any]) -> int:
+        """Insert a methodology change event.
+
+        Args:
+            event: Dict with source_id, previous/current period dates,
+                   previous/current means, shift_percent, hospitals_analyzed,
+                   explanation
+
+        Returns:
+            The ID of the inserted row
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO methodology_change_events (
+                        source_id,
+                        previous_period_start, previous_period_end,
+                        current_period_start, current_period_end,
+                        previous_mean, current_mean,
+                        shift_percent, hospitals_analyzed, explanation
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    RETURNING id
+                    """,
+                    (
+                        event["source_id"],
+                        event["previous_period_start"],
+                        event["previous_period_end"],
+                        event["current_period_start"],
+                        event["current_period_end"],
+                        event["previous_mean"],
+                        event["current_mean"],
+                        event["shift_percent"],
+                        event["hospitals_analyzed"],
+                        event["explanation"],
+                    ),
+                )
+                row = cur.fetchone()
+                return row["id"] if row else 0
+
+    def get_methodology_changes(
+        self, source_id: str | None = None, limit: int = 20
+    ) -> list[dict[str, Any]]:
+        """Get recent methodology change events.
+
+        Args:
+            source_id: Optional filter by source
+            limit: Max results
+
+        Returns:
+            List of event dicts ordered by detected_at descending
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                if source_id:
+                    cur.execute(
+                        """
+                        SELECT * FROM methodology_change_events
+                        WHERE source_id = %s
+                        ORDER BY detected_at DESC
+                        LIMIT %s
+                        """,
+                        (source_id, limit),
+                    )
+                else:
+                    cur.execute(
+                        """
+                        SELECT * FROM methodology_change_events
+                        ORDER BY detected_at DESC
+                        LIMIT %s
+                        """,
+                        (limit,),
+                    )
+                return [dict(row) for row in cur.fetchall()]
 
     # ─────────────────────────────────────────────────────────────────
     # Scraper Status (Heartbeat)
@@ -545,4 +985,6 @@ class DatabaseService:
             raw_payload_hash=row["raw_payload_hash"],
             raw_payload_snippet=row.get("raw_payload_snippet"),
             parser_version=row["parser_version"],
+            is_anomaly=row.get("is_anomaly", False),
+            anomaly_reason=row.get("anomaly_reason"),
         )

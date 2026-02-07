@@ -13,6 +13,7 @@ from waittime.core.enums import (
 from waittime.core.models import (
     Hospital,
     Measurement,
+    MeasurementAggregate,
     ScraperStatus,
     Source,
     are_comparable,
@@ -28,6 +29,7 @@ __all__ = [
     "PatientScope",
     # Models
     "Measurement",
+    "MeasurementAggregate",
     "Hospital",
     "Source",
     "ScraperStatus",

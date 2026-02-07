@@ -79,7 +79,7 @@ describe('DataExport', () => {
       expect(select.value).toBe('30d');
     });
 
-    it('has all date range options', () => {
+    it('has all date range options including extended ranges', () => {
       render(<DataExport />);
 
       const options = screen.getAllByRole('option');
@@ -88,7 +88,95 @@ describe('DataExport', () => {
       expect(labels).toContain('Last 24 Hours');
       expect(labels).toContain('Last 7 Days');
       expect(labels).toContain('Last 30 Days');
+      expect(labels).toContain('Last 90 Days');
+      expect(labels).toContain('Last 6 Months');
+      expect(labels).toContain('Last Year');
       expect(labels).toContain('All Data');
+    });
+  });
+
+  describe('granularity selector', () => {
+    it('renders the granularity selector', () => {
+      render(<DataExport />);
+
+      expect(screen.getByLabelText('Data Granularity')).toBeInTheDocument();
+    });
+
+    it('starts with raw granularity selected', () => {
+      render(<DataExport />);
+
+      const select = screen.getByLabelText('Data Granularity') as HTMLSelectElement;
+      expect(select.value).toBe('raw');
+    });
+
+    it('has all granularity options', () => {
+      render(<DataExport />);
+
+      const options = screen.getAllByRole('option');
+      const labels = options.map(opt => opt.textContent);
+
+      expect(labels).toContain('Raw Measurements');
+      expect(labels).toContain('Hourly Averages');
+      expect(labels).toContain('Daily Averages');
+      expect(labels).toContain('Weekly Averages');
+      expect(labels).toContain('Monthly Averages');
+    });
+
+    it('shows raw data help text by default', () => {
+      render(<DataExport />);
+
+      expect(screen.getByText(/Raw data is available for the last 30 days/i)).toBeInTheDocument();
+    });
+
+    it('shows aggregated help text when aggregate selected', () => {
+      render(<DataExport />);
+
+      const select = screen.getByLabelText('Data Granularity') as HTMLSelectElement;
+      fireEvent.change(select, { target: { value: 'daily' } });
+
+      expect(screen.getByText(/Aggregated data includes mean, median, P90/i)).toBeInTheDocument();
+    });
+
+    it('granularity is passed as query parameter in download URL', () => {
+      render(<DataExport />);
+
+      const granularitySelect = screen.getByLabelText('Data Granularity') as HTMLSelectElement;
+      fireEvent.change(granularitySelect, { target: { value: 'weekly' } });
+
+      const downloadButton = screen.getByRole('button', { name: /Download Data/i });
+      fireEvent.click(downloadButton);
+
+      expect(window.location.href).toContain('granularity=weekly');
+    });
+  });
+
+  describe('raw data warning', () => {
+    it('shows warning when raw data selected with >30 day range', () => {
+      render(<DataExport />);
+
+      const dateRangeSelect = screen.getByLabelText('Date Range');
+      fireEvent.change(dateRangeSelect, { target: { value: '90d' } });
+
+      expect(screen.getByText(/Raw measurements are retained for 30 days/i)).toBeInTheDocument();
+    });
+
+    it('does not show warning for raw data within 30 days', () => {
+      render(<DataExport />);
+
+      // Default is 7d + raw, no warning
+      expect(screen.queryByText(/Raw measurements are retained for 30 days/i)).not.toBeInTheDocument();
+    });
+
+    it('does not show warning for aggregated data with long range', () => {
+      render(<DataExport />);
+
+      const granularitySelect = screen.getByLabelText('Data Granularity');
+      fireEvent.change(granularitySelect, { target: { value: 'daily' } });
+
+      const dateRangeSelect = screen.getByLabelText('Date Range');
+      fireEvent.change(dateRangeSelect, { target: { value: '90d' } });
+
+      expect(screen.queryByText(/Raw measurements are retained for 30 days/i)).not.toBeInTheDocument();
     });
   });
 
@@ -133,9 +221,10 @@ describe('DataExport', () => {
       const downloadButton = screen.getByRole('button', { name: /Download Data/i });
       fireEvent.click(downloadButton);
 
-      // Should construct URL with format=csv and start_date for 7d range
+      // Should construct URL with format=csv, granularity=raw, and start_date for 7d range
       expect(window.location.href).toContain('/api/export');
       expect(window.location.href).toContain('format=csv');
+      expect(window.location.href).toContain('granularity=raw');
       expect(window.location.href).toContain('start_date=');
     });
 
@@ -200,6 +289,7 @@ describe('DataExport', () => {
 
       expect(screen.getByLabelText('Province')).toBeInTheDocument();
       expect(screen.getByLabelText('Date Range')).toBeInTheDocument();
+      expect(screen.getByLabelText('Data Granularity')).toBeInTheDocument();
     });
 
     it('download button is keyboard accessible', () => {

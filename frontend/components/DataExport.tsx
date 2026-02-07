@@ -3,11 +3,37 @@
 import { useState } from 'react';
 import { Download, FileSpreadsheet, Code, Info } from 'lucide-react';
 
+type DateRange = '24h' | '7d' | '30d' | '90d' | '6m' | '1y' | 'all';
+type Granularity = 'raw' | 'hourly' | 'daily' | 'weekly' | 'monthly';
+
+const DATE_RANGE_DAYS: Record<DateRange, number | null> = {
+  '24h': 1,
+  '7d': 7,
+  '30d': 30,
+  '90d': 90,
+  '6m': 180,
+  '1y': 365,
+  'all': null,
+};
+
+const GRANULARITY_LABELS: Record<Granularity, string> = {
+  raw: 'Raw Measurements',
+  hourly: 'Hourly Averages',
+  daily: 'Daily Averages',
+  weekly: 'Weekly Averages',
+  monthly: 'Monthly Averages',
+};
+
 export function DataExport() {
   const [province, setProvince] = useState<string>('');
-  const [dateRange, setDateRange] = useState<'24h' | '7d' | '30d' | 'all'>('7d');
+  const [dateRange, setDateRange] = useState<DateRange>('7d');
+  const [granularity, setGranularity] = useState<Granularity>('raw');
   const [format, setFormat] = useState<'csv' | 'json'>('csv');
   const [loading, setLoading] = useState(false);
+
+  const isAggregated = granularity !== 'raw';
+  const rangeDays = DATE_RANGE_DAYS[dateRange];
+  const rangeExceedsRaw = rangeDays !== null && rangeDays > 30;
 
   const handleExport = async () => {
     setLoading(true);
@@ -15,11 +41,12 @@ export function DataExport() {
     const params = new URLSearchParams();
     if (province) params.set('province', province);
     params.set('format', format);
+    params.set('granularity', granularity);
 
     // Calculate date range
     const now = new Date();
     if (dateRange !== 'all') {
-      const days = { '24h': 1, '7d': 7, '30d': 30 }[dateRange];
+      const days = DATE_RANGE_DAYS[dateRange]!;
       const start = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
       params.set('start_date', start.toISOString());
     }
@@ -71,16 +98,54 @@ export function DataExport() {
           <select
             id="daterange-select"
             value={dateRange}
-            onChange={(e) => setDateRange(e.target.value as any)}
+            onChange={(e) => setDateRange(e.target.value as DateRange)}
             className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
           >
             <option value="24h">Last 24 Hours</option>
             <option value="7d">Last 7 Days</option>
             <option value="30d">Last 30 Days</option>
+            <option value="90d">Last 90 Days</option>
+            <option value="6m">Last 6 Months</option>
+            <option value="1y">Last Year</option>
             <option value="all">All Data</option>
           </select>
         </div>
       </div>
+
+      {/* Granularity Selector */}
+      <div className="mb-4">
+        <label htmlFor="granularity-select" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+          Data Granularity
+        </label>
+        <select
+          id="granularity-select"
+          value={granularity}
+          onChange={(e) => setGranularity(e.target.value as Granularity)}
+          className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+        >
+          {Object.entries(GRANULARITY_LABELS).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          {isAggregated
+            ? 'Aggregated data includes mean, median, P90, min, max, and sample count per period.'
+            : 'Raw data is available for the last 30 days. For longer ranges, use aggregated data.'}
+        </p>
+      </div>
+
+      {/* Warning for raw data with long range */}
+      {!isAggregated && rangeExceedsRaw && (
+        <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+          <p className="text-xs text-amber-700 dark:text-amber-400">
+            Raw measurements are retained for 30 days. For ranges beyond 30 days,
+            switch to an aggregated granularity (daily, weekly, or monthly) to access
+            permanent statistical summaries.
+          </p>
+        </div>
+      )}
 
       {/* Format Toggle */}
       <div className="flex items-center gap-4 mb-6">

@@ -5,7 +5,7 @@ complementing the database-level constraints.
 """
 
 from datetime import UTC, datetime
-from typing import Self
+from typing import ClassVar, Self
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -56,6 +56,16 @@ class Measurement(BaseModel):
     parser_version: str = Field(
         default="v1.0",
         description="Version of the parser that created this measurement",
+    )
+
+    # Anomaly detection metadata (flagged but never excluded)
+    is_anomaly: bool = Field(
+        default=False,
+        description="Whether this measurement was flagged as anomalous",
+    )
+    anomaly_reason: str | None = Field(
+        default=None,
+        description="Human-readable explanation if flagged as anomaly",
     )
 
 
@@ -110,6 +120,68 @@ class Source(BaseModel):
     default_start_event: StartEvent
     default_end_event: EndEvent
     default_statistic_type: StatisticType
+
+
+class MeasurementAggregate(BaseModel):
+    """Aggregated statistics for a hospital over a time period.
+
+    Permanent summaries that survive the 30-day raw measurement retention
+    window. Enables longitudinal research and long-range trend analysis.
+
+    Ontology tags are denormalized intentionally: if a source changes
+    methodology, historical aggregates preserve what the methodology
+    was at the time of aggregation.
+    """
+
+    VALID_PERIOD_TYPES: ClassVar[set[str]] = {"hourly", "daily", "weekly", "monthly"}
+
+    hospital_id: str = Field(description="Hospital this aggregate covers")
+    source_id: str = Field(description="Data source at time of aggregation")
+
+    # Time period
+    period_type: str = Field(
+        description="Granularity: hourly, daily, weekly, or monthly"
+    )
+    period_start: datetime = Field(description="Start of the aggregation window")
+    period_end: datetime = Field(description="End of the aggregation window")
+
+    # Summary statistics
+    mean_value: float = Field(description="Mean wait time in minutes")
+    median_value: float | None = Field(
+        default=None,
+        description="Median wait time (None if < 3 samples)",
+    )
+    p90_value: float | None = Field(
+        default=None,
+        description="90th percentile wait time (None if < 3 samples)",
+    )
+    min_value: float = Field(description="Minimum observed wait time")
+    max_value: float = Field(description="Maximum observed wait time")
+    std_dev: float | None = Field(
+        default=None,
+        description="Standard deviation (None if < 3 samples)",
+    )
+    sample_count: int = Field(gt=0, description="Number of raw measurements aggregated")
+
+    # Ontology snapshot (denormalized from source at aggregation time)
+    metric_family: str = Field(description="Metric family at time of aggregation")
+    start_event: str = Field(description="Start event at time of aggregation")
+    end_event: str = Field(description="End event at time of aggregation")
+    statistic_type: str = Field(description="Statistic type at time of aggregation")
+
+    created_at: datetime | None = None
+
+    @model_validator(mode="after")
+    def validate_period(self) -> Self:
+        """Ensure period_type is valid and period_end is after period_start."""
+        if self.period_type not in self.VALID_PERIOD_TYPES:
+            raise ValueError(
+                f"period_type must be one of {self.VALID_PERIOD_TYPES}, "
+                f"got '{self.period_type}'"
+            )
+        if self.period_end <= self.period_start:
+            raise ValueError("period_end must be after period_start")
+        return self
 
 
 class ScraperStatus(BaseModel):

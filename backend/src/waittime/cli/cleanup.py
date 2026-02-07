@@ -13,6 +13,7 @@ import argparse
 import logging
 import sys
 
+from waittime.services.aggregation import AggregationService
 from waittime.services.database import DatabaseService
 
 logging.basicConfig(
@@ -72,8 +73,20 @@ def main() -> int:
             )
             return 0
 
+        # Aggregate before cleanup to ensure no data is lost
+        logger.info("\nAggregating measurements before cleanup...")
+        agg_service = AggregationService(db)
+        agg_counts = agg_service.backfill(
+            start_date=None,  # defaults to 30 days back
+            end_date=None,
+            period_types=["hourly", "daily"],
+        )
+        agg_total = sum(agg_counts.values())
+        if agg_total > 0:
+            logger.info(f"  Created {agg_total} new aggregates before cleanup")
+
         # Actually perform cleanup
-        logger.info(f"\n🗑️  Deleting measurements older than {args.retention_days} days...")
+        logger.info(f"\nDeleting measurements older than {args.retention_days} days...")
         deleted_count = db.cleanup_old_measurements(retention_days=args.retention_days)
 
         logger.info("\n✅ Cleanup complete!")

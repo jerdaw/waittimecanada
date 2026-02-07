@@ -13,7 +13,9 @@ vi.mock("recharts", () => {
   return {
     ResponsiveContainer: ({ children }: any) => <div>{children}</div>,
     LineChart: PropMonitor,
+    ComposedChart: PropMonitor,
     Line: () => <div />,
+    Area: () => <div />,
     XAxis: () => <div />,
     YAxis: () => <div />,
     Tooltip: () => <div />,
@@ -30,10 +32,6 @@ describe("TrendChart Component", () => {
     // @ts-ignore
     global.fetch.mockReturnValue(new Promise(() => {}));
     render(<TrendChart hospitalId="test-id" />);
-    // The spinner might not have text, we check for layout or class
-    // In our component, loading is a div with animate-spin
-    // Let's modify component to have test id or text for easier testing
-    // Or just check if chart is NOT there
     expect(screen.queryByTestId("recharts-mock")).not.toBeInTheDocument();
   });
 
@@ -41,7 +39,8 @@ describe("TrendChart Component", () => {
     const mockResponse = {
       period: "24h",
       dataPoints: [{ timestamp: "2023-01-01", waitTime: 60 }],
-      aggregation: "hourly"
+      aggregation: "hourly",
+      dataSource: "raw",
     };
 
     // @ts-ignore
@@ -70,11 +69,39 @@ describe("TrendChart Component", () => {
     });
   });
 
+  it("renders all six period buttons", async () => {
+    const mockResponse = {
+      period: "24h",
+      dataPoints: [],
+      aggregation: "hourly",
+      dataSource: "raw",
+    };
+
+    // @ts-ignore
+    global.fetch.mockResolvedValue({
+      json: () => Promise.resolve(mockResponse)
+    });
+
+    render(<TrendChart hospitalId="test-id" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("24h")).toBeInTheDocument();
+    });
+
+    expect(screen.getByText("24h")).toBeInTheDocument();
+    expect(screen.getByText("7d")).toBeInTheDocument();
+    expect(screen.getByText("30d")).toBeInTheDocument();
+    expect(screen.getByText("90d")).toBeInTheDocument();
+    expect(screen.getByText("6m")).toBeInTheDocument();
+    expect(screen.getByText("1y")).toBeInTheDocument();
+  });
+
   it("allows switching time periods", async () => {
     const mockResponse = {
       period: "24h",
       dataPoints: [],
-      aggregation: "hourly"
+      aggregation: "hourly",
+      dataSource: "raw",
     };
 
     // @ts-ignore
@@ -89,8 +116,98 @@ describe("TrendChart Component", () => {
     });
 
     fireEvent.click(screen.getByText("7d"));
-    
+
     // API should be called with new period
     expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("period=7d"));
+  });
+
+  it("allows switching to long-range periods", async () => {
+    const mockResponse = {
+      period: "24h",
+      dataPoints: [],
+      aggregation: "hourly",
+      dataSource: "raw",
+    };
+
+    // @ts-ignore
+    global.fetch.mockResolvedValue({
+      json: () => Promise.resolve(mockResponse)
+    });
+
+    render(<TrendChart hospitalId="test-id" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("90d")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("90d"));
+    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("period=90d"));
+
+    fireEvent.click(screen.getByText("1y"));
+    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("period=1y"));
+  });
+
+  it("shows aggregated badge when viewing aggregated data", async () => {
+    const mockResponse = {
+      period: "90d",
+      dataPoints: [
+        { timestamp: "2023-01-01", waitTime: 60, minWaitTime: 30, maxWaitTime: 120, sampleCount: 24 }
+      ],
+      aggregation: "daily",
+      dataSource: "aggregated",
+    };
+
+    // @ts-ignore
+    global.fetch.mockResolvedValue({
+      json: () => Promise.resolve(mockResponse)
+    });
+
+    render(<TrendChart hospitalId="test-id" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Aggregated")).toBeInTheDocument();
+    });
+  });
+
+  it("does not show aggregated badge for raw data", async () => {
+    const mockResponse = {
+      period: "24h",
+      dataPoints: [{ timestamp: "2023-01-01", waitTime: 60 }],
+      aggregation: "hourly",
+      dataSource: "raw",
+    };
+
+    // @ts-ignore
+    global.fetch.mockResolvedValue({
+      json: () => Promise.resolve(mockResponse)
+    });
+
+    render(<TrendChart hospitalId="test-id" />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("recharts-mock")).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText("Aggregated")).not.toBeInTheDocument();
+  });
+
+  it("shows no data message for empty results", async () => {
+    const mockResponse = {
+      period: "1y",
+      dataPoints: [],
+      aggregation: "monthly",
+      dataSource: "aggregated",
+    };
+
+    // @ts-ignore
+    global.fetch.mockResolvedValue({
+      json: () => Promise.resolve(mockResponse)
+    });
+
+    render(<TrendChart hospitalId="test-id" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("No historical data available")).toBeInTheDocument();
+    });
   });
 });

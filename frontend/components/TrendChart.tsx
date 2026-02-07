@@ -3,15 +3,17 @@ import { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
+  Area,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  ComposedChart,
 } from "recharts";
 import { clsx } from "clsx";
 
-type Period = "24h" | "7d" | "30d";
+type Period = "24h" | "7d" | "30d" | "90d" | "6m" | "1y";
 
 interface TrendChartProps {
   hospitalId: string;
@@ -22,14 +24,13 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
   // eslint-disable-next-line
   const [data, setData] = useState<any>(null);
 
-  // ... (lines 24-62 omitted)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
     setLoading(true);
-    
+
     fetch(`/api/hospitals/${hospitalId}/trends?period=${period}`)
       .then((r) => r.json())
       .then((json) => {
@@ -53,17 +54,32 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
     };
   }, [hospitalId, period]);
 
+  const isAggregated = data?.dataSource === "aggregated";
+  const hasMinMax = data?.dataPoints?.some(
+    // eslint-disable-next-line
+    (d: any) => d.minWaitTime != null && d.maxWaitTime != null
+  );
+
   // Format tick labels
   const formatXAxis = (tickItem: string) => {
     const date = new Date(tickItem);
     if (period === "24h") {
       return date.toLocaleTimeString([], { hour: "numeric", hour12: true });
     }
+    if (period === "1y") {
+      return date.toLocaleDateString([], { month: "short", year: "2-digit" });
+    }
     return date.toLocaleDateString([], { month: "short", day: "numeric" });
   };
 
   // eslint-disable-next-line
-  const formatTooltip = (value: any) => [`${value} min`, "Wait Time"];
+  const formatTooltip = (value: any, name: string) => {
+    if (name === "waitTime") return [`${value} min`, isAggregated ? "Mean" : "Wait Time"];
+    if (name === "minWaitTime") return [`${value} min`, "Min"];
+    if (name === "maxWaitTime") return [`${value} min`, "Max"];
+    return [`${value}`, name];
+  };
+
   // eslint-disable-next-line
   const formatTooltipLabel = (label: any) => {
     if (!label) return "";
@@ -74,9 +90,16 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
   return (
     <div className="bg-card rounded-lg p-4 border border-border/50 shadow-sm mt-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-sm">Wait Time Trends</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="font-semibold text-sm">Wait Time Trends</h3>
+          {isAggregated && (
+            <span className="text-[10px] px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded font-medium">
+              Aggregated
+            </span>
+          )}
+        </div>
         <div className="flex gap-1 bg-muted/50 p-1 rounded-md">
-          {(["24h", "7d", "30d"] as const).map((p) => (
+          {(["24h", "7d", "30d", "90d", "6m", "1y"] as const).map((p) => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
@@ -106,12 +129,13 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
            <div className="h-full w-full flex items-center justify-center text-sm text-muted-foreground">
             No historical data available
           </div>
-        ) : (
+        ) : hasMinMax ? (
+          /* Aggregate view: mean line with min/max shaded area */
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data.dataPoints}>
+            <ComposedChart data={data.dataPoints}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-              <XAxis 
-                dataKey="timestamp" 
+              <XAxis
+                dataKey="timestamp"
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                 tickFormatter={formatXAxis}
                 tickMargin={8}
@@ -119,17 +143,71 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
                 axisLine={false}
                 tickLine={false}
               />
-              <YAxis 
+              <YAxis
                 width={30}
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip 
+              <Tooltip
                 formatter={formatTooltip}
                 labelFormatter={formatTooltipLabel}
-                contentStyle={{ 
-                  backgroundColor: "var(--card)", 
+                contentStyle={{
+                  backgroundColor: "var(--card)",
+                  borderColor: "var(--border)",
+                  borderRadius: "8px",
+                  fontSize: "12px",
+                }}
+              />
+              <Area
+                type="monotone"
+                dataKey="maxWaitTime"
+                fill="var(--primary)"
+                fillOpacity={0.08}
+                stroke="none"
+              />
+              <Area
+                type="monotone"
+                dataKey="minWaitTime"
+                fill="var(--card)"
+                fillOpacity={1}
+                stroke="none"
+              />
+              <Line
+                type="monotone"
+                dataKey="waitTime"
+                stroke="var(--primary)"
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 4, fill: "var(--primary)" }}
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        ) : (
+          /* Raw view: simple line chart */
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={data.dataPoints}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+              <XAxis
+                dataKey="timestamp"
+                tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+                tickFormatter={formatXAxis}
+                tickMargin={8}
+                minTickGap={30}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                width={30}
+                tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                formatter={formatTooltip}
+                labelFormatter={formatTooltipLabel}
+                contentStyle={{
+                  backgroundColor: "var(--card)",
                   borderColor: "var(--border)",
                   borderRadius: "8px",
                   fontSize: "12px"
