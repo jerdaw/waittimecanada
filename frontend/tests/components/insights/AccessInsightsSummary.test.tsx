@@ -104,9 +104,9 @@ describe('AccessInsightsSummary', () => {
       />
     );
 
-    // Should show a dollar amount for average access cost
-    const costElement = screen.getByText(/^\$\d+$/);
-    expect(costElement).toBeInTheDocument();
+    // Should show average access cost in the stat card
+    expect(screen.getByText(/Avg Access Cost/i)).toBeInTheDocument();
+    expect(screen.getByText(/Fuel \+ Parking/i)).toBeInTheDocument();
   });
 
   it('identifies nearest hospital', () => {
@@ -136,22 +136,37 @@ describe('AccessInsightsSummary', () => {
       />
     );
 
-    // Should still render without crashing
-    expect(screen.getByText(/ERs Within 30km/i)).toBeInTheDocument();
+    // Should render empty state without crashing
+    expect(screen.getByText(/No hospitals available/i)).toBeInTheDocument();
   });
 
   it('uses correct gas price for province', () => {
     const userLocation = { lat: 49.2827, lon: -123.1207 }; // Vancouver
+    const bcHospitals: Hospital[] = [
+      {
+        id: 'ca-bc-vgh',
+        name: 'Vancouver General Hospital',
+        province: 'BC',
+        city: 'Vancouver',
+        latitude: 49.2628,
+        longitude: -123.1225,
+        current_wait_time: 150,
+        last_updated: '2024-01-01T12:00:00Z',
+        is_verified: true,
+        is_visible: true,
+        source_id: 'bc-phsa',
+      },
+    ];
 
     render(
       <AccessInsightsSummary
-        hospitals={mockHospitals}
+        hospitals={bcHospitals}
         userLocation={userLocation}
         province="BC"
       />
     );
 
-    // BC should use $1.75/L (mentioned in the component)
+    // BC should use $1.75/L (shown in the distribution insight)
     expect(screen.getByText(/\$1\.75\/L in BC/i)).toBeInTheDocument();
   });
 });

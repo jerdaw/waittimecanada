@@ -82,6 +82,17 @@ export function AccessInsightsSummary({
     })
     .sort((a, b) => a.distance - b.distance);
 
+  if (hospitalsWithMetrics.length === 0) {
+    return (
+      <div className="p-6 text-center bg-card border border-border rounded-lg">
+        <MapPin className="w-8 h-8 mx-auto mb-2 text-muted-foreground opacity-50" />
+        <p className="text-sm font-medium text-muted-foreground">
+          No hospitals available to calculate access insights
+        </p>
+      </div>
+    );
+  }
+
   // Calculate statistics
   const within30km = hospitalsWithMetrics.filter(h => h.distance <= 30);
   const within50km = hospitalsWithMetrics.filter(h => h.distance <= 50);
@@ -91,7 +102,6 @@ export function AccessInsightsSummary({
     : 0;
 
   const nearest = hospitalsWithMetrics[0];
-  const furthest = hospitalsWithMetrics[hospitalsWithMetrics.length - 1];
 
   return (
     <div className="space-y-4">

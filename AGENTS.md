@@ -39,23 +39,24 @@ This file provides guidance to automated developer tools when working with code 
 
 This is the **WaitTime Canada** project - a "Health Systems Observatory" designed to audit and standardize Canadian emergency room wait time data across provinces. This is **NOT a simple wait time app**, but rather a clinically defensible auditing platform that exposes methodological inconsistencies in healthcare reporting.
 
-**Current Status:** Milestone 8 (UX Enhancements) Complete. **PRIMARY FOCUS: Hybrid landing page architecture, distance-default sorting, and clinical UX polish.**
+**Current Status:** Milestone 14 (Data Quality & Anomaly Detection) Complete. **NEXT: Milestone 15 (Analytics & Benchmarking).**
 
 **Current Architecture:**
-- **Database**: Neon PostgreSQL 17 with full schema (sources, hospitals, measurements, scraper_status)
+- **Database**: Neon PostgreSQL 17 (7 tables: sources, hospitals, measurements, scraper_status, measurement_aggregates, data_quality_snapshots, methodology_change_events)
 - **Backend**: Python 3.12+ with psycopg2, pytest
-  - **Tests**: 143 passing (122 unit + 21 integration), 57% coverage
-  - Quebec scraper: Complete
-  - Ontario scraper: Complete (Playwright-based for dynamic content)
-  - Services: DatabaseService, HeartbeatService, ComparisonService
-  - CLI tools: scraper runner, database cleanup, seeding
+  - **Tests**: 279+ passing (unit + integration)
+  - Scrapers: Quebec (BeautifulSoup), Ontario (Playwright), BC (HTML/JSON)
+  - Services: DatabaseService, AggregationService, DataQualityService, AnomalyDetectionService, MethodologyChangeDetector, GeocodingService
+  - CLI tools: scraper runner, database cleanup, seeding, aggregation
 - **Frontend**: Next.js 14 + TypeScript + Mapbox GL JS
-  - **Tests**: 79 passing (Vitest + React Testing Library)
+  - **Tests**: 218+ passing (Vitest + React Testing Library)
   - Map component with hospital markers and methodology display
-  - Comparison modal with methodology divergence warnings
+  - Data quality dashboard (`/data-quality`)
+  - Data export with granularity selector
+  - Trend charts with aggregate visualization (90d/6m/1y)
   - Admin verification queue UI (`/admin/verify`)
   - Methods & governance page (`/methods`)
-  - API routes for hospitals, comparisons, health checks
+  - API routes for hospitals, comparisons, health, data-quality, anomalies, export
 
 ## Core Architecture
 
