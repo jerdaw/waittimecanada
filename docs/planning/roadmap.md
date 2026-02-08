@@ -62,6 +62,7 @@ Delivered scope:
 - [x] Apply GitHub repository polish (description, topics, README badges)
 - [x] Finalize LinkedIn launch post draft (`docs/linkedin-launch-post.md`)
 - [x] Finalize application summary artifact (`docs/application-summary.md`)
+- [x] Prepare stakeholder interview toolkit (`docs/stakeholder-interviews/*`, `docs/stakeholder-feedback.md`)
 - [ ] Stakeholder interview (1 ER nurse/physician)
 - [ ] Publish LinkedIn post
 

@@ -207,6 +207,12 @@ Thanks,
 - Extract 1-2 testimonial quotes (with permission)
 - Add testimonial section to site if obtained
 
+**Toolkit Status:**
+- [x] Outreach template prepared (`docs/stakeholder-interviews/outreach-template.md`)
+- [x] Intake template prepared (`docs/stakeholder-interviews/participant-intake-template.md`)
+- [x] Interview script prepared (`docs/stakeholder-interviews/interview-template.md`)
+- [x] Feedback log template prepared (`docs/stakeholder-feedback.md`)
+
 ---
 
 ## 🟢 READY: Screenshot Capture for Portfolio

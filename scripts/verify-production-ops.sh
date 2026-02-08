@@ -142,6 +142,19 @@ PY
 
   age_minutes="$(minutes_since_timestamp "${created_at}")"
 
+  if [[ "${status}" != "completed" ]]; then
+    if (( age_minutes > max_age )); then
+      echo "  FAIL ${workflow} latest run still ${status} after ${age_minutes}m (>${max_age}m)"
+      if [[ -n "${run_url}" ]]; then
+        echo "       ${run_url}"
+      fi
+      run_failures=1
+      continue
+    fi
+    echo "  OK   ${workflow} latest run is ${status} (${age_minutes}m ago)"
+    continue
+  fi
+
   if [[ "${conclusion}" != "success" ]]; then
     echo "  FAIL ${workflow} latest run not successful (status=${status}, conclusion=${conclusion})"
     if [[ -n "${run_url}" ]]; then
