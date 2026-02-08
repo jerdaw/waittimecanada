@@ -69,15 +69,24 @@ Completed in this cycle:
 - Documentation hardening pass (modernized guides, historical snapshot labeling, and automated docs lint checks in CI)
 
 Current open autonomous backlog:
-- None (remaining open work is currently human/external dependency-bound)
-
-**M11: Equity Layer** — remaining items:
-- [ ] Research Canadian socioeconomic shapefiles (StatsCan census data)
-- [ ] Replace placeholder equity GeoJSON with processed census tract layer
-
-**M12: Research Infra** — remaining items:
-- [ ] Occupancy ingestion/parser rollout when provincial source fields become available
-- [ ] Proactive notification system (future)
+- [ ] **P0 / M10-M12:** Complete Alberta scraper implementation (parser + source factory + tests), then register it in CLI/workflows.
+- [ ] **P0 / M10:** Register BC scraper in runtime CLI and cron execution path (currently implemented but not run by `--all`).
+- [ ] **P0 / M12-M14:** Refactor scraper CLI to use `BaseScraper.run(db=...)` for anomaly checks and heartbeat writes in one path.
+- [ ] **P0 / M12:** Replace hardcoded source lists in heartbeat checks with dynamic source discovery from `sources`.
+- [ ] **P0 / M3-M10:** Resolve ontology/source metadata drift across migrations, seed JSON, and scraper factories (Ontario/BC defaults + methodology URLs).
+- [ ] **P0 / M14:** Correct data-quality metric math so totals are query-backed counts (not inferred from success-rate approximations).
+- [ ] **P0 / M14:** Wire methodology change detection into scheduled ops and expose change events in API/UI.
+- [ ] **P0 / M13-M15:** Enforce ontology-safe analytics grouping so aggregates are not mixed across incompatible methodologies.
+- [ ] **P1 / M11:** Replace placeholder equity layer payload with processed tract dataset pipeline and production ON data load.
+- [ ] **P1 / M12:** Implement occupancy schema columns + parser ingestion path + validations/backfill.
+- [ ] **P1 / M5-M9:** Add admin authn/authz and audit logging for verification queue API routes and UI actions.
+- [ ] **P1 / M7-M15:** Add a methods-page feature set: methodology timeline, deep-linkable comparisons, and comparability matrix CSV export.
+- [ ] **P1 / M9-M12:** Tighten production-ops automation to require smoke readiness once `PRODUCTION_BASE_URL` is configured.
+- [ ] **P1 / CI:** Remove non-blocking CI fallbacks (`format:check` soft pass, advisory-only mypy/bandit) and make gates strict after remediation.
+- [ ] **P1 / CI:** Resolve Bandit finding in synthetic test data generator to reach clean security scan output.
+- [ ] **P1 / Repo Hygiene:** Stop tracking TS incremental build artifact (`frontend/tsconfig.tsbuildinfo`) and ignore it.
+- [ ] **P2 / Test Quality:** Eliminate React `act(...)` warnings in frontend unit tests to improve signal quality.
+- [ ] **P2 / Docs Integrity:** Add roadmap consistency checks so autonomous backlog status cannot regress to stale “none” when open items exist.
 
 ### Deferred
 - **M10: Multi-Province** — Alberta API endpoint research, additional provinces
