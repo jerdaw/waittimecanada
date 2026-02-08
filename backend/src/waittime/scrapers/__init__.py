@@ -6,8 +6,8 @@ Each scraper implements BaseScraper and knows how to:
 3. Tag with correct ontology values (per ADR-0002)
 """
 
-from waittime.scrapers.base import BaseScraper
 from waittime.scrapers.alberta import AlbertaScraper, create_alberta_source
+from waittime.scrapers.base import BaseScraper
 from waittime.scrapers.bc import BCScraper, create_bc_source
 from waittime.scrapers.ontario import OntarioScraper, create_ontario_source
 from waittime.scrapers.quebec import QuebecScraper, create_quebec_source

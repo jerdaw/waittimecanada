@@ -13,6 +13,8 @@ Methodology (per ADR-0002):
 import logging
 import re
 import time
+from collections.abc import Callable
+from datetime import UTC, datetime
 
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -73,44 +75,78 @@ class QuebecScraper(BaseScraper):
         "Hôpital Fleury": "ca-qc-fleury",
     }
 
-    def run(self, save_to_db: bool = True) -> list[Measurement]:
-        """Fetch all pages of measurements."""
+    def run(
+        self,
+        save_to_db: bool = True,
+        before_save: Callable[[list[Measurement]], None] | None = None,
+    ) -> list[Measurement]:
+        """Fetch all pages of measurements and execute shared persistence hooks."""
+        logger.info(f"Starting scrape for {self.source.id}")
+        start_time = datetime.now(UTC)
         measurements: list[Measurement] = []
-
-        # We need to iterate through pages.
-        # There are typically ~12 pages (116 results, 10 per page).
-        # We'll stop when we get no results or hit a safety limit.
         max_pages = 20
 
-        for page in range(1, max_pages + 1):
-            try:
-                logger.info(f"Fetching page {page}...")
-                html = self._fetch_page(page)
+        try:
+            # We need to iterate through pages.
+            # There are typically ~12 pages (116 results, 10 per page).
+            # We'll stop when we get no results or hit a safety limit.
+            for page in range(1, max_pages + 1):
+                try:
+                    logger.info(f"Fetching page {page}...")
+                    html = self._fetch_page(page)
 
-                # Check if we got valid content (if page is out of range, it might return empty or error)
-                if not html or "hospital_element" not in html:
-                    if page > 1:
-                        logger.info(f"No results on page {page}, stopping.")
-                        break
+                    # Check if we got valid content (if page is out of range, it might return empty or error)
+                    if not html or "hospital_element" not in html:
+                        if page > 1:
+                            logger.info(f"No results on page {page}, stopping.")
+                            break
 
-                page_measurements = self.parse(html)
-                if not page_measurements:
-                    if page > 1:
-                        logger.info(f"No measurements on page {page}, stopping.")
-                        break
+                    page_measurements = self.parse(html)
+                    if not page_measurements:
+                        if page > 1:
+                            logger.info(f"No measurements on page {page}, stopping.")
+                            break
 
-                measurements.extend(page_measurements)
+                    measurements.extend(page_measurements)
 
-                # Be nice to the server
-                time.sleep(1)
+                    # Be nice to the server
+                    time.sleep(1)
 
-            except Exception as e:
-                logger.error(f"Error fetching page {page}: {e}")
-                # Don't break immediately on one error, try next page?
-                # Or stop? Let's stop to be safe.
-                break
+                except Exception as e:
+                    logger.error(f"Error fetching page {page}: {e}")
+                    # Stop on page-level failure to avoid silently mixing stale/partial pages.
+                    break
 
-        return measurements
+            if self.db is not None and measurements:
+                self._check_anomalies(measurements)
+
+            if save_to_db and self.db is not None and measurements:
+                if before_save is not None:
+                    before_save(measurements)
+                self.db.insert_measurements(measurements)
+                logger.info(f"Saved {len(measurements)} measurements to database")
+
+            if self._heartbeat is not None:
+                self._heartbeat.record_success(
+                    source_id=self.source.id,
+                    measurements_count=len(measurements),
+                )
+
+            elapsed = (datetime.now(UTC) - start_time).total_seconds()
+            logger.info(
+                f"Completed scrape for {self.source.id}: "
+                f"{len(measurements)} measurements in {elapsed:.2f}s"
+            )
+            return measurements
+
+        except Exception as e:
+            if self._heartbeat is not None:
+                self._heartbeat.record_failure(
+                    source_id=self.source.id,
+                    error_message=str(e),
+                )
+            logger.error(f"Scrape failed for {self.source.id}: {e}")
+            raise
 
     def _fetch_page(self, page_num: int) -> str:
         """Fetch a single page of results."""

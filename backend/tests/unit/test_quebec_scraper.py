@@ -1,5 +1,7 @@
 """Unit tests for Quebec scraper."""
 
+from unittest.mock import MagicMock, patch
+
 import pytest
 
 from waittime.core import EndEvent, MetricFamily, StartEvent, StatisticType
@@ -182,3 +184,36 @@ class TestQuebecScraper:
         """Handle empty HTML gracefully."""
         measurements = scraper.parse("<html><body></body></html>")
         assert measurements == []
+
+    def test_run_supports_before_save_hook(self):
+        """Quebec run() should support the shared before_save persistence hook."""
+        source = create_quebec_source()
+        db = MagicMock()
+        scraper = QuebecScraper(source, db=db)
+        scraper._heartbeat = MagicMock()
+
+        first_page_html = """
+        <div class="hospital_element">
+            <div class="font-weight-bold">CHUM</div>
+            <ul class="list-unstyled">
+                <li class="hopital-item">
+                    Estimated waiting time for non-priority cases : 90 min
+                </li>
+            </ul>
+        </div>
+        """
+        before_save = MagicMock()
+
+        with (
+            patch.object(scraper, "_fetch_page", side_effect=[first_page_html, "<html></html>"]),
+            patch("waittime.scrapers.quebec.time.sleep", return_value=None),
+        ):
+            measurements = scraper.run(save_to_db=True, before_save=before_save)
+
+        assert len(measurements) == 1
+        before_save.assert_called_once_with(measurements)
+        db.insert_measurements.assert_called_once_with(measurements)
+        scraper._heartbeat.record_success.assert_called_once_with(
+            source_id="quebec-msss",
+            measurements_count=1,
+        )
