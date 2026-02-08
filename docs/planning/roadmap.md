@@ -2,7 +2,7 @@
 
 ## Current Status (Updated 2026-02-08)
 
-**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage) | M9 production smoke + readiness automation implemented | M9 repo polish completed
+**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage) | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed
 
 **Strategic Direction:** Ontario-focused depth over multi-province breadth. The platform is
 transitioning from a real-time snapshot tool into a Health Systems Observatory with longitudinal
@@ -60,8 +60,10 @@ Delivered scope:
 - [ ] Run `Production Readiness` workflow and confirm heartbeat freshness pass
 - [ ] Set `PRODUCTION_BASE_URL` GitHub Actions secret and run smoke workflow
 - [x] Apply GitHub repository polish (description, topics, README badges)
+- [x] Finalize LinkedIn launch post draft (`docs/linkedin-launch-post.md`)
+- [x] Finalize application summary artifact (`docs/application-summary.md`)
 - [ ] Stakeholder interview (1 ER nurse/physician)
-- [ ] Finalize and publish LinkedIn post
+- [ ] Publish LinkedIn post
 
 **M11: Equity Layer** — remaining items:
 - [ ] Research Canadian socioeconomic shapefiles (StatsCan census data)

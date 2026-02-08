@@ -375,6 +375,8 @@ export function Testimonial() {
 
 ### 4.1 LinkedIn Post
 
+**Status:** Draft finalized 2026-02-08 (`docs/linkedin-launch-post.md`); publishing remains manual.
+
 **Edit existing draft:** `docs/linkedin-launch-post.md`
 
 **Key Elements:**
@@ -407,6 +409,8 @@ Create screenshots showing:
 - README badges: Build status, test coverage, license
 
 ### 4.4 Application Summary
+
+**Status:** Completed 2026-02-08 (`docs/application-summary.md`)
 
 **One-paragraph summary for applications:**
 
@@ -442,10 +446,10 @@ Create screenshots showing:
 - [ ] Testimonial added (if obtained)
 
 ### Launch
-- [ ] LinkedIn post finalized
+- [x] LinkedIn post finalized
 - [ ] Screenshots captured
 - [x] GitHub repo polished
-- [ ] Application summary written
+- [x] Application summary written
 
 ---
 
