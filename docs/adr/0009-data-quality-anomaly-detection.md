@@ -55,4 +55,4 @@ Chosen option: "Flag anomalies transparently", because excluding data would unde
 ## Links
 
 * [Related to] [ADR-0008](0008-aggregation-pipeline.md) (depends on aggregation infrastructure)
-* Implementation plan: `docs/planning/implementation/milestone-14-data-quality.md`
+* Implementation plan: `docs/planning/archive/milestone-14-data-quality.md`

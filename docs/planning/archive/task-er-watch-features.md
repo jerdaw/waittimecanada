@@ -1,5 +1,7 @@
 # ER Watch Feature Implementation Task List (Completed Feb 4, 2026)
 
+> Archived task plan (historical reference). Items fully delivered.
+
 ## Phase 1: Critical Safety & Quick Wins
 - [x] Add 911 Emergency Banner component
 - [x] Configure Tailwind dark mode support

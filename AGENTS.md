@@ -66,7 +66,7 @@ This is the **WaitTime Canada** project - a "Health Systems Observatory" designe
 - **Database:** Neon PostgreSQL 17 with strict schema constraints
 - **Frontend:** Next.js 14 App Router + TypeScript + Mapbox GL JS
 - **Testing:** pytest (backend), Vitest (frontend), Playwright (E2E in CI)
-- **Hosting:** Render (frontend) + GitHub Actions (scrapers)
+- **Hosting:** Netlify (frontend, release-gated and currently offline for cost control) + GitHub Actions (scrapers)
 
 ### The Metric Ontology System
 

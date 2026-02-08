@@ -1,5 +1,7 @@
 # Milestone 14: Data Quality & Anomaly Detection
 
+> Archived plan (historical reference). Milestone delivered and closed.
+
 > **Priority:** HIGH - Establishes research-grade trust in the platform
 > **Estimated Effort:** 4-5 days
 > **Admissions Appeal:** Scholar (scientific rigor), Professional (data stewardship), Leader (operational excellence)

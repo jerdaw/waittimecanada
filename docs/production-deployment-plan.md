@@ -1,10 +1,10 @@
 # Production Deployment Plan - Milestone 3
 
-**Status:** In Progress - Render Selected
+**Status:** On Hold - Frontend Intentionally Offline (Cost Control)
 **Date:** February 3, 2026
-**Platform:** Render (account created)
+**Platform:** Netlify (release-gated; currently offline)
 
-> Update (February 8, 2026): Netlify Free credit usage exceeded plan allowance and projects were suspended. In this repo, Netlify deploys are now guarded by `frontend/scripts/netlify-ignore.sh` and only proceed for explicit `[release]`/`[deploy]` commits. This reduces future credit burn but does not unsuspend already suspended projects before billing reset on March 2, 2026.
+> Update (February 8, 2026): Netlify Free credit usage exceeded plan allowance and projects were suspended. In this repo, Netlify deploys are guarded by `frontend/scripts/netlify-ignore.sh` and only proceed for explicit `[release]`/`[deploy]` commits. The frontend is intentionally kept offline for now to avoid unnecessary credit usage.
 >
 > Runtime usage controls implemented:
 > - `/api/health` polling reduced to every 5 minutes and only while tab is visible.
@@ -109,7 +109,7 @@
 
 ---
 
-## Selected Approach: Render
+## Historical Approach: Render (Superseded)
 
 **Platform:** Render (container-based hosting)
 

@@ -124,7 +124,7 @@ if __name__ == '__main__':
 
 ### 1.4 Production Smoke Verification Automation
 
-**Status:** Implemented (automation), pending live URL execution
+**Status:** Implemented (automation); workflow intentionally disabled while frontend public hosting is offline for cost control.
 
 **Files:**
 - `.github/workflows/production-smoke.yml`
@@ -132,7 +132,7 @@ if __name__ == '__main__':
 
 **Behavior:**
 1. Supports manual runs via `workflow_dispatch` with optional `base_url` input
-2. Runs every 6 hours on schedule as a passive production sanity check
+2. Scheduled runs are disabled while frontend hosting is intentionally offline
 3. Verifies `200` + expected content marker for:
    - `/`
    - `/methods`
@@ -144,7 +144,7 @@ if __name__ == '__main__':
 
 ### 1.5 Production Readiness Verification Automation
 
-**Status:** Implemented (automation), pending secret configuration + run execution
+**Status:** Implemented and verified (run passed 2026-02-08)
 
 **Files:**
 - `.github/workflows/production-readiness.yml`
@@ -468,9 +468,9 @@ Create screenshots showing:
 ### Production
 - [ ] Site loads at production URL
 - [x] Automated smoke workflow exists for core routes (`/`, `/methods`, `/data-quality`, `/analytics`)
-- [ ] Live smoke run has passed against production URL
+- [ ] Live smoke run has passed against production URL (deferred while frontend is intentionally offline)
 - [x] Production readiness workflow exists for secrets + heartbeat verification
-- [ ] Live readiness run has passed in GitHub Actions
+- [x] Live readiness run has passed in GitHub Actions
 - [ ] All pages work (/, /methods, /faq)
 - [ ] Database queries return data
 - [ ] Scraper cron job configured

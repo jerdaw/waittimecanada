@@ -8,6 +8,8 @@
 transitioning from a real-time snapshot tool into a Health Systems Observatory with longitudinal
 analysis, data quality transparency, and research-grade analytics.
 
+**Deployment Note (2026-02-08):** Frontend public hosting is intentionally offline for now to avoid unnecessary free-tier credit usage. Production smoke workflow is disabled until a public URL is intentionally re-enabled.
+
 ---
 
 ## Completed Milestones
@@ -30,66 +32,63 @@ analysis, data quality transparency, and research-grade analytics.
 
 ---
 
-## Next Steps
+## Next Steps (1-2 Sessions)
 
-### Immediate: M9 Production Completion
-- [ ] Deploy frontend to Render/Vercel with production `DATABASE_URL`
-- [ ] Set required production GitHub Secrets (`DATABASE_URL`, optional alert keys) and run readiness verification
-- [ ] Run production smoke workflow against live URL for `/`, `/methods`, `/data-quality`, `/analytics`
+- [ ] Complete `P0 / Data correctness` by replacing inferred totals with query-backed totals in data-quality outputs and tests.
+- [ ] Complete `P0 / Ontology safety` by enforcing methodology-safe grouping boundaries in analytics aggregation paths.
+- [ ] Complete `P0 / Ops reliability` by migrating heartbeat source checks to dynamic source discovery.
 
-### Recently Closed: M15 Analytics & Benchmarking
-**Status:** CLOSED (archived) | **Delivered:** 2026-02-07 | **Depends On:** M13
-**Archived Plan:** `docs/planning/archive/milestone-15-analytics.md`
+## Roadmap Operating Model
 
-Delivered scope:
-- Peer benchmarking (`/api/analytics/benchmarks` + UI integration)
-- Temporal patterns (`/api/analytics/patterns`)
-- Regional analytics (`regions` + `hospital_regions`, seed CLI, `/api/analytics/regions`)
-- System trends (`/api/analytics/trends`, `/analytics`)
-- Operational hardening (schema-aware setup guidance, daily-rollup fallback)
-- Region coverage expansion (audit CLI, auto-assignment, overrides, coverage telemetry)
+### Planning Standards
+- **Single source of truth:** This file is the canonical roadmap status. Detailed execution plans live in milestone docs.
+- **Horizon-based planning:** Work is prioritized as `Now` (0-2 weeks), `Next` (2-6 weeks), and `Later` (6+ weeks).
+- **Priority discipline:** `P0` = correctness/reliability blockers, `P1` = capability delivery, `P2` = polish.
+- **Review cadence:** Refresh this roadmap at least weekly and after any milestone closeout or major ops decision.
 
-### Short-Term: Complete Partial Milestones
+### Definition of Done (Roadmap Items)
+- Code merged to `main` with tests passing in CI.
+- Required docs/ADRs updated if architecture or policy changed.
+- Operational impact confirmed (alerts, workflows, secrets, deployment posture).
+- Item status reflected in this roadmap and no duplicate open tasks remain.
 
-**M9: Portfolio Launch** — remaining items:
-- [ ] Deploy frontend to Render/Vercel with production DATABASE_URL
-- [ ] Set required production GitHub Secrets (DATABASE_URL, optional alert keys)
-- [ ] Run `Production Readiness` workflow and confirm heartbeat freshness pass
-- [ ] Set `PRODUCTION_BASE_URL` GitHub Actions secret and run smoke workflow
-- [ ] Stakeholder interview (1 ER nurse/physician)
-- [ ] Publish LinkedIn post
+### Release and Cost Policy (Current)
+- Netlify deploys are intentionally release-gated and frontend public hosting is intentionally offline.
+- Production smoke workflow remains disabled until a public frontend URL is intentionally re-enabled.
+- Scraper reliability workflows (`scraper-cron`, heartbeat monitor, readiness checks) remain active.
 
-### Autonomous Backlog (No Human Intervention Required)
+## Active Roadmap (Now / Next / Later)
 
-Completed in this cycle:
-- M11: Equity layer foundation scaffolding (toggle, legend, placeholder GeoJSON flow)
-- M12: Occupancy endpoint + explicit "not available yet" UI state
-- Governance hardening for testimonial content validation (single published quote guardrails)
-- CI optimization pass for developer velocity (keep checks strict, reduce redundant runtime)
-- Documentation hardening pass (modernized guides, historical snapshot labeling, and automated docs lint checks in CI)
-- M10-M12: Alberta scraper delivered (parser + source factory + CLI `--all` registration + unit tests)
-- M10: BC scraper registered in runtime CLI registry so cron `--all` execution now includes BC
-- M12-M14: Scraper CLI now runs via `BaseScraper.run(db=...)` with a pre-save hospital upsert hook, so anomaly checks and heartbeat recording are handled in the shared scraper pipeline
-- Repo hygiene: removed tracked build/debug artifacts (`frontend/tsconfig.tsbuildinfo`, `backend/scripts/alberta_output.html`) and added ignore rules
+### Now (P0, 0-2 weeks)
+- [ ] **P0 / Data correctness:** Correct data-quality metric math so totals are query-backed counts (not inferred from success-rate approximations).
+- [ ] **P0 / Ontology safety:** Enforce ontology-safe analytics grouping so aggregates are never mixed across incompatible methodologies.
+- [ ] **P0 / Source consistency:** Resolve ontology/source metadata drift across migrations, seed JSON, and scraper factories.
+- [ ] **P0 / Ops reliability:** Replace hardcoded source lists in heartbeat checks with dynamic source discovery from `sources`.
+- [ ] **P0 / Methodology monitoring:** Wire methodology change detection into scheduled ops and expose change events in API/UI.
 
-Current open autonomous backlog:
-- [ ] **P0 / M12:** Replace hardcoded source lists in heartbeat checks with dynamic source discovery from `sources`.
-- [ ] **P0 / M3-M10:** Resolve ontology/source metadata drift across migrations, seed JSON, and scraper factories (Ontario/BC defaults + methodology URLs).
-- [ ] **P0 / M14:** Correct data-quality metric math so totals are query-backed counts (not inferred from success-rate approximations).
-- [ ] **P0 / M14:** Wire methodology change detection into scheduled ops and expose change events in API/UI.
-- [ ] **P0 / M13-M15:** Enforce ontology-safe analytics grouping so aggregates are not mixed across incompatible methodologies.
-- [ ] **P1 / M11:** Replace placeholder equity layer payload with processed tract dataset pipeline and production ON data load.
-- [ ] **P1 / M12:** Implement occupancy schema columns + parser ingestion path + validations/backfill.
-- [ ] **P1 / M5-M9:** Add admin authn/authz and audit logging for verification queue API routes and UI actions.
-- [ ] **P1 / M7-M15:** Add a methods-page feature set: methodology timeline, deep-linkable comparisons, and comparability matrix CSV export.
-- [ ] **P1 / M9-M12:** Tighten production-ops automation to require smoke readiness once `PRODUCTION_BASE_URL` is configured.
-- [ ] **P1 / CI:** Remove non-blocking CI fallbacks (`format:check` soft pass, advisory-only mypy/bandit) and make gates strict after remediation.
-- [ ] **P1 / CI:** Resolve Bandit finding in synthetic test data generator to reach clean security scan output.
-- [ ] **P2 / Test Quality:** Eliminate React `act(...)` warnings in frontend unit tests to improve signal quality.
-- [ ] **P2 / Docs Integrity:** Add roadmap consistency checks so autonomous backlog status cannot regress to stale “none” when open items exist.
+Success criteria for `Now`:
+- Data-quality totals match direct SQL count validation in tests.
+- Analytics endpoints reject or separate incompatible ontology dimensions.
+- Heartbeat checks automatically adapt to source table updates without code changes.
 
-### Deferred
-- **M10: Multi-Province** — Alberta API endpoint research, additional provinces
+### Next (P1, 2-6 weeks)
+- [ ] **P1 / Equity:** Replace placeholder equity layer payload with processed tract dataset pipeline and production Ontario load.
+- [ ] **P1 / Occupancy:** Implement occupancy schema columns + scraper ingestion path + validations/backfill.
+- [ ] **P1 / Admin security:** Add authn/authz and audit logging for verification queue API routes and UI actions.
+- [ ] **P1 / Methods UX:** Add methodology timeline, deep-linkable comparisons, and comparability matrix CSV export.
+- [ ] **P1 / CI hardening:** Remove non-blocking CI fallbacks and make quality/security gates strict after remediation.
+- [ ] **P1 / Security debt:** Resolve Bandit finding in synthetic test data generator.
+
+Success criteria for `Next`:
+- Equity and occupancy endpoints serve real production-backed values (not scaffold-only payloads).
+- Admin verification actions are fully authenticated and auditable.
+- CI gates fail hard for lint/type/security once remediation is complete.
+
+### Later (P2+, 6+ weeks)
+- [ ] **P2 / Test quality:** Eliminate React `act(...)` warnings in frontend unit tests.
+- [ ] **P2 / Docs integrity:** Add roadmap consistency checks so stale status summaries cannot regress.
+- [ ] **P2 / Portfolio launch completion:** Complete stakeholder interview and publish launch communications when public hosting is re-enabled.
+- [ ] **Deferred / M10 breadth:** Resume broader multi-province expansion once P0/P1 reliability and governance goals are closed.
 
 ---
 
@@ -110,15 +109,16 @@ Each feature maps to CanMEDS competencies for medical school admissions:
 ## Implementation Plans
 
 Active milestone plans in `docs/planning/implementation/`:
-- `milestone-9-launch.md` — Production deployment & stakeholder validation
-- `milestone-10-provinces.md` — Alberta scraper & multi-province support
-- `milestone-11-equity.md` — Access Burden Estimator & equity layer
-- `milestone-12-research.md` — Citation export & alert system
+- `docs/planning/implementation/milestone-9-launch.md` — Production deployment & stakeholder validation
+- `docs/planning/implementation/milestone-10-provinces.md` — Alberta scraper & multi-province support
+- `docs/planning/implementation/milestone-11-equity.md` — Access Burden Estimator & equity layer
+- `docs/planning/implementation/milestone-12-research.md` — Citation export & alert system
 
 Archived (delivered):
 - `docs/planning/archive/milestone-15-analytics.md` — Analytics & benchmarking (M15)
-- `milestone-13-aggregation.md` — Aggregation pipeline (M13)
-- `milestone-14-data-quality.md` — Data quality & anomaly detection (M14)
+- `docs/planning/archive/milestone-14-data-quality.md` — Data quality & anomaly detection (M14)
+- `docs/planning/archive/milestone-13-aggregation.md` — Aggregation pipeline (M13)
+- `docs/planning/archive/task-er-watch-features.md` — ER Watch feature execution checklist (completed)
 
 ---
 
@@ -183,5 +183,5 @@ Archived (delivered):
 | Neon PostgreSQL | Database hosting | Free (512 MB) |
 | Mapbox | Map tiles | Free (50k loads/month) |
 | Nominatim (OSM) | Geocoding | Free (1 req/sec) |
-| Render | Frontend hosting | Free |
+| Netlify | Frontend hosting (release-gated; intentionally offline) | Free (300 credits/month) |
 | GitHub Actions | CI/CD + scrapers | Free (2000 min/month) |

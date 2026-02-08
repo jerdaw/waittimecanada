@@ -53,4 +53,4 @@ Chosen option: "Two-tier architecture", because it balances storage constraints 
 ## Links
 
 * [Related to] [ADR-0002](0002-metric-ontology.md) (ontology tags denormalized into aggregates)
-* Implementation plan: `docs/planning/implementation/milestone-13-aggregation.md`
+* Implementation plan: `docs/planning/archive/milestone-13-aggregation.md`

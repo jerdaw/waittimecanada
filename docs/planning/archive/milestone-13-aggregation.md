@@ -1,5 +1,7 @@
 # Milestone 13: Aggregation Pipeline
 
+> Archived plan (historical reference). Milestone delivered and closed.
+
 > **Priority:** CRITICAL - Foundational infrastructure for all research/analytics features
 > **Estimated Effort:** 4-5 days
 > **Admissions Appeal:** Scholar (longitudinal research), Professional (data stewardship), Leader (systems thinking)

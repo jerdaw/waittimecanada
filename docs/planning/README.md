@@ -18,6 +18,9 @@ This directory is the planning control plane for WaitTime Canada.
 ## Archived Milestone Plans
 
 - `docs/planning/archive/milestone-15-analytics.md` (closed, delivered)
+- `docs/planning/archive/milestone-14-data-quality.md` (closed, delivered)
+- `docs/planning/archive/milestone-13-aggregation.md` (closed, delivered)
+- `docs/planning/archive/task-er-watch-features.md` (closed, delivered)
 - `docs/planning/archive/implementation-plan-m2-ontario.md`
 - `docs/planning/archive/IMPLEMENTATION_PLAN_SUMMARY.md`
 - `docs/planning/archive/REPO_MODERNIZATION_SUMMARY.md`
