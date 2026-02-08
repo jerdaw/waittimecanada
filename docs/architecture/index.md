@@ -20,6 +20,7 @@ WaitTime Canada is structured as a data observatory pipeline:
 - Database architecture: `docs/architecture/database.md`
 - Public API reference: `docs/API.md`
 - Metric ontology ADR: `docs/adr/0002-metric-ontology.md`
+- Scraper runtime ADR: `docs/adr/0014-unified-scraper-runtime-pipeline.md`
 
 ## Runtime Components
 
@@ -27,3 +28,4 @@ WaitTime Canada is structured as a data observatory pipeline:
 - Frontend app/API: `frontend/app/`
 - Migrations: `backend/migrations/`
 - CI/ops workflows: `.github/workflows/`
+- Scraper CLI delegates persistence/heartbeat/anomaly flow through `BaseScraper.run(...)`

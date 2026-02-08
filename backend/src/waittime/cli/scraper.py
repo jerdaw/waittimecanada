@@ -8,14 +8,16 @@ Usage:
 import argparse
 import logging
 import sys
-from typing import NoReturn
+from typing import Any, NoReturn
 
-from waittime.core import Hospital
+from waittime.core import Hospital, Measurement, Source
 from waittime.scrapers import (
     AlbertaScraper,
+    BCScraper,
     OntarioScraper,
     QuebecScraper,
     create_alberta_source,
+    create_bc_source,
     create_ontario_source,
     create_quebec_source,
 )
@@ -32,9 +34,85 @@ logger = logging.getLogger(__name__)
 # Registry of available scrapers
 SCRAPERS = {
     "alberta-ahs": (AlbertaScraper, create_alberta_source),
+    "bc-phsa": (BCScraper, create_bc_source),
     "ontario-health": (OntarioScraper, create_ontario_source),
     "quebec-msss": (QuebecScraper, create_quebec_source),
 }
+
+
+def _upsert_hospitals_for_measurements(
+    measurements: list[Measurement],
+    *,
+    source_id: str,
+    source: Source,
+    scraper_class: Any,
+    db: DatabaseService,
+    geocoder: GeocodingService,
+) -> None:
+    """Ensure hospitals exist before measurement insert.
+
+    Measurement rows reference hospitals by ID, so we upsert any missing facilities first.
+    """
+    unique_hospital_ids = {m.hospital_id for m in measurements}
+    logger.info(f"Upserting {len(unique_hospital_ids)} unique hospitals")
+
+    reverse_map: dict[str, str] = {}
+    if hasattr(scraper_class, "HOSPITAL_MAPPING"):
+        reverse_map = {v: k for k, v in scraper_class.HOSPITAL_MAPPING.items()}
+
+    geocoded_count = 0
+    skipped_count = 0
+
+    for hospital_id in unique_hospital_ids:
+        existing_hospital = db.get_hospital(hospital_id)
+        if (
+            existing_hospital
+            and existing_hospital.latitude != 0.0
+            and existing_hospital.longitude != 0.0
+        ):
+            skipped_count += 1
+            continue
+
+        hospital_name = reverse_map.get(hospital_id) or hospital_id_to_name(hospital_id)
+
+        geocoding_result = geocoder.geocode_hospital(
+            hospital_name, province=source.province, hospital_id=hospital_id
+        )
+
+        if geocoding_result:
+            city = geocoding_result.city
+            latitude = geocoding_result.latitude
+            longitude = geocoding_result.longitude
+            geocoded_count += 1
+            logger.info(
+                f"Geocoded {hospital_name}: ({latitude:.4f}, {longitude:.4f}) "
+                f"confidence={geocoding_result.confidence:.2f}"
+            )
+        else:
+            logger.warning(
+                f"Failed to geocode {hospital_name} ({hospital_id}) - using placeholders"
+            )
+            city = "Unknown"
+            latitude = 0.0
+            longitude = 0.0
+
+        hospital = Hospital(
+            id=hospital_id,
+            name=hospital_name,
+            province=source.province,
+            city=city,
+            latitude=latitude,
+            longitude=longitude,
+            is_verified=False,
+            is_visible=False,
+            source_id=source_id,
+        )
+        db.upsert_hospital(hospital)
+
+    logger.info(
+        f"✅ Geocoded {geocoded_count} new hospitals, "
+        f"skipped {skipped_count} existing (total {len(unique_hospital_ids)})"
+    )
 
 
 def hospital_id_to_name(hospital_id: str) -> str:
@@ -86,8 +164,27 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
     logger.info(f"Starting scraper for {source.name} ({source_id})")
 
     try:
-        with scraper_class(source) as scraper:
-            measurements = scraper.run()
+        db = DatabaseService() if not dry_run else None
+        geocoder = GeocodingService() if not dry_run else None
+
+        before_save = None
+        if db is not None and geocoder is not None:
+
+            def before_save(measurements: list[Measurement]) -> None:
+                _upsert_hospitals_for_measurements(
+                    measurements,
+                    source_id=source_id,
+                    source=source,
+                    scraper_class=scraper_class,
+                    db=db,
+                    geocoder=geocoder,
+                )
+
+        with scraper_class(source, db=db) as scraper:
+            measurements = scraper.run(
+                save_to_db=not dry_run,
+                before_save=before_save,
+            )
 
         logger.info(f"Collected {len(measurements)} measurements")
 
@@ -99,111 +196,11 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
                 logger.info(f"  ... and {len(measurements) - 5} more")
             return len(measurements)
 
-        # Write to database
-        db = DatabaseService()
-        geocoder = GeocodingService()
-
-        # Step 1: Upsert hospitals (create if they don't exist)
-        # Extract unique hospital IDs
-        unique_hospital_ids = {m.hospital_id for m in measurements}
-        logger.info(f"Upserting {len(unique_hospital_ids)} unique hospitals")
-
-        geocoded_count = 0
-        skipped_count = 0
-        for hospital_id in unique_hospital_ids:
-            # Check if hospital already exists with valid coordinates
-            existing_hospital = db.get_hospital(hospital_id)
-            if (
-                existing_hospital
-                and existing_hospital.latitude != 0.0
-                and existing_hospital.longitude != 0.0
-            ):
-                # Hospital already has valid coordinates, skip geocoding
-                skipped_count += 1
-                continue
-
-            # Try to get official name from scraper's mapping
-            hospital_name = None
-            if hasattr(scraper_class, "HOSPITAL_MAPPING"):
-                # Reverse lookup: find the key that maps to this hospital_id
-                reverse_map = {v: k for k, v in scraper_class.HOSPITAL_MAPPING.items()}
-                hospital_name = reverse_map.get(hospital_id)
-
-            # Fall back to converting ID to name
-            if not hospital_name:
-                hospital_name = hospital_id_to_name(hospital_id)
-
-            # Try to geocode using the hospital name
-            geocoding_result = geocoder.geocode_hospital(
-                hospital_name, province=source.province, hospital_id=hospital_id
-            )
-
-            if geocoding_result:
-                # Use geocoded data (accept any confidence level)
-                city = geocoding_result.city
-                latitude = geocoding_result.latitude
-                longitude = geocoding_result.longitude
-                geocoded_count += 1
-                logger.info(
-                    f"Geocoded {hospital_name}: ({latitude:.4f}, {longitude:.4f}) "
-                    f"confidence={geocoding_result.confidence:.2f}"
-                )
-            else:
-                # Fall back to placeholders
-                logger.warning(
-                    f"Failed to geocode {hospital_name} ({hospital_id}) - using placeholders"
-                )
-                city = "Unknown"
-                latitude = 0.0
-                longitude = 0.0
-
-            # Create hospital with geocoded or placeholder data
-            hospital = Hospital(
-                id=hospital_id,
-                name=hospital_name,  # Use official or converted name
-                province=source.province,
-                city=city,
-                latitude=latitude,
-                longitude=longitude,
-                is_verified=False,  # Still requires manual verification
-                is_visible=False,  # Hidden until verified
-                source_id=source_id,
-            )
-            db.upsert_hospital(hospital)
-
-        logger.info(
-            f"✅ Geocoded {geocoded_count} new hospitals, "
-            f"skipped {skipped_count} existing (total {len(unique_hospital_ids)})"
-        )
-
-        # Step 2: Insert measurements
-        count = db.insert_measurements(measurements)
-
-        # Step 3: Update heartbeat
-        db.update_heartbeat(
-            source_id=source_id,
-            status="healthy",
-            measurements_count=count,
-        )
-
-        logger.info(f"Wrote {count} measurements to database")
-        return count
+        logger.info("Persisted measurements through BaseScraper.run database pipeline")
+        return len(measurements)
 
     except Exception as e:
         logger.exception(f"Scraper failed for {source_id}: {e}")
-
-        if not dry_run:
-            try:
-                db = DatabaseService()
-                db.update_heartbeat(
-                    source_id=source_id,
-                    status="error",
-                    error_message=str(e)[:500],
-                    measurements_count=0,
-                )
-            except Exception:
-                logger.exception("Failed to update heartbeat")
-
         return 0
 
 

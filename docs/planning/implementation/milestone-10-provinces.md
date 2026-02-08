@@ -85,6 +85,7 @@ URL: https://www.albertahealthservices.ca/waittimes/waittimes.aspx
 - [x] Implemented Alberta parser for real AHS `wt-well` card structure (Emergency-only filtering, unavailable wait-time skip, adult-vs-child handling for dual cards).
 - [x] Added `create_alberta_source()` and exported Alberta scraper/source from `waittime.scrapers`.
 - [x] Registered Alberta in runtime scraper CLI (`python -m waittime.cli.scraper --all`) so scheduled cron runs now include it.
+- [x] Registered BC in runtime scraper CLI (`python -m waittime.cli.scraper --all`); no cron workflow edit required because cron already executes `--all`.
 - [x] Added Alberta unit tests (`backend/tests/unit/test_alberta_scraper.py`) and validated with targeted pytest run.
 
 ### 1.1 Add Alberta Source

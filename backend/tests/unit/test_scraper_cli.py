@@ -3,6 +3,10 @@ from unittest.mock import patch, MagicMock
 import sys
 from waittime.cli.scraper import hospital_id_to_name, run_scraper, main, SCRAPERS
 
+def test_scrapers_registry_includes_bc():
+    """Verify BC is registered for --all runs."""
+    assert "bc-phsa" in SCRAPERS
+
 def test_hospital_id_to_name():
     """Verify conversion of hospital IDs to readable names."""
     assert hospital_id_to_name("ca-on-cheo") == "Cheo"
@@ -43,7 +47,7 @@ def test_run_scraper_dry_run(mock_scrapers):
 @patch("waittime.cli.scraper.DatabaseService")
 @patch("waittime.cli.scraper.GeocodingService")
 def test_run_scraper_success(mock_geocoder, mock_db, mock_scrapers):
-    """Verify end-to-end success path for run_scraper."""
+    """Verify run_scraper uses BaseScraper.run pipeline with hospital upserts."""
     mock_scraper_class = MagicMock()
     mock_source_factory = MagicMock()
     mock_source = MagicMock(name="Test Source", province="ON")
@@ -52,28 +56,33 @@ def test_run_scraper_success(mock_geocoder, mock_db, mock_scrapers):
     mock_scrapers.__contains__.return_value = True
     mock_scrapers.__getitem__.return_value = (mock_scraper_class, mock_source_factory)
     
+    measurements = [MagicMock(hospital_id="ca-on-h1", value=10)]
     mock_scraper_instance = mock_scraper_class.return_value.__enter__.return_value
-    mock_scraper_instance.run.return_value = [
-        MagicMock(hospital_id="ca-on-h1", value=10)
-    ]
+
+    def run_side_effect(*args, **kwargs):
+        before_save = kwargs.get("before_save")
+        if kwargs.get("save_to_db") and before_save:
+            before_save(measurements)
+        return measurements
+
+    mock_scraper_instance.run.side_effect = run_side_effect
     
     mock_db_instance = mock_db.return_value
     mock_db_instance.get_hospital.return_value = None  # New hospital
-    mock_db_instance.insert_measurements.return_value = 1
-    
     mock_geocoder_instance = mock_geocoder.return_value
     mock_geocoder_instance.geocode_hospital.return_value = MagicMock(
         city="Ottawa", latitude=45.0, longitude=-75.0, confidence=1.0
     )
     
     count = run_scraper("ontario-health", dry_run=False)
-    
+
     assert count == 1
+    mock_scraper_class.assert_called_once_with(mock_source, db=mock_db_instance)
+    assert mock_scraper_instance.run.call_args.kwargs["save_to_db"] is True
+    assert callable(mock_scraper_instance.run.call_args.kwargs["before_save"])
     mock_db_instance.upsert_hospital.assert_called_once()
-    mock_db_instance.insert_measurements.assert_called_once()
-    mock_db_instance.update_heartbeat.assert_called_once_with(
-        source_id="ontario-health", status="healthy", measurements_count=1
-    )
+    mock_db_instance.insert_measurements.assert_not_called()
+    mock_db_instance.update_heartbeat.assert_not_called()
 
 def test_main_list_scrapers():
     """Verify that --list exits normally."""
@@ -112,17 +121,22 @@ def test_run_scraper_skip_existing_hospital():
     mock_source = MagicMock(name="Test Source", province="ON")
     mock_source_factory.return_value = mock_source
     
+    measurements = [MagicMock(hospital_id="ca-on-h1", value=10)]
     mock_scraper_instance = mock_scraper_class.return_value.__enter__.return_value
-    mock_scraper_instance.run.return_value = [
-        MagicMock(hospital_id="ca-on-h1", value=10)
-    ]
+
+    def run_side_effect(*args, **kwargs):
+        before_save = kwargs.get("before_save")
+        if kwargs.get("save_to_db") and before_save:
+            before_save(measurements)
+        return measurements
+
+    mock_scraper_instance.run.side_effect = run_side_effect
     
     with patch("waittime.cli.scraper.SCRAPERS", {"s1": (mock_scraper_class, mock_source_factory)}):
         with patch("waittime.cli.scraper.DatabaseService") as mock_db:
             mock_db_instance = mock_db.return_value
             # Setup existing hospital with valid coords
             mock_db_instance.get_hospital.return_value = MagicMock(latitude=45.0, longitude=-75.0)
-            mock_db_instance.insert_measurements.return_value = 1
             
             with patch("waittime.cli.scraper.GeocodingService") as mock_geocoder:
                 run_scraper("s1", dry_run=False)
@@ -140,22 +154,12 @@ def test_run_scraper_handles_general_exception():
 
     with patch("waittime.cli.scraper.SCRAPERS", mock_scrapers_dict):
         with patch("waittime.cli.scraper.DatabaseService") as mock_db:
-            # Trigger exception in run_scraper by making the metadata update raise an exception
-            # We use side_effect with a list to have it succeed once (healthy) and then raise?
-            # Actually, line 182 is the FIRST call to update_heartbeat.
-            # If line 182 raises, line 197 is called (the catch block).
-            mock_db.return_value.update_heartbeat.side_effect = [Exception("General Error"), None]
+            mock_scraper_instance = mock_scraper_class.return_value.__enter__.return_value
+            mock_scraper_instance.run.side_effect = Exception("General Error")
             
             count = run_scraper("s1")
             assert count == 0
-            
-            # Should have called update_heartbeat TWICE: once for healthy (failed) and once for error
-            assert mock_db.return_value.update_heartbeat.call_count == 2
-            
-            # The second call should be the error status
-            mock_db.return_value.update_heartbeat.assert_called_with(
-                source_id="s1", status="error", error_message="General Error", measurements_count=0
-            )
+            mock_db.return_value.update_heartbeat.assert_not_called()
 
 def test_main_single_source():
     """Verify that --source runs a single scraper."""
@@ -182,16 +186,21 @@ def test_run_scraper_geocoding_failure():
     mock_source = MagicMock(name="Test Source", province="ON")
     mock_source_factory.return_value = mock_source
     
+    measurements = [MagicMock(hospital_id="ca-on-h1", value=10)]
     mock_scraper_instance = mock_scraper_class.return_value.__enter__.return_value
-    mock_scraper_instance.run.return_value = [
-        MagicMock(hospital_id="ca-on-h1", value=10)
-    ]
+
+    def run_side_effect(*args, **kwargs):
+        before_save = kwargs.get("before_save")
+        if kwargs.get("save_to_db") and before_save:
+            before_save(measurements)
+        return measurements
+
+    mock_scraper_instance.run.side_effect = run_side_effect
     
     with patch("waittime.cli.scraper.SCRAPERS", {"s1": (mock_scraper_class, mock_source_factory)}):
         with patch("waittime.cli.scraper.DatabaseService") as mock_db:
             mock_db_instance = mock_db.return_value
             mock_db_instance.get_hospital.return_value = None
-            mock_db_instance.insert_measurements.return_value = 1
             
             with patch("waittime.cli.scraper.GeocodingService") as mock_geocoder:
                 # Mock geocoding failure

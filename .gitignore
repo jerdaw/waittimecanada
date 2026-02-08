@@ -76,6 +76,8 @@ tmp/
 temp/
 *.tmp
 backend/data/regions/coverage-report.json
+backend/scripts/alberta_output.html
+frontend/tsconfig.tsbuildinfo
 
 # Database
 *.db

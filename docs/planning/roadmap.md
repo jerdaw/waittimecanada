@@ -68,10 +68,11 @@ Completed in this cycle:
 - CI optimization pass for developer velocity (keep checks strict, reduce redundant runtime)
 - Documentation hardening pass (modernized guides, historical snapshot labeling, and automated docs lint checks in CI)
 - M10-M12: Alberta scraper delivered (parser + source factory + CLI `--all` registration + unit tests)
+- M10: BC scraper registered in runtime CLI registry so cron `--all` execution now includes BC
+- M12-M14: Scraper CLI now runs via `BaseScraper.run(db=...)` with a pre-save hospital upsert hook, so anomaly checks and heartbeat recording are handled in the shared scraper pipeline
+- Repo hygiene: removed tracked build/debug artifacts (`frontend/tsconfig.tsbuildinfo`, `backend/scripts/alberta_output.html`) and added ignore rules
 
 Current open autonomous backlog:
-- [ ] **P0 / M10:** Register BC scraper in runtime CLI and cron execution path (currently implemented but not run by `--all`).
-- [ ] **P0 / M12-M14:** Refactor scraper CLI to use `BaseScraper.run(db=...)` for anomaly checks and heartbeat writes in one path.
 - [ ] **P0 / M12:** Replace hardcoded source lists in heartbeat checks with dynamic source discovery from `sources`.
 - [ ] **P0 / M3-M10:** Resolve ontology/source metadata drift across migrations, seed JSON, and scraper factories (Ontario/BC defaults + methodology URLs).
 - [ ] **P0 / M14:** Correct data-quality metric math so totals are query-backed counts (not inferred from success-rate approximations).
@@ -84,7 +85,6 @@ Current open autonomous backlog:
 - [ ] **P1 / M9-M12:** Tighten production-ops automation to require smoke readiness once `PRODUCTION_BASE_URL` is configured.
 - [ ] **P1 / CI:** Remove non-blocking CI fallbacks (`format:check` soft pass, advisory-only mypy/bandit) and make gates strict after remediation.
 - [ ] **P1 / CI:** Resolve Bandit finding in synthetic test data generator to reach clean security scan output.
-- [ ] **P1 / Repo Hygiene:** Stop tracking TS incremental build artifact (`frontend/tsconfig.tsbuildinfo`) and ignore it.
 - [ ] **P2 / Test Quality:** Eliminate React `act(...)` warnings in frontend unit tests to improve signal quality.
 - [ ] **P2 / Docs Integrity:** Add roadmap consistency checks so autonomous backlog status cannot regress to stale “none” when open items exist.
 
@@ -168,10 +168,11 @@ Archived (delivered):
 | [0007](../adr/0007-bc-scraper-implementation.md) | BC scraper implementation |
 | [0008](../adr/0008-aggregation-pipeline.md) | Two-tier aggregation pipeline |
 | [0009](../adr/0009-data-quality-anomaly-detection.md) | Data quality & anomaly detection |
-| [0010](../adr/0010-region-mapping-coverage-heuristics.md) | Region mapping coverage audit and heuristic auto-assignment |
+| [0010](../adr/0010-region-mapping-coverage-heuristics.md) | Region mapping coverage heuristics |
 | [0011](../adr/0011-equity-layer-scaffold.md) | Equity layer scaffold-first delivery |
-| [0012](../adr/0012-occupancy-availability-contract.md) | Occupancy availability contract and UI behavior |
-| [0013](../adr/0013-testimonial-governance-guardrails.md) | Testimonial publication guardrails and fail-closed rendering |
+| [0012](../adr/0012-occupancy-availability-contract.md) | Occupancy availability contract |
+| [0013](../adr/0013-testimonial-governance-guardrails.md) | Testimonial governance guardrails |
+| [0014](../adr/0014-unified-scraper-runtime-pipeline.md) | Unified scraper runtime pipeline |
 
 ---
 

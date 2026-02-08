@@ -291,3 +291,16 @@ class TestRun:
 
             mock_db.insert_measurements.assert_not_called()
             assert len(measurements) == 1
+
+    def test_run_calls_before_save_hook_when_saving(self, scraper_with_db):
+        """Should execute before_save callback before persisting measurements."""
+        html = "<html>Test</html>"
+        hook = MagicMock()
+
+        with patch.object(scraper_with_db, "fetch", return_value=html):
+            scraper_with_db.run(save_to_db=True, before_save=hook)
+
+        hook.assert_called_once()
+        call_arg_measurements = hook.call_args.args[0]
+        assert len(call_arg_measurements) == 1
+        assert call_arg_measurements[0].hospital_id == "ca-test-hospital"

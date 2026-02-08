@@ -10,6 +10,9 @@
 
 - Citation-ready export: implemented
 - Dead Man's Switch + health endpoint: implemented
+- Scraper runtime pipeline hardening: implemented
+  - `backend/src/waittime/cli/scraper.py` now instantiates scrapers with `db` and delegates persistence/heartbeat to `BaseScraper.run(...)`
+  - hospital prerequisite upserts are executed through a `before_save` hook so the shared run path remains authoritative
 - Occupancy analytics contract: implemented with explicit availability states
   - `/api/analytics/occupancy` now returns `not_available_yet`, `no_reporting_data`, or `available`
   - `/analytics` now renders clear "Occupancy metrics not available yet" messaging when source

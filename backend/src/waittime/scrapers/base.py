@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import logging
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
@@ -138,11 +139,17 @@ class BaseScraper(ABC):
         """
         return content[:max_length]
 
-    def run(self, save_to_db: bool = True) -> list[Measurement]:
+    def run(
+        self,
+        save_to_db: bool = True,
+        before_save: Callable[[list[Measurement]], None] | None = None,
+    ) -> list[Measurement]:
         """Execute full scrape cycle: fetch → parse → save → heartbeat.
 
         Args:
             save_to_db: If True and db is configured, save measurements to database
+            before_save: Optional callback executed before database insert. Useful for
+                prerequisites like hospital upserts that must exist before measurements.
 
         Returns:
             List of parsed measurements
@@ -163,6 +170,8 @@ class BaseScraper(ABC):
 
             # Save measurements to database if configured
             if save_to_db and self.db is not None and measurements:
+                if before_save is not None:
+                    before_save(measurements)
                 self.db.insert_measurements(measurements)
                 logger.info(f"Saved {len(measurements)} measurements to database")
 

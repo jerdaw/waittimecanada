@@ -105,7 +105,7 @@ We transformed the high-level strategic document (`er-times-plan.md`) into a **c
     - Documentation structure and navigation
 
 18. **[AGENTS.md](./AGENTS.md)** (Updated)
-    - AI assistant guidance for codebase
+    - Agent workflow guidance for codebase
 
 ---
 
@@ -223,7 +223,7 @@ We transformed the high-level strategic document (`er-times-plan.md`) into a **c
 3. **Code Reviews:** Enforce standards from IMPLEMENTATION.md
 4. **Retrospectives:** Adjust roadmap based on velocity
 
-### For Automated Developer Tools (automated developer tools):
+### For Contributor Tooling Workflows:
 1. **Context:** Read AGENTS.md first
 2. **Reference:** Consult IMPLEMENTATION.md for patterns
 3. **Schema:** Check DATABASE.md for exact table structure
