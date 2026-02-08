@@ -2,7 +2,7 @@
 
 ## Current Status (Updated 2026-02-08)
 
-**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage) | M9 production smoke + readiness automation implemented
+**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage) | M9 production smoke + readiness automation implemented | M9 repo polish completed
 
 **Strategic Direction:** Ontario-focused depth over multi-province breadth. The platform is
 transitioning from a real-time snapshot tool into a Health Systems Observatory with longitudinal
@@ -59,6 +59,7 @@ Delivered scope:
 - [ ] Set required production GitHub Secrets (DATABASE_URL, optional alert keys)
 - [ ] Run `Production Readiness` workflow and confirm heartbeat freshness pass
 - [ ] Set `PRODUCTION_BASE_URL` GitHub Actions secret and run smoke workflow
+- [x] Apply GitHub repository polish (description, topics, README badges)
 - [ ] Stakeholder interview (1 ER nurse/physician)
 - [ ] Finalize and publish LinkedIn post
 

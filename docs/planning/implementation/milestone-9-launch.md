@@ -399,6 +399,8 @@ Create screenshots showing:
 
 ### 4.3 GitHub Repo Polish
 
+**Status:** Completed 2026-02-08 (description, topics, README badges)
+
 **Update:**
 - Repository description: "A clinically defensible Health Systems Observatory for Canadian ER wait times"
 - Topics: `healthcare`, `canada`, `open-data`, `nextjs`, `postgresql`, `mapbox`, `wait-times`, `health-informatics`
@@ -442,7 +444,7 @@ Create screenshots showing:
 ### Launch
 - [ ] LinkedIn post finalized
 - [ ] Screenshots captured
-- [ ] GitHub repo polished
+- [x] GitHub repo polished
 - [ ] Application summary written
 
 ---

@@ -36,8 +36,9 @@ declare -a required_workflows=(
   "production-smoke.yml"
 )
 
+# Age thresholds allow for normal GitHub Actions schedule jitter.
 declare -a required_runs=(
-  "scraper-cron.yml:45"
+  "scraper-cron.yml:75"
   "heartbeat-monitor.yml:90"
 )
 

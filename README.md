@@ -3,13 +3,14 @@
 > A clinically defensible "Health Systems Observatory" that audits and standardizes Canadian emergency room wait time data across provinces.
 
 **Status:** 🚀 Core Features Complete | 📊 Ready for Production
-**Test Coverage:** Backend: 155 tests (57% coverage) | Frontend: 87 tests (100% pass rate)
+**Quality Gates:** Frontend CI, Scraper CI, Production Readiness, Production Smoke
 **Provinces:** Ontario, Quebec, British Columbia
-**Live Site:** Coming Soon
+**Live Site:** Pending production URL
 **Documentation:** [docs/](./docs/)
 
-[![Tests](https://img.shields.io/badge/tests-242%20passing-success)](./tests)
-[![Coverage](https://img.shields.io/badge/coverage-57%25-yellow)](./coverage)
+[![Frontend CI](https://github.com/jerdaw/waittimecanada/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/jerdaw/waittimecanada/actions/workflows/frontend-ci.yml)
+[![Scraper CI](https://github.com/jerdaw/waittimecanada/actions/workflows/scraper-ci.yml/badge.svg)](https://github.com/jerdaw/waittimecanada/actions/workflows/scraper-ci.yml)
+[![Production Readiness](https://github.com/jerdaw/waittimecanada/actions/workflows/production-readiness.yml/badge.svg)](https://github.com/jerdaw/waittimecanada/actions/workflows/production-readiness.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12-blue)](./backend)
 [![Next.js](https://img.shields.io/badge/next.js-14-black)](./frontend)

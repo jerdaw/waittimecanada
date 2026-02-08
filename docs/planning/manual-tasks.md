@@ -263,11 +263,11 @@ Thanks,
 **Priority:** MEDIUM
 
 ### Checklist:
-- [ ] Add repository description
-- [ ] Add topics/tags: `healthcare`, `wait-times`, `canada`, `data-visualization`, `postgresql`, `nextjs`
+- [x] Add repository description
+- [x] Add topics/tags: `healthcare`, `wait-times`, `canada`, `data-visualization`, `postgresql`, `nextjs`
 - [ ] Pin repository to profile
 - [ ] Add website URL (once deployed)
-- [ ] Verify README badges are accurate
+- [x] Verify README badges are accurate
 - [ ] Add social preview image (use screenshot)
 
 ---
@@ -314,6 +314,6 @@ When ready to knock out manual tasks:
 
 ---
 
-**Last Updated:** 2026-02-05
-**Tasks Pending:** 9
-**Tasks Completed:** 0
+**Last Updated:** 2026-02-08
+**Tasks Pending:** Tracked inline
+**Tasks Completed:** Tracked inline
