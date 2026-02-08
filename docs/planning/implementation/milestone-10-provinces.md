@@ -80,6 +80,13 @@ URL: https://www.albertahealthservices.ca/waittimes/waittimes.aspx
 
 ## Phase 1: Alberta Scraper Implementation (Day 2-3)
 
+### Implementation Status (2026-02-08)
+
+- [x] Implemented Alberta parser for real AHS `wt-well` card structure (Emergency-only filtering, unavailable wait-time skip, adult-vs-child handling for dual cards).
+- [x] Added `create_alberta_source()` and exported Alberta scraper/source from `waittime.scrapers`.
+- [x] Registered Alberta in runtime scraper CLI (`python -m waittime.cli.scraper --all`) so scheduled cron runs now include it.
+- [x] Added Alberta unit tests (`backend/tests/unit/test_alberta_scraper.py`) and validated with targeted pytest run.
+
 ### 1.1 Add Alberta Source
 
 **SQL Migration or seed script:**
@@ -541,7 +548,7 @@ Add Alberta to the coverage section:
 
 - [ ] Alberta methodology documented in `docs/methodologies/`
 - [ ] Alberta source added to `sources` table
-- [ ] Alberta scraper implemented and passing tests
+- [x] Alberta scraper implemented and passing tests
 - [ ] Alberta hospitals geocoded and imported
 - [ ] Province filter working in UI
 - [ ] Map shows Alberta hospitals

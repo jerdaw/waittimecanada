@@ -67,9 +67,9 @@ Completed in this cycle:
 - Governance hardening for testimonial content validation (single published quote guardrails)
 - CI optimization pass for developer velocity (keep checks strict, reduce redundant runtime)
 - Documentation hardening pass (modernized guides, historical snapshot labeling, and automated docs lint checks in CI)
+- M10-M12: Alberta scraper delivered (parser + source factory + CLI `--all` registration + unit tests)
 
 Current open autonomous backlog:
-- [ ] **P0 / M10-M12:** Complete Alberta scraper implementation (parser + source factory + tests), then register it in CLI/workflows.
 - [ ] **P0 / M10:** Register BC scraper in runtime CLI and cron execution path (currently implemented but not run by `--all`).
 - [ ] **P0 / M12-M14:** Refactor scraper CLI to use `BaseScraper.run(db=...)` for anomaly checks and heartbeat writes in one path.
 - [ ] **P0 / M12:** Replace hardcoded source lists in heartbeat checks with dynamic source discovery from `sources`.

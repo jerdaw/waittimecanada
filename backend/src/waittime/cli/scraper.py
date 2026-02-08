@@ -12,8 +12,10 @@ from typing import NoReturn
 
 from waittime.core import Hospital
 from waittime.scrapers import (
+    AlbertaScraper,
     OntarioScraper,
     QuebecScraper,
+    create_alberta_source,
     create_ontario_source,
     create_quebec_source,
 )
@@ -29,10 +31,9 @@ logger = logging.getLogger(__name__)
 
 # Registry of available scrapers
 SCRAPERS = {
+    "alberta-ahs": (AlbertaScraper, create_alberta_source),
     "ontario-health": (OntarioScraper, create_ontario_source),
     "quebec-msss": (QuebecScraper, create_quebec_source),
-    # Add more as implemented:
-    # "alberta-ahs": (AlbertaScraper, create_alberta_source),
 }
 
 

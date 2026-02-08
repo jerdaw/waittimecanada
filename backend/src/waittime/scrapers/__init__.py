@@ -7,12 +7,15 @@ Each scraper implements BaseScraper and knows how to:
 """
 
 from waittime.scrapers.base import BaseScraper
+from waittime.scrapers.alberta import AlbertaScraper, create_alberta_source
 from waittime.scrapers.bc import BCScraper, create_bc_source
 from waittime.scrapers.ontario import OntarioScraper, create_ontario_source
 from waittime.scrapers.quebec import QuebecScraper, create_quebec_source
 
 __all__ = [
     "BaseScraper",
+    "AlbertaScraper",
+    "create_alberta_source",
     "BCScraper",
     "create_bc_source",
     "OntarioScraper",
