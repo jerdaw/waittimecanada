@@ -402,6 +402,8 @@ export function Testimonial() {
 
 ### 4.2 Screenshots
 
+**Status:** Automated baseline capture implemented 2026-02-08 (`.github/workflows/portfolio-screenshots.yml` + `frontend/scripts/capture-portfolio-screenshots.mjs`)
+
 Create screenshots showing:
 1. **Hero view** - Clean landing page with map
 2. **Methodology warning** - Divergence brief in comparison modal
@@ -411,6 +413,11 @@ Create screenshots showing:
 **Tool:** Browser DevTools device mode or actual mobile device
 
 **Storage:** `docs/screenshots/` directory
+
+**Automation:**
+- Trigger workflow: `Portfolio Screenshots`
+- Artifact: `portfolio-screenshots` (contains generated baseline captures + manifest)
+- Remaining manual captures: divergence warning modal and curated map popup states
 
 ### 4.3 GitHub Repo Polish
 
@@ -462,7 +469,8 @@ Create screenshots showing:
 
 ### Launch
 - [x] LinkedIn post finalized
-- [ ] Screenshots captured
+- [x] Screenshot automation baseline implemented
+- [ ] Curated/manual screenshots captured for launch materials
 - [x] GitHub repo polished
 - [x] Application summary written
 

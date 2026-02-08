@@ -2,7 +2,7 @@
 
 ## Current Status (Updated 2026-02-08)
 
-**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage) | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed
+**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage) | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented
 
 **Strategic Direction:** Ontario-focused depth over multi-province breadth. The platform is
 transitioning from a real-time snapshot tool into a Health Systems Observatory with longitudinal
@@ -38,6 +38,7 @@ analysis, data quality transparency, and research-grade analytics.
 - [ ] Set required production GitHub Secrets (`DATABASE_URL`, optional alert keys) and run readiness verification
 - [x] Implement automated production smoke workflow (`.github/workflows/production-smoke.yml`)
 - [ ] Run production smoke workflow against live URL for `/`, `/methods`, `/data-quality`, `/analytics`
+- [x] Implement screenshot artifact workflow (`.github/workflows/portfolio-screenshots.yml`)
 
 ### Recently Closed: M15 Analytics & Benchmarking
 **Status:** CLOSED (archived) | **Delivered:** 2026-02-07 | **Depends On:** M13
@@ -64,8 +65,15 @@ Delivered scope:
 - [x] Finalize application summary artifact (`docs/application-summary.md`)
 - [x] Prepare stakeholder interview toolkit (`docs/stakeholder-interviews/*`, `docs/stakeholder-feedback.md`)
 - [x] Integrate testimonial publication pipeline (`frontend/components/Testimonial.tsx`)
+- [x] Automate baseline screenshot capture workflow (`portfolio-screenshots`)
 - [ ] Stakeholder interview (1 ER nurse/physician)
 - [ ] Publish LinkedIn post
+
+### Autonomous Backlog (No Human Intervention Required)
+- [ ] M11: Equity layer foundation scaffolding (toggle, legend, placeholder GeoJSON flow)
+- [ ] M12: Occupancy endpoint + explicit "not available yet" UI state
+- [ ] Governance hardening for testimonial content validation (single published quote guardrails)
+- [ ] CI optimization pass for developer velocity (keep checks strict, reduce redundant runtime)
 
 **M11: Equity Layer** — remaining items:
 - [ ] Research Canadian socioeconomic shapefiles (StatsCan census data)

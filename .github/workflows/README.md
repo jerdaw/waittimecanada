@@ -95,6 +95,15 @@ This directory contains CI/CD workflows for the WaitTime Canada project.
 - `heartbeat_max_age_minutes` (default `90`)
 - `run_smoke_check` (default `true`)
 
+### 8. `portfolio-screenshots.yml` - Portfolio Screenshot Artifact Generation
+
+**Trigger:** Manual dispatch
+**Purpose:** Builds frontend, runs scripted Playwright capture flow, uploads screenshot artifact
+**Artifact:** `portfolio-screenshots`
+**Notes:**
+- Designed for launch material generation and documentation assets
+- Complements (does not replace) curated manual screenshots for modal-specific storytelling
+
 ## Required GitHub Secrets
 
 Configure these in Settings → Secrets and variables → Actions:

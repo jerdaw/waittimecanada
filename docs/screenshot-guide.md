@@ -195,6 +195,23 @@
 
 ## Screenshot Workflow
 
+### Automated Baseline (CI)
+
+Use GitHub Actions workflow `Portfolio Screenshots` to generate a baseline pack automatically.
+
+Outputs:
+- `01-landing-page.png`
+- `02-landing-about-expanded.png`
+- `03-methods-page.png`
+- `04-analytics-page.png`
+- `05-data-quality-page.png`
+- `06-mobile-home.png`
+- `manifest.json`
+
+Artifact name: `portfolio-screenshots`
+
+Use these as base assets, then add curated manual captures for comparison-modal divergence and map popup storytelling.
+
 ### Tools Recommended
 1. **Built-in browser tools** (Chrome screenshot)
    - Open DevTools (F12)

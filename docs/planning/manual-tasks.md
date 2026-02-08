@@ -225,6 +225,11 @@ Thanks,
 
 **Reference Guide:** `docs/screenshot-guide.md` (already created)
 
+**Automation Status:**
+- [x] Baseline screenshot workflow implemented (`.github/workflows/portfolio-screenshots.yml`)
+- [x] Automated captures generated as CI artifact (`portfolio-screenshots`)
+- [ ] Curated manual captures still needed for divergence warning/modal storytelling shots
+
 ### Priority Screenshots:
 1. **Hero landing page** - Full page view
 2. **Interactive map** with markers - Zoomed to Toronto/Ottawa area
