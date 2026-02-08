@@ -1,0 +1,93 @@
+name: Production Readiness
+
+on:
+  workflow_dispatch:
+    inputs:
+      heartbeat_max_age_minutes:
+        description: "Maximum allowed scraper heartbeat age in minutes"
+        required: false
+        default: "90"
+        type: string
+      run_smoke_check:
+        description: "Run production smoke check in this workflow"
+        required: false
+        default: true
+        type: boolean
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  readiness:
+    name: Validate Production Readiness
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required/recommended secrets
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PUSHOVER_USER_KEY: ${{ secrets.PUSHOVER_USER_KEY }}
+          PUSHOVER_API_TOKEN: ${{ secrets.PUSHOVER_API_TOKEN }}
+          PRODUCTION_BASE_URL: ${{ secrets.PRODUCTION_BASE_URL }}
+        run: |
+          set -euo pipefail
+          missing_required=0
+
+          if [ -z "${DATABASE_URL}" ]; then
+            echo "ERROR: DATABASE_URL is missing."
+            missing_required=1
+          else
+            echo "OK: DATABASE_URL is configured."
+          fi
+
+          if [ -z "${PUSHOVER_USER_KEY}" ] || [ -z "${PUSHOVER_API_TOKEN}" ]; then
+            echo "WARN: Pushover alert secrets are not fully configured (optional)."
+          else
+            echo "OK: Pushover alert secrets are configured."
+          fi
+
+          if [ -z "${PRODUCTION_BASE_URL}" ]; then
+            echo "WARN: PRODUCTION_BASE_URL is not configured (required for smoke automation)."
+          else
+            echo "OK: PRODUCTION_BASE_URL is configured."
+          fi
+
+          if [ "${missing_required}" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Verify scraper heartbeat freshness
+        working-directory: ./backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python -m waittime.cli.check_heartbeat \
+            --max-age "${{ inputs.heartbeat_max_age_minutes }}" \
+            --dry-run
+
+      - name: Run production smoke checks
+        if: ${{ inputs.run_smoke_check }}
+        env:
+          PRODUCTION_BASE_URL: ${{ secrets.PRODUCTION_BASE_URL }}
+        run: |
+          if [ -z "${PRODUCTION_BASE_URL}" ]; then
+            echo "Skipping smoke check: PRODUCTION_BASE_URL is not configured."
+            exit 0
+          fi
+          ./scripts/production-smoke.sh

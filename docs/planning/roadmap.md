@@ -1,8 +1,8 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-02-07)
+## Current Status (Updated 2026-02-08)
 
-**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage)
+**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage) | M9 production smoke + readiness automation implemented
 
 **Strategic Direction:** Ontario-focused depth over multi-province breadth. The platform is
 transitioning from a real-time snapshot tool into a Health Systems Observatory with longitudinal
@@ -34,8 +34,10 @@ analysis, data quality transparency, and research-grade analytics.
 
 ### Immediate: M9 Production Completion
 - [ ] Deploy frontend to Render/Vercel with production `DATABASE_URL`
-- [ ] Set required production GitHub Secrets (`DATABASE_URL`, optional alert keys) and verify cron execution
-- [ ] Perform production smoke check for `/`, `/methods`, `/data-quality`, `/analytics`
+- [x] Implement production readiness workflow (`.github/workflows/production-readiness.yml`)
+- [ ] Set required production GitHub Secrets (`DATABASE_URL`, optional alert keys) and run readiness verification
+- [x] Implement automated production smoke workflow (`.github/workflows/production-smoke.yml`)
+- [ ] Run production smoke workflow against live URL for `/`, `/methods`, `/data-quality`, `/analytics`
 
 ### Recently Closed: M15 Analytics & Benchmarking
 **Status:** CLOSED (archived) | **Delivered:** 2026-02-07 | **Depends On:** M13
@@ -54,7 +56,9 @@ Delivered scope:
 **M9: Portfolio Launch** — remaining items:
 - [ ] Deploy frontend to Render/Vercel with production DATABASE_URL
 - [x] Configure GitHub Actions for automated scraper runs
-- [ ] Set required production GitHub Secrets (DATABASE_URL, optional alert keys) and verify cron execution
+- [ ] Set required production GitHub Secrets (DATABASE_URL, optional alert keys)
+- [ ] Run `Production Readiness` workflow and confirm heartbeat freshness pass
+- [ ] Set `PRODUCTION_BASE_URL` GitHub Actions secret and run smoke workflow
 - [ ] Stakeholder interview (1 ER nurse/physician)
 - [ ] Finalize and publish LinkedIn post
 

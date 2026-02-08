@@ -133,13 +133,37 @@ I'll process the data, create Mapbox tilesets, and implement the overlay UI.
 ### GitHub Actions (Already Configured):
 ✅ Scraper cron already set up in `.github/workflows/scraper-cron.yml`
 ✅ Heartbeat monitor already set up
+✅ Production smoke workflow set up in `.github/workflows/production-smoke.yml`
+✅ Production readiness workflow set up in `.github/workflows/production-readiness.yml`
 ⚠️  Need to verify DATABASE_URL secret is set in GitHub
+⚠️  Need to set `PRODUCTION_BASE_URL` secret and run smoke workflow once
 
 **Document Live URL:**
 ```
 Production URL: _______________________
 Deployment Date: _______________________
 ```
+
+### Production Smoke Verification:
+1. Add GitHub Actions secret:
+   - `PRODUCTION_BASE_URL` = your live site URL
+2. Run workflow manually:
+   - GitHub Actions → `Production Smoke` → Run workflow
+3. Confirm all checks pass for:
+   - `/`
+   - `/methods`
+   - `/data-quality`
+   - `/analytics`
+
+### Production Readiness Verification:
+1. Configure required/recommended secrets:
+   - Required: `DATABASE_URL`
+   - Recommended: `PUSHOVER_USER_KEY`, `PUSHOVER_API_TOKEN`
+2. Run workflow manually:
+   - GitHub Actions → `Production Readiness` → Run workflow
+3. Confirm heartbeat freshness passes.
+4. Optional local audit with GitHub CLI:
+   - `./scripts/verify-production-ops.sh`
 
 ---
 

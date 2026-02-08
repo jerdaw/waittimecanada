@@ -1,0 +1,41 @@
+name: Production Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Optional override (defaults to PRODUCTION_BASE_URL secret)"
+        required: false
+        type: string
+  schedule:
+    - cron: "17 */6 * * *"
+
+jobs:
+  smoke:
+    name: Smoke Check Live Routes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve base URL
+        id: resolve-url
+        run: |
+          BASE_URL="${{ github.event.inputs.base_url }}"
+          if [ -z "$BASE_URL" ]; then
+            BASE_URL="${{ secrets.PRODUCTION_BASE_URL }}"
+          fi
+
+          if [ -z "$BASE_URL" ]; then
+            echo "Missing base URL. Provide workflow input 'base_url' or set PRODUCTION_BASE_URL secret."
+            exit 1
+          fi
+
+          echo "base_url=$BASE_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Run production smoke checks
+        env:
+          PRODUCTION_BASE_URL: ${{ steps.resolve-url.outputs.base_url }}
+        run: ./scripts/production-smoke.sh

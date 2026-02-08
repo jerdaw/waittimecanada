@@ -68,6 +68,33 @@ This directory contains CI/CD workflows for the WaitTime Canada project.
 
 **Secrets Required:** Same as `scraper-cron.yml`
 
+### 6. `production-smoke.yml` - Production Route Verification
+
+**Trigger:** Manual dispatch and every 6 hours
+**Purpose:** Verifies key public routes respond with expected content
+**Checks:**
+1. `/`
+2. `/methods`
+3. `/data-quality`
+4. `/analytics`
+
+**Secrets Required:**
+- `PRODUCTION_BASE_URL` (or pass `base_url` as workflow input)
+
+### 7. `production-readiness.yml` - Secrets + Heartbeat Readiness Gate
+
+**Trigger:** Manual dispatch
+**Purpose:** Validates core production secrets and scraper operational health
+**Checks:**
+1. Required secret presence (`DATABASE_URL`)
+2. Optional/recommended secret presence (Pushover + production base URL)
+3. Heartbeat freshness via `waittime.cli.check_heartbeat --dry-run`
+4. Optional smoke check execution in same workflow
+
+**Inputs:**
+- `heartbeat_max_age_minutes` (default `90`)
+- `run_smoke_check` (default `true`)
+
 ## Required GitHub Secrets
 
 Configure these in Settings → Secrets and variables → Actions:
@@ -85,6 +112,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...
 
 # Error Tracking
 SENTRY_DSN=https://xxxxx@sentry.io/xxxxx
+
+# Production smoke checks
+PRODUCTION_BASE_URL=https://waittimecanada.ca
 
 # Email Alerts (for Dead Man's Switch)
 ALERT_EMAIL_USER=monitoring@example.com

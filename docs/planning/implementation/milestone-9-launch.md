@@ -122,6 +122,46 @@ if __name__ == '__main__':
     main()
 ```
 
+### 1.4 Production Smoke Verification Automation
+
+**Status:** Implemented (automation), pending live URL execution
+
+**Files:**
+- `.github/workflows/production-smoke.yml`
+- `scripts/production-smoke.sh`
+
+**Behavior:**
+1. Supports manual runs via `workflow_dispatch` with optional `base_url` input
+2. Runs every 6 hours on schedule as a passive production sanity check
+3. Verifies `200` + expected content marker for:
+   - `/`
+   - `/methods`
+   - `/data-quality`
+   - `/analytics`
+
+**Required Secret:**
+- `PRODUCTION_BASE_URL` - e.g., `https://waittimecanada.ca`
+
+### 1.5 Production Readiness Verification Automation
+
+**Status:** Implemented (automation), pending secret configuration + run execution
+
+**Files:**
+- `.github/workflows/production-readiness.yml`
+- `scripts/verify-production-ops.sh`
+
+**Behavior:**
+1. Manual workflow validates required/recommended production secrets
+2. Runs heartbeat freshness check (`python -m waittime.cli.check_heartbeat --dry-run`)
+3. Optionally runs smoke checks in the same workflow when `PRODUCTION_BASE_URL` is configured
+4. Local script audits secret presence, workflow state, and recent cron freshness via `gh`
+
+**Runbook:**
+1. Configure `DATABASE_URL` (required)
+2. Configure `PUSHOVER_USER_KEY` + `PUSHOVER_API_TOKEN` (recommended)
+3. Trigger workflow `Production Readiness` from GitHub Actions tab
+4. Optionally run `./scripts/verify-production-ops.sh` locally for `gh`-based audit output
+
 ---
 
 ## Phase 2: About/Story Section (Day 2)
@@ -383,6 +423,10 @@ Create screenshots showing:
 
 ### Production
 - [ ] Site loads at production URL
+- [x] Automated smoke workflow exists for core routes (`/`, `/methods`, `/data-quality`, `/analytics`)
+- [ ] Live smoke run has passed against production URL
+- [x] Production readiness workflow exists for secrets + heartbeat verification
+- [ ] Live readiness run has passed in GitHub Actions
 - [ ] All pages work (/, /methods, /faq)
 - [ ] Database queries return data
 - [ ] Scraper cron job configured
