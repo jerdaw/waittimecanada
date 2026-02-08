@@ -117,6 +117,8 @@ Playwright E2E is CI-first in this project; avoid local E2E unless debugging.
 Workflow reference and required secrets:
 
 - `.github/workflows/README.md`
+- `frontend/netlify.toml` + `frontend/scripts/netlify-ignore.sh` gate Netlify builds to explicit `[release]`/`[deploy]` commits only
+- Netlify guardrails reduce future credit burn only; they do not automatically unsuspend a site already suspended for exceeded credits before billing reset on March 2, 2026
 
 Quick production ops check:
 

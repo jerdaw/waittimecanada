@@ -203,6 +203,14 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 6. **Attribution** - Always link back to official provincial sources
 7. **Human Authorship Only** - Never attribute work to AI or non-human agents
 
+## Deployment Guardrails (Cost Control)
+
+- Netlify production deploys are intentionally gated to explicit release commits.
+- `frontend/netlify.toml` uses `frontend/scripts/netlify-ignore.sh`.
+- A Netlify production build is allowed only when commit message contains `[release]` or `[deploy]`.
+- Non-production branches are skipped by default.
+- This guardrail prevents new accidental credit burn; it does **not** unsuspend already suspended Netlify projects before billing reset on March 2, 2026.
+
 ## Implementation Roadmap
 
 - [x] **Week 1: Database Foundation** - Neon PostgreSQL setup, Quebec scraper MVP.

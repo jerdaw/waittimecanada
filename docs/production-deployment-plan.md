@@ -4,6 +4,8 @@
 **Date:** February 3, 2026
 **Platform:** Render (account created)
 
+> Update (February 8, 2026): Netlify Free credit usage exceeded plan allowance and projects were suspended. In this repo, Netlify deploys are now guarded by `frontend/scripts/netlify-ignore.sh` and only proceed for explicit `[release]`/`[deploy]` commits. This reduces future credit burn but does not unsuspend already suspended projects before billing reset on March 2, 2026.
+
 ---
 
 ## Current State
@@ -202,7 +204,7 @@ Instructions will depend on platform chosen (see platform-specific guides below)
 **Notes:**
 - Free tier instances spin down after 15 minutes of inactivity (first request may be slow)
 - Paid tier ($7/month) keeps instance running continuously
-- Auto-deploy on push to main branch
+- Deploys are release-gated in this repo; production deploy requires commit message containing `[release]` or `[deploy]`
 
 ---
 

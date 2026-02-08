@@ -78,6 +78,22 @@ API routes (selected):
 - Occupancy and equity routes include explicit availability states when source data is not ready.
 - Map layer equity geometry is scaffolded placeholder data until StatsCan integration is completed.
 
+## Netlify Deploy Guard
+
+This repo is configured to avoid accidental Netlify credit burn:
+
+- `frontend/netlify.toml` uses `frontend/scripts/netlify-ignore.sh` as the build ignore rule.
+- Non-production branches are skipped by default.
+- Production branch builds require explicit release intent via commit message containing `[release]` or `[deploy]`.
+- This prevents new accidental usage; it does not unsuspend a currently suspended Netlify site before the billing cycle reset date (March 2, 2026).
+
+Example release commit:
+
+```bash
+git commit -m "[release] deploy milestone 15 analytics update"
+git push origin main
+```
+
 ## Related Docs
 
 - `docs/API.md`
