@@ -1,5 +1,9 @@
 # Repository Structure Modernization Plan
 
+> [!WARNING]
+> Historical planning snapshot. This file is preserved for context and may reference superseded tooling or paths.
+> Use `docs/planning/roadmap.md` and `docs/development/documentation-guidelines.md` as current source of truth.
+
 **Goal:** Transform the WaitTime Canada repository into a best-practice exemplar with:
 - MkDocs Material for beautiful, searchable documentation
 - Architecture Decision Records (ADRs) for design choices

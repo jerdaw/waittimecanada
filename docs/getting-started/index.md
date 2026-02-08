@@ -1,24 +1,17 @@
 # Getting Started
 
-Welcome to WaitTime Canada! This section will help you get up and running quickly.
+This section provides the fastest path to run WaitTime Canada locally.
+
+## Recommended Path
+
+1. Follow the root quick start in `README.md`.
+2. Review backend specifics in `backend/README.md`.
+3. Review frontend specifics in `frontend/README.md`.
+4. Validate roadmap context in `docs/planning/roadmap.md`.
 
 ## Quick Links
 
-- [Quick Start](quick-start.md) - Get started in 5 minutes
-- [Installation](installation.md) - Detailed installation guide
-- [First Scraper](first-scraper.md) - Build your first scraper
-
-## Prerequisites
-
-Before you begin, ensure you have:
-
-- Python 3.12+
-- Node.js 20.x LTS
-- pnpm 8.x
-- A Supabase account
-
-## Next Steps
-
-1. Follow the [Quick Start](quick-start.md) guide
-2. Review the [Architecture](../architecture/overview.md) documentation
-3. Explore the [Development](../development/setup.md) guides
+- One-page quick start: `docs/getting-started/quick-start.md`
+- Development setup reference: `docs/development/setup.md`
+- Architecture overview: `docs/architecture/index.md`
+- API contracts: `docs/API.md`

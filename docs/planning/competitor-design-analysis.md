@@ -1,6 +1,8 @@
 # Competitor Design Analysis & Feature Mapping
 
 > Deep evaluation of competitor UI/UX and web design with actionable recommendations for WaitTime Canada.
+>
+> Historical analysis snapshot. For active implementation scope, use `docs/planning/roadmap.md`.
 
 ---
 

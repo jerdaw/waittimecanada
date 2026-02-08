@@ -20,7 +20,7 @@ The roadmap is the "source of truth" for project progress and strategic directio
 ## Maintenance
 
 - Once a milestone is "Delivered" and "Closed", relevant documents in `docs/planning/` should be archived if they are no longer living documents.
-- The `ROADMAP.md` should be kept as a single-entry point for project status.
+- `docs/planning/roadmap.md` should be kept as the single entry point for project status.
 
 ## Narrative Alignment
 

@@ -4,7 +4,24 @@ This directory contains operational and CI workflows for WaitTime Canada.
 
 ## Workflow Catalog
 
-### 1. `frontend-ci.yml` - Frontend CI
+### 1. `docs-ci.yml` - Documentation Quality CI
+
+**Trigger:** push/PR affecting docs and README surfaces.
+
+**Purpose:** Prevent stale/broken markdown by enforcing documentation hygiene checks.
+
+**Jobs:**
+- `docs-quality` (runs `scripts/check-docs.sh`)
+
+**Checks include:**
+- ban `file://` links
+- detect non-human co-author trailers
+- validate repository-relative markdown links across active docs
+- exclude designated historical snapshot docs from strict link checks
+
+---
+
+### 2. `frontend-ci.yml` - Frontend CI
 
 **Trigger:** push/PR affecting `frontend/**`.
 
@@ -25,7 +42,7 @@ This directory contains operational and CI workflows for WaitTime Canada.
 
 ---
 
-### 2. `scraper-ci.yml` - Backend/Scraper CI
+### 3. `scraper-ci.yml` - Backend/Scraper CI
 
 **Trigger:** push/PR affecting `backend/**`.
 
@@ -40,7 +57,7 @@ This directory contains operational and CI workflows for WaitTime Canada.
 
 ---
 
-### 3. `scraper-cron.yml` - Scheduled Scraper Execution
+### 4. `scraper-cron.yml` - Scheduled Scraper Execution
 
 **Trigger:** every 15 minutes + manual dispatch.
 
@@ -51,7 +68,7 @@ This directory contains operational and CI workflows for WaitTime Canada.
 
 ---
 
-### 4. `heartbeat-monitor.yml` - Dead Man's Switch
+### 5. `heartbeat-monitor.yml` - Dead Man's Switch
 
 **Trigger:** every 30 minutes + manual dispatch.
 
@@ -62,7 +79,7 @@ This directory contains operational and CI workflows for WaitTime Canada.
 
 ---
 
-### 5. `database-cleanup.yml` - Measurement Retention Cleanup
+### 6. `database-cleanup.yml` - Measurement Retention Cleanup
 
 **Trigger:** daily + manual dispatch.
 
@@ -73,7 +90,7 @@ This directory contains operational and CI workflows for WaitTime Canada.
 
 ---
 
-### 6. `production-readiness.yml` - Production Readiness Gate
+### 7. `production-readiness.yml` - Production Readiness Gate
 
 **Trigger:** manual dispatch.
 
@@ -84,7 +101,7 @@ This directory contains operational and CI workflows for WaitTime Canada.
 
 ---
 
-### 7. `production-smoke.yml` - Live Route Smoke Checks
+### 8. `production-smoke.yml` - Live Route Smoke Checks
 
 **Trigger:** every 6 hours + manual dispatch.
 
@@ -95,7 +112,7 @@ This directory contains operational and CI workflows for WaitTime Canada.
 
 ---
 
-### 8. `portfolio-screenshots.yml` - Portfolio Screenshot Artifact Generation
+### 9. `portfolio-screenshots.yml` - Portfolio Screenshot Artifact Generation
 
 **Trigger:** manual dispatch.
 
@@ -106,11 +123,15 @@ This directory contains operational and CI workflows for WaitTime Canada.
 
 ---
 
-### 9. `database-migrate.yml` - Database Migration Runner
+### 10. `database-migrate.yml` - Database Migration Runner
 
 **Trigger:** push to `main` for `database/migrations/**` + manual dispatch.
 
 **Purpose:** Apply database migrations through Supabase tooling.
+
+Note: the current production database is Neon PostgreSQL. Treat this workflow as
+legacy/optional unless your environment is explicitly configured for Supabase CLI.
+Default local migration path remains `python backend/run_migrations.py`.
 
 **Optimization controls:**
 - Serialized concurrency per ref.

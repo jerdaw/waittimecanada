@@ -221,7 +221,7 @@ python -m waittime.cli.seed --file hospitals.json --dry-run
 
 ## See Also
 
-- [Database Schema](../docs/architecture/database.md)
+- [Database Schema](../../docs/architecture/database.md)
 - [Ontario Methodology](methodologies/ontario-methodology.md)
 - [Verification Queue](verification-queue.md)
 - [Integration Testing](integration-testing.md)

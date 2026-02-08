@@ -2,7 +2,7 @@
 
 ## Current Status (Updated 2026-02-08)
 
-**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage) | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented
+**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage) | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
 **Strategic Direction:** Ontario-focused depth over multi-province breadth. The platform is
 transitioning from a real-time snapshot tool into a Health Systems Observatory with longitudinal
@@ -66,6 +66,7 @@ Completed in this cycle:
 - M12: Occupancy endpoint + explicit "not available yet" UI state
 - Governance hardening for testimonial content validation (single published quote guardrails)
 - CI optimization pass for developer velocity (keep checks strict, reduce redundant runtime)
+- Documentation hardening pass (modernized guides, historical snapshot labeling, and automated docs lint checks in CI)
 
 Current open autonomous backlog:
 - None (remaining open work is currently human/external dependency-bound)

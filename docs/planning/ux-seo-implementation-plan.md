@@ -3,7 +3,10 @@
 > Milestone 7: Features for improving SEO and user experience
 
 **Created:** 2026-02-04
-**Status:** Draft - Awaiting Review
+**Status:** Historical Reference (Implemented in Milestone 7)
+
+> [!NOTE]
+> This document is preserved for implementation history. Current project status and active priorities live in `docs/planning/roadmap.md`.
 
 ---
 
@@ -28,7 +31,7 @@ Schema.org structured data significantly improves search result appearance (rich
 
 ---
 
-#### [NEW] [structured-data.tsx](file:///home/jer/localsync/waittimecanada/frontend/app/structured-data.tsx)
+#### [NEW] [structured-data.tsx](../../frontend/app/structured-data.tsx)
 
 New component containing JSON-LD scripts for schema.org markup:
 - `FAQPage` - 5-6 methodology Q&A pairs for rich snippet dropdowns
@@ -38,7 +41,7 @@ New component containing JSON-LD scripts for schema.org markup:
 
 ---
 
-#### [MODIFY] [layout.tsx](file:///home/jer/localsync/waittimecanada/frontend/app/layout.tsx)
+#### [MODIFY] [layout.tsx](../../frontend/app/layout.tsx)
 
 Add healthcare-specific meta tags:
 ```tsx
@@ -63,7 +66,7 @@ Skeleton screens improve perceived performance by showing content-shaped placeho
 
 ---
 
-#### [NEW] [components/skeletons/](file:///home/jer/localsync/waittimecanada/frontend/components/skeletons/)
+#### [NEW] [components/skeletons/](../../frontend/components/skeletons/)
 
 Create skeleton directory with:
 
@@ -78,7 +81,7 @@ Skeleton pattern:
 
 ---
 
-#### [MODIFY] [HospitalList.tsx](file:///home/jer/localsync/waittimecanada/frontend/components/HospitalList.tsx)
+#### [MODIFY] [HospitalList.tsx](../../frontend/components/HospitalList.tsx)
 
 Add loading state prop and render skeletons when `loading={true}`.
 
@@ -90,7 +93,7 @@ Allow users to quickly find hospitals by name or city.
 
 ---
 
-#### [MODIFY] [HospitalList.tsx](file:///home/jer/localsync/waittimecanada/frontend/components/HospitalList.tsx)
+#### [MODIFY] [HospitalList.tsx](../../frontend/components/HospitalList.tsx)
 
 Add search functionality:
 - Search input above list (sticky header)
@@ -100,7 +103,7 @@ Add search functionality:
 
 ---
 
-#### [MODIFY] [page.tsx](file:///home/jer/localsync/waittimecanada/frontend/app/page.tsx)
+#### [MODIFY] [page.tsx](../../frontend/app/page.tsx)
 
 Lift search state to page level if needed for map synchronization.
 
@@ -112,7 +115,7 @@ Lift search state to page level if needed for map synchronization.
 
 ---
 
-#### [NEW] [utils/distance.ts](file:///home/jer/localsync/waittimecanada/frontend/utils/distance.ts)
+#### [NEW] [utils/distance.ts](../../frontend/utils/distance.ts)
 
 Haversine distance calculation:
 ```typescript
@@ -126,7 +129,7 @@ export function calculateDistance(
 
 ---
 
-#### [MODIFY] [page.tsx](file:///home/jer/localsync/waittimecanada/frontend/app/page.tsx)
+#### [MODIFY] [page.tsx](../../frontend/app/page.tsx)
 
 Add geolocation state:
 ```tsx
@@ -144,7 +147,7 @@ const requestLocation = () => {
 
 ---
 
-#### [MODIFY] [HospitalList.tsx](file:///home/jer/localsync/waittimecanada/frontend/components/HospitalList.tsx)
+#### [MODIFY] [HospitalList.tsx](../../frontend/components/HospitalList.tsx)
 
 - Accept `userLocation` prop
 - When available, display distance in km next to each hospital
@@ -158,7 +161,7 @@ More prominent "LIVE" badges on hospitals with fresh data.
 
 ---
 
-#### [MODIFY] [HospitalList.tsx](file:///home/jer/localsync/waittimecanada/frontend/components/HospitalList.tsx)
+#### [MODIFY] [HospitalList.tsx](../../frontend/components/HospitalList.tsx)
 
 Add live indicator to each card:
 ```tsx

@@ -1,70 +1,49 @@
-# WaitTime Canada - Implementation Documentation
+# Documentation Index
 
-This directory contains the detailed implementation plan for WaitTime Canada.
+This directory is the documentation control plane for WaitTime Canada.
 
-## Document Structure
+## Start Here
 
-### Core Implementation Guides
+- Project overview and local setup: `README.md` (repo root)
+- Active roadmap and milestone status: `docs/planning/roadmap.md`
+- Human-intervention queue: `docs/planning/manual-tasks.md`
 
-1. **[IMPLEMENTATION.md](./IMPLEMENTATION.md)** - Comprehensive technical implementation guide
-   - Tech stack with specific versions
-   - Project structure and organization
-   - Development environment setup
-   - Testing and code quality standards
-   - Security and performance considerations
+## Core References
 
-2. **[DATABASE.md](./DATABASE.md)** - Complete database specification
-   - Full schema with all tables and constraints
-   - Database migrations strategy
-   - Indexes and performance optimizations
-   - Row-level security policies
-   - Sample queries and data access patterns
+- API contracts: `docs/API.md`
+- Architecture overview: `docs/architecture/index.md`
+- ADRs: `docs/adr/`
+- Development setup: `docs/development/setup.md`
+- Testing standards: `docs/development/testing-guidelines.md`
+- Documentation standards: `docs/development/documentation-guidelines.md`
 
-3. **[API.md](./API.md)** - API contracts and specifications
-   - REST endpoint definitions
-   - Request/response schemas
-   - Error handling patterns
-   - OpenAPI/Swagger specification
-   - Authentication and rate limiting
+## Planning and Execution
 
-4. **[ROADMAP.md](./ROADMAP.md)** - Granular implementation roadmap
-   - Week-by-week breakdown with specific tasks
-   - Dependencies and acceptance criteria
-   - Testing checkpoints
-   - Risk mitigation per phase
+- Planning hub: `docs/planning/README.md`
+- Roadmap lifecycle process: `docs/planning/roadmap-process.md`
+- Active milestone plans: `docs/planning/implementation/`
+- Archived plans: `docs/planning/archive/`
 
-### Reference Documents
+## Historical Snapshots
 
-- **[../er-times-plan.md](../er-times-plan.md)** - Original strategic specification
-- **[../AGENTS.md](../AGENTS.md)** - AI assistant guidance for the codebase
+- `docs/REPO_STRUCTURE_PLAN.md`
+- `docs/final-documentation-review.md`
+- `docs/planning/strategic-plan.md`
 
-## Implementation Philosophy
+These files are retained for historical context and may include superseded details.
 
-This documentation follows modern best practices:
+## Portfolio and Stakeholder Materials
 
-- **Specificity**: Exact versions, not "latest"
-- **Reproducibility**: Clear setup instructions anyone can follow
-- **Type Safety**: TypeScript and Python type hints throughout
-- **Testing**: Test-driven development with comprehensive coverage
-- **Observability**: Monitoring and alerting built-in from day one
-- **Security**: Security considerations at every layer
-- **Maintainability**: Code quality tools and CI/CD automation
+- Application summary: `docs/application-summary.md`
+- LinkedIn launch post draft: `docs/linkedin-launch-post.md`
+- Screenshot guide: `docs/screenshot-guide.md`
+- Stakeholder toolkit: `docs/stakeholder-interviews/`
 
-## Quick Start Path
+## Maintenance Rules
 
-For developers starting implementation:
-
-1. Read [IMPLEMENTATION.md](./IMPLEMENTATION.md) for tech stack and setup
-2. Review [DATABASE.md](./DATABASE.md) to understand data model
-3. Check [API.md](./API.md) for interface contracts
-4. Follow [ROADMAP.md](./ROADMAP.md) for step-by-step execution
-
-## Document Maintenance
-
-These documents should be updated as:
-- Technologies are upgraded
-- Architecture decisions change
-- New features are added
-- Lessons are learned during implementation
-
-Treat this as living documentation, not static specs.
+- Treat docs as code: update docs in same PR as behavior changes.
+- Run `bash scripts/check-docs.sh` before opening docs-heavy PRs.
+- Keep roadmap current every working session.
+- Archive milestone plans only when delivered/closed per process.
+- Clearly label historical documents and avoid using them as source-of-truth.
+- Keep author/contributor attribution human-only.

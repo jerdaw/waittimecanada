@@ -1,36 +1,53 @@
 # Documentation Guidelines
 
-This project follows a "Documentation-as-Code" philosophy. Documentation should be treat with the same rigor as code.
+Documentation is treated as production code in this repository.
 
-## Principles
+## Standards
 
-1. **Accuracy**: Documentation must match the current state of the codebase.
-2. **Conciseness**: Avoid fluff. Use bullet points and tables for readability.
-3. **Traceability**: Link back to ADRs or implementation plans when relevant.
-4. **Clinical Tone**: Maintain a professional, physician-innovator tone (CanMEDS focus).
+- Accurate: reflects current runtime behavior, schema, and workflows.
+- Actionable: command snippets run as written.
+- Traceable: major decisions link to ADRs and roadmap entries.
+- Maintained: stale plans are archived; active plans stay current.
 
-## File Locations
+## Update Triggers
 
-- **Architecture**: `docs/architecture/`
-- **ADRs**: `docs/adr/`
-- **Guides**: `docs/guides/`
-- **Planning**: `docs/planning/`
-- **Implementation Summaries**: `docs/implementation/`
+Update docs in the same PR when changing:
 
-## Markdown Standards
+- API routes, parameters, response contracts, or error behavior
+- database schema, migrations, or bootstrap workflows
+- setup steps, scripts, environment variables, or CI workflows
+- roadmap/milestone status
 
-- Use GitHub Flavored Markdown (GFM).
-- All code blocks must have language tags.
-- Headers should follow logical hierarchy (# -> ## -> ###).
-- Use clickable file links: `[filename](file:///path/to/file)`.
+## Link and Path Rules
 
-## Review Process
+- Use repository-relative links (for example, `docs/planning/roadmap.md`).
+- Never use absolute local paths or `file://` links.
+- Prefer stable links to source-of-truth docs over duplicate explanations.
 
-- Documentation updates should be included in the same PR as code changes.
-- Large architectural changes require an ADR.
-- Before launch, a final documentation review (like `docs/final-documentation-review.md`) must be performed.
+## Active vs Historical Docs
 
-## Attribution
+- Active docs should describe current behavior.
+- Historical plans should be clearly marked as archived/historical and removed from active task lists.
+- The roadmap (`docs/planning/roadmap.md`) remains the primary status entry point.
+- Documentation automation (`scripts/check-docs.sh`) validates active docs and intentionally excludes designated historical snapshots.
 
-- **CRITICAL**: ONLY human contributors may be listed in documentation.
-- Do NOT attribute any work to AI assistants, agents, or automated tools.
+## Required Updates for Major Features
+
+1. Update roadmap status: `docs/planning/roadmap.md`
+2. Update related implementation plan: `docs/planning/implementation/*`
+3. Add/update ADR when architecture or contracts changed: `docs/adr/*`
+4. Update public docs for externally visible behavior: `README.md`, `docs/API.md`, `docs/architecture/*`
+
+## Documentation Quality Check
+
+Run before opening a PR:
+
+```bash
+bash scripts/check-docs.sh
+```
+
+This check enforces high-signal documentation hygiene rules used by CI.
+
+## Attribution Policy
+
+Only human contributors may be listed as authors/co-authors in documentation and commits.

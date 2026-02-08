@@ -1,319 +1,122 @@
-# WaitTime Canada API Documentation
+# WaitTime Canada API Reference
 
 ## Overview
 
-The WaitTime Canada API provides programmatic access to Canadian emergency department wait time data with full methodology attribution. All endpoints are read-only and return data under the CC-BY-4.0 license.
+WaitTime Canada APIs are served from Next.js route handlers in `frontend/app/api/`.
 
-**Base URL:** `https://waittimecanada.ca/api`
+Base URL:
 
-**Data License:** CC-BY-4.0 (Creative Commons Attribution 4.0 International)
+- Local: `http://localhost:3000/api`
+- Production: `<PRODUCTION_BASE_URL>/api` (when deployed)
 
-**Required Attribution:**
-> WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set]. https://waittimecanada.ca
+## Conventions
 
----
+- Most routes use JSON responses.
+- Many routes return `{ success, data }` for success and `{ success: false, error, message }` for errors.
+- Some older routes use payload-first contracts (kept for compatibility).
 
-## Endpoints
+## Endpoint Catalog
 
-### GET /api/hospitals
+## Hospitals and comparability
 
-Returns a list of hospitals with current wait times and full methodology metadata.
+- `GET /api/hospitals?province=ON`
+- `GET /api/hospitals/[slug]/trends?period=24h|7d|30d|90d|6m|1y`
+- `GET /api/compare?a=<hospital_id>&b=<hospital_id>`
 
-**Query Parameters:**
+## System and data quality
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `province` | string | No | Filter by province code (ON, QC, AB) |
+- `GET /api/health`
+- `GET /api/data-quality?hospital_id=<id>&days=30`
+- `GET /api/anomalies?source_id=<source_id>&days=7`
 
-**Response:**
+## Analytics
 
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "ca-on-toronto-general",
-      "name": "Toronto General Hospital",
-      "province": "ON",
-      "city": "Toronto",
-      "latitude": 43.6591,
-      "longitude": -79.3878,
-      "current_wait_time": 145,
-      "metric_family": "TIME_TO_PROVIDER",
-      "start_event": "TRIAGE",
-      "end_event": "PHYSICIAN",
-      "statistic_type": "P90",
-      "patient_scope": "ALL",
-      "last_updated": "2026-02-04T15:30:00Z",
-      "source_id": "ontario-health",
-      "methodology_url": "https://www.hqontario.ca/..."
-    }
-  ]
-}
-```
+- `GET /api/analytics/benchmarks?province=ON&period=24h|7d|30d[&hospital_id=<id>]`
+- `GET /api/analytics/trends?province=ON&period=weekly|monthly&lookback=3m|6m|1y`
+- `GET /api/analytics/regions?province=ON&period=24h|7d|30d`
+- `GET /api/analytics/patterns?hospital_id=<id>&type=hour_of_day|day_of_week|monthly`
+- `GET /api/analytics/occupancy?province=ON`
+- `GET /api/analytics/equity-summary?province=ON&period=24h|7d|30d`
 
-**Example:**
-```bash
-curl "https://waittimecanada.ca/api/hospitals?province=ON"
-```
+## Equity layer
 
----
+- `GET /api/equity-layer?province=ON`
 
-### GET /api/export
+## Export
 
-Download historical wait time data in CSV or JSON format with full methodology tags.
+- `GET /api/export?format=csv|json&granularity=raw|hourly|daily|weekly|monthly`
 
-**Query Parameters:**
+Additional optional export params:
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `province` | string | No | Filter by province code (ON, QC, AB) |
-| `start_date` | ISO 8601 | No | Start of date range (e.g., `2026-01-01T00:00:00Z`) |
-| `end_date` | ISO 8601 | No | End of date range (e.g., `2026-02-04T23:59:59Z`) |
-| `format` | string | No | Response format: `csv` (default) or `json` |
-| `include_methodology` | boolean | No | Include ontology columns in CSV (default: `true`) |
+- `province`
+- `start_date`
+- `end_date`
+- `include_methodology=true|false`
 
-**CSV Response:**
+## Geolocation
 
-```csv
-timestamp_utc,hospital_id,hospital_name,province,city,latitude,longitude,wait_time_minutes,metric_family,start_event,end_event,statistic_type,patient_scope,source_id,source_name,methodology_url
-2026-02-04T15:30:00Z,ca-on-toronto-general,Toronto General Hospital,ON,Toronto,43.6591,-79.3878,145,TIME_TO_PROVIDER,TRIAGE,PHYSICIAN,P90,ALL,ontario-health,Ontario Health,https://www.hqontario.ca/...
-```
+- `GET /api/geolocation`
 
-**Response Headers:**
-```
-Content-Type: text/csv
-Content-Disposition: attachment; filename="waittime-canada-export-2026-02-04.csv"
-X-Data-License: CC-BY-4.0
-X-Citation: WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set]. https://waittimecanada.ca
-```
+## Admin verification
 
-**JSON Response:**
+- `GET /api/admin/hospitals/unverified`
+- `POST /api/admin/hospitals/[id]/verify`
+- `DELETE /api/admin/hospitals/[id]/verify`
 
-```json
-{
-  "data": [
-    {
-      "timestamp_utc": "2026-02-04T15:30:00Z",
-      "hospital_id": "ca-on-toronto-general",
-      "hospital_name": "Toronto General Hospital",
-      "province": "ON",
-      "city": "Toronto",
-      "latitude": 43.6591,
-      "longitude": -79.3878,
-      "wait_time_minutes": 145,
-      "metric_family": "TIME_TO_PROVIDER",
-      "start_event": "TRIAGE",
-      "end_event": "PHYSICIAN",
-      "statistic_type": "P90",
-      "patient_scope": "ALL",
-      "source_id": "ontario-health",
-      "source_name": "Ontario Health",
-      "methodology_url": "https://www.hqontario.ca/..."
-    }
-  ],
-  "metadata": {
-    "exported_at": "2026-02-04T16:00:00Z",
-    "record_count": 1,
-    "filters": {
-      "province": "ON",
-      "startDate": "2026-02-01T00:00:00Z",
-      "endDate": null
-    },
-    "license": "CC-BY-4.0",
-    "citation": "WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set]. https://waittimecanada.ca"
-  }
-}
-```
+## Key Contracts
 
-**Examples:**
+## Comparability endpoint
+
+`GET /api/compare` returns:
+
+- `comparable: boolean`
+- `divergence_brief: string | null`
+- methodology fields for both hospitals
+
+## Occupancy availability contract
+
+`GET /api/analytics/occupancy` returns one of:
+
+- `status: "available"`
+- `status: "no_reporting_data"`
+- `status: "not_available_yet"`
+
+This ensures missing source fields are explicit, not silently treated as zero.
+
+## Equity availability contract
+
+`GET /api/analytics/equity-summary` returns one of:
+
+- `status: "ready"`
+- `status: "no_reporting_data"`
+- `status: "not_available_yet"`
+
+`GET /api/equity-layer` returns setup guidance when province data is not scaffolded yet.
+
+## Example Requests
 
 ```bash
-# Download last 7 days as CSV
-curl "https://waittimecanada.ca/api/export?format=csv&start_date=2026-01-28T00:00:00Z"
+# Hospitals in Ontario
+curl "http://localhost:3000/api/hospitals?province=ON"
 
-# Get Ontario data as JSON
-curl "https://waittimecanada.ca/api/export?format=json&province=ON"
+# Compare two hospitals
+curl "http://localhost:3000/api/compare?a=ca-on-ottawa-general&b=ca-qc-chum"
 
-# Download all data without methodology columns
-curl "https://waittimecanada.ca/api/export?format=csv&include_methodology=false"
+# Benchmarks
+curl "http://localhost:3000/api/analytics/benchmarks?province=ON&period=7d"
+
+# Province trend
+curl "http://localhost:3000/api/analytics/trends?province=ON&period=monthly&lookback=6m"
+
+# Regions
+curl "http://localhost:3000/api/analytics/regions?province=ON&period=7d"
+
+# Export aggregated monthly data
+curl "http://localhost:3000/api/export?format=json&granularity=monthly&province=ON"
 ```
 
-**Rate Limits:**
-- 10,000 records per request
-- No authentication required
-- No rate limiting (please be respectful)
+## Data Use and Interpretation
 
----
-
-### GET /api/health
-
-Returns system health status and scraper heartbeat information.
-
-**Response:**
-
-```json
-{
-  "status": "healthy",
-  "last_heartbeat": "2026-02-04T15:30:00Z",
-  "heartbeat_age_minutes": 5,
-  "source_id": "ontario-health"
-}
-```
-
-**Status Values:**
-- `healthy`: Scraper ran recently (< 60 minutes ago)
-- `degraded`: Scraper data is stale (60-120 minutes ago)
-- `down`: No recent scraper activity (> 120 minutes ago)
-- `unknown`: No heartbeat data available
-
-**Example:**
-```bash
-curl "https://waittimecanada.ca/api/health"
-```
-
----
-
-## Methodology Ontology
-
-All data exports include these methodology tags for proper attribution:
-
-| Field | Values | Description |
-|-------|--------|-------------|
-| `metric_family` | `TIME_TO_PROVIDER`, `TOTAL_LOS`, `STRETCHER_OCCUPANCY` | What is being measured |
-| `start_event` | `TRIAGE`, `REGISTRATION`, `DOOR`, `UNKNOWN` | When measurement starts |
-| `end_event` | `PHYSICIAN`, `PROVIDER`, `DISCHARGE`, `FIRST_ASSESSMENT` | When measurement ends |
-| `statistic_type` | `POINT_ESTIMATE`, `P90`, `ALGORITHMIC`, `ROLLING_AVG` | How the value was calculated |
-| `patient_scope` | `ALL`, `MID_ACUITY`, `NON_PRIORITY` | Which patients are included |
-
-**Comparability Rule:**
-Two measurements are directly comparable if and only if:
-```
-A.metric_family == B.metric_family AND
-A.start_event == B.start_event AND
-A.end_event == B.end_event AND
-A.statistic_type == B.statistic_type
-```
-
-See [/methods](https://waittimecanada.ca/methods) for detailed explanations.
-
----
-
-## Usage Examples
-
-### Python
-
-```python
-import requests
-import pandas as pd
-from io import StringIO
-
-# Download CSV data
-response = requests.get(
-    'https://waittimecanada.ca/api/export',
-    params={
-        'format': 'csv',
-        'province': 'ON',
-        'start_date': '2026-01-01T00:00:00Z'
-    }
-)
-
-# Load into pandas
-df = pd.read_csv(StringIO(response.text))
-
-# Filter for comparable measurements
-comparable = df[
-    (df['metric_family'] == 'TIME_TO_PROVIDER') &
-    (df['start_event'] == 'TRIAGE') &
-    (df['end_event'] == 'PHYSICIAN') &
-    (df['statistic_type'] == 'P90')
-]
-
-print(comparable.groupby('hospital_name')['wait_time_minutes'].mean())
-```
-
-### R
-
-```r
-library(httr)
-library(readr)
-
-# Download data
-response <- GET(
-  'https://waittimecanada.ca/api/export',
-  query = list(
-    format = 'csv',
-    province = 'QC'
-  )
-)
-
-# Parse CSV
-data <- read_csv(content(response, 'text'))
-
-# Analyze by city
-library(dplyr)
-data %>%
-  group_by(city) %>%
-  summarize(
-    avg_wait = mean(wait_time_minutes, na.rm = TRUE),
-    n = n()
-  )
-```
-
-### JavaScript
-
-```javascript
-// Fetch JSON data
-const response = await fetch(
-  'https://waittimecanada.ca/api/export?format=json&province=AB'
-);
-const { data, metadata } = await response.json();
-
-// Filter for recent data
-const recent = data.filter(row => {
-  const age = Date.now() - new Date(row.timestamp_utc);
-  return age < 24 * 60 * 60 * 1000; // Last 24 hours
-});
-
-console.log(`Found ${recent.length} recent measurements`);
-console.log(`Citation: ${metadata.citation}`);
-```
-
----
-
-## Data License & Attribution
-
-All data is provided under **CC-BY-4.0** (Creative Commons Attribution 4.0 International).
-
-**You are free to:**
-- Share: Copy and redistribute the material
-- Adapt: Remix, transform, and build upon the material
-
-**Under the following terms:**
-- **Attribution:** You must give appropriate credit, provide a link to the license, and indicate if changes were made
-
-**Suggested Citation:**
-> WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set]. https://waittimecanada.ca
-
-**BibTeX:**
-```bibtex
-@misc{waittimecanada2026,
-  title = {Canadian ER Wait Time Data},
-  author = {{WaitTime Canada}},
-  year = {2026},
-  howpublished = {\url{https://waittimecanada.ca}},
-  note = {Data set}
-}
-```
-
----
-
-## Support
-
-**Documentation:** https://waittimecanada.ca/methods
-**Issues:** https://github.com/jerdaw/waittimecanada/issues
-**Email:** [Contact via GitHub]
-
----
-
-*Last Updated: February 4, 2026*
+- Use methodology tags when interpreting or comparing hospitals.
+- Do not interpret cross-province comparisons as directly comparable unless ontology dimensions match.
+- This platform is informational and operational; it is not a triage or medical advice service.

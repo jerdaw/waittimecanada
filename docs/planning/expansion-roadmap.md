@@ -1,5 +1,8 @@
 # Provincial Expansion Roadmap
 
+> [!NOTE]
+> Historical planning snapshot. Use `docs/planning/roadmap.md` for current priorities and status.
+
 ## Philosophy: One Province at a Time
 
 **Rationale:** Better to have ONE province working end-to-end (scraper → database → frontend → deployment) than FIVE provinces half-built.

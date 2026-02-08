@@ -12,7 +12,7 @@
 > - **Database:** Now uses **Neon PostgreSQL** (not Supabase)
 > - **Hosting:** Frontend on **Render** (not Vercel)
 > - **Alerts:** Uses **Pushover** (not email)
-> - **Current status:** See `ROADMAP.md` for up-to-date progress
+> - **Current status:** See `docs/planning/roadmap.md` for up-to-date progress
 
 ---
 

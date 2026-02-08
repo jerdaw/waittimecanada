@@ -1,74 +1,104 @@
-# WaitTime Canada - Backend
+# WaitTime Canada Backend
 
-Provincial ER wait time scrapers and core domain models.
+Python backend for scraping, ontology enforcement, aggregation, and operational health checks.
 
-**Status:** MVP Complete ✓
-**Tests:** 24 passing (56% coverage)
-**Database:** Neon PostgreSQL 17
-**Scrapers:** Quebec (complete), Alberta/ON/MB/BC (planned)
+## Stack
 
-## Installation
+- Python 3.12+
+- Neon PostgreSQL
+- `psycopg2-binary`, `pydantic`, `structlog`, `tenacity`
+- `pytest`, `ruff`, `mypy`
 
-```bash
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+## Setup
 
-# Install in development mode
-pip install -e ".[dev]"
-```
-
-## Project Structure
-
-```
-backend/
-├── src/waittime/          # Main package
-│   ├── core/              # Domain models and ontology
-│   ├── scrapers/          # Provincial data scrapers
-│   ├── services/          # Business logic
-│   └── cli/               # Command-line interface
-├── tests/                 # Test suite
-│   ├── unit/              # Fast, no I/O
-│   ├── integration/       # Database, HTTP
-│   └── e2e/               # Full workflows
-└── migrations/            # Database migrations
-```
-
-## Running Tests
+From repository root:
 
 ```bash
-# All tests
-pytest
-
-# Unit tests only (fast)
-pytest -m unit
-
-# With coverage report
-pytest --cov=src/waittime --cov-report=html
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e 'backend[dev]'
 ```
 
-## Code Quality
+From `backend/` directly:
 
 ```bash
-# Lint and format
-ruff check src/ tests/
-ruff format src/ tests/
-
-# Type checking
-mypy src/
+python -m pip install -e '.[dev]'
 ```
 
-## Core Concepts
+Create local env file:
 
-### Metric Ontology
+```bash
+cp backend/.env.example backend/.env.local
+```
 
-Every measurement is tagged with ontology fields that describe its methodology:
+Required env var: `DATABASE_URL`.
 
-- **metric_family**: What is being measured (TIME_TO_PROVIDER, TOTAL_LOS)
-- **start_event**: When the clock starts (TRIAGE, REGISTRATION, DOOR)
-- **end_event**: When the clock stops (PHYSICIAN, PROVIDER, DISCHARGE)
-- **statistic_type**: How value is calculated (P90, MEAN, ROLLING_AVG)
+## Database Initialization
 
-Two measurements are **comparable** only if all four fields match.
+```bash
+python backend/run_migrations.py
+python -m waittime.cli.bootstrap_analytics --days 180
+```
 
-See [ADR-0002](../docs/adr/0002-metric-ontology.md) for the full rationale.
+## Core CLI Commands
+
+```bash
+# List scraper sources
+python -m waittime.cli.scraper --list
+
+# Run all scrapers
+python -m waittime.cli.scraper --all
+
+# Run one scraper
+python -m waittime.cli.scraper --source ontario-health
+
+# Heartbeat check
+python -m waittime.cli.check_heartbeat --max-age 60
+
+# Seed source/hospital data
+python -m waittime.cli.seed_sources backend/data/sources/ontario-health.json
+python -m waittime.cli.seed backend/data/hospitals/ontario-seed.json
+
+# Region mapping audit / auto-assign
+python -m waittime.cli.region_mapping --province ON
+python -m waittime.cli.region_mapping --province ON --auto-assign
+```
+
+## Testing and Quality
+
+```bash
+# All backend tests
+python -m pytest backend/tests
+
+# Unit only
+python -m pytest -m unit backend/tests
+
+# Lint / format / typing
+ruff check backend/src backend/tests
+ruff format backend/src backend/tests
+mypy backend/src
+```
+
+## Schema Highlights
+
+Primary tables:
+
+- `sources`
+- `hospitals`
+- `measurements`
+- `scraper_status`
+- `measurement_aggregates`
+- `data_quality_snapshots`
+- `methodology_change_events`
+- `regions`
+- `hospital_regions`
+
+Migrations live in `backend/migrations/`.
+
+## Related Docs
+
+- `docs/architecture/database.md`
+- `docs/architecture/api.md`
+- `docs/planning/roadmap.md`
+- `docs/adr/0002-metric-ontology.md`

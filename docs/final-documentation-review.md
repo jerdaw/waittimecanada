@@ -1,7 +1,11 @@
 # Final Documentation Review - Milestone 5.6
 
 **Date:** February 2, 2026
-**Status:** ✅ Complete
+**Status:** Historical Snapshot
+
+> [!WARNING]
+> This review reflects repository state at the date above and is not maintained as live documentation.
+> For current status, use `docs/planning/roadmap.md` and `docs/README.md`.
 
 ## Executive Summary
 

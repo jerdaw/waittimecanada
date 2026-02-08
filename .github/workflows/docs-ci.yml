@@ -1,0 +1,35 @@
+name: Docs CI
+
+on:
+  pull_request:
+    paths:
+      - "README.md"
+      - "CONTRIBUTING.md"
+      - "backend/README.md"
+      - "frontend/README.md"
+      - "docs/**"
+      - "scripts/check-docs.sh"
+      - ".github/workflows/docs-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "README.md"
+      - "CONTRIBUTING.md"
+      - "backend/README.md"
+      - "frontend/README.md"
+      - "docs/**"
+      - "scripts/check-docs.sh"
+      - ".github/workflows/docs-ci.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: docs-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run docs quality checks
+        run: bash scripts/check-docs.sh

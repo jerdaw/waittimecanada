@@ -126,7 +126,7 @@ Separate tables: `measurements_ab`, `measurements_qc`, etc.
 
 ## Links
 
-* [Related to] [ADR-0001](0001-use-supabase.md) - PostgreSQL enums chosen for ontology enforcement
+* [Related to] [Architecture Database Guide](../architecture/database.md) - PostgreSQL enums chosen for ontology enforcement
 * [Refines] Strategic plan "Comparability Boolean" section
 
 ## Additional Information

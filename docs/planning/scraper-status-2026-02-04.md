@@ -4,6 +4,9 @@
 **Author:** Development Team
 **Status:** Ontario Working, Quebec Broken
 
+> [!NOTE]
+> Point-in-time status snapshot. Use `docs/planning/roadmap.md` and live operational tooling for current state.
+
 ---
 
 ## Executive Summary

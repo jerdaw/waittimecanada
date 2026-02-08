@@ -1,35 +1,95 @@
 # Testing Guidelines
 
-We prioritize high-quality, clinically-defensible code through rigorous testing.
+This project treats testing as a reliability control for clinical data interpretation.
 
-## Frameworks
+## Test Stack
 
-- **Backend**: `pytest`
-- **Frontend**: `Vitest` + `React Testing Library`
-- **E2E**: `Playwright` (CI only)
+- Backend: `pytest` (`backend/tests`)
+- Frontend unit/component: `Vitest` + React Testing Library
+- Frontend E2E: `Playwright` (CI-first; local only when debugging)
 
-## Test Categories
+## Core Principles
 
-### 1. Unit Tests (Fast, No I/O)
-- Test individual functions, models, and logic.
-- Target: 90% coverage for core logic (ComparisonService, Scrapers).
-- Run: `pytest -m unit` (Backend) or `npm run test:unit` (Frontend).
+- Test behavior, not implementation details.
+- Keep assertions tied to ontology/comparability contracts.
+- Prefer deterministic fixtures over live external dependencies.
+- Add regression tests when fixing bugs.
 
-### 2. Integration Tests (Database, External APIs)
-- Test interactions between components.
-- Use mocks for external APIs when possible, or specialized fixtures.
-- Run: `pytest -m integration`.
+## Backend Test Types
 
-### 3. E2E Tests (Browser-based)
-- Test full user flows in the browser.
-- **Rule**: Do NOT run these locally unless specifically debugging. They are run automatically in GitHub CI.
+### Unit (`@pytest.mark.unit`)
 
-## Standards
+Use for isolated logic without network/database I/O.
 
-- **Coverage**: Minimum 80% overall coverage required for any new feature.
-- **Naming**: Files should end in `.test.tsx` (Frontend) or start with `test_` (Backend).
-- **Fixtures**: Use `conftest.py` for shared backend fixtures and `frontend/tests/fixtures/` for frontend data.
+```bash
+python -m pytest -m unit backend/tests
+```
 
-## Attribution
+### Integration (`@pytest.mark.integration`)
 
-- Only humans should be credited with writing or maintaining tests.
+Use for DB interactions, scraper parsing integration, and service composition.
+
+```bash
+python -m pytest -m integration backend/tests
+```
+
+### Full backend suite
+
+```bash
+python -m pytest backend/tests
+```
+
+## Frontend Test Types
+
+### Unit/component suite
+
+```bash
+cd frontend
+npm run test:unit
+```
+
+### E2E suite (CI)
+
+```bash
+cd frontend
+npm run test:e2e
+```
+
+Default rule: do not run E2E locally unless investigating a specific browser-flow bug.
+
+## Coverage and Quality Expectations
+
+- Coverage should not regress for changed modules.
+- New API routes/services should include happy-path and error-path tests.
+- Comparability, divergence warnings, and data-quality logic must remain explicitly tested.
+- If a change is hard to test directly, document rationale in PR notes.
+
+## Naming and Organization
+
+- Backend: `test_*.py` under `backend/tests/unit` or `backend/tests/integration`
+- Frontend: `*.test.ts` or `*.test.tsx` in `frontend/tests`
+- Shared backend fixtures: `backend/tests/conftest.py`
+- Shared frontend test utilities: `frontend/tests/test-utils.tsx`
+
+## Local Verification Matrix
+
+Use this as a minimal baseline before opening a PR:
+
+```bash
+# Backend
+ruff check backend/src backend/tests
+mypy backend/src
+python -m pytest backend/tests
+
+# Frontend
+cd frontend
+npm run lint
+npm run type-check
+npm run test:unit
+```
+
+## CI Alignment
+
+- CI is the source of truth for merge readiness.
+- Treat local runs as fast preflight to reduce CI churn.
+- If local and CI disagree, prioritize reproducing and fixing CI conditions.

@@ -22,6 +22,16 @@ This directory is the planning control plane for WaitTime Canada.
 - `docs/planning/archive/IMPLEMENTATION_PLAN_SUMMARY.md`
 - `docs/planning/archive/REPO_MODERNIZATION_SUMMARY.md`
 
+## Historical Planning Snapshots
+
+- `docs/planning/strategic-plan.md`
+- `docs/planning/expansion-roadmap.md`
+- `docs/planning/competitor-design-analysis.md`
+- `docs/planning/scraper-status-2026-02-04.md`
+- `docs/planning/ux-seo-implementation-plan.md`
+
+These documents are retained for context and may not match current implementation details.
+
 ## Lifecycle Rules
 
 1. Keep the roadmap current every session.
