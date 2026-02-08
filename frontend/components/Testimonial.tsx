@@ -22,6 +22,10 @@ function contextLabel(testimonial: StakeholderTestimonial): string | null {
 }
 
 export function Testimonial({ testimonial }: TestimonialProps) {
+  if (!testimonial.published) {
+    return null;
+  }
+
   const attribution = attributionLabel(testimonial);
   const context = contextLabel(testimonial);
 

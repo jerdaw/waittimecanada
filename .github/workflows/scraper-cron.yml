@@ -9,6 +9,10 @@ on:
 env:
   PYTHON_VERSION: '3.12'
 
+concurrency:
+  group: scraper-cron
+  cancel-in-progress: false
+
 jobs:
   run-scrapers:
     name: Run All Scrapers

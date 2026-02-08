@@ -1,12 +1,27 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import MapGL, { Marker, Popup, NavigationControl } from "react-map-gl";
+import MapGL, {
+  Marker,
+  Popup,
+  NavigationControl,
+  Source,
+  Layer,
+  type LayerProps,
+} from "react-map-gl";
 import type { Hospital } from "@/app/api/hospitals/route";
 import { ComparisonModal } from "./ComparisonModal";
 import { DivergenceWarning } from "./DivergenceWarning";
 import { TrendChart } from "./TrendChart";
 import { BenchmarkCard } from "./BenchmarkCard";
+import { EquityLayerToggle } from "./EquityLayerToggle";
+import { EquityLegend } from "./EquityLegend";
+import {
+  EQUITY_QUINTILE_COLORS,
+  type EquityFeatureCollection,
+  type EquityLayerApiResponse,
+  type EquityLayerMetadata,
+} from "@/utils/equity";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -18,6 +33,34 @@ const colors = {
   busy: "#DC2626", // red-600
   unknown: "#6B7280", // gray-500
   primary: "#2563EB", // blue-600
+};
+
+const EQUITY_FILL_LAYER: LayerProps = {
+  id: "equity-fill",
+  type: "fill",
+  paint: {
+    "fill-color": [
+      "match",
+      ["get", "income_quintile"],
+      1, EQUITY_QUINTILE_COLORS[1],
+      2, EQUITY_QUINTILE_COLORS[2],
+      3, EQUITY_QUINTILE_COLORS[3],
+      4, EQUITY_QUINTILE_COLORS[4],
+      5, EQUITY_QUINTILE_COLORS[5],
+      "#CBD5E1",
+    ] as any,
+    "fill-opacity": 0.24,
+  },
+};
+
+const EQUITY_OUTLINE_LAYER: LayerProps = {
+  id: "equity-outline",
+  type: "line",
+  paint: {
+    "line-color": "#ffffff",
+    "line-width": 0.6,
+    "line-opacity": 0.45,
+  },
 };
 
 // Get marker color based on wait time
@@ -531,6 +574,7 @@ function MissingTokenError() {
 
 interface MapProps {
   hospitals: Hospital[];
+  province?: string;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
   lastUpdate: string | null;
@@ -544,6 +588,7 @@ interface MapProps {
 // Main Map component
 export default function Map({
   hospitals,
+  province = "ON",
   selectedId,
   onSelect,
   lastUpdate,
@@ -557,6 +602,15 @@ export default function Map({
   const [comparisonMode, setComparisonMode] = useState(false);
   const [selectedForComparison, setSelectedForComparison] = useState<Hospital[]>([]);
   const [showComparisonModal, setShowComparisonModal] = useState(false);
+  const [showEquityLayer, setShowEquityLayer] = useState(false);
+  const [equityStatus, setEquityStatus] = useState<"idle" | "loading" | "ready" | "unavailable" | "error">("idle");
+  const [equityError, setEquityError] = useState<string | null>(null);
+  const [equityDataByProvince, setEquityDataByProvince] = useState<Record<string, EquityFeatureCollection>>({});
+  const [equityMetadataByProvince, setEquityMetadataByProvince] = useState<Record<string, EquityLayerMetadata>>({});
+
+  const normalizedProvince = province.toUpperCase();
+  const activeEquityData = equityDataByProvince[normalizedProvince] ?? null;
+  const activeEquityMetadata = equityMetadataByProvince[normalizedProvince] ?? null;
 
   // Find selected hospital object
   const selectedHospital = useMemo(
@@ -636,6 +690,64 @@ export default function Map({
     };
   }, [hospitals, userLocation]);
 
+  useEffect(() => {
+    if (!showEquityLayer) {
+      setEquityStatus("idle");
+      setEquityError(null);
+      return;
+    }
+
+    if (activeEquityData) {
+      setEquityStatus("ready");
+      setEquityError(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadEquityLayer() {
+      setEquityStatus("loading");
+      setEquityError(null);
+
+      try {
+        const response = await fetch(`/api/equity-layer?province=${normalizedProvince}`);
+        const payload = (await response.json()) as EquityLayerApiResponse;
+
+        if (!response.ok || !payload.success) {
+          if (cancelled) return;
+
+          const errorMessage = "error" in payload ? payload.error : "Failed to load equity layer";
+          setEquityError(errorMessage);
+          setEquityStatus(response.status === 404 ? "unavailable" : "error");
+          return;
+        }
+
+        if (cancelled) return;
+
+        setEquityDataByProvince((prev) => ({
+          ...prev,
+          [normalizedProvince]: payload.data,
+        }));
+        setEquityMetadataByProvince((prev) => ({
+          ...prev,
+          [normalizedProvince]: payload.metadata,
+        }));
+        setEquityStatus("ready");
+      } catch (err) {
+        console.error("Failed to load equity layer:", err);
+        if (cancelled) return;
+        setEquityError("Failed to load equity layer. Try again shortly.");
+        setEquityStatus("error");
+      }
+    }
+
+    loadEquityLayer();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeEquityData, normalizedProvince, showEquityLayer]);
+
   // Render states
   if (!MAPBOX_TOKEN) return <MissingTokenError />;
   if (loading) return <MapSkeleton />;
@@ -652,6 +764,13 @@ export default function Map({
         onClick={() => onSelect(null)}
       >
         <NavigationControl position="bottom-right" showCompass={false} />
+
+        {showEquityLayer && activeEquityData && activeEquityData.features.length > 0 && (
+          <Source id={`equity-${normalizedProvince}`} type="geojson" data={activeEquityData as any}>
+            <Layer {...EQUITY_FILL_LAYER} />
+            <Layer {...EQUITY_OUTLINE_LAYER} />
+          </Source>
+        )}
 
         {/* Hospital markers */}
         {hospitals.map((hospital) => {
@@ -758,11 +877,27 @@ export default function Map({
         <DataFreshnessIndicator lastUpdate={lastUpdate} isStale={isStale} />
       </div>
 
+      <div className="absolute top-16 left-4 z-10 flex max-w-[320px] flex-col gap-2">
+        <EquityLayerToggle
+          enabled={showEquityLayer}
+          loading={equityStatus === "loading"}
+          onChange={setShowEquityLayer}
+        />
+        {showEquityLayer && (equityStatus === "unavailable" || equityStatus === "error") && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50/95 px-3 py-2 text-xs text-amber-800 shadow-sm">
+            {equityError ?? "Equity layer is unavailable for this province."}
+          </div>
+        )}
+      </div>
+
       <div className="absolute top-4 right-4 z-10">
         <StatsBadge count={hospitals.length} label="hospitals" />
       </div>
 
-      <div className="absolute bottom-8 left-4 z-10">
+      <div className="absolute bottom-8 left-4 z-10 flex flex-col gap-3">
+        {showEquityLayer && activeEquityData && activeEquityData.features.length > 0 && (
+          <EquityLegend metadata={activeEquityMetadata ?? undefined} />
+        )}
         <MapLegend />
       </div>
 

@@ -6,6 +6,20 @@
 
 ---
 
+## Implementation Status (Updated 2026-02-08)
+
+- Citation-ready export: implemented
+- Dead Man's Switch + health endpoint: implemented
+- Occupancy analytics contract: implemented with explicit availability states
+  - `/api/analytics/occupancy` now returns `not_available_yet`, `no_reporting_data`, or `available`
+  - `/analytics` now renders clear "Occupancy metrics not available yet" messaging when source
+    fields are absent
+- Remaining for full occupancy rollout:
+  - ingest source occupancy fields once published by provincial feeds
+  - backfill and validate occupancy aggregates for interpretation
+
+---
+
 ## Overview
 
 These features position WaitTime Canada as research infrastructure, not just a consumer app. The citation-ready export lets researchers use the data properly, while the alert system ensures operational reliability.
@@ -706,7 +720,8 @@ Before implementing, verify:
 2. Does Ontario Health provide "patients in treatment" count?
 3. Are these values in the same scrape or a different endpoint?
 
-**If not available:** Skip this phase. Document in ADR why omitted.
+**Current implementation:** Deliver explicit availability contract now; defer ingestion until source
+fields exist.
 
 ### 3.2 Schema Extension (If Available)
 
@@ -846,9 +861,10 @@ See `/methods` page for detailed explanation of the metric ontology.
 - [ ] `/api/health` endpoint returns status
 
 ### Occupancy (If Implemented)
-- [ ] Schema extended
-- [ ] Scraper collects data
-- [ ] UI displays stats
+- [x] Occupancy endpoint returns explicit availability status
+- [x] Analytics UI shows explicit "not available yet" state
+- [ ] Schema extended for production occupancy ingestion
+- [ ] Scraper collects occupancy fields when source supports them
 
 ---
 

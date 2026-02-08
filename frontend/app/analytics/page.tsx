@@ -43,6 +43,28 @@ interface RegionMappingCoverage {
   coverage_percent: number;
 }
 
+type OccupancyStatus = "available" | "no_reporting_data" | "not_available_yet";
+
+interface OccupancySnapshot {
+  province: string;
+  available: boolean;
+  status: OccupancyStatus;
+  generated_at: string;
+  message: string;
+  fields: {
+    patients_waiting: boolean;
+    patients_in_treatment: boolean;
+  };
+  setup_steps?: string[];
+  observations_24h?: number;
+  hospitals_reporting?: number;
+  averages?: {
+    patients_waiting: number | null;
+    patients_in_treatment: number | null;
+  };
+  latest_observation?: string | null;
+}
+
 const PROVINCE_OPTIONS = [
   { code: "ON", label: "Ontario" },
   { code: "QC", label: "Quebec" },
@@ -85,6 +107,8 @@ export default function AnalyticsPage() {
   const [selectedRegionId, setSelectedRegionId] = useState<string | null>(null);
   const [loadingRegions, setLoadingRegions] = useState(true);
   const [loadingBenchmarks, setLoadingBenchmarks] = useState(true);
+  const [loadingOccupancy, setLoadingOccupancy] = useState(true);
+  const [occupancy, setOccupancy] = useState<OccupancySnapshot | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -173,8 +197,31 @@ export default function AnalyticsPage() {
       }
     }
 
+    async function loadOccupancy() {
+      setLoadingOccupancy(true);
+      try {
+        const response = await fetch(`/api/analytics/occupancy?province=${province}`);
+        const json = await response.json();
+
+        if (!mounted) return;
+        if (response.ok && json.success && json.data) {
+          setOccupancy(json.data as OccupancySnapshot);
+        } else {
+          setOccupancy(null);
+        }
+      } catch {
+        if (!mounted) return;
+        setOccupancy(null);
+      } finally {
+        if (mounted) {
+          setLoadingOccupancy(false);
+        }
+      }
+    }
+
     loadRegions();
     loadBenchmarks();
+    loadOccupancy();
 
     return () => {
       mounted = false;
@@ -277,6 +324,71 @@ export default function AnalyticsPage() {
             selectedRegionId={selectedRegionId}
             onSelectRegion={setSelectedRegionId}
           />
+        </section>
+
+        <section className="rounded-xl border border-border/50 bg-card p-4">
+          <h2 className="text-lg font-semibold text-foreground">Occupancy Signals</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Patients waiting and patients in treatment metrics are surfaced only when source fields
+            are available and explicitly reported.
+          </p>
+
+          {loadingOccupancy ? (
+            <p className="mt-3 text-sm text-muted-foreground">Loading occupancy status...</p>
+          ) : !occupancy ? (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Occupancy status could not be loaded at this time.
+            </p>
+          ) : occupancy.status === "not_available_yet" ? (
+            <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+              <p className="font-medium">Occupancy metrics not available yet</p>
+              <p className="mt-1">{occupancy.message}</p>
+              {Array.isArray(occupancy.setup_steps) && occupancy.setup_steps.length > 0 && (
+                <div className="mt-2 space-y-1 text-xs">
+                  {occupancy.setup_steps.map((step) => (
+                    <p key={step}>{step}</p>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : occupancy.status === "no_reporting_data" ? (
+            <div className="mt-3 rounded-lg border border-border/60 bg-muted/30 p-3 text-sm text-muted-foreground">
+              {occupancy.message}
+            </div>
+          ) : (
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-lg border border-border/60 bg-background p-3">
+                <p className="text-xs text-muted-foreground">Avg Patients Waiting (24h)</p>
+                <p className="mt-1 text-2xl font-semibold text-foreground tabular-nums">
+                  {occupancy.averages?.patients_waiting === null ||
+                  occupancy.averages?.patients_waiting === undefined
+                    ? "n/a"
+                    : Math.round(occupancy.averages.patients_waiting)}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Hospitals reporting: {occupancy.hospitals_reporting ?? 0}
+                </p>
+              </div>
+              <div className="rounded-lg border border-border/60 bg-background p-3">
+                <p className="text-xs text-muted-foreground">Avg Patients In Treatment (24h)</p>
+                <p className="mt-1 text-2xl font-semibold text-foreground tabular-nums">
+                  {occupancy.averages?.patients_in_treatment === null ||
+                  occupancy.averages?.patients_in_treatment === undefined
+                    ? "n/a"
+                    : Math.round(occupancy.averages.patients_in_treatment)}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Observations: {occupancy.observations_24h ?? 0}
+                </p>
+              </div>
+              {occupancy.latest_observation && (
+                <p className="text-xs text-muted-foreground sm:col-span-2">
+                  Latest occupancy observation:{" "}
+                  {new Date(occupancy.latest_observation).toLocaleString()}
+                </p>
+              )}
+            </div>
+          )}
         </section>
 
         <section className="rounded-xl border border-border/50 bg-card p-4">

@@ -6,6 +6,10 @@ on:
 env:
   NODE_VERSION: "20"
 
+concurrency:
+  group: portfolio-screenshots
+  cancel-in-progress: true
+
 jobs:
   capture:
     name: Capture Portfolio Screenshots

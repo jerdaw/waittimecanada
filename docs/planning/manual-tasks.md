@@ -78,6 +78,7 @@ Provide the above information and I'll complete the Alberta scraper implementati
 **Milestone:** M11 Phase 2 - Equity Layer
 **Estimated Time:** 20-30 minutes
 **Priority:** MEDIUM (strong Health Advocate feature)
+**Current State:** Map/API scaffold and tract-linkage summary are live with placeholder geometry; this task unlocks real-data replacement.
 
 ### Steps:
 1. **Download Census Data:**
@@ -100,7 +101,9 @@ Provide the above information and I'll complete the Alberta scraper implementati
    ```
 
 **Next Steps After Completion:**
-I'll process the data, create Mapbox tilesets, and implement the overlay UI.
+- Replace placeholder payload in `/api/equity-layer`
+- Keep legend attribution synchronized with final StatsCan source metadata
+- Extend equity insights summary using tract-level linkage
 
 ---
 
@@ -205,7 +208,8 @@ Thanks,
 **Document Results:**
 - Save interview notes in `docs/stakeholder-interviews/`
 - Extract 1-2 testimonial quotes (with permission)
-- Add testimonial section to site if obtained
+- If publishing a quote, include `publishedAt` + `approvalReference` metadata in `frontend/content/stakeholderTestimonials.ts`
+- Keep at most one `published: true` testimonial entry (guardrail-enforced)
 
 **Toolkit Status:**
 - [x] Outreach template prepared (`docs/stakeholder-interviews/outreach-template.md`)

@@ -6,6 +6,10 @@ on:
     - cron: '*/30 * * * *'  # Every 30 minutes
   workflow_dispatch:
 
+concurrency:
+  group: heartbeat-monitor
+  cancel-in-progress: false
+
 jobs:
   check-heartbeat:
     name: Check Scraper Health

@@ -2,8 +2,8 @@
  * Tests for Map component with prop-based data
  */
 
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Map from "@/components/Map";
 import { Hospital } from "@/app/api/hospitals/route";
 
@@ -19,6 +19,10 @@ vi.mock("react-map-gl", () => ({
     <div data-testid="map-popup">{children}</div>
   ),
   NavigationControl: () => <div data-testid="navigation-control" />,
+  Source: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="map-source">{children}</div>
+  ),
+  Layer: () => <div data-testid="map-layer" />,
 }));
 
 // Mock Mapbox CSS
@@ -37,6 +41,45 @@ vi.mock("@/components/BenchmarkCard", () => ({
 }));
 
 describe("Map Component", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(global.fetch).mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        success: true,
+        data: {
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              id: "test-tract",
+              geometry: {
+                type: "Polygon",
+                coordinates: [[[-79.5, 43.6], [-79.4, 43.6], [-79.4, 43.7], [-79.5, 43.7], [-79.5, 43.6]]],
+              },
+              properties: {
+                tract_id: "test-tract",
+                tract_name: "Test Tract",
+                income_quintile: 2,
+                median_household_income: 65000,
+                is_placeholder: true,
+              },
+            },
+          ],
+        },
+        metadata: {
+          province: "ON",
+          source: "test",
+          attribution: "test attribution",
+          generated_at: "2026-02-08T00:00:00.000Z",
+          is_placeholder: true,
+          note: "test note",
+        },
+      }),
+    } as Response);
+  });
+
   const mockHospitals: Hospital[] = [
     {
       id: "test-hospital",
@@ -60,6 +103,7 @@ describe("Map Component", () => {
 
   const defaultProps = {
     hospitals: [],
+    province: "ON",
     selectedId: null,
     onSelect: vi.fn(),
     lastUpdate: null,
@@ -124,5 +168,16 @@ describe("Map Component", () => {
     expect(screen.getByText("Directions")).toBeInTheDocument();
     // Website button removed
     expect(screen.getByText("Call Health Info")).toBeInTheDocument();
+  });
+
+  it("loads equity layer when income overlay is enabled", async () => {
+    render(<Map {...defaultProps} hospitals={mockHospitals} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Enable income overlay" }));
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith("/api/equity-layer?province=ON");
+    });
+    expect(screen.getByText("Income Quintile")).toBeInTheDocument();
   });
 });

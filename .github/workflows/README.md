@@ -1,205 +1,144 @@
 # GitHub Actions Workflows
 
-This directory contains CI/CD workflows for the WaitTime Canada project.
+This directory contains operational and CI workflows for WaitTime Canada.
 
-## Workflows Overview
+## Workflow Catalog
 
-### 1. `scraper-cron.yml` - Production Scraper Execution
+### 1. `frontend-ci.yml` - Frontend CI
 
-**Trigger:** Every 15 minutes (cron: `*/15 * * * *`)
-**Purpose:** Runs all provincial scrapers in production
-**Secrets Required:**
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_KEY`
-- `SENTRY_DSN` (optional)
-- `ALERT_EMAIL_USER` (for failure notifications)
-- `ALERT_EMAIL_PASSWORD`
-- `ALERT_EMAIL_TO`
+**Trigger:** push/PR affecting `frontend/**`.
 
-**What it does:**
-1. Installs Python dependencies
-2. Runs `python -m src.main` to execute all scrapers
-3. Sends email alert on failure (Dead Man's Switch)
+**Purpose:** Keep frontend quality gates strict while reducing redundant runtime.
 
-### 2. `scraper-ci.yml` - Scraper Code Quality
-
-**Trigger:** Push/PR to `scrapers/` directory
-**Purpose:** Lint, type-check, and test scraper code
 **Jobs:**
-- **lint**: Ruff linter + formatter check
-- **type-check**: mypy static type analysis
-- **test**: pytest with coverage
-- **security**: Bandit security scan
+- `changes` (path-aware scope detection)
+- `lint` (ESLint + Prettier check)
+- `type-check` (TypeScript)
+- `test-unit` (Vitest + coverage)
+- `test-e2e` (Playwright Chromium only, diff-gated)
+- `build` (Next.js production build, diff-gated)
 
-### 3. `frontend-ci.yml` - Frontend Code Quality
+**Optimization controls:**
+- Branch-level concurrency cancellation.
+- Changed-path gating for heavy E2E/build steps.
+- Explicit failures (no permissive "skip on error" fallbacks).
 
-**Trigger:** Push/PR to `frontend/` directory
-**Purpose:** Lint, type-check, test, and build frontend
+---
+
+### 2. `scraper-ci.yml` - Backend/Scraper CI
+
+**Trigger:** push/PR affecting `backend/**`.
+
 **Jobs:**
-- **lint**: ESLint + Prettier
-- **type-check**: TypeScript compiler
-- **test-unit**: Vitest with coverage
-- **test-e2e**: Playwright E2E tests
-- **build**: Next.js production build
+- `lint` (ruff)
+- `type-check` (mypy, advisory)
+- `test` (pytest + coverage)
+- `security` (Bandit, advisory)
 
-**Secrets Required:**
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+**Optimization controls:**
+- Branch-level concurrency cancellation.
 
-### 4. `database-migrate.yml` - Database Schema Updates
+---
 
-**Trigger:** Push to `main` when `database/migrations/` changes
-**Purpose:** Apply database migrations automatically
-**Secrets Required:**
-- `SUPABASE_ACCESS_TOKEN`
-- `SUPABASE_PROJECT_ID`
-- `SUPABASE_URL`
+### 3. `scraper-cron.yml` - Scheduled Scraper Execution
 
-**Manual Trigger:** Can specify individual migration file
+**Trigger:** every 15 minutes + manual dispatch.
 
-### 5. `heartbeat-monitor.yml` - Health Check (Dead Man's Switch)
+**Purpose:** Run all provincial scrapers against production DB and emit failure alerts.
 
-**Trigger:** Every hour (cron: `0 * * * *`)
-**Purpose:** Verify scrapers are running
-**What it does:**
-1. Queries `scraper_status` table
-2. Checks if last run was < 60 minutes ago
-3. Sends email alert if stale
+**Optimization controls:**
+- Serialized concurrency group to avoid overlapping cron runs.
 
-**Secrets Required:** Same as `scraper-cron.yml`
+---
 
-### 6. `production-smoke.yml` - Production Route Verification
+### 4. `heartbeat-monitor.yml` - Dead Man's Switch
 
-**Trigger:** Manual dispatch and every 6 hours
-**Purpose:** Verifies key public routes respond with expected content
-**Checks:**
-1. `/`
-2. `/methods`
-3. `/data-quality`
-4. `/analytics`
+**Trigger:** every 30 minutes + manual dispatch.
 
-**Secrets Required:**
-- `PRODUCTION_BASE_URL` (or pass `base_url` as workflow input)
+**Purpose:** Ensure scraper heartbeat freshness remains within threshold.
 
-### 7. `production-readiness.yml` - Secrets + Heartbeat Readiness Gate
+**Optimization controls:**
+- Serialized concurrency group to avoid overlapping checks.
 
-**Trigger:** Manual dispatch
-**Purpose:** Validates core production secrets and scraper operational health
-**Checks:**
-1. Required secret presence (`DATABASE_URL`)
-2. Optional/recommended secret presence (Pushover + production base URL)
-3. Heartbeat freshness via `waittime.cli.check_heartbeat --dry-run`
-4. Optional smoke check execution in same workflow
+---
 
-**Inputs:**
-- `heartbeat_max_age_minutes` (default `90`)
-- `run_smoke_check` (default `true`)
+### 5. `database-cleanup.yml` - Measurement Retention Cleanup
+
+**Trigger:** daily + manual dispatch.
+
+**Purpose:** Enforce retention policy for old measurement rows.
+
+**Optimization controls:**
+- Serialized concurrency group.
+
+---
+
+### 6. `production-readiness.yml` - Production Readiness Gate
+
+**Trigger:** manual dispatch.
+
+**Purpose:** Validate secrets + heartbeat, optionally run smoke checks.
+
+**Optimization controls:**
+- Branch-level concurrency cancellation.
+
+---
+
+### 7. `production-smoke.yml` - Live Route Smoke Checks
+
+**Trigger:** every 6 hours + manual dispatch.
+
+**Purpose:** Verify public production routes respond with expected markers.
+
+**Optimization controls:**
+- Single concurrency group with cancellation for stale overlapping runs.
+
+---
 
 ### 8. `portfolio-screenshots.yml` - Portfolio Screenshot Artifact Generation
 
-**Trigger:** Manual dispatch
-**Purpose:** Builds frontend, runs scripted Playwright capture flow, uploads screenshot artifact
-**Artifact:** `portfolio-screenshots`
-**Notes:**
-- Designed for launch material generation and documentation assets
-- Complements (does not replace) curated manual screenshots for modal-specific storytelling
+**Trigger:** manual dispatch.
 
-## Required GitHub Secrets
+**Purpose:** Build frontend, run scripted capture flow, upload screenshots artifact.
 
-Configure these in Settings → Secrets and variables → Actions:
+**Optimization controls:**
+- Single concurrency group with cancellation.
 
-```bash
-# Supabase
-SUPABASE_URL=https://xxxxx.supabase.co
-SUPABASE_SERVICE_KEY=eyJhbGc...        # Service role key
-SUPABASE_ACCESS_TOKEN=sbp_...          # For Supabase CLI
-SUPABASE_PROJECT_ID=xxxxx              # Project ref
+---
 
-# Frontend (public keys)
-NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...
+### 9. `database-migrate.yml` - Database Migration Runner
 
-# Error Tracking
-SENTRY_DSN=https://xxxxx@sentry.io/xxxxx
+**Trigger:** push to `main` for `database/migrations/**` + manual dispatch.
 
-# Production smoke checks
-PRODUCTION_BASE_URL=https://waittimecanada.ca
+**Purpose:** Apply database migrations through Supabase tooling.
 
-# Email Alerts (for Dead Man's Switch)
-ALERT_EMAIL_USER=monitoring@example.com
-ALERT_EMAIL_PASSWORD=app_password_here
-ALERT_EMAIL_TO=admin@example.com
-```
+**Optimization controls:**
+- Serialized concurrency per ref.
 
-## Deployment Strategy
+## Secrets Matrix
 
-### Scrapers
-- Run serverlessly via GitHub Actions every 15 minutes
-- No dedicated server required
-- Utilizes GitHub Actions free tier (2000 minutes/month)
+### Core production/runtime
+- `DATABASE_URL` (required by scraper, readiness, cleanup, frontend build paths)
+- `NEXT_PUBLIC_MAPBOX_TOKEN` (required by frontend build/test/screenshot workflows)
 
-### Frontend
-- Auto-deployed to Vercel on push to `main`
-- Vercel GitHub integration handles deployment
-- No GitHub Action needed (Vercel CLI can be added if needed)
+### Alerting/observability
+- `PUSHOVER_USER_KEY` (optional but recommended)
+- `PUSHOVER_API_TOKEN` (optional but recommended)
+- `SENTRY_DSN` (optional)
 
-### Database
-- Migrations applied automatically on merge to `main`
-- Manual rollback via workflow dispatch
+### Production smoke
+- `PRODUCTION_BASE_URL` (required for scheduled smoke checks and optional readiness smoke)
 
-## Monitoring
+### Database migration workflow
+- `SUPABASE_ACCESS_TOKEN`
+- `SUPABASE_PROJECT_ID`
+- `SUPABASE_URL`
+- `ALERT_EMAIL_USER`
+- `ALERT_EMAIL_PASSWORD`
+- `ALERT_EMAIL_TO`
 
-### Success Metrics
-- Scraper runs complete in < 10 minutes
-- Frontend builds complete in < 5 minutes
-- All tests pass with > 80% coverage
+## Operational Notes
 
-### Failure Alerts
-- Email sent on scraper failure (immediate)
-- Email sent on heartbeat failure (hourly check)
-- GitHub Actions notifications in Slack (optional setup)
-
-## Local Testing
-
-Test workflows locally with [act](https://github.com/nektos/act):
-
-```bash
-# Install act
-brew install act  # macOS
-# or: https://github.com/nektos/act#installation
-
-# Test scraper workflow
-act -j run-scrapers --secret-file .env
-
-# Test frontend CI
-act -j lint -W .github/workflows/frontend-ci.yml
-```
-
-## Troubleshooting
-
-### Scraper cron not running
-1. Check GitHub Actions tab for failed runs
-2. Verify secrets are set correctly
-3. Check Supabase service key has not expired
-4. Review logs in failed workflow run
-
-### Database migration failed
-1. **DO NOT** re-run automatically
-2. Review SQL syntax errors in logs
-3. Test migration locally: `psql $SUPABASE_URL -f database/migrations/XXX.sql`
-4. Fix and create new migration (never edit existing)
-
-### E2E tests failing
-1. Check Playwright browser installation
-2. Verify test environment has network access
-3. Review screenshots in workflow artifacts
-4. Run locally: `pnpm test:e2e`
-
-## Future Enhancements
-
-- [ ] Add staging environment workflow
-- [ ] Implement blue-green deployment for DB migrations
-- [ ] Add performance benchmarking to frontend CI
-- [ ] Set up automatic dependency updates (Dependabot)
-- [ ] Add Slack notifications for failures
-- [ ] Implement canary deployments for scrapers
+- Playwright E2E is CI-only for normal development flow.
+- `frontend-ci.yml` keeps strict quality gates while avoiding heavy jobs when changes do not affect runtime behavior.
+- `production-readiness.yml` and `production-smoke.yml` are the operational preflight/postflight checks for live deployment confidence.

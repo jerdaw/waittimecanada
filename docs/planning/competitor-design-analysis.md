@@ -90,7 +90,7 @@ graph TD
 
 ### Hero Section
 
-![Competitor Homepage Hero](/home/jer/.gemini/antigravity/brain/453fe363-bdac-44b3-ab26-ae07a18e1e90/hospital_list_main_1770239798252.png)
+_Screenshot captured during competitor review (stored outside repo)._
 
 **Components:**
 1. **Emergency Alert Banner** (top)
@@ -152,7 +152,7 @@ graph TD
 
 ## Hospital Detail Page
 
-![Hospital Detail Page](/home/jer/.gemini/antigravity/brain/453fe363-bdac-44b3-ab26-ae07a18e1e90/hospital_detail_page_1770239645836.png)
+_Screenshot captured during competitor review (stored outside repo)._
 
 ### Layout Components
 
@@ -189,7 +189,7 @@ graph TD
 
 ## About Section
 
-![About Section](/home/jer/.gemini/antigravity/brain/453fe363-bdac-44b3-ab26-ae07a18e1e90/about_section_top_1770239788783.png)
+_Screenshot captured during competitor review (stored outside repo)._
 
 ### Content Structure
 
@@ -214,7 +214,7 @@ graph TD
 
 ## FAQ Section
 
-![FAQ Section](/home/jer/.gemini/antigravity/brain/453fe363-bdac-44b3-ab26-ae07a18e1e90/faq_page_top_1770239759841.png)
+_Screenshot captured during competitor review (stored outside repo)._
 
 ### Questions Covered
 
@@ -246,7 +246,7 @@ graph TD
 
 ## Mobile Experience
 
-![Mobile View](/home/jer/.gemini/antigravity/brain/453fe363-bdac-44b3-ab26-ae07a18e1e90/mobile_menu_open_1770239865512.png)
+_Screenshot captured during competitor review (stored outside repo)._
 
 ### Responsive Adaptations
 
@@ -479,10 +479,10 @@ return hospitals.map(hospital => (
 The following recordings demonstrate the competitor's user experience:
 
 ### Homepage & Navigation Exploration
-![Homepage Exploration](/home/jer/.gemini/antigravity/brain/453fe363-bdac-44b3-ab26-ae07a18e1e90/competitor_homepage_1770239578824.webp)
+_Recording captured during competitor review (stored outside repo)._
 
 ### Feature Deep Dive (FAQ, About, Search, Mobile)
-![Feature Exploration](/home/jer/.gemini/antigravity/brain/453fe363-bdac-44b3-ab26-ae07a18e1e90/competitor_features_1770239741126.webp)
+_Recording captured during competitor review (stored outside repo)._
 
 ---
 

@@ -11,6 +11,10 @@ on:
         description: 'Specific migration file to run (optional)'
         required: false
 
+concurrency:
+  group: database-migrate-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   migrate:
     name: Apply Migrations

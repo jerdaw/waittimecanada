@@ -361,6 +361,7 @@ export default function Home() {
                   <div className="h-full bg-card rounded-xl border border-border/50 shadow-sm overflow-hidden">
                     <Map
                       hospitals={filteredAndSortedHospitals}
+                      province={selectedProvince}
                       selectedId={selectedHospitalId}
                       onSelect={setSelectedHospitalId}
                       lastUpdate={lastUpdate}

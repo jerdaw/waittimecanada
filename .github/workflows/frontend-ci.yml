@@ -14,7 +14,50 @@ on:
 env:
   NODE_VERSION: '20'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  changes:
+    name: Detect Changed Frontend Scope
+    runs-on: ubuntu-latest
+    outputs:
+      run_e2e: ${{ steps.filter.outputs.e2e }}
+      run_build: ${{ steps.filter.outputs.build }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            e2e:
+              - 'frontend/app/**'
+              - 'frontend/components/**'
+              - 'frontend/utils/**'
+              - 'frontend/content/**'
+              - 'frontend/public/**'
+              - 'frontend/playwright.config.ts'
+              - 'frontend/tests/e2e/**'
+              - 'frontend/package.json'
+              - 'frontend/package-lock.json'
+              - '.github/workflows/frontend-ci.yml'
+            build:
+              - 'frontend/app/**'
+              - 'frontend/components/**'
+              - 'frontend/utils/**'
+              - 'frontend/content/**'
+              - 'frontend/public/**'
+              - 'frontend/next.config.*'
+              - 'frontend/tsconfig.json'
+              - 'frontend/tailwind.config.*'
+              - 'frontend/postcss.config.*'
+              - 'frontend/package.json'
+              - 'frontend/package-lock.json'
+              - '.github/workflows/frontend-ci.yml'
+
   lint:
     name: Lint & Format
     runs-on: ubuntu-latest
@@ -61,7 +104,7 @@ jobs:
 
       - name: Run TypeScript compiler
         working-directory: ./frontend
-        run: npm run type-check || npx tsc --noEmit
+        run: npm run type-check
 
   test-unit:
     name: Unit Tests (Vitest)
@@ -83,7 +126,7 @@ jobs:
 
       - name: Run unit tests
         working-directory: ./frontend
-        run: npm run test:unit --coverage || echo "Unit tests not configured, skipping"
+        run: npm run test:unit --coverage
 
       - name: Upload coverage
         if: hashFiles('frontend/coverage/coverage-final.json') != ''
@@ -95,7 +138,10 @@ jobs:
 
   test-e2e:
     name: E2E Tests (Playwright)
+    needs: [changes]
+    if: needs.changes.outputs.run_e2e == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 25
 
     steps:
       - uses: actions/checkout@v4
@@ -113,14 +159,14 @@ jobs:
 
       - name: Install Playwright browsers
         working-directory: ./frontend
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chromium
 
       - name: Run E2E tests
         working-directory: ./frontend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXT_PUBLIC_MAPBOX_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }}
-        run: npm run test:e2e || echo "E2E tests not configured, skipping"
+        run: npm run test:e2e -- --project=chromium
 
       - name: Upload Playwright report
         if: always() && hashFiles('frontend/playwright-report/**/*') != ''
@@ -132,6 +178,8 @@ jobs:
 
   build:
     name: Build
+    needs: [changes, lint, type-check, test-unit]
+    if: needs.changes.outputs.run_build == 'true'
     runs-on: ubuntu-latest
 
     steps:

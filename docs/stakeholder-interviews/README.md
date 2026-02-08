@@ -19,9 +19,11 @@ This folder contains templates for M9 Phase 3 stakeholder validation.
 ## Publishing A Testimonial
 
 1. Open `frontend/content/stakeholderTestimonials.ts`.
-2. Add one entry with `published: true` and appropriate `attribution`.
-3. Keep only approved quotes in this file.
-4. The homepage will render the testimonial automatically when a published entry exists.
+2. Add one entry with `published: true`, appropriate `attribution`, and governance metadata:
+   `publishedAt` (ISO timestamp) + `approvalReference` (link/path to consent record).
+3. Ensure there is at most one `published: true` entry.
+4. Keep only approved quotes in this file.
+5. The homepage will render the testimonial automatically when validation passes.
 
 ## Data Handling
 

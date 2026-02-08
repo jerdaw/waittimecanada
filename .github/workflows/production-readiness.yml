@@ -17,6 +17,10 @@ on:
 env:
   PYTHON_VERSION: "3.12"
 
+concurrency:
+  group: production-readiness-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   readiness:
     name: Validate Production Readiness

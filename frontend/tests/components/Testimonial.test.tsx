@@ -52,4 +52,17 @@ describe("Testimonial", () => {
 
     expect(screen.getByText("Anonymous ER Clinician")).toBeInTheDocument();
   });
+
+  it("does not render unpublished testimonials", () => {
+    const testimonial: StakeholderTestimonial = {
+      id: "t-4",
+      quote: "This should never render publicly before publication approval.",
+      role: "ER Nurse",
+      attribution: "role_only",
+      published: false,
+    };
+
+    const { container } = render(<Testimonial testimonial={testimonial} />);
+    expect(container).toBeEmptyDOMElement();
+  });
 });

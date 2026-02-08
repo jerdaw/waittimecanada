@@ -6,6 +6,22 @@
 
 ---
 
+## Implementation Status (Updated 2026-02-08)
+
+- Access Burden Estimator: implemented and test-covered
+- Equity layer foundation scaffold: implemented
+  - `/api/equity-layer` placeholder GeoJSON flow (Ontario)
+  - Map toggle + legend integration in `Map.tsx`
+  - Clear placeholder attribution/labeling to avoid overclaiming
+- Tract-linked equity summary: implemented (placeholder-aware)
+  - `/api/analytics/equity-summary` linkage metrics (low-income tract proximity + wait-time gap)
+  - `AccessInsightsSummary` now surfaces equity snapshot alongside personal access estimates
+- Remaining for full M11 completion:
+  - Replace placeholder data with StatsCan census tract income layer
+  - Recompute linkage summary with real provincial tract datasets
+
+---
+
 ## Overview
 
 These features demonstrate awareness that healthcare access is about more than wait times. The Access Burden Estimator highlights financial barriers, while the Equity Layer visualizes socioeconomic disparities in ER access.
@@ -557,10 +573,10 @@ export function EquityInsights({ hospitals, equityData }) {
 
 ### 3.1 ADR for Equity Layer
 
-**File:** `docs/adr/0006-equity-layer-design.md`
+**File:** `docs/adr/0011-equity-layer-scaffold.md`
 
 ```markdown
-# ADR 0006: Socioeconomic Equity Layer
+# ADR 0011: Equity Layer Scaffold-First Delivery
 
 ## Status
 Accepted
@@ -598,21 +614,22 @@ Statistics Canada 2021 Census, census tract level, median household income.
 ## Verification Checklist
 
 ### Access Burden Estimator
-- [ ] Component renders with collapsed view
-- [ ] Disclaimer is visible and prominent
-- [ ] Expands to show fuel + parking breakdown
-- [ ] Uses correct provincial gas prices
-- [ ] Calculates round-trip distance
-- [ ] Tests pass
-- [ ] ADR documented
+- [x] Component renders with collapsed view
+- [x] Disclaimer is visible and prominent
+- [x] Expands to show fuel + parking breakdown
+- [x] Uses correct provincial gas prices
+- [x] Calculates round-trip distance
+- [x] Tests pass
+- [x] ADR documented
 
 ### Equity Layer
 - [ ] Census tract data downloaded and processed
-- [ ] GeoJSON layer loads in Mapbox
-- [ ] Toggle shows/hides layer
-- [ ] Legend explains quintiles
-- [ ] Data attribution visible
-- [ ] ADR documented
+- [x] GeoJSON layer loads in Mapbox (placeholder scaffold payload)
+- [x] Toggle shows/hides layer
+- [x] Legend explains quintiles
+- [x] Data attribution visible
+- [x] Tract-linked equity summary shown with wait-time linkage metrics
+- [x] ADR documented (scaffold-first approach)
 
 ---
 

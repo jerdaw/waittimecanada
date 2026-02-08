@@ -2,7 +2,7 @@
 
 ## Current Status (Updated 2026-02-08)
 
-**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage) | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented
+**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage) | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented
 
 **Strategic Direction:** Ontario-focused depth over multi-province breadth. The platform is
 transitioning from a real-time snapshot tool into a Health Systems Observatory with longitudinal
@@ -23,7 +23,7 @@ analysis, data quality transparency, and research-grade analytics.
 | **M9: Portfolio Launch** (partial) | About section, LinkedIn post draft, screenshot guide, application summary |
 | **M10: Multi-Province** (partial) | Alberta scraper skeleton, BC scraper (ADR-0007) |
 | **M11: Access & Equity** (partial) | Access Burden Estimator with fuel + parking cost (ADR-0005, 21 tests) |
-| **M12: Research Infra** (partial) | Citation-ready data export (19 tests), Dead Man's Switch alerts (7 tests), SystemStatus component |
+| **M12: Research Infra** (partial) | Citation-ready data export (19 tests), Dead Man's Switch alerts (7 tests), SystemStatus component, occupancy availability endpoint/UI state |
 | **M13: Aggregation Pipeline** | Permanent hourly/daily/weekly/monthly aggregates, backfill CLI, enhanced trends (90d/6m/1y), extended data export (ADR-0008) |
 | **M14: Data Quality & Anomaly Detection** | DataQualityService, AnomalyDetectionService, MethodologyChangeDetector, /data-quality dashboard, 3 new DB tables (ADR-0009) |
 | **M15: Analytics & Benchmarking** | Peer benchmarking, temporal pattern analysis, regional intelligence mapping, system trend dashboard, dedicated /analytics page |
@@ -34,11 +34,8 @@ analysis, data quality transparency, and research-grade analytics.
 
 ### Immediate: M9 Production Completion
 - [ ] Deploy frontend to Render/Vercel with production `DATABASE_URL`
-- [x] Implement production readiness workflow (`.github/workflows/production-readiness.yml`)
 - [ ] Set required production GitHub Secrets (`DATABASE_URL`, optional alert keys) and run readiness verification
-- [x] Implement automated production smoke workflow (`.github/workflows/production-smoke.yml`)
 - [ ] Run production smoke workflow against live URL for `/`, `/methods`, `/data-quality`, `/analytics`
-- [x] Implement screenshot artifact workflow (`.github/workflows/portfolio-screenshots.yml`)
 
 ### Recently Closed: M15 Analytics & Benchmarking
 **Status:** CLOSED (archived) | **Delivered:** 2026-02-07 | **Depends On:** M13
@@ -56,32 +53,29 @@ Delivered scope:
 
 **M9: Portfolio Launch** — remaining items:
 - [ ] Deploy frontend to Render/Vercel with production DATABASE_URL
-- [x] Configure GitHub Actions for automated scraper runs
 - [ ] Set required production GitHub Secrets (DATABASE_URL, optional alert keys)
 - [ ] Run `Production Readiness` workflow and confirm heartbeat freshness pass
 - [ ] Set `PRODUCTION_BASE_URL` GitHub Actions secret and run smoke workflow
-- [x] Apply GitHub repository polish (description, topics, README badges)
-- [x] Finalize LinkedIn launch post draft (`docs/linkedin-launch-post.md`)
-- [x] Finalize application summary artifact (`docs/application-summary.md`)
-- [x] Prepare stakeholder interview toolkit (`docs/stakeholder-interviews/*`, `docs/stakeholder-feedback.md`)
-- [x] Integrate testimonial publication pipeline (`frontend/components/Testimonial.tsx`)
-- [x] Automate baseline screenshot capture workflow (`portfolio-screenshots`)
 - [ ] Stakeholder interview (1 ER nurse/physician)
 - [ ] Publish LinkedIn post
 
 ### Autonomous Backlog (No Human Intervention Required)
-- [ ] M11: Equity layer foundation scaffolding (toggle, legend, placeholder GeoJSON flow)
-- [ ] M12: Occupancy endpoint + explicit "not available yet" UI state
-- [ ] Governance hardening for testimonial content validation (single published quote guardrails)
-- [ ] CI optimization pass for developer velocity (keep checks strict, reduce redundant runtime)
+
+Completed in this cycle:
+- M11: Equity layer foundation scaffolding (toggle, legend, placeholder GeoJSON flow)
+- M12: Occupancy endpoint + explicit "not available yet" UI state
+- Governance hardening for testimonial content validation (single published quote guardrails)
+- CI optimization pass for developer velocity (keep checks strict, reduce redundant runtime)
+
+Current open autonomous backlog:
+- None (remaining open work is currently human/external dependency-bound)
 
 **M11: Equity Layer** — remaining items:
 - [ ] Research Canadian socioeconomic shapefiles (StatsCan census data)
-- [ ] Mapbox income overlay layer
-- [ ] Access insights summary
+- [ ] Replace placeholder equity GeoJSON with processed census tract layer
 
 **M12: Research Infra** — remaining items:
-- [ ] Occupancy statistics (if data available)
+- [ ] Occupancy ingestion/parser rollout when provincial source fields become available
 - [ ] Proactive notification system (future)
 
 ### Deferred
@@ -165,6 +159,9 @@ Archived (delivered):
 | [0008](../adr/0008-aggregation-pipeline.md) | Two-tier aggregation pipeline |
 | [0009](../adr/0009-data-quality-anomaly-detection.md) | Data quality & anomaly detection |
 | [0010](../adr/0010-region-mapping-coverage-heuristics.md) | Region mapping coverage audit and heuristic auto-assignment |
+| [0011](../adr/0011-equity-layer-scaffold.md) | Equity layer scaffold-first delivery |
+| [0012](../adr/0012-occupancy-availability-contract.md) | Occupancy availability contract and UI behavior |
+| [0013](../adr/0013-testimonial-governance-guardrails.md) | Testimonial publication guardrails and fail-closed rendering |
 
 ---
 

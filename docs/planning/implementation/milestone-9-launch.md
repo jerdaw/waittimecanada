@@ -162,6 +162,17 @@ if __name__ == '__main__':
 3. Trigger workflow `Production Readiness` from GitHub Actions tab
 4. Optionally run `./scripts/verify-production-ops.sh` locally for `gh`-based audit output
 
+### 1.6 CI Efficiency Hardening
+
+**Status:** Implemented 2026-02-08
+
+Changes applied:
+- Added workflow `concurrency` cancellation for branch-stale runs (`frontend-ci.yml`, `scraper-ci.yml`)
+- Added changed-path detection in `frontend-ci.yml` so heavy E2E/build jobs are skipped when
+  runtime-impacting files are untouched
+- Limited Playwright browser install in CI to Chromium only
+- Removed permissive `|| echo "skipping"` fallbacks for type-check/unit/E2E so failures are explicit
+
 ---
 
 ## Phase 2: About/Story Section (Day 2)
@@ -355,12 +366,19 @@ Jeremy Dawson
 
 ### 3.4 Testimonial Component (If Obtained)
 
-**Status:** Component + data pipeline implemented 2026-02-08 (awaiting first approved quote)
+**Status:** Component + data pipeline implemented 2026-02-08; governance guardrails added 2026-02-08 (awaiting first approved quote)
 
 **Files:**
 - `frontend/components/Testimonial.tsx`
 - `frontend/content/stakeholderTestimonials.ts`
 - `frontend/app/page.tsx` (conditional render when published testimonial exists)
+- `frontend/tests/content/stakeholderTestimonials.test.ts` (single-published + metadata validation)
+
+**Governance Guardrails (Implemented):**
+- At most one `published: true` testimonial is allowed
+- Published testimonials must include `publishedAt` + `approvalReference`
+- Named attribution requires `displayName`
+- Invalid testimonial datasets fail closed (`getFeaturedTestimonial()` returns `null`)
 
 ```tsx
 export function Testimonial() {
