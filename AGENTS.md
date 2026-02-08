@@ -210,6 +210,7 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 - A Netlify production build is allowed only when commit message contains `[release]` or `[deploy]`.
 - Non-production branches are skipped by default.
 - This guardrail prevents new accidental credit burn; it does **not** unsuspend already suspended Netlify projects before billing reset on March 2, 2026.
+- `production-smoke.yml` may be intentionally disabled while frontend hosting is offline; `scripts/verify-production-ops.sh` treats this as a warning, not a hard failure.
 
 ## Runtime Usage Guardrails
 

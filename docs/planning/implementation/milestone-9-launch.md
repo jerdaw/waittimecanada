@@ -155,6 +155,7 @@ if __name__ == '__main__':
 2. Runs heartbeat freshness check (`python -m waittime.cli.check_heartbeat --dry-run`)
 3. Optionally runs smoke checks in the same workflow when `PRODUCTION_BASE_URL` is configured
 4. Local script audits secret presence, workflow state, and recent cron freshness via `gh`
+   - If `production-smoke.yml` is intentionally disabled (frontend offline posture), audit emits a warning instead of failing.
 
 **Runbook:**
 1. Configure `DATABASE_URL` (required)

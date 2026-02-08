@@ -127,6 +127,8 @@ Quick production ops check:
 ./scripts/verify-production-ops.sh jerdaw/waittimecanada
 ```
 
+Note: if frontend hosting is intentionally offline, `production-smoke.yml` may be disabled and this audit will report that as a warning.
+
 ## Guardrails
 
 - Do not provide medical advice.

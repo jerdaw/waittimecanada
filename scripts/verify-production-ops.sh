@@ -33,6 +33,9 @@ declare -a recommended_secrets=(
 declare -a required_workflows=(
   "scraper-cron.yml"
   "heartbeat-monitor.yml"
+)
+
+declare -a recommended_workflows=(
   "production-smoke.yml"
 )
 
@@ -92,6 +95,7 @@ done
 echo
 echo "Workflow States:"
 workflow_failures=0
+workflow_warnings=0
 
 for workflow in "${required_workflows[@]}"; do
   state="$(gh api "repos/${repo}/actions/workflows/${workflow}" --jq .state 2>/dev/null || true)"
@@ -103,6 +107,19 @@ for workflow in "${required_workflows[@]}"; do
   else
     echo "  FAIL ${workflow} state=${state}"
     workflow_failures=1
+  fi
+done
+
+for workflow in "${recommended_workflows[@]}"; do
+  state="$(gh api "repos/${repo}/actions/workflows/${workflow}" --jq .state 2>/dev/null || true)"
+  if [[ "${state}" == "active" ]]; then
+    echo "  OK   ${workflow} is active"
+  elif [[ -z "${state}" ]]; then
+    echo "  WARN ${workflow} not found (recommended)"
+    workflow_warnings=1
+  else
+    echo "  WARN ${workflow} state=${state} (recommended)"
+    workflow_warnings=1
   fi
 done
 
@@ -178,7 +195,11 @@ done
 
 echo
 if (( missing_required == 0 && workflow_failures == 0 && run_failures == 0 )); then
-  echo "Production ops audit passed."
+  if (( workflow_warnings != 0 )); then
+    echo "Production ops audit passed with warnings."
+  else
+    echo "Production ops audit passed."
+  fi
   exit 0
 fi
 
