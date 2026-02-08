@@ -16,6 +16,13 @@ This folder contains templates for M9 Phase 3 stakeholder validation.
 4. Summarize results in `docs/stakeholder-feedback.md`.
 5. Convert actionable items into roadmap or implementation tasks.
 
+## Publishing A Testimonial
+
+1. Open `frontend/content/stakeholderTestimonials.ts`.
+2. Add one entry with `published: true` and appropriate `attribution`.
+3. Keep only approved quotes in this file.
+4. The homepage will render the testimonial automatically when a published entry exists.
+
 ## Data Handling
 
 - Do not store personal contact details beyond what is needed for follow-up.

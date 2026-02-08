@@ -13,15 +13,18 @@ import { calculateDistance } from "@/utils/distance";
 
 import { Hero } from "@/components/Hero";
 import { AboutSection } from "@/components/AboutSection";
+import { Testimonial } from "@/components/Testimonial";
 import { SystemStatus } from "@/components/SystemStatus";
 import { AccessInsightsSummary } from "@/components/insights/AccessInsightsSummary";
 import { RegionDashboard, type RegionAnalyticsRow } from "@/components/RegionDashboard";
 import type { RegionOption } from "@/components/RegionSelector";
+import { getFeaturedTestimonial } from "@/content/stakeholderTestimonials";
 
 import { isRecent } from "@/utils/date";
 
 export default function Home() {
   const REGION_PERIOD = "7d";
+  const featuredTestimonial = getFeaturedTestimonial();
 
   // Application State
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
@@ -271,6 +274,11 @@ export default function Home() {
           <div className="flex-shrink-0 animate-in fade-in slide-in-from-top-10 duration-500">
              {loading ? <HeroSkeleton /> : <Hero hospitals={hospitals} onExplore={handleExplore} userLocation={userLocation} />}
              {!loading && <AboutSection />}
+             {!loading && featuredTestimonial && (
+               <div className="mx-auto w-full max-w-4xl px-4 pb-8">
+                 <Testimonial testimonial={featuredTestimonial} />
+               </div>
+             )}
           </div>
         )}
 

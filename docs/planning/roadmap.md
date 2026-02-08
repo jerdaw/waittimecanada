@@ -63,6 +63,7 @@ Delivered scope:
 - [x] Finalize LinkedIn launch post draft (`docs/linkedin-launch-post.md`)
 - [x] Finalize application summary artifact (`docs/application-summary.md`)
 - [x] Prepare stakeholder interview toolkit (`docs/stakeholder-interviews/*`, `docs/stakeholder-feedback.md`)
+- [x] Integrate testimonial publication pipeline (`frontend/components/Testimonial.tsx`)
 - [ ] Stakeholder interview (1 ER nurse/physician)
 - [ ] Publish LinkedIn post
 

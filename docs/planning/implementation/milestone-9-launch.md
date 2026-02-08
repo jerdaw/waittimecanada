@@ -355,7 +355,12 @@ Jeremy Dawson
 
 ### 3.4 Testimonial Component (If Obtained)
 
-**File:** `frontend/components/Testimonial.tsx`
+**Status:** Component + data pipeline implemented 2026-02-08 (awaiting first approved quote)
+
+**Files:**
+- `frontend/components/Testimonial.tsx`
+- `frontend/content/stakeholderTestimonials.ts`
+- `frontend/app/page.tsx` (conditional render when published testimonial exists)
 
 ```tsx
 export function Testimonial() {
@@ -450,6 +455,7 @@ Create screenshots showing:
 - [ ] About section added with narrative
 - [ ] Author bio and social links included
 - [x] Stakeholder interview toolkit prepared
+- [x] Testimonial publication pipeline prepared
 - [ ] Stakeholder interview completed
 - [ ] Feedback documented
 - [ ] Testimonial added (if obtained)

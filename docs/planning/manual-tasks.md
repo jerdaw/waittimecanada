@@ -212,6 +212,7 @@ Thanks,
 - [x] Intake template prepared (`docs/stakeholder-interviews/participant-intake-template.md`)
 - [x] Interview script prepared (`docs/stakeholder-interviews/interview-template.md`)
 - [x] Feedback log template prepared (`docs/stakeholder-feedback.md`)
+- [x] Testimonial UI/data pipeline prepared (`frontend/components/Testimonial.tsx`, `frontend/content/stakeholderTestimonials.ts`)
 
 ---
 
