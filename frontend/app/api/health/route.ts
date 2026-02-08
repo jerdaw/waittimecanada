@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
+import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
 
 export interface SourceHealth {
   source_id: string;
@@ -77,12 +78,15 @@ export async function GET() {
           new Date(b.last_run!).getTime() - new Date(a.last_run!).getTime()
       )[0]?.last_run;
 
-    return NextResponse.json({
-      healthy,
-      last_update: lastUpdate || null,
-      stale_threshold_minutes: STALE_THRESHOLD_MINUTES,
-      sources,
-    } as HealthResponse);
+    return NextResponse.json(
+      {
+        healthy,
+        last_update: lastUpdate || null,
+        stale_threshold_minutes: STALE_THRESHOLD_MINUTES,
+        sources,
+      } as HealthResponse,
+      { headers: publicCacheHeaders(120, 300) }
+    );
   } catch (error) {
     console.error("Failed to fetch health status:", error);
     return NextResponse.json(
@@ -93,7 +97,7 @@ export async function GET() {
         sources: [],
         error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500, headers: NO_STORE_HEADERS }
     );
   }
 }

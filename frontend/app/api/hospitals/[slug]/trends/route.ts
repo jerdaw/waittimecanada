@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
+import { publicCacheHeaders } from "@/utils/cache";
 
 // GET /api/hospitals/[slug]/trends?period=24h|7d|30d|90d|6m|1y
 //
@@ -57,16 +58,19 @@ export async function GET(
         ORDER BY timestamp ASC
       `;
 
-      return NextResponse.json({
-        hospitalId: params.slug,
-        period,
-        dataPoints: data.map((d) => ({
-          timestamp: d.timestamp,
-          waitTime: d.wait_time,
-        })),
-        aggregation: aggregation === "hour" ? "hourly" : "daily",
-        dataSource: "raw",
-      });
+      return NextResponse.json(
+        {
+          hospitalId: params.slug,
+          period,
+          dataPoints: data.map((d) => ({
+            timestamp: d.timestamp,
+            waitTime: d.wait_time,
+          })),
+          aggregation: aggregation === "hour" ? "hourly" : "daily",
+          dataSource: "raw",
+        },
+        { headers: publicCacheHeaders(600, 1800) }
+      );
     }
 
     // For longer periods, use pre-computed aggregates
@@ -91,19 +95,22 @@ export async function GET(
       ORDER BY period_start ASC
     `;
 
-    return NextResponse.json({
-      hospitalId: params.slug,
-      period,
-      dataPoints: data.map((d) => ({
-        timestamp: d.timestamp,
-        waitTime: d.wait_time,
-        minWaitTime: d.min_wait_time,
-        maxWaitTime: d.max_wait_time,
-        sampleCount: d.sample_count,
-      })),
-      aggregation: periodType,
-      dataSource: "aggregated",
-    });
+    return NextResponse.json(
+      {
+        hospitalId: params.slug,
+        period,
+        dataPoints: data.map((d) => ({
+          timestamp: d.timestamp,
+          waitTime: d.wait_time,
+          minWaitTime: d.min_wait_time,
+          maxWaitTime: d.max_wait_time,
+          sampleCount: d.sample_count,
+        })),
+        aggregation: periodType,
+        dataSource: "aggregated",
+      },
+      { headers: publicCacheHeaders(600, 1800) }
+    );
   } catch (error) {
     console.error("Failed to fetch trends:", error);
     return NextResponse.json(

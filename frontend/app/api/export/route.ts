@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/utils/db';
+import { NO_STORE_HEADERS } from '@/utils/cache';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -51,18 +52,22 @@ export async function GET(request: NextRequest) {
       `;
 
       if (format === 'json') {
-        return NextResponse.json({
-          data: results,
-          metadata: {
-            exported_at: new Date().toISOString(),
-            record_count: results.length,
-            data_type: 'aggregated',
-            granularity,
-            filters: { province, startDate, endDate },
-            license: 'CC-BY-4.0',
-            citation: 'WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set]. https://waittimecanada.ca',
+        return NextResponse.json(
+          {
+            data: results,
+            metadata: {
+              exported_at: new Date().toISOString(),
+              record_count: results.length,
+              data_type: 'aggregated',
+              granularity,
+              filters: { province, startDate, endDate },
+              license: 'CC-BY-4.0',
+              citation:
+                'WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set]. https://waittimecanada.ca',
+            },
           },
-        });
+          { headers: NO_STORE_HEADERS }
+        );
       }
 
       // CSV for aggregated data
@@ -114,6 +119,7 @@ export async function GET(request: NextRequest) {
           'X-Data-License': 'CC-BY-4.0',
           'X-Data-Type': 'aggregated',
           'X-Granularity': granularity,
+          ...NO_STORE_HEADERS,
         },
       });
     }
@@ -150,18 +156,22 @@ export async function GET(request: NextRequest) {
 
     // Format response as JSON
     if (format === 'json') {
-      return NextResponse.json({
-        data: results,
-        metadata: {
-          exported_at: new Date().toISOString(),
-          record_count: results.length,
-          data_type: 'raw',
-          granularity: 'raw',
-          filters: { province, startDate, endDate },
-          license: 'CC-BY-4.0',
-          citation: 'WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set]. https://waittimecanada.ca',
+      return NextResponse.json(
+        {
+          data: results,
+          metadata: {
+            exported_at: new Date().toISOString(),
+            record_count: results.length,
+            data_type: 'raw',
+            granularity: 'raw',
+            filters: { province, startDate, endDate },
+            license: 'CC-BY-4.0',
+            citation:
+              'WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set]. https://waittimecanada.ca',
+          },
         },
-      });
+        { headers: NO_STORE_HEADERS }
+      );
     }
 
     // Format response as CSV
@@ -207,6 +217,7 @@ export async function GET(request: NextRequest) {
         'Content-Disposition': `attachment; filename="${filename}"`,
         'X-Data-License': 'CC-BY-4.0',
         'X-Data-Type': 'raw',
+        ...NO_STORE_HEADERS,
       },
     });
   } catch (error) {
@@ -216,7 +227,7 @@ export async function GET(request: NextRequest) {
         error: 'Failed to export data',
         message: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500, headers: NO_STORE_HEADERS }
     );
   }
 }

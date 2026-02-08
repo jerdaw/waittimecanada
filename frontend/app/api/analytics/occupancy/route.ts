@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
+import { publicCacheHeaders } from "@/utils/cache";
 
 type OccupancyStatus = "available" | "no_reporting_data" | "not_available_yet";
 
@@ -46,23 +47,26 @@ export async function GET(request: Request) {
     };
 
     if (!fields.patients_waiting || !fields.patients_in_treatment) {
-      return NextResponse.json({
-        success: true,
-        data: {
-          province,
-          available: false,
-          status: "not_available_yet" as OccupancyStatus,
-          generated_at: new Date().toISOString(),
-          message:
-            "Occupancy metrics are not available from the current provincial feed for this observatory.",
-          fields,
-          setup_steps: [
-            "Verify provincial source publishes occupancy fields",
-            "Extend scraper parser to capture patients_waiting and patients_in_treatment",
-            "Backfill and validate occupancy aggregates before public interpretation",
-          ],
+      return NextResponse.json(
+        {
+          success: true,
+          data: {
+            province,
+            available: false,
+            status: "not_available_yet" as OccupancyStatus,
+            generated_at: new Date().toISOString(),
+            message:
+              "Occupancy metrics are not available from the current provincial feed for this observatory.",
+            fields,
+            setup_steps: [
+              "Verify provincial source publishes occupancy fields",
+              "Extend scraper parser to capture patients_waiting and patients_in_treatment",
+              "Backfill and validate occupancy aggregates before public interpretation",
+            ],
+          },
         },
-      });
+        { headers: publicCacheHeaders(300, 900) }
+      );
     }
 
     const aggregateRows = await sql`
@@ -102,27 +106,30 @@ export async function GET(request: Request) {
 
     const status: OccupancyStatus = observations > 0 ? "available" : "no_reporting_data";
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        province,
-        available: true,
-        status,
-        generated_at: new Date().toISOString(),
-        message:
-          status === "available"
-            ? "Occupancy fields are available for reporting hospitals."
-            : "Occupancy fields exist in schema but no recent reporting rows were found in the last 24 hours.",
-        fields,
-        observations_24h: observations,
-        hospitals_reporting: hospitalsReporting,
-        averages: {
-          patients_waiting: avgPatientsWaiting,
-          patients_in_treatment: avgPatientsInTreatment,
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          province,
+          available: true,
+          status,
+          generated_at: new Date().toISOString(),
+          message:
+            status === "available"
+              ? "Occupancy fields are available for reporting hospitals."
+              : "Occupancy fields exist in schema but no recent reporting rows were found in the last 24 hours.",
+          fields,
+          observations_24h: observations,
+          hospitals_reporting: hospitalsReporting,
+          averages: {
+            patients_waiting: avgPatientsWaiting,
+            patients_in_treatment: avgPatientsInTreatment,
+          },
+          latest_observation: latestObservation,
         },
-        latest_observation: latestObservation,
       },
-    });
+      { headers: publicCacheHeaders(300, 900) }
+    );
   } catch (error) {
     console.error("Failed to compute occupancy analytics:", error);
     return NextResponse.json(

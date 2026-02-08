@@ -12,6 +12,8 @@ interface HealthData {
   sourceCount: number;
 }
 
+const HEALTH_CHECK_INTERVAL_MS = 5 * 60 * 1000;
+
 export function SystemStatus() {
   const [health, setHealth] = useState<HealthData>({
     status: 'loading',
@@ -58,8 +60,25 @@ export function SystemStatus() {
     }
 
     checkHealth();
-    const interval = setInterval(checkHealth, 60000); // Check every minute
-    return () => clearInterval(interval);
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkHealth();
+      }
+    };
+
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        checkHealth();
+      }
+    }, HEALTH_CHECK_INTERVAL_MS);
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
   }, []);
 
   const statusConfig = {

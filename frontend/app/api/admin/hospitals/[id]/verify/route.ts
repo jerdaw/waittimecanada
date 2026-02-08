@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
+import { NO_STORE_HEADERS } from "@/utils/cache";
 
 interface VerifyRequestBody {
   makeVisible?: boolean;
@@ -37,15 +38,18 @@ export async function POST(
           success: false,
           error: "Hospital not found",
         },
-        { status: 404 }
+        { status: 404, headers: NO_STORE_HEADERS }
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      data: result[0],
-      message: `Hospital verified and ${makeVisible ? "made visible" : "kept hidden"}`,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: result[0],
+        message: `Hospital verified and ${makeVisible ? "made visible" : "kept hidden"}`,
+      },
+      { headers: NO_STORE_HEADERS }
+    );
   } catch (error) {
     console.error("Failed to verify hospital:", error);
     return NextResponse.json(
@@ -54,7 +58,7 @@ export async function POST(
         error: "Failed to verify hospital",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500, headers: NO_STORE_HEADERS }
     );
   }
 }
@@ -85,14 +89,17 @@ export async function DELETE(
           success: false,
           error: "Hospital not found",
         },
-        { status: 404 }
+        { status: 404, headers: NO_STORE_HEADERS }
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      message: `Hospital "${result[0].name}" rejected and removed from database`,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: `Hospital "${result[0].name}" rejected and removed from database`,
+      },
+      { headers: NO_STORE_HEADERS }
+    );
   } catch (error) {
     console.error("Failed to reject hospital:", error);
     return NextResponse.json(
@@ -101,7 +108,7 @@ export async function DELETE(
         error: "Failed to reject hospital",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500, headers: NO_STORE_HEADERS }
     );
   }
 }

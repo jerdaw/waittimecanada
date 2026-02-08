@@ -119,6 +119,7 @@ Workflow reference and required secrets:
 - `.github/workflows/README.md`
 - `frontend/netlify.toml` + `frontend/scripts/netlify-ignore.sh` gate Netlify builds to explicit `[release]`/`[deploy]` commits only
 - Netlify guardrails reduce future credit burn only; they do not automatically unsuspend a site already suspended for exceeded credits before billing reset on March 2, 2026
+- `frontend/utils/cache.ts` standardizes API cache headers for read-heavy endpoints; admin/user-specific routes remain `no-store`
 
 Quick production ops check:
 

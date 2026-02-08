@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
+import { publicCacheHeaders } from "@/utils/cache";
 
 interface Methodology {
   metric_family: string;
@@ -182,10 +183,13 @@ export async function GET(request: Request) {
       comparison_timestamp: new Date().toISOString(),
     };
 
-    return NextResponse.json({
-      success: true,
-      data: response,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: response,
+      },
+      { headers: publicCacheHeaders(300, 900) }
+    );
   } catch (error) {
     console.error("Failed to compare hospitals:", error);
     return NextResponse.json(

@@ -94,6 +94,16 @@ git commit -m "[release] deploy milestone 15 analytics update"
 git push origin main
 ```
 
+## Runtime Usage Controls
+
+- `SystemStatus` polls `/api/health` every 5 minutes (not every minute) and only while the browser tab is visible.
+- Read-heavy API routes use shared cache headers from `frontend/utils/cache.ts`.
+- Typical cache windows:
+  - `120s` for `/api/health`
+  - `300s` for hospitals and analytics endpoints
+  - `600s` for hospital trend timelines
+- Admin, geolocation, and export endpoints are explicitly `Cache-Control: no-store`.
+
 ## Related Docs
 
 - `docs/API.md`

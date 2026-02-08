@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
+import { publicCacheHeaders } from "@/utils/cache";
 
 type TrendDirection = "improving" | "stable" | "worsening";
 type PeriodType = "weekly" | "monthly";
@@ -363,32 +364,35 @@ export async function GET(request: Request) {
 
     const direction = classifyDirection(changePercent);
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        province: normalizedProvince,
-        period,
-        lookback: lookbackConfig.label,
-        generated_at: now.toISOString(),
-        data_source: fallbackSource === "none" ? "precomputed" : "derived_from_daily",
-        fallback_used: fallbackSource !== "none",
-        data_points: dataPoints,
-        trend_summary: {
-          direction,
-          change_percent: changePercent,
-          start_mean: startMean,
-          end_mean: endMean,
-          narrative: narrative(
-            normalizedProvince,
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          province: normalizedProvince,
+          period,
+          lookback: lookbackConfig.label,
+          generated_at: now.toISOString(),
+          data_source: fallbackSource === "none" ? "precomputed" : "derived_from_daily",
+          fallback_used: fallbackSource !== "none",
+          data_points: dataPoints,
+          trend_summary: {
             direction,
-            changePercent,
-            startMean,
-            endMean,
-            lookbackConfig.label
-          ),
+            change_percent: changePercent,
+            start_mean: startMean,
+            end_mean: endMean,
+            narrative: narrative(
+              normalizedProvince,
+              direction,
+              changePercent,
+              startMean,
+              endMean,
+              lookbackConfig.label
+            ),
+          },
         },
       },
-    });
+      { headers: publicCacheHeaders(300, 900) }
+    );
   } catch (error) {
     console.error("Failed to compute system trends:", error);
     return NextResponse.json(

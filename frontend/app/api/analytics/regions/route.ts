@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
+import { publicCacheHeaders } from "@/utils/cache";
 
 type RegionTrend = "improving" | "stable" | "worsening";
 
@@ -254,26 +255,29 @@ export async function GET(request: Request) {
     const mappingCoveragePercent =
       provinceHospitalTotal > 0 ? (mappedHospitalCount / provinceHospitalTotal) * 100 : 0;
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        province: normalizedProvince,
-        period: periodConfig.label,
-        generated_at: now.toISOString(),
-        region_count: regions.length,
-        reporting_regions: regions.filter((region) => region.reporting_count > 0).length,
-        hospital_count: mappedHospitalCount,
-        mapped_hospital_count: mappedHospitalCount,
-        province_hospital_total: provinceHospitalTotal,
-        mapping_coverage: {
-          mapped_hospitals: mappedHospitalCount,
-          total_hospitals: provinceHospitalTotal,
-          coverage_percent: Number(mappingCoveragePercent.toFixed(1)),
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          province: normalizedProvince,
+          period: periodConfig.label,
+          generated_at: now.toISOString(),
+          region_count: regions.length,
+          reporting_regions: regions.filter((region) => region.reporting_count > 0).length,
+          hospital_count: mappedHospitalCount,
+          mapped_hospital_count: mappedHospitalCount,
+          province_hospital_total: provinceHospitalTotal,
+          mapping_coverage: {
+            mapped_hospitals: mappedHospitalCount,
+            total_hospitals: provinceHospitalTotal,
+            coverage_percent: Number(mappingCoveragePercent.toFixed(1)),
+          },
+          province_mean: average(meanValues),
+          regions,
         },
-        province_mean: average(meanValues),
-        regions,
       },
-    });
+      { headers: publicCacheHeaders(300, 900) }
+    );
   } catch (error) {
     if (isMissingRegionsSchemaError(error)) {
       return NextResponse.json(

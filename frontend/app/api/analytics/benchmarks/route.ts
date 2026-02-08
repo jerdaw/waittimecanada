@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
+import { publicCacheHeaders } from "@/utils/cache";
 
 type BenchmarkTrend = "improving" | "stable" | "worsening";
 
@@ -247,17 +248,20 @@ export async function GET(request: Request) {
 
     const provinceStats = computeProvinceStats(hospitals.map((hospital) => hospital.period_mean));
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        province: normalizedProvince,
-        period: periodConfig.label,
-        generated_at: new Date().toISOString(),
-        hospital_count: hospitals.length,
-        province_stats: provinceStats,
-        hospitals: selectedHospitals,
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          province: normalizedProvince,
+          period: periodConfig.label,
+          generated_at: new Date().toISOString(),
+          hospital_count: hospitals.length,
+          province_stats: provinceStats,
+          hospitals: selectedHospitals,
+        },
       },
-    });
+      { headers: publicCacheHeaders(300, 900) }
+    );
   } catch (error) {
     console.error("Failed to compute benchmarks:", error);
     return NextResponse.json(

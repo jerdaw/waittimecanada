@@ -3,6 +3,7 @@ import {
   buildPlaceholderEquityFeatureCollection,
   type EquityLayerApiResponse,
 } from "@/utils/equity";
+import { publicCacheHeaders } from "@/utils/cache";
 
 const SUPPORTED_PROVINCES = new Set(["ON"]);
 
@@ -40,5 +41,8 @@ export async function GET(request: Request) {
     },
   };
 
-  return NextResponse.json(response, { status: 200 });
+  return NextResponse.json(response, {
+    status: 200,
+    headers: publicCacheHeaders(3600, 10800),
+  });
 }

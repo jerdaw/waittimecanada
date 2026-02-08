@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
+import { publicCacheHeaders } from "@/utils/cache";
 
 /**
  * GET /api/data-quality
@@ -96,16 +97,23 @@ async function getSystemQuality(sql: ReturnType<typeof getDb>) {
   // Total counts
   const total24h = sources.reduce((acc, s) => acc + (Number(s.hospitals_reporting) || 0), 0);
 
-  return NextResponse.json({
-    overall_status: overallStatus,
-    sources,
-    system_uptime_24h: Math.round(avgRate * 1000) / 1000,
-    total_measurements_24h: sources.reduce(
-      (acc, s) => acc + Math.round(s.last_24h_success_rate * s.total_hospitals * EXPECTED_SCRAPES_PER_DAY),
-      0
-    ),
-    total_hospitals_reporting: total24h,
-  });
+  return NextResponse.json(
+    {
+      overall_status: overallStatus,
+      sources,
+      system_uptime_24h: Math.round(avgRate * 1000) / 1000,
+      total_measurements_24h: sources.reduce(
+        (acc, s) =>
+          acc +
+          Math.round(
+            s.last_24h_success_rate * s.total_hospitals * EXPECTED_SCRAPES_PER_DAY
+          ),
+        0
+      ),
+      total_hospitals_reporting: total24h,
+    },
+    { headers: publicCacheHeaders(300, 900) }
+  );
 }
 
 async function getHospitalQuality(
@@ -151,19 +159,22 @@ async function getHospitalQuality(
     LIMIT 50
   `;
 
-  return NextResponse.json({
-    hospital_id: hospitalId,
-    coverage_timeline: coverageTimeline,
-    current_quality: {
-      success_rate: Math.min(currentCount / EXPECTED_SCRAPES_PER_DAY, 1.0),
-      actual_scrapes_24h: currentCount,
-      expected_scrapes_24h: EXPECTED_SCRAPES_PER_DAY,
+  return NextResponse.json(
+    {
+      hospital_id: hospitalId,
+      coverage_timeline: coverageTimeline,
+      current_quality: {
+        success_rate: Math.min(currentCount / EXPECTED_SCRAPES_PER_DAY, 1.0),
+        actual_scrapes_24h: currentCount,
+        expected_scrapes_24h: EXPECTED_SCRAPES_PER_DAY,
+      },
+      anomalies_7d: anomalies.map((a) => ({
+        id: a.id,
+        value: Number(a.value),
+        timestamp: a.timestamp_utc,
+        reason: a.anomaly_reason,
+      })),
     },
-    anomalies_7d: anomalies.map((a) => ({
-      id: a.id,
-      value: Number(a.value),
-      timestamp: a.timestamp_utc,
-      reason: a.anomaly_reason,
-    })),
-  });
+    { headers: publicCacheHeaders(300, 900) }
+  );
 }

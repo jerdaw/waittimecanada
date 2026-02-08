@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
+import { publicCacheHeaders } from "@/utils/cache";
 
 /**
  * GET /api/anomalies
@@ -48,19 +49,22 @@ export async function GET(request: Request) {
       `;
     }
 
-    return NextResponse.json({
-      anomalies: anomalies.map((a) => ({
-        id: a.id,
-        hospital_id: a.hospital_id,
-        hospital_name: a.hospital_name,
-        province: a.province,
-        value: Number(a.value),
-        timestamp: a.timestamp_utc,
-        reason: a.anomaly_reason,
-        source_id: a.source_id,
-      })),
-      total_count: anomalies.length,
-    });
+    return NextResponse.json(
+      {
+        anomalies: anomalies.map((a) => ({
+          id: a.id,
+          hospital_id: a.hospital_id,
+          hospital_name: a.hospital_name,
+          province: a.province,
+          value: Number(a.value),
+          timestamp: a.timestamp_utc,
+          reason: a.anomaly_reason,
+          source_id: a.source_id,
+        })),
+        total_count: anomalies.length,
+      },
+      { headers: publicCacheHeaders(300, 900) }
+    );
   } catch (error) {
     console.error("Failed to fetch anomalies:", error);
     return NextResponse.json(

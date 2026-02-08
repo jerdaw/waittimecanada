@@ -211,6 +211,13 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 - Non-production branches are skipped by default.
 - This guardrail prevents new accidental credit burn; it does **not** unsuspend already suspended Netlify projects before billing reset on March 2, 2026.
 
+## Runtime Usage Guardrails
+
+- Frontend health polling should remain low-frequency: `SystemStatus` checks `/api/health` every 5 minutes and only when the tab is visible.
+- Shared read-heavy API routes should use CDN cache headers via `frontend/utils/cache.ts` with short TTLs (typically 2-10 minutes).
+- Admin and user-specific API routes must use `Cache-Control: no-store` (for example admin verification routes and IP geolocation).
+- Export endpoints must use `no-store` to avoid serving stale downloadable datasets.
+
 ## Implementation Roadmap
 
 - [x] **Week 1: Database Foundation** - Neon PostgreSQL setup, Quebec scraper MVP.

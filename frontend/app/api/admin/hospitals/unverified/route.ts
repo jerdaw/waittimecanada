@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
+import { NO_STORE_HEADERS } from "@/utils/cache";
 
 export interface UnverifiedHospital {
   id: string;
@@ -39,11 +40,14 @@ export async function GET() {
       ORDER BY created_at DESC
     `;
 
-    return NextResponse.json({
-      success: true,
-      count: hospitals.length,
-      data: hospitals,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        count: hospitals.length,
+        data: hospitals,
+      },
+      { headers: NO_STORE_HEADERS }
+    );
   } catch (error) {
     console.error("Failed to fetch unverified hospitals:", error);
     return NextResponse.json(
@@ -52,7 +56,7 @@ export async function GET() {
         error: "Failed to fetch unverified hospitals",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500, headers: NO_STORE_HEADERS }
     );
   }
 }

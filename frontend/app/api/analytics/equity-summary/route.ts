@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { buildPlaceholderEquityFeatureCollection } from "@/utils/equity";
 import { computeEquityLinkageSummary, type HospitalWaitPoint } from "@/utils/equityInsights";
+import { publicCacheHeaders } from "@/utils/cache";
 
 type EquitySummaryStatus = "ready" | "no_reporting_data" | "not_available_yet";
 
@@ -50,22 +51,25 @@ export async function GET(request: Request) {
   }
 
   if (province !== "ON") {
-    return NextResponse.json({
-      success: true,
-      data: {
-        province,
-        period: periodConfig.label,
-        status: "not_available_yet" as EquitySummaryStatus,
-        generated_at: new Date().toISOString(),
-        is_placeholder: true,
-        message:
-          "Equity linkage summary is currently scaffolded for Ontario while province-specific tract datasets are onboarded.",
-        setup_steps: [
-          "Integrate provincial census tract income dataset",
-          "Enable equity summary calculations for this province",
-        ],
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          province,
+          period: periodConfig.label,
+          status: "not_available_yet" as EquitySummaryStatus,
+          generated_at: new Date().toISOString(),
+          is_placeholder: true,
+          message:
+            "Equity linkage summary is currently scaffolded for Ontario while province-specific tract datasets are onboarded.",
+          setup_steps: [
+            "Integrate provincial census tract income dataset",
+            "Enable equity summary calculations for this province",
+          ],
+        },
       },
-    });
+      { headers: publicCacheHeaders(300, 900) }
+    );
   }
 
   try {
@@ -119,21 +123,24 @@ export async function GET(request: Request) {
     const status: EquitySummaryStatus =
       summary.reporting_hospitals > 0 ? "ready" : "no_reporting_data";
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        province,
-        period: periodConfig.label,
-        status,
-        generated_at: new Date().toISOString(),
-        is_placeholder: true,
-        message:
-          status === "ready"
-            ? "Equity linkage summary computed using current scaffold tract dataset."
-            : "No hospital wait aggregates available for linkage in the selected period.",
-        ...summary,
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          province,
+          period: periodConfig.label,
+          status,
+          generated_at: new Date().toISOString(),
+          is_placeholder: true,
+          message:
+            status === "ready"
+              ? "Equity linkage summary computed using current scaffold tract dataset."
+              : "No hospital wait aggregates available for linkage in the selected period.",
+          ...summary,
+        },
       },
-    });
+      { headers: publicCacheHeaders(300, 900) }
+    );
   } catch (error) {
     console.error("Failed to compute equity linkage summary:", error);
     return NextResponse.json(

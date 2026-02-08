@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { NO_STORE_HEADERS } from "@/utils/cache";
 
 // Server-side IP geolocation to avoid CORS issues
 export async function GET(request: Request) {
@@ -33,30 +34,36 @@ export async function GET(request: Request) {
       throw new Error(data.reason || "IP geolocation failed");
     }
     
-    return NextResponse.json({
-      success: true,
-      location: {
-        lat: data.latitude,
-        lon: data.longitude,
-        city: data.city,
-        region: data.region,
-        country: data.country_name,
+    return NextResponse.json(
+      {
+        success: true,
+        location: {
+          lat: data.latitude,
+          lon: data.longitude,
+          city: data.city,
+          region: data.region,
+          country: data.country_name,
+        },
       },
-    });
+      { headers: NO_STORE_HEADERS }
+    );
   } catch (error) {
     console.error("IP geolocation error:", error);
     
     // Return a default location (Toronto) as fallback
-    return NextResponse.json({
-      success: true,
-      location: {
-        lat: 43.6532,
-        lon: -79.3832,
-        city: "Toronto",
-        region: "Ontario",
-        country: "Canada",
+    return NextResponse.json(
+      {
+        success: true,
+        location: {
+          lat: 43.6532,
+          lon: -79.3832,
+          city: "Toronto",
+          region: "Ontario",
+          country: "Canada",
+        },
+        fallback: true,
       },
-      fallback: true,
-    });
+      { headers: NO_STORE_HEADERS }
+    );
   }
 }

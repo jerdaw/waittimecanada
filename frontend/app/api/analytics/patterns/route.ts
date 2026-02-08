@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
+import { publicCacheHeaders } from "@/utils/cache";
 
 type PatternType = "hour_of_day" | "day_of_week" | "monthly";
 
@@ -171,30 +172,33 @@ export async function GET(request: Request) {
       const peakMean = peak?.mean ?? null;
       const quietMean = quiet?.mean ?? null;
 
-      return NextResponse.json({
-        success: true,
-        data: {
-          hospital_id: hospitalId,
-          hospital_name: hospitalName,
-          pattern_type: "hour_of_day",
-          data_period: {
-            start: formatDate(start),
-            end: formatDate(now),
-          },
-          sample_count: patterns.reduce((sum, row) => sum + row.sample_count, 0),
-          patterns,
-          insights: {
-            peak_hour: peak?.hour ?? null,
-            quietest_hour: quiet?.hour ?? null,
-            peak_mean: peakMean,
-            quietest_mean: quietMean,
-            peak_vs_quiet_ratio:
-              peakMean !== null && quietMean !== null && quietMean > 0
-                ? Number((peakMean / quietMean).toFixed(2))
-                : null,
+      return NextResponse.json(
+        {
+          success: true,
+          data: {
+            hospital_id: hospitalId,
+            hospital_name: hospitalName,
+            pattern_type: "hour_of_day",
+            data_period: {
+              start: formatDate(start),
+              end: formatDate(now),
+            },
+            sample_count: patterns.reduce((sum, row) => sum + row.sample_count, 0),
+            patterns,
+            insights: {
+              peak_hour: peak?.hour ?? null,
+              quietest_hour: quiet?.hour ?? null,
+              peak_mean: peakMean,
+              quietest_mean: quietMean,
+              peak_vs_quiet_ratio:
+                peakMean !== null && quietMean !== null && quietMean > 0
+                  ? Number((peakMean / quietMean).toFixed(2))
+                  : null,
+            },
           },
         },
-      });
+        { headers: publicCacheHeaders(300, 900) }
+      );
     }
 
     if (patternType === "day_of_week") {
@@ -258,28 +262,31 @@ export async function GET(request: Request) {
           .map((row) => Number(row.mean))
       );
 
-      return NextResponse.json({
-        success: true,
-        data: {
-          hospital_id: hospitalId,
-          hospital_name: hospitalName,
-          pattern_type: "day_of_week",
-          data_period: {
-            start: formatDate(start),
-            end: formatDate(now),
-          },
-          sample_count: patterns.reduce((sum, row) => sum + row.sample_count, 0),
-          patterns,
-          insights: {
-            worst_day: worst?.day ?? null,
-            best_day: best?.day ?? null,
-            weekend_vs_weekday_ratio:
-              weekendMean !== null && weekdayMean !== null && weekdayMean > 0
-                ? Number((weekendMean / weekdayMean).toFixed(2))
-                : null,
+      return NextResponse.json(
+        {
+          success: true,
+          data: {
+            hospital_id: hospitalId,
+            hospital_name: hospitalName,
+            pattern_type: "day_of_week",
+            data_period: {
+              start: formatDate(start),
+              end: formatDate(now),
+            },
+            sample_count: patterns.reduce((sum, row) => sum + row.sample_count, 0),
+            patterns,
+            insights: {
+              worst_day: worst?.day ?? null,
+              best_day: best?.day ?? null,
+              weekend_vs_weekday_ratio:
+                weekendMean !== null && weekdayMean !== null && weekdayMean > 0
+                  ? Number((weekendMean / weekdayMean).toFixed(2))
+                  : null,
+            },
           },
         },
-      });
+        { headers: publicCacheHeaders(300, 900) }
+      );
     }
 
     const lookbackMonths = parsePositiveInt(searchParams.get("lookback_months"), 12, 36);
@@ -325,26 +332,29 @@ export async function GET(request: Request) {
       }
     }
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        hospital_id: hospitalId,
-        hospital_name: hospitalName,
-        pattern_type: "monthly",
-        data_period: {
-          start: formatDate(start),
-          end: formatDate(now),
-        },
-        sample_count: patterns.reduce((sum, row) => sum + row.sample_count, 0),
-        patterns,
-        insights: {
-          direction,
-          change_percent: changePercent,
-          start_mean: startMean,
-          end_mean: endMean,
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          hospital_id: hospitalId,
+          hospital_name: hospitalName,
+          pattern_type: "monthly",
+          data_period: {
+            start: formatDate(start),
+            end: formatDate(now),
+          },
+          sample_count: patterns.reduce((sum, row) => sum + row.sample_count, 0),
+          patterns,
+          insights: {
+            direction,
+            change_percent: changePercent,
+            start_mean: startMean,
+            end_mean: endMean,
+          },
         },
       },
-    });
+      { headers: publicCacheHeaders(300, 900) }
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     if (message.includes("Invalid lookback value")) {
