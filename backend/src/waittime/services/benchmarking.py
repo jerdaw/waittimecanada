@@ -79,9 +79,7 @@ class BenchmarkingService:
                     "hospital_name": row["hospital_name"],
                     "city": row["city"],
                     "current_wait": (
-                        float(row["current_wait"])
-                        if row.get("current_wait") is not None
-                        else None
+                        float(row["current_wait"]) if row.get("current_wait") is not None else None
                     ),
                     "period_mean": period_mean,
                     "percentile": percentile,
@@ -293,12 +291,12 @@ class BenchmarkingService:
         # We need separate params list for measurements
         ontology_params_measurements = []
         if ontology:
-             if "metric_family" in ontology:
-                 ontology_params_measurements.append(ontology["metric_family"])
-             if "start_event" in ontology:
-                 ontology_params_measurements.append(ontology["start_event"])
-             if "end_event" in ontology:
-                 ontology_params_measurements.append(ontology["end_event"])
+            if "metric_family" in ontology:
+                ontology_params_measurements.append(ontology["metric_family"])
+            if "start_event" in ontology:
+                ontology_params_measurements.append(ontology["start_event"])
+            if "end_event" in ontology:
+                ontology_params_measurements.append(ontology["end_event"])
 
         full_params.extend(ontology_params_measurements)
 
@@ -307,7 +305,7 @@ class BenchmarkingService:
 
         final_query = base_query.format(
             ontology_filter=ontology_clause,
-            ontology_filter_measurements=ontology_clause_measurements
+            ontology_filter_measurements=ontology_clause_measurements,
         )
 
         with self.db.get_connection() as conn:

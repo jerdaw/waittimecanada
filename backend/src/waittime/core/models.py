@@ -48,9 +48,7 @@ class Measurement(BaseModel):
     patients_in_treatment: int | None = Field(
         default=None, ge=0, description="Number of patients in treatment"
     )
-    total_treatment_spaces: int | None = Field(
-        default=None, ge=0, description="Total ER capacity"
-    )
+    total_treatment_spaces: int | None = Field(default=None, ge=0, description="Total ER capacity")
 
     # Provenance tracking
     source_id: str = Field(description="Foreign key to sources table")

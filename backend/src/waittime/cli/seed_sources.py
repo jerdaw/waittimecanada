@@ -186,8 +186,8 @@ Examples:
                 seed_source(db, source, dry_run=args.dry_run)
                 success_count += 1
             except Exception as e:
-                 logger.error(f"Failed to process {file_path}: {e}")
-                 # Continue with others? Or stop? Let's continue but report error.
+                logger.error(f"Failed to process {file_path}: {e}")
+                # Continue with others? Or stop? Let's continue but report error.
 
         if args.dry_run:
             print(f"\n✓ Dry run complete - processed {success_count} sources")
