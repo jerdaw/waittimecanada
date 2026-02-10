@@ -55,7 +55,11 @@ function parseType(value: string | null): PatternType {
   throw new Error("Invalid type");
 }
 
-function parsePositiveInt(value: string | null, fallback: number, max: number): number {
+function parsePositiveInt(
+  value: string | null,
+  fallback: number,
+  max: number,
+): number {
   if (!value) return fallback;
   const parsed = Number.parseInt(value, 10);
   if (Number.isNaN(parsed) || parsed <= 0 || parsed > max) {
@@ -81,7 +85,7 @@ export async function GET(request: Request) {
           error: "Missing required parameter",
           message: "Query parameter 'hospital_id' is required",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -95,7 +99,7 @@ export async function GET(request: Request) {
           error: "Invalid pattern type",
           message: "Supported type values: hour_of_day, day_of_week, monthly",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -115,7 +119,7 @@ export async function GET(request: Request) {
           error: "Hospital not found",
           message: "Hospital not found or not visible",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -123,8 +127,14 @@ export async function GET(request: Request) {
     const now = new Date();
 
     if (patternType === "hour_of_day") {
-      const lookbackDays = parsePositiveInt(searchParams.get("lookback_days"), 30, 365);
-      const start = new Date(now.getTime() - lookbackDays * 24 * 60 * 60 * 1000);
+      const lookbackDays = parsePositiveInt(
+        searchParams.get("lookback_days"),
+        30,
+        365,
+      );
+      const start = new Date(
+        now.getTime() - lookbackDays * 24 * 60 * 60 * 1000,
+      );
 
       const rows = await sql`
         SELECT
@@ -145,7 +155,8 @@ export async function GET(request: Request) {
         byHour.set(Number(row.hour), {
           hour: Number(row.hour),
           mean: row.mean === null ? null : Number(Number(row.mean).toFixed(1)),
-          median: row.median === null ? null : Number(Number(row.median).toFixed(1)),
+          median:
+            row.median === null ? null : Number(Number(row.median).toFixed(1)),
           sample_count: toNumber(row.sample_count),
         });
       }
@@ -163,10 +174,14 @@ export async function GET(request: Request) {
 
       const populated = patterns.filter((row) => row.mean !== null);
       const peak = populated.length
-        ? populated.reduce((best, row) => ((row.mean ?? 0) > (best.mean ?? 0) ? row : best))
+        ? populated.reduce((best, row) =>
+            (row.mean ?? 0) > (best.mean ?? 0) ? row : best,
+          )
         : null;
       const quiet = populated.length
-        ? populated.reduce((best, row) => ((row.mean ?? 0) < (best.mean ?? 0) ? row : best))
+        ? populated.reduce((best, row) =>
+            (row.mean ?? 0) < (best.mean ?? 0) ? row : best,
+          )
         : null;
 
       const peakMean = peak?.mean ?? null;
@@ -183,7 +198,10 @@ export async function GET(request: Request) {
               start: formatDate(start),
               end: formatDate(now),
             },
-            sample_count: patterns.reduce((sum, row) => sum + row.sample_count, 0),
+            sample_count: patterns.reduce(
+              (sum, row) => sum + row.sample_count,
+              0,
+            ),
             patterns,
             insights: {
               peak_hour: peak?.hour ?? null,
@@ -197,13 +215,19 @@ export async function GET(request: Request) {
             },
           },
         },
-        { headers: publicCacheHeaders(300, 900) }
+        { headers: publicCacheHeaders(300, 900) },
       );
     }
 
     if (patternType === "day_of_week") {
-      const lookbackDays = parsePositiveInt(searchParams.get("lookback_days"), 90, 365);
-      const start = new Date(now.getTime() - lookbackDays * 24 * 60 * 60 * 1000);
+      const lookbackDays = parsePositiveInt(
+        searchParams.get("lookback_days"),
+        90,
+        365,
+      );
+      const start = new Date(
+        now.getTime() - lookbackDays * 24 * 60 * 60 * 1000,
+      );
 
       const rows = await sql`
         SELECT
@@ -226,7 +250,8 @@ export async function GET(request: Request) {
           day: DAYS_OF_WEEK[dayIndex],
           day_index: dayIndex,
           mean: row.mean === null ? null : Number(Number(row.mean).toFixed(1)),
-          median: row.median === null ? null : Number(Number(row.median).toFixed(1)),
+          median:
+            row.median === null ? null : Number(Number(row.median).toFixed(1)),
           sample_count: toNumber(row.sample_count),
         });
       }
@@ -245,21 +270,25 @@ export async function GET(request: Request) {
 
       const populated = patterns.filter((row) => row.mean !== null);
       const worst = populated.length
-        ? populated.reduce((best, row) => ((row.mean ?? 0) > (best.mean ?? 0) ? row : best))
+        ? populated.reduce((best, row) =>
+            (row.mean ?? 0) > (best.mean ?? 0) ? row : best,
+          )
         : null;
       const best = populated.length
-        ? populated.reduce((best, row) => ((row.mean ?? 0) < (best.mean ?? 0) ? row : best))
+        ? populated.reduce((best, row) =>
+            (row.mean ?? 0) < (best.mean ?? 0) ? row : best,
+          )
         : null;
 
       const weekendMean = mean(
         patterns
           .filter((row) => row.day_index >= 5 && row.mean !== null)
-          .map((row) => Number(row.mean))
+          .map((row) => Number(row.mean)),
       );
       const weekdayMean = mean(
         patterns
           .filter((row) => row.day_index <= 4 && row.mean !== null)
-          .map((row) => Number(row.mean))
+          .map((row) => Number(row.mean)),
       );
 
       return NextResponse.json(
@@ -273,7 +302,10 @@ export async function GET(request: Request) {
               start: formatDate(start),
               end: formatDate(now),
             },
-            sample_count: patterns.reduce((sum, row) => sum + row.sample_count, 0),
+            sample_count: patterns.reduce(
+              (sum, row) => sum + row.sample_count,
+              0,
+            ),
             patterns,
             insights: {
               worst_day: worst?.day ?? null,
@@ -285,12 +317,18 @@ export async function GET(request: Request) {
             },
           },
         },
-        { headers: publicCacheHeaders(300, 900) }
+        { headers: publicCacheHeaders(300, 900) },
       );
     }
 
-    const lookbackMonths = parsePositiveInt(searchParams.get("lookback_months"), 12, 36);
-    const start = new Date(now.getTime() - lookbackMonths * 31 * 24 * 60 * 60 * 1000);
+    const lookbackMonths = parsePositiveInt(
+      searchParams.get("lookback_months"),
+      12,
+      36,
+    );
+    const start = new Date(
+      now.getTime() - lookbackMonths * 31 * 24 * 60 * 60 * 1000,
+    );
 
     const rows = await sql`
       SELECT
@@ -311,20 +349,25 @@ export async function GET(request: Request) {
       return {
         month: `${monthDate.getUTCFullYear()}-${String(monthDate.getUTCMonth() + 1).padStart(2, "0")}`,
         mean: row.mean === null ? null : Number(Number(row.mean).toFixed(1)),
-        median: row.median === null ? null : Number(Number(row.median).toFixed(1)),
+        median:
+          row.median === null ? null : Number(Number(row.median).toFixed(1)),
         sample_count: toNumber(row.sample_count),
       };
     });
 
     const populated = patterns.filter((row) => row.mean !== null);
     const startMean = populated.length ? Number(populated[0].mean) : null;
-    const endMean = populated.length ? Number(populated[populated.length - 1].mean) : null;
+    const endMean = populated.length
+      ? Number(populated[populated.length - 1].mean)
+      : null;
 
     let direction: "improving" | "stable" | "worsening" = "stable";
     let changePercent = 0;
 
     if (startMean !== null && endMean !== null && startMean > 0) {
-      changePercent = Number((((endMean - startMean) / startMean) * 100).toFixed(1));
+      changePercent = Number(
+        (((endMean - startMean) / startMean) * 100).toFixed(1),
+      );
       if (changePercent < -5) {
         direction = "improving";
       } else if (changePercent > 5) {
@@ -343,7 +386,10 @@ export async function GET(request: Request) {
             start: formatDate(start),
             end: formatDate(now),
           },
-          sample_count: patterns.reduce((sum, row) => sum + row.sample_count, 0),
+          sample_count: patterns.reduce(
+            (sum, row) => sum + row.sample_count,
+            0,
+          ),
           patterns,
           insights: {
             direction,
@@ -353,7 +399,7 @@ export async function GET(request: Request) {
           },
         },
       },
-      { headers: publicCacheHeaders(300, 900) }
+      { headers: publicCacheHeaders(300, 900) },
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
@@ -362,9 +408,10 @@ export async function GET(request: Request) {
         {
           success: false,
           error: "Invalid lookback",
-          message: "Lookback values must be positive integers within allowed limits",
+          message:
+            "Lookback values must be positive integers within allowed limits",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -375,7 +422,7 @@ export async function GET(request: Request) {
         error: "Failed to compute temporal patterns",
         message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

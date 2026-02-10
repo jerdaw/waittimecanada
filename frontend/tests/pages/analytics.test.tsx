@@ -7,7 +7,9 @@ vi.mock("@/components/Header", () => ({
 }));
 
 vi.mock("@/components/SystemTrendChart", () => ({
-  SystemTrendChart: () => <section data-testid="mock-system-trend">System Trend Chart</section>,
+  SystemTrendChart: () => (
+    <section data-testid="mock-system-trend">System Trend Chart</section>
+  ),
 }));
 
 vi.mock("@/components/RegionDashboard", () => ({
@@ -87,12 +89,15 @@ describe("AnalyticsPage", () => {
               available: false,
               status: "not_available_yet",
               generated_at: "2026-02-08T00:00:00.000Z",
-              message: "Occupancy metrics are not available from the current provincial feed.",
+              message:
+                "Occupancy metrics are not available from the current provincial feed.",
               fields: {
                 patients_waiting: false,
                 patients_in_treatment: false,
               },
-              setup_steps: ["Verify provincial source publishes occupancy fields"],
+              setup_steps: [
+                "Verify provincial source publishes occupancy fields",
+              ],
             },
           }),
       });
@@ -109,7 +114,9 @@ describe("AnalyticsPage", () => {
     await waitFor(() => {
       expect(screen.getByText("Test Hospital")).toBeInTheDocument();
     });
-    expect(screen.getByText("Occupancy metrics not available yet")).toBeInTheDocument();
+    expect(
+      screen.getByText("Occupancy metrics not available yet"),
+    ).toBeInTheDocument();
   });
 
   it("shows loading state for ranking table", () => {
@@ -118,7 +125,9 @@ describe("AnalyticsPage", () => {
 
     render(<AnalyticsPage />);
 
-    expect(screen.getByText("Loading benchmark rankings...")).toBeInTheDocument();
+    expect(
+      screen.getByText("Loading benchmark rankings..."),
+    ).toBeInTheDocument();
   });
 
   it("shows setup guidance when regional schema is not initialized", async () => {
@@ -154,7 +163,8 @@ describe("AnalyticsPage", () => {
               available: false,
               status: "not_available_yet",
               generated_at: "2026-02-08T00:00:00.000Z",
-              message: "Occupancy metrics are not available from current sources.",
+              message:
+                "Occupancy metrics are not available from current sources.",
               fields: {
                 patients_waiting: false,
                 patients_in_treatment: false,
@@ -167,9 +177,13 @@ describe("AnalyticsPage", () => {
     render(<AnalyticsPage />);
 
     await waitFor(() => {
-      expect(screen.getByText("Regional analytics setup needed")).toBeInTheDocument();
+      expect(
+        screen.getByText("Regional analytics setup needed"),
+      ).toBeInTheDocument();
     });
     expect(screen.getByText("Missing regions tables")).toBeInTheDocument();
-    expect(screen.getByText("python backend/run_migrations.py")).toBeInTheDocument();
+    expect(
+      screen.getByText("python backend/run_migrations.py"),
+    ).toBeInTheDocument();
   });
 });

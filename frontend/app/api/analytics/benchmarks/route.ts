@@ -31,7 +31,9 @@ const PERIOD_TO_DAYS: Record<string, number> = {
   "30d": 30,
 };
 
-function parsePeriod(period: string | null): { label: string; days: number } | null {
+function parsePeriod(
+  period: string | null,
+): { label: string; days: number } | null {
   const label = period ?? "7d";
   const days = PERIOD_TO_DAYS[label];
   if (!days) {
@@ -52,7 +54,9 @@ function computeQuantile(sortedValues: number[], q: number): number | null {
   if (lower === upper) {
     return sortedValues[lower];
   }
-  return sortedValues[lower] + (sortedValues[upper] - sortedValues[lower]) * fraction;
+  return (
+    sortedValues[lower] + (sortedValues[upper] - sortedValues[lower]) * fraction
+  );
 }
 
 function computeProvinceStats(values: number[]): ProvinceStats {
@@ -99,7 +103,10 @@ function computeQuartile(percentile: number): 1 | 2 | 3 | 4 {
   return 4;
 }
 
-function computeTrend(currentMean: number, previousMean: number | null): BenchmarkTrend {
+function computeTrend(
+  currentMean: number,
+  previousMean: number | null,
+): BenchmarkTrend {
   if (previousMean === null || previousMean <= 0) {
     return "stable";
   }
@@ -110,11 +117,16 @@ function computeTrend(currentMean: number, previousMean: number | null): Benchma
   return "stable";
 }
 
-function computeTrendChangePercent(currentMean: number, previousMean: number | null): number {
+function computeTrendChangePercent(
+  currentMean: number,
+  previousMean: number | null,
+): number {
   if (previousMean === null || previousMean <= 0) {
     return 0;
   }
-  return Number((((currentMean - previousMean) / previousMean) * 100).toFixed(1));
+  return Number(
+    (((currentMean - previousMean) / previousMean) * 100).toFixed(1),
+  );
 }
 
 export async function GET(request: Request) {
@@ -130,7 +142,7 @@ export async function GET(request: Request) {
           error: "Missing required parameter",
           message: "Query parameter 'province' is required",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -142,7 +154,7 @@ export async function GET(request: Request) {
           error: "Invalid period",
           message: "Supported period values: 24h, 7d, 30d",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -150,8 +162,12 @@ export async function GET(request: Request) {
     const normalizedProvince = province.toUpperCase();
 
     const now = new Date();
-    const currentStart = new Date(now.getTime() - periodConfig.days * 24 * 60 * 60 * 1000);
-    const previousStart = new Date(currentStart.getTime() - periodConfig.days * 24 * 60 * 60 * 1000);
+    const currentStart = new Date(
+      now.getTime() - periodConfig.days * 24 * 60 * 60 * 1000,
+    );
+    const previousStart = new Date(
+      currentStart.getTime() - periodConfig.days * 24 * 60 * 60 * 1000,
+    );
 
     const rows = await sql`
       WITH current_period AS (
@@ -203,10 +219,13 @@ export async function GET(request: Request) {
         hospital_id: String(row.hospital_id),
         hospital_name: String(row.hospital_name),
         city: String(row.city),
-        current_wait: row.current_wait === null ? null : Number(row.current_wait),
+        current_wait:
+          row.current_wait === null ? null : Number(row.current_wait),
         period_mean: Number(row.period_mean),
         previous_period_mean:
-          row.previous_period_mean === null ? null : Number(row.previous_period_mean),
+          row.previous_period_mean === null
+            ? null
+            : Number(row.previous_period_mean),
       }))
       .sort((a, b) => a.period_mean - b.period_mean);
 
@@ -225,7 +244,7 @@ export async function GET(request: Request) {
         trend: computeTrend(row.period_mean, row.previous_period_mean),
         trend_change_percent: computeTrendChangePercent(
           row.period_mean,
-          row.previous_period_mean
+          row.previous_period_mean,
         ),
       };
     });
@@ -242,11 +261,13 @@ export async function GET(request: Request) {
           message:
             "The requested hospital has no benchmarkable aggregate data for this province and period",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    const provinceStats = computeProvinceStats(hospitals.map((hospital) => hospital.period_mean));
+    const provinceStats = computeProvinceStats(
+      hospitals.map((hospital) => hospital.period_mean),
+    );
 
     return NextResponse.json(
       {
@@ -260,7 +281,7 @@ export async function GET(request: Request) {
           hospitals: selectedHospitals,
         },
       },
-      { headers: publicCacheHeaders(300, 900) }
+      { headers: publicCacheHeaders(300, 900) },
     );
   } catch (error) {
     console.error("Failed to compute benchmarks:", error);
@@ -270,7 +291,7 @@ export async function GET(request: Request) {
         error: "Failed to compute benchmarks",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

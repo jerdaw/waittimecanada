@@ -14,7 +14,10 @@ async function ensureOutputDir() {
 }
 
 async function captureDesktop(page, route, filename, readySelector) {
-  await page.goto(`${BASE_URL}${route}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
+  await page.goto(`${BASE_URL}${route}`, {
+    waitUntil: "domcontentloaded",
+    timeout: 60_000,
+  });
   if (readySelector) {
     await page.waitForSelector(readySelector, { timeout: 30_000 });
   }
@@ -40,7 +43,9 @@ async function run() {
 
   await captureDesktop(page, "/", "01-landing-page.png", "h1");
 
-  const expandAboutButton = page.getByRole("button", { name: /expand about section/i });
+  const expandAboutButton = page.getByRole("button", {
+    name: /expand about section/i,
+  });
   if (await expandAboutButton.count()) {
     await expandAboutButton.click();
     await page.waitForTimeout(500);
@@ -70,7 +75,7 @@ async function run() {
   await fs.writeFile(
     path.join(OUTPUT_DIR, "manifest.json"),
     `${JSON.stringify(manifest, null, 2)}\n`,
-    "utf-8"
+    "utf-8",
   );
 
   await browser.close();

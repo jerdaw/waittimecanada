@@ -16,8 +16,8 @@ import time
 from collections.abc import Callable
 from datetime import UTC, datetime
 
-import requests
-from bs4 import BeautifulSoup, Tag
+import requests  # type: ignore[import-untyped]
+from bs4 import BeautifulSoup, Tag  # type: ignore[import-untyped]
 
 from waittime.core import (
     EndEvent,
@@ -303,7 +303,7 @@ class QuebecScraper(BaseScraper):
         slug = re.sub(r"[^a-z0-9]+", "-", ascii_name.lower()).strip("-")
 
         if slug:
-            # We log this but accept it. The admin verification queue will catch it.
+            # We log this but accept it. Data quality monitoring will flag anomalies.
             return f"ca-qc-{slug}"
 
         return None

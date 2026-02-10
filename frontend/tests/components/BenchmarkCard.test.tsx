@@ -63,7 +63,9 @@ describe("BenchmarkCard", () => {
     render(<BenchmarkCard hospital={mockHospital} />);
 
     await waitFor(() => {
-      expect(screen.getByText(/67th percentile wait time/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/67th percentile wait time/i),
+      ).toBeInTheDocument();
     });
 
     expect(screen.getByText(/Q3 - Above Typical/i)).toBeInTheDocument();

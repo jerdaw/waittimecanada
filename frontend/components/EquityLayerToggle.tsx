@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Layers } from "lucide-react";
 
@@ -8,7 +8,11 @@ interface EquityLayerToggleProps {
   onChange: (enabled: boolean) => void;
 }
 
-export function EquityLayerToggle({ enabled, loading = false, onChange }: EquityLayerToggleProps) {
+export function EquityLayerToggle({
+  enabled,
+  loading = false,
+  onChange,
+}: EquityLayerToggleProps) {
   return (
     <button
       type="button"

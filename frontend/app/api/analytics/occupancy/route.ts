@@ -24,7 +24,7 @@ export async function GET(request: Request) {
         error: "Missing required parameter",
         message: "Query parameter 'province' is required",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -40,9 +40,11 @@ export async function GET(request: Request) {
     `;
 
     const fields: OccupancyFieldsAvailability = {
-      patients_waiting: schemaRows.some((row) => row.column_name === "patients_waiting"),
+      patients_waiting: schemaRows.some(
+        (row) => row.column_name === "patients_waiting",
+      ),
       patients_in_treatment: schemaRows.some(
-        (row) => row.column_name === "patients_in_treatment"
+        (row) => row.column_name === "patients_in_treatment",
       ),
     };
 
@@ -65,7 +67,7 @@ export async function GET(request: Request) {
             ],
           },
         },
-        { headers: publicCacheHeaders(300, 900) }
+        { headers: publicCacheHeaders(300, 900) },
       );
     }
 
@@ -92,11 +94,13 @@ export async function GET(request: Request) {
     const observations = Number(row?.observations_24h ?? 0);
     const hospitalsReporting = Number(row?.hospitals_reporting ?? 0);
     const avgPatientsWaiting =
-      row?.avg_patients_waiting === null || row?.avg_patients_waiting === undefined
+      row?.avg_patients_waiting === null ||
+      row?.avg_patients_waiting === undefined
         ? null
         : Number(row.avg_patients_waiting);
     const avgPatientsInTreatment =
-      row?.avg_patients_in_treatment === null || row?.avg_patients_in_treatment === undefined
+      row?.avg_patients_in_treatment === null ||
+      row?.avg_patients_in_treatment === undefined
         ? null
         : Number(row.avg_patients_in_treatment);
     const latestObservation =
@@ -104,7 +108,8 @@ export async function GET(request: Request) {
         ? null
         : String(row.latest_observation);
 
-    const status: OccupancyStatus = observations > 0 ? "available" : "no_reporting_data";
+    const status: OccupancyStatus =
+      observations > 0 ? "available" : "no_reporting_data";
 
     return NextResponse.json(
       {
@@ -128,7 +133,7 @@ export async function GET(request: Request) {
           latest_observation: latestObservation,
         },
       },
-      { headers: publicCacheHeaders(300, 900) }
+      { headers: publicCacheHeaders(300, 900) },
     );
   } catch (error) {
     console.error("Failed to compute occupancy analytics:", error);
@@ -137,7 +142,7 @@ export async function GET(request: Request) {
         success: false,
         error: "Failed to compute occupancy analytics",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

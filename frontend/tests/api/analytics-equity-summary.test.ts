@@ -13,7 +13,9 @@ describe("Equity Summary API", () => {
   });
 
   it("returns 400 when province is missing", async () => {
-    const request = new Request("http://localhost/api/analytics/equity-summary");
+    const request = new Request(
+      "http://localhost/api/analytics/equity-summary",
+    );
     const response = await GET(request);
     const json = await response.json();
 
@@ -23,7 +25,9 @@ describe("Equity Summary API", () => {
   });
 
   it("returns not_available_yet for unsupported province", async () => {
-    const request = new Request("http://localhost/api/analytics/equity-summary?province=QC");
+    const request = new Request(
+      "http://localhost/api/analytics/equity-summary?province=QC",
+    );
     const response = await GET(request);
     const json = await response.json();
 
@@ -50,7 +54,7 @@ describe("Equity Summary API", () => {
     ]);
 
     const request = new Request(
-      "http://localhost/api/analytics/equity-summary?province=ON&period=7d"
+      "http://localhost/api/analytics/equity-summary?province=ON&period=7d",
     );
     const response = await GET(request);
     const json = await response.json();
@@ -75,7 +79,7 @@ describe("Equity Summary API", () => {
     ]);
 
     const request = new Request(
-      "http://localhost/api/analytics/equity-summary?province=ON&period=7d"
+      "http://localhost/api/analytics/equity-summary?province=ON&period=7d",
     );
     const response = await GET(request);
     const json = await response.json();
@@ -90,7 +94,7 @@ describe("Equity Summary API", () => {
     mockSql.mockRejectedValue(new Error("DB failure"));
 
     const request = new Request(
-      "http://localhost/api/analytics/equity-summary?province=ON&period=7d"
+      "http://localhost/api/analytics/equity-summary?province=ON&period=7d",
     );
     const response = await GET(request);
     const json = await response.json();

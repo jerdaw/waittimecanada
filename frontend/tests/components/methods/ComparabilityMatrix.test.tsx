@@ -1,9 +1,37 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, waitFor, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ComparabilityMatrix } from "@/components/methods/ComparabilityMatrix";
+import { useSearchParams, useRouter } from "next/navigation";
+
+// Mock Next.js navigation hooks
+vi.mock("next/navigation", () => ({
+  useSearchParams: vi.fn(),
+  useRouter: vi.fn(),
+}));
+
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 describe("ComparabilityMatrix", () => {
+  let mockSearchParams: any;
+  let mockRouter: any;
+
+  beforeEach(() => {
+    mockSearchParams = {
+      get: vi.fn(() => null),
+      toString: vi.fn(() => ""),
+    };
+    mockRouter = {
+      replace: vi.fn(),
+    };
+
+    vi.mocked(useSearchParams).mockReturnValue(mockSearchParams);
+    vi.mocked(useRouter).mockReturnValue(mockRouter);
+  });
+
   const mockSources = [
     {
       id: "on-health",
@@ -96,9 +124,7 @@ describe("ComparabilityMatrix", () => {
     // Click a cell (not on header row/col)
     const cells = screen.getAllByRole("cell");
     // Find a non-header cell
-    const dataCell = cells.find((cell) =>
-      cell.querySelector('[title]')
-    );
+    const dataCell = cells.find((cell) => cell.querySelector("[title]"));
 
     if (dataCell) {
       await user.click(dataCell);
@@ -114,7 +140,7 @@ describe("ComparabilityMatrix", () => {
     render(<ComparabilityMatrix sources={mockSources} />);
 
     const cells = screen.getAllByRole("cell");
-    const dataCell = cells.find((cell) => cell.querySelector('[title]'));
+    const dataCell = cells.find((cell) => cell.querySelector("[title]"));
 
     if (dataCell) {
       await user.click(dataCell);
@@ -133,7 +159,7 @@ describe("ComparabilityMatrix", () => {
     const { container } = render(<ComparabilityMatrix sources={mockSources} />);
 
     const cells = screen.getAllByRole("cell");
-    const dataCell = cells.find((cell) => cell.querySelector('[title]'));
+    const dataCell = cells.find((cell) => cell.querySelector("[title]"));
 
     if (dataCell) {
       await user.click(dataCell);
@@ -165,5 +191,56 @@ describe("ComparabilityMatrix", () => {
     const xmarks = screen.queryAllByText("✗");
 
     expect(warnings.length + xmarks.length).toBeGreaterThan(0);
+  });
+
+  it("renders CSV export button", () => {
+    render(<ComparabilityMatrix sources={mockSources} />);
+
+    expect(screen.getByText("Export CSV")).toBeInTheDocument();
+  });
+
+  it("CSV export button is clickable", async () => {
+    const user = userEvent.setup();
+    render(<ComparabilityMatrix sources={mockSources} />);
+
+    const exportButton = screen.getByText("Export CSV");
+    expect(exportButton).toBeInTheDocument();
+
+    // Verify button is clickable (won't actually download in test environment)
+    await user.click(exportButton);
+
+    // If we get here without errors, the button is functional
+    expect(exportButton).toBeInTheDocument();
+  });
+
+  it("pre-selects cell from URL parameters", async () => {
+    mockSearchParams.get = vi.fn((key) => {
+      if (key === "compare") return "Ontario,Quebec";
+      return null;
+    });
+
+    render(<ComparabilityMatrix sources={mockSources} />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Comparing Ontario with Quebec/i),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("updates URL when cell is clicked", async () => {
+    const user = userEvent.setup();
+    render(<ComparabilityMatrix sources={mockSources} />);
+
+    const cells = screen.getAllByRole("cell");
+    const dataCell = cells.find((cell) => cell.querySelector("[title]"));
+
+    if (dataCell) {
+      await user.click(dataCell);
+
+      await waitFor(() => {
+        expect(mockRouter.replace).toHaveBeenCalled();
+      });
+    }
   });
 });

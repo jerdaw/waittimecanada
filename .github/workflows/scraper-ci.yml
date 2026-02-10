@@ -45,7 +45,6 @@ jobs:
   type-check:
     name: Type Check (mypy)
     runs-on: ubuntu-latest
-    continue-on-error: true  # Non-blocking - guides but doesn't fail CI
 
     steps:
       - uses: actions/checkout@v4
@@ -100,7 +99,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       security-events: write
-    continue-on-error: true  # Non-blocking - advisory only
 
     steps:
       - uses: actions/checkout@v4

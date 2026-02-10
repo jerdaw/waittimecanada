@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface Source {
   id: string;
@@ -28,7 +29,9 @@ function areComparable(a: Source, b: Source): ComparabilityLevel {
   const endMatch = a.default_end_event === b.default_end_event;
   const statMatch = a.default_statistic_type === b.default_statistic_type;
 
-  const matches = [metricMatch, startMatch, endMatch, statMatch].filter(Boolean).length;
+  const matches = [metricMatch, startMatch, endMatch, statMatch].filter(
+    Boolean,
+  ).length;
 
   if (matches === 4) return "comparable";
   if (matches >= 2) return "partial";
@@ -68,11 +71,75 @@ function getComparabilityLabel(level: ComparabilityLevel): string {
   }
 }
 
+function exportMatrixToCSV(sources: Source[]) {
+  // Build CSV content
+  const rows: string[][] = [];
+
+  // Header row
+  const header = ["Province", ...sources.map((s) => s.province)];
+  rows.push(header);
+
+  // Data rows
+  sources.forEach((rowSource) => {
+    const row = [rowSource.province];
+    sources.forEach((colSource) => {
+      const level = areComparable(rowSource, colSource);
+      row.push(getComparabilityLabel(level));
+    });
+    rows.push(row);
+  });
+
+  // Convert to CSV string
+  const csvContent = rows
+    .map((row) => row.map((cell) => `"${cell}"`).join(","))
+    .join("\n");
+
+  // Download
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.setAttribute("href", url);
+  link.setAttribute(
+    "download",
+    `comparability-matrix-${new Date().toISOString().split("T")[0]}.csv`,
+  );
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
   const [selectedCell, setSelectedCell] = useState<{
     row: Source;
     col: Source;
   } | null>(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Read URL params on mount to pre-select comparison
+  useEffect(() => {
+    const compareParam = searchParams.get("compare");
+    if (compareParam && sources.length > 0) {
+      const [prov1, prov2] = compareParam.split(",");
+      const source1 = sources.find((s) => s.province === prov1);
+      const source2 = sources.find((s) => s.province === prov2);
+      if (source1 && source2) {
+        setSelectedCell({ row: source1, col: source2 });
+      }
+    }
+  }, [searchParams, sources]);
+
+  const handleCellClick = (rowSource: Source, colSource: Source) => {
+    setSelectedCell({ row: rowSource, col: colSource });
+
+    // Update URL with deep link
+    if (rowSource.id !== colSource.id) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("compare", `${rowSource.province},${colSource.province}`);
+      router.replace(`?${params.toString()}`, { scroll: false });
+    }
+  };
 
   if (sources.length === 0) {
     return (
@@ -123,9 +190,7 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
                           ${isSelected ? "ring-2 ring-blue-500 ring-inset" : ""}
                           hover:opacity-80
                         `}
-                        onClick={() =>
-                          setSelectedCell({ row: rowSource, col: colSource })
-                        }
+                        onClick={() => handleCellClick(rowSource, colSource)}
                         title={getComparabilityLabel(level)}
                       >
                         <span className="text-lg font-semibold">
@@ -141,33 +206,60 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap items-center gap-6 text-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-emerald-100 text-emerald-700 border-emerald-200 font-semibold">
-            ✓
+      {/* Legend and Export */}
+      <div className="flex flex-wrap items-center justify-between gap-6">
+        <div className="flex flex-wrap items-center gap-6 text-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-emerald-100 text-emerald-700 border-emerald-200 font-semibold">
+              ✓
+            </div>
+            <span className="text-slate-700">Directly comparable</span>
           </div>
-          <span className="text-slate-700">Directly comparable</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-amber-100 text-amber-700 border-amber-200 font-semibold">
-            ⚠
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-amber-100 text-amber-700 border-amber-200 font-semibold">
+              ⚠
+            </div>
+            <span className="text-slate-700">
+              Partially comparable (2-3 matches)
+            </span>
           </div>
-          <span className="text-slate-700">Partially comparable (2-3 matches)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-red-100 text-red-700 border-red-200 font-semibold">
-            ✗
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-red-100 text-red-700 border-red-200 font-semibold">
+              ✗
+            </div>
+            <span className="text-slate-700">Not comparable (0-1 matches)</span>
           </div>
-          <span className="text-slate-700">Not comparable (0-1 matches)</span>
         </div>
+
+        {/* Export Button */}
+        <button
+          onClick={() => exportMatrixToCSV(sources)}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm font-medium"
+          title="Export matrix as CSV"
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          Export CSV
+        </button>
       </div>
 
       {/* Selected cell details */}
       {selectedCell && selectedCell.row.id !== selectedCell.col.id && (
         <div className="mt-6 p-6 rounded-xl border-2 border-blue-200 bg-blue-50">
           <h4 className="font-semibold text-blue-900 mb-3">
-            Comparing {selectedCell.row.province} with {selectedCell.col.province}
+            Comparing {selectedCell.row.province} with{" "}
+            {selectedCell.col.province}
           </h4>
           <div className="space-y-2 text-sm">
             <ComparisonRow
@@ -192,22 +284,25 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
             />
           </div>
           <p className="mt-4 text-sm text-blue-800">
-            {areComparable(selectedCell.row, selectedCell.col) === "comparable" && (
+            {areComparable(selectedCell.row, selectedCell.col) ===
+              "comparable" && (
               <>
-                ✓ These provinces use identical methodologies and can be directly compared.
+                ✓ These provinces use identical methodologies and can be
+                directly compared.
               </>
             )}
-            {areComparable(selectedCell.row, selectedCell.col) === "partial" && (
+            {areComparable(selectedCell.row, selectedCell.col) ===
+              "partial" && (
               <>
-                ⚠ These provinces differ in some dimensions. Comparisons should note these
-                differences.
+                ⚠ These provinces differ in some dimensions. Comparisons should
+                note these differences.
               </>
             )}
             {areComparable(selectedCell.row, selectedCell.col) ===
               "not-comparable" && (
               <>
-                ✗ These provinces use fundamentally different methodologies. Direct
-                comparison is statistically invalid.
+                ✗ These provinces use fundamentally different methodologies.
+                Direct comparison is statistically invalid.
               </>
             )}
           </p>
@@ -237,9 +332,7 @@ function ComparisonRow({
         >
           {value1}
         </code>
-        <span className="text-blue-400">
-          {matches ? "=" : "≠"}
-        </span>
+        <span className="text-blue-400">{matches ? "=" : "≠"}</span>
         <code
           className={`px-2 py-1 rounded text-xs ${matches ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-700"}`}
         >

@@ -71,7 +71,9 @@ describe("Regions Analytics API", () => {
       },
     ]);
 
-    const request = new Request("http://localhost/api/analytics/regions?province=ON&period=7d");
+    const request = new Request(
+      "http://localhost/api/analytics/regions?province=ON&period=7d",
+    );
     const response = await GET(request);
     const json = await response.json();
 
@@ -97,7 +99,9 @@ describe("Regions Analytics API", () => {
   it("handles query failures", async () => {
     mockSql.mockRejectedValue(new Error("DB failure"));
 
-    const request = new Request("http://localhost/api/analytics/regions?province=ON");
+    const request = new Request(
+      "http://localhost/api/analytics/regions?province=ON",
+    );
     const response = await GET(request);
     const json = await response.json();
 
@@ -107,12 +111,17 @@ describe("Regions Analytics API", () => {
   });
 
   it("returns setup instructions when regions schema is missing", async () => {
-    const error = Object.assign(new Error('relation "regions" does not exist'), {
-      code: "42P01",
-    });
+    const error = Object.assign(
+      new Error('relation "regions" does not exist'),
+      {
+        code: "42P01",
+      },
+    );
     mockSql.mockRejectedValue(error);
 
-    const request = new Request("http://localhost/api/analytics/regions?province=ON");
+    const request = new Request(
+      "http://localhost/api/analytics/regions?province=ON",
+    );
     const response = await GET(request);
     const json = await response.json();
 

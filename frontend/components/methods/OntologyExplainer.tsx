@@ -12,7 +12,8 @@ const dimensions = [
       {
         value: "TIME_TO_PROVIDER",
         label: "Time to Provider",
-        explanation: "How long until a patient is first assessed by a healthcare provider",
+        explanation:
+          "How long until a patient is first assessed by a healthcare provider",
       },
       {
         value: "TOTAL_LOS",
@@ -22,7 +23,8 @@ const dimensions = [
       {
         value: "STRETCHER_OCCUPANCY",
         label: "Stretcher Occupancy",
-        explanation: "Percentage of available stretcher beds currently occupied",
+        explanation:
+          "Percentage of available stretcher beds currently occupied",
       },
     ],
   },
@@ -82,12 +84,14 @@ const dimensions = [
       {
         value: "P90",
         label: "90th Percentile",
-        explanation: "90% of patients are seen faster than this time (worst-case planning)",
+        explanation:
+          "90% of patients are seen faster than this time (worst-case planning)",
       },
       {
         value: "MEDIAN",
         label: "Median (50th Percentile)",
-        explanation: "Typical middle-of-the-road experience for an average patient",
+        explanation:
+          "Typical middle-of-the-road experience for an average patient",
       },
       {
         value: "ROLLING_AVG",
@@ -114,7 +118,8 @@ export function OntologyExplainer() {
         </h3>
         <p className="text-slate-600 max-w-2xl mx-auto">
           For two measurements to be comparable, all four dimensions must match.
-          Understanding these dimensions is crucial for interpreting published wait times.
+          Understanding these dimensions is crucial for interpreting published
+          wait times.
         </p>
       </div>
 
@@ -160,7 +165,9 @@ export function OntologyExplainer() {
             {/* Expanded content */}
             {isExpanded && (
               <div className="px-6 pb-6 border-t border-slate-200 bg-slate-50">
-                <p className="text-slate-700 mb-4 pt-4">{dimension.description}</p>
+                <p className="text-slate-700 mb-4 pt-4">
+                  {dimension.description}
+                </p>
 
                 <div className="space-y-3">
                   {dimension.examples.map((example, exIndex) => (
@@ -178,7 +185,9 @@ export function OntologyExplainer() {
                           </code>
                         </div>
                       </div>
-                      <p className="text-sm text-slate-600">{example.explanation}</p>
+                      <p className="text-sm text-slate-600">
+                        {example.explanation}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -213,10 +222,11 @@ export function OntologyExplainer() {
               Why This Matters
             </h4>
             <p className="text-blue-800 text-sm leading-relaxed">
-              A 60-minute wait in Ontario (P90, Triage→Physician) is fundamentally
-              different from a 60-minute wait in Quebec (Rolling Avg,
-              Registration→Provider). Our platform automatically detects these
-              differences and warns you when comparing incompatible measurements.
+              A 60-minute wait in Ontario (P90, Triage→Physician) is
+              fundamentally different from a 60-minute wait in Quebec (Rolling
+              Avg, Registration→Provider). Our platform automatically detects
+              these differences and warns you when comparing incompatible
+              measurements.
             </p>
           </div>
         </div>

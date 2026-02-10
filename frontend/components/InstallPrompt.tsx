@@ -44,7 +44,7 @@ export function InstallPrompt() {
           </p>
         </div>
         <div className="flex gap-2">
-           <button
+          <button
             onClick={() => setShow(false)}
             className="text-xs text-muted-foreground hover:text-foreground px-2"
           >

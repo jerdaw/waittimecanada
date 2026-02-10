@@ -49,11 +49,13 @@ describe("AccessInsightsSummary", () => {
         hospitals={hospitals}
         userLocation={null}
         province="ON"
-      />
+      />,
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Equity linkage summary not available yet")).toBeInTheDocument();
+      expect(
+        screen.getByText("Equity linkage summary not available yet"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -88,15 +90,19 @@ describe("AccessInsightsSummary", () => {
         hospitals={hospitals}
         userLocation={{ lat: 43.66, lon: -79.4 }}
         province="ON"
-      />
+      />,
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Equity Access Snapshot (7d)")).toBeInTheDocument();
+      expect(
+        screen.getByText("Equity Access Snapshot (7d)"),
+      ).toBeInTheDocument();
       expect(screen.getByText("Low-Income Tracts")).toBeInTheDocument();
       expect(screen.getByText("Hospitals Near Tracts")).toBeInTheDocument();
       expect(screen.getByText("Wait Gap vs Province")).toBeInTheDocument();
-      expect(screen.getByText(/Placeholder tract dataset in use/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Placeholder tract dataset in use/i),
+      ).toBeInTheDocument();
     });
   });
 });

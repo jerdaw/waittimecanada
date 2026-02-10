@@ -36,23 +36,30 @@ function areComparable(a: Methodology, b: Methodology): boolean {
   );
 }
 
-function generateDivergenceBrief(a: Methodology, b: Methodology): string | null {
+function generateDivergenceBrief(
+  a: Methodology,
+  b: Methodology,
+): string | null {
   if (areComparable(a, b)) return null;
 
   const differences: string[] = [];
 
   if (a.metric_family !== b.metric_family) {
-    differences.push(`Different metrics: ${a.metric_family} vs ${b.metric_family}`);
+    differences.push(
+      `Different metrics: ${a.metric_family} vs ${b.metric_family}`,
+    );
   }
   if (a.start_event !== b.start_event) {
-    differences.push(`Different start points: ${a.start_event} vs ${b.start_event}`);
+    differences.push(
+      `Different start points: ${a.start_event} vs ${b.start_event}`,
+    );
   }
   if (a.end_event !== b.end_event) {
     differences.push(`Different end points: ${a.end_event} vs ${b.end_event}`);
   }
   if (a.statistic_type !== b.statistic_type) {
     differences.push(
-      `Different statistics: ${a.statistic_type} vs ${b.statistic_type}`
+      `Different statistics: ${a.statistic_type} vs ${b.statistic_type}`,
     );
   }
 
@@ -124,7 +131,7 @@ export async function GET(request: Request) {
           error: "Missing required parameters",
           message: "Both 'a' and 'b' hospital IDs are required",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -135,7 +142,7 @@ export async function GET(request: Request) {
           error: "Invalid comparison",
           message: "Cannot compare a hospital with itself",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -152,7 +159,7 @@ export async function GET(request: Request) {
           error: "Hospital not found",
           message: `Hospital ${hospitalA} not found or has no measurements`,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -163,7 +170,7 @@ export async function GET(request: Request) {
           error: "Hospital not found",
           message: `Hospital ${hospitalB} not found or has no measurements`,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -188,7 +195,7 @@ export async function GET(request: Request) {
         success: true,
         data: response,
       },
-      { headers: publicCacheHeaders(300, 900) }
+      { headers: publicCacheHeaders(300, 900) },
     );
   } catch (error) {
     console.error("Failed to compare hospitals:", error);
@@ -198,7 +205,7 @@ export async function GET(request: Request) {
         error: "Comparison failed",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

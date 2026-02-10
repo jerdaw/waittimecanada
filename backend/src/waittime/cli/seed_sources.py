@@ -114,6 +114,11 @@ Examples:
         help="Path to JSON file containing source data",
     )
     parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Seed all sources from data/sources/ directory",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Validate data without inserting into database",
@@ -139,8 +144,8 @@ Examples:
     )
 
     # Validate arguments
-    if not args.list and not args.file:
-        print("Error: --file is required (or use --list to view existing)")
+    if not args.list and not args.file and not args.all:
+        print("Error: --file or --all is required (or use --list to view existing)")
         return 1
 
     try:
@@ -152,18 +157,42 @@ Examples:
             return 0
 
         # Seed mode
-        logger.info(f"Loading source from {args.file}...")
-        source = load_source_from_json(args.file)
+        sources_to_seed = []
+        if args.file:
+            sources_to_seed.append(args.file)
+
+        if args.all:
+            # Find all json files in data/sources
+            sources_dir = Path(__file__).parents[2] / "data" / "sources"
+            if not sources_dir.exists():
+                logger.error(f"Sources directory not found: {sources_dir}")
+                return 1
+
+            for json_file in sources_dir.glob("*.json"):
+                sources_to_seed.append(json_file)
+
+        if not sources_to_seed:
+            logger.error("No source files found to seed.")
+            return 1
 
         if args.dry_run:
             logger.info("[DRY RUN MODE - No changes will be made]\n")
 
-        seed_source(db, source, dry_run=args.dry_run)
+        success_count = 0
+        for file_path in sources_to_seed:
+            try:
+                logger.info(f"Loading source from {file_path}...")
+                source = load_source_from_json(file_path)
+                seed_source(db, source, dry_run=args.dry_run)
+                success_count += 1
+            except Exception as e:
+                 logger.error(f"Failed to process {file_path}: {e}")
+                 # Continue with others? Or stop? Let's continue but report error.
 
         if args.dry_run:
-            print("\n✓ Dry run complete - no changes made")
+            print(f"\n✓ Dry run complete - processed {success_count} sources")
         else:
-            print("\n✓ Source seeding complete")
+            print(f"\n✓ Source seeding complete - upserted {success_count} sources")
 
         return 0
 

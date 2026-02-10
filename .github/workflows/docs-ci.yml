@@ -9,6 +9,7 @@ on:
       - "frontend/README.md"
       - "docs/**"
       - "scripts/check-docs.sh"
+      - "backend/scripts/verify_roadmap_consistency.py"
       - ".github/workflows/docs-ci.yml"
   push:
     branches: [main]
@@ -19,6 +20,7 @@ on:
       - "frontend/README.md"
       - "docs/**"
       - "scripts/check-docs.sh"
+      - "backend/scripts/verify_roadmap_consistency.py"
       - ".github/workflows/docs-ci.yml"
   workflow_dispatch:
 

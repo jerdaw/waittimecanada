@@ -106,8 +106,9 @@ export function FAQ() {
           Have more questions?
         </h4>
         <p className="text-blue-800 text-sm mb-4">
-          We&apos;re continuously improving our methodology documentation and data sources.
-          If you have questions or feedback, we&apos;d love to hear from you.
+          We&apos;re continuously improving our methodology documentation and
+          data sources. If you have questions or feedback, we&apos;d love to
+          hear from you.
         </p>
         <a
           href="https://github.com/jerdaw/waittimecanada/issues"

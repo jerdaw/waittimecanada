@@ -212,13 +212,7 @@ Consider making scrapers independent:
 
 ## Verification Queue Status
 
-All 154 Ontario hospitals are in the verification queue with:
-- `is_verified = FALSE`
-- `is_visible = FALSE`
-
-**Action Required:** Admin must verify hospitals before they appear on the public map.
-
-Access: `/admin/verify` on the frontend
+All 154 Ontario hospitals are auto-approved from trusted government sources (`is_verified = TRUE`, `is_visible = TRUE`).
 
 ---
 
@@ -234,7 +228,7 @@ Access: `/admin/verify` on the frontend
 
 ### Short-term (This Week)
 
-- [ ] Verify sample Ontario hospitals in admin queue
+- [ ] Verify Ontario hospitals appear on frontend map
 - [ ] Test frontend map with real data
 - [ ] Investigate Quebec page API endpoints
 - [ ] Plan Quebec scraper rewrite

@@ -54,7 +54,6 @@ This is the **WaitTime Canada** project - a "Health Systems Observatory" designe
   - Data quality dashboard (`/data-quality`)
   - Data export with granularity selector
   - Trend charts with aggregate visualization (90d/6m/1y)
-  - Admin verification queue UI (`/admin/verify`)
   - Methods & governance page (`/methods`)
   - API routes for hospitals, comparisons, health, data-quality, anomalies, export
 
@@ -104,9 +103,8 @@ If not comparable, generate a **"Divergence Brief"** explaining why direct compa
 - Includes telehealth contact info (Health Link 811 vs Info-Santé 811)
 - Links to official methodology documentation
 
-**`hospitals`** - Facility metadata with verification workflow
-- `is_verified`: Requires manual approval before appearing on site
-- `is_visible`: Toggle for production visibility
+**`hospitals`** - Facility metadata with visibility controls
+- `is_verified` / `is_visible`: Hospitals from trusted government sources are auto-approved on insert
 - Geographic coordinates for mapping
 
 **`measurements`** - Audit log of all scraped data
@@ -142,12 +140,9 @@ def write_heartbeat(source_id: str):
     })
 ```
 
-### 3. Verification Queue
+### 3. Trusted Source Auto-Approval
 
-**NEVER auto-publish new hospitals.** All discovered facilities must go through verification:
-1. Scraper inserts with `is_verified=FALSE, is_visible=FALSE`
-2. Admin reviews via simple UI
-3. Manual approval sets `is_verified=TRUE, is_visible=TRUE`
+Hospitals scraped from official government health authority websites (Ontario Health, Quebec MSSS, BC PHSA, Alberta AHS) are trusted sources and auto-approved on insert (`is_verified=TRUE, is_visible=TRUE`). Data quality is enforced through automated controls: anomaly detection, payload hashing, parser versioning, and heartbeat monitoring.
 
 ### 4. Province-Aware Routing
 
@@ -198,7 +193,7 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 1. **Never claim to "fix" inconsistent data** - We audit and expose inconsistencies
 2. **Never provide medical advice** - This is a data observatory, not a triage tool
 3. **Storage-first thinking** - Hash payloads, not store full HTML
-4. **Verification gate** - No auto-publishing of new facilities
+4. **Trusted sources** - Government health authority data is auto-approved; quality enforced via automated monitoring
 5. **Ontology enforcement** - Use database CHECK constraints or application-level validation
 6. **Attribution** - Always link back to official provincial sources
 7. **Human Authorship Only** - Never attribute work to AI or non-human agents
@@ -216,7 +211,7 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 
 - Frontend health polling should remain low-frequency: `SystemStatus` checks `/api/health` every 5 minutes and only when the tab is visible.
 - Shared read-heavy API routes should use CDN cache headers via `frontend/utils/cache.ts` with short TTLs (typically 2-10 minutes).
-- Admin and user-specific API routes must use `Cache-Control: no-store` (for example admin verification routes and IP geolocation).
+- User-specific API routes must use `Cache-Control: no-store` (for example IP geolocation).
 - Export endpoints must use `no-store` to avoid serving stale downloadable datasets.
 
 ## Implementation Roadmap

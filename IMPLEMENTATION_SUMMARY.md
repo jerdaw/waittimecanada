@@ -314,7 +314,7 @@ useEffect(() => {
 ### Immediate (Optional)
 1. **Test BC Scraper Live:** Run scraper against live BC data, verify hospital IDs
 2. **Seed BC Hospitals:** Add BC hospitals to database via seeding script
-3. **Manual Verification:** Approve BC hospitals in admin verification queue
+3. **Verify Auto-Approval:** Confirm BC hospitals are auto-approved from trusted source
 
 ### Short-term (Next Milestone)
 1. **Implement Quebec Occupancy:** 2-3 hours, high value

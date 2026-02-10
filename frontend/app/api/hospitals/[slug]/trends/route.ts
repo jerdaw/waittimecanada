@@ -24,7 +24,7 @@ const RAW_PERIODS = ["24h", "7d", "30d"];
 
 export async function GET(
   request: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: { slug: string } },
 ) {
   try {
     const sql = getDb();
@@ -41,7 +41,9 @@ export async function GET(
       "6m": 180 * 24 * 60 * 60 * 1000,
       "1y": 365 * 24 * 60 * 60 * 1000,
     };
-    const start = new Date(now.getTime() - (periodMs[period] || periodMs["24h"]));
+    const start = new Date(
+      now.getTime() - (periodMs[period] || periodMs["24h"]),
+    );
 
     // For periods within raw retention, use raw measurements
     if (RAW_PERIODS.includes(period)) {
@@ -69,7 +71,7 @@ export async function GET(
           aggregation: aggregation === "hour" ? "hourly" : "daily",
           dataSource: "raw",
         },
-        { headers: publicCacheHeaders(600, 1800) }
+        { headers: publicCacheHeaders(600, 1800) },
       );
     }
 
@@ -109,13 +111,13 @@ export async function GET(
         aggregation: periodType,
         dataSource: "aggregated",
       },
-      { headers: publicCacheHeaders(600, 1800) }
+      { headers: publicCacheHeaders(600, 1800) },
     );
   } catch (error) {
     console.error("Failed to fetch trends:", error);
     return NextResponse.json(
       { error: "Failed to fetch trends" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

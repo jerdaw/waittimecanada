@@ -20,8 +20,8 @@ import json
 import logging
 import re
 
-import requests
-from bs4 import BeautifulSoup
+import requests  # type: ignore[import-untyped]
+from bs4 import BeautifulSoup  # type: ignore[import-untyped]
 
 from waittime.core import (
     EndEvent,

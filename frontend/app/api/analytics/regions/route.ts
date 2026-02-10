@@ -43,14 +43,19 @@ const PERIOD_TO_DAYS: Record<string, number> = {
   "30d": 30,
 };
 
-function parsePeriod(period: string | null): { label: string; days: number } | null {
+function parsePeriod(
+  period: string | null,
+): { label: string; days: number } | null {
   const label = period ?? "7d";
   const days = PERIOD_TO_DAYS[label];
   if (!days) return null;
   return { label, days };
 }
 
-function computeTrend(currentMean: number | null, previousMean: number | null): RegionTrend {
+function computeTrend(
+  currentMean: number | null,
+  previousMean: number | null,
+): RegionTrend {
   if (currentMean === null || previousMean === null || previousMean <= 0) {
     return "stable";
   }
@@ -61,11 +66,16 @@ function computeTrend(currentMean: number | null, previousMean: number | null): 
   return "stable";
 }
 
-function computeTrendChangePercent(currentMean: number | null, previousMean: number | null): number {
+function computeTrendChangePercent(
+  currentMean: number | null,
+  previousMean: number | null,
+): number {
   if (currentMean === null || previousMean === null || previousMean <= 0) {
     return 0;
   }
-  return Number((((currentMean - previousMean) / previousMean) * 100).toFixed(1));
+  return Number(
+    (((currentMean - previousMean) / previousMean) * 100).toFixed(1),
+  );
 }
 
 function computePercentile(rank: number, total: number): number {
@@ -93,7 +103,10 @@ function isMissingRegionsSchemaError(error: unknown): boolean {
   if (maybeError.code !== "42P01") return false;
 
   const message = maybeError.message ?? "";
-  return message.includes(`relation "regions"`) || message.includes(`relation "hospital_regions"`);
+  return (
+    message.includes(`relation "regions"`) ||
+    message.includes(`relation "hospital_regions"`)
+  );
 }
 
 export async function GET(request: Request) {
@@ -109,7 +122,7 @@ export async function GET(request: Request) {
           error: "Missing required parameter",
           message: "Query parameter 'province' is required",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -121,16 +134,18 @@ export async function GET(request: Request) {
           error: "Invalid period",
           message: "Supported period values: 24h, 7d, 30d",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const normalizedProvince = province.toUpperCase();
 
     const now = new Date();
-    const currentStart = new Date(now.getTime() - periodConfig.days * 24 * 60 * 60 * 1000);
+    const currentStart = new Date(
+      now.getTime() - periodConfig.days * 24 * 60 * 60 * 1000,
+    );
     const previousStart = new Date(
-      currentStart.getTime() - periodConfig.days * 24 * 60 * 60 * 1000
+      currentStart.getTime() - periodConfig.days * 24 * 60 * 60 * 1000,
     );
 
     const rows = await sql`
@@ -196,11 +211,14 @@ export async function GET(request: Request) {
       hospital_count: Number(row.hospital_count ?? 0),
       reporting_count: Number(row.reporting_count ?? 0),
       period_mean: row.period_mean === null ? null : Number(row.period_mean),
-      period_median: row.period_median === null ? null : Number(row.period_median),
+      period_median:
+        row.period_median === null ? null : Number(row.period_median),
       best_wait: row.best_wait === null ? null : Number(row.best_wait),
       worst_wait: row.worst_wait === null ? null : Number(row.worst_wait),
       previous_period_mean:
-        row.previous_period_mean === null ? null : Number(row.previous_period_mean),
+        row.previous_period_mean === null
+          ? null
+          : Number(row.previous_period_mean),
       hospital_ids: Array.isArray(row.hospital_ids)
         ? row.hospital_ids.map((value) => String(value))
         : [],
@@ -211,7 +229,10 @@ export async function GET(request: Request) {
       .filter((row) => row.period_mean !== null)
       .sort((a, b) => Number(a.period_mean) - Number(b.period_mean));
 
-    const rankIndex = new Map<string, { percentile: number; quartile: 1 | 2 | 3 | 4 }>();
+    const rankIndex = new Map<
+      string,
+      { percentile: number; quartile: 1 | 2 | 3 | 4 }
+    >();
     ranked.forEach((row, index) => {
       const percentile = computePercentile(index + 1, ranked.length);
       rankIndex.set(row.region_id, {
@@ -237,7 +258,7 @@ export async function GET(request: Request) {
           trend: computeTrend(row.period_mean, row.previous_period_mean),
           trend_change_percent: computeTrendChangePercent(
             row.period_mean,
-            row.previous_period_mean
+            row.previous_period_mean,
           ),
           hospital_ids: row.hospital_ids,
           percentile: rank?.percentile ?? null,
@@ -249,11 +270,18 @@ export async function GET(request: Request) {
       .filter((region) => region.period_mean !== null)
       .map((region) => Number(region.period_mean));
 
-    const mappedHospitalCount = regions.reduce((sum, region) => sum + region.hospital_count, 0);
+    const mappedHospitalCount = regions.reduce(
+      (sum, region) => sum + region.hospital_count,
+      0,
+    );
     const provinceHospitalTotal =
-      parsedRows.length > 0 ? Number(parsedRows[0].province_hospital_total ?? 0) : 0;
+      parsedRows.length > 0
+        ? Number(parsedRows[0].province_hospital_total ?? 0)
+        : 0;
     const mappingCoveragePercent =
-      provinceHospitalTotal > 0 ? (mappedHospitalCount / provinceHospitalTotal) * 100 : 0;
+      provinceHospitalTotal > 0
+        ? (mappedHospitalCount / provinceHospitalTotal) * 100
+        : 0;
 
     return NextResponse.json(
       {
@@ -263,7 +291,9 @@ export async function GET(request: Request) {
           period: periodConfig.label,
           generated_at: now.toISOString(),
           region_count: regions.length,
-          reporting_regions: regions.filter((region) => region.reporting_count > 0).length,
+          reporting_regions: regions.filter(
+            (region) => region.reporting_count > 0,
+          ).length,
           hospital_count: mappedHospitalCount,
           mapped_hospital_count: mappedHospitalCount,
           province_hospital_total: provinceHospitalTotal,
@@ -276,7 +306,7 @@ export async function GET(request: Request) {
           regions,
         },
       },
-      { headers: publicCacheHeaders(300, 900) }
+      { headers: publicCacheHeaders(300, 900) },
     );
   } catch (error) {
     if (isMissingRegionsSchemaError(error)) {
@@ -292,7 +322,7 @@ export async function GET(request: Request) {
             "python -m waittime.cli.seed_regions --file backend/data/regions/ontario-regions.json",
           ],
         },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -303,7 +333,7 @@ export async function GET(request: Request) {
         error: "Failed to compute regional analytics",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

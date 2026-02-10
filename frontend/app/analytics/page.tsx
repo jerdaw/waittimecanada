@@ -98,10 +98,14 @@ function trendLabel(trend: TrendDirection): string {
 export default function AnalyticsPage() {
   const [province, setProvince] = useState("ON");
   const [regions, setRegions] = useState<RegionRow[]>([]);
-  const [provinceRegionMean, setProvinceRegionMean] = useState<number | null>(null);
+  const [provinceRegionMean, setProvinceRegionMean] = useState<number | null>(
+    null,
+  );
   const [regionMappingCoverage, setRegionMappingCoverage] =
     useState<RegionMappingCoverage | null>(null);
-  const [regionSetupMessage, setRegionSetupMessage] = useState<string | null>(null);
+  const [regionSetupMessage, setRegionSetupMessage] = useState<string | null>(
+    null,
+  );
   const [regionSetupSteps, setRegionSetupSteps] = useState<string[]>([]);
   const [benchmarks, setBenchmarks] = useState<BenchmarkRow[]>([]);
   const [selectedRegionId, setSelectedRegionId] = useState<string | null>(null);
@@ -119,20 +123,30 @@ export default function AnalyticsPage() {
       setRegionSetupMessage(null);
       setRegionSetupSteps([]);
       try {
-        const response = await fetch(`/api/analytics/regions?province=${province}&period=7d`);
+        const response = await fetch(
+          `/api/analytics/regions?province=${province}&period=7d`,
+        );
         const json = await response.json();
 
         if (!mounted) return;
         if (response.ok && json.success && json.data) {
           setRegions(json.data.regions ?? []);
           setProvinceRegionMean(
-            json.data.province_mean === null ? null : Number(json.data.province_mean)
+            json.data.province_mean === null
+              ? null
+              : Number(json.data.province_mean),
           );
           if (json.data.mapping_coverage) {
             setRegionMappingCoverage({
-              mapped_hospitals: Number(json.data.mapping_coverage.mapped_hospitals ?? 0),
-              total_hospitals: Number(json.data.mapping_coverage.total_hospitals ?? 0),
-              coverage_percent: Number(json.data.mapping_coverage.coverage_percent ?? 0),
+              mapped_hospitals: Number(
+                json.data.mapping_coverage.mapped_hospitals ?? 0,
+              ),
+              total_hospitals: Number(
+                json.data.mapping_coverage.total_hospitals ?? 0,
+              ),
+              coverage_percent: Number(
+                json.data.mapping_coverage.coverage_percent ?? 0,
+              ),
             });
           } else {
             setRegionMappingCoverage(null);
@@ -146,13 +160,13 @@ export default function AnalyticsPage() {
           setRegionSetupMessage(
             String(
               json.message ??
-                "Regional analytics requires schema initialization before it can be computed."
-            )
+                "Regional analytics requires schema initialization before it can be computed.",
+            ),
           );
           setRegionSetupSteps(
             Array.isArray(json.setup_steps)
               ? json.setup_steps.map((step: unknown) => String(step))
-              : []
+              : [],
           );
         } else {
           setRegions([]);
@@ -178,7 +192,9 @@ export default function AnalyticsPage() {
     async function loadBenchmarks() {
       setLoadingBenchmarks(true);
       try {
-        const response = await fetch(`/api/analytics/benchmarks?province=${province}&period=7d`);
+        const response = await fetch(
+          `/api/analytics/benchmarks?province=${province}&period=7d`,
+        );
         const json = await response.json();
 
         if (!mounted) return;
@@ -200,7 +216,9 @@ export default function AnalyticsPage() {
     async function loadOccupancy() {
       setLoadingOccupancy(true);
       try {
-        const response = await fetch(`/api/analytics/occupancy?province=${province}`);
+        const response = await fetch(
+          `/api/analytics/occupancy?province=${province}`,
+        );
         const json = await response.json();
 
         if (!mounted) return;
@@ -230,14 +248,18 @@ export default function AnalyticsPage() {
 
   const selectedRegionHospitalIds = useMemo(() => {
     if (!selectedRegionId) return null;
-    const selectedRegion = regions.find((region) => region.region_id === selectedRegionId);
+    const selectedRegion = regions.find(
+      (region) => region.region_id === selectedRegionId,
+    );
     if (!selectedRegion) return null;
     return new Set(selectedRegion.hospital_ids);
   }, [regions, selectedRegionId]);
 
   const filteredBenchmarks = useMemo(() => {
     if (!selectedRegionHospitalIds) return benchmarks;
-    return benchmarks.filter((row) => selectedRegionHospitalIds.has(row.hospital_id));
+    return benchmarks.filter((row) =>
+      selectedRegionHospitalIds.has(row.hospital_id),
+    );
   }, [benchmarks, selectedRegionHospitalIds]);
 
   const datasetSchema = {
@@ -274,10 +296,13 @@ export default function AnalyticsPage() {
             <Link href="/" className="text-sm text-primary hover:underline">
               Back to live map
             </Link>
-            <h1 className="text-3xl font-bold text-foreground mt-2">Analytics Dashboard</h1>
+            <h1 className="text-3xl font-bold text-foreground mt-2">
+              Analytics Dashboard
+            </h1>
             <p className="text-sm text-muted-foreground mt-1 max-w-3xl">
-              System-level wait-time trends, Ontario-style regional intelligence, and peer hospital
-              ranking outputs for operational and research interpretation.
+              System-level wait-time trends, Ontario-style regional
+              intelligence, and peer hospital ranking outputs for operational
+              and research interpretation.
             </p>
           </div>
 
@@ -300,7 +325,9 @@ export default function AnalyticsPage() {
         <SystemTrendChart province={province} />
 
         <section>
-          <h2 className="text-lg font-semibold text-foreground mb-3">Regional Overview</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-3">
+            Regional Overview
+          </h2>
           {regionSetupMessage && (
             <div className="mb-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
               <p className="font-medium">Regional analytics setup needed</p>
@@ -327,14 +354,18 @@ export default function AnalyticsPage() {
         </section>
 
         <section className="rounded-xl border border-border/50 bg-card p-4">
-          <h2 className="text-lg font-semibold text-foreground">Occupancy Signals</h2>
+          <h2 className="text-lg font-semibold text-foreground">
+            Occupancy Signals
+          </h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Patients waiting and patients in treatment metrics are surfaced only when source fields
-            are available and explicitly reported.
+            Patients waiting and patients in treatment metrics are surfaced only
+            when source fields are available and explicitly reported.
           </p>
 
           {loadingOccupancy ? (
-            <p className="mt-3 text-sm text-muted-foreground">Loading occupancy status...</p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Loading occupancy status...
+            </p>
           ) : !occupancy ? (
             <p className="mt-3 text-sm text-muted-foreground">
               Occupancy status could not be loaded at this time.
@@ -343,13 +374,14 @@ export default function AnalyticsPage() {
             <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
               <p className="font-medium">Occupancy metrics not available yet</p>
               <p className="mt-1">{occupancy.message}</p>
-              {Array.isArray(occupancy.setup_steps) && occupancy.setup_steps.length > 0 && (
-                <div className="mt-2 space-y-1 text-xs">
-                  {occupancy.setup_steps.map((step) => (
-                    <p key={step}>{step}</p>
-                  ))}
-                </div>
-              )}
+              {Array.isArray(occupancy.setup_steps) &&
+                occupancy.setup_steps.length > 0 && (
+                  <div className="mt-2 space-y-1 text-xs">
+                    {occupancy.setup_steps.map((step) => (
+                      <p key={step}>{step}</p>
+                    ))}
+                  </div>
+                )}
             </div>
           ) : occupancy.status === "no_reporting_data" ? (
             <div className="mt-3 rounded-lg border border-border/60 bg-muted/30 p-3 text-sm text-muted-foreground">
@@ -358,7 +390,9 @@ export default function AnalyticsPage() {
           ) : (
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div className="rounded-lg border border-border/60 bg-background p-3">
-                <p className="text-xs text-muted-foreground">Avg Patients Waiting (24h)</p>
+                <p className="text-xs text-muted-foreground">
+                  Avg Patients Waiting (24h)
+                </p>
                 <p className="mt-1 text-2xl font-semibold text-foreground tabular-nums">
                   {occupancy.averages?.patients_waiting === null ||
                   occupancy.averages?.patients_waiting === undefined
@@ -370,7 +404,9 @@ export default function AnalyticsPage() {
                 </p>
               </div>
               <div className="rounded-lg border border-border/60 bg-background p-3">
-                <p className="text-xs text-muted-foreground">Avg Patients In Treatment (24h)</p>
+                <p className="text-xs text-muted-foreground">
+                  Avg Patients In Treatment (24h)
+                </p>
                 <p className="mt-1 text-2xl font-semibold text-foreground tabular-nums">
                   {occupancy.averages?.patients_in_treatment === null ||
                   occupancy.averages?.patients_in_treatment === undefined
@@ -394,7 +430,9 @@ export default function AnalyticsPage() {
         <section className="rounded-xl border border-border/50 bg-card p-4">
           <div className="flex items-center justify-between gap-2 mb-4">
             <div>
-              <h2 className="text-lg font-semibold text-foreground">Hospital Rankings</h2>
+              <h2 className="text-lg font-semibold text-foreground">
+                Hospital Rankings
+              </h2>
               <p className="text-xs text-muted-foreground">
                 Seven-day peer ranking by average wait time within {province}
               </p>
@@ -405,9 +443,13 @@ export default function AnalyticsPage() {
           </div>
 
           {loadingBenchmarks ? (
-            <div className="text-sm text-muted-foreground">Loading benchmark rankings...</div>
+            <div className="text-sm text-muted-foreground">
+              Loading benchmark rankings...
+            </div>
           ) : filteredBenchmarks.length === 0 ? (
-            <div className="text-sm text-muted-foreground">No benchmark rows available.</div>
+            <div className="text-sm text-muted-foreground">
+              No benchmark rows available.
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -423,14 +465,28 @@ export default function AnalyticsPage() {
                 </thead>
                 <tbody>
                   {filteredBenchmarks.map((row) => (
-                    <tr key={row.hospital_id} className="border-b border-border/40">
-                      <td className="py-2 pr-2 font-medium text-foreground">{row.hospital_name}</td>
-                      <td className="py-2 pr-2 text-muted-foreground">{row.city}</td>
-                      <td className="py-2 pr-2 tabular-nums">{Math.round(row.period_mean)} min</td>
-                      <td className="py-2 pr-2 tabular-nums">{formatOrdinal(row.percentile)}</td>
-                      <td className="py-2 pr-2">{quartileLabel(row.quartile)}</td>
+                    <tr
+                      key={row.hospital_id}
+                      className="border-b border-border/40"
+                    >
+                      <td className="py-2 pr-2 font-medium text-foreground">
+                        {row.hospital_name}
+                      </td>
+                      <td className="py-2 pr-2 text-muted-foreground">
+                        {row.city}
+                      </td>
+                      <td className="py-2 pr-2 tabular-nums">
+                        {Math.round(row.period_mean)} min
+                      </td>
+                      <td className="py-2 pr-2 tabular-nums">
+                        {formatOrdinal(row.percentile)}
+                      </td>
                       <td className="py-2 pr-2">
-                        {trendLabel(row.trend)} ({Math.abs(row.trend_change_percent).toFixed(1)}%)
+                        {quartileLabel(row.quartile)}
+                      </td>
+                      <td className="py-2 pr-2">
+                        {trendLabel(row.trend)} (
+                        {Math.abs(row.trend_change_percent).toFixed(1)}%)
                       </td>
                     </tr>
                   ))}

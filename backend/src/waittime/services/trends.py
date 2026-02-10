@@ -24,8 +24,15 @@ class SystemTrendService:
         province: str,
         period_type: str = "monthly",
         lookback_months: int = 6,
+        ontology: dict[str, str] | None = None,
     ) -> dict[str, Any]:
-        """Compute province-wide trend from hospital aggregates."""
+        """Compute province-wide trend from hospital aggregates.
+
+        Enforces ontology safety: if multiple methodologies exist (e.g. "Triage->Nurse"
+        vs "Triage->Doctor"), this will automatically select the one with the most
+        measurements to prevent mixing incompatible data, unless a specific
+        ontology is requested.
+        """
         if period_type not in {"weekly", "monthly"}:
             raise ValueError("period_type must be 'weekly' or 'monthly'")
         if lookback_months <= 0:
@@ -40,10 +47,46 @@ class SystemTrendService:
             period_type=period_type,
             start=start,
             end=end,
+            ontology=ontology,
         )
 
-        grouped: dict[datetime, list[dict[str, Any]]] = defaultdict(list)
+        if not rows:
+            return {
+                "province": normalized_province,
+                "period": period_type,
+                "lookback": self._lookback_label(lookback_months),
+                "data_points": [],
+                "trend_summary": self._empty_summary(normalized_province, lookback_months),
+                "ontology": ontology or {},
+            }
+
+        # Ontology Safety: Group by methodology
+        by_ontology = defaultdict(list)
         for row in rows:
+            key = (
+                row["metric_family"],
+                row["start_event"],
+                row["end_event"],
+                row["statistic_type"],
+            )
+            by_ontology[key].append(row)
+
+        # Select dominant ontology (most measurements)
+        selected_key = max(
+            by_ontology.keys(),
+            key=lambda k: sum(r["sample_count"] for r in by_ontology[k]),
+        )
+        selected_rows = by_ontology[selected_key]
+
+        selected_ontology = {
+            "metric_family": selected_key[0],
+            "start_event": selected_key[1],
+            "end_event": selected_key[2],
+            "statistic_type": selected_key[3],
+        }
+
+        grouped: dict[datetime, list[dict[str, Any]]] = defaultdict(list)
+        for row in selected_rows:
             grouped[row["period_start"]].append(row)
 
         data_points: list[dict[str, Any]] = []
@@ -84,6 +127,19 @@ class SystemTrendService:
             "lookback": self._lookback_label(lookback_months),
             "data_points": data_points,
             "trend_summary": summary,
+            "ontology": selected_ontology,
+        }
+
+    def _empty_summary(self, province: str, lookback_months: int) -> dict[str, Any]:
+        """Return a stable/no-data summary."""
+        return {
+            "direction": "stable",
+            "change_percent": 0.0,
+            "start_mean": None,
+            "end_mean": None,
+            "narrative": self.generate_narrative(
+                province, "stable", 0.0, None, None, self._lookback_label(lookback_months)
+            ),
         }
 
     def generate_narrative(
@@ -132,32 +188,52 @@ class SystemTrendService:
         period_type: str,
         start: datetime,
         end: datetime,
+        ontology: dict[str, str] | None = None,
     ) -> list[dict[str, Any]]:
         """Query hospital-level aggregates for a province and period window."""
+        query = """
+            SELECT
+                ma.hospital_id,
+                ma.period_start,
+                ma.period_end,
+                ma.mean_value,
+                ma.min_value,
+                ma.max_value,
+                ma.sample_count,
+                ma.metric_family,
+                ma.start_event,
+                ma.end_event,
+                ma.statistic_type
+            FROM measurement_aggregates ma
+            JOIN hospitals h ON h.id = ma.hospital_id
+            WHERE h.province = %s
+              AND h.is_visible = TRUE
+              AND h.is_verified = TRUE
+              AND ma.period_type = %s
+              AND ma.period_start >= %s
+              AND ma.period_start <= %s
+        """
+        params = [province, period_type, start, end]
+
+        if ontology:
+            if "metric_family" in ontology:
+                query += " AND ma.metric_family = %s"
+                params.append(ontology["metric_family"])
+            if "start_event" in ontology:
+                query += " AND ma.start_event = %s"
+                params.append(ontology["start_event"])
+            if "end_event" in ontology:
+                query += " AND ma.end_event = %s"
+                params.append(ontology["end_event"])
+            if "statistic_type" in ontology:
+                query += " AND ma.statistic_type = %s"
+                params.append(ontology["statistic_type"])
+
+        query += " ORDER BY ma.period_start, ma.hospital_id"
+
         with self.db.get_connection() as conn:
             with self.db.get_cursor(conn) as cur:
-                cur.execute(
-                    """
-                    SELECT
-                        ma.hospital_id,
-                        ma.period_start,
-                        ma.period_end,
-                        ma.mean_value,
-                        ma.min_value,
-                        ma.max_value,
-                        ma.sample_count
-                    FROM measurement_aggregates ma
-                    JOIN hospitals h ON h.id = ma.hospital_id
-                    WHERE h.province = %s
-                      AND h.is_visible = TRUE
-                      AND h.is_verified = TRUE
-                      AND ma.period_type = %s
-                      AND ma.period_start >= %s
-                      AND ma.period_start <= %s
-                    ORDER BY ma.period_start, ma.hospital_id
-                    """,
-                    (province, period_type, start, end),
-                )
+                cur.execute(query, tuple(params))
                 return [dict(row) for row in cur.fetchall()]
 
     def _trend_summary(

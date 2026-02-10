@@ -63,13 +63,13 @@ export async function GET(request: Request) {
         })),
         total_count: anomalies.length,
       },
-      { headers: publicCacheHeaders(300, 900) }
+      { headers: publicCacheHeaders(300, 900) },
     );
   } catch (error) {
     console.error("Failed to fetch anomalies:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

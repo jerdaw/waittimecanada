@@ -1,0 +1,13 @@
+{
+  "id": "alberta-ahs",
+  "name": "Alberta Health Services",
+  "province": "AB",
+  "url": "https://www.albertahealthservices.ca/waittimes/Page14230.aspx",
+  "methodology_url": "https://www.albertahealthservices.ca/waittimes/Page14230.aspx",
+  "telehealth_number": "811",
+  "telehealth_name": "Health Link 811",
+  "default_metric_family": "TIME_TO_PROVIDER",
+  "default_start_event": "TRIAGE",
+  "default_end_event": "PHYSICIAN",
+  "default_statistic_type": "POINT_ESTIMATE"
+}

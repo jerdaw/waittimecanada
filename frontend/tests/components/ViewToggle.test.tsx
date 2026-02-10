@@ -16,7 +16,7 @@ describe("ViewToggle", () => {
     const listBtn = screen.getByText("List").closest("button");
     expect(listBtn?.className).toContain("bg-background");
     expect(listBtn?.className).toContain("shadow-sm");
-    
+
     const mapBtn = screen.getByText("Map").closest("button");
     expect(mapBtn?.className).not.toContain("shadow-sm");
   });
@@ -24,10 +24,10 @@ describe("ViewToggle", () => {
   it("calls onChange when clicked", () => {
     const onChange = vi.fn();
     render(<ViewToggle mode="map" onChange={onChange} />);
-    
+
     fireEvent.click(screen.getByText("List"));
     expect(onChange).toHaveBeenCalledWith("list");
-    
+
     fireEvent.click(screen.getByText("Split"));
     expect(onChange).toHaveBeenCalledWith("split");
   });

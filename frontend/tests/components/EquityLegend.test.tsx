@@ -22,7 +22,7 @@ describe("EquityLegend", () => {
           is_placeholder: true,
           note: "test note",
         }}
-      />
+      />,
     );
 
     expect(screen.getByText("test attribution")).toBeInTheDocument();

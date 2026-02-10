@@ -16,7 +16,9 @@ describe("Equity Layer API", () => {
   });
 
   it("normalizes lowercase province query", async () => {
-    const request = new Request("http://localhost/api/equity-layer?province=on");
+    const request = new Request(
+      "http://localhost/api/equity-layer?province=on",
+    );
     const response = await GET(request);
     const json = await response.json();
 
@@ -26,7 +28,9 @@ describe("Equity Layer API", () => {
   });
 
   it("returns setup instructions for unsupported provinces", async () => {
-    const request = new Request("http://localhost/api/equity-layer?province=QC");
+    const request = new Request(
+      "http://localhost/api/equity-layer?province=QC",
+    );
     const response = await GET(request);
     const json = await response.json();
 

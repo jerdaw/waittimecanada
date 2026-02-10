@@ -13,8 +13,8 @@ interface HeaderProps {
   showStats?: boolean;
 }
 
-export function Header({ 
-  viewMode, 
+export function Header({
+  viewMode,
   onViewModeChange,
   searchQuery = "",
   onSearchChange,
@@ -27,7 +27,10 @@ export function Header({
       {/* Main Header Row */}
       <div className="container flex h-16 items-center justify-between px-4 sm:px-6 gap-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity group shrink-0">
+        <Link
+          href="/"
+          className="flex items-center gap-2 hover:opacity-90 transition-opacity group shrink-0"
+        >
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-lg blur-sm opacity-50 group-hover:opacity-75 transition-opacity" />
             <div className="relative bg-gradient-to-br from-primary to-primary-hover p-1.5 rounded-lg shadow-md">
@@ -47,7 +50,9 @@ export function Header({
             </div>
           </div>
           <div className="hidden sm:block">
-            <span className="font-bold text-base tracking-tight">WaitTime Canada</span>
+            <span className="font-bold text-base tracking-tight">
+              WaitTime Canada
+            </span>
           </div>
           <span className="font-bold text-base sm:hidden">WTC</span>
         </Link>
@@ -63,7 +68,12 @@ export function Header({
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
               <input
                 type="text"
@@ -77,8 +87,18 @@ export function Header({
                   onClick={() => onSearchChange("")}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               )}
@@ -132,7 +152,9 @@ export function Header({
             <div className="flex items-center gap-4 text-xs sm:text-sm">
               <div className="flex items-center gap-1.5">
                 <span className="text-muted-foreground">Hospitals:</span>
-                <span className="font-semibold tabular-nums">{hospitalCount ?? "--"}</span>
+                <span className="font-semibold tabular-nums">
+                  {hospitalCount ?? "--"}
+                </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="relative flex h-2 w-2">
@@ -140,7 +162,9 @@ export function Header({
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
                 </span>
                 <span className="text-muted-foreground">Live:</span>
-                <span className="font-semibold text-success tabular-nums">{liveCount ?? "--"}</span>
+                <span className="font-semibold text-success tabular-nums">
+                  {liveCount ?? "--"}
+                </span>
               </div>
             </div>
 
@@ -155,7 +179,12 @@ export function Header({
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
                   </svg>
                   <input
                     type="text"

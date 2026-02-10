@@ -47,7 +47,9 @@ export interface EquityLayerErrorResponse {
   setup_steps?: string[];
 }
 
-export type EquityLayerApiResponse = EquityLayerSuccessResponse | EquityLayerErrorResponse;
+export type EquityLayerApiResponse =
+  | EquityLayerSuccessResponse
+  | EquityLayerErrorResponse;
 
 export const EQUITY_QUINTILE_COLORS: Record<IncomeQuintile, string> = {
   1: "#fee5d9",
@@ -61,15 +63,17 @@ function rectanglePolygon(
   minLon: number,
   minLat: number,
   maxLon: number,
-  maxLat: number
+  maxLat: number,
 ): number[][][] {
-  return [[
-    [minLon, minLat],
-    [maxLon, minLat],
-    [maxLon, maxLat],
-    [minLon, maxLat],
-    [minLon, minLat],
-  ]];
+  return [
+    [
+      [minLon, minLat],
+      [maxLon, minLat],
+      [maxLon, maxLat],
+      [minLon, maxLat],
+      [minLon, minLat],
+    ],
+  ];
 }
 
 const ON_PLACEHOLDER_FEATURES: EquityFeature[] = [
@@ -78,7 +82,7 @@ const ON_PLACEHOLDER_FEATURES: EquityFeature[] = [
     id: "on-demo-1",
     geometry: {
       type: "Polygon",
-      coordinates: rectanglePolygon(-79.60, 43.59, -79.42, 43.74),
+      coordinates: rectanglePolygon(-79.6, 43.59, -79.42, 43.74),
     },
     properties: {
       tract_id: "on-demo-1",
@@ -108,7 +112,7 @@ const ON_PLACEHOLDER_FEATURES: EquityFeature[] = [
     id: "on-demo-3",
     geometry: {
       type: "Polygon",
-      coordinates: rectanglePolygon(-75.88, 45.30, -75.55, 45.47),
+      coordinates: rectanglePolygon(-75.88, 45.3, -75.55, 45.47),
     },
     properties: {
       tract_id: "on-demo-3",
@@ -123,7 +127,7 @@ const ON_PLACEHOLDER_FEATURES: EquityFeature[] = [
     id: "on-demo-4",
     geometry: {
       type: "Polygon",
-      coordinates: rectanglePolygon(-81.34, 42.90, -81.05, 43.12),
+      coordinates: rectanglePolygon(-81.34, 42.9, -81.05, 43.12),
     },
     properties: {
       tract_id: "on-demo-4",
@@ -138,7 +142,7 @@ const ON_PLACEHOLDER_FEATURES: EquityFeature[] = [
     id: "on-demo-5",
     geometry: {
       type: "Polygon",
-      coordinates: rectanglePolygon(-89.65, 48.33, -89.10, 48.53),
+      coordinates: rectanglePolygon(-89.65, 48.33, -89.1, 48.53),
     },
     properties: {
       tract_id: "on-demo-5",
@@ -150,7 +154,9 @@ const ON_PLACEHOLDER_FEATURES: EquityFeature[] = [
   },
 ];
 
-export function buildPlaceholderEquityFeatureCollection(province: string): EquityFeatureCollection {
+export function buildPlaceholderEquityFeatureCollection(
+  province: string,
+): EquityFeatureCollection {
   if (province === "ON") {
     return {
       type: "FeatureCollection",

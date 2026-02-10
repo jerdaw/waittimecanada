@@ -190,6 +190,11 @@ class TestComputeSourceQuality:
             "ca-on-hosp-1": 96,
             "ca-on-hosp-2": 48,
         }
+        # Mock onboarding dates (all hospitals active before period start)
+        mock_db.get_hospital_onboarding_dates.return_value = {
+            "ca-on-hosp-1": start - timedelta(days=1),
+            "ca-on-hosp-2": start - timedelta(days=1),
+        }
 
         result = service.compute_source_quality("ontario-er", start, end)
 
@@ -209,6 +214,7 @@ class TestComputeSourceQuality:
 
         mock_db.get_hospitals_by_source.return_value = []
         mock_db.get_measurement_count_by_hospital.return_value = {}
+        mock_db.get_hospital_onboarding_dates.return_value = {}
 
         result = service.compute_source_quality("empty-source", start, end)
 
@@ -233,6 +239,10 @@ class TestComputeSourceQuality:
             "hosp-0": 90,
             "hosp-2": 80,
         }
+        # All hospitals onboarded early
+        mock_db.get_hospital_onboarding_dates.return_value = {
+            f"hosp-{i}": start - timedelta(days=1) for i in range(4)
+        }
 
         result = service.compute_source_quality("test-source", start, end)
 
@@ -254,6 +264,11 @@ class TestComputeSystemQuality:
         mock_db.get_hospitals_by_source.return_value = mock_hospitals
         mock_db.get_measurement_count_by_hospital.return_value = {"h-1": 96}
 
+        # Mock onboarding date
+        mock_db.get_hospital_onboarding_dates.return_value = {
+            "h-1": datetime(2025, 1, 1, tzinfo=UTC)
+        }
+
         mock_source = Mock()
         mock_source.province = "ON"
         mock_db.get_source.return_value = mock_source
@@ -274,6 +289,11 @@ class TestComputeSystemQuality:
         mock_db.get_hospitals_by_source.return_value = mock_hospitals
         # Very few measurements
         mock_db.get_measurement_count_by_hospital.return_value = {"h-1": 10}
+
+        # Mock onboarding date
+        mock_db.get_hospital_onboarding_dates.return_value = {
+            "h-1": datetime(2025, 1, 1, tzinfo=UTC)
+        }
 
         mock_source = Mock()
         mock_source.province = "QC"

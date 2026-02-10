@@ -25,6 +25,13 @@ class TestBenchmarkingService:
 
     def test_compute_benchmarks_basic(self, service: BenchmarkingService) -> None:
         """Should rank hospitals by shorter period mean and compute quartiles/trends."""
+        service._get_dominant_ontology = Mock(return_value={
+            "metric_family": "wait_time",
+            "start_event": "triage",
+            "end_event": "nurse_seen",
+            "statistic_type": "mean",
+        })
+
         service._query_benchmark_rows = Mock(  # type: ignore[method-assign]
             return_value=[
                 {
@@ -100,6 +107,12 @@ class TestBenchmarkingService:
         self, service: BenchmarkingService
     ) -> None:
         """Hospitals without aggregates in the window should be excluded from ranking."""
+        service._get_dominant_ontology = Mock(return_value={
+            "metric_family": "wait_time",
+            "start_event": "triage",
+            "end_event": "nurse_seen",
+            "statistic_type": "mean",
+        })
         service._query_benchmark_rows = Mock(  # type: ignore[method-assign]
             return_value=[
                 {
@@ -157,6 +170,12 @@ class TestBenchmarkingService:
     def test_get_hospital_benchmark(self, service: BenchmarkingService) -> None:
         """Should return benchmark payload scoped to one hospital."""
         service._get_province_for_hospital = Mock(return_value="ON")  # type: ignore[method-assign]
+        service._get_dominant_ontology = Mock(return_value={
+            "metric_family": "wait_time",
+            "start_event": "triage",
+            "end_event": "nurse_seen",
+            "statistic_type": "mean",
+        })
         service._query_benchmark_rows = Mock(  # type: ignore[method-assign]
             return_value=[
                 {

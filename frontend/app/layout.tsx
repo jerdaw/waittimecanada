@@ -8,7 +8,7 @@ import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { StructuredData } from "./structured-data";
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
@@ -20,13 +20,13 @@ export const metadata: Metadata = {
     "A health systems observatory auditing emergency room wait times across Canada with methodological transparency.",
   manifest: "/manifest.json",
   other: {
-    'geo.region': 'CA-ON',
-    'geo.placename': 'Ontario',
-    'geo.position': '43.6532;-79.3832',
-    'revisit-after': '1 day',
-    'category': 'health',
-    'classification': 'Healthcare Information',
-  }
+    "geo.region": "CA-ON",
+    "geo.placename": "Ontario",
+    "geo.position": "43.6532;-79.3832",
+    "revisit-after": "1 day",
+    category: "health",
+    classification: "Healthcare Information",
+  },
 };
 
 export default function RootLayout({
@@ -48,4 +48,3 @@ export default function RootLayout({
     </html>
   );
 }
-

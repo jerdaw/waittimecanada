@@ -54,7 +54,6 @@ Pages:
 - `/data-quality` quality and anomalies
 - `/analytics` benchmarking, trends, regions, occupancy/equity insights
 - `/faq`
-- `/admin/verify`
 
 API routes (selected):
 

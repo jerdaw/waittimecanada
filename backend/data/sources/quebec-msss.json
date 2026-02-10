@@ -1,0 +1,13 @@
+{
+  "id": "quebec-msss",
+  "name": "Ministère de la Santé et des Services sociaux",
+  "province": "QC",
+  "url": "https://www.quebec.ca/en/health/health-system-and-services/service-organization/quebec-health-system-and-its-services/situation-in-emergency-rooms-in-quebec",
+  "methodology_url": null,
+  "telehealth_number": "811",
+  "telehealth_name": "Info-Santé 811",
+  "default_metric_family": "TIME_TO_PROVIDER",
+  "default_start_event": "REGISTRATION",
+  "default_end_event": "PHYSICIAN",
+  "default_statistic_type": "ROLLING_AVG"
+}

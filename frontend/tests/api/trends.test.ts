@@ -21,10 +21,12 @@ describe("Trends API", () => {
     ];
     // Postgres.js returns an array-like object with map
     mockData.map = Array.prototype.map;
-    
+
     mockSql.mockResolvedValue(mockData);
 
-    const request = new Request("http://localhost/api/hospitals/test-hospital/trends");
+    const request = new Request(
+      "http://localhost/api/hospitals/test-hospital/trends",
+    );
     const response = await GET(request, { params: { slug: "test-hospital" } });
     const json = await response.json();
 
@@ -38,7 +40,9 @@ describe("Trends API", () => {
   it("accepts period parameter", async () => {
     mockSql.mockResolvedValue([]);
 
-    const request = new Request("http://localhost/api/hospitals/test-hospital/trends?period=7d");
+    const request = new Request(
+      "http://localhost/api/hospitals/test-hospital/trends?period=7d",
+    );
     const response = await GET(request, { params: { slug: "test-hospital" } });
     const json = await response.json();
 
@@ -49,7 +53,9 @@ describe("Trends API", () => {
   it("handles database errors", async () => {
     mockSql.mockRejectedValue(new Error("DB Connection failed"));
 
-    const request = new Request("http://localhost/api/hospitals/test-hospital/trends");
+    const request = new Request(
+      "http://localhost/api/hospitals/test-hospital/trends",
+    );
     const response = await GET(request, { params: { slug: "test-hospital" } });
     const json = await response.json();
 

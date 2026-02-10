@@ -174,12 +174,7 @@ python -m waittime.cli.scraper --all
 
 ### Hospital Discovery
 
-When scrapers discover new hospitals:
-1. They insert with `is_verified=false, is_visible=false`
-2. Admin reviews via `/admin/verify` UI
-3. Manual approval sets `is_verified=true, is_visible=true`
-
-This workflow prevents incorrect or duplicate hospital data.
+When scrapers discover new hospitals from trusted government sources, they are auto-approved on insert (`is_verified=true, is_visible=true`). Data quality is enforced through automated monitoring (anomaly detection, payload hashing, heartbeat checks).
 
 ### Coordinate Accuracy
 
@@ -223,5 +218,4 @@ python -m waittime.cli.seed --file hospitals.json --dry-run
 
 - [Database Schema](../../docs/architecture/database.md)
 - [Ontario Methodology](methodologies/ontario-methodology.md)
-- [Verification Queue](verification-queue.md)
 - [Integration Testing](integration-testing.md)

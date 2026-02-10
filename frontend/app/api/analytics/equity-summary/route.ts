@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { buildPlaceholderEquityFeatureCollection } from "@/utils/equity";
-import { computeEquityLinkageSummary, type HospitalWaitPoint } from "@/utils/equityInsights";
+import {
+  computeEquityLinkageSummary,
+  type HospitalWaitPoint,
+} from "@/utils/equityInsights";
 import { publicCacheHeaders } from "@/utils/cache";
 
 type EquitySummaryStatus = "ready" | "no_reporting_data" | "not_available_yet";
@@ -12,7 +15,9 @@ const PERIOD_TO_DAYS: Record<string, number> = {
   "30d": 30,
 };
 
-function parsePeriod(period: string | null): { label: string; days: number } | null {
+function parsePeriod(
+  period: string | null,
+): { label: string; days: number } | null {
   const label = period ?? "7d";
   const days = PERIOD_TO_DAYS[label];
   if (!days) return null;
@@ -35,7 +40,7 @@ export async function GET(request: Request) {
         error: "Missing required parameter",
         message: "Query parameter 'province' is required",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -46,7 +51,7 @@ export async function GET(request: Request) {
         error: "Invalid period",
         message: "Supported period values: 24h, 7d, 30d",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -68,7 +73,7 @@ export async function GET(request: Request) {
           ],
         },
       },
-      { headers: publicCacheHeaders(300, 900) }
+      { headers: publicCacheHeaders(300, 900) },
     );
   }
 
@@ -76,7 +81,7 @@ export async function GET(request: Request) {
     const sql = getDb();
     const now = new Date();
     const periodStart = new Date(
-      now.getTime() - periodConfig.days * 24 * 60 * 60 * 1000
+      now.getTime() - periodConfig.days * 24 * 60 * 60 * 1000,
     );
 
     const rows = await sql`
@@ -139,7 +144,7 @@ export async function GET(request: Request) {
           ...summary,
         },
       },
-      { headers: publicCacheHeaders(300, 900) }
+      { headers: publicCacheHeaders(300, 900) },
     );
   } catch (error) {
     console.error("Failed to compute equity linkage summary:", error);
@@ -148,7 +153,7 @@ export async function GET(request: Request) {
         success: false,
         error: "Failed to compute equity linkage summary",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

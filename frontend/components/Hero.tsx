@@ -1,4 +1,3 @@
-
 import type { Hospital } from "@/app/api/hospitals/route";
 import { clsx } from "clsx";
 import Link from "next/link";
@@ -11,32 +10,52 @@ interface HeroProps {
   userLocation?: { lat: number; lon: number } | null;
 }
 
-export function Hero({ hospitals, onExplore, className, userLocation }: HeroProps) {
+export function Hero({
+  hospitals,
+  onExplore,
+  className,
+  userLocation,
+}: HeroProps) {
   // Find the featured hospital based on location
   const featuredHospital = (() => {
     const hospitalsWithData = hospitals.filter(
-      (h) => h.current_wait_time !== null && h.current_wait_time !== undefined
+      (h) => h.current_wait_time !== null && h.current_wait_time !== undefined,
     );
-    
+
     if (hospitalsWithData.length === 0) return null;
-    
+
     // If we have location, show the nearest hospital
     if (userLocation) {
       const sorted = [...hospitalsWithData].sort((a, b) => {
-        const distA = calculateDistance(userLocation.lat, userLocation.lon, a.latitude, a.longitude);
-        const distB = calculateDistance(userLocation.lat, userLocation.lon, b.latitude, b.longitude);
+        const distA = calculateDistance(
+          userLocation.lat,
+          userLocation.lon,
+          a.latitude,
+          a.longitude,
+        );
+        const distB = calculateDistance(
+          userLocation.lat,
+          userLocation.lon,
+          b.latitude,
+          b.longitude,
+        );
         return distA - distB;
       });
       return {
         hospital: sorted[0],
         type: "nearest" as const,
-        distance: calculateDistance(userLocation.lat, userLocation.lon, sorted[0].latitude, sorted[0].longitude)
+        distance: calculateDistance(
+          userLocation.lat,
+          userLocation.lon,
+          sorted[0].latitude,
+          sorted[0].longitude,
+        ),
       };
     }
-    
+
     // Otherwise show shortest wait (fallback)
     const sorted = [...hospitalsWithData].sort(
-      (a, b) => (a.current_wait_time ?? 999) - (b.current_wait_time ?? 999)
+      (a, b) => (a.current_wait_time ?? 999) - (b.current_wait_time ?? 999),
     );
     return { hospital: sorted[0], type: "shortest" as const, distance: null };
   })();
@@ -51,18 +70,19 @@ export function Hero({ hospitals, onExplore, className, userLocation }: HeroProp
       className={clsx(
         "relative py-8 px-6 md:py-12 lg:py-14 overflow-hidden min-h-[40vh] flex items-center",
         "bg-gradient-to-b from-muted/30 via-background to-background",
-        className
+        className,
       )}
     >
       {/* Subtle dot grid pattern - inspired by ER-Watch */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none opacity-[0.15] dark:opacity-[0.15]"
         style={{
-          backgroundImage: 'radial-gradient(circle, var(--muted-foreground) 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
+          backgroundImage:
+            "radial-gradient(circle, var(--muted-foreground) 1px, transparent 1px)",
+          backgroundSize: "24px 24px",
         }}
       />
-      
+
       {/* Soft gradient overlays for depth */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl" />
@@ -87,9 +107,12 @@ export function Hero({ hospitals, onExplore, className, userLocation }: HeroProp
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200 leading-relaxed">
-            Explore publicly reported wait time data from official provincial sources.
-            Browse <strong className="text-foreground">{hospitals.length || "..."}</strong> Ontario hospitals
-            and compare methodologies.
+            Explore publicly reported wait time data from official provincial
+            sources. Browse{" "}
+            <strong className="text-foreground">
+              {hospitals.length || "..."}
+            </strong>{" "}
+            Ontario hospitals and compare methodologies.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start animate-in fade-in slide-in-from-bottom-7 duration-700 delay-300 pt-2">
@@ -141,15 +164,17 @@ export function Hero({ hospitals, onExplore, className, userLocation }: HeroProp
           <div className="relative group">
             {/* Enhanced card glow effect for floating appearance */}
             <div className="absolute -inset-2 bg-gradient-to-r from-primary/25 via-accent/20 to-primary/25 rounded-3xl blur-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-500" />
-            
+
             <div className="relative bg-card rounded-2xl shadow-2xl border border-border/40 overflow-hidden">
               {/* Gradient top bar */}
               <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary" />
-              
+
               <div className="p-7">
                 <div className="flex justify-between items-center mb-6">
                   <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                    {featuredHospital?.type === "nearest" ? "Nearest ER" : "Featured"}
+                    {featuredHospital?.type === "nearest"
+                      ? "Nearest ER"
+                      : "Featured"}
                   </span>
                   <span className="flex items-center gap-1.5 text-success bg-success/10 px-2.5 py-1 rounded-full text-xs font-bold ring-1 ring-inset ring-success/20">
                     <span className="relative flex h-1.5 w-1.5">
@@ -168,7 +193,8 @@ export function Hero({ hospitals, onExplore, className, userLocation }: HeroProp
                       </h3>
                       <div className="flex items-center gap-2 text-sm mt-0.5">
                         <span className="text-muted-foreground">
-                          {featuredHospital.hospital.city}, {featuredHospital.hospital.province}
+                          {featuredHospital.hospital.city},{" "}
+                          {featuredHospital.hospital.province}
                         </span>
                         {featuredHospital.distance !== null && (
                           <span className="text-xs bg-muted px-2 py-0.5 rounded-full font-medium">
@@ -180,7 +206,9 @@ export function Hero({ hospitals, onExplore, className, userLocation }: HeroProp
 
                     <div className="flex items-baseline gap-2">
                       <span className="text-5xl font-black text-foreground tracking-tight tabular-nums">
-                        {Math.round(featuredHospital.hospital.current_wait_time ?? 0)}
+                        {Math.round(
+                          featuredHospital.hospital.current_wait_time ?? 0,
+                        )}
                       </span>
                       <span className="text-xl font-medium text-muted-foreground">
                         min

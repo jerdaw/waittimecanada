@@ -14,7 +14,10 @@ interface ProvinceMethodologyCardProps {
   source: Source;
 }
 
-const provinceColors: Record<string, { bg: string; border: string; accent: string }> = {
+const provinceColors: Record<
+  string,
+  { bg: string; border: string; accent: string }
+> = {
   Ontario: {
     bg: "bg-blue-50",
     border: "border-blue-200",
@@ -43,7 +46,8 @@ const provinceColors: Record<string, { bg: string; border: string; accent: strin
 };
 
 const metricFamilyDescriptions: Record<string, string> = {
-  TIME_TO_PROVIDER: "Time until first contact with physician or healthcare provider",
+  TIME_TO_PROVIDER:
+    "Time until first contact with physician or healthcare provider",
   TOTAL_LOS: "Complete length of stay in emergency department",
   STRETCHER_OCCUPANCY: "Percentage of stretchers currently occupied",
 };
@@ -71,7 +75,9 @@ const statisticTypeDescriptions: Record<string, string> = {
   POINT_ESTIMATE: "Real-time snapshot of current wait",
 };
 
-export function ProvinceMethodologyCard({ source }: ProvinceMethodologyCardProps) {
+export function ProvinceMethodologyCard({
+  source,
+}: ProvinceMethodologyCardProps) {
   const colors = provinceColors[source.province] || {
     bg: "bg-slate-50",
     border: "border-slate-200",

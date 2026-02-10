@@ -1,4 +1,8 @@
-import { EQUITY_QUINTILE_COLORS, type EquityLayerMetadata, type IncomeQuintile } from "@/utils/equity";
+import {
+  EQUITY_QUINTILE_COLORS,
+  type EquityLayerMetadata,
+  type IncomeQuintile,
+} from "@/utils/equity";
 
 const quintileRows: Array<{ quintile: IncomeQuintile; label: string }> = [
   { quintile: 1, label: "Lowest 20%" },
@@ -30,7 +34,8 @@ export function EquityLegend({ metadata }: EquityLegendProps) {
         ))}
       </div>
       <p className="mt-2 text-[10px] leading-tight text-slate-500">
-        {metadata?.attribution ?? "Data attribution pending source integration."}
+        {metadata?.attribution ??
+          "Data attribution pending source integration."}
       </p>
       {metadata?.is_placeholder && (
         <p className="mt-1 text-[10px] font-medium text-amber-700">

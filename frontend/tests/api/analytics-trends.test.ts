@@ -24,7 +24,7 @@ describe("System Trends API", () => {
 
   it("returns 400 for invalid period", async () => {
     const request = new Request(
-      "http://localhost/api/analytics/trends?province=ON&period=daily"
+      "http://localhost/api/analytics/trends?province=ON&period=daily",
     );
     const response = await GET(request);
 
@@ -72,7 +72,7 @@ describe("System Trends API", () => {
     ]);
 
     const request = new Request(
-      "http://localhost/api/analytics/trends?province=ON&period=monthly&lookback=6m"
+      "http://localhost/api/analytics/trends?province=ON&period=monthly&lookback=6m",
     );
 
     const response = await GET(request);
@@ -89,13 +89,17 @@ describe("System Trends API", () => {
     expect(json.data.data_points[1].province_mean).toBe(147.1);
 
     expect(json.data.trend_summary.direction).toBe("worsening");
-    expect(json.data.trend_summary.narrative).toMatch(/Ontario ER wait times have increased/i);
+    expect(json.data.trend_summary.narrative).toMatch(
+      /Ontario ER wait times have increased/i,
+    );
   });
 
   it("handles query failures", async () => {
     mockSql.mockRejectedValue(new Error("DB failure"));
 
-    const request = new Request("http://localhost/api/analytics/trends?province=ON");
+    const request = new Request(
+      "http://localhost/api/analytics/trends?province=ON",
+    );
     const response = await GET(request);
     const json = await response.json();
 
@@ -105,49 +109,47 @@ describe("System Trends API", () => {
   });
 
   it("falls back to daily rollups when requested period has no rows", async () => {
-    mockSql
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([
-        {
-          hospital_id: "h1",
-          period_start: "2025-12-01T00:00:00.000Z",
-          period_end: "2025-12-02T00:00:00.000Z",
-          mean_value: 100,
-          min_value: 70,
-          max_value: 160,
-          sample_count: 100,
-        },
-        {
-          hospital_id: "h1",
-          period_start: "2025-12-02T00:00:00.000Z",
-          period_end: "2025-12-03T00:00:00.000Z",
-          mean_value: 120,
-          min_value: 90,
-          max_value: 180,
-          sample_count: 100,
-        },
-        {
-          hospital_id: "h2",
-          period_start: "2025-12-01T00:00:00.000Z",
-          period_end: "2025-12-02T00:00:00.000Z",
-          mean_value: 140,
-          min_value: 100,
-          max_value: 220,
-          sample_count: 100,
-        },
-        {
-          hospital_id: "h2",
-          period_start: "2025-12-02T00:00:00.000Z",
-          period_end: "2025-12-03T00:00:00.000Z",
-          mean_value: 160,
-          min_value: 110,
-          max_value: 240,
-          sample_count: 100,
-        },
-      ]);
+    mockSql.mockResolvedValueOnce([]).mockResolvedValueOnce([
+      {
+        hospital_id: "h1",
+        period_start: "2025-12-01T00:00:00.000Z",
+        period_end: "2025-12-02T00:00:00.000Z",
+        mean_value: 100,
+        min_value: 70,
+        max_value: 160,
+        sample_count: 100,
+      },
+      {
+        hospital_id: "h1",
+        period_start: "2025-12-02T00:00:00.000Z",
+        period_end: "2025-12-03T00:00:00.000Z",
+        mean_value: 120,
+        min_value: 90,
+        max_value: 180,
+        sample_count: 100,
+      },
+      {
+        hospital_id: "h2",
+        period_start: "2025-12-01T00:00:00.000Z",
+        period_end: "2025-12-02T00:00:00.000Z",
+        mean_value: 140,
+        min_value: 100,
+        max_value: 220,
+        sample_count: 100,
+      },
+      {
+        hospital_id: "h2",
+        period_start: "2025-12-02T00:00:00.000Z",
+        period_end: "2025-12-03T00:00:00.000Z",
+        mean_value: 160,
+        min_value: 110,
+        max_value: 240,
+        sample_count: 100,
+      },
+    ]);
 
     const request = new Request(
-      "http://localhost/api/analytics/trends?province=ON&period=monthly&lookback=6m"
+      "http://localhost/api/analytics/trends?province=ON&period=monthly&lookback=6m",
     );
 
     const response = await GET(request);

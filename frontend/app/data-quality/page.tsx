@@ -25,8 +25,10 @@ interface SystemQuality {
 
 function getStatusBadge(status: string) {
   const styles: Record<string, string> = {
-    healthy: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300",
-    degraded: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300",
+    healthy:
+      "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300",
+    degraded:
+      "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300",
     critical: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300",
   };
   return styles[status] ?? styles.critical;
@@ -57,9 +59,10 @@ export default function DataQualityPage() {
         <div className="mb-8">
           <h1 className="text-2xl font-bold mb-2">Data Quality & Provenance</h1>
           <p className="text-muted-foreground text-sm max-w-2xl">
-            Transparent metrics about our data collection reliability. Every measurement
-            is tracked, gaps are detected, and statistical outliers are flagged — because
-            research-grade data requires research-grade auditing.
+            Transparent metrics about our data collection reliability. Every
+            measurement is tracked, gaps are detected, and statistical outliers
+            are flagged — because research-grade data requires research-grade
+            auditing.
           </p>
         </div>
 
@@ -78,7 +81,8 @@ export default function DataQualityPage() {
                 <span
                   className={`text-xs px-2 py-0.5 rounded-full font-medium ${getStatusBadge(quality.overall_status)}`}
                 >
-                  {quality.overall_status.charAt(0).toUpperCase() + quality.overall_status.slice(1)}
+                  {quality.overall_status.charAt(0).toUpperCase() +
+                    quality.overall_status.slice(1)}
                 </span>
               </div>
 
@@ -87,19 +91,25 @@ export default function DataQualityPage() {
                   <div className="text-2xl font-bold tabular-nums">
                     {(quality.system_uptime_24h * 100).toFixed(1)}%
                   </div>
-                  <div className="text-xs text-muted-foreground">24h Uptime</div>
+                  <div className="text-xs text-muted-foreground">
+                    24h Uptime
+                  </div>
                 </div>
                 <div className="bg-card rounded-lg border border-border/50 p-3 text-center">
                   <div className="text-2xl font-bold tabular-nums">
                     {quality.total_measurements_24h.toLocaleString()}
                   </div>
-                  <div className="text-xs text-muted-foreground">Measurements (24h)</div>
+                  <div className="text-xs text-muted-foreground">
+                    Measurements (24h)
+                  </div>
                 </div>
                 <div className="bg-card rounded-lg border border-border/50 p-3 text-center">
                   <div className="text-2xl font-bold tabular-nums">
                     {quality.total_hospitals_reporting}
                   </div>
-                  <div className="text-xs text-muted-foreground">Hospitals Reporting</div>
+                  <div className="text-xs text-muted-foreground">
+                    Hospitals Reporting
+                  </div>
                 </div>
               </div>
 
@@ -115,31 +125,41 @@ export default function DataQualityPage() {
             <section>
               <h2 className="text-lg font-semibold mb-4">Recent Anomalies</h2>
               <p className="text-sm text-muted-foreground mb-4">
-                Measurements flagged as statistical outliers. These are still included in the
-                dataset — the flag is metadata for transparency, not a filter.
+                Measurements flagged as statistical outliers. These are still
+                included in the dataset — the flag is metadata for transparency,
+                not a filter.
               </p>
               <AnomalyFeed />
             </section>
 
             {/* Methodology Notes */}
             <section className="bg-card rounded-lg border border-border/50 p-6">
-              <h2 className="text-lg font-semibold mb-3">About Data Quality Metrics</h2>
+              <h2 className="text-lg font-semibold mb-3">
+                About Data Quality Metrics
+              </h2>
               <div className="space-y-3 text-sm text-muted-foreground">
                 <div>
-                  <strong className="text-foreground">Success Rate:</strong> Scrapers run
-                  every 15 minutes (96 expected per day per hospital). Success rate measures
-                  actual vs expected data collection.
+                  <strong className="text-foreground">Success Rate:</strong>{" "}
+                  Scrapers run every 15 minutes (96 expected per day per
+                  hospital). Success rate measures actual vs expected data
+                  collection.
                 </div>
                 <div>
-                  <strong className="text-foreground">Anomaly Detection:</strong> Uses z-score
-                  (3 standard deviations) and IQR methods against a 7-day rolling baseline.
-                  Requires 20+ historical data points before flagging.
+                  <strong className="text-foreground">
+                    Anomaly Detection:
+                  </strong>{" "}
+                  Uses z-score (3 standard deviations) and IQR methods against a
+                  7-day rolling baseline. Requires 20+ historical data points
+                  before flagging.
                 </div>
                 <div>
-                  <strong className="text-foreground">Why Transparency Matters:</strong> Clinical
-                  researchers need to know data reliability before drawing conclusions. We expose
-                  every gap, outlier, and quality metric because that is what research-grade
-                  infrastructure demands.
+                  <strong className="text-foreground">
+                    Why Transparency Matters:
+                  </strong>{" "}
+                  Clinical researchers need to know data reliability before
+                  drawing conclusions. We expose every gap, outlier, and quality
+                  metric because that is what research-grade infrastructure
+                  demands.
                 </div>
               </div>
             </section>

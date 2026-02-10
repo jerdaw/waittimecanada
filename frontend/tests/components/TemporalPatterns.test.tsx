@@ -3,14 +3,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TemporalPatterns } from "@/components/TemporalPatterns";
 
 vi.mock("recharts", () => {
-  const Monitor = ({ children, data }: { children: React.ReactNode; data: unknown }) => (
+  const Monitor = ({
+    children,
+    data,
+  }: {
+    children: React.ReactNode;
+    data: unknown;
+  }) => (
     <div data-testid="recharts-mock" data-data={JSON.stringify(data)}>
       {children}
     </div>
   );
 
   return {
-    ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    ),
     BarChart: Monitor,
     LineChart: Monitor,
     CartesianGrid: () => <div />,
@@ -108,13 +116,55 @@ describe("TemporalPatterns", () => {
               pattern_type: "day_of_week",
               sample_count: 70,
               patterns: [
-                { day: "Monday", day_index: 0, mean: 100, median: 95, sample_count: 10 },
-                { day: "Tuesday", day_index: 1, mean: 110, median: 100, sample_count: 10 },
-                { day: "Wednesday", day_index: 2, mean: 95, median: 90, sample_count: 10 },
-                { day: "Thursday", day_index: 3, mean: 105, median: 100, sample_count: 10 },
-                { day: "Friday", day_index: 4, mean: 115, median: 110, sample_count: 10 },
-                { day: "Saturday", day_index: 5, mean: 125, median: 120, sample_count: 10 },
-                { day: "Sunday", day_index: 6, mean: 130, median: 125, sample_count: 10 },
+                {
+                  day: "Monday",
+                  day_index: 0,
+                  mean: 100,
+                  median: 95,
+                  sample_count: 10,
+                },
+                {
+                  day: "Tuesday",
+                  day_index: 1,
+                  mean: 110,
+                  median: 100,
+                  sample_count: 10,
+                },
+                {
+                  day: "Wednesday",
+                  day_index: 2,
+                  mean: 95,
+                  median: 90,
+                  sample_count: 10,
+                },
+                {
+                  day: "Thursday",
+                  day_index: 3,
+                  mean: 105,
+                  median: 100,
+                  sample_count: 10,
+                },
+                {
+                  day: "Friday",
+                  day_index: 4,
+                  mean: 115,
+                  median: 110,
+                  sample_count: 10,
+                },
+                {
+                  day: "Saturday",
+                  day_index: 5,
+                  mean: 125,
+                  median: 120,
+                  sample_count: 10,
+                },
+                {
+                  day: "Sunday",
+                  day_index: 6,
+                  mean: 130,
+                  median: 125,
+                  sample_count: 10,
+                },
               ],
               insights: {
                 worst_day: "Sunday",
@@ -136,7 +186,7 @@ describe("TemporalPatterns", () => {
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining("type=day_of_week"),
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
@@ -175,7 +225,9 @@ describe("TemporalPatterns", () => {
     render(<TemporalPatterns hospitalId="ca-on-test" />);
 
     await waitFor(() => {
-      expect(screen.getByText("Not enough pattern data yet")).toBeInTheDocument();
+      expect(
+        screen.getByText("Not enough pattern data yet"),
+      ).toBeInTheDocument();
     });
   });
 });

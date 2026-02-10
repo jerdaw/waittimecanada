@@ -37,7 +37,8 @@ export function RegionSelector({
         <option value="all">All Regions</option>
         {regions.map((region) => (
           <option key={region.region_id} value={region.region_id}>
-            {region.region_name} ({region.reporting_count}/{region.hospital_count})
+            {region.region_name} ({region.reporting_count}/
+            {region.hospital_count})
           </option>
         ))}
       </select>

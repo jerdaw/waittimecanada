@@ -71,16 +71,21 @@ describe("ComparisonModal", () => {
     });
   });
 
-  it("renders loading state initially", () => {
+  it("renders loading state initially", async () => {
     render(
       <ComparisonModal
         hospitalAId={hospitalAId}
         hospitalBId={hospitalBId}
         onClose={mockOnClose}
-      />
+      />,
     );
 
     expect(screen.getByText("Loading comparison...")).toBeInTheDocument();
+
+    // Wait for data to load to ensure async operation completes
+    await waitFor(() => {
+      expect(screen.getByText("Ottawa Civic Hospital")).toBeInTheDocument();
+    });
   });
 
   it("fetches comparison data on mount", async () => {
@@ -89,12 +94,12 @@ describe("ComparisonModal", () => {
         hospitalAId={hospitalAId}
         hospitalBId={hospitalBId}
         onClose={mockOnClose}
-      />
+      />,
     );
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        `/api/compare?a=${hospitalAId}&b=${hospitalBId}`
+        `/api/compare?a=${hospitalAId}&b=${hospitalBId}`,
       );
     });
   });
@@ -105,7 +110,7 @@ describe("ComparisonModal", () => {
         hospitalAId={hospitalAId}
         hospitalBId={hospitalBId}
         onClose={mockOnClose}
-      />
+      />,
     );
 
     await waitFor(() => {
@@ -120,13 +125,15 @@ describe("ComparisonModal", () => {
         hospitalAId={hospitalAId}
         hospitalBId={hospitalBId}
         onClose={mockOnClose}
-      />
+      />,
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Methodology Divergence Warning")).toBeInTheDocument();
       expect(
-        screen.getByText(/Different start points: TRIAGE vs REGISTRATION/)
+        screen.getByText("Methodology Divergence Warning"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/Different start points: TRIAGE vs REGISTRATION/),
       ).toBeInTheDocument();
     });
   });
@@ -141,13 +148,13 @@ describe("ComparisonModal", () => {
         hospitalAId={hospitalAId}
         hospitalBId={hospitalBId}
         onClose={mockOnClose}
-      />
+      />,
     );
 
     await waitFor(() => {
       expect(screen.getByText("Directly Comparable")).toBeInTheDocument();
       expect(
-        screen.getByText(/use identical methodologies/)
+        screen.getByText(/use identical methodologies/),
       ).toBeInTheDocument();
     });
   });
@@ -158,7 +165,7 @@ describe("ComparisonModal", () => {
         hospitalAId={hospitalAId}
         hospitalBId={hospitalBId}
         onClose={mockOnClose}
-      />
+      />,
     );
 
     await waitFor(() => {
@@ -174,7 +181,7 @@ describe("ComparisonModal", () => {
         hospitalAId={hospitalAId}
         hospitalBId={hospitalBId}
         onClose={mockOnClose}
-      />
+      />,
     );
 
     await waitFor(() => {
@@ -192,7 +199,7 @@ describe("ComparisonModal", () => {
         hospitalAId={hospitalAId}
         hospitalBId={hospitalBId}
         onClose={mockOnClose}
-      />
+      />,
     );
 
     await waitFor(() => {
@@ -211,7 +218,7 @@ describe("ComparisonModal", () => {
         hospitalAId={hospitalAId}
         hospitalBId={hospitalBId}
         onClose={mockOnClose}
-      />
+      />,
     );
 
     await waitFor(() => {
@@ -228,7 +235,7 @@ describe("ComparisonModal", () => {
         hospitalAId={hospitalAId}
         hospitalBId={hospitalBId}
         onClose={mockOnClose}
-      />
+      />,
     );
 
     await waitFor(() => {
@@ -249,7 +256,7 @@ describe("ComparisonModal", () => {
         hospitalAId={hospitalAId}
         hospitalBId={hospitalBId}
         onClose={mockOnClose}
-      />
+      />,
     );
 
     await waitFor(() => {
@@ -270,7 +277,7 @@ describe("ComparisonModal", () => {
         hospitalAId={hospitalAId}
         hospitalBId={hospitalBId}
         onClose={mockOnClose}
-      />
+      />,
     );
 
     await waitFor(() => {
@@ -288,7 +295,7 @@ describe("ComparisonModal", () => {
         hospitalAId={hospitalAId}
         hospitalBId={hospitalBId}
         onClose={mockOnClose}
-      />
+      />,
     );
 
     await waitFor(() => {
@@ -310,7 +317,7 @@ describe("ComparisonModal", () => {
         hospitalAId={hospitalAId}
         hospitalBId={hospitalBId}
         onClose={mockOnClose}
-      />
+      />,
     );
 
     await waitFor(() => {

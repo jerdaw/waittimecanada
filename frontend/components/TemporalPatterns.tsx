@@ -63,9 +63,12 @@ export function TemporalPatterns({ hospitalId }: TemporalPatternsProps) {
           type: tab,
         });
 
-        const response = await fetch(`/api/analytics/patterns?${query.toString()}`, {
-          signal: controller.signal,
-        });
+        const response = await fetch(
+          `/api/analytics/patterns?${query.toString()}`,
+          {
+            signal: controller.signal,
+          },
+        );
         const json = (await response.json()) as PatternsResponse;
 
         if (!mounted) return;
@@ -97,7 +100,9 @@ export function TemporalPatterns({ hospitalId }: TemporalPatternsProps) {
 
   const chartData = useMemo(() => payload?.patterns ?? [], [payload]);
 
-  const hasData = chartData.some((row) => row.mean !== null && row.mean !== undefined);
+  const hasData = chartData.some(
+    (row) => row.mean !== null && row.mean !== undefined,
+  );
 
   const hourInsights = payload?.insights as
     | {
@@ -149,7 +154,7 @@ export function TemporalPatterns({ hospitalId }: TemporalPatternsProps) {
               "px-2.5 py-1 text-xs rounded-md font-medium transition-colors",
               tab === item.key
                 ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground hover:bg-background/70"
+                : "text-muted-foreground hover:text-foreground hover:bg-background/70",
             )}
           >
             {item.label}
@@ -163,7 +168,9 @@ export function TemporalPatterns({ hospitalId }: TemporalPatternsProps) {
             <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         ) : error ? (
-          <div className="h-full flex items-center justify-center text-xs text-red-600">{error}</div>
+          <div className="h-full flex items-center justify-center text-xs text-red-600">
+            {error}
+          </div>
         ) : !hasData ? (
           <div className="h-full flex items-center justify-center text-xs text-muted-foreground">
             Not enough pattern data yet
@@ -171,9 +178,23 @@ export function TemporalPatterns({ hospitalId }: TemporalPatternsProps) {
         ) : tab === "monthly" ? (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-              <XAxis dataKey="month" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} width={30} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="var(--border)"
+              />
+              <XAxis
+                dataKey="month"
+                tick={{ fontSize: 10 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 10 }}
+                axisLine={false}
+                tickLine={false}
+                width={30}
+              />
               <Tooltip />
               <Line
                 type="monotone"
@@ -188,21 +209,34 @@ export function TemporalPatterns({ hospitalId }: TemporalPatternsProps) {
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="var(--border)"
+              />
               <XAxis
                 dataKey={tab === "hour_of_day" ? "hour" : "day"}
                 tickFormatter={(value) =>
-                  tab === "hour_of_day" ? hourLabel(Number(value)) : String(value)
+                  tab === "hour_of_day"
+                    ? hourLabel(Number(value))
+                    : String(value)
                 }
                 tick={{ fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
                 interval={tab === "hour_of_day" ? 3 : 0}
               />
-              <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} width={30} />
+              <YAxis
+                tick={{ fontSize: 10 }}
+                axisLine={false}
+                tickLine={false}
+                width={30}
+              />
               <Tooltip
                 labelFormatter={(value) =>
-                  tab === "hour_of_day" ? `Hour: ${hourLabel(Number(value))}` : String(value)
+                  tab === "hour_of_day"
+                    ? `Hour: ${hourLabel(Number(value))}`
+                    : String(value)
                 }
               />
               <Bar dataKey="mean" fill="var(--primary)" radius={[3, 3, 0, 0]} />
@@ -211,29 +245,35 @@ export function TemporalPatterns({ hospitalId }: TemporalPatternsProps) {
         )}
       </div>
 
-      {!loading && !error && hasData && tab === "hour_of_day" && hourInsights && (
-        <p className="mt-2 text-[10px] text-muted-foreground">
-          Peak at {hourInsights.peak_hour}:00 ({hourInsights.peak_mean} min), quietest at
-          {" "}
-          {hourInsights.quietest_hour}:00 ({hourInsights.quietest_mean} min).
-          {" "}
-          {hourInsights.peak_vs_quiet_ratio}x difference.
-        </p>
-      )}
+      {!loading &&
+        !error &&
+        hasData &&
+        tab === "hour_of_day" &&
+        hourInsights && (
+          <p className="mt-2 text-[10px] text-muted-foreground">
+            Peak at {hourInsights.peak_hour}:00 ({hourInsights.peak_mean} min),
+            quietest at {hourInsights.quietest_hour}:00 (
+            {hourInsights.quietest_mean} min).{" "}
+            {hourInsights.peak_vs_quiet_ratio}x difference.
+          </p>
+        )}
 
-      {!loading && !error && hasData && tab === "day_of_week" && dayInsights && (
-        <p className="mt-2 text-[10px] text-muted-foreground">
-          Busiest: {dayInsights.worst_day}. Best: {dayInsights.best_day}. Weekend/weekday ratio:
-          {" "}
-          {dayInsights.weekend_vs_weekday_ratio}.
-        </p>
-      )}
+      {!loading &&
+        !error &&
+        hasData &&
+        tab === "day_of_week" &&
+        dayInsights && (
+          <p className="mt-2 text-[10px] text-muted-foreground">
+            Busiest: {dayInsights.worst_day}. Best: {dayInsights.best_day}.
+            Weekend/weekday ratio: {dayInsights.weekend_vs_weekday_ratio}.
+          </p>
+        )}
 
       {!loading && !error && hasData && tab === "monthly" && monthInsights && (
         <p className="mt-2 text-[10px] text-muted-foreground">
-          Trend: {monthInsights.direction} ({monthInsights.change_percent}% change). From
-          {" "}
-          {monthInsights.start_mean} to {monthInsights.end_mean} minutes.
+          Trend: {monthInsights.direction} ({monthInsights.change_percent}%
+          change). From {monthInsights.start_mean} to {monthInsights.end_mean}{" "}
+          minutes.
         </p>
       )}
     </div>

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useState } from 'react';
-import { MapPin, DollarSign, Navigation, AlertTriangle } from 'lucide-react';
-import { Hospital } from '@/app/api/hospitals/route';
-import { calculateDistance } from '@/utils/distance';
+import { useEffect, useMemo, useState } from "react";
+import { MapPin, DollarSign, Navigation, AlertTriangle } from "lucide-react";
+import { Hospital } from "@/app/api/hospitals/route";
+import { calculateDistance } from "@/utils/distance";
 
 interface AccessInsightsSummaryProps {
   hospitals: Hospital[];
@@ -11,7 +11,7 @@ interface AccessInsightsSummaryProps {
   province: string;
 }
 
-type EquitySummaryStatus = 'ready' | 'no_reporting_data' | 'not_available_yet';
+type EquitySummaryStatus = "ready" | "no_reporting_data" | "not_available_yet";
 
 interface EquitySummarySnapshot {
   province: string;
@@ -34,7 +34,7 @@ interface EquitySummarySnapshot {
 // Gas prices from AccessBurdenEstimator
 const GAS_PRICES: Record<string, number> = {
   ON: 1.55,
-  QC: 1.60,
+  QC: 1.6,
   AB: 1.45,
   BC: 1.75,
 };
@@ -42,7 +42,13 @@ const GAS_PRICES: Record<string, number> = {
 const FUEL_CONSUMPTION = 10; // L/100km
 const AVG_PARKING = 15; // Mid-range estimate
 
-function StatCard({ title, value, subtitle, icon, className = "" }: {
+function StatCard({
+  title,
+  value,
+  subtitle,
+  icon,
+  className = "",
+}: {
   title: string;
   value: string | number;
   subtitle?: string;
@@ -56,7 +62,9 @@ function StatCard({ title, value, subtitle, icon, className = "" }: {
         <div className="text-muted-foreground">{icon}</div>
       </div>
       <p className="text-2xl font-bold text-foreground">{value}</p>
-      {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
+      {subtitle && (
+        <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
+      )}
     </div>
   );
 }
@@ -66,7 +74,8 @@ export function AccessInsightsSummary({
   userLocation,
   province,
 }: AccessInsightsSummaryProps) {
-  const [equitySummary, setEquitySummary] = useState<EquitySummarySnapshot | null>(null);
+  const [equitySummary, setEquitySummary] =
+    useState<EquitySummarySnapshot | null>(null);
   const [equityLoading, setEquityLoading] = useState(true);
   const [equityError, setEquityError] = useState<string | null>(null);
 
@@ -78,7 +87,9 @@ export function AccessInsightsSummary({
       setEquityError(null);
 
       try {
-        const response = await fetch(`/api/analytics/equity-summary?province=${province}&period=7d`);
+        const response = await fetch(
+          `/api/analytics/equity-summary?province=${province}&period=7d`,
+        );
         const payload = await response.json();
 
         if (cancelled) return;
@@ -86,12 +97,14 @@ export function AccessInsightsSummary({
           setEquitySummary(payload.data as EquitySummarySnapshot);
         } else {
           setEquitySummary(null);
-          setEquityError(payload.error ?? 'Failed to load equity linkage summary');
+          setEquityError(
+            payload.error ?? "Failed to load equity linkage summary",
+          );
         }
       } catch {
         if (cancelled) return;
         setEquitySummary(null);
-        setEquityError('Failed to load equity linkage summary');
+        setEquityError("Failed to load equity linkage summary");
       } finally {
         if (!cancelled) {
           setEquityLoading(false);
@@ -114,12 +127,12 @@ export function AccessInsightsSummary({
           userLocation.lat,
           userLocation.lon,
           hospital.latitude,
-          hospital.longitude
+          hospital.longitude,
         );
 
         const gasPrice = GAS_PRICES[province] || 1.55;
         const roundTripKm = distance * 2;
-        const fuelCost = (roundTripKm * FUEL_CONSUMPTION / 100) * gasPrice;
+        const fuelCost = ((roundTripKm * FUEL_CONSUMPTION) / 100) * gasPrice;
         const totalCost = fuelCost + AVG_PARKING;
 
         return {
@@ -131,11 +144,16 @@ export function AccessInsightsSummary({
       .sort((a, b) => a.distance - b.distance);
   }, [hospitals, province, userLocation]);
 
-  const within30km = hospitalsWithMetrics.filter((hospital) => hospital.distance <= 30);
-  const within50km = hospitalsWithMetrics.filter((hospital) => hospital.distance <= 50);
+  const within30km = hospitalsWithMetrics.filter(
+    (hospital) => hospital.distance <= 30,
+  );
+  const within50km = hospitalsWithMetrics.filter(
+    (hospital) => hospital.distance <= 50,
+  );
   const avgAccessCost =
     within30km.length > 0
-      ? within30km.reduce((sum, hospital) => sum + hospital.accessCost, 0) / within30km.length
+      ? within30km.reduce((sum, hospital) => sum + hospital.accessCost, 0) /
+        within30km.length
       : 0;
   const nearest = hospitalsWithMetrics[0];
 
@@ -147,7 +165,8 @@ export function AccessInsightsSummary({
           <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
             <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
             <p className="text-xs text-amber-800 dark:text-amber-200">
-              <strong>Logistical estimates only.</strong> Never delay care for cost. Call 911 for emergencies.
+              <strong>Logistical estimates only.</strong> Never delay care for
+              cost. Call 911 for emergencies.
             </p>
           </div>
 
@@ -181,8 +200,9 @@ export function AccessInsightsSummary({
               {within30km.length === 0 && within50km.length > 0 && (
                 <div className="p-3 bg-muted/50 border border-border rounded-lg">
                   <p className="text-xs text-muted-foreground">
-                    <strong>Note:</strong> No emergency rooms within 30km. The nearest ER is{' '}
-                    {nearest.distance.toFixed(1)}km away in {nearest.city}.
+                    <strong>Note:</strong> No emergency rooms within 30km. The
+                    nearest ER is {nearest.distance.toFixed(1)}km away in{" "}
+                    {nearest.city}.
                   </p>
                 </div>
               )}
@@ -191,11 +211,16 @@ export function AccessInsightsSummary({
               {within30km.length > 0 && (
                 <div className="p-3 bg-muted/50 border border-border rounded-lg">
                   <p className="text-xs text-muted-foreground">
-                    Access costs range from <strong>${Math.round(nearest.accessCost)}</strong>{' '}
-                    (nearest) to{' '}
-                    <strong>${Math.round(within30km[within30km.length - 1].accessCost)}</strong>{' '}
+                    Access costs range from{" "}
+                    <strong>${Math.round(nearest.accessCost)}</strong> (nearest)
+                    to{" "}
+                    <strong>
+                      $
+                      {Math.round(within30km[within30km.length - 1].accessCost)}
+                    </strong>{" "}
                     (furthest within 30km). Costs include fuel ($
-                    {(GAS_PRICES[province] || 1.55).toFixed(2)}/L in {province}) and parking.
+                    {(GAS_PRICES[province] || 1.55).toFixed(2)}/L in {province})
+                    and parking.
                   </p>
                 </div>
               )}
@@ -216,36 +241,47 @@ export function AccessInsightsSummary({
             Enable location access to see personal access insights
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            We&apos;ll show you how many ERs are nearby and estimated travel costs
+            We&apos;ll show you how many ERs are nearby and estimated travel
+            costs
           </p>
         </div>
       )}
 
       <div className="rounded-lg border border-border bg-card p-4">
-        <h3 className="text-sm font-semibold text-foreground">Equity Access Snapshot (7d)</h3>
+        <h3 className="text-sm font-semibold text-foreground">
+          Equity Access Snapshot (7d)
+        </h3>
         <p className="mt-1 text-xs text-muted-foreground">
-          Tract-level linkage of low-income areas (income quintiles 1-2) and nearby reporting ER wait times.
+          Tract-level linkage of low-income areas (income quintiles 1-2) and
+          nearby reporting ER wait times.
         </p>
 
         {equityLoading ? (
-          <p className="mt-3 text-sm text-muted-foreground">Loading equity linkage summary...</p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Loading equity linkage summary...
+          </p>
         ) : equityError ? (
           <p className="mt-3 text-sm text-muted-foreground">{equityError}</p>
         ) : !equitySummary ? (
-          <p className="mt-3 text-sm text-muted-foreground">No equity linkage summary available.</p>
-        ) : equitySummary.status === 'not_available_yet' ? (
+          <p className="mt-3 text-sm text-muted-foreground">
+            No equity linkage summary available.
+          </p>
+        ) : equitySummary.status === "not_available_yet" ? (
           <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-            <p className="font-medium">Equity linkage summary not available yet</p>
+            <p className="font-medium">
+              Equity linkage summary not available yet
+            </p>
             <p className="mt-1">{equitySummary.message}</p>
-            {Array.isArray(equitySummary.setup_steps) && equitySummary.setup_steps.length > 0 && (
-              <div className="mt-2 space-y-1 text-xs">
-                {equitySummary.setup_steps.map((step) => (
-                  <p key={step}>{step}</p>
-                ))}
-              </div>
-            )}
+            {Array.isArray(equitySummary.setup_steps) &&
+              equitySummary.setup_steps.length > 0 && (
+                <div className="mt-2 space-y-1 text-xs">
+                  {equitySummary.setup_steps.map((step) => (
+                    <p key={step}>{step}</p>
+                  ))}
+                </div>
+              )}
           </div>
-        ) : equitySummary.status === 'no_reporting_data' ? (
+        ) : equitySummary.status === "no_reporting_data" ? (
           <div className="mt-3 rounded-lg border border-border/60 bg-muted/30 p-3 text-sm text-muted-foreground">
             {equitySummary.message}
           </div>
@@ -267,10 +303,11 @@ export function AccessInsightsSummary({
               <StatCard
                 title="Wait Gap vs Province"
                 value={
-                  equitySummary.wait_gap_minutes === null || equitySummary.wait_gap_minutes === undefined
+                  equitySummary.wait_gap_minutes === null ||
+                  equitySummary.wait_gap_minutes === undefined
                     ? "n/a"
                     : `${equitySummary.wait_gap_minutes > 0 ? "+" : ""}${Math.round(
-                        equitySummary.wait_gap_minutes
+                        equitySummary.wait_gap_minutes,
                       )} min`
                 }
                 subtitle={`Reporting hospitals: ${equitySummary.reporting_hospitals ?? 0}`}
@@ -279,16 +316,17 @@ export function AccessInsightsSummary({
             </div>
 
             <p className="text-xs text-muted-foreground">
-              Near-tract mean wait:{' '}
+              Near-tract mean wait:{" "}
               <strong>
                 {equitySummary.near_low_income_avg_wait === null ||
                 equitySummary.near_low_income_avg_wait === undefined
                   ? "n/a"
                   : `${Math.round(equitySummary.near_low_income_avg_wait)} min`}
-              </strong>{' '}
-              • Province mean wait:{' '}
+              </strong>{" "}
+              • Province mean wait:{" "}
               <strong>
-                {equitySummary.province_avg_wait === null || equitySummary.province_avg_wait === undefined
+                {equitySummary.province_avg_wait === null ||
+                equitySummary.province_avg_wait === undefined
                   ? "n/a"
                   : `${Math.round(equitySummary.province_avg_wait)} min`}
               </strong>
@@ -296,7 +334,8 @@ export function AccessInsightsSummary({
 
             {equitySummary.is_placeholder && (
               <p className="text-xs text-amber-700">
-                Placeholder tract dataset in use. Replace with StatsCan-linked tract data before making policy conclusions.
+                Placeholder tract dataset in use. Replace with StatsCan-linked
+                tract data before making policy conclusions.
               </p>
             )}
           </div>

@@ -57,7 +57,7 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
   const isAggregated = data?.dataSource === "aggregated";
   const hasMinMax = data?.dataPoints?.some(
     // eslint-disable-next-line
-    (d: any) => d.minWaitTime != null && d.maxWaitTime != null
+    (d: any) => d.minWaitTime != null && d.maxWaitTime != null,
   );
 
   // Format tick labels
@@ -74,7 +74,8 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
 
   // eslint-disable-next-line
   const formatTooltip = (value: any, name: string | undefined) => {
-    if (name === "waitTime") return [`${value} min`, isAggregated ? "Mean" : "Wait Time"];
+    if (name === "waitTime")
+      return [`${value} min`, isAggregated ? "Mean" : "Wait Time"];
     if (name === "minWaitTime") return [`${value} min`, "Min"];
     if (name === "maxWaitTime") return [`${value} min`, "Max"];
     return [`${value}`, name ?? ""];
@@ -107,7 +108,7 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
                 "px-2 py-1 text-xs rounded font-medium transition-colors",
                 period === p
                   ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                  : "text-muted-foreground hover:text-foreground hover:bg-background/50",
               )}
             >
               {p}
@@ -126,14 +127,18 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
             {error}
           </div>
         ) : !data?.dataPoints?.length ? (
-           <div className="h-full w-full flex items-center justify-center text-sm text-muted-foreground">
+          <div className="h-full w-full flex items-center justify-center text-sm text-muted-foreground">
             No historical data available
           </div>
         ) : hasMinMax ? (
           /* Aggregate view: mean line with min/max shaded area */
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={data.dataPoints}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="var(--border)"
+              />
               <XAxis
                 dataKey="timestamp"
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
@@ -187,7 +192,11 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
           /* Raw view: simple line chart */
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data.dataPoints}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="var(--border)"
+              />
               <XAxis
                 dataKey="timestamp"
                 tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
@@ -210,7 +219,7 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
                   backgroundColor: "var(--card)",
                   borderColor: "var(--border)",
                   borderRadius: "8px",
-                  fontSize: "12px"
+                  fontSize: "12px",
                 }}
               />
               <Line

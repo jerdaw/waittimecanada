@@ -8,7 +8,7 @@ import {
 } from "@/content/stakeholderTestimonials";
 
 function buildTestimonial(
-  partial: Partial<StakeholderTestimonial> = {}
+  partial: Partial<StakeholderTestimonial> = {},
 ): StakeholderTestimonial {
   return {
     id: "t-1",
@@ -51,7 +51,9 @@ describe("stakeholderTestimonials governance", () => {
     ];
 
     const errors = validateStakeholderTestimonials(testimonials);
-    expect(errors.some((error) => error.includes("at most 1 published"))).toBe(true);
+    expect(errors.some((error) => error.includes("at most 1 published"))).toBe(
+      true,
+    );
   });
 
   it("requires governance metadata for published testimonials", () => {
@@ -60,7 +62,9 @@ describe("stakeholderTestimonials governance", () => {
     ];
 
     const errors = validateStakeholderTestimonials(testimonials);
-    expect(errors.some((error) => error.includes("approvalReference"))).toBe(true);
+    expect(errors.some((error) => error.includes("approvalReference"))).toBe(
+      true,
+    );
     expect(errors.some((error) => error.includes("publishedAt"))).toBe(true);
   });
 
@@ -75,11 +79,17 @@ describe("stakeholderTestimonials governance", () => {
     ];
 
     const errors = validateStakeholderTestimonials(testimonials);
-    expect(errors.some((error) => error.includes("requires a non-empty displayName"))).toBe(true);
+    expect(
+      errors.some((error) =>
+        error.includes("requires a non-empty displayName"),
+      ),
+    ).toBe(true);
   });
 
   it("keeps the repository dataset valid by default", () => {
-    expect(validateStakeholderTestimonials(stakeholderTestimonials)).toEqual([]);
+    expect(validateStakeholderTestimonials(stakeholderTestimonials)).toEqual(
+      [],
+    );
     expect(getFeaturedTestimonial()).toBeNull();
   });
 });

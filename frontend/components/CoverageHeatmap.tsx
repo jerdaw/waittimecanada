@@ -19,7 +19,10 @@ function getCellColor(rate: number): string {
   return "bg-green-600 dark:bg-green-600/80";
 }
 
-export function CoverageHeatmap({ timeline, hospitalId }: CoverageHeatmapProps) {
+export function CoverageHeatmap({
+  timeline,
+  hospitalId,
+}: CoverageHeatmapProps) {
   if (!timeline || timeline.length === 0) {
     return (
       <div className="text-sm text-muted-foreground text-center py-4">
@@ -44,7 +47,11 @@ export function CoverageHeatmap({ timeline, hospitalId }: CoverageHeatmapProps) 
           <span>100%</span>
         </div>
       </div>
-      <div className="flex gap-px flex-wrap" role="grid" aria-label="Data coverage heatmap">
+      <div
+        className="flex gap-px flex-wrap"
+        role="grid"
+        aria-label="Data coverage heatmap"
+      >
         {timeline.map((day) => (
           <div
             key={day.date}

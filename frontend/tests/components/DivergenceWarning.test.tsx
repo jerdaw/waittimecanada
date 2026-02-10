@@ -14,7 +14,7 @@ describe("DivergenceWarning", () => {
 
     it("applies compact styling", () => {
       const { container } = render(
-        <DivergenceWarning message={testMessage} variant="compact" />
+        <DivergenceWarning message={testMessage} variant="compact" />,
       );
 
       const element = container.firstChild as HTMLElement;
@@ -32,7 +32,7 @@ describe("DivergenceWarning", () => {
 
     it("includes warning icon", () => {
       const { container } = render(
-        <DivergenceWarning message={testMessage} variant="inline" />
+        <DivergenceWarning message={testMessage} variant="inline" />,
       );
 
       const svg = container.querySelector("svg");
@@ -44,7 +44,9 @@ describe("DivergenceWarning", () => {
     it("renders with title and message", () => {
       render(<DivergenceWarning message={testMessage} variant="banner" />);
 
-      expect(screen.getByText("Methodology Divergence Warning")).toBeInTheDocument();
+      expect(
+        screen.getByText("Methodology Divergence Warning"),
+      ).toBeInTheDocument();
       expect(screen.getByText(testMessage)).toBeInTheDocument();
     });
 
@@ -58,7 +60,7 @@ describe("DivergenceWarning", () => {
 
     it("applies banner styling", () => {
       const { container } = render(
-        <DivergenceWarning message={testMessage} variant="banner" />
+        <DivergenceWarning message={testMessage} variant="banner" />,
       );
 
       const element = container.firstChild as HTMLElement;
@@ -87,9 +89,7 @@ describe("DivergenceWarning", () => {
     });
 
     it("includes visual icon for non-text indicator", () => {
-      const { container } = render(
-        <DivergenceWarning message={testMessage} />
-      );
+      const { container } = render(<DivergenceWarning message={testMessage} />);
 
       const svg = container.querySelector("svg");
       expect(svg).toBeInTheDocument();

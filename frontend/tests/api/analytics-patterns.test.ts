@@ -24,7 +24,7 @@ describe("Temporal Patterns API", () => {
 
   it("returns 400 for invalid type", async () => {
     const request = new Request(
-      "http://localhost/api/analytics/patterns?hospital_id=ca-on-test&type=bad"
+      "http://localhost/api/analytics/patterns?hospital_id=ca-on-test&type=bad",
     );
     const response = await GET(request);
 
@@ -40,7 +40,7 @@ describe("Temporal Patterns API", () => {
       ]);
 
     const request = new Request(
-      "http://localhost/api/analytics/patterns?hospital_id=ca-on-test&type=hour_of_day"
+      "http://localhost/api/analytics/patterns?hospital_id=ca-on-test&type=hour_of_day",
     );
     const response = await GET(request);
     const json = await response.json();
@@ -62,7 +62,7 @@ describe("Temporal Patterns API", () => {
       ]);
 
     const request = new Request(
-      "http://localhost/api/analytics/patterns?hospital_id=ca-on-test&type=day_of_week"
+      "http://localhost/api/analytics/patterns?hospital_id=ca-on-test&type=day_of_week",
     );
     const response = await GET(request);
     const json = await response.json();
@@ -78,7 +78,7 @@ describe("Temporal Patterns API", () => {
     mockSql.mockRejectedValue(new Error("DB failure"));
 
     const request = new Request(
-      "http://localhost/api/analytics/patterns?hospital_id=ca-on-test&type=monthly"
+      "http://localhost/api/analytics/patterns?hospital_id=ca-on-test&type=monthly",
     );
     const response = await GET(request);
     const json = await response.json();

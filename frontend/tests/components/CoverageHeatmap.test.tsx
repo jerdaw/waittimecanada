@@ -27,7 +27,10 @@ describe("CoverageHeatmap", () => {
 
     render(<CoverageHeatmap timeline={timeline} hospitalId="test" />);
     const cell = screen.getByRole("gridcell");
-    expect(cell).toHaveAttribute("title", expect.stringContaining("94 scrapes"));
+    expect(cell).toHaveAttribute(
+      "title",
+      expect.stringContaining("94 scrapes"),
+    );
   });
 
   it("shows legend with scale", () => {

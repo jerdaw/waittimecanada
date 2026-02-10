@@ -43,12 +43,6 @@ Characteristics:
 
 - `GET /api/export`
 
-## Admin verification queue
-
-- `GET /api/admin/hospitals/unverified`
-- `POST /api/admin/hospitals/[id]/verify`
-- `DELETE /api/admin/hospitals/[id]/verify`
-
 ## Response Patterns
 
 ## Success pattern

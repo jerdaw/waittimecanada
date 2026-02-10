@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     console.error("Failed to fetch data quality:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -68,7 +68,8 @@ async function getSystemQuality(sql: ReturnType<typeof getDb>) {
     const totalHospitals = Number(row.total_hospitals);
     const expected24h = totalHospitals * EXPECTED_SCRAPES_PER_DAY;
     const actual24h = Number(row.measurements_24h);
-    const rate24h = expected24h > 0 ? Math.min(actual24h / expected24h, 1.0) : 0;
+    const rate24h =
+      expected24h > 0 ? Math.min(actual24h / expected24h, 1.0) : 0;
 
     const expected7d = totalHospitals * EXPECTED_SCRAPES_PER_DAY * 7;
     const actual7d = Number(row.measurements_7d);
@@ -91,11 +92,16 @@ async function getSystemQuality(sql: ReturnType<typeof getDb>) {
 
   // Overall status
   const rates = sources.map((s) => s.last_24h_success_rate);
-  const avgRate = rates.length > 0 ? rates.reduce((a, b) => a + b, 0) / rates.length : 0;
-  const overallStatus = avgRate >= 0.95 ? "healthy" : avgRate >= 0.8 ? "degraded" : "critical";
+  const avgRate =
+    rates.length > 0 ? rates.reduce((a, b) => a + b, 0) / rates.length : 0;
+  const overallStatus =
+    avgRate >= 0.95 ? "healthy" : avgRate >= 0.8 ? "degraded" : "critical";
 
   // Total counts
-  const total24h = sources.reduce((acc, s) => acc + (Number(s.hospitals_reporting) || 0), 0);
+  const total24h = sources.reduce(
+    (acc, s) => acc + (Number(s.hospitals_reporting) || 0),
+    0,
+  );
 
   return NextResponse.json(
     {
@@ -106,20 +112,22 @@ async function getSystemQuality(sql: ReturnType<typeof getDb>) {
         (acc, s) =>
           acc +
           Math.round(
-            s.last_24h_success_rate * s.total_hospitals * EXPECTED_SCRAPES_PER_DAY
+            s.last_24h_success_rate *
+              s.total_hospitals *
+              EXPECTED_SCRAPES_PER_DAY,
           ),
-        0
+        0,
       ),
       total_hospitals_reporting: total24h,
     },
-    { headers: publicCacheHeaders(300, 900) }
+    { headers: publicCacheHeaders(300, 900) },
   );
 }
 
 async function getHospitalQuality(
   sql: ReturnType<typeof getDb>,
   hospitalId: string,
-  days: number
+  days: number,
 ) {
   // Coverage timeline
   const timeline = await sql`
@@ -136,7 +144,10 @@ async function getHospitalQuality(
   const coverageTimeline = timeline.map((row) => ({
     date: row.date,
     scrape_count: Number(row.scrape_count),
-    success_rate: Math.min(Number(row.scrape_count) / EXPECTED_SCRAPES_PER_DAY, 1.0),
+    success_rate: Math.min(
+      Number(row.scrape_count) / EXPECTED_SCRAPES_PER_DAY,
+      1.0,
+    ),
   }));
 
   // Current quality (last 24h)
@@ -175,6 +186,6 @@ async function getHospitalQuality(
         reason: a.anomaly_reason,
       })),
     },
-    { headers: publicCacheHeaders(300, 900) }
+    { headers: publicCacheHeaders(300, 900) },
   );
 }

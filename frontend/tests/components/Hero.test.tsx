@@ -15,7 +15,7 @@ describe("Hero Component", () => {
       longitude: 0,
       is_visible: true,
       is_verified: true,
-      last_updated: new Date().toISOString()
+      last_updated: new Date().toISOString(),
     },
     {
       id: "h2",
@@ -27,7 +27,7 @@ describe("Hero Component", () => {
       longitude: 0,
       is_visible: true,
       is_verified: true,
-      last_updated: new Date().toISOString()
+      last_updated: new Date().toISOString(),
     },
     {
       id: "h3",
@@ -39,22 +39,26 @@ describe("Hero Component", () => {
       longitude: 0,
       is_visible: true,
       is_verified: true,
-      last_updated: new Date().toISOString()
-    }
+      last_updated: new Date().toISOString(),
+    },
   ];
 
   it("renders correctly", () => {
     render(<Hero hospitals={mockHospitals} onExplore={() => {}} />);
-    expect(screen.getByRole("heading", { name: /Ontario.*ER.*Wait Time.*Observatory/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        name: /Ontario.*ER.*Wait Time.*Observatory/i,
+      }),
+    ).toBeInTheDocument();
   });
 
   it("calculates and displays the shortest wait time", () => {
     render(<Hero hospitals={mockHospitals} onExplore={() => {}} />);
-    
+
     // Should show Short Wait Hospital
     expect(screen.getByText("Short Wait Hospital")).toBeInTheDocument();
     expect(screen.getByText("30")).toBeInTheDocument();
-    
+
     // Should not show Long Wait Hospital details in the shortest card
     expect(screen.queryByText("Long Wait Hospital")).not.toBeInTheDocument();
   });
@@ -62,7 +66,7 @@ describe("Hero Component", () => {
   it("calls onExplore when button clicked", () => {
     const onExplore = vi.fn();
     render(<Hero hospitals={mockHospitals} onExplore={onExplore} />);
-    
+
     fireEvent.click(screen.getByText("Explore Hospitals"));
     expect(onExplore).toHaveBeenCalled();
   });

@@ -52,9 +52,13 @@ export function DataQualityCard({ source }: DataQualityCardProps) {
     <div className="bg-card rounded-lg border border-border/50 p-4 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full ${getStatusDot(source.scraper_status)}`} />
+          <span
+            className={`w-2 h-2 rounded-full ${getStatusDot(source.scraper_status)}`}
+          />
           <h3 className="font-semibold text-sm">{source.source_name}</h3>
-          <span className="text-xs text-muted-foreground">({source.province})</span>
+          <span className="text-xs text-muted-foreground">
+            ({source.province})
+          </span>
         </div>
         <span className="text-xs text-muted-foreground">
           {formatAge(source.last_heartbeat_age_minutes)}
@@ -65,7 +69,9 @@ export function DataQualityCard({ source }: DataQualityCardProps) {
         {/* 24h Success Rate */}
         <div className={`rounded-md p-2 ${getRateBg(rate24h)}`}>
           <div className="text-xs text-muted-foreground mb-0.5">24h Rate</div>
-          <div className={`text-lg font-bold tabular-nums ${getRateColor(rate24h)}`}>
+          <div
+            className={`text-lg font-bold tabular-nums ${getRateColor(rate24h)}`}
+          >
             {(rate24h * 100).toFixed(1)}%
           </div>
         </div>
@@ -73,7 +79,9 @@ export function DataQualityCard({ source }: DataQualityCardProps) {
         {/* 7d Success Rate */}
         <div className={`rounded-md p-2 ${getRateBg(rate7d)}`}>
           <div className="text-xs text-muted-foreground mb-0.5">7d Rate</div>
-          <div className={`text-lg font-bold tabular-nums ${getRateColor(rate7d)}`}>
+          <div
+            className={`text-lg font-bold tabular-nums ${getRateColor(rate7d)}`}
+          >
             {(rate7d * 100).toFixed(1)}%
           </div>
         </div>
@@ -81,7 +89,8 @@ export function DataQualityCard({ source }: DataQualityCardProps) {
 
       <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
         <span>
-          {source.hospitals_reporting}/{source.total_hospitals} hospitals reporting
+          {source.hospitals_reporting}/{source.total_hospitals} hospitals
+          reporting
         </span>
       </div>
     </div>

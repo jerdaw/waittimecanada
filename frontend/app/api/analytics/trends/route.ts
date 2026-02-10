@@ -33,7 +33,9 @@ const LOOKBACK_TO_MONTHS: Record<string, number> = {
   "1y": 12,
 };
 
-function parseLookback(lookback: string | null): { label: string; months: number } | null {
+function parseLookback(
+  lookback: string | null,
+): { label: string; months: number } | null {
   const label = lookback ?? "6m";
   const months = LOOKBACK_TO_MONTHS[label];
   if (!months) return null;
@@ -61,7 +63,9 @@ function computeQuantile(sortedValues: number[], q: number): number {
     return sortedValues[lower];
   }
 
-  return sortedValues[lower] + (sortedValues[upper] - sortedValues[lower]) * fraction;
+  return (
+    sortedValues[lower] + (sortedValues[upper] - sortedValues[lower]) * fraction
+  );
 }
 
 function weightedMean(values: number[], weights: number[]): number {
@@ -70,13 +74,16 @@ function weightedMean(values: number[], weights: number[]): number {
   const totalWeight = weights.reduce((sum, value) => sum + value, 0);
   if (totalWeight <= 0) return 0;
 
-  const weightedSum = values.reduce((sum, value, index) => sum + value * weights[index], 0);
+  const weightedSum = values.reduce(
+    (sum, value, index) => sum + value * weights[index],
+    0,
+  );
   return weightedSum / totalWeight;
 }
 
 function startOfWeekUtc(date: Date): Date {
   const midnight = new Date(
-    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
   );
   const day = midnight.getUTCDay();
   const daysSinceMonday = (day + 6) % 7;
@@ -92,12 +99,17 @@ function periodBucketStart(date: Date, period: PeriodType): Date {
 
 function periodBucketEnd(start: Date, period: PeriodType): Date {
   if (period === "monthly") {
-    return new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 1, 1));
+    return new Date(
+      Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 1, 1),
+    );
   }
   return new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
 }
 
-function classifyDirection(changePercent: number, threshold = 5): TrendDirection {
+function classifyDirection(
+  changePercent: number,
+  threshold = 5,
+): TrendDirection {
   if (changePercent < -threshold) return "improving";
   if (changePercent > threshold) return "worsening";
   return "stable";
@@ -134,7 +146,7 @@ function narrative(
   changePercent: number,
   startMean: number | null,
   endMean: number | null,
-  lookback: string
+  lookback: string,
 ): string {
   const provinceName = provinceLabel(province);
   const lookbackText = lookbackLabel(lookback);
@@ -161,7 +173,7 @@ async function queryAggregateRows(
   sql: ReturnType<typeof getDb>,
   province: string,
   periodType: PeriodType | "daily",
-  lookbackStartIso: string
+  lookbackStartIso: string,
 ): Promise<AggregateRow[]> {
   const rows = await sql`
     SELECT
@@ -193,7 +205,10 @@ async function queryAggregateRows(
   }));
 }
 
-function rollupDailyRows(dailyRows: AggregateRow[], targetPeriod: PeriodType): AggregateRow[] {
+function rollupDailyRows(
+  dailyRows: AggregateRow[],
+  targetPeriod: PeriodType,
+): AggregateRow[] {
   const grouped = new Map<
     string,
     {
@@ -282,8 +297,12 @@ function buildTrendPoints(rows: AggregateRow[]): TrendPoint[] {
         province_p90: Number(provinceP90.toFixed(1)),
         hospitals_reporting: periodRows.length,
         total_measurements: sampleCounts.reduce((sum, value) => sum + value, 0),
-        range_min: Number(Math.min(...periodRows.map((row) => row.min_value)).toFixed(1)),
-        range_max: Number(Math.max(...periodRows.map((row) => row.max_value)).toFixed(1)),
+        range_min: Number(
+          Math.min(...periodRows.map((row) => row.min_value)).toFixed(1),
+        ),
+        range_max: Number(
+          Math.max(...periodRows.map((row) => row.max_value)).toFixed(1),
+        ),
       };
     });
 }
@@ -301,7 +320,7 @@ export async function GET(request: Request) {
           error: "Missing required parameter",
           message: "Query parameter 'province' is required",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -313,7 +332,7 @@ export async function GET(request: Request) {
           error: "Invalid period",
           message: "Supported period values: weekly, monthly",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -325,14 +344,14 @@ export async function GET(request: Request) {
           error: "Invalid lookback",
           message: "Supported lookback values: 3m, 6m, 1y",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const normalizedProvince = province.toUpperCase();
     const now = new Date();
     const lookbackStart = new Date(
-      now.getTime() - lookbackConfig.months * 31 * 24 * 60 * 60 * 1000
+      now.getTime() - lookbackConfig.months * 31 * 24 * 60 * 60 * 1000,
     );
 
     const lookbackStartIso = lookbackStart.toISOString();
@@ -340,12 +359,17 @@ export async function GET(request: Request) {
       sql,
       normalizedProvince,
       period,
-      lookbackStartIso
+      lookbackStartIso,
     );
     let fallbackSource: "none" | "daily_rollup" = "none";
 
     if (aggregateRows.length === 0) {
-      const dailyRows = await queryAggregateRows(sql, normalizedProvince, "daily", lookbackStartIso);
+      const dailyRows = await queryAggregateRows(
+        sql,
+        normalizedProvince,
+        "daily",
+        lookbackStartIso,
+      );
       if (dailyRows.length > 0) {
         aggregateRows = rollupDailyRows(dailyRows, period);
         fallbackSource = "daily_rollup";
@@ -354,12 +378,18 @@ export async function GET(request: Request) {
 
     const dataPoints = buildTrendPoints(aggregateRows);
 
-    const startMean = dataPoints.length > 0 ? dataPoints[0].province_mean : null;
-    const endMean = dataPoints.length > 0 ? dataPoints[dataPoints.length - 1].province_mean : null;
+    const startMean =
+      dataPoints.length > 0 ? dataPoints[0].province_mean : null;
+    const endMean =
+      dataPoints.length > 0
+        ? dataPoints[dataPoints.length - 1].province_mean
+        : null;
 
     let changePercent = 0;
     if (startMean !== null && endMean !== null && startMean > 0) {
-      changePercent = Number((((endMean - startMean) / startMean) * 100).toFixed(1));
+      changePercent = Number(
+        (((endMean - startMean) / startMean) * 100).toFixed(1),
+      );
     }
 
     const direction = classifyDirection(changePercent);
@@ -372,7 +402,8 @@ export async function GET(request: Request) {
           period,
           lookback: lookbackConfig.label,
           generated_at: now.toISOString(),
-          data_source: fallbackSource === "none" ? "precomputed" : "derived_from_daily",
+          data_source:
+            fallbackSource === "none" ? "precomputed" : "derived_from_daily",
           fallback_used: fallbackSource !== "none",
           data_points: dataPoints,
           trend_summary: {
@@ -386,12 +417,12 @@ export async function GET(request: Request) {
               changePercent,
               startMean,
               endMean,
-              lookbackConfig.label
+              lookbackConfig.label,
             ),
           },
         },
       },
-      { headers: publicCacheHeaders(300, 900) }
+      { headers: publicCacheHeaders(300, 900) },
     );
   } catch (error) {
     console.error("Failed to compute system trends:", error);
@@ -401,7 +432,7 @@ export async function GET(request: Request) {
         error: "Failed to compute system trends",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

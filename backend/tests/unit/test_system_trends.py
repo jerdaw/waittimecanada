@@ -36,6 +36,10 @@ class TestSystemTrendService:
                     "min_value": 60.0,
                     "max_value": 180.0,
                     "sample_count": 200,
+                    "metric_family": "wait_time",
+                    "start_event": "triage",
+                    "end_event": "nurse_seen",
+                    "statistic_type": "mean",
                 },
                 {
                     "hospital_id": "h2",
@@ -45,6 +49,10 @@ class TestSystemTrendService:
                     "min_value": 80.0,
                     "max_value": 220.0,
                     "sample_count": 100,
+                    "metric_family": "wait_time",
+                    "start_event": "triage",
+                    "end_event": "nurse_seen",
+                    "statistic_type": "mean",
                 },
                 {
                     "hospital_id": "h1",
@@ -54,6 +62,10 @@ class TestSystemTrendService:
                     "min_value": 70.0,
                     "max_value": 200.0,
                     "sample_count": 210,
+                    "metric_family": "wait_time",
+                    "start_event": "triage",
+                    "end_event": "nurse_seen",
+                    "statistic_type": "mean",
                 },
                 {
                     "hospital_id": "h2",
@@ -63,6 +75,10 @@ class TestSystemTrendService:
                     "min_value": 90.0,
                     "max_value": 240.0,
                     "sample_count": 110,
+                    "metric_family": "wait_time",
+                    "start_event": "triage",
+                    "end_event": "nurse_seen",
+                    "statistic_type": "mean",
                 },
             ]
         )

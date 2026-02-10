@@ -80,7 +80,7 @@ else
 fi
 
 echo
-echo "[3/3] Checking repository-relative markdown links..."
+echo "[3/4] Checking repository-relative markdown links..."
 while IFS= read -r file; do
   file_dir="$(dirname "${file}")"
 
@@ -118,6 +118,15 @@ while IFS= read -r file; do
     fi
   done < <(perl -nE 'while(/\[[^\]]+\]\(([^)]+)\)/g){ say $1 }' "${file}")
 done < <(printf "%s\n" "${md_files[@]}")
+
+echo
+echo "[4/4] Checking roadmap consistency..."
+if python3 backend/scripts/verify_roadmap_consistency.py; then
+  echo "OK: roadmap consistency checks passed."
+else
+  echo "Roadmap consistency check failed."
+  failures=1
+fi
 
 if [[ "${failures}" -ne 0 ]]; then
   echo

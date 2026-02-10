@@ -34,7 +34,7 @@ describe("RegionDashboard", () => {
             quartile: 1,
           },
         ]}
-      />
+      />,
     );
 
     expect(screen.getByText("Regional Intelligence")).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe("RegionDashboard", () => {
             quartile: 2,
           },
         ]}
-      />
+      />,
     );
 
     fireEvent.click(screen.getByText("East Health Region"));
@@ -92,9 +92,11 @@ describe("RegionDashboard", () => {
         onSelectRegion={() => {}}
         regions={[]}
         loading
-      />
+      />,
     );
 
-    expect(screen.getByText("Loading regional analytics...")).toBeInTheDocument();
+    expect(
+      screen.getByText("Loading regional analytics..."),
+    ).toBeInTheDocument();
   });
 });

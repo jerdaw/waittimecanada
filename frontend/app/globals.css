@@ -14,26 +14,29 @@
   --muted: #f4f4f5;
   --muted-foreground: #71717a;
   --border: #e4e4e7;
-  
+
   /* Accent colors */
   --accent: #06b6d4;
   --accent-foreground: #ffffff;
   --accent-glow: rgba(6, 182, 212, 0.15);
-  
+
   /* Status colors */
   --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
-  
+
   /* Enhanced shadows */
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
   --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.15);
   --shadow-glow-accent: 0 0 20px rgba(6, 182, 212, 0.2);
-  
+
   /* Radii */
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
@@ -54,17 +57,20 @@
   --muted: #27272a;
   --muted-foreground: #a1a1aa;
   --border: #27272a;
-  
+
   /* Dark mode accents */
   --accent: #22d3ee;
   --accent-glow: rgba(34, 211, 238, 0.15);
-  
+
   /* Dark mode shadows */
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.35), 0 10px 10px -5px rgba(0, 0, 0, 0.15);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.35), 0 10px 10px -5px rgba(0, 0, 0, 0.15);
   --shadow-glow: 0 0 30px rgba(59, 130, 246, 0.25);
   --shadow-glow-accent: 0 0 30px rgba(34, 211, 238, 0.25);
 }
@@ -72,7 +78,13 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    var(--font-inter),
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -86,8 +98,13 @@ body {
 }
 
 /* Override transition for elements that shouldn't animate */
-button, a, input, select, textarea {
-  transition-property: background-color, border-color, color, box-shadow, transform, opacity;
+button,
+a,
+input,
+select,
+textarea {
+  transition-property:
+    background-color, border-color, color, box-shadow, transform, opacity;
 }
 
 /* Custom scrollbar */

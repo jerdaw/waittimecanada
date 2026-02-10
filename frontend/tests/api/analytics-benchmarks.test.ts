@@ -51,7 +51,7 @@ describe("Benchmarks API", () => {
     ]);
 
     const request = new Request(
-      "http://localhost/api/analytics/benchmarks?province=ON&period=7d"
+      "http://localhost/api/analytics/benchmarks?province=ON&period=7d",
     );
     const response = await GET(request);
     const json = await response.json();
@@ -83,7 +83,7 @@ describe("Benchmarks API", () => {
     ]);
 
     const request = new Request(
-      "http://localhost/api/analytics/benchmarks?province=ON&hospital_id=missing"
+      "http://localhost/api/analytics/benchmarks?province=ON&hospital_id=missing",
     );
     const response = await GET(request);
     const json = await response.json();
@@ -96,7 +96,9 @@ describe("Benchmarks API", () => {
   it("handles database failures", async () => {
     mockSql.mockRejectedValue(new Error("DB failed"));
 
-    const request = new Request("http://localhost/api/analytics/benchmarks?province=ON");
+    const request = new Request(
+      "http://localhost/api/analytics/benchmarks?province=ON",
+    );
     const response = await GET(request);
     const json = await response.json();
 

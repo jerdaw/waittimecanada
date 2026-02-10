@@ -119,8 +119,7 @@ waittime-canada/
 │   │   │   ├── services/             # Business logic
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── heartbeat.py
-│   │   │   │   ├── comparability.py  # Auto-researcher logic
-│   │   │   │   └── verification.py   # Verification queue
+│   │   │   │   └── comparability.py  # Auto-researcher logic
 │   │   │   └── cli/                  # CLI commands
 │   │   │       ├── __init__.py
 │   │   │       ├── scrape.py         # Scraping commands

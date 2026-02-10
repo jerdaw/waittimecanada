@@ -42,11 +42,16 @@ const EQUITY_FILL_LAYER: LayerProps = {
     "fill-color": [
       "match",
       ["get", "income_quintile"],
-      1, EQUITY_QUINTILE_COLORS[1],
-      2, EQUITY_QUINTILE_COLORS[2],
-      3, EQUITY_QUINTILE_COLORS[3],
-      4, EQUITY_QUINTILE_COLORS[4],
-      5, EQUITY_QUINTILE_COLORS[5],
+      1,
+      EQUITY_QUINTILE_COLORS[1],
+      2,
+      EQUITY_QUINTILE_COLORS[2],
+      3,
+      EQUITY_QUINTILE_COLORS[3],
+      4,
+      EQUITY_QUINTILE_COLORS[4],
+      5,
+      EQUITY_QUINTILE_COLORS[5],
       "#CBD5E1",
     ] as any,
     "fill-opacity": 0.24,
@@ -171,8 +176,18 @@ function HospitalMarker({
       {/* Checkmark for comparison selection */}
       {isSelectedForComparison && (
         <div className="absolute -top-2 -right-2 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center border-2 border-white shadow-lg z-10">
-          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          <svg
+            className="w-3 h-3 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={3}
+              d="M5 13l4 4L19 7"
+            />
           </svg>
         </div>
       )}
@@ -287,18 +302,12 @@ function HospitalPopup({
           {hasData ? (
             <div className="text-center">
               <div className="flex items-baseline justify-center gap-1">
-                <span
-                  className="text-3xl font-bold"
-                  style={{ color }}
-                >
+                <span className="text-3xl font-bold" style={{ color }}>
                   {Math.round(hospital.current_wait_time!)}
                 </span>
                 <span className="text-lg font-medium text-slate-500">min</span>
               </div>
-              <div
-                className="text-sm font-medium mt-1"
-                style={{ color }}
-              >
+              <div className="text-sm font-medium mt-1" style={{ color }}>
                 {status}
               </div>
             </div>
@@ -311,9 +320,9 @@ function HospitalPopup({
 
         {/* Trend Chart (only if we have an ID) */}
         {hospital.id && (
-           <div className="px-4 mb-3">
-             <TrendChart hospitalId={hospital.id} />
-           </div>
+          <div className="px-4 mb-3">
+            <TrendChart hospitalId={hospital.id} />
+          </div>
         )}
 
         <div className="px-4 mb-3">
@@ -365,14 +374,22 @@ function HospitalPopup({
                   <span className="font-medium">Need medical advice?</span>
                 </div>
                 <div className="text-xs text-slate-900">
-                  Call <span className="font-semibold">{hospital.telehealth_name}</span>
+                  Call{" "}
+                  <span className="font-semibold">
+                    {hospital.telehealth_name}
+                  </span>
                 </div>
                 <a
                   href={`tel:${hospital.telehealth_number}`}
                   className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700 mt-1"
                 >
                   {hospital.telehealth_number}
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    className="w-3 h-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -388,27 +405,47 @@ function HospitalPopup({
 
         {/* Quick Actions */}
         <div className="px-4 pb-3 border-t border-slate-100 pt-3 grid grid-cols-2 gap-2">
-            <a 
-              href={`https://www.google.com/maps/dir/?api=1&destination=${hospital.latitude},${hospital.longitude}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col items-center justify-center gap-1 p-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors group"
+          <a
+            href={`https://www.google.com/maps/dir/?api=1&destination=${hospital.latitude},${hospital.longitude}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center justify-center gap-1 p-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors group"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0121 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7m0 0a2 2 0 012-2h.01M9 17v5a2 2 0 01-2-2h.01M9 17H5" />
-              </svg>
-              <span className="text-[10px] font-semibold">Directions</span>
-            </a>
-            
-            <a 
-              href={`tel:${hospital.telehealth_number?.replace(/\D/g, '') || '811'}`}
-              className="flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-lg transition-colors"
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0121 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7m0 0a2 2 0 012-2h.01M9 17v5a2 2 0 01-2-2h.01M9 17H5"
+              />
+            </svg>
+            <span className="text-[10px] font-semibold">Directions</span>
+          </a>
+
+          <a
+            href={`tel:${hospital.telehealth_number?.replace(/\D/g, "") || "811"}`}
+            className="flex flex-col items-center justify-center gap-1 p-2 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-lg transition-colors"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              <span className="text-[10px] font-semibold">Call Health Info</span>
-            </a>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+              />
+            </svg>
+            <span className="text-[10px] font-semibold">Call Health Info</span>
+          </a>
         </div>
 
         {/* Footer */}
@@ -447,7 +484,9 @@ function DataFreshnessIndicator({
         className={`w-2 h-2 rounded-full ${isStale ? "bg-amber-500 animate-pulse" : "bg-emerald-500"}`}
       />
       <span>
-        {isStale ? "Data may be stale" : `Updated ${formatRelativeTime(lastUpdate ?? undefined)}`}
+        {isStale
+          ? "Data may be stale"
+          : `Updated ${formatRelativeTime(lastUpdate ?? undefined)}`}
       </span>
     </div>
   );
@@ -600,44 +639,56 @@ export default function Map({
 }: MapProps) {
   // Comparison mode state
   const [comparisonMode, setComparisonMode] = useState(false);
-  const [selectedForComparison, setSelectedForComparison] = useState<Hospital[]>([]);
+  const [selectedForComparison, setSelectedForComparison] = useState<
+    Hospital[]
+  >([]);
   const [showComparisonModal, setShowComparisonModal] = useState(false);
   const [showEquityLayer, setShowEquityLayer] = useState(false);
-  const [equityStatus, setEquityStatus] = useState<"idle" | "loading" | "ready" | "unavailable" | "error">("idle");
+  const [equityStatus, setEquityStatus] = useState<
+    "idle" | "loading" | "ready" | "unavailable" | "error"
+  >("idle");
   const [equityError, setEquityError] = useState<string | null>(null);
-  const [equityDataByProvince, setEquityDataByProvince] = useState<Record<string, EquityFeatureCollection>>({});
-  const [equityMetadataByProvince, setEquityMetadataByProvince] = useState<Record<string, EquityLayerMetadata>>({});
+  const [equityDataByProvince, setEquityDataByProvince] = useState<
+    Record<string, EquityFeatureCollection>
+  >({});
+  const [equityMetadataByProvince, setEquityMetadataByProvince] = useState<
+    Record<string, EquityLayerMetadata>
+  >({});
 
   const normalizedProvince = province.toUpperCase();
   const activeEquityData = equityDataByProvince[normalizedProvince] ?? null;
-  const activeEquityMetadata = equityMetadataByProvince[normalizedProvince] ?? null;
+  const activeEquityMetadata =
+    equityMetadataByProvince[normalizedProvince] ?? null;
 
   // Find selected hospital object
   const selectedHospital = useMemo(
     () => hospitals.find((h) => h.id === selectedId) || null,
-    [hospitals, selectedId]
+    [hospitals, selectedId],
   );
 
   // Handle marker click
-  const handleMarkerClick = useCallback((hospital: Hospital) => {
-    if (comparisonMode) {
-      // In comparison mode, toggle selection
-      setSelectedForComparison((prev) => {
-        const isSelected = prev.some((h) => h.id === hospital.id);
-        if (isSelected) {
-          return prev.filter((h) => h.id !== hospital.id);
-        }
-        if (prev.length >= 2) {
-          // Max 2 hospitals for comparison
-          return prev;
-        }
-        return [...prev, hospital];
-      });
-    } else {
-      // Normal mode - trigger parent select
-      onSelect(hospital.id);
-    }
-  }, [comparisonMode, onSelect]);
+  const handleMarkerClick = useCallback(
+    (hospital: Hospital) => {
+      if (comparisonMode) {
+        // In comparison mode, toggle selection
+        setSelectedForComparison((prev) => {
+          const isSelected = prev.some((h) => h.id === hospital.id);
+          if (isSelected) {
+            return prev.filter((h) => h.id !== hospital.id);
+          }
+          if (prev.length >= 2) {
+            // Max 2 hospitals for comparison
+            return prev;
+          }
+          return [...prev, hospital];
+        });
+      } else {
+        // Normal mode - trigger parent select
+        onSelect(hospital.id);
+      }
+    },
+    [comparisonMode, onSelect],
+  );
 
   // Close popup
   const handleClosePopup = useCallback(() => {
@@ -710,13 +761,16 @@ export default function Map({
       setEquityError(null);
 
       try {
-        const response = await fetch(`/api/equity-layer?province=${normalizedProvince}`);
+        const response = await fetch(
+          `/api/equity-layer?province=${normalizedProvince}`,
+        );
         const payload = (await response.json()) as EquityLayerApiResponse;
 
         if (!response.ok || !payload.success) {
           if (cancelled) return;
 
-          const errorMessage = "error" in payload ? payload.error : "Failed to load equity layer";
+          const errorMessage =
+            "error" in payload ? payload.error : "Failed to load equity layer";
           setEquityError(errorMessage);
           setEquityStatus(response.status === 404 ? "unavailable" : "error");
           return;
@@ -765,16 +819,24 @@ export default function Map({
       >
         <NavigationControl position="bottom-right" showCompass={false} />
 
-        {showEquityLayer && activeEquityData && activeEquityData.features.length > 0 && (
-          <Source id={`equity-${normalizedProvince}`} type="geojson" data={activeEquityData as any}>
-            <Layer {...EQUITY_FILL_LAYER} />
-            <Layer {...EQUITY_OUTLINE_LAYER} />
-          </Source>
-        )}
+        {showEquityLayer &&
+          activeEquityData &&
+          activeEquityData.features.length > 0 && (
+            <Source
+              id={`equity-${normalizedProvince}`}
+              type="geojson"
+              data={activeEquityData as any}
+            >
+              <Layer {...EQUITY_FILL_LAYER} />
+              <Layer {...EQUITY_OUTLINE_LAYER} />
+            </Source>
+          )}
 
         {/* Hospital markers */}
         {hospitals.map((hospital) => {
-          const isSelectedForComp = selectedForComparison.some((h) => h.id === hospital.id);
+          const isSelectedForComp = selectedForComparison.some(
+            (h) => h.id === hospital.id,
+          );
           return (
             <Marker
               key={hospital.id}
@@ -797,7 +859,10 @@ export default function Map({
 
         {/* Selected hospital popup */}
         {selectedHospital && !comparisonMode && (
-          <HospitalPopup hospital={selectedHospital} onClose={handleClosePopup} />
+          <HospitalPopup
+            hospital={selectedHospital}
+            onClose={handleClosePopup}
+          />
         )}
       </MapGL>
 
@@ -806,20 +871,29 @@ export default function Map({
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
           <div className="bg-white rounded-xl shadow-lg border-2 border-blue-200 p-4 min-w-80">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-slate-900">
-                Comparison Mode
-              </h3>
+              <h3 className="font-semibold text-slate-900">Comparison Mode</h3>
               <button
                 onClick={toggleComparisonMode}
                 className="text-slate-400 hover:text-slate-600"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
             <p className="text-sm text-slate-600 mb-3">
-              Select 2 hospitals to compare ({selectedForComparison.length}/2 selected)
+              Select 2 hospitals to compare ({selectedForComparison.length}/2
+              selected)
             </p>
             {selectedForComparison.length > 0 && (
               <div className="space-y-2 mb-3">
@@ -837,11 +911,25 @@ export default function Map({
                       </span>
                     </div>
                     <button
-                      onClick={() => setSelectedForComparison(prev => prev.filter(h => h.id !== hospital.id))}
+                      onClick={() =>
+                        setSelectedForComparison((prev) =>
+                          prev.filter((h) => h.id !== hospital.id),
+                        )
+                      }
                       className="text-slate-400 hover:text-slate-600"
                     >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -883,11 +971,12 @@ export default function Map({
           loading={equityStatus === "loading"}
           onChange={setShowEquityLayer}
         />
-        {showEquityLayer && (equityStatus === "unavailable" || equityStatus === "error") && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50/95 px-3 py-2 text-xs text-amber-800 shadow-sm">
-            {equityError ?? "Equity layer is unavailable for this province."}
-          </div>
-        )}
+        {showEquityLayer &&
+          (equityStatus === "unavailable" || equityStatus === "error") && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50/95 px-3 py-2 text-xs text-amber-800 shadow-sm">
+              {equityError ?? "Equity layer is unavailable for this province."}
+            </div>
+          )}
       </div>
 
       <div className="absolute top-4 right-4 z-10">
@@ -895,9 +984,11 @@ export default function Map({
       </div>
 
       <div className="absolute bottom-8 left-4 z-10 flex flex-col gap-3">
-        {showEquityLayer && activeEquityData && activeEquityData.features.length > 0 && (
-          <EquityLegend metadata={activeEquityMetadata ?? undefined} />
-        )}
+        {showEquityLayer &&
+          activeEquityData &&
+          activeEquityData.features.length > 0 && (
+            <EquityLegend metadata={activeEquityMetadata ?? undefined} />
+          )}
         <MapLegend />
       </div>
 
@@ -909,8 +1000,18 @@ export default function Map({
               onClick={toggleComparisonMode}
               className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition-all shadow-sm flex items-center gap-2"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
               </svg>
               Compare Hospitals
             </button>

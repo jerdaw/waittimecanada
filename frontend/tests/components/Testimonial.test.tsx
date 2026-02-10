@@ -8,7 +8,8 @@ describe("Testimonial", () => {
   it("renders a role-only attribution with context", () => {
     const testimonial: StakeholderTestimonial = {
       id: "t-1",
-      quote: "The warning helps clarify that the numbers are not directly comparable.",
+      quote:
+        "The warning helps clarify that the numbers are not directly comparable.",
       role: "ER Nurse",
       organization: "Toronto General Hospital",
       province: "ON",
@@ -21,13 +22,16 @@ describe("Testimonial", () => {
     expect(screen.getByText(/Stakeholder Feedback/i)).toBeInTheDocument();
     expect(screen.getByText(/The warning helps clarify/i)).toBeInTheDocument();
     expect(screen.getByText("ER Nurse")).toBeInTheDocument();
-    expect(screen.getByText("Toronto General Hospital - ON")).toBeInTheDocument();
+    expect(
+      screen.getByText("Toronto General Hospital - ON"),
+    ).toBeInTheDocument();
   });
 
   it("renders named attribution when approved", () => {
     const testimonial: StakeholderTestimonial = {
       id: "t-2",
-      quote: "Methodology context should always be shown beside wait-time values.",
+      quote:
+        "Methodology context should always be shown beside wait-time values.",
       role: "Emergency Physician",
       displayName: "Dr. Jane Doe",
       attribution: "named",
@@ -36,13 +40,16 @@ describe("Testimonial", () => {
 
     render(<Testimonial testimonial={testimonial} />);
 
-    expect(screen.getByText("Dr. Jane Doe, Emergency Physician")).toBeInTheDocument();
+    expect(
+      screen.getByText("Dr. Jane Doe, Emergency Physician"),
+    ).toBeInTheDocument();
   });
 
   it("renders anonymous attribution safely", () => {
     const testimonial: StakeholderTestimonial = {
       id: "t-3",
-      quote: "Patients often do not realize the measurement definitions are different.",
+      quote:
+        "Patients often do not realize the measurement definitions are different.",
       role: "ER Clinician",
       attribution: "anonymous",
       published: true,

@@ -87,7 +87,7 @@ export async function GET(request: Request) {
         count: hospitals.length,
         data: hospitals,
       },
-      { headers: publicCacheHeaders(300, 900) }
+      { headers: publicCacheHeaders(300, 900) },
     );
   } catch (error) {
     console.error("Failed to fetch hospitals:", error);
@@ -97,7 +97,7 @@ export async function GET(request: Request) {
         error: "Failed to fetch hospitals",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

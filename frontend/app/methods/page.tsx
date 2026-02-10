@@ -2,6 +2,7 @@ import { ComparabilityMatrix } from "@/components/methods/ComparabilityMatrix";
 import { ProvinceMethodologyCard } from "@/components/methods/ProvinceMethodologyCard";
 import { OntologyExplainer } from "@/components/methods/OntologyExplainer";
 import { FAQ } from "@/components/methods/FAQ";
+import { MethodologyTimeline } from "@/components/methods/MethodologyTimeline";
 import { DataExport } from "@/components/DataExport";
 import { getDb } from "@/utils/db";
 
@@ -94,8 +95,9 @@ export default async function MethodsPage() {
                 Understanding Wait Time Metrics
               </h1>
               <p className="text-lg text-slate-600 max-w-3xl">
-                Canadian provinces measure emergency department wait times using different
-                methodologies. Direct comparison requires understanding these differences.
+                Canadian provinces measure emergency department wait times using
+                different methodologies. Direct comparison requires
+                understanding these differences.
               </p>
             </div>
           </div>
@@ -112,8 +114,8 @@ export default async function MethodsPage() {
                 Provincial Comparability Matrix
               </h2>
               <p className="text-slate-600 leading-relaxed max-w-3xl">
-                This matrix shows which provinces can be directly compared. Click any cell
-                to see detailed methodology differences.
+                This matrix shows which provinces can be directly compared.
+                Click any cell to see detailed methodology differences.
               </p>
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
@@ -128,8 +130,8 @@ export default async function MethodsPage() {
                 Provincial Methodologies
               </h2>
               <p className="text-slate-600 leading-relaxed max-w-3xl">
-                Each province has chosen different measurement approaches based on their
-                health system priorities and data infrastructure.
+                Each province has chosen different measurement approaches based
+                on their health system priorities and data infrastructure.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -139,30 +141,47 @@ export default async function MethodsPage() {
             </div>
           </section>
 
-          {/* Section 3: Ontology Explainer */}
+          {/* Section 3: Methodology Timeline */}
+          <section>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-slate-900 mb-3">
+                Methodology Change History
+              </h2>
+              <p className="text-slate-600 leading-relaxed max-w-3xl">
+                This timeline shows detected changes in how provinces calculate
+                wait times. Our system monitors for distributional shifts that
+                may indicate methodology updates.
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+              <MethodologyTimeline sources={sources} />
+            </div>
+          </section>
+
+          {/* Section 4: Ontology Explainer */}
           <section>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
               <OntologyExplainer />
             </div>
           </section>
 
-          {/* Section 4: FAQ */}
+          {/* Section 5: FAQ */}
           <section>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
               <FAQ />
             </div>
           </section>
 
-          {/* Section 5: Data for Researchers */}
+          {/* Section 6: Data for Researchers */}
           <section>
             <div className="mb-8">
               <h2 className="text-3xl font-bold text-slate-900 mb-3">
                 Data for Researchers
               </h2>
               <p className="text-slate-600 leading-relaxed max-w-3xl">
-                Download wait time data with full methodology tags for research use.
-                All exports include our metric ontology columns to ensure proper
-                attribution and comparability analysis.
+                Download wait time data with full methodology tags for research
+                use. All exports include our metric ontology columns to ensure
+                proper attribution and comparability analysis.
               </p>
             </div>
             <DataExport />
@@ -175,8 +194,8 @@ export default async function MethodsPage() {
                 Ready to explore wait times?
               </h3>
               <p className="text-blue-100 mb-6 max-w-md">
-                Now that you understand how measurements differ, browse the interactive
-                map with confidence.
+                Now that you understand how measurements differ, browse the
+                interactive map with confidence.
               </p>
               <a
                 href="/"
@@ -206,12 +225,8 @@ export default async function MethodsPage() {
       <footer className="border-t border-slate-200 bg-white mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between text-sm text-slate-500">
-            <span>
-              WaitTime Canada - A Health Systems Observatory
-            </span>
-            <span>
-              Last updated: {new Date().toLocaleDateString()}
-            </span>
+            <span>WaitTime Canada - A Health Systems Observatory</span>
+            <span>Last updated: {new Date().toLocaleDateString()}</span>
           </div>
         </div>
       </footer>

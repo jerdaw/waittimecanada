@@ -1,0 +1,13 @@
+{
+  "id": "bc-phsa",
+  "name": "Provincial Health Services Authority",
+  "province": "BC",
+  "url": "https://edwaittimes.ca",
+  "methodology_url": "https://www.edwaittimes.ca/about",
+  "telehealth_number": "811",
+  "telehealth_name": "HealthLink BC",
+  "default_metric_family": "TIME_TO_PROVIDER",
+  "default_start_event": "TRIAGE",
+  "default_end_event": "PHYSICIAN",
+  "default_statistic_type": "P90"
+}

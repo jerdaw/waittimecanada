@@ -40,7 +40,7 @@ def generate_measurement_for_hospital(hospital_id: str, source_id: str) -> Measu
     """
     # Generate realistic wait time values (in minutes)
     # P90 times typically range from 60-300 minutes
-    value = random.randint(60, 300)  # noqa: S311
+    value = random.randint(60, 300)  # nosec B311 - Using random for test data (not cryptographic)
 
     # Create synthetic payload
     payload = f"{{hospital_id: {hospital_id}, value: {value}, timestamp: {datetime.now(UTC)}}}"

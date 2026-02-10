@@ -38,7 +38,8 @@ def main() -> None:
         sources = [args.source]
     else:
         # Check all known sources
-        sources = ["ontario-health", "quebec-msss"]
+        all_sources = db.list_sources()
+        sources = [s.id for s in all_sources]
 
     all_healthy = True
 

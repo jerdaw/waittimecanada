@@ -79,7 +79,7 @@ describe("AnomalyFeed", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("No anomalies detected in the last 7 days")
+        screen.getByText("No anomalies detected in the last 7 days"),
       ).toBeInTheDocument();
     });
   });

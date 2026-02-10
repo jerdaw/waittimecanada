@@ -9,11 +9,30 @@ import { Hospital } from "@/app/api/hospitals/route";
 
 // Mock MapboxGL
 vi.mock("react-map-gl", () => ({
-  default: ({ children, onClick }: { children: React.ReactNode, onClick: () => void }) => (
-    <div data-testid="mapbox-map" onClick={onClick}>{children}</div>
+  default: ({
+    children,
+    onClick,
+  }: {
+    children: React.ReactNode;
+    onClick: () => void;
+  }) => (
+    <div data-testid="mapbox-map" onClick={onClick}>
+      {children}
+    </div>
   ),
-  Marker: ({ children, onClick }: { children: React.ReactNode, onClick: (e: any) => void }) => (
-    <div data-testid="map-marker" onClick={(e) => onClick({ originalEvent: { stopPropagation: () => {} } })}>{children}</div>
+  Marker: ({
+    children,
+    onClick,
+  }: {
+    children: React.ReactNode;
+    onClick: (e: any) => void;
+  }) => (
+    <div
+      data-testid="map-marker"
+      onClick={(e) => onClick({ originalEvent: { stopPropagation: () => {} } })}
+    >
+      {children}
+    </div>
   ),
   Popup: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="map-popup">{children}</div>
@@ -37,7 +56,9 @@ vi.mock("@/components/TrendChart", () => ({
 }));
 
 vi.mock("@/components/BenchmarkCard", () => ({
-  BenchmarkCard: () => <div data-testid="benchmark-card">Benchmark Card Mock</div>,
+  BenchmarkCard: () => (
+    <div data-testid="benchmark-card">Benchmark Card Mock</div>
+  ),
 }));
 
 describe("Map Component", () => {
@@ -56,7 +77,15 @@ describe("Map Component", () => {
               id: "test-tract",
               geometry: {
                 type: "Polygon",
-                coordinates: [[[-79.5, 43.6], [-79.4, 43.6], [-79.4, 43.7], [-79.5, 43.7], [-79.5, 43.6]]],
+                coordinates: [
+                  [
+                    [-79.5, 43.6],
+                    [-79.4, 43.6],
+                    [-79.4, 43.7],
+                    [-79.5, 43.7],
+                    [-79.5, 43.6],
+                  ],
+                ],
               },
               properties: {
                 tract_id: "test-tract",
@@ -132,22 +161,32 @@ describe("Map Component", () => {
 
   it("calls onSelect when marker is clicked", () => {
     const onSelect = vi.fn();
-    render(<Map {...defaultProps} hospitals={mockHospitals} onSelect={onSelect} />);
-    
+    render(
+      <Map {...defaultProps} hospitals={mockHospitals} onSelect={onSelect} />,
+    );
+
     fireEvent.click(screen.getByTestId("map-marker"));
     expect(onSelect).toHaveBeenCalledWith("test-hospital");
   });
 
   it("calls onSelect(null) when map background is clicked", () => {
     const onSelect = vi.fn();
-    render(<Map {...defaultProps} hospitals={mockHospitals} onSelect={onSelect} />);
-    
+    render(
+      <Map {...defaultProps} hospitals={mockHospitals} onSelect={onSelect} />,
+    );
+
     fireEvent.click(screen.getByTestId("mapbox-map"));
     expect(onSelect).toHaveBeenCalledWith(null);
   });
 
   it("shows popup when hospital is selected", () => {
-    render(<Map {...defaultProps} hospitals={mockHospitals} selectedId="test-hospital" />);
+    render(
+      <Map
+        {...defaultProps}
+        hospitals={mockHospitals}
+        selectedId="test-hospital"
+      />,
+    );
     expect(screen.getByTestId("map-popup")).toBeInTheDocument();
     expect(screen.getByText("Test Hospital")).toBeInTheDocument();
   });
@@ -163,8 +202,14 @@ describe("Map Component", () => {
       ...mockHospitals[0],
       telehealth_number: "123-456-7890",
     };
-    render(<Map {...defaultProps} hospitals={[hospitalWithInfo]} selectedId="test-hospital" />);
-    
+    render(
+      <Map
+        {...defaultProps}
+        hospitals={[hospitalWithInfo]}
+        selectedId="test-hospital"
+      />,
+    );
+
     expect(screen.getByText("Directions")).toBeInTheDocument();
     // Website button removed
     expect(screen.getByText("Call Health Info")).toBeInTheDocument();
@@ -173,10 +218,14 @@ describe("Map Component", () => {
   it("loads equity layer when income overlay is enabled", async () => {
     render(<Map {...defaultProps} hospitals={mockHospitals} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Enable income overlay" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Enable income overlay" }),
+    );
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith("/api/equity-layer?province=ON");
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/equity-layer?province=ON",
+      );
     });
     expect(screen.getByText("Income Quintile")).toBeInTheDocument();
   });

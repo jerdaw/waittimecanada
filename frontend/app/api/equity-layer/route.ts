@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import {
-  buildPlaceholderEquityFeatureCollection,
-  type EquityLayerApiResponse,
-} from "@/utils/equity";
+import { promises as fs } from "fs";
+import path from "path";
 import { publicCacheHeaders } from "@/utils/cache";
 
 const SUPPORTED_PROVINCES = new Set(["ON"]);
@@ -12,37 +10,73 @@ function normalizeProvince(province: string | null): string {
 }
 
 export async function GET(request: Request) {
-  const province = normalizeProvince(new URL(request.url).searchParams.get("province"));
+  const province = normalizeProvince(
+    new URL(request.url).searchParams.get("province"),
+  );
 
   if (!SUPPORTED_PROVINCES.has(province)) {
-    const response: EquityLayerApiResponse = {
-      success: false,
-      error: `Equity layer is not scaffolded for province ${province}`,
-      setup_required: true,
-      setup_steps: [
-        "Add census tract boundaries for the province (StatsCan 2021)",
-        "Join tract boundaries to income variables and derive quintiles",
-        "Replace placeholder payload in /api/equity-layer with processed dataset",
-      ],
-    };
-    return NextResponse.json(response, { status: 404 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: `Equity layer is not scaffolded for province ${province}`,
+        setup_required: true,
+      },
+      { status: 404 },
+    );
   }
 
-  const response: EquityLayerApiResponse = {
-    success: true,
-    data: buildPlaceholderEquityFeatureCollection(province),
-    metadata: {
-      province,
-      source: "WaitTime Canada placeholder scaffold",
-      attribution: "Placeholder geometry only; replace with Statistics Canada Census tract data",
-      generated_at: new Date().toISOString(),
-      is_placeholder: true,
-      note: "This layer validates toggle + legend + API plumbing until census integration is complete.",
-    },
-  };
+  try {
+    // Determine path to the GeoJSON layer
+    // In production, this data should be in a known location
+    const dataPath = path.join(
+      process.cwd(),
+      "..",
+      "backend",
+      "data",
+      "layers",
+      "ontario-equity-layer.geojson",
+    );
 
-  return NextResponse.json(response, {
-    status: 200,
-    headers: publicCacheHeaders(3600, 10800),
-  });
+    // Check if file exists
+    try {
+      await fs.access(dataPath);
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Equity layer data not found (run preparation script)",
+          setup_required: true,
+        },
+        { status: 404 },
+      );
+    }
+
+    const fileContents = await fs.readFile(dataPath, "utf-8");
+    const geojson = JSON.parse(fileContents);
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: geojson,
+        metadata: {
+          province,
+          source: "Statistics Canada 2021 Census (Processed)",
+          attribution:
+            "Contains information licensed under the Open Government Licence – Canada.",
+          generated_at: new Date().toISOString(),
+          is_placeholder: false,
+        },
+      },
+      {
+        status: 200,
+        headers: publicCacheHeaders(3600, 86400),
+      },
+    );
+  } catch (error) {
+    console.error("Failed to serve equity layer:", error);
+    return NextResponse.json(
+      { success: false, error: "Internal server error" },
+      { status: 500 },
+    );
+  }
 }

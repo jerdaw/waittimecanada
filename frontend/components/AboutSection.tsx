@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { ChevronDown, ChevronUp, Github, Linkedin, Mail } from 'lucide-react';
+import { useState } from "react";
+import { ChevronDown, ChevronUp, Github, Linkedin, Mail } from "lucide-react";
 
 export function AboutSection() {
   const [expanded, setExpanded] = useState(false);
@@ -13,7 +13,9 @@ export function AboutSection() {
           onClick={() => setExpanded(!expanded)}
           className="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity"
           aria-expanded={expanded}
-          aria-label={expanded ? 'Collapse about section' : 'Expand about section'}
+          aria-label={
+            expanded ? "Collapse about section" : "Expand about section"
+          }
         >
           <div>
             <span className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide">
@@ -33,25 +35,29 @@ export function AboutSection() {
         {expanded && (
           <div className="mt-6 space-y-4 text-slate-600 dark:text-slate-300 animate-in fade-in slide-in-from-top-4 duration-300">
             <p>
-              As a pre-medical student, I noticed something troubling: Canadian provinces
-              report emergency room wait times using <strong>completely different methodologies</strong>.
-              Ontario measures from triage to physician (90th percentile). Quebec measures from
-              registration to physician (rolling average). These numbers can&apos;t be directly compared—but
-              most apps present them side-by-side anyway.
+              As a pre-medical student, I noticed something troubling: Canadian
+              provinces report emergency room wait times using{" "}
+              <strong>completely different methodologies</strong>. Ontario
+              measures from triage to physician (90th percentile). Quebec
+              measures from registration to physician (rolling average). These
+              numbers can&apos;t be directly compared—but most apps present them
+              side-by-side anyway.
             </p>
 
             <p>
-              <strong>WaitTime Canada is different.</strong> Instead of pretending the data is
-              comparable, we audit it. We tag every measurement with its methodology and warn
-              users when direct comparison is statistically invalid. This is what I call a
-              &quot;Health Systems Observatory&quot;—a tool that exposes the black box of healthcare
-              reporting.
+              <strong>WaitTime Canada is different.</strong> Instead of
+              pretending the data is comparable, we audit it. We tag every
+              measurement with its methodology and warn users when direct
+              comparison is statistically invalid. This is what I call a
+              &quot;Health Systems Observatory&quot;—a tool that exposes the
+              black box of healthcare reporting.
             </p>
 
             <p>
-              This project demonstrates my approach to medicine: rigorous methodology,
-              transparent limitations, and a commitment to helping patients make informed
-              decisions—even when that means telling them what we <em>don&apos;t</em> know.
+              This project demonstrates my approach to medicine: rigorous
+              methodology, transparent limitations, and a commitment to helping
+              patients make informed decisions—even when that means telling them
+              what we <em>don&apos;t</em> know.
             </p>
 
             <div className="flex items-center gap-6 pt-4 border-t border-slate-200 dark:border-slate-700">
@@ -63,7 +69,9 @@ export function AboutSection() {
                   JD
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900 dark:text-white">Jeremy Dawson</p>
+                  <p className="font-semibold text-slate-900 dark:text-white">
+                    Jeremy Dawson
+                  </p>
                   <p className="text-sm text-slate-500">Pre-Medical Student</p>
                 </div>
               </div>

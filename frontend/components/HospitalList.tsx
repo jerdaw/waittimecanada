@@ -116,18 +116,24 @@ export function HospitalList({
                 "px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 border",
                 showLiveOnly
                   ? "bg-success/10 border-success/30 text-success"
-                  : "bg-background border-border text-muted-foreground hover:bg-muted/50"
+                  : "bg-background border-border text-muted-foreground hover:bg-muted/50",
               )}
             >
               <span className="relative flex h-1.5 w-1.5">
-                <span className={clsx(
-                  "absolute inline-flex h-full w-full rounded-full opacity-75",
-                  showLiveOnly ? "animate-ping bg-success" : "bg-muted-foreground"
-                )} />
-                <span className={clsx(
-                  "relative inline-flex rounded-full h-1.5 w-1.5",
-                  showLiveOnly ? "bg-success" : "bg-muted-foreground"
-                )} />
+                <span
+                  className={clsx(
+                    "absolute inline-flex h-full w-full rounded-full opacity-75",
+                    showLiveOnly
+                      ? "animate-ping bg-success"
+                      : "bg-muted-foreground",
+                  )}
+                />
+                <span
+                  className={clsx(
+                    "relative inline-flex rounded-full h-1.5 w-1.5",
+                    showLiveOnly ? "bg-success" : "bg-muted-foreground",
+                  )}
+                />
               </span>
               Live Only
             </button>
@@ -144,12 +150,22 @@ export function HospitalList({
       <div className="flex-1 overflow-y-auto" ref={listRef}>
         {!loading && displayedHospitals.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-6 text-center min-h-[150px]">
-            <svg className="w-8 h-8 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              className="w-8 h-8 mb-2 opacity-50"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
             <p className="text-sm font-medium">No hospitals found</p>
             {searchQuery && (
-              <button 
+              <button
                 onClick={() => onSearchChange?.("")}
                 className="mt-2 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors"
               >
@@ -170,22 +186,26 @@ export function HospitalList({
               const isExpanded = hospital.id === expandedId;
               const color = getStatusColor(hospital.current_wait_time);
               const showLiveBadge = isRecent(hospital.last_updated);
-              
+
               // Calculate distance if user location is available
-              const distance = userLocation ? calculateDistance(
-                userLocation.lat, userLocation.lon, 
-                hospital.latitude, hospital.longitude
-              ) : null;
+              const distance = userLocation
+                ? calculateDistance(
+                    userLocation.lat,
+                    userLocation.lon,
+                    hospital.latitude,
+                    hospital.longitude,
+                  )
+                : null;
 
               return (
-                <div 
-                  key={hospital.id} 
+                <div
+                  key={hospital.id}
                   id={`hospital-card-${hospital.id}`}
                   className={clsx(
                     "rounded-xl border transition-all duration-200 overflow-hidden",
                     isSelected || isExpanded
                       ? "bg-card border-primary/50 ring-1 ring-primary/20 shadow-lg translate-y-[-1px]"
-                      : "bg-card/50 border-border/30 hover:bg-card hover:border-border/50 hover:shadow-sm"
+                      : "bg-card/50 border-border/30 hover:bg-card hover:border-border/50 hover:shadow-sm",
                   )}
                 >
                   {/* Compact Card Row */}
@@ -194,15 +214,21 @@ export function HospitalList({
                     className="w-full text-left p-4 flex items-center gap-4"
                   >
                     {/* Status Indicator */}
-                    <div className={clsx("w-1.5 h-8 rounded-full shrink-0", color)} />
+                    <div
+                      className={clsx("w-1.5 h-8 rounded-full shrink-0", color)}
+                    />
 
                     {/* Name & Location */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <h3 className={clsx(
-                          "font-medium text-sm truncate",
-                          (isSelected || isExpanded) ? "text-primary" : "text-foreground"
-                        )}>
+                        <h3
+                          className={clsx(
+                            "font-medium text-sm truncate",
+                            isSelected || isExpanded
+                              ? "text-primary"
+                              : "text-foreground",
+                          )}
+                        >
                           {hospital.name}
                         </h3>
                         {showLiveBadge && (
@@ -225,19 +251,28 @@ export function HospitalList({
                     {/* Wait Time */}
                     <div className="flex items-center gap-2 shrink-0">
                       <div className="text-right">
-                        <span className="text-lg font-bold tabular-nums">{formatWaitTime(hospital.current_wait_time)}</span>
-                        <span className="text-xs text-muted-foreground ml-0.5">min</span>
+                        <span className="text-lg font-bold tabular-nums">
+                          {formatWaitTime(hospital.current_wait_time)}
+                        </span>
+                        <span className="text-xs text-muted-foreground ml-0.5">
+                          min
+                        </span>
                       </div>
-                      <svg 
+                      <svg
                         className={clsx(
                           "w-4 h-4 text-muted-foreground transition-transform duration-200",
-                          isExpanded && "rotate-180"
-                        )} 
-                        fill="none" 
-                        viewBox="0 0 24 24" 
+                          isExpanded && "rotate-180",
+                        )}
+                        fill="none"
+                        viewBox="0 0 24 24"
                         stroke="currentColor"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
                       </svg>
                     </div>
                   </button>
@@ -246,11 +281,14 @@ export function HospitalList({
                   <div
                     className={clsx(
                       "grid transition-[grid-template-rows] duration-300 ease-out",
-                      isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                      isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
                     )}
                   >
                     <div className="overflow-hidden px-3 pb-3">
-                      <ExpandedCardDetails hospital={hospital} userLocation={userLocation} />
+                      <ExpandedCardDetails
+                        hospital={hospital}
+                        userLocation={userLocation}
+                      />
                     </div>
                   </div>
                 </div>

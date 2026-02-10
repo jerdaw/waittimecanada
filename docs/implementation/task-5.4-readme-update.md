@@ -211,10 +211,9 @@ Added current coverage and policies:
 - Daily GitHub Actions cleanup
 - Aggregate statistics preserved
 
-**Verification Queue:**
-- Manual approval required
-- Admin UI at /admin/verify
-- Prevents incorrect data
+**Trusted Source Auto-Approval:**
+- Government health authority data auto-approved on insert
+- Quality enforced via automated monitoring
 
 ### 10. Key Implementation Details (NEW)
 

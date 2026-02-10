@@ -67,7 +67,7 @@ export async function GET() {
 
     // Overall health: all sources must be healthy
     const healthy = sources.every(
-      (s) => s.status === "healthy" || s.status === "unknown"
+      (s) => s.status === "healthy" || s.status === "unknown",
     );
 
     // Find the most recent update across all sources
@@ -75,7 +75,7 @@ export async function GET() {
       .filter((s) => s.last_run)
       .sort(
         (a, b) =>
-          new Date(b.last_run!).getTime() - new Date(a.last_run!).getTime()
+          new Date(b.last_run!).getTime() - new Date(a.last_run!).getTime(),
       )[0]?.last_run;
 
     return NextResponse.json(
@@ -85,7 +85,7 @@ export async function GET() {
         stale_threshold_minutes: STALE_THRESHOLD_MINUTES,
         sources,
       } as HealthResponse,
-      { headers: publicCacheHeaders(120, 300) }
+      { headers: publicCacheHeaders(120, 300) },
     );
   } catch (error) {
     console.error("Failed to fetch health status:", error);
@@ -97,7 +97,7 @@ export async function GET() {
         sources: [],
         error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500, headers: NO_STORE_HEADERS }
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 }

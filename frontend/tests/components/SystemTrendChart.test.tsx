@@ -3,14 +3,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SystemTrendChart } from "@/components/SystemTrendChart";
 
 vi.mock("recharts", () => {
-  const Monitor = ({ children, data }: { children: React.ReactNode; data: unknown }) => (
+  const Monitor = ({
+    children,
+    data,
+  }: {
+    children: React.ReactNode;
+    data: unknown;
+  }) => (
     <div data-testid="recharts-mock" data-data={JSON.stringify(data)}>
       {children}
     </div>
   );
 
   return {
-    ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    ),
     ComposedChart: Monitor,
     CartesianGrid: () => <div />,
     XAxis: () => <div />,
@@ -81,7 +89,9 @@ describe("SystemTrendChart", () => {
     });
 
     expect(screen.getByText(/System Trend/i)).toBeInTheDocument();
-    expect(screen.getByText(/Ontario ER wait times have increased/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Ontario ER wait times have increased/i),
+    ).toBeInTheDocument();
   });
 
   it("updates query when toggles are changed", async () => {
@@ -113,7 +123,7 @@ describe("SystemTrendChart", () => {
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining("period=monthly&lookback=6m"),
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
@@ -122,7 +132,7 @@ describe("SystemTrendChart", () => {
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining("period=weekly"),
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
@@ -131,7 +141,7 @@ describe("SystemTrendChart", () => {
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining("lookback=1y"),
-        expect.any(Object)
+        expect.any(Object),
       );
     });
   });

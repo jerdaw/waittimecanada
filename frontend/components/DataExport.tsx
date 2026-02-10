@@ -1,37 +1,37 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Download, FileSpreadsheet, Code, Info } from 'lucide-react';
+import { useState } from "react";
+import { Download, FileSpreadsheet, Code, Info } from "lucide-react";
 
-type DateRange = '24h' | '7d' | '30d' | '90d' | '6m' | '1y' | 'all';
-type Granularity = 'raw' | 'hourly' | 'daily' | 'weekly' | 'monthly';
+type DateRange = "24h" | "7d" | "30d" | "90d" | "6m" | "1y" | "all";
+type Granularity = "raw" | "hourly" | "daily" | "weekly" | "monthly";
 
 const DATE_RANGE_DAYS: Record<DateRange, number | null> = {
-  '24h': 1,
-  '7d': 7,
-  '30d': 30,
-  '90d': 90,
-  '6m': 180,
-  '1y': 365,
-  'all': null,
+  "24h": 1,
+  "7d": 7,
+  "30d": 30,
+  "90d": 90,
+  "6m": 180,
+  "1y": 365,
+  all: null,
 };
 
 const GRANULARITY_LABELS: Record<Granularity, string> = {
-  raw: 'Raw Measurements',
-  hourly: 'Hourly Averages',
-  daily: 'Daily Averages',
-  weekly: 'Weekly Averages',
-  monthly: 'Monthly Averages',
+  raw: "Raw Measurements",
+  hourly: "Hourly Averages",
+  daily: "Daily Averages",
+  weekly: "Weekly Averages",
+  monthly: "Monthly Averages",
 };
 
 export function DataExport() {
-  const [province, setProvince] = useState<string>('');
-  const [dateRange, setDateRange] = useState<DateRange>('7d');
-  const [granularity, setGranularity] = useState<Granularity>('raw');
-  const [format, setFormat] = useState<'csv' | 'json'>('csv');
+  const [province, setProvince] = useState<string>("");
+  const [dateRange, setDateRange] = useState<DateRange>("7d");
+  const [granularity, setGranularity] = useState<Granularity>("raw");
+  const [format, setFormat] = useState<"csv" | "json">("csv");
   const [loading, setLoading] = useState(false);
 
-  const isAggregated = granularity !== 'raw';
+  const isAggregated = granularity !== "raw";
   const rangeDays = DATE_RANGE_DAYS[dateRange];
   const rangeExceedsRaw = rangeDays !== null && rangeDays > 30;
 
@@ -39,16 +39,16 @@ export function DataExport() {
     setLoading(true);
 
     const params = new URLSearchParams();
-    if (province) params.set('province', province);
-    params.set('format', format);
-    params.set('granularity', granularity);
+    if (province) params.set("province", province);
+    params.set("format", format);
+    params.set("granularity", granularity);
 
     // Calculate date range
     const now = new Date();
-    if (dateRange !== 'all') {
+    if (dateRange !== "all") {
       const days = DATE_RANGE_DAYS[dateRange]!;
       const start = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-      params.set('start_date', start.toISOString());
+      params.set("start_date", start.toISOString());
     }
 
     // Trigger download
@@ -68,14 +68,17 @@ export function DataExport() {
       </div>
 
       <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-        Export wait time data with full methodology tags for research use.
-        All exports include metric ontology columns for proper attribution.
+        Export wait time data with full methodology tags for research use. All
+        exports include metric ontology columns for proper attribution.
       </p>
 
       {/* Filters */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <label htmlFor="province-select" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+          <label
+            htmlFor="province-select"
+            className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+          >
             Province
           </label>
           <select
@@ -92,7 +95,10 @@ export function DataExport() {
         </div>
 
         <div>
-          <label htmlFor="daterange-select" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+          <label
+            htmlFor="daterange-select"
+            className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+          >
             Date Range
           </label>
           <select
@@ -114,7 +120,10 @@ export function DataExport() {
 
       {/* Granularity Selector */}
       <div className="mb-4">
-        <label htmlFor="granularity-select" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+        <label
+          htmlFor="granularity-select"
+          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+        >
           Data Granularity
         </label>
         <select
@@ -131,8 +140,8 @@ export function DataExport() {
         </select>
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
           {isAggregated
-            ? 'Aggregated data includes mean, median, P90, min, max, and sample count per period.'
-            : 'Raw data is available for the last 30 days. For longer ranges, use aggregated data.'}
+            ? "Aggregated data includes mean, median, P90, min, max, and sample count per period."
+            : "Raw data is available for the last 30 days. For longer ranges, use aggregated data."}
         </p>
       </div>
 
@@ -140,9 +149,9 @@ export function DataExport() {
       {!isAggregated && rangeExceedsRaw && (
         <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
           <p className="text-xs text-amber-700 dark:text-amber-400">
-            Raw measurements are retained for 30 days. For ranges beyond 30 days,
-            switch to an aggregated granularity (daily, weekly, or monthly) to access
-            permanent statistical summaries.
+            Raw measurements are retained for 30 days. For ranges beyond 30
+            days, switch to an aggregated granularity (daily, weekly, or
+            monthly) to access permanent statistical summaries.
           </p>
         </div>
       )}
@@ -154,22 +163,22 @@ export function DataExport() {
         </span>
         <div className="flex gap-2">
           <button
-            onClick={() => setFormat('csv')}
+            onClick={() => setFormat("csv")}
             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
-              format === 'csv'
-                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
+              format === "csv"
+                ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600"
             }`}
           >
             <FileSpreadsheet className="w-4 h-4" />
             CSV
           </button>
           <button
-            onClick={() => setFormat('json')}
+            onClick={() => setFormat("json")}
             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
-              format === 'json'
-                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
+              format === "json"
+                ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600"
             }`}
           >
             <Code className="w-4 h-4" />
@@ -185,7 +194,7 @@ export function DataExport() {
         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Download className="w-5 h-5" />
-        {loading ? 'Preparing...' : 'Download Data'}
+        {loading ? "Preparing..." : "Download Data"}
       </button>
 
       {/* Citation Info */}

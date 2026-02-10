@@ -16,7 +16,7 @@ describe("RegionSelector", () => {
         ]}
         selectedRegionId={null}
         onRegionChange={() => {}}
-      />
+      />,
     );
 
     expect(screen.getByText("All Regions")).toBeInTheDocument();
@@ -38,7 +38,7 @@ describe("RegionSelector", () => {
         ]}
         selectedRegionId={null}
         onRegionChange={onRegionChange}
-      />
+      />,
     );
 
     const select = screen.getByRole("combobox");

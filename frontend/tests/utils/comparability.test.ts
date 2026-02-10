@@ -20,7 +20,7 @@ describe("Comparability Logic", () => {
 
   function generateDivergenceBrief(
     a: Methodology,
-    b: Methodology
+    b: Methodology,
   ): string | null {
     if (areComparable(a, b)) return null;
 
@@ -28,20 +28,22 @@ describe("Comparability Logic", () => {
 
     if (a.metric_family !== b.metric_family) {
       differences.push(
-        `Different metrics: ${a.metric_family} vs ${b.metric_family}`
+        `Different metrics: ${a.metric_family} vs ${b.metric_family}`,
       );
     }
     if (a.start_event !== b.start_event) {
       differences.push(
-        `Different start points: ${a.start_event} vs ${b.start_event}`
+        `Different start points: ${a.start_event} vs ${b.start_event}`,
       );
     }
     if (a.end_event !== b.end_event) {
-      differences.push(`Different end points: ${a.end_event} vs ${b.end_event}`);
+      differences.push(
+        `Different end points: ${a.end_event} vs ${b.end_event}`,
+      );
     }
     if (a.statistic_type !== b.statistic_type) {
       differences.push(
-        `Different statistics: ${a.statistic_type} vs ${b.statistic_type}`
+        `Different statistics: ${a.statistic_type} vs ${b.statistic_type}`,
       );
     }
 
@@ -300,7 +302,9 @@ describe("Comparability Logic", () => {
       const torontoWestern: Methodology = { ...torontoGeneral };
 
       expect(areComparable(torontoGeneral, torontoWestern)).toBe(true);
-      expect(generateDivergenceBrief(torontoGeneral, torontoWestern)).toBeNull();
+      expect(
+        generateDivergenceBrief(torontoGeneral, torontoWestern),
+      ).toBeNull();
     });
   });
 });

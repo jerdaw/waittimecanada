@@ -224,8 +224,7 @@ def test_bc_scraper_live():
 
 - [ ] Scraper runs via CLI: `python -m waittime.cli.scraper bc`
 - [ ] Measurements stored in database
-- [ ] BC hospitals appear in verification queue
-- [ ] After verification, hospitals show on map
+- [ ] BC hospitals auto-approved and visible on map
 - [ ] Province filter includes "British Columbia" option
 - [ ] Methodology page shows BC comparability
 
@@ -237,7 +236,7 @@ def test_bc_scraper_live():
 
 1. **Seed BC Source:** Run `seed_sources.py` to add bc-phsa to database
 2. **Manual Test:** Run scraper locally, verify measurements
-3. **Approve Hospitals:** Use `/admin/verify` to approve 20+ BC hospitals
+3. **Verify Hospitals:** Confirm BC hospitals are auto-approved from trusted source
 4. **Deploy Frontend:** Province filter with BC option
 5. **Monitor:** Check heartbeat API for BC scraper health
 

@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# Testing
+coverage/
+
+# Misc
+*.min.js
+*.min.css
+*.bundle.js
+
+# Package manager
+pnpm-lock.yaml
+package-lock.json
+yarn.lock

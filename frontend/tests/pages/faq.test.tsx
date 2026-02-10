@@ -14,14 +14,20 @@ describe("FAQPage", () => {
   it("renders page title and description", () => {
     render(<FAQPage />);
     expect(screen.getByText("Frequently Asked Questions")).toBeInTheDocument();
-    expect(screen.getByText(/Understand how we track wait times/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Understand how we track wait times/),
+    ).toBeInTheDocument();
     expect(screen.getByTestId("mock-header")).toBeInTheDocument();
   });
 
   it("renders faq items", () => {
     render(<FAQPage />);
-    expect(screen.getByText("Are these wait times official?")).toBeInTheDocument();
-    expect(screen.getByText("Why do wait times change so quickly?")).toBeInTheDocument();
+    expect(
+      screen.getByText("Are these wait times official?"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Why do wait times change so quickly?"),
+    ).toBeInTheDocument();
   });
 
   it("renders methodology link", () => {

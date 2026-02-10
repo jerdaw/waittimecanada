@@ -21,21 +21,24 @@ const mockHospital = {
   source_id: "test-source",
   current_wait_time: 120,
   last_updated: new Date().toISOString(),
-  telehealth_number: "1-866-555-0123"
+  telehealth_number: "1-866-555-0123",
 };
 
 describe("ExpandedCardDetails", () => {
-  it("renders methodology metrics", () => { // @ts-ignore
+  it("renders methodology metrics", () => {
+    // @ts-ignore
     render(<ExpandedCardDetails hospital={mockHospital} />);
     expect(screen.getByText("Triage to Doctor")).toBeInTheDocument();
   });
 
-  it("renders telehealth number if available", () => { // @ts-ignore
+  it("renders telehealth number if available", () => {
+    // @ts-ignore
     render(<ExpandedCardDetails hospital={mockHospital} />);
     expect(screen.getByText("1-866-555-0123")).toBeInTheDocument();
   });
 
-  it("renders quick action buttons", () => { // @ts-ignore
+  it("renders quick action buttons", () => {
+    // @ts-ignore
     render(<ExpandedCardDetails hospital={mockHospital} />);
     expect(screen.getByText("Directions")).toBeInTheDocument();
     // Website button removed
@@ -50,7 +53,7 @@ describe("ExpandedCardDetails", () => {
   it("shows stale data indicator for old data", () => {
     const staleHospital = {
       ...mockHospital,
-      last_updated: new Date(Date.now() - 3600000).toISOString() // 1 hour ago
+      last_updated: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
     };
     render(<ExpandedCardDetails hospital={staleHospital} />);
     expect(screen.getByText("Stale Data")).toBeInTheDocument();

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Activity, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Activity, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
 
-type Status = 'healthy' | 'degraded' | 'down' | 'loading';
+type Status = "healthy" | "degraded" | "down" | "loading";
 
 interface HealthData {
   status: Status;
@@ -16,7 +16,7 @@ const HEALTH_CHECK_INTERVAL_MS = 5 * 60 * 1000;
 
 export function SystemStatus() {
   const [health, setHealth] = useState<HealthData>({
-    status: 'loading',
+    status: "loading",
     lastUpdate: null,
     ageMinutes: 0,
     sourceCount: 0,
@@ -25,7 +25,7 @@ export function SystemStatus() {
   useEffect(() => {
     async function checkHealth() {
       try {
-        const res = await fetch('/api/health');
+        const res = await fetch("/api/health");
         const data = await res.json();
 
         // Calculate age from most recent update
@@ -36,11 +36,11 @@ export function SystemStatus() {
         }
 
         // Determine status based on overall health and age
-        let status: Status = 'healthy';
+        let status: Status = "healthy";
         if (!data.healthy || ageMinutes > 120) {
-          status = 'down';
+          status = "down";
         } else if (ageMinutes > 60) {
-          status = 'degraded';
+          status = "degraded";
         }
 
         setHealth({
@@ -51,7 +51,7 @@ export function SystemStatus() {
         });
       } catch {
         setHealth({
-          status: 'down',
+          status: "down",
           lastUpdate: null,
           ageMinutes: 999,
           sourceCount: 0,
@@ -62,38 +62,38 @@ export function SystemStatus() {
     checkHealth();
 
     const onVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === "visible") {
         checkHealth();
       }
     };
 
     const interval = setInterval(() => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === "visible") {
         checkHealth();
       }
     }, HEALTH_CHECK_INTERVAL_MS);
 
-    document.addEventListener('visibilitychange', onVisibilityChange);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       clearInterval(interval);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, []);
 
   const statusConfig = {
-    loading: { icon: Activity, color: 'text-slate-400', label: 'Checking...' },
+    loading: { icon: Activity, color: "text-slate-400", label: "Checking..." },
     healthy: {
       icon: CheckCircle,
-      color: 'text-green-500',
-      label: 'All Systems Operational',
+      color: "text-green-500",
+      label: "All Systems Operational",
     },
     degraded: {
       icon: AlertTriangle,
-      color: 'text-amber-500',
-      label: 'Data May Be Stale',
+      color: "text-amber-500",
+      label: "Data May Be Stale",
     },
-    down: { icon: XCircle, color: 'text-red-500', label: 'Data Unavailable' },
+    down: { icon: XCircle, color: "text-red-500", label: "Data Unavailable" },
   };
 
   const { icon: Icon, color, label } = statusConfig[health.status];

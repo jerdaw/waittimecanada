@@ -183,7 +183,6 @@ Instructions will depend on platform chosen (see platform-specific guides below)
 - [ ] Frontend accessible at public URL
 - [ ] Map displays with hospital markers
 - [ ] `/methods` page loads
-- [ ] `/admin/verify` page loads
 - [ ] API routes returning data
 - [ ] Scraper cron runs successfully
 

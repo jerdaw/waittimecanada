@@ -45,7 +45,7 @@ describe("TrendChart Component", () => {
 
     // @ts-ignore
     global.fetch.mockResolvedValue({
-      json: () => Promise.resolve(mockResponse)
+      json: () => Promise.resolve(mockResponse),
     });
 
     render(<TrendChart hospitalId="test-id" />);
@@ -79,7 +79,7 @@ describe("TrendChart Component", () => {
 
     // @ts-ignore
     global.fetch.mockResolvedValue({
-      json: () => Promise.resolve(mockResponse)
+      json: () => Promise.resolve(mockResponse),
     });
 
     render(<TrendChart hospitalId="test-id" />);
@@ -106,7 +106,7 @@ describe("TrendChart Component", () => {
 
     // @ts-ignore
     global.fetch.mockResolvedValue({
-      json: () => Promise.resolve(mockResponse)
+      json: () => Promise.resolve(mockResponse),
     });
 
     render(<TrendChart hospitalId="test-id" />);
@@ -118,7 +118,9 @@ describe("TrendChart Component", () => {
     fireEvent.click(screen.getByText("7d"));
 
     // API should be called with new period
-    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("period=7d"));
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("period=7d"),
+    );
   });
 
   it("allows switching to long-range periods", async () => {
@@ -131,7 +133,7 @@ describe("TrendChart Component", () => {
 
     // @ts-ignore
     global.fetch.mockResolvedValue({
-      json: () => Promise.resolve(mockResponse)
+      json: () => Promise.resolve(mockResponse),
     });
 
     render(<TrendChart hospitalId="test-id" />);
@@ -141,17 +143,27 @@ describe("TrendChart Component", () => {
     });
 
     fireEvent.click(screen.getByText("90d"));
-    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("period=90d"));
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("period=90d"),
+    );
 
     fireEvent.click(screen.getByText("1y"));
-    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("period=1y"));
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("period=1y"),
+    );
   });
 
   it("shows aggregated badge when viewing aggregated data", async () => {
     const mockResponse = {
       period: "90d",
       dataPoints: [
-        { timestamp: "2023-01-01", waitTime: 60, minWaitTime: 30, maxWaitTime: 120, sampleCount: 24 }
+        {
+          timestamp: "2023-01-01",
+          waitTime: 60,
+          minWaitTime: 30,
+          maxWaitTime: 120,
+          sampleCount: 24,
+        },
       ],
       aggregation: "daily",
       dataSource: "aggregated",
@@ -159,7 +171,7 @@ describe("TrendChart Component", () => {
 
     // @ts-ignore
     global.fetch.mockResolvedValue({
-      json: () => Promise.resolve(mockResponse)
+      json: () => Promise.resolve(mockResponse),
     });
 
     render(<TrendChart hospitalId="test-id" />);
@@ -179,7 +191,7 @@ describe("TrendChart Component", () => {
 
     // @ts-ignore
     global.fetch.mockResolvedValue({
-      json: () => Promise.resolve(mockResponse)
+      json: () => Promise.resolve(mockResponse),
     });
 
     render(<TrendChart hospitalId="test-id" />);
@@ -201,13 +213,15 @@ describe("TrendChart Component", () => {
 
     // @ts-ignore
     global.fetch.mockResolvedValue({
-      json: () => Promise.resolve(mockResponse)
+      json: () => Promise.resolve(mockResponse),
     });
 
     render(<TrendChart hospitalId="test-id" />);
 
     await waitFor(() => {
-      expect(screen.getByText("No historical data available")).toBeInTheDocument();
+      expect(
+        screen.getByText("No historical data available"),
+      ).toBeInTheDocument();
     });
   });
 });

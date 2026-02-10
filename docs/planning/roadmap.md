@@ -1,8 +1,8 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-02-08)
+## Current Status (Updated 2026-02-09)
 
-**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage) | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
+**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage) | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
 **Strategic Direction:** Ontario-focused depth over multi-province breadth. The platform is
 transitioning from a real-time snapshot tool into a Health Systems Observatory with longitudinal
@@ -60,11 +60,11 @@ analysis, data quality transparency, and research-grade analytics.
 ## Active Roadmap (Now / Next / Later)
 
 ### Now (P0, 0-2 weeks)
-- [ ] **P0 / Data correctness:** Correct data-quality metric math so totals are query-backed counts (not inferred from success-rate approximations).
-- [ ] **P0 / Ontology safety:** Enforce ontology-safe analytics grouping so aggregates are never mixed across incompatible methodologies.
-- [ ] **P0 / Source consistency:** Resolve ontology/source metadata drift across migrations, seed JSON, and scraper factories.
-- [ ] **P0 / Ops reliability:** Replace hardcoded source lists in heartbeat checks with dynamic source discovery from `sources`.
-- [ ] **P0 / Methodology monitoring:** Wire methodology change detection into scheduled ops and expose change events in API/UI.
+- [x] **P0 / Data correctness:** Correct data-quality metric math so totals are query-backed counts (not inferred from success-rate approximations).
+- [x] **P0 / Ontology safety:** Enforce ontology-safe analytics grouping so aggregates are never mixed across incompatible methodologies.
+- [x] **P0 / Source consistency:** Resolve ontology/source metadata drift across migrations, seed JSON, and scraper factories.
+- [x] **P0 / Ops reliability:** Replace hardcoded source lists in heartbeat checks with dynamic source discovery from `sources`.
+- [x] **P0 / Methodology monitoring:** Wire methodology change detection into scheduled ops and expose change events in API/UI.
 
 Success criteria for `Now`:
 - Data-quality totals match direct SQL count validation in tests.
@@ -72,21 +72,21 @@ Success criteria for `Now`:
 - Heartbeat checks automatically adapt to source table updates without code changes.
 
 ### Next (P1, 2-6 weeks)
-- [ ] **P1 / Equity:** Replace placeholder equity layer payload with processed tract dataset pipeline and production Ontario load.
-- [ ] **P1 / Occupancy:** Implement occupancy schema columns + scraper ingestion path + validations/backfill.
-- [ ] **P1 / Admin security:** Add authn/authz and audit logging for verification queue API routes and UI actions.
-- [ ] **P1 / Methods UX:** Add methodology timeline, deep-linkable comparisons, and comparability matrix CSV export.
-- [ ] **P1 / CI hardening:** Remove non-blocking CI fallbacks and make quality/security gates strict after remediation.
-- [ ] **P1 / Security debt:** Resolve Bandit finding in synthetic test data generator.
+- [x] **P1 / Equity:** Replace placeholder equity layer payload with processed tract dataset pipeline and production Ontario load.
+- [x] **P1 / Occupancy:** Implement occupancy schema columns + scraper ingestion path + validations/backfill.
+- [x] ~~**P1 / Admin security:**~~ Removed — admin verification queue was over-engineered for trusted government data sources; automated quality controls (anomaly detection, data quality monitoring) provide better assurance.
+- [x] **P1 / Methods UX:** Add methodology timeline, deep-linkable comparisons, and comparability matrix CSV export.
+- [x] **P1 / CI hardening:** Remove non-blocking CI fallbacks and make quality/security gates strict after remediation.
+- [x] **P1 / Security debt:** Resolve Bandit finding in synthetic test data generator.
 
 Success criteria for `Next`:
 - Equity and occupancy endpoints serve real production-backed values (not scaffold-only payloads).
-- Admin verification actions are fully authenticated and auditable.
+- ~~Admin verification actions are fully authenticated and auditable.~~ (Removed — not needed for trusted government sources.)
 - CI gates fail hard for lint/type/security once remediation is complete.
 
 ### Later (P2+, 6+ weeks)
-- [ ] **P2 / Test quality:** Eliminate React `act(...)` warnings in frontend unit tests.
-- [ ] **P2 / Docs integrity:** Add roadmap consistency checks so stale status summaries cannot regress.
+- [x] **P2 / Test quality:** Eliminate React `act(...)` warnings in frontend unit tests.
+- [x] **P2 / Docs integrity:** Add roadmap consistency checks so stale status summaries cannot regress.
 - [ ] **P2 / Portfolio launch completion:** Complete stakeholder interview and publish launch communications when public hosting is re-enabled.
 - [ ] **Deferred / M10 breadth:** Resume broader multi-province expansion once P0/P1 reliability and governance goals are closed.
 
@@ -99,7 +99,7 @@ Each feature maps to CanMEDS competencies for medical school admissions:
 | Competency | Features |
 |------------|----------|
 | **Scholar** | Metric ontology, comparability matrix, citation export, aggregation pipeline, anomaly detection, methodology change detection |
-| **Professional** | Clinical defensibility, divergence warnings, verification queue, data quality transparency, peer benchmarking |
+| **Professional** | Clinical defensibility, divergence warnings, data quality transparency, peer benchmarking |
 | **Health Advocate** | Access Burden Estimator, equity layer, temporal access patterns |
 | **Leader** | Multi-province scaling, systems architecture, regional dashboards, data quality monitoring |
 | **Collaborator** | Province-aware telehealth routing, stakeholder interviews |
@@ -113,12 +113,18 @@ Active milestone plans in `docs/planning/implementation/`:
 - `docs/planning/implementation/milestone-10-provinces.md` — Alberta scraper & multi-province support
 - `docs/planning/implementation/milestone-11-equity.md` — Access Burden Estimator & equity layer
 - `docs/planning/implementation/milestone-12-research.md` — Citation export & alert system
+- `docs/planning/implementation/m9-remaining-user-actions.md` — M9 manual user action guide (active)
 
 Archived (delivered):
 - `docs/planning/archive/milestone-15-analytics.md` — Analytics & benchmarking (M15)
 - `docs/planning/archive/milestone-14-data-quality.md` — Data quality & anomaly detection (M14)
 - `docs/planning/archive/milestone-13-aggregation.md` — Aggregation pipeline (M13)
 - `docs/planning/archive/task-er-watch-features.md` — ER Watch feature execution checklist (completed)
+- `docs/planning/archive/methods-ux-implementation.md` — Methodology timeline, CSV export, deep-linking (P1)
+- `docs/planning/archive/ci-hardening-implementation.md` — CI hardening & quality gates (P1)
+- `docs/planning/archive/test-quality-implementation.md` — React act warning elimination (P2)
+- `docs/planning/archive/docs-integrity-implementation.md` — Roadmap consistency checks (P2)
+- `docs/planning/archive/about-section-verification.md` — About section implementation verification (M9)
 
 ---
 

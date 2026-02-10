@@ -7,7 +7,9 @@ describe("EquityLayerToggle", () => {
     const onChange = vi.fn();
     render(<EquityLayerToggle enabled={false} onChange={onChange} />);
 
-    const button = screen.getByRole("button", { name: "Enable income overlay" });
+    const button = screen.getByRole("button", {
+      name: "Enable income overlay",
+    });
     expect(button).toBeInTheDocument();
 
     fireEvent.click(button);
@@ -15,7 +17,13 @@ describe("EquityLayerToggle", () => {
   });
 
   it("renders loading hint when loading", () => {
-    render(<EquityLayerToggle enabled={true} loading={true} onChange={() => undefined} />);
+    render(
+      <EquityLayerToggle
+        enabled={true}
+        loading={true}
+        onChange={() => undefined}
+      />,
+    );
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 });

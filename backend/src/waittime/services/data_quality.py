@@ -113,6 +113,34 @@ class DataQualityService:
         hospitals_with_data = len(counts)
         coverage_rate = hospitals_with_data / total_hospitals if total_hospitals > 0 else 0.0
 
+        # Dynamic expected count based on hospital onboarding
+        onboarding_dates = self.db.get_hospital_onboarding_dates(source_id)
+        total_expected = 0
+
+        # Calculate expected scrapes day by day for each hospital
+        # This prevents new hospitals from dragging down historical success rates
+        current = start_date
+        while current < end_date:
+            next_day = current + timedelta(days=1)
+            day_expected = 0
+
+            for hospital in hospitals:
+                # If hospital has never been seen, it doesn't contribute to expected count
+                # (Treat as not yet onboarded)
+                first_seen = onboarding_dates.get(hospital.id)
+                if not first_seen:
+                    continue
+
+                # If hospital was onboarded on or before this day, expect data
+                # We use the date of the first measurement as the "active since" date
+                if current.date() >= first_seen.date():
+                    day_expected += self.EXPECTED_SCRAPES_PER_DAY
+
+            total_expected += day_expected
+            current = next_day
+
+        overall_rate = total_actual / total_expected if total_expected > 0 else 0.0
+
         return {
             "source_id": source_id,
             "period": {

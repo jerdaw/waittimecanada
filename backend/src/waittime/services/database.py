@@ -263,9 +263,10 @@ class DatabaseService:
                     INSERT INTO measurements (
                         hospital_id, timestamp_utc, value,
                         metric_family, start_event, end_event, statistic_type, patient_scope,
+                        patients_waiting, patients_in_treatment, total_treatment_spaces,
                         source_id, raw_payload_hash, raw_payload_snippet, parser_version,
                         is_anomaly, anomaly_reason
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING *
                     """,
                     (
@@ -277,6 +278,9 @@ class DatabaseService:
                         measurement.end_event.value,
                         measurement.statistic_type.value,
                         measurement.patient_scope.value,
+                        measurement.patients_waiting,
+                        measurement.patients_in_treatment,
+                        measurement.total_treatment_spaces,
                         measurement.source_id,
                         measurement.raw_payload_hash,
                         measurement.raw_payload_snippet,
@@ -307,6 +311,9 @@ class DatabaseService:
                         m.end_event.value,
                         m.statistic_type.value,
                         m.patient_scope.value,
+                        m.patients_waiting,
+                        m.patients_in_treatment,
+                        m.total_treatment_spaces,
                         m.source_id,
                         m.raw_payload_hash,
                         m.raw_payload_snippet,
@@ -323,9 +330,10 @@ class DatabaseService:
                     INSERT INTO measurements (
                         hospital_id, timestamp_utc, value,
                         metric_family, start_event, end_event, statistic_type, patient_scope,
+                        patients_waiting, patients_in_treatment, total_treatment_spaces,
                         source_id, raw_payload_hash, raw_payload_snippet, parser_version,
                         is_anomaly, anomaly_reason
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """,
                     data,
                 )
@@ -654,6 +662,31 @@ class DatabaseService:
                     (source_id, start, end),
                 )
                 return {row["hospital_id"]: row["cnt"] for row in cur.fetchall()}
+
+    def get_hospital_onboarding_dates(self, source_id: str) -> dict[str, datetime]:
+        """Get the earliest measurement timestamp for each hospital in a source.
+
+        Used to determine when a hospital was "onboarded" so that historical
+        data quality metrics don't penalize hospitals for not existing yet.
+
+        Args:
+            source_id: Source to analyze
+
+        Returns:
+            Dict mapping hospital_id to first seen timestamp (UTC)
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT hospital_id, MIN(timestamp_utc) as first_seen
+                    FROM measurements
+                    WHERE source_id = %s
+                    GROUP BY hospital_id
+                    """,
+                    (source_id,),
+                )
+                return {row["hospital_id"]: row["first_seen"] for row in cur.fetchall()}
 
     def insert_quality_snapshot(self, snapshot: dict[str, Any]) -> bool:
         """Insert a data quality snapshot (ON CONFLICT DO NOTHING).
@@ -1191,6 +1224,9 @@ class DatabaseService:
             end_event=EndEvent(row["end_event"]),
             statistic_type=StatisticType(row["statistic_type"]),
             patient_scope=PatientScope(row["patient_scope"]),
+            patients_waiting=row.get("patients_waiting"),
+            patients_in_treatment=row.get("patients_in_treatment"),
+            total_treatment_spaces=row.get("total_treatment_spaces"),
             source_id=row["source_id"],
             raw_payload_hash=row["raw_payload_hash"],
             raw_payload_snippet=row.get("raw_payload_snippet"),

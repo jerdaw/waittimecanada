@@ -97,7 +97,7 @@ export function ComparisonModal({
     async function fetchComparison() {
       try {
         const response = await fetch(
-          `/api/compare?a=${hospitalAId}&b=${hospitalBId}`
+          `/api/compare?a=${hospitalAId}&b=${hospitalBId}`,
         );
         const result = await response.json();
 
@@ -198,7 +198,10 @@ export function ComparisonModal({
         <div className="p-6 space-y-6">
           {/* Divergence Warning (if applicable) */}
           {!data.comparable && data.divergence_brief && (
-            <DivergenceWarning message={data.divergence_brief} variant="banner" />
+            <DivergenceWarning
+              message={data.divergence_brief}
+              variant="banner"
+            />
           )}
 
           {/* Comparable indicator */}
@@ -223,8 +226,8 @@ export function ComparisonModal({
                     Directly Comparable
                   </h4>
                   <p className="text-emerald-800 text-sm">
-                    These hospitals use identical methodologies. Direct comparison is
-                    statistically valid.
+                    These hospitals use identical methodologies. Direct
+                    comparison is statistically valid.
                   </p>
                 </div>
               </div>

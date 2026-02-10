@@ -1,29 +1,35 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { ChevronDown, ChevronUp, AlertTriangle, Car, ParkingCircle } from 'lucide-react';
+import { useState } from "react";
+import {
+  ChevronDown,
+  ChevronUp,
+  AlertTriangle,
+  Car,
+  ParkingCircle,
+} from "lucide-react";
 
 interface AccessBurdenEstimatorProps {
   distanceKm: number;
   province: string;
-  hospitalType?: 'urban' | 'suburban' | 'rural';
+  hospitalType?: "urban" | "suburban" | "rural";
 }
 
 // Provincial gas prices (CAD/L) - Updated periodically from Natural Resources Canada
 const GAS_PRICES: Record<string, number> = {
   ON: 1.55,
-  QC: 1.60,
+  QC: 1.6,
   AB: 1.45,
   BC: 1.75,
-  MB: 1.50,
+  MB: 1.5,
   SK: 1.48,
   NS: 1.58,
   NB: 1.55,
   PE: 1.52,
   NL: 1.65,
-  YT: 1.70,
+  YT: 1.7,
   NT: 1.75,
-  NU: 1.80,
+  NU: 1.8,
 };
 
 // Parking estimates by hospital type (CAD)
@@ -39,14 +45,14 @@ const FUEL_CONSUMPTION = 10;
 export function AccessBurdenEstimator({
   distanceKm,
   province,
-  hospitalType = 'urban',
+  hospitalType = "urban",
 }: AccessBurdenEstimatorProps) {
   const [expanded, setExpanded] = useState(false);
 
   // Calculate costs
   const gasPrice = GAS_PRICES[province] || 1.55; // Default to Ontario
   const roundTripKm = distanceKm * 2;
-  const fuelCost = (roundTripKm * FUEL_CONSUMPTION / 100) * gasPrice;
+  const fuelCost = ((roundTripKm * FUEL_CONSUMPTION) / 100) * gasPrice;
   const parking = PARKING_ESTIMATES[hospitalType];
   const parkingMid = (parking.min + parking.max) / 2;
   const totalMin = fuelCost + parking.min;
@@ -57,10 +63,13 @@ export function AccessBurdenEstimator({
       {/* Disclaimer Banner - Always Visible */}
       <div className="px-4 py-2 bg-amber-100 dark:bg-amber-900/50 border-b border-amber-200 dark:border-amber-800">
         <div className="flex items-start gap-2 text-amber-800 dark:text-amber-200">
-          <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
+          <AlertTriangle
+            className="w-4 h-4 mt-0.5 flex-shrink-0"
+            aria-hidden="true"
+          />
           <p className="text-xs">
-            <strong>Planning tool only.</strong> Never delay emergency care for cost.
-            Call 911 for emergencies.
+            <strong>Planning tool only.</strong> Never delay emergency care for
+            cost. Call 911 for emergencies.
           </p>
         </div>
       </div>
@@ -70,10 +79,17 @@ export function AccessBurdenEstimator({
         onClick={() => setExpanded(!expanded)}
         className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-amber-100/50 dark:hover:bg-amber-900/30 transition-colors"
         aria-expanded={expanded}
-        aria-label={expanded ? 'Collapse access burden details' : 'Expand access burden details'}
+        aria-label={
+          expanded
+            ? "Collapse access burden details"
+            : "Expand access burden details"
+        }
       >
         <div className="flex items-center gap-2">
-          <Car className="w-4 h-4 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+          <Car
+            className="w-4 h-4 text-amber-600 dark:text-amber-400"
+            aria-hidden="true"
+          />
           <span className="font-medium text-slate-900 dark:text-white">
             Access Burden Estimate
           </span>
@@ -83,9 +99,15 @@ export function AccessBurdenEstimator({
             ${totalMin.toFixed(0)} - ${totalMax.toFixed(0)}
           </span>
           {expanded ? (
-            <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0" aria-hidden="true" />
+            <ChevronUp
+              className="w-4 h-4 text-slate-400 flex-shrink-0"
+              aria-hidden="true"
+            />
           ) : (
-            <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" aria-hidden="true" />
+            <ChevronDown
+              className="w-4 h-4 text-slate-400 flex-shrink-0"
+              aria-hidden="true"
+            />
           )}
         </div>
       </button>
@@ -129,17 +151,19 @@ export function AccessBurdenEstimator({
 
           {/* Methodology Note */}
           <p className="text-xs text-slate-500 dark:text-slate-400 pt-2">
-            Based on {FUEL_CONSUMPTION}L/100km fuel consumption at ${gasPrice.toFixed(2)}/L ({province}).
-            Actual costs vary by vehicle and current fuel prices. Parking estimates are typical
-            for {hospitalType} hospitals in Canada.
+            Based on {FUEL_CONSUMPTION}L/100km fuel consumption at $
+            {gasPrice.toFixed(2)}/L ({province}). Actual costs vary by vehicle
+            and current fuel prices. Parking estimates are typical for{" "}
+            {hospitalType} hospitals in Canada.
           </p>
 
           {/* Additional Context */}
           <div className="pt-2 border-t border-amber-200 dark:border-amber-800">
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              <strong>Why show this?</strong> Financial barriers to healthcare access are often invisible.
-              This estimate makes logistical costs explicit for patients and policymakers, but should
-              never influence the decision to seek emergency care.
+              <strong>Why show this?</strong> Financial barriers to healthcare
+              access are often invisible. This estimate makes logistical costs
+              explicit for patients and policymakers, but should never influence
+              the decision to seek emergency care.
             </p>
           </div>
         </div>

@@ -24,7 +24,9 @@ function average(values: number[]): number | null {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
-function polygonCentroid(coordinates: number[][][]): { lat: number; lon: number } | null {
+function polygonCentroid(
+  coordinates: number[][][],
+): { lat: number; lon: number } | null {
   const ring = coordinates[0];
   if (!Array.isArray(ring) || ring.length < 3) return null;
 
@@ -37,7 +39,7 @@ function polygonCentroid(coordinates: number[][][]): { lat: number; lon: number 
       lon: acc.lon + Number(point[0]),
       lat: acc.lat + Number(point[1]),
     }),
-    { lon: 0, lat: 0 }
+    { lon: 0, lat: 0 },
   );
 
   return {
@@ -49,14 +51,18 @@ function polygonCentroid(coordinates: number[][][]): { lat: number; lon: number 
 export function computeEquityLinkageSummary(
   hospitals: HospitalWaitPoint[],
   equityData: EquityFeatureCollection,
-  thresholdKm = 30
+  thresholdKm = 30,
 ): EquityLinkageSummary {
   const lowIncomeCentroids = equityData.features
     .filter((feature) => feature.properties.income_quintile <= 2)
     .map((feature) => polygonCentroid(feature.geometry.coordinates))
-    .filter((centroid): centroid is { lat: number; lon: number } => centroid !== null);
+    .filter(
+      (centroid): centroid is { lat: number; lon: number } => centroid !== null,
+    );
 
-  const reportingHospitals = hospitals.filter((hospital) => hospital.period_mean !== null);
+  const reportingHospitals = hospitals.filter(
+    (hospital) => hospital.period_mean !== null,
+  );
   const reportingWaits = reportingHospitals
     .map((hospital) => hospital.period_mean)
     .filter((value): value is number => value !== null);
@@ -68,7 +74,7 @@ export function computeEquityLinkageSummary(
         hospital.latitude,
         hospital.longitude,
         centroid.lat,
-        centroid.lon
+        centroid.lon,
       );
       return distanceKm <= thresholdKm;
     });
@@ -89,7 +95,9 @@ export function computeEquityLinkageSummary(
     province_avg_wait: provinceAvgWait,
     near_low_income_avg_wait: nearAvgWait,
     wait_gap_minutes:
-      provinceAvgWait === null || nearAvgWait === null ? null : nearAvgWait - provinceAvgWait,
+      provinceAvgWait === null || nearAvgWait === null
+        ? null
+        : nearAvgWait - provinceAvgWait,
     threshold_km: thresholdKm,
   };
 }

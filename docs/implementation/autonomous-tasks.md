@@ -9,7 +9,7 @@
 
 1. [Complete Map Component](#1-complete-map-component)
 2. [Build Methods Page](#2-build-methods-page)
-3. [Verification Queue UI](#3-verification-queue-ui)
+3. ~~[Verification Queue UI](#3-verification-queue-ui)~~ (Removed)
 4. [Heartbeat Monitoring](#4-heartbeat-monitoring)
 5. [Data Retention Cleanup](#5-data-retention-cleanup)
 6. [Divergence Brief Integration](#6-divergence-brief-integration)
@@ -357,124 +357,9 @@ WHERE is_active = true;
 
 ---
 
-## 3. Verification Queue UI
+## 3. ~~Verification Queue UI~~ (Removed)
 
-### Overview
-Admin interface for reviewing and approving newly discovered hospitals. Implements the verification gate pattern from AGENTS.md.
-
-### Route: `frontend/app/admin/verify/page.tsx`
-
-### Authentication
-For MVP, use simple shared secret in URL:
-```
-/admin/verify?token=ADMIN_SECRET
-```
-Future: Proper auth with Clerk or NextAuth.
-
-### Page Layout
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  VERIFICATION QUEUE                                             │
-│                                                                 │
-│  ┌───────────────────────────────────────────────────────────┐ │
-│  │  HEADER                                                   │ │
-│  │                                                           │ │
-│  │  Hospital Verification Queue          [3 pending]         │ │
-│  │  Review and approve newly discovered facilities           │ │
-│  └───────────────────────────────────────────────────────────┘ │
-│                                                                 │
-│  ┌───────────────────────────────────────────────────────────┐ │
-│  │  FILTERS                                                  │ │
-│  │                                                           │ │
-│  │  Status: [All ▾]  Province: [All ▾]  Sort: [Newest ▾]    │ │
-│  └───────────────────────────────────────────────────────────┘ │
-│                                                                 │
-│  ┌───────────────────────────────────────────────────────────┐ │
-│  │  HOSPITAL CARD (pending verification)                     │ │
-│  │                                                           │ │
-│  │  ┌─────────────────────────────────────────────────────┐ │ │
-│  │  │  ○ Pending                           Jan 30, 2026   │ │ │
-│  │  │                                                     │ │ │
-│  │  │  Hôpital du Sacré-Cœur de Montréal                 │ │ │
-│  │  │  Montreal, Quebec                                   │ │ │
-│  │  │                                                     │ │ │
-│  │  │  ID: ca-qc-sacre-coeur                             │ │ │
-│  │  │  Source: Quebec MSSS                                │ │ │
-│  │  │  Coordinates: 45.5320, -73.6544                     │ │ │
-│  │  │                                                     │ │ │
-│  │  │  ┌─────────────────────────────────────────────┐   │ │ │
-│  │  │  │ 📍 View on Map                              │   │ │ │
-│  │  │  └─────────────────────────────────────────────┘   │ │ │
-│  │  │                                                     │ │ │
-│  │  │  ┌───────────┐  ┌───────────┐  ┌───────────────┐  │ │ │
-│  │  │  │ ✓ Approve │  │ ✗ Reject  │  │ ✎ Edit & Save │  │ │ │
-│  │  │  └───────────┘  └───────────┘  └───────────────┘  │ │ │
-│  │  └─────────────────────────────────────────────────────┘ │ │
-│  │                                                           │ │
-│  │  [Similar cards for other pending hospitals...]           │ │
-│  └───────────────────────────────────────────────────────────┘ │
-│                                                                 │
-│  ┌───────────────────────────────────────────────────────────┐ │
-│  │  BULK ACTIONS                                             │ │
-│  │                                                           │ │
-│  │  [☐ Select All]  [Approve Selected]  [Export CSV]        │ │
-│  └───────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Edit Modal
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  EDIT HOSPITAL                                          [✕]    │
-│                                                                 │
-│  Name                                                           │
-│  ┌───────────────────────────────────────────────────────────┐ │
-│  │ Hôpital du Sacré-Cœur de Montréal                        │ │
-│  └───────────────────────────────────────────────────────────┘ │
-│                                                                 │
-│  City                        Province                           │
-│  ┌────────────────────────┐  ┌────────────────────────────┐   │
-│  │ Montreal               │  │ Quebec              ▾      │   │
-│  └────────────────────────┘  └────────────────────────────┘   │
-│                                                                 │
-│  Latitude                    Longitude                          │
-│  ┌────────────────────────┐  ┌────────────────────────────┐   │
-│  │ 45.5320                │  │ -73.6544                   │   │
-│  └────────────────────────┘  └────────────────────────────┘   │
-│                                                                 │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │ 🗺️ Mini map preview showing pin location               │   │
-│  └─────────────────────────────────────────────────────────┘   │
-│                                                                 │
-│  ┌───────────────────┐  ┌───────────────────────────────────┐ │
-│  │      Cancel       │  │         Save & Approve            │ │
-│  └───────────────────┘  └───────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### API Endpoints
-
-```typescript
-// GET /api/admin/hospitals/pending
-// Returns hospitals where is_verified = false
-
-// PATCH /api/admin/hospitals/[id]/verify
-// Body: { action: 'approve' | 'reject' }
-// Sets is_verified = true, is_visible = true (or deletes)
-
-// PATCH /api/admin/hospitals/[id]
-// Body: { name?, city?, lat?, lng? }
-// Updates hospital details
-```
-
-### Files to Create
-- `frontend/app/admin/verify/page.tsx`
-- `frontend/components/admin/HospitalVerifyCard.tsx`
-- `frontend/components/admin/HospitalEditModal.tsx`
-- `frontend/app/api/admin/hospitals/pending/route.ts`
-- `frontend/app/api/admin/hospitals/[id]/verify/route.ts`
+> **Removed:** The admin verification queue was removed because all data sources are trusted government health authority websites. Automated quality controls (anomaly detection, data quality monitoring, payload hashing, parser versioning, heartbeat monitoring) provide better assurance than manual approval of government data. Hospitals from trusted sources are now auto-approved on insert.
 
 ---
 

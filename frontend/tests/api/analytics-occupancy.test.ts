@@ -25,7 +25,9 @@ describe("Occupancy Analytics API", () => {
   it("returns explicit not_available_yet when schema fields are absent", async () => {
     mockSql.mockResolvedValueOnce([]);
 
-    const request = new Request("http://localhost/api/analytics/occupancy?province=ON");
+    const request = new Request(
+      "http://localhost/api/analytics/occupancy?province=ON",
+    );
     const response = await GET(request);
     const json = await response.json();
 
@@ -52,7 +54,9 @@ describe("Occupancy Analytics API", () => {
         },
       ]);
 
-    const request = new Request("http://localhost/api/analytics/occupancy?province=ON");
+    const request = new Request(
+      "http://localhost/api/analytics/occupancy?province=ON",
+    );
     const response = await GET(request);
     const json = await response.json();
 
@@ -82,7 +86,9 @@ describe("Occupancy Analytics API", () => {
         },
       ]);
 
-    const request = new Request("http://localhost/api/analytics/occupancy?province=ON");
+    const request = new Request(
+      "http://localhost/api/analytics/occupancy?province=ON",
+    );
     const response = await GET(request);
     const json = await response.json();
 
@@ -95,7 +101,9 @@ describe("Occupancy Analytics API", () => {
   it("handles database failures", async () => {
     mockSql.mockRejectedValue(new Error("DB failure"));
 
-    const request = new Request("http://localhost/api/analytics/occupancy?province=ON");
+    const request = new Request(
+      "http://localhost/api/analytics/occupancy?province=ON",
+    );
     const response = await GET(request);
     const json = await response.json();
 

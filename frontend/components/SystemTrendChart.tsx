@@ -92,18 +92,26 @@ function directionPrefix(direction: TrendDirection): string {
 function formatPeriodLabel(point: TrendPoint, period: PeriodType): string {
   const start = new Date(point.period_start);
   if (period === "weekly") {
-    const month = start.toLocaleString("en-CA", { month: "short", timeZone: "UTC" });
+    const month = start.toLocaleString("en-CA", {
+      month: "short",
+      timeZone: "UTC",
+    });
     return `${month} ${start.getUTCDate()}`;
   }
 
-  const month = start.toLocaleString("en-CA", { month: "short", timeZone: "UTC" });
+  const month = start.toLocaleString("en-CA", {
+    month: "short",
+    timeZone: "UTC",
+  });
   return `${month} '${String(start.getUTCFullYear()).slice(2)}`;
 }
 
 export function SystemTrendChart({ province = "ON" }: SystemTrendChartProps) {
   const [period, setPeriod] = useState<PeriodType>("monthly");
   const [lookback, setLookback] = useState<Lookback>("6m");
-  const [payload, setPayload] = useState<TrendsApiResponse["data"] | null>(null);
+  const [payload, setPayload] = useState<TrendsApiResponse["data"] | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -122,9 +130,12 @@ export function SystemTrendChart({ province = "ON" }: SystemTrendChartProps) {
           lookback,
         });
 
-        const response = await fetch(`/api/analytics/trends?${query.toString()}`, {
-          signal: controller.signal,
-        });
+        const response = await fetch(
+          `/api/analytics/trends?${query.toString()}`,
+          {
+            signal: controller.signal,
+          },
+        );
         const json = (await response.json()) as TrendsApiResponse;
 
         if (!mounted) return;
@@ -171,7 +182,9 @@ export function SystemTrendChart({ province = "ON" }: SystemTrendChartProps) {
     <section className="rounded-xl border border-border/50 bg-card p-4">
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">System Trend</h2>
+          <h2 className="text-lg font-semibold text-foreground">
+            System Trend
+          </h2>
           <p className="text-xs text-muted-foreground">
             Province-wide emergency wait trend for {provinceLabel(province)}
           </p>
@@ -188,7 +201,7 @@ export function SystemTrendChart({ province = "ON" }: SystemTrendChartProps) {
                   "px-2.5 py-1 text-xs rounded-md font-medium transition-colors",
                   period === option.value
                     ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {option.label}
@@ -206,7 +219,7 @@ export function SystemTrendChart({ province = "ON" }: SystemTrendChartProps) {
                   "px-2.5 py-1 text-xs rounded-md font-medium transition-colors",
                   lookback === option.value
                     ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {option.label}
@@ -221,10 +234,11 @@ export function SystemTrendChart({ province = "ON" }: SystemTrendChartProps) {
           <span
             className={clsx(
               "text-xs font-semibold px-2.5 py-1 rounded-full border",
-              directionClasses(trendSummary.direction)
+              directionClasses(trendSummary.direction),
             )}
           >
-            {directionPrefix(trendSummary.direction)} {Math.abs(trendSummary.change_percent).toFixed(1)}%
+            {directionPrefix(trendSummary.direction)}{" "}
+            {Math.abs(trendSummary.change_percent).toFixed(1)}%
           </span>
           <span className="text-xs text-muted-foreground">
             {provinceLabel(province)} ER waits over {lookback}
@@ -238,7 +252,9 @@ export function SystemTrendChart({ province = "ON" }: SystemTrendChartProps) {
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         ) : error ? (
-          <div className="h-full flex items-center justify-center text-sm text-red-600">{error}</div>
+          <div className="h-full flex items-center justify-center text-sm text-red-600">
+            {error}
+          </div>
         ) : !hasData ? (
           <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
             Not enough province trend data yet.
@@ -246,9 +262,23 @@ export function SystemTrendChart({ province = "ON" }: SystemTrendChartProps) {
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-              <XAxis dataKey="label" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} width={40} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="var(--border)"
+              />
+              <XAxis
+                dataKey="label"
+                tick={{ fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+                width={40}
+              />
               <Tooltip />
               <Area
                 type="monotone"
@@ -292,7 +322,9 @@ export function SystemTrendChart({ province = "ON" }: SystemTrendChartProps) {
       </div>
 
       {trendSummary && !loading && !error && (
-        <p className="mt-3 text-sm text-muted-foreground">{trendSummary.narrative}</p>
+        <p className="mt-3 text-sm text-muted-foreground">
+          {trendSummary.narrative}
+        </p>
       )}
     </section>
   );

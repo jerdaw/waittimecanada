@@ -62,12 +62,18 @@ function quartileLabel(quartile: number): string {
 }
 
 function quartileClasses(quartile: number): string {
-  if (quartile === 1) return "bg-emerald-50 text-emerald-700 border-emerald-200";
-  if (quartile === 2 || quartile === 3) return "bg-amber-50 text-amber-700 border-amber-200";
+  if (quartile === 1)
+    return "bg-emerald-50 text-emerald-700 border-emerald-200";
+  if (quartile === 2 || quartile === 3)
+    return "bg-amber-50 text-amber-700 border-amber-200";
   return "bg-red-50 text-red-700 border-red-200";
 }
 
-function trendIndicator(trend: TrendDirection): { symbol: string; className: string; label: string } {
+function trendIndicator(trend: TrendDirection): {
+  symbol: string;
+  className: string;
+  label: string;
+} {
   if (trend === "improving") {
     return { symbol: "v", className: "text-emerald-700", label: "Improving" };
   }
@@ -97,7 +103,10 @@ function provinceLabel(code: string): string {
   return labels[code] ?? code;
 }
 
-export function BenchmarkCard({ hospital, compact = false }: BenchmarkCardProps) {
+export function BenchmarkCard({
+  hospital,
+  compact = false,
+}: BenchmarkCardProps) {
   const [benchmark, setBenchmark] = useState<BenchmarkHospital | null>(null);
   const [provinceMean, setProvinceMean] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -119,9 +128,12 @@ export function BenchmarkCard({ hospital, compact = false }: BenchmarkCardProps)
           hospital_id: hospital.id,
         });
 
-        const response = await fetch(`/api/analytics/benchmarks?${query.toString()}`, {
-          signal: controller.signal,
-        });
+        const response = await fetch(
+          `/api/analytics/benchmarks?${query.toString()}`,
+          {
+            signal: controller.signal,
+          },
+        );
 
         const payload = (await response.json()) as BenchmarksApiResponse;
         if (!response.ok || !payload.success || !payload.data) {
@@ -162,11 +174,13 @@ export function BenchmarkCard({ hospital, compact = false }: BenchmarkCardProps)
             <div className="flex items-center justify-between gap-2 text-xs">
               <span className="font-semibold text-slate-700">Peer Rank</span>
               <span className={clsx("font-semibold", trend.className)}>
-                {trend.symbol} {Math.abs(benchmark.trend_change_percent).toFixed(1)}%
+                {trend.symbol}{" "}
+                {Math.abs(benchmark.trend_change_percent).toFixed(1)}%
               </span>
             </div>
             <div className="text-xs text-slate-700">
-              {formatOrdinal(benchmark.percentile)} percentile ({quartileLabel(benchmark.quartile)})
+              {formatOrdinal(benchmark.percentile)} percentile (
+              {quartileLabel(benchmark.quartile)})
             </div>
             {provinceMean !== null && (
               <div className="text-[11px] text-slate-500">
@@ -185,7 +199,9 @@ export function BenchmarkCard({ hospital, compact = false }: BenchmarkCardProps)
         <p className="text-[10px] uppercase tracking-wide font-semibold text-muted-foreground">
           Peer Benchmark ({provinceLabel(hospital.province)})
         </p>
-        {loading && <span className="text-[10px] text-muted-foreground">Loading...</span>}
+        {loading && (
+          <span className="text-[10px] text-muted-foreground">Loading...</span>
+        )}
       </div>
 
       {!loading && benchmark && trend && (
@@ -194,28 +210,32 @@ export function BenchmarkCard({ hospital, compact = false }: BenchmarkCardProps)
             <span
               className={clsx(
                 "text-xs font-semibold px-2 py-1 rounded-full border",
-                quartileClasses(benchmark.quartile)
+                quartileClasses(benchmark.quartile),
               )}
             >
               {formatOrdinal(benchmark.percentile)} percentile wait time
             </span>
             <span className={clsx("text-xs font-semibold", trend.className)}>
-              {trend.symbol} {trend.label} ({Math.abs(benchmark.trend_change_percent).toFixed(1)}%)
+              {trend.symbol} {trend.label} (
+              {Math.abs(benchmark.trend_change_percent).toFixed(1)}%)
             </span>
           </div>
 
-          <p className="text-xs text-foreground mb-1">{quartileLabel(benchmark.quartile)}</p>
+          <p className="text-xs text-foreground mb-1">
+            {quartileLabel(benchmark.quartile)}
+          </p>
 
           <p className="text-xs text-muted-foreground">
             {provinceMean !== null
               ? `${provinceLabel(hospital.province)} avg: ${Math.round(
-                  provinceMean
+                  provinceMean,
                 )} min | This hospital: ${Math.round(benchmark.period_mean)} min`
               : `This hospital: ${Math.round(benchmark.period_mean)} min (7-day mean)`}
           </p>
 
           <p className="mt-2 text-[10px] text-muted-foreground">
-            Rankings reflect 7-day averages. Lower percentile indicates shorter waits.
+            Rankings reflect 7-day averages. Lower percentile indicates shorter
+            waits.
           </p>
         </>
       )}

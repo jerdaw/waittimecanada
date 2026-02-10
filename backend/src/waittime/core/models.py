@@ -41,6 +41,17 @@ class Measurement(BaseModel):
     statistic_type: StatisticType
     patient_scope: PatientScope = PatientScope.ALL
 
+    # Occupancy Metrics (Optional)
+    patients_waiting: int | None = Field(
+        default=None, ge=0, description="Number of patients waiting"
+    )
+    patients_in_treatment: int | None = Field(
+        default=None, ge=0, description="Number of patients in treatment"
+    )
+    total_treatment_spaces: int | None = Field(
+        default=None, ge=0, description="Total ER capacity"
+    )
+
     # Provenance tracking
     source_id: str = Field(description="Foreign key to sources table")
     raw_payload_hash: str = Field(
