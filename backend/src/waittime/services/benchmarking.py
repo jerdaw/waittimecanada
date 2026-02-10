@@ -242,8 +242,6 @@ class BenchmarkingService:
             ORDER BY h.id
         """
 
-        params = [current_start, current_end]
-
         # Helper to append ontology params repeatedly
         ontology_params = []
         ontology_clause = ""
@@ -295,9 +293,12 @@ class BenchmarkingService:
         # We need separate params list for measurements
         ontology_params_measurements = []
         if ontology:
-             if "metric_family" in ontology: ontology_params_measurements.append(ontology["metric_family"])
-             if "start_event" in ontology: ontology_params_measurements.append(ontology["start_event"])
-             if "end_event" in ontology: ontology_params_measurements.append(ontology["end_event"])
+             if "metric_family" in ontology:
+                 ontology_params_measurements.append(ontology["metric_family"])
+             if "start_event" in ontology:
+                 ontology_params_measurements.append(ontology["start_event"])
+             if "end_event" in ontology:
+                 ontology_params_measurements.append(ontology["end_event"])
 
         full_params.extend(ontology_params_measurements)
 
