@@ -429,7 +429,7 @@ See [`docs/planning/roadmap.md`](docs/planning/roadmap.md) for detailed status a
 This is a **portfolio project for medical school applications**. While not actively seeking contributors, the codebase follows professional standards and is well-documented for educational purposes.
 
 **If you're interested in the methodology:**
-- Review [`docs/methodologies/`](docs/methodologies/) for provincial analysis
+- Review [`backend/docs/methodologies/`](backend/docs/methodologies/) for provincial analysis
 - Check [`docs/adr/`](docs/adr/) for architectural decisions
 - Explore [`CLAUDE.md`](CLAUDE.md) for project principles
 
