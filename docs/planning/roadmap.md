@@ -2,7 +2,7 @@
 
 ## Current Status (Updated 2026-02-11)
 
-**Progress:** **M16 Complete** (Multi-Province Operationalization) | Milestone 15 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
+**Progress:** **M16 Complete** (Multi-Province Operationalization) | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
 **Strategic Direction:** **Four-province breadth achieved** (ON, QC, AB, BC). All four scrapers active in production, 380+ hospitals visible across all provinces, methodology documentation complete for all provinces, regional analytics data seeded for 15 regions.
 
@@ -121,7 +121,6 @@ Each feature maps to CanMEDS competencies for medical school admissions:
 ## Implementation Plans
 
 Active milestone plans in `docs/planning/implementation/`:
-- `docs/planning/implementation/milestone-16-multi-province-ops.md` — M16: Multi-Province Operationalization (COMPLETE)
 - `docs/planning/implementation/milestone-9-launch.md` — Production deployment & stakeholder validation
 - `docs/planning/implementation/milestone-11-equity.md` — Access Burden Estimator & equity layer
 - `docs/planning/implementation/milestone-12-research.md` — Citation export & alert system
