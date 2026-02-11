@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from "react";
 import { isRecent } from "@/utils/date";
 import { ProvinceFilter } from "./ProvinceFilter";
 import { RegionSelector, type RegionOption } from "./RegionSelector";
+import { OccupancyBadge } from "./OccupancyBadge";
 
 interface HospitalListProps {
   hospitals: Hospital[];
@@ -144,6 +145,18 @@ export function HospitalList({
             {displayedHospitals.length} results
           </span>
         </div>
+
+        {/* Quebec Occupancy Info Banner */}
+        {selectedProvince === "QC" &&
+          displayedHospitals.some((h) => h.occupancy_percentage !== undefined) && (
+            <div className="mt-2 px-3 py-2 bg-primary/5 border border-primary/10 rounded-lg text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">
+                Stretcher Occupancy:
+              </span>{" "}
+              Quebec reports real-time ED capacity. &gt;100% indicates
+              overcrowding.
+            </div>
+          )}
       </div>
 
       {/* Scrollable List */}
@@ -248,15 +261,23 @@ export function HospitalList({
                       </div>
                     </div>
 
-                    {/* Wait Time */}
+                    {/* Wait Time & Occupancy */}
                     <div className="flex items-center gap-2 shrink-0">
-                      <div className="text-right">
-                        <span className="text-lg font-bold tabular-nums">
-                          {formatWaitTime(hospital.current_wait_time)}
-                        </span>
-                        <span className="text-xs text-muted-foreground ml-0.5">
-                          min
-                        </span>
+                      <div className="text-right flex flex-col items-end gap-0.5">
+                        <div>
+                          <span className="text-lg font-bold tabular-nums">
+                            {formatWaitTime(hospital.current_wait_time)}
+                          </span>
+                          <span className="text-xs text-muted-foreground ml-0.5">
+                            min
+                          </span>
+                        </div>
+                        {hospital.occupancy_percentage !== undefined && (
+                          <OccupancyBadge
+                            percentage={hospital.occupancy_percentage}
+                            size="sm"
+                          />
+                        )}
                       </div>
                       <svg
                         className={clsx(

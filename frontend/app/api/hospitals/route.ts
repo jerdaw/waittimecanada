@@ -23,6 +23,9 @@ export interface Hospital {
   // Telehealth fields (from sources)
   telehealth_name?: string;
   telehealth_number?: string;
+  // Occupancy fields (Quebec-specific)
+  occupancy_percentage?: number; // Stretcher occupancy as percentage
+  occupancy_updated?: string; // Timestamp of occupancy measurement
 }
 
 export async function GET(request: Request) {
@@ -31,7 +34,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const province = searchParams.get("province");
 
-    // Query hospitals with their most recent measurement including methodology and telehealth info
+    // Query hospitals with their most recent wait time and occupancy measurements
     let query = `
       SELECT
         h.id,
@@ -51,7 +54,9 @@ export async function GET(request: Request) {
         m.start_event,
         m.end_event,
         m.statistic_type,
-        m.patient_scope
+        m.patient_scope,
+        occ.value as occupancy_percentage,
+        occ.timestamp_utc as occupancy_updated
       FROM hospitals h
       LEFT JOIN sources s ON s.id = h.source_id
       LEFT JOIN LATERAL (
@@ -65,9 +70,20 @@ export async function GET(request: Request) {
           patient_scope
         FROM measurements
         WHERE hospital_id = h.id
+          AND metric_family = 'TIME_TO_PROVIDER'
         ORDER BY timestamp_utc DESC
         LIMIT 1
       ) m ON true
+      LEFT JOIN LATERAL (
+        SELECT
+          value,
+          timestamp_utc
+        FROM measurements
+        WHERE hospital_id = h.id
+          AND metric_family = 'STRETCHER_OCCUPANCY'
+        ORDER BY timestamp_utc DESC
+        LIMIT 1
+      ) occ ON true
       WHERE h.is_visible = true AND h.is_verified = true
     `;
 

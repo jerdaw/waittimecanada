@@ -35,10 +35,10 @@ Quebec reports emergency department wait times through the Ministere de la Sante
 **Data Type:** Rolling average estimates
 
 **What They Report:**
-- **Estimated waiting time for non-priority cases**: Average wait from registration to physician
-- **Stretcher occupancy rate**: Percentage of stretchers in use (separate metric, not currently scraped)
-- **Number of patients on stretchers**: Current count
-- **Average length of stay on stretcher**: For admitted patients awaiting transfer
+- **Estimated waiting time for non-priority cases**: Average wait from registration to physician ✅ **SCRAPED**
+- **Stretcher occupancy rate**: Percentage of stretchers in use ✅ **SCRAPED (M17)** - Stored as STRETCHER_OCCUPANCY measurements
+- **Number of patients on stretchers**: Current count (displayed but not scraped)
+- **Average length of stay on stretcher**: For admitted patients awaiting transfer (not scraped)
 
 **Methodology:**
 - Reports a **rolling average** of registration-to-physician time
@@ -46,7 +46,7 @@ Quebec reports emergency department wait times through the Ministere de la Sante
 - Based on hospital administrative data systems
 - Includes all patient acuity levels
 
-**Ontology Mapping:**
+**Ontology Mapping (Wait Time):**
 ```
 metric_family: TIME_TO_PROVIDER
 start_event: REGISTRATION
@@ -54,6 +54,17 @@ end_event: PHYSICIAN
 statistic_type: ROLLING_AVG
 patient_scope: ALL
 ```
+
+**Ontology Mapping (Occupancy):**
+```
+metric_family: STRETCHER_OCCUPANCY
+start_event: UNKNOWN (point-in-time snapshot)
+end_event: PHYSICIAN (placeholder for consistency)
+statistic_type: POINT_ESTIMATE
+patient_scope: ALL
+```
+
+**Note:** Stretcher occupancy is reported as a percentage (e.g., 110% = 10% over capacity). This is a **Quebec-only metric** - no other province currently reports occupancy data.
 
 ---
 

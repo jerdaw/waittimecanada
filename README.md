@@ -1,92 +1,255 @@
 # WaitTime Canada
 
-> A clinically defensible Health Systems Observatory for Canadian ER wait-time methodology and reporting quality.
+> A clinically defensible Health Systems Observatory for Canadian emergency department wait-time methodology and data quality.
 
 [![Frontend CI](https://github.com/jerdaw/waittimecanada/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/jerdaw/waittimecanada/actions/workflows/frontend-ci.yml)
 [![Scraper CI](https://github.com/jerdaw/waittimecanada/actions/workflows/scraper-ci.yml/badge.svg)](https://github.com/jerdaw/waittimecanada/actions/workflows/scraper-ci.yml)
 [![Production Readiness](https://github.com/jerdaw/waittimecanada/actions/workflows/production-readiness.yml/badge.svg)](https://github.com/jerdaw/waittimecanada/actions/workflows/production-readiness.yml)
 
-## What This Project Is
+---
 
-WaitTime Canada is not a simple wait-time leaderboard. It is an observatory that:
+## 📊 Overview
 
-- audits methodology differences across provinces
-- preserves source semantics instead of normalizing incomparable metrics
-- surfaces divergence warnings when direct comparisons are invalid
-- provides data-quality and anomaly visibility for operational trust
-- supports analytics, benchmarking, and export for transparent interpretation
+**WaitTime Canada is not a simple wait-time leaderboard.** It's a comprehensive health systems observatory that audits and exposes methodological inconsistencies in Canadian emergency department reporting across provinces.
 
-## Current Scope
+### Current Coverage
 
-- Frontend: Next.js 14 + TypeScript (`frontend/`)
-- Backend: Python 3.12+ scraper/services package (`backend/`)
-- Database: Neon PostgreSQL with strict metric ontology constraints
-- Major delivered capabilities: comparability warnings, aggregation pipeline, data-quality dashboard, analytics benchmarks/trends/regions, occupancy availability contract, equity scaffold
+- **4 Provinces:** Quebec, Ontario, Alberta, British Columbia
+- **380+ Hospitals:** Real-time monitoring across all regions
+- **15-Minute Updates:** Automated data collection via GitHub Actions
+- **First-in-Canada:** Real-time ED stretcher occupancy visualization (Quebec)
 
-Source-of-truth roadmap: `docs/planning/roadmap.md`
+### Why This Matters
 
-## Quick Start (Local)
+Provincial health authorities report ER wait times using **fundamentally different methodologies**:
+- Quebec starts the clock at **REGISTRATION** (administrative check-in)
+- Ontario starts at **TRIAGE** (clinical assessment)
+- Different statistical measures (P90 vs rolling averages)
+- Different patient populations (all vs mid-acuity)
 
-### 1. Prerequisites
+**Direct comparison without methodology awareness is clinically misleading.** This observatory makes those differences transparent.
+
+---
+
+## ✨ Key Features
+
+### 🎯 Methodology Transparency
+- **Ontology-Based Architecture:** Every measurement tagged with start_event, end_event, statistic_type, patient_scope
+- **Divergence Warnings:** Automatic alerts when comparing incompatible metrics
+- **Comparability Matrix:** Visual display of cross-province methodology alignment
+- **Deep Linking:** Share specific hospital comparisons with methodology context
+
+### 📈 Data Quality & Monitoring
+- **Anomaly Detection:** Automated flagging of suspicious measurements
+- **Data Quality Dashboard:** Real-time visibility into scraper health, measurement counts, staleness
+- **Heartbeat Monitoring:** Dead Man's Switch alerts via Pushover if data becomes stale
+- **Methodology Change Detection:** Tracks when provincial reporting methods change
+
+### 🏥 Real-Time Occupancy (Quebec)
+- **First-in-Canada:** Stretcher occupancy percentage visualization
+- **Color-Coded Indicators:**
+  - 🟢 Green (<90%): Below capacity
+  - 🟡 Yellow (90-110%): Near capacity
+  - 🔴 Red (>110%): Overcrowded with pulse animation
+- **Clinical Context:** >100% indicates overcrowding and potential extended waits
+
+### 📊 Analytics & Benchmarking
+- **Peer Benchmarking:** Hospital performance vs regional/provincial averages
+- **Temporal Patterns:** Hour-of-day, day-of-week, monthly trend analysis
+- **Regional Intelligence:** 15 health regions mapped with analytics segmentation
+- **System Trends:** Province-wide performance tracking with 90d/6m/1y views
+
+### 🗺️ Interactive Map
+- **Mapbox Integration:** Geographic visualization of all hospitals
+- **Live Data Indicators:** Real-time updates highlighted
+- **Distance Calculation:** User location-based sorting
+- **Cluster Markers:** Efficient rendering of 380+ locations
+
+### 📤 Data Export
+- **Citation-Ready:** CSV/JSON export with methodology metadata
+- **Granularity Control:** Raw measurements, hourly, daily, weekly, or monthly aggregates
+- **Research-Grade:** Full audit trail with payload hashing and parser versioning
+
+### 🔍 Access & Equity Insights
+- **Access Burden Estimator:** Fuel + parking cost calculations for patient decision-making
+- **Provincial Gas Price Awareness:** ON $1.55/L, QC $1.60/L, BC $1.75/L
+- **Distance-Based Analysis:** Nearest hospital identification within radius
+- **Equity Layer Scaffold:** Foundation for census tract income overlays (future)
+
+---
+
+## 🏗️ Technical Architecture
+
+### Backend
+- **Language:** Python 3.12+
+- **Testing:** pytest with 375+ tests, 77% code coverage
+- **Scrapers:** 4 provincial scrapers (BeautifulSoup, Playwright, JSON extraction)
+- **Database:** Neon PostgreSQL 17 with 9 tables, strict ontology constraints
+- **Services:**
+  - DatabaseService, AggregationService, DataQualityService
+  - AnomalyDetectionService, MethodologyChangeDetector
+  - GeocodingService (Nominatim), HeartbeatService
+- **CLI Tools:** Scraper runner, database cleanup, seeding, aggregation, region mapping
+
+### Frontend
+- **Framework:** Next.js 14 App Router + TypeScript
+- **Testing:** Vitest with 287 tests (285 passing)
+- **Mapping:** Mapbox GL JS
+- **Components:** 30+ React components with comprehensive test coverage
+- **API Routes:** 15+ endpoints for hospitals, comparisons, analytics, data quality
+- **Pages:** Home (map + list), /data-quality, /analytics, /methods, /about
+
+### Database Schema (9 Tables)
+- `sources` - Provincial data source metadata
+- `hospitals` - Facility metadata with verification workflow
+- `measurements` - Audit log with ontology tags (payload hashing, not full HTML)
+- `scraper_status` - Heartbeat monitoring
+- `measurement_aggregates` - Permanent statistical summaries (hourly/daily/weekly/monthly)
+- `data_quality_snapshots` - Daily scraper reliability metrics
+- `methodology_change_events` - Detected methodology shifts
+- `regions` - Province region metadata for analytics
+- `hospital_regions` - Hospital-to-region mappings
+
+### Automation
+- **GitHub Actions:** Scrapers run every 15 minutes, heartbeat checks every 30 minutes
+- **Playwright Browsers:** Automated for Ontario/Alberta JavaScript-rendered pages
+- **Failure Alerting:** Pushover notifications for scraper/heartbeat failures
+- **Cost:** ~$240/month GitHub Actions (optimizable to ~$120/month)
+
+---
+
+## 🎓 Portfolio Narrative
+
+This project demonstrates multiple CanMEDS competencies for medical school applications:
+
+### Scholar
+- Sophisticated metric ontology system for research validity
+- Statistical aggregation pipeline (percentiles, rolling averages)
+- Methodology change detection and documentation
+- Citation-ready data export with full provenance tracking
+
+### Professional
+- Clinical defensibility through methodology transparency
+- Divergence warnings prevent misleading comparisons
+- Data quality monitoring ensures operational trust
+- Peer benchmarking enables evidence-based decisions
+
+### Health Advocate
+- Access Burden Estimator helps vulnerable populations make informed decisions
+- Transparency around ED capacity constraints (occupancy data)
+- Equity layer foundation for income-based analysis
+- Provincial gas price awareness for financial planning
+
+### Leader
+- Multi-province scaling demonstrates systems architecture
+- Regional analytics dashboards for health authority insights
+- Automated data collection reduces manual burden
+- Comprehensive operational documentation
+
+### Collaborator
+- Province-aware telehealth routing (811 variations by province)
+- Attribution to official provincial sources
+- Methodology timeline preserves institutional knowledge
+
+---
+
+## 🚀 Quick Start (Local Development)
+
+### Prerequisites
 
 - Python 3.12+
 - Node.js 20+
-- npm
-- Neon `DATABASE_URL`
-- Mapbox token (`NEXT_PUBLIC_MAPBOX_TOKEN`)
+- PostgreSQL (Neon account recommended)
+- Mapbox account (free tier sufficient)
 
-### 2. Create Environment Files
+### 1. Clone and Setup Environment
 
 ```bash
+git clone https://github.com/yourusername/waittimecanada.git
+cd waittimecanada
+
+# Backend environment
 cp backend/.env.example backend/.env.local
+# Edit backend/.env.local with DATABASE_URL
+
+# Frontend environment
 cp frontend/.env.example frontend/.env.local
+# Edit frontend/.env.local with NEXT_PUBLIC_MAPBOX_TOKEN
 ```
 
-Populate values in both files (at minimum `DATABASE_URL`; frontend also needs `NEXT_PUBLIC_MAPBOX_TOKEN`).
-
-### 3. Set Up Python Environment
+### 2. Backend Setup
 
 ```bash
+cd backend
+
+# Create virtual environment
 python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -e 'backend[dev]'
-```
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-Note for `zsh`: keep quotes around `backend[dev]`.
+# Install dependencies
+pip install --upgrade pip
+pip install -e '.[dev]'  # Note: use quotes in zsh
 
-### 4. Apply Migrations and Bootstrap Analytics
+# Install Playwright browsers (for Ontario/Alberta scrapers)
+playwright install chromium
 
-```bash
-python backend/run_migrations.py
+# Apply database migrations
+python run_migrations.py
+
+# Seed sources and bootstrap analytics
 python -m waittime.cli.bootstrap_analytics --days 180
 ```
 
-### 5. Set Up Frontend
+### 3. Frontend Setup
 
 ```bash
 cd frontend
+
+# Install dependencies
 npm install
+
+# Run development server
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open `http://localhost:3000` to view the app.
 
-## Common Commands
+### 4. Run Scrapers (Optional)
+
+```bash
+cd backend
+source .venv/bin/activate
+
+# Run all scrapers
+python -m waittime.cli.scraper --all
+
+# Or run single province
+python -m waittime.cli.scraper --source quebec-msss
+```
+
+---
+
+## 📚 Common Commands
 
 ### Backend
 
 ```bash
 source .venv/bin/activate
 
-# Run all scrapers
-python -m waittime.cli.scraper --all
+# Scrapers
+python -m waittime.cli.scraper --all              # Run all scrapers
+python -m waittime.cli.scraper --source ontario-health  # Single province
+python -m waittime.cli.scraper --dry-run --all    # Test without DB writes
 
-# Run a single scraper
-python -m waittime.cli.scraper --source ontario-health
+# Maintenance
+python -m waittime.cli.check_heartbeat            # Verify scraper health
+python -m waittime.cli.aggregate --backfill       # Regenerate aggregates
+python -m waittime.cli.cleanup --dry-run          # Preview cleanup
 
-# Run backend tests
-python -m pytest backend/tests
+# Testing
+pytest tests/unit                                  # Unit tests only
+pytest tests/integration                           # Integration tests
+pytest tests/ -v --cov=waittime                   # Full suite with coverage
 ```
 
 ### Frontend
@@ -94,44 +257,220 @@ python -m pytest backend/tests
 ```bash
 cd frontend
 
-# Type check + lint + unit tests
-npm run type-check
-npm run lint
-npm run test:unit
+# Development
+npm run dev          # Start dev server
+npm run build        # Production build
+npm run start        # Run production build
+
+# Quality
+npm run type-check   # TypeScript validation
+npm run lint         # ESLint checks
+npm run test:unit    # Vitest unit tests
 ```
 
-Playwright E2E is CI-first in this project; avoid local E2E unless debugging.
+---
 
-## Repository Map
+## 📖 Documentation
 
-- `backend/README.md`: backend architecture, CLI, and testing
-- `frontend/README.md`: frontend architecture, APIs, and testing
-- `docs/README.md`: documentation index
-- `docs/API.md`: API contracts and examples
-- `docs/architecture/`: architecture overviews
-- `docs/planning/roadmap.md`: active roadmap and milestone status
-- `docs/planning/manual-tasks.md`: human-intervention queue
+### Essential Reading
+- [`docs/planning/roadmap.md`](docs/planning/roadmap.md) - **Active roadmap and milestone status**
+- [`docs/operations/scraper-scheduling.md`](docs/operations/scraper-scheduling.md) - Production operations guide
+- [`CLAUDE.md`](CLAUDE.md) - AI agent instructions and project architecture
 
-## Operational Workflows
+### Deep Dives
+- [`docs/adr/`](docs/adr/) - Architecture Decision Records (14 ADRs)
+- [`docs/methodologies/`](docs/methodologies/) - Provincial methodology documentation
+- [`docs/architecture/`](docs/architecture/) - System architecture diagrams
+- [`backend/README.md`](backend/README.md) - Backend architecture and testing
+- [`frontend/README.md`](frontend/README.md) - Frontend architecture and testing
 
-Workflow reference and required secrets:
+### API Reference
+- [`docs/API.md`](docs/API.md) - API contracts and examples
+- Endpoints: `/api/hospitals`, `/api/comparisons`, `/api/analytics/*`, `/api/data-quality`
 
-- `.github/workflows/README.md`
-- `frontend/netlify.toml` + `frontend/scripts/netlify-ignore.sh` gate Netlify builds to explicit `[release]`/`[deploy]` commits only
-- Netlify guardrails reduce future credit burn only; they do not automatically unsuspend a site already suspended for exceeded credits before billing reset on March 2, 2026
-- `frontend/utils/cache.ts` standardizes API cache headers for read-heavy endpoints; admin/user-specific routes remain `no-store`
+---
 
-Quick production ops check:
+## 🔧 Repository Structure
 
+```
+waittimecanada/
+├── backend/
+│   ├── src/waittime/
+│   │   ├── scrapers/          # Provincial scrapers (QC, ON, AB, BC)
+│   │   ├── services/          # Business logic services
+│   │   ├── core/              # Models, enums, ontology
+│   │   └── cli/               # Command-line tools
+│   ├── tests/                 # 375+ tests (unit + integration)
+│   ├── migrations/            # Database schema migrations
+│   ├── seed_data/             # Hospital/region seed data
+│   └── docs/                  # Backend-specific documentation
+├── frontend/
+│   ├── app/                   # Next.js 14 App Router
+│   │   ├── api/               # API routes
+│   │   ├── data-quality/      # Data quality dashboard
+│   │   ├── analytics/         # Analytics dashboard
+│   │   └── methods/           # Methodology documentation page
+│   ├── components/            # React components
+│   ├── tests/                 # 287 frontend tests
+│   └── utils/                 # Utilities (cache, distance, date)
+├── docs/
+│   ├── planning/              # Roadmap, strategic plans
+│   ├── operations/            # Operational guides
+│   ├── adr/                   # Architecture decisions
+│   ├── methodologies/         # Provincial methodology docs
+│   └── architecture/          # System architecture
+└── .github/workflows/         # CI/CD automation (10 workflows)
+```
+
+---
+
+## 🎯 Operational Workflows
+
+### Production Automation
+- **Scraper Cron:** Runs every 15 minutes via GitHub Actions
+- **Heartbeat Monitor:** Checks scraper health every 30 minutes
+- **Failure Alerts:** Pushover notifications for stale data or errors
+- **Database Cleanup:** Automated retention policy (30-day measurement rolloff)
+
+### CI/CD Pipelines
+- **Frontend CI:** Type checking, linting, unit tests
+- **Scraper CI:** Python tests, coverage reporting
+- **Production Readiness:** Pre-deployment validation
+- **Docs CI:** Documentation quality checks
+
+### Deployment Configuration
+- **Frontend:** Netlify (release-gated, currently offline for cost control)
+- **Backend:** GitHub Actions runners
+- **Database:** Neon PostgreSQL (free tier: 512 MB)
+- **Secrets Management:** GitHub Secrets for `DATABASE_URL`, `PUSHOVER_*`, `MAPBOX_TOKEN`
+
+**Quick Production Check:**
 ```bash
-./scripts/verify-production-ops.sh jerdaw/waittimecanada
+./scripts/verify-production-ops.sh yourusername/waittimecanada
 ```
 
-Note: if frontend hosting is intentionally offline, `production-smoke.yml` may be disabled and this audit will report that as a warning.
+---
 
-## Guardrails
+## 🛡️ Project Guardrails
 
-- Do not provide medical advice.
-- Do not claim cross-province comparability unless ontology dimensions match.
-- Do not store full HTML payloads in measurements.
-- Keep verification gate intact (`is_verified` and `is_visible`) for hospital publishing.
+### Clinical Safety
+- ✅ Never provide medical advice or triage recommendations
+- ✅ Always include emergency disclaimer: "Call 911 for emergencies"
+- ✅ Display telehealth routing (811 varies by province)
+
+### Data Integrity
+- ✅ Preserve source semantics - never normalize incompatible metrics
+- ✅ Surface divergence warnings when comparisons are invalid
+- ✅ Hash payloads (SHA256) instead of storing full HTML
+- ✅ Tag every measurement with complete ontology metadata
+
+### Verification & Quality
+- ✅ Government health authority sources are trusted and auto-approved
+- ✅ Quality enforced via anomaly detection and data quality monitoring
+- ✅ Heartbeat monitoring ensures data freshness
+- ✅ Methodology change detection tracks reporting shifts
+
+### Attribution
+- ✅ Link back to official provincial sources
+- ✅ Display data provenance in all visualizations
+- ✅ Citation-ready export formats
+- ✅ Never claim work from automated tools as human authorship
+
+---
+
+## 📊 Current Status (as of 2026-02-11)
+
+### Milestones Completed
+- ✅ M1-M4: Database foundation, Ontario/Quebec scrapers, methodology warnings, PWA setup
+- ✅ M7-M8: UX polish, SEO, landing page optimization
+- ✅ M9: Portfolio launch artifacts (About section, testimonial governance)
+- ✅ M10-M11: Multi-province expansion, Access Burden Estimator
+- ✅ M12: Research infrastructure (citation export, Dead Man's Switch alerts)
+- ✅ M13: Aggregation pipeline (hourly/daily/weekly/monthly)
+- ✅ M14: Data quality & anomaly detection (3 new DB tables)
+- ✅ M15: Analytics & benchmarking (peer comparison, temporal patterns)
+- ✅ M16: Multi-province operationalization (4 provinces, 380+ hospitals, region mapping)
+- ✅ M17: Quebec occupancy implementation (scraper + API)
+- ✅ M18: Occupancy frontend UI (visual indicators on hospital cards)
+- ✅ Operations: Production verification and comprehensive documentation
+
+### Test Coverage
+- **Backend:** 375 tests passing, 77% code coverage
+- **Frontend:** 285/287 tests passing (2 pre-existing failures unrelated to core features)
+- **Total:** 660+ tests across full stack
+
+### Data Freshness
+- **Update Frequency:** Every 15 minutes (automated)
+- **Heartbeat Threshold:** 60 minutes (alerts if exceeded)
+- **Current Status:** All 4 scrapers operational ✅
+
+---
+
+## 💡 Future Roadmap
+
+### Planned Enhancements
+- [ ] Additional provinces (Nova Scotia, New Brunswick)
+- [ ] Historical occupancy trends (daily/weekly patterns)
+- [ ] Enhanced equity layer with census tract income overlays
+- [ ] Prometheus/Grafana monitoring dashboard
+- [ ] Smart scheduling (reduce frequency during overnight hours)
+- [ ] Occupancy-based hospital recommendations
+
+### Deferred / Research
+- [ ] Manitoba scraper (data source unclear)
+- [ ] Saskatchewan scraper (no public data available)
+- [ ] Territories expansion (limited data availability)
+
+See [`docs/planning/roadmap.md`](docs/planning/roadmap.md) for detailed status and next steps.
+
+---
+
+## 🤝 Contributing
+
+This is a **portfolio project for medical school applications**. While not actively seeking contributors, the codebase follows professional standards and is well-documented for educational purposes.
+
+**If you're interested in the methodology:**
+- Review [`docs/methodologies/`](docs/methodologies/) for provincial analysis
+- Check [`docs/adr/`](docs/adr/) for architectural decisions
+- Explore [`CLAUDE.md`](CLAUDE.md) for project principles
+
+---
+
+## 📄 License
+
+Educational/Portfolio Project
+
+**Data Sources:**
+- Quebec: Ministère de la Santé et des Services sociaux (MSSS)
+- Ontario: Health Ontario
+- Alberta: Alberta Health Services (AHS)
+- British Columbia: Provincial Health Services Authority (PHSA)
+
+All data sourced from publicly available provincial health authority websites.
+
+---
+
+## 🎓 Author
+
+**Portfolio Project for Medical School Applications**
+
+This project demonstrates:
+- Full-stack software development
+- Health systems research methodology
+- Data quality and anomaly detection
+- Clinical defensibility in health informatics
+- Systems-level thinking and architecture
+
+**Contact:** See repository owner
+
+---
+
+## 📞 Emergency Disclaimer
+
+**⚠️ This is a data observatory tool, not a triage service.**
+
+- **For medical emergencies:** Call **911** immediately
+- **For health advice:** Call your provincial health line (**811** in most provinces)
+- **Never delay emergency care** based on wait time estimates
+
+Wait time data is for informational purposes only. Clinical decisions should always prioritize patient safety over convenience.

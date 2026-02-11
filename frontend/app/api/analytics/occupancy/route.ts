@@ -31,6 +31,22 @@ export async function GET(request: Request) {
   try {
     const sql = getDb();
 
+    // Check for STRETCHER_OCCUPANCY measurements (e.g., Quebec percentage-based data)
+    const occupancyMeasurements = await sql`
+      SELECT COUNT(*)::int AS count
+      FROM measurements m
+      JOIN hospitals h ON h.id = m.hospital_id
+      WHERE h.province = ${province}
+        AND h.is_visible = true
+        AND h.is_verified = true
+        AND m.metric_family = 'STRETCHER_OCCUPANCY'
+        AND m.timestamp_utc >= NOW() - INTERVAL '24 hours'
+    `;
+
+    const hasOccupancyMeasurements =
+      Number(occupancyMeasurements[0]?.count ?? 0) > 0;
+
+    // Check for raw count fields (for future provinces that report absolute numbers)
     const schemaRows = await sql`
       SELECT column_name
       FROM information_schema.columns
@@ -48,7 +64,11 @@ export async function GET(request: Request) {
       ),
     };
 
-    if (!fields.patients_waiting || !fields.patients_in_treatment) {
+    // If neither STRETCHER_OCCUPANCY measurements nor raw count fields are available
+    if (
+      !hasOccupancyMeasurements &&
+      (!fields.patients_waiting || !fields.patients_in_treatment)
+    ) {
       return NextResponse.json(
         {
           success: true,
@@ -62,7 +82,7 @@ export async function GET(request: Request) {
             fields,
             setup_steps: [
               "Verify provincial source publishes occupancy fields",
-              "Extend scraper parser to capture patients_waiting and patients_in_treatment",
+              "Extend scraper parser to capture occupancy metrics (percentage or raw counts)",
               "Backfill and validate occupancy aggregates before public interpretation",
             ],
           },
@@ -71,7 +91,26 @@ export async function GET(request: Request) {
       );
     }
 
-    const aggregateRows = await sql`
+    // Query for STRETCHER_OCCUPANCY measurements (percentage-based)
+    const occupancyRows = await sql`
+      SELECT
+        COUNT(*)::int AS observations_24h,
+        COUNT(DISTINCT m.hospital_id)::int AS hospitals_reporting,
+        AVG(m.value)::float AS avg_occupancy_percentage,
+        MIN(m.value)::float AS min_occupancy_percentage,
+        MAX(m.value)::float AS max_occupancy_percentage,
+        MAX(m.timestamp_utc) AS latest_observation
+      FROM measurements m
+      JOIN hospitals h ON h.id = m.hospital_id
+      WHERE h.province = ${province}
+        AND h.is_visible = true
+        AND h.is_verified = true
+        AND m.metric_family = 'STRETCHER_OCCUPANCY'
+        AND m.timestamp_utc >= NOW() - INTERVAL '24 hours'
+    `;
+
+    // Query for raw count fields (for future provinces)
+    const rawCountRows = await sql`
       SELECT
         COUNT(*)::int AS observations_24h,
         COUNT(DISTINCT m.hospital_id)::int AS hospitals_reporting,
@@ -90,48 +129,76 @@ export async function GET(request: Request) {
         )
     `;
 
-    const row = aggregateRows[0] ?? null;
-    const observations = Number(row?.observations_24h ?? 0);
-    const hospitalsReporting = Number(row?.hospitals_reporting ?? 0);
-    const avgPatientsWaiting =
-      row?.avg_patients_waiting === null ||
-      row?.avg_patients_waiting === undefined
-        ? null
-        : Number(row.avg_patients_waiting);
-    const avgPatientsInTreatment =
-      row?.avg_patients_in_treatment === null ||
-      row?.avg_patients_in_treatment === undefined
-        ? null
-        : Number(row.avg_patients_in_treatment);
-    const latestObservation =
-      row?.latest_observation === null || row?.latest_observation === undefined
-        ? null
-        : String(row.latest_observation);
+    const occupancyRow = occupancyRows[0] ?? null;
+    const rawCountRow = rawCountRows[0] ?? null;
+
+    const occupancyObservations = Number(occupancyRow?.observations_24h ?? 0);
+    const rawCountObservations = Number(rawCountRow?.observations_24h ?? 0);
+    const totalObservations = occupancyObservations + rawCountObservations;
 
     const status: OccupancyStatus =
-      observations > 0 ? "available" : "no_reporting_data";
+      totalObservations > 0 ? "available" : "no_reporting_data";
+
+    // Build response data
+    const responseData: any = {
+      province,
+      available: true,
+      status,
+      generated_at: new Date().toISOString(),
+      message:
+        status === "available"
+          ? "Occupancy data is available for reporting hospitals."
+          : "Occupancy fields exist but no recent reporting rows were found in the last 24 hours.",
+      fields,
+      observations_24h: totalObservations,
+    };
+
+    // Add percentage-based data if available (Quebec)
+    if (occupancyObservations > 0) {
+      responseData.occupancy_percentage = {
+        hospitals_reporting: Number(occupancyRow?.hospitals_reporting ?? 0),
+        average: occupancyRow?.avg_occupancy_percentage
+          ? Number(occupancyRow.avg_occupancy_percentage)
+          : null,
+        min: occupancyRow?.min_occupancy_percentage
+          ? Number(occupancyRow.min_occupancy_percentage)
+          : null,
+        max: occupancyRow?.max_occupancy_percentage
+          ? Number(occupancyRow.max_occupancy_percentage)
+          : null,
+        latest_observation: occupancyRow?.latest_observation
+          ? String(occupancyRow.latest_observation)
+          : null,
+        note: "Stretcher occupancy rate as percentage. >100% indicates overcrowding.",
+      };
+    }
+
+    // Add raw count data if available (future provinces)
+    if (rawCountObservations > 0) {
+      responseData.raw_counts = {
+        hospitals_reporting: Number(rawCountRow?.hospitals_reporting ?? 0),
+        averages: {
+          patients_waiting:
+            rawCountRow?.avg_patients_waiting !== null &&
+            rawCountRow?.avg_patients_waiting !== undefined
+              ? Number(rawCountRow.avg_patients_waiting)
+              : null,
+          patients_in_treatment:
+            rawCountRow?.avg_patients_in_treatment !== null &&
+            rawCountRow?.avg_patients_in_treatment !== undefined
+              ? Number(rawCountRow.avg_patients_in_treatment)
+              : null,
+        },
+        latest_observation: rawCountRow?.latest_observation
+          ? String(rawCountRow.latest_observation)
+          : null,
+      };
+    }
 
     return NextResponse.json(
       {
         success: true,
-        data: {
-          province,
-          available: true,
-          status,
-          generated_at: new Date().toISOString(),
-          message:
-            status === "available"
-              ? "Occupancy fields are available for reporting hospitals."
-              : "Occupancy fields exist in schema but no recent reporting rows were found in the last 24 hours.",
-          fields,
-          observations_24h: observations,
-          hospitals_reporting: hospitalsReporting,
-          averages: {
-            patients_waiting: avgPatientsWaiting,
-            patients_in_treatment: avgPatientsInTreatment,
-          },
-          latest_observation: latestObservation,
-        },
+        data: responseData,
       },
       { headers: publicCacheHeaders(300, 900) },
     );

@@ -122,9 +122,9 @@ python -m waittime.cli.scraper bc
 
 ---
 
-### Phase 5: Occupancy Statistics Research (COMPLETE)
+### Phase 5: Quebec Occupancy Implementation (COMPLETE)
 
-**Status:** ✅ Research documented, implementation-ready
+**Status:** ✅ Fully implemented and tested (M17 - 2026-02-11)
 
 **Research Findings:**
 
@@ -140,19 +140,78 @@ python -m waittime.cli.scraper bc
 - **Sample Data:** CHUM 127%, St. Mary's 150%, CHUL 95%, Province-wide 110%
 - **Clinical Significance:** Strong correlation with wait times, useful for "avoid this ER" logic
 
-**Implementation Roadmap (for future):**
-1. Add `STRETCHER_OCCUPANCY` to `MetricFamily` enum
-2. Update Quebec scraper to extract occupancy percentage
-3. Store as separate measurements (POINT_ESTIMATE statistic)
-4. Display occupancy badge on Quebec hospital cards
-5. Add divergence warning (Quebec-only metric)
+**Implementation (Completed M17):**
+1. ✅ `STRETCHER_OCCUPANCY` metric family already in enums
+2. ✅ Updated Quebec scraper to extract occupancy percentage from facility cards
+3. ✅ Store as separate measurements with POINT_ESTIMATE statistic
+4. ⏸️ Display occupancy badge on Quebec hospital cards (frontend UI - future enhancement)
+5. ⏸️ Add divergence warning (Quebec-only metric - future enhancement)
+
+**Files Modified:**
+- `/backend/src/waittime/scrapers/quebec.py` - Added occupancy extraction logic
+- `/backend/tests/unit/test_quebec_scraper.py` - Added 4 new occupancy tests (17 total)
+- `/frontend/app/api/analytics/occupancy/route.ts` - Support for percentage-based occupancy
+- `/frontend/tests/api/analytics-occupancy.test.ts` - Updated 6 API tests
+
+**Implementation Details:**
+- Quebec scraper now extracts stretcher occupancy percentages (e.g., "110%", "127%")
+- Creates separate Measurement objects with `metric_family=STRETCHER_OCCUPANCY`
+- API endpoint `/api/analytics/occupancy?province=QC` returns real-time occupancy data
+- Supports both percentage-based (Quebec) and raw count (future provinces) formats
+- Parse logic handles English and French text ("Occupancy rate" / "Taux d'occupation")
+
+**Testing:**
+- ✅ 17/17 Quebec scraper tests pass (86% coverage)
+- ✅ 6/6 occupancy API tests pass
+- ✅ 375 total backend tests pass
+- ✅ 270/272 frontend tests pass (2 pre-existing failures)
+
+**Actual Effort:** ~2.5 hours (as estimated)
+
+---
+
+### Phase 6: Occupancy Frontend UI (COMPLETE)
+
+**Status:** ✅ Fully implemented and tested (M18 - 2026-02-11)
+
+**Implementation (Completed M18):**
+1. ✅ Created OccupancyBadge component with color-coded visual indicators
+2. ✅ Integrated occupancy display into hospital cards (Quebec only)
+3. ✅ Updated Hospital API to fetch per-hospital occupancy data
+4. ✅ Added methodology information banner for Quebec hospitals
+5. ✅ Comprehensive unit testing (15 tests)
 
 **Files Created:**
-- `/backend/docs/research/occupancy-availability.md` (comprehensive analysis)
+- `/frontend/components/OccupancyBadge.tsx` - Reusable badge component
+- `/frontend/tests/components/OccupancyBadge.test.tsx` - 15 unit tests
 
-**Estimated Effort:** 2-3 hours (scraper update + frontend badge + tests)
+**Files Modified:**
+- `/frontend/app/api/hospitals/route.ts` - Added occupancy fields to Hospital interface and query
+- `/frontend/components/HospitalList.tsx` - Integrated OccupancyBadge display, added methodology note
 
-**Decision:** Defer to future milestone - foundational research complete
+**Implementation Details:**
+- **Color Coding:**
+  - Green (<90%): Below capacity, good access
+  - Yellow (90-110%): Near or at capacity
+  - Red (>110%): Overcrowded, animated pulse indicator
+- **Display Logic:** Only shows on Quebec hospitals with occupancy data
+- **Methodology Note:** Informational banner explains >100% = overcrowding
+- **Responsive:** Adapts to small (sm) and medium (md) sizes
+
+**Testing:**
+- ✅ 15/15 OccupancyBadge component tests pass
+- ✅ 287 total frontend tests (285 pass, 2 pre-existing failures)
+- ✅ Color thresholds validated (90%, 110% edge cases)
+- ✅ Title tooltips tested for accessibility
+- ✅ Animation behavior verified
+
+**User Experience:**
+- Occupancy badge appears below wait time on Quebec hospital cards
+- Tooltip provides context on hover
+- Visual pulse animation for overcrowded hospitals draws attention
+- Methodology note educates users about Quebec-specific metric
+
+**Actual Effort:** ~1.5 hours
 
 ---
 
@@ -317,9 +376,10 @@ useEffect(() => {
 3. **Verify Auto-Approval:** Confirm BC hospitals are auto-approved from trusted source
 
 ### Short-term (Next Milestone)
-1. **Implement Quebec Occupancy:** 2-3 hours, high value
-2. **Add BC to GitHub Actions:** Schedule BC scraper to run every 15 minutes
-3. **Monitor BC Data Quality:** Track measurement counts, staleness
+1. ✅ **Implement Quebec Occupancy:** COMPLETE (M17) - Scraper extraction + API endpoint operational
+2. ✅ **Occupancy Frontend UI:** COMPLETE (M18) - Color-coded badges on Quebec hospital cards, methodology note, 15 unit tests
+3. ✅ **Scraper Scheduling:** COMPLETE - All 4 scrapers (QC, ON, AB, BC) run every 15 min via GitHub Actions cron
+4. ✅ **Heartbeat Monitoring:** COMPLETE - Dead Man's Switch checks all sources every 30 min, Pushover alerts configured
 
 ### Long-term
 1. **Equity Layer:** Acquire census data, process GeoJSON, implement map overlay

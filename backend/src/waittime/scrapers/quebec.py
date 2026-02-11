@@ -186,34 +186,41 @@ class QuebecScraper(BaseScraper):
         facilities = soup.find_all("div", class_="hospital_element")
 
         for facility in facilities:
-            measurement = self._extract_from_facility(facility, payload_hash, payload_snippet)
-            if measurement:
-                measurements.append(measurement)
+            facility_measurements = self._extract_from_facility(
+                facility, payload_hash, payload_snippet
+            )
+            measurements.extend(facility_measurements)
 
         return measurements
 
     def _extract_from_facility(
         self, facility: Tag, payload_hash: str, payload_snippet: str
-    ) -> Measurement | None:
-        """Extract measurement from a facility card."""
+    ) -> list[Measurement]:
+        """Extract measurements from a facility card.
+
+        Extracts both wait time and occupancy measurements if available.
+
+        Returns:
+            List of Measurement objects (may include wait time and/or occupancy)
+        """
+        measurements: list[Measurement] = []
 
         # 1. Extract Name
         # <div class="font-weight-bold textual-content">Name</div>
         name_div = facility.find("div", class_="font-weight-bold")
         if not name_div:
-            return None
+            return measurements
 
         hospital_name = name_div.get_text(strip=True)
+        hospital_id = self._normalize_hospital_id(hospital_name)
+        if not hospital_id:
+            return measurements
 
-        # 2. Extract Wait Time
-        # The metrics are in a list <ul> with class "list-unstyled"
-        # Each item is <li> class "hopital-item"
-        # We need the one that says "Estimated waiting time for non-priority cases"
-        # Since it's bilingual or French, we should look for keywords or specific structure.
-
-        wait_time_val = None
-
+        # 2. Extract metrics from list items
         items = facility.find_all("li", class_="hopital-item")
+        wait_time_val = None
+        occupancy_val = None
+
         for item in items:
             text = item.get_text(" ", strip=True).lower()
 
@@ -221,27 +228,39 @@ class QuebecScraper(BaseScraper):
             if (
                 "waiting time" in text or "temps d'attente" in text or "attente estimé" in text
             ) and ("stretcher" not in text and "civiere" not in text):
-                # Found the wait time line.
-                # The value is usually in a span, but let's parse the whole line text.
+                # Found the wait time line
                 # Example: "Estimated waiting time for non-priority cases : 4 h 15 min"
-
-                # Extract the value part (after the colon usually)
                 if ":" in text:
                     value_text = text.split(":", 1)[1]
                 else:
                     value_text = text
-
                 wait_time_val = self._extract_wait_time(value_text)
-                break
 
+            # Look for occupancy keywords (English or French)
+            elif (
+                "occupancy rate" in text
+                or "taux d'occupation" in text
+                or ("occupation" in text and ("stretcher" in text or "civiere" in text))
+            ):
+                # Found occupancy line
+                # Example: "Occupancy rate: 110%" or "Taux d'occupation sur civière: 127%"
+                occupancy_val = self._extract_occupancy_percentage(text)
+
+        # Create wait time measurement if available
         if wait_time_val is not None:
-            hospital_id = self._normalize_hospital_id(hospital_name)
-            if hospital_id:
-                return self._create_measurement(
-                    hospital_id, wait_time_val, payload_hash, payload_snippet
-                )
+            measurements.append(
+                self._create_measurement(hospital_id, wait_time_val, payload_hash, payload_snippet)
+            )
 
-        return None
+        # Create occupancy measurement if available
+        if occupancy_val is not None:
+            measurements.append(
+                self._create_occupancy_measurement(
+                    hospital_id, occupancy_val, payload_hash, payload_snippet
+                )
+            )
+
+        return measurements
 
     def _extract_wait_time(self, text: str) -> float | None:
         """Extract numeric wait time from text.
@@ -308,10 +327,27 @@ class QuebecScraper(BaseScraper):
 
         return None
 
+    def _extract_occupancy_percentage(self, text: str) -> float | None:
+        """Extract occupancy percentage from text.
+
+        Handles formats like:
+        - "Occupancy rate: 110%"
+        - "Taux d'occupation: 127%"
+        - "150%"
+
+        Returns:
+            Percentage value (e.g., 110.0 for 110%) or None if not found
+        """
+        # Look for percentage pattern (number followed by %)
+        match = re.search(r"(\d+(?:\.\d+)?)\s*%", text)
+        if match:
+            return float(match.group(1))
+        return None
+
     def _create_measurement(
         self, hospital_id: str, value: float, payload_hash: str, payload_snippet: str
     ) -> Measurement:
-        """Create a Measurement with Quebec's methodology tags."""
+        """Create a wait time Measurement with Quebec's methodology tags."""
         return Measurement(
             hospital_id=hospital_id,
             value=value,
@@ -319,6 +355,32 @@ class QuebecScraper(BaseScraper):
             start_event=StartEvent.REGISTRATION,
             end_event=EndEvent.PHYSICIAN,
             statistic_type=StatisticType.ROLLING_AVG,
+            source_id=self.source.id,
+            raw_payload_hash=payload_hash,
+            raw_payload_snippet=payload_snippet,
+        )
+
+    def _create_occupancy_measurement(
+        self, hospital_id: str, occupancy_percentage: float, payload_hash: str, payload_snippet: str
+    ) -> Measurement:
+        """Create an occupancy Measurement with STRETCHER_OCCUPANCY ontology.
+
+        Args:
+            hospital_id: Hospital identifier
+            occupancy_percentage: Occupancy rate as percentage (e.g., 110.0 for 110%)
+            payload_hash: SHA256 hash of raw HTML
+            payload_snippet: First 200 chars of HTML
+
+        Returns:
+            Measurement tagged with STRETCHER_OCCUPANCY metric family
+        """
+        return Measurement(
+            hospital_id=hospital_id,
+            value=occupancy_percentage,
+            metric_family=MetricFamily.STRETCHER_OCCUPANCY,
+            start_event=StartEvent.UNKNOWN,  # Occupancy is a point-in-time snapshot
+            end_event=EndEvent.PHYSICIAN,  # Use PHYSICIAN as placeholder for consistency
+            statistic_type=StatisticType.POINT_ESTIMATE,
             source_id=self.source.id,
             raw_payload_hash=payload_hash,
             raw_payload_snippet=payload_snippet,

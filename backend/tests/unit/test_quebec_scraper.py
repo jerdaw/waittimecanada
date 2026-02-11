@@ -70,8 +70,8 @@ class TestQuebecScraper:
         assert result == "ca-qc-hopital-nouveau"
 
     def test_parse_new_format(self, scraper):
-        """Parse new search-result HTML format."""
-        
+        """Parse new search-result HTML format with wait time and occupancy."""
+
         # Simulated HTML from the AJAX endpoint
         html = """
         <div class="hospital_element">
@@ -87,7 +87,7 @@ class TestQuebecScraper:
                     </li>
                     <li class="hopital-item">
                         <span class="picto"></span>
-                        Estimated waiting time for non-priority cases : 
+                        Estimated waiting time for non-priority cases :
                         <span class="font-weight-bold">2 h 15 min</span>
                     </li>
                     <li class="hopital-item">
@@ -109,21 +109,30 @@ class TestQuebecScraper:
             </div>
         </div>
         """
-        
+
         measurements = scraper.parse(html)
 
-        assert len(measurements) == 2
-        
-        # Check first hospital (CHUM)
+        # Should now extract 3 measurements: CHUM wait time, CHUM occupancy, Jewish General wait time
+        assert len(measurements) == 3
+
+        # Check first hospital (CHUM) - wait time measurement
         assert measurements[0].hospital_id == "ca-qc-chum"
         assert measurements[0].value == 135.0  # 2h 15min
-        
-        # Check second hospital (Jewish General)
-        assert measurements[1].hospital_id == "ca-qc-jewish-general"
-        assert measurements[1].value == 45.0   # 45 min
+        assert measurements[0].metric_family == MetricFamily.TIME_TO_PROVIDER
 
-    def test_parse_ignores_other_metrics(self, scraper):
-        """Ensure we don't accidentally pick up occupancy rates or patient counts."""
+        # Check first hospital (CHUM) - occupancy measurement
+        assert measurements[1].hospital_id == "ca-qc-chum"
+        assert measurements[1].value == 110.0  # 110%
+        assert measurements[1].metric_family == MetricFamily.STRETCHER_OCCUPANCY
+        assert measurements[1].statistic_type == StatisticType.POINT_ESTIMATE
+
+        # Check second hospital (Jewish General) - wait time only
+        assert measurements[2].hospital_id == "ca-qc-jewish-general"
+        assert measurements[2].value == 45.0   # 45 min
+        assert measurements[2].metric_family == MetricFamily.TIME_TO_PROVIDER
+
+    def test_parse_extracts_occupancy_only(self, scraper):
+        """Extract occupancy measurement when wait time is not available."""
         html = """
         <div class="hospital_element">
             <div class="font-weight-bold">CHUM</div>
@@ -138,7 +147,13 @@ class TestQuebecScraper:
         </div>
         """
         measurements = scraper.parse(html)
-        assert len(measurements) == 0
+
+        # Should extract 1 occupancy measurement (wait time not present)
+        assert len(measurements) == 1
+        assert measurements[0].hospital_id == "ca-qc-chum"
+        assert measurements[0].value == 150.0
+        assert measurements[0].metric_family == MetricFamily.STRETCHER_OCCUPANCY
+        assert measurements[0].statistic_type == StatisticType.POINT_ESTIMATE
 
     def test_measurement_has_correct_ontology(self, scraper):
         """Verify measurements are tagged with Quebec's methodology."""
@@ -184,6 +199,80 @@ class TestQuebecScraper:
         """Handle empty HTML gracefully."""
         measurements = scraper.parse("<html><body></body></html>")
         assert measurements == []
+
+    def test_extract_occupancy_percentage(self, scraper):
+        """Extract occupancy percentage from various text formats."""
+        assert scraper._extract_occupancy_percentage("Occupancy rate: 110%") == 110.0
+        assert scraper._extract_occupancy_percentage("Taux d'occupation: 127%") == 127.0
+        assert scraper._extract_occupancy_percentage("150%") == 150.0
+        assert scraper._extract_occupancy_percentage("95.5%") == 95.5
+        assert scraper._extract_occupancy_percentage("Occupancy rate of stretchers: 85%") == 85.0
+
+    def test_extract_occupancy_percentage_none(self, scraper):
+        """Return None for text without percentage."""
+        assert scraper._extract_occupancy_percentage("N/A") is None
+        assert scraper._extract_occupancy_percentage("Unknown") is None
+        assert scraper._extract_occupancy_percentage("") is None
+        assert scraper._extract_occupancy_percentage("Number of people waiting: 10") is None
+
+    def test_parse_french_occupancy_text(self, scraper):
+        """Extract occupancy from French text."""
+        html = """
+        <div class="hospital_element">
+            <div class="font-weight-bold">Hôpital Maisonneuve-Rosemont</div>
+            <ul class="list-unstyled">
+                <li class="hopital-item">
+                   Taux d'occupation sur civière : 127%
+                </li>
+                <li class="hopital-item">
+                   Temps d'attente estimé : 3 h 30 min
+                </li>
+            </ul>
+        </div>
+        """
+        measurements = scraper.parse(html)
+
+        # Should extract both wait time and occupancy
+        assert len(measurements) == 2
+
+        # Find occupancy measurement
+        occupancy_measurements = [
+            m for m in measurements if m.metric_family == MetricFamily.STRETCHER_OCCUPANCY
+        ]
+        assert len(occupancy_measurements) == 1
+        assert occupancy_measurements[0].value == 127.0
+
+    def test_parse_multiple_facilities_with_mixed_data(self, scraper):
+        """Parse multiple facilities where some have occupancy and others don't."""
+        html = """
+        <div class="hospital_element">
+            <div class="font-weight-bold">CHUM</div>
+            <ul class="list-unstyled">
+                <li class="hopital-item">Estimated waiting time : 90 min</li>
+                <li class="hopital-item">Occupancy rate: 125%</li>
+            </ul>
+        </div>
+        <div class="hospital_element">
+            <div class="font-weight-bold">Jewish General Hospital</div>
+            <ul class="list-unstyled">
+                <li class="hopital-item">Estimated waiting time : 60 min</li>
+            </ul>
+        </div>
+        """
+        measurements = scraper.parse(html)
+
+        # Should extract 3 measurements: CHUM wait+occupancy, Jewish wait only
+        assert len(measurements) == 3
+
+        # Verify we have 2 wait time measurements and 1 occupancy measurement
+        wait_time_measurements = [
+            m for m in measurements if m.metric_family == MetricFamily.TIME_TO_PROVIDER
+        ]
+        occupancy_measurements = [
+            m for m in measurements if m.metric_family == MetricFamily.STRETCHER_OCCUPANCY
+        ]
+        assert len(wait_time_measurements) == 2
+        assert len(occupancy_measurements) == 1
 
     def test_run_supports_before_save_hook(self):
         """Quebec run() should support the shared before_save persistence hook."""

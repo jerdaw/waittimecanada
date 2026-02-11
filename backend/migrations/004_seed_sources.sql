@@ -68,14 +68,14 @@ INSERT INTO sources (
     'bc-phsa',
     'Provincial Health Services Authority',
     'BC',
-    'http://www.edwaittimes.ca/',
-    NULL,
+    'https://edwaittimes.ca',
+    'https://www.edwaittimes.ca/about',
     'HealthLink BC',
     '811',
     'TIME_TO_PROVIDER',
-    'REGISTRATION',
+    'TRIAGE',
     'PHYSICIAN',
-    'POINT_ESTIMATE'
+    'P90'
 )
 ON CONFLICT (id) DO UPDATE SET
     name = EXCLUDED.name,
