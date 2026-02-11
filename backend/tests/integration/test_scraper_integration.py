@@ -1,7 +1,7 @@
 """Integration tests for scrapers with real database writes."""
 
-from datetime import datetime, timezone
-from unittest.mock import Mock, patch
+from datetime import UTC, datetime
+from unittest.mock import patch
 
 import pytest
 
@@ -48,7 +48,7 @@ class TestScraperDatabase:
             def fetch(self) -> str:
                 return "<html>test</html>"
 
-        scraper = TestScraper(test_source, clean_database)
+        _scraper = TestScraper(test_source, clean_database)
 
         # Insert a hospital via scraper
         hospital = Hospital(
@@ -107,7 +107,7 @@ class TestScraperDatabase:
         measurement = Measurement(
             hospital_id="test-scraper-hospital-2",
             value=75.5,
-            timestamp_utc=datetime.now(timezone.utc),
+            timestamp_utc=datetime.now(UTC),
             metric_family=MetricFamily.TIME_TO_PROVIDER,
             start_event=StartEvent.TRIAGE,
             end_event=EndEvent.PHYSICIAN,
@@ -145,7 +145,7 @@ class TestScraperDatabase:
             def fetch(self) -> str:
                 return "<html>test</html>"
 
-        scraper = TestScraper(test_source, clean_database)
+        _scraper = TestScraper(test_source, clean_database)
         heartbeat = HeartbeatService(clean_database)
 
         # Record successful scrape
@@ -294,7 +294,7 @@ class TestScraperErrorHandling:
         measurement = Measurement(
             hospital_id="nonexistent-hospital",
             value=100.0,
-            timestamp_utc=datetime.now(timezone.utc),
+            timestamp_utc=datetime.now(UTC),
             metric_family=MetricFamily.TIME_TO_PROVIDER,
             start_event=StartEvent.TRIAGE,
             end_event=EndEvent.PHYSICIAN,
@@ -307,5 +307,6 @@ class TestScraperErrorHandling:
         )
 
         # Should fail due to foreign key constraint
-        with pytest.raises(Exception):
+        import psycopg2
+        with pytest.raises(psycopg2.IntegrityError):
             clean_database.insert_measurement(measurement)

@@ -1,8 +1,8 @@
 """Tests for database cleanup functionality."""
 
-import pytest
-from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, Mock
+
+import pytest
 
 from waittime.services.database import DatabaseService
 
@@ -251,7 +251,7 @@ class TestCleanupIntegration:
 
         monkeypatch.setattr(mock_db_with_cleanup, "get_connection", mock_get_connection)
 
-        original_get_cursor = mock_db_with_cleanup.get_cursor
+        _original_get_cursor = mock_db_with_cleanup.get_cursor
 
         def mock_get_cursor(conn):
             return mock_cursor_factory()

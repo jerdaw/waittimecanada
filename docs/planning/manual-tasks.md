@@ -9,39 +9,11 @@ This document tracks all tasks requiring significant human intervention, browser
 
 ---
 
-## 🔴 BLOCKED: Alberta Scraper API Research
+## ✅ COMPLETED: Alberta Scraper API Research
 
 **Why:** Need to find the data API endpoint to complete Alberta scraper implementation
 **Milestone:** M10 Phase 1 - Alberta Scraper
-**Estimated Time:** 10-15 minutes
-**Priority:** HIGH (proves multi-province methodology)
-
-### Steps:
-1. Open browser and go to: https://www.albertahealthservices.ca/waittimes/Page14230.aspx
-2. Open Developer Tools (F12 or Cmd+Option+I)
-3. Go to Network tab, filter by "Fetch/XHR"
-4. Clear network log
-5. Select a region from dropdown (e.g., "Calgary & area")
-6. Look for network requests that return JSON data
-7. Common patterns to look for:
-   - `/api/` endpoints
-   - `/GetWaitTimes`
-   - `/waittimes.json`
-   - Requests returning hospital names and wait times
-
-### Document:
-```
-Request URL: _______________________
-Request Method: GET / POST
-Parameters (if any): _______________________
-Response structure (sample JSON):
-{
-  ...paste example here...
-}
-```
-
-**Next Steps After Completion:**
-Provide the above information and I'll complete the Alberta scraper implementation.
+**Status:** Completed — Alberta scraper is implemented (Playwright-based, parses `div.well.wt-well` cards from rendered HTML), registered in scraper cron, and running in production. 22 Alberta hospitals active. Superseded by M16.
 
 ---
 
@@ -344,6 +316,6 @@ When ready to knock out manual tasks:
 
 ---
 
-**Last Updated:** 2026-02-08
+**Last Updated:** 2026-02-11
 **Tasks Pending:** Tracked inline
 **Tasks Completed:** Tracked inline

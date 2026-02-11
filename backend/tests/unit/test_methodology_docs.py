@@ -1,8 +1,9 @@
 """Tests for methodology documentation validation."""
 
 import json
-import pytest
 from pathlib import Path
+
+import pytest
 
 
 class TestOntarioMethodologyJSON:

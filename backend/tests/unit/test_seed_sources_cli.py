@@ -1,8 +1,11 @@
-import pytest
-from unittest.mock import patch, MagicMock
 import json
 from pathlib import Path
-from waittime.cli.seed_sources import load_source_from_json, seed_source, main
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+from waittime.cli.seed_sources import load_source_from_json, main, seed_source
+
 
 def test_load_source_from_json_success(tmp_path):
     """Verify loading source from valid JSON file."""

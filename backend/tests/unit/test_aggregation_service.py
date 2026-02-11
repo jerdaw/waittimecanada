@@ -209,7 +209,7 @@ class TestAggregatePeriod:
             _make_measurement_row(value=100.0),
         ]
 
-        result = service.aggregate_monthly("ca-on-test", 2028, 2)
+        _result = service.aggregate_monthly("ca-on-test", 2028, 2)
 
         expected_start = datetime(2028, 2, 1, 0, 0, 0, tzinfo=UTC)
         expected_end = datetime(2028, 3, 1, 0, 0, 0, tzinfo=UTC)

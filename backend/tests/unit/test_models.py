@@ -1,6 +1,5 @@
 """Unit tests for core domain models."""
 
-from datetime import datetime
 
 import pytest
 

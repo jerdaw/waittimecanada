@@ -1,12 +1,10 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-02-09)
+## Current Status (Updated 2026-02-11)
 
-**Progress:** Milestone 14 Complete | Milestone 15 Closed & Archived (Analytics + Operationalization + Region Coverage) | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
+**Progress:** **M16 Complete** (Multi-Province Operationalization) | Milestone 15 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
-**Strategic Direction:** Ontario-focused depth over multi-province breadth. The platform is
-transitioning from a real-time snapshot tool into a Health Systems Observatory with longitudinal
-analysis, data quality transparency, and research-grade analytics.
+**Strategic Direction:** **Four-province breadth achieved** (ON, QC, AB, BC). All four scrapers active in production, 380+ hospitals visible across all provinces, methodology documentation complete for all provinces, regional analytics data seeded for 15 regions.
 
 **Deployment Note (2026-02-08):** Frontend public hosting is intentionally offline for now to avoid unnecessary free-tier credit usage. Production smoke workflow is disabled until a public URL is intentionally re-enabled.
 
@@ -23,20 +21,23 @@ analysis, data quality transparency, and research-grade analytics.
 | **M7: UX Polish & SEO** | Schema.org structured data, skeleton loading, search/filter, geolocation, live indicators |
 | **M8: UX Enhancements** | Expandable cards, FAQ page, quick actions, landing page architecture, distance sorting |
 | **M9: Portfolio Launch** (partial) | About section, LinkedIn post draft, screenshot guide, application summary |
-| **M10: Multi-Province** (partial) | Alberta scraper skeleton, BC scraper (ADR-0007) |
+| **M10: Multi-Province** (partial) | Alberta scraper skeleton, BC scraper (ADR-0007). Superseded by M16. |
 | **M11: Access & Equity** (partial) | Access Burden Estimator with fuel + parking cost (ADR-0005, 21 tests) |
 | **M12: Research Infra** (partial) | Citation-ready data export (19 tests), Dead Man's Switch alerts (7 tests), SystemStatus component, occupancy availability endpoint/UI state |
 | **M13: Aggregation Pipeline** | Permanent hourly/daily/weekly/monthly aggregates, backfill CLI, enhanced trends (90d/6m/1y), extended data export (ADR-0008) |
 | **M14: Data Quality & Anomaly Detection** | DataQualityService, AnomalyDetectionService, MethodologyChangeDetector, /data-quality dashboard, 3 new DB tables (ADR-0009) |
 | **M15: Analytics & Benchmarking** | Peer benchmarking, temporal pattern analysis, regional intelligence mapping, system trend dashboard, dedicated /analytics page |
+| **M16: Multi-Province Operationalization** | Trusted source auto-approval, hospital seed data (65 hospitals for AB/BC/QC), methodology docs for all 4 provinces, region data (15 regions), 380+ hospitals visible |
 
 ---
 
 ## Next Steps (1-2 Sessions)
 
-- [ ] Complete `P0 / Data correctness` by replacing inferred totals with query-backed totals in data-quality outputs and tests.
-- [ ] Complete `P0 / Ontology safety` by enforcing methodology-safe grouping boundaries in analytics aggregation paths.
-- [ ] Complete `P0 / Ops reliability` by migrating heartbeat source checks to dynamic source discovery.
+- [x] **M16 Phase 1:** Fix trusted source auto-approval so scraper-discovered hospitals are visible.
+- [x] **M16 Phase 2:** Create hospital seed data for AB, BC, QC with verified coordinates.
+- [x] **M16 Phase 3:** Complete methodology documentation for Alberta and Quebec.
+- [x] **M16 Phase 4:** Expand region data to AB, BC, QC for regional analytics.
+- [x] **M16 Phase 5:** Cross-province verification and roadmap cleanup.
 
 ## Roadmap Operating Model
 
@@ -84,11 +85,22 @@ Success criteria for `Next`:
 - ~~Admin verification actions are fully authenticated and auditable.~~ (Removed — not needed for trusted government sources.)
 - CI gates fail hard for lint/type/security once remediation is complete.
 
+### Now (P1, 0-2 weeks) — M16: Multi-Province Operationalization
+- [x] **M16 Phase 1 / Auto-approval:** Fix hospital visibility for trusted government sources (scraper + backfill CLI).
+- [x] **M16 Phase 2 / Hospital seed data:** Create curated seed files for AB, BC, QC with verified coordinates (65 hospitals total).
+- [x] **M16 Phase 3 / Methodology docs:** Complete Alberta and Quebec methodology documentation + 4-province comparability index.
+- [x] **M16 Phase 4 / Region expansion:** Create health region definitions for AB, BC, QC (15 regions, 65 mappings).
+- [x] **M16 Phase 5 / Verification:** Cross-province verification, M10 archived, manual-tasks updated, roadmap cleanup.
+
+Success criteria for `Now`:
+- Hospitals from all 4 provinces visible in API/frontend.
+- Methodology documentation complete for all 4 provinces.
+- Regional analytics coverage >80% per province.
+
 ### Later (P2+, 6+ weeks)
 - [x] **P2 / Test quality:** Eliminate React `act(...)` warnings in frontend unit tests.
 - [x] **P2 / Docs integrity:** Add roadmap consistency checks so stale status summaries cannot regress.
 - [ ] **P2 / Portfolio launch completion:** Complete stakeholder interview and publish launch communications when public hosting is re-enabled.
-- [ ] **Deferred / M10 breadth:** Resume broader multi-province expansion once P0/P1 reliability and governance goals are closed.
 
 ---
 
@@ -109,16 +121,18 @@ Each feature maps to CanMEDS competencies for medical school admissions:
 ## Implementation Plans
 
 Active milestone plans in `docs/planning/implementation/`:
+- `docs/planning/implementation/milestone-16-multi-province-ops.md` — M16: Multi-Province Operationalization (COMPLETE)
 - `docs/planning/implementation/milestone-9-launch.md` — Production deployment & stakeholder validation
-- `docs/planning/implementation/milestone-10-provinces.md` — Alberta scraper & multi-province support
 - `docs/planning/implementation/milestone-11-equity.md` — Access Burden Estimator & equity layer
 - `docs/planning/implementation/milestone-12-research.md` — Citation export & alert system
 - `docs/planning/implementation/m9-remaining-user-actions.md` — M9 manual user action guide (active)
 
 Archived (delivered):
+- `docs/planning/archive/milestone-16-multi-province-ops.md` — Multi-Province Operationalization (M16)
 - `docs/planning/archive/milestone-15-analytics.md` — Analytics & benchmarking (M15)
 - `docs/planning/archive/milestone-14-data-quality.md` — Data quality & anomaly detection (M14)
 - `docs/planning/archive/milestone-13-aggregation.md` — Aggregation pipeline (M13)
+- `docs/planning/archive/milestone-10-provinces.md` — Alberta scraper & multi-province support (M10, superseded by M16)
 - `docs/planning/archive/task-er-watch-features.md` — ER Watch feature execution checklist (completed)
 - `docs/planning/archive/methods-ux-implementation.md` — Methodology timeline, CSV export, deep-linking (P1)
 - `docs/planning/archive/ci-hardening-implementation.md` — CI hardening & quality gates (P1)

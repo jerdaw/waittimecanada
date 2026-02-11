@@ -96,6 +96,9 @@ def _upsert_hospitals_for_measurements(
             latitude = 0.0
             longitude = 0.0
 
+        # Government health authority sources are trusted and auto-approved
+        # per project policy. Quality is enforced via anomaly detection,
+        # payload hashing, parser versioning, and heartbeat monitoring.
         hospital = Hospital(
             id=hospital_id,
             name=hospital_name,
@@ -103,8 +106,8 @@ def _upsert_hospitals_for_measurements(
             city=city,
             latitude=latitude,
             longitude=longitude,
-            is_verified=False,
-            is_visible=False,
+            is_verified=True,
+            is_visible=True,
             source_id=source_id,
         )
         db.upsert_hospital(hospital)

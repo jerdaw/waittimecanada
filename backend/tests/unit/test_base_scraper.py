@@ -1,17 +1,17 @@
 """Tests for BaseScraper."""
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, MagicMock, patch
-from datetime import UTC, datetime
 
 from waittime.core import (
-    Measurement,
-    Source,
-    MetricFamily,
-    StartEvent,
     EndEvent,
-    StatisticType,
+    Measurement,
+    MetricFamily,
     PatientScope,
+    Source,
+    StartEvent,
+    StatisticType,
 )
 from waittime.scrapers.base import BaseScraper
 
@@ -253,7 +253,7 @@ class TestRun:
 
         with patch.object(scraper_with_db, "fetch", return_value=html):
             with patch.object(scraper_with_db._heartbeat, "record_success") as mock_success:
-                measurements = scraper_with_db.run(save_to_db=False)
+                _measurements = scraper_with_db.run(save_to_db=False)
 
                 mock_success.assert_called_once_with(
                     source_id="test-source",

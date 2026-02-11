@@ -5,9 +5,8 @@ Set DATABASE_URL environment variable to run these tests.
 """
 
 import os
-from typing import Generator
+from collections.abc import Generator
 
-import psycopg2
 import pytest
 
 from waittime.services.database import DatabaseService

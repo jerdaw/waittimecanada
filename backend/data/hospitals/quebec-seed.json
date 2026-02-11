@@ -1,0 +1,255 @@
+{
+  "source_id": "quebec-msss",
+  "hospitals": [
+    {
+      "id": "ca-qc-chum",
+      "name": "Centre hospitalier universitaire de Montr\u00e9al (CHUM)",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.5112,
+      "longitude": -73.5575,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-jewish-general",
+      "name": "H\u00f4pital g\u00e9n\u00e9ral juif",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.4929,
+      "longitude": -73.6327,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-maisonneuve-rosemont",
+      "name": "H\u00f4pital Maisonneuve-Rosemont",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.5653,
+      "longitude": -73.5610,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-sacre-coeur",
+      "name": "H\u00f4pital du Sacr\u00e9-Coeur de Montr\u00e9al",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.5380,
+      "longitude": -73.6564,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-notre-dame",
+      "name": "H\u00f4pital Notre-Dame",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.5242,
+      "longitude": -73.5614,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-saint-luc",
+      "name": "H\u00f4pital Saint-Luc",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.5149,
+      "longitude": -73.5603,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-hotel-dieu",
+      "name": "H\u00f4tel-Dieu de Montr\u00e9al",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.5155,
+      "longitude": -73.5764,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-enfant-jesus",
+      "name": "CHU de Qu\u00e9bec - H\u00f4pital de l'Enfant-J\u00e9sus",
+      "province": "QC",
+      "city": "Qu\u00e9bec",
+      "latitude": 46.8341,
+      "longitude": -71.2280,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-chul",
+      "name": "CHU de Qu\u00e9bec - CHUL",
+      "province": "QC",
+      "city": "Qu\u00e9bec",
+      "latitude": 46.7856,
+      "longitude": -71.2841,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-cite-sante",
+      "name": "H\u00f4pital de la Cit\u00e9-de-la-Sant\u00e9",
+      "province": "QC",
+      "city": "Laval",
+      "latitude": 45.5900,
+      "longitude": -73.7241,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-charles-lemoyne",
+      "name": "H\u00f4pital Charles-Le Moyne",
+      "province": "QC",
+      "city": "Longueuil",
+      "latitude": 45.5188,
+      "longitude": -73.4934,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-pierre-boucher",
+      "name": "H\u00f4pital Pierre-Boucher",
+      "province": "QC",
+      "city": "Longueuil",
+      "latitude": 45.5406,
+      "longitude": -73.4444,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-anna-laberge",
+      "name": "H\u00f4pital Anna-Laberge",
+      "province": "QC",
+      "city": "Ch\u00e2teauguay",
+      "latitude": 45.3571,
+      "longitude": -73.7359,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-haut-richelieu",
+      "name": "H\u00f4pital du Haut-Richelieu",
+      "province": "QC",
+      "city": "Saint-Jean-sur-Richelieu",
+      "latitude": 45.3068,
+      "longitude": -73.2655,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-honore-mercier",
+      "name": "H\u00f4pital Honor\u00e9-Mercier",
+      "province": "QC",
+      "city": "Saint-Hyacinthe",
+      "latitude": 45.6208,
+      "longitude": -72.9464,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-verdun",
+      "name": "H\u00f4pital de Verdun",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.4548,
+      "longitude": -73.5687,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-lasalle",
+      "name": "H\u00f4pital LaSalle",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.4318,
+      "longitude": -73.6322,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-lachine",
+      "name": "H\u00f4pital de Lachine",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.4380,
+      "longitude": -73.6861,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-santa-cabrini",
+      "name": "H\u00f4pital Santa Cabrini",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.5611,
+      "longitude": -73.5854,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-jean-talon",
+      "name": "H\u00f4pital Jean-Talon",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.5403,
+      "longitude": -73.6115,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-fleury",
+      "name": "H\u00f4pital Fleury",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.5631,
+      "longitude": -73.6425,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-chu-sainte-justine",
+      "name": "CHU Sainte-Justine",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.5017,
+      "longitude": -73.6201,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-hopital-de-gatineau",
+      "name": "H\u00f4pital de Gatineau",
+      "province": "QC",
+      "city": "Gatineau",
+      "latitude": 45.4766,
+      "longitude": -75.6467,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-hopital-de-hull",
+      "name": "H\u00f4pital de Hull",
+      "province": "QC",
+      "city": "Gatineau",
+      "latitude": 45.4328,
+      "longitude": -75.7372,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-qc-hopital-general-de-montreal",
+      "name": "H\u00f4pital g\u00e9n\u00e9ral de Montr\u00e9al",
+      "province": "QC",
+      "city": "Montr\u00e9al",
+      "latitude": 45.4748,
+      "longitude": -73.6003,
+      "is_verified": true,
+      "is_visible": true
+    }
+  ]
+}

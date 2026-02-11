@@ -1,7 +1,6 @@
 """Tests for Ontology Safety in Benchmarking."""
 
-from datetime import UTC, datetime
-from unittest.mock import MagicMock, Mock, call
+from unittest.mock import MagicMock, Mock
 
 import pytest
 

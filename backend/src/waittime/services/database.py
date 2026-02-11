@@ -141,7 +141,13 @@ class DatabaseService:
                 return self._row_to_hospital(dict(row))
 
     def upsert_hospital(self, hospital: Hospital) -> Hospital:
-        """Insert or update a hospital."""
+        """Insert or update a hospital.
+
+        Note: ON CONFLICT intentionally does NOT update is_verified or
+        is_visible.  This prevents scraper re-runs from downgrading a
+        hospital that was already approved (either via seed data or a
+        previous insert).  Only name, city, and coordinates are refreshed.
+        """
         with self.get_connection() as conn:
             with self.get_cursor(conn) as cur:
                 cur.execute(

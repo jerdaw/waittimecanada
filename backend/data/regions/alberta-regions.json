@@ -1,0 +1,70 @@
+{
+  "province": "AB",
+  "regions": [
+    {
+      "id": "ca-ab-region-south",
+      "name": "South Zone",
+      "code": "SOUTH",
+      "sort_order": 1,
+      "description": "Southern Alberta including Lethbridge and Medicine Hat.",
+      "hospitals": [
+        "ca-ab-chinook-regional-hospital",
+        "ca-ab-medicine-hat-regional-hospital"
+      ]
+    },
+    {
+      "id": "ca-ab-region-calgary",
+      "name": "Calgary Zone",
+      "code": "CALGARY",
+      "sort_order": 2,
+      "description": "Calgary metropolitan area and surrounding communities including Canmore and High River.",
+      "hospitals": [
+        "ca-ab-foothills-medical-centre",
+        "ca-ab-rockyview-general-hospital",
+        "ca-ab-peter-lougheed-centre",
+        "ca-ab-south-health-campus",
+        "ca-ab-alberta-children-s-hospital",
+        "ca-ab-canmore-general-hospital",
+        "ca-ab-high-river-general-hospital"
+      ]
+    },
+    {
+      "id": "ca-ab-region-central",
+      "name": "Central Zone",
+      "code": "CENTRAL",
+      "sort_order": 3,
+      "description": "Central Alberta including Red Deer.",
+      "hospitals": [
+        "ca-ab-red-deer-regional-hospital-centre"
+      ]
+    },
+    {
+      "id": "ca-ab-region-edmonton",
+      "name": "Edmonton Zone",
+      "code": "EDMONTON",
+      "sort_order": 4,
+      "description": "Edmonton metropolitan area including St. Albert and Sherwood Park.",
+      "hospitals": [
+        "ca-ab-royal-alexandra-hospital",
+        "ca-ab-university-of-alberta-hospital",
+        "ca-ab-stollery-children-s-hospital",
+        "ca-ab-misericordia-community-hospital",
+        "ca-ab-grey-nuns-community-hospital",
+        "ca-ab-northeast-community-health-centre",
+        "ca-ab-sturgeon-community-hospital",
+        "ca-ab-strathcona-community-hospital"
+      ]
+    },
+    {
+      "id": "ca-ab-region-north",
+      "name": "North Zone",
+      "code": "NORTH",
+      "sort_order": 5,
+      "description": "Northern Alberta including Grande Prairie and Fort McMurray.",
+      "hospitals": [
+        "ca-ab-queen-elizabeth-ii-hospital",
+        "ca-ab-northern-lights-regional-health-centre"
+      ]
+    }
+  ]
+}

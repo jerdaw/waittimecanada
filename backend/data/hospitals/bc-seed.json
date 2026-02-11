@@ -1,0 +1,205 @@
+{
+  "source_id": "bc-phsa",
+  "hospitals": [
+    {
+      "id": "ca-bc-st-pauls",
+      "name": "St. Paul's Hospital",
+      "province": "BC",
+      "city": "Vancouver",
+      "latitude": 49.2802,
+      "longitude": -123.1283,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-vgh",
+      "name": "Vancouver General Hospital",
+      "province": "BC",
+      "city": "Vancouver",
+      "latitude": 49.2612,
+      "longitude": -123.1216,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-bc-childrens",
+      "name": "BC Children's Hospital",
+      "province": "BC",
+      "city": "Vancouver",
+      "latitude": 49.2448,
+      "longitude": -123.1254,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-richmond",
+      "name": "Richmond Hospital",
+      "province": "BC",
+      "city": "Richmond",
+      "latitude": 49.1697,
+      "longitude": -123.1366,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-lions-gate",
+      "name": "Lions Gate Hospital",
+      "province": "BC",
+      "city": "North Vancouver",
+      "latitude": 49.3233,
+      "longitude": -123.0723,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-mount-saint-joseph",
+      "name": "Mount Saint Joseph Hospital",
+      "province": "BC",
+      "city": "Vancouver",
+      "latitude": 49.2430,
+      "longitude": -123.0575,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-ubc",
+      "name": "UBC Hospital",
+      "province": "BC",
+      "city": "Vancouver",
+      "latitude": 49.2643,
+      "longitude": -123.2459,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-whistler",
+      "name": "Whistler Health Care Centre",
+      "province": "BC",
+      "city": "Whistler",
+      "latitude": 50.1171,
+      "longitude": -122.9575,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-pemberton",
+      "name": "Pemberton Health Centre",
+      "province": "BC",
+      "city": "Pemberton",
+      "latitude": 50.3180,
+      "longitude": -122.8024,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-ridge-meadows",
+      "name": "Ridge Meadows Hospital",
+      "province": "BC",
+      "city": "Maple Ridge",
+      "latitude": 49.2259,
+      "longitude": -122.5983,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-burnaby",
+      "name": "Burnaby Hospital",
+      "province": "BC",
+      "city": "Burnaby",
+      "latitude": 49.2480,
+      "longitude": -122.9944,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-royal-columbian",
+      "name": "Royal Columbian Hospital",
+      "province": "BC",
+      "city": "New Westminster",
+      "latitude": 49.2271,
+      "longitude": -122.8916,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-eagle-ridge",
+      "name": "Eagle Ridge Hospital",
+      "province": "BC",
+      "city": "Port Moody",
+      "latitude": 49.2804,
+      "longitude": -122.8395,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-peace-arch",
+      "name": "Peace Arch Hospital",
+      "province": "BC",
+      "city": "White Rock",
+      "latitude": 49.0457,
+      "longitude": -122.8035,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-delta",
+      "name": "Delta Hospital",
+      "province": "BC",
+      "city": "Delta",
+      "latitude": 49.0866,
+      "longitude": -123.0602,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-chilliwack",
+      "name": "Chilliwack General Hospital",
+      "province": "BC",
+      "city": "Chilliwack",
+      "latitude": 49.1655,
+      "longitude": -121.9427,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-langley",
+      "name": "Langley Memorial Hospital",
+      "province": "BC",
+      "city": "Langley",
+      "latitude": 49.1043,
+      "longitude": -122.6604,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-abbotsford",
+      "name": "Abbotsford Regional Hospital",
+      "province": "BC",
+      "city": "Abbotsford",
+      "latitude": 49.0297,
+      "longitude": -122.2804,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-surrey-memorial-adult",
+      "name": "Surrey Memorial Hospital (Adult Emergency)",
+      "province": "BC",
+      "city": "Surrey",
+      "latitude": 49.1828,
+      "longitude": -122.8449,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-bc-surrey-memorial-pediatrics",
+      "name": "Surrey Memorial Hospital (Pediatrics Emergency)",
+      "province": "BC",
+      "city": "Surrey",
+      "latitude": 49.1828,
+      "longitude": -122.8449,
+      "is_verified": true,
+      "is_visible": true
+    }
+  ]
+}

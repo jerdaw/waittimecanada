@@ -1,6 +1,6 @@
 """Integration tests for DatabaseService with real database."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -149,7 +149,7 @@ class TestDatabaseServiceIntegration:
         measurement = Measurement(
             hospital_id="test-hospital-measurement",
             value=120.5,
-            timestamp_utc=datetime.now(timezone.utc),
+            timestamp_utc=datetime.now(UTC),
             metric_family=MetricFamily.TIME_TO_PROVIDER,
             start_event=StartEvent.TRIAGE,
             end_event=EndEvent.PHYSICIAN,
@@ -284,7 +284,7 @@ class TestDatabaseServiceIntegration:
         recent = Measurement(
             hospital_id="test-hospital-cleanup",
             value=90.0,
-            timestamp_utc=datetime.now(timezone.utc),
+            timestamp_utc=datetime.now(UTC),
             metric_family=MetricFamily.TOTAL_LOS,
             start_event=StartEvent.DOOR,
             end_event=EndEvent.DISCHARGE,
@@ -408,7 +408,7 @@ class TestComparisonServiceIntegration:
             Measurement(
                 hospital_id="test-hospital-a",
                 value=100.0,
-                timestamp_utc=datetime.now(timezone.utc),
+                timestamp_utc=datetime.now(UTC),
                 metric_family=MetricFamily.TIME_TO_PROVIDER,
                 start_event=StartEvent.TRIAGE,
                 end_event=EndEvent.PHYSICIAN,
@@ -422,7 +422,7 @@ class TestComparisonServiceIntegration:
             Measurement(
                 hospital_id="test-hospital-b",
                 value=150.0,
-                timestamp_utc=datetime.now(timezone.utc),
+                timestamp_utc=datetime.now(UTC),
                 metric_family=MetricFamily.TIME_TO_PROVIDER,
                 start_event=StartEvent.TRIAGE,
                 end_event=EndEvent.PHYSICIAN,

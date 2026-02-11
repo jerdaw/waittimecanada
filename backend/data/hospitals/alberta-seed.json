@@ -1,0 +1,205 @@
+{
+  "source_id": "alberta-ahs",
+  "hospitals": [
+    {
+      "id": "ca-ab-foothills-medical-centre",
+      "name": "Foothills Medical Centre",
+      "province": "AB",
+      "city": "Calgary",
+      "latitude": 51.0652,
+      "longitude": -114.1324,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-rockyview-general-hospital",
+      "name": "Rockyview General Hospital",
+      "province": "AB",
+      "city": "Calgary",
+      "latitude": 50.9973,
+      "longitude": -114.1010,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-peter-lougheed-centre",
+      "name": "Peter Lougheed Centre",
+      "province": "AB",
+      "city": "Calgary",
+      "latitude": 51.0767,
+      "longitude": -114.0102,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-south-health-campus",
+      "name": "South Health Campus",
+      "province": "AB",
+      "city": "Calgary",
+      "latitude": 50.8966,
+      "longitude": -114.0048,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-alberta-children-s-hospital",
+      "name": "Alberta Children's Hospital",
+      "province": "AB",
+      "city": "Calgary",
+      "latitude": 51.0594,
+      "longitude": -114.1416,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-royal-alexandra-hospital",
+      "name": "Royal Alexandra Hospital",
+      "province": "AB",
+      "city": "Edmonton",
+      "latitude": 53.5543,
+      "longitude": -113.4960,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-university-of-alberta-hospital",
+      "name": "University of Alberta Hospital",
+      "province": "AB",
+      "city": "Edmonton",
+      "latitude": 53.5214,
+      "longitude": -113.5218,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-misericordia-community-hospital",
+      "name": "Misericordia Community Hospital",
+      "province": "AB",
+      "city": "Edmonton",
+      "latitude": 53.5377,
+      "longitude": -113.5673,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-grey-nuns-community-hospital",
+      "name": "Grey Nuns Community Hospital",
+      "province": "AB",
+      "city": "Edmonton",
+      "latitude": 53.4872,
+      "longitude": -113.4398,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-northeast-community-health-centre",
+      "name": "Northeast Community Health Centre",
+      "province": "AB",
+      "city": "Edmonton",
+      "latitude": 53.5909,
+      "longitude": -113.4282,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-sturgeon-community-hospital",
+      "name": "Sturgeon Community Hospital",
+      "province": "AB",
+      "city": "St. Albert",
+      "latitude": 53.6317,
+      "longitude": -113.6228,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-strathcona-community-hospital",
+      "name": "Strathcona Community Hospital",
+      "province": "AB",
+      "city": "Sherwood Park",
+      "latitude": 53.5064,
+      "longitude": -113.3101,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-red-deer-regional-hospital-centre",
+      "name": "Red Deer Regional Hospital Centre",
+      "province": "AB",
+      "city": "Red Deer",
+      "latitude": 52.2583,
+      "longitude": -113.8058,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-chinook-regional-hospital",
+      "name": "Chinook Regional Hospital",
+      "province": "AB",
+      "city": "Lethbridge",
+      "latitude": 49.6775,
+      "longitude": -112.8078,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-medicine-hat-regional-hospital",
+      "name": "Medicine Hat Regional Hospital",
+      "province": "AB",
+      "city": "Medicine Hat",
+      "latitude": 50.0363,
+      "longitude": -110.6648,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-queen-elizabeth-ii-hospital",
+      "name": "Queen Elizabeth II Hospital",
+      "province": "AB",
+      "city": "Grande Prairie",
+      "latitude": 55.1686,
+      "longitude": -118.7973,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-northern-lights-regional-health-centre",
+      "name": "Northern Lights Regional Health Centre",
+      "province": "AB",
+      "city": "Fort McMurray",
+      "latitude": 56.7289,
+      "longitude": -111.3803,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-stollery-children-s-hospital",
+      "name": "Stollery Children's Hospital",
+      "province": "AB",
+      "city": "Edmonton",
+      "latitude": 53.5214,
+      "longitude": -113.5218,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-canmore-general-hospital",
+      "name": "Canmore General Hospital",
+      "province": "AB",
+      "city": "Canmore",
+      "latitude": 51.0858,
+      "longitude": -115.3571,
+      "is_verified": true,
+      "is_visible": true
+    },
+    {
+      "id": "ca-ab-high-river-general-hospital",
+      "name": "High River General Hospital",
+      "province": "AB",
+      "city": "High River",
+      "latitude": 50.5818,
+      "longitude": -113.8745,
+      "is_verified": true,
+      "is_visible": true
+    }
+  ]
+}

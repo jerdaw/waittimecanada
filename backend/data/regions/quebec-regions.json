@@ -1,0 +1,75 @@
+{
+  "province": "QC",
+  "regions": [
+    {
+      "id": "ca-qc-region-montreal",
+      "name": "Montreal",
+      "code": "MONTREAL",
+      "sort_order": 1,
+      "description": "Island of Montreal CIUSSS/CISSS facilities including major university hospitals.",
+      "hospitals": [
+        "ca-qc-chum",
+        "ca-qc-jewish-general",
+        "ca-qc-maisonneuve-rosemont",
+        "ca-qc-sacre-coeur",
+        "ca-qc-notre-dame",
+        "ca-qc-saint-luc",
+        "ca-qc-hotel-dieu",
+        "ca-qc-verdun",
+        "ca-qc-lasalle",
+        "ca-qc-lachine",
+        "ca-qc-santa-cabrini",
+        "ca-qc-jean-talon",
+        "ca-qc-fleury",
+        "ca-qc-chu-sainte-justine",
+        "ca-qc-hopital-general-de-montreal"
+      ]
+    },
+    {
+      "id": "ca-qc-region-laval",
+      "name": "Laval",
+      "code": "LAVAL",
+      "sort_order": 2,
+      "description": "CISSS de Laval facilities.",
+      "hospitals": [
+        "ca-qc-cite-sante"
+      ]
+    },
+    {
+      "id": "ca-qc-region-monteregie",
+      "name": "Mont\u00e9r\u00e9gie",
+      "code": "MONTEREGIE",
+      "sort_order": 3,
+      "description": "South Shore and Monteregie CISSS facilities including Longueuil and Saint-Hyacinthe.",
+      "hospitals": [
+        "ca-qc-charles-lemoyne",
+        "ca-qc-pierre-boucher",
+        "ca-qc-anna-laberge",
+        "ca-qc-haut-richelieu",
+        "ca-qc-honore-mercier"
+      ]
+    },
+    {
+      "id": "ca-qc-region-capitale-nationale",
+      "name": "Capitale-Nationale",
+      "code": "CAPITALE_NATIONALE",
+      "sort_order": 4,
+      "description": "Quebec City region including CHU de Quebec sites.",
+      "hospitals": [
+        "ca-qc-enfant-jesus",
+        "ca-qc-chul"
+      ]
+    },
+    {
+      "id": "ca-qc-region-outaouais",
+      "name": "Outaouais",
+      "code": "OUTAOUAIS",
+      "sort_order": 5,
+      "description": "Gatineau-Ottawa corridor. Critical for cross-province comparison with Ontario.",
+      "hospitals": [
+        "ca-qc-hopital-de-gatineau",
+        "ca-qc-hopital-de-hull"
+      ]
+    }
+  ]
+}

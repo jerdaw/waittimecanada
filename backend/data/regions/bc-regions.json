@@ -1,0 +1,67 @@
+{
+  "province": "BC",
+  "regions": [
+    {
+      "id": "ca-bc-region-vancouver-coastal",
+      "name": "Vancouver Coastal Health",
+      "code": "VCH",
+      "sort_order": 1,
+      "description": "Vancouver, North Shore, Richmond, Sea-to-Sky corridor, and Sunshine Coast.",
+      "hospitals": [
+        "ca-bc-st-pauls",
+        "ca-bc-vgh",
+        "ca-bc-bc-childrens",
+        "ca-bc-richmond",
+        "ca-bc-lions-gate",
+        "ca-bc-mount-saint-joseph",
+        "ca-bc-ubc",
+        "ca-bc-whistler",
+        "ca-bc-pemberton"
+      ]
+    },
+    {
+      "id": "ca-bc-region-fraser",
+      "name": "Fraser Health",
+      "code": "FRASER",
+      "sort_order": 2,
+      "description": "Fraser Valley from Burnaby to Chilliwack, including Surrey, Langley, and Abbotsford.",
+      "hospitals": [
+        "ca-bc-burnaby",
+        "ca-bc-royal-columbian",
+        "ca-bc-eagle-ridge",
+        "ca-bc-ridge-meadows",
+        "ca-bc-surrey-memorial-adult",
+        "ca-bc-surrey-memorial-pediatrics",
+        "ca-bc-langley",
+        "ca-bc-abbotsford",
+        "ca-bc-chilliwack",
+        "ca-bc-peace-arch",
+        "ca-bc-delta"
+      ]
+    },
+    {
+      "id": "ca-bc-region-island",
+      "name": "Island Health",
+      "code": "ISLAND",
+      "sort_order": 3,
+      "description": "Vancouver Island and Gulf Islands. Not currently covered by the BC PHSA scraper.",
+      "hospitals": []
+    },
+    {
+      "id": "ca-bc-region-interior",
+      "name": "Interior Health",
+      "code": "INTERIOR",
+      "sort_order": 4,
+      "description": "BC Interior from Kamloops to Kelowna to Cranbrook. Not currently covered by the BC PHSA scraper.",
+      "hospitals": []
+    },
+    {
+      "id": "ca-bc-region-northern",
+      "name": "Northern Health",
+      "code": "NORTHERN",
+      "sort_order": 5,
+      "description": "Northern BC including Prince George and Fort St. John. Not currently covered by the BC PHSA scraper.",
+      "hospitals": []
+    }
+  ]
+}

@@ -68,7 +68,7 @@ def test_apply_migrations_skips_duplicate_error(tmp_path: Path) -> None:
     migration.write_text("SELECT 1;", encoding="utf-8")
 
     duplicate_exc = Exception('relation "sources" already exists')
-    setattr(duplicate_exc, "pgcode", "42P07")
+    duplicate_exc.pgcode = "42P07"
 
     mock_cursor = Mock()
     mock_cursor.execute.side_effect = duplicate_exc

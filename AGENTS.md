@@ -39,23 +39,24 @@ This file provides guidance to automated developer tools when working with code 
 
 This is the **WaitTime Canada** project - a "Health Systems Observatory" designed to audit and standardize Canadian emergency room wait time data across provinces. This is **NOT a simple wait time app**, but rather a clinically defensible auditing platform that exposes methodological inconsistencies in healthcare reporting.
 
-**Current Status:** Milestone 14 (Data Quality & Anomaly Detection) Complete. **NEXT: Milestone 15 (Analytics & Benchmarking).**
+**Current Status:** Milestone 16 (Multi-Province Operationalization) Complete. **Four-province breadth achieved** (ON, QC, AB, BC). All scrapers active, 380+ hospitals visible, methodology documentation complete for all provinces.
 
 **Current Architecture:**
-- **Database**: Neon PostgreSQL 17 (7 tables: sources, hospitals, measurements, scraper_status, measurement_aggregates, data_quality_snapshots, methodology_change_events)
+- **Database**: Neon PostgreSQL 17 (9 tables: sources, hospitals, measurements, scraper_status, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions)
 - **Backend**: Python 3.12+ with psycopg2, pytest
-  - **Tests**: 279+ passing (unit + integration)
-  - Scrapers: Quebec (BeautifulSoup), Ontario (Playwright), BC (HTML/JSON)
+  - **Tests**: 350+ passing (unit + integration)
+  - Scrapers: Quebec (BeautifulSoup), Ontario (Playwright), Alberta (Playwright), BC (JSON/__NEXT_DATA__)
   - Services: DatabaseService, AggregationService, DataQualityService, AnomalyDetectionService, MethodologyChangeDetector, GeocodingService
-  - CLI tools: scraper runner, database cleanup, seeding, aggregation
+  - CLI tools: scraper runner, database cleanup, seeding, aggregation, trusted hospital approval, region mapping
 - **Frontend**: Next.js 14 + TypeScript + Mapbox GL JS
   - **Tests**: 218+ passing (Vitest + React Testing Library)
   - Map component with hospital markers and methodology display
   - Data quality dashboard (`/data-quality`)
+  - Analytics & benchmarking dashboard (`/analytics`)
   - Data export with granularity selector
   - Trend charts with aggregate visualization (90d/6m/1y)
   - Methods & governance page (`/methods`)
-  - API routes for hospitals, comparisons, health, data-quality, anomalies, export
+  - API routes for hospitals, comparisons, health, data-quality, anomalies, export, analytics
 
 ## Core Architecture
 
@@ -147,9 +148,10 @@ Hospitals scraped from official government health authority websites (Ontario He
 ### 4. Province-Aware Routing
 
 When displaying hospital details, query the `sources` table to show correct telehealth info:
-- Ontario: "Call Health811"
+- Ontario: "Call Health Connect Ontario 811"
 - Quebec: "Call Info-Santé 811"
 - Alberta: "Call Health Link 811"
+- BC: "Call HealthLink BC 811"
 
 This demonstrates **stewardship** and **professional collaboration**.
 
@@ -216,10 +218,8 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 
 ## Implementation Roadmap
 
-- [x] **Week 1: Database Foundation** - Neon PostgreSQL setup, Quebec scraper MVP.
-- [x] **Week 2: Multi-Province & Geocoding** - Ontario scraper (Playwright), geocoding manual overrides.
-- [x] **Week 3: Frontend & Analytics** - Mapbox integration, wait time trends, methods page.
-- [x] **Week 4: UX Polish & SEO** - Skeleton loading, search/filter, structured data, live indicators.
+- [x] **Milestones 1-15:** Database foundation, multi-province scrapers, methodology comparisons, data quality monitoring, aggregation pipeline, analytics & benchmarking.
+- [x] **Milestone 16 (Complete):** Multi-Province Operationalization - 4 provinces active (ON, QC, AB, BC), 380+ hospitals visible, methodology documentation complete for all provinces, 15 health regions mapped, hospital seed data for all provinces.
 
 ---
 

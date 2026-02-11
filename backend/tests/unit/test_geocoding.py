@@ -1,10 +1,12 @@
 
-import pytest
-from unittest.mock import patch, MagicMock, mock_open
-from pathlib import Path
-import httpx
 import time
-from waittime.services.geocoding import GeocodingService, GeocodingResult
+from unittest.mock import MagicMock, mock_open, patch
+
+import httpx
+import pytest
+
+from waittime.services.geocoding import GeocodingResult, GeocodingService
+
 
 @pytest.fixture
 def geocoding_service():

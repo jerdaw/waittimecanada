@@ -3,18 +3,10 @@
 These tests verify the comparison feature works end-to-end with real seeded data.
 """
 
-import pytest
-from datetime import UTC, datetime
+from datetime import datetime
 
-from waittime.core import (
-    EndEvent,
-    MetricFamily,
-    PatientScope,
-    StartEvent,
-    StatisticType,
-    Hospital,
-    Measurement,
-)
+import pytest
+
 from waittime.services.comparison import ComparisonService
 from waittime.services.database import DatabaseService
 
@@ -395,7 +387,6 @@ class TestComparisonWithRealData:
         assert isinstance(result["comparison_timestamp"], str)
 
         # Should be parseable as datetime
-        from datetime import datetime
 
         datetime.fromisoformat(result["hospital_a"]["last_updated"].replace("Z", "+00:00"))
         datetime.fromisoformat(result["hospital_b"]["last_updated"].replace("Z", "+00:00"))

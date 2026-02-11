@@ -1,7 +1,9 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
-import sys
-from waittime.cli.scraper import hospital_id_to_name, run_scraper, main, SCRAPERS
+
+from waittime.cli.scraper import SCRAPERS, hospital_id_to_name, main, run_scraper
+
 
 def test_scrapers_registry_includes_bc():
     """Verify BC is registered for --all runs."""
@@ -185,7 +187,7 @@ def test_run_scraper_geocoding_failure():
     mock_source_factory = MagicMock()
     mock_source = MagicMock(name="Test Source", province="ON")
     mock_source_factory.return_value = mock_source
-    
+
     measurements = [MagicMock(hospital_id="ca-on-h1", value=10)]
     mock_scraper_instance = mock_scraper_class.return_value.__enter__.return_value
 
@@ -196,21 +198,57 @@ def test_run_scraper_geocoding_failure():
         return measurements
 
     mock_scraper_instance.run.side_effect = run_side_effect
-    
+
     with patch("waittime.cli.scraper.SCRAPERS", {"s1": (mock_scraper_class, mock_source_factory)}):
         with patch("waittime.cli.scraper.DatabaseService") as mock_db:
             mock_db_instance = mock_db.return_value
             mock_db_instance.get_hospital.return_value = None
-            
+
             with patch("waittime.cli.scraper.GeocodingService") as mock_geocoder:
                 # Mock geocoding failure
                 mock_geocoder.return_value.geocode_hospital.return_value = None
-                
+
                 run_scraper("s1", dry_run=False)
-                
+
                 # Should call upsert_hospital with placeholders
                 args, _ = mock_db_instance.upsert_hospital.call_args
                 hospital = args[0]
                 assert hospital.city == "Unknown"
                 assert hospital.latitude == 0.0
                 assert hospital.longitude == 0.0
+
+
+def test_new_hospitals_are_auto_approved():
+    """Verify hospitals from government sources are created as verified and visible."""
+    mock_scraper_class = MagicMock()
+    mock_source_factory = MagicMock()
+    mock_source = MagicMock(name="Test Source", province="AB")
+    mock_source_factory.return_value = mock_source
+
+    measurements = [MagicMock(hospital_id="ca-ab-foothills", value=60)]
+    mock_scraper_instance = mock_scraper_class.return_value.__enter__.return_value
+
+    def run_side_effect(*args, **kwargs):
+        before_save = kwargs.get("before_save")
+        if kwargs.get("save_to_db") and before_save:
+            before_save(measurements)
+        return measurements
+
+    mock_scraper_instance.run.side_effect = run_side_effect
+
+    with patch("waittime.cli.scraper.SCRAPERS", {"s1": (mock_scraper_class, mock_source_factory)}):
+        with patch("waittime.cli.scraper.DatabaseService") as mock_db:
+            mock_db_instance = mock_db.return_value
+            mock_db_instance.get_hospital.return_value = None
+
+            with patch("waittime.cli.scraper.GeocodingService") as mock_geocoder:
+                mock_geocoder.return_value.geocode_hospital.return_value = MagicMock(
+                    city="Calgary", latitude=51.0, longitude=-114.0, confidence=0.9
+                )
+
+                run_scraper("s1", dry_run=False)
+
+                args, _ = mock_db_instance.upsert_hospital.call_args
+                hospital = args[0]
+                assert hospital.is_verified is True
+                assert hospital.is_visible is True

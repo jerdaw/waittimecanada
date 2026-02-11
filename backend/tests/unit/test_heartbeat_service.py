@@ -1,8 +1,9 @@
 """Tests for HeartbeatService."""
 
-import pytest
 from datetime import UTC, datetime, timedelta
-from unittest.mock import MagicMock, Mock, call
+from unittest.mock import MagicMock, Mock
+
+import pytest
 
 from waittime.core import ScraperStatus
 from waittime.services.heartbeat import HeartbeatService
@@ -101,7 +102,7 @@ class TestRecordFailure:
         )
         mock_db.update_heartbeat.return_value = mock_status
 
-        result = heartbeat_service.record_failure("qc-msss", long_error)
+        _result = heartbeat_service.record_failure("qc-msss", long_error)
 
         # Should truncate to 500 characters
         call_args = mock_db.update_heartbeat.call_args
@@ -118,7 +119,7 @@ class TestRecordFailure:
         )
         mock_db.update_heartbeat.return_value = mock_status
 
-        result = heartbeat_service.record_failure("qc-msss", "")
+        _result = heartbeat_service.record_failure("qc-msss", "")
 
         call_args = mock_db.update_heartbeat.call_args
         assert call_args.kwargs["error_message"] == "Unknown error"
@@ -288,7 +289,7 @@ class TestCheckAllSources:
 
     def test_all_healthy_sources(self, heartbeat_service, mock_db):
         """Should return healthy=True when all sources are healthy."""
-        from waittime.core import Source, MetricFamily, StartEvent, EndEvent, StatisticType
+        from waittime.core import EndEvent, MetricFamily, Source, StartEvent, StatisticType
 
         mock_sources = [
             Source(
@@ -319,7 +320,7 @@ class TestCheckAllSources:
         mock_db.list_sources.return_value = mock_sources
 
         # Mock check_health to return healthy for both
-        original_check = heartbeat_service.check_health
+        _original_check = heartbeat_service.check_health
         healthy_result = {
             "source_id": "test",
             "healthy": True,
@@ -346,7 +347,7 @@ class TestCheckAllSources:
 
     def test_some_unhealthy_sources(self, heartbeat_service, mock_db):
         """Should return healthy=False when any source is unhealthy."""
-        from waittime.core import Source, MetricFamily, StartEvent, EndEvent, StatisticType
+        from waittime.core import EndEvent, MetricFamily, Source, StartEvent, StatisticType
 
         mock_sources = [
             Source(
@@ -433,6 +434,6 @@ class TestGetStalescrapers:
         """Should use DEFAULT_STALE_THRESHOLD when not specified."""
         mock_db.get_stale_scrapers.return_value = []
 
-        result = heartbeat_service.get_stale_scrapers()
+        _result = heartbeat_service.get_stale_scrapers()
 
         mock_db.get_stale_scrapers.assert_called_once_with(60)

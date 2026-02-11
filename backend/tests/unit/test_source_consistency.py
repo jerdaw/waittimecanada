@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+
 from waittime.core import Source
 from waittime.scrapers import (
     create_alberta_source,

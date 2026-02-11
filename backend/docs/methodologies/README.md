@@ -13,31 +13,58 @@ These documents serve multiple purposes:
 
 ## Available Documentation
 
-### ✅ Ontario
+### Ontario
 - **File**: `ontario-methodology.md`
 - **Status**: Complete
 - **Data Sources**: ER Watch (real-time), Health Quality Ontario (historical)
 - **Key Insight**: Two distinct methodologies (POINT_ESTIMATE vs P90) that are incomparable
 
-### 🚧 Quebec
-- **Status**: Planned
-- **Data Sources**: Index Santé, Quebec MSSS
-- **Expected Differences**: Different start_event (REGISTRATION vs TRIAGE)
+### Alberta
+- **File**: `alberta-methodology.md`
+- **Status**: Complete
+- **Data Sources**: Alberta Health Services Wait Times Portal
+- **Key Insight**: POINT_ESTIMATE (real-time, updated every 2 minutes), TRIAGE to PHYSICIAN
 
-### 🚧 Alberta
-- **Status**: Planned
-- **Data Sources**: Alberta Health Services
-- **Expected Compatibility**: High compatibility with Ontario HQO (both use P90)
+### British Columbia
+- **File**: `bc-methodology.md`
+- **Status**: Complete
+- **Data Sources**: BC PHSA via edwaittimes.ca
+- **Key Insight**: P90 statistic (90th percentile), TRIAGE to PHYSICIAN, 5-minute refresh
 
-### 🚧 British Columbia
-- **Status**: Planned
-- **Data Sources**: BC Emergency Medicine Network
-- **Expected Differences**: May use TOTAL_LOS instead of TIME_TO_PROVIDER
+### Quebec
+- **File**: `quebec-methodology.md`
+- **Status**: Complete
+- **Data Sources**: MSSS Emergency Room Situation Portal
+- **Key Insight**: Uses REGISTRATION start event (not TRIAGE) and ROLLING_AVG statistic - incomparable to all other provinces on two ontology dimensions
 
-### 🚧 Manitoba
-- **Status**: Planned
+### Manitoba (Future)
+- **Status**: Not yet tracked
 - **Data Sources**: Shared Health Manitoba
 - **Expected Differences**: Different statistic_type
+
+## Cross-Province Comparability Summary
+
+All four active provinces measure TIME_TO_PROVIDER but differ in start event and statistic type:
+
+| Province | Source ID | Start Event | End Event | Statistic Type | Update Freq |
+|----------|-----------|-------------|-----------|----------------|-------------|
+| **Ontario** | ontario-health | TRIAGE | PHYSICIAN | POINT_ESTIMATE | ~15 min |
+| **Alberta** | alberta-ahs | TRIAGE | PHYSICIAN | POINT_ESTIMATE | ~2 min |
+| **BC** | bc-phsa | TRIAGE | PHYSICIAN | P90 | ~5 min |
+| **Quebec** | quebec-msss | REGISTRATION | PHYSICIAN | ROLLING_AVG | Periodic |
+
+### Pairwise Comparability
+
+| Pair | Comparable? | Divergent Fields | Notes |
+|------|-------------|------------------|-------|
+| **ON vs AB** | Partial | statistic_type matches (both POINT_ESTIMATE) | Same ontology when using real-time Ontario data |
+| **ON vs BC** | No | statistic_type (POINT_ESTIMATE vs P90) | Same start/end events but different statistics |
+| **ON vs QC** | No | start_event + statistic_type | Two dimensions differ; Quebec times systematically higher |
+| **AB vs BC** | No | statistic_type (POINT_ESTIMATE vs P90) | Same start/end events but different statistics |
+| **AB vs QC** | No | start_event + statistic_type | Two dimensions differ |
+| **BC vs QC** | No | start_event + statistic_type | Two dimensions differ |
+
+**Key Takeaway:** No province pair is fully comparable. Ontario and Alberta share the closest methodology (both TRIAGE -> PHYSICIAN, POINT_ESTIMATE), but even these represent instantaneous snapshots that may vary by measurement timing. Quebec is the most methodologically distinct province.
 
 ## Methodology Document Structure
 
@@ -216,4 +243,4 @@ For methodology questions, consult:
 
 ---
 
-*Last Updated: February 1, 2026*
+*Last Updated: February 11, 2026*
