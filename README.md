@@ -279,8 +279,7 @@ npm run test:unit    # Vitest unit tests
 
 ### Deep Dives
 - [`docs/adr/`](docs/adr/) - Architecture Decision Records (14 ADRs)
-- [`docs/methodologies/`](docs/methodologies/) - Provincial methodology documentation
-- [`docs/architecture/`](docs/architecture/) - System architecture diagrams
+- [`backend/docs/methodologies/`](backend/docs/methodologies/) - Provincial methodology documentation
 - [`backend/README.md`](backend/README.md) - Backend architecture and testing
 - [`frontend/README.md`](frontend/README.md) - Frontend architecture and testing
 

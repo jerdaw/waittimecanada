@@ -72,10 +72,10 @@ Future feature development - to be prioritized based on project goals:
 - Occupancy-based hospital recommendations
 
 ### Later (6+ weeks)
-- [ ] **P2 / Portfolio launch completion:** Complete stakeholder interview and publish launch communications when public hosting is re-enabled.
-- [ ] **Performance optimization:** Smart scheduling (reduce frequency during overnight hours)
-- [ ] **Monitoring dashboard:** Prometheus/Grafana integration
-- [ ] **Advanced analytics:** Predictive wait time modeling
+- [ ] **P2 / Portfolio launch:** Complete stakeholder interview and publish launch communications when public hosting is re-enabled.
+- [ ] **P2 / Performance optimization:** Smart scheduling (reduce frequency during overnight hours)
+- [ ] **P2 / Monitoring dashboard:** Prometheus/Grafana integration for operational visibility
+- [ ] **P2 / Advanced analytics:** Predictive wait time modeling based on historical patterns
 
 ---
 
