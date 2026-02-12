@@ -59,23 +59,97 @@ All planned milestones through M18 and Operations verification are complete. Fut
 
 ## Active Roadmap (Now / Next / Later)
 
-### Now (0-2 weeks)
+### Now (0-2 weeks) — High-Impact Portfolio Improvements
 
-No active development tasks. All planned milestones through M18 are complete.
+**Priority: Documentation & Governance (Quick wins for admissions credibility)**
+- [x] **P1 / Add LICENSE file** — MIT or Apache-2.0 license for legal clarity and professional governance (30min)
+- [ ] **P1 / Add SECURITY.md** — Responsible disclosure policy with GitHub Security tab integration (1-2h) ⏸️ On hold - content filtering
+- [ ] **P1 / Add CODE_OF_CONDUCT.md** — Contributor Covenant v2.1 for community governance (30min) ⏸️ On hold - content filtering
+- [x] **P1 / Add CITATION.cff** — GitHub "Cite this repository" button for research credibility (30min)
+- [ ] **P1 / Add Zenodo DOI integration** — Permanent citation link and DOI badge (1-2h)
+- [ ] **P1 / Add README badges** — CI status, coverage, license, language badges for professional polish (1h)
+- [ ] **P1 / Add architecture diagram (Mermaid)** — Visual system architecture in README for reviewer clarity (1-2h)
 
-### Next (2-6 weeks)
+**Priority: Frontend Quality & Accessibility**
+- [x] **P1 / Add error boundaries** — `error.tsx`, `not-found.tsx`, `global-error.tsx` for graceful failure handling (2-3h)
+- [x] **P1 / Add loading states** — Proper `loading.tsx` for all pages (/analytics, /data-quality, /methods, /faq) (2-3h)
+- [x] **P1 / Add Privacy Policy page (/privacy)** — PIPEDA/PHIPA awareness, no-PII documentation (2-3h)
+- [x] **P1 / Add Terms of Use page (/terms)** — Data accuracy disclaimers, no medical advice warning (2-3h)
+- [ ] **P1 / Add robots.txt and sitemap** — SEO basics via Next.js metadata API (`robots.ts`, `sitemap.ts`) (1-2h)
 
-Future feature development - to be prioritized based on project goals:
-- Additional provinces (Nova Scotia, New Brunswick)
-- Historical occupancy trends (daily/weekly patterns)
-- Enhanced equity layer with census tract income overlays
-- Occupancy-based hospital recommendations
+**Priority: Security & Configuration**
+- [ ] **P1 / Add Content Security Policy** — CSP and security headers in `next.config.js` (2-3h)
+- [x] **P1 / Add .pre-commit-config.yaml** — Ruff, mypy, Prettier, ESLint, secrets detection hooks (1-2h)
+- [x] **P1 / Add Dependabot/Renovate** — Automated dependency updates via `.github/dependabot.yml` (1h)
+- [ ] **P1 / Add CORS configuration** — Explicit allowed origins via Next.js middleware (1-2h)
+- [x] **P1 / Add git commit hooks** — Commitlint for conventional commits enforcement (1-2h)
 
-### Later (6+ weeks)
-- [ ] **P2 / Portfolio launch:** Complete stakeholder interview and publish launch communications when public hosting is re-enabled.
-- [ ] **P2 / Performance optimization:** Smart scheduling (reduce frequency during overnight hours)
-- [ ] **P2 / Monitoring dashboard:** Prometheus/Grafana integration for operational visibility
-- [ ] **P2 / Advanced analytics:** Predictive wait time modeling based on historical patterns
+**Priority: Deployment & Operational Artifacts**
+- [ ] **P1 / Add GitHub Releases** — Tag M1-M18 as versioned releases with release notes (4-6h)
+- [x] **P1 / Add CHANGELOG.md** — Semantic versioning with Keep a Changelog format, retroactive from git history (4-6h)
+- [ ] **P1 / Expand portfolio screenshots** — Capture all 10+ views (light/dark, mobile, occupancy, divergence warnings) (4-8h)
+- [ ] **P1 / Add data freshness badge** — Dynamic README badge showing "Last scrape: X mins ago" (4-6h)
+
+### Next (2-6 weeks) — Medium-Impact Quality Improvements
+
+**Category: Testing & Reliability**
+- [ ] **P1 / Add accessibility testing (axe-core)** — WCAG compliance testing in Playwright E2E with CI checks (1-2d)
+- [ ] **P1 / Increase backend test coverage to 85%+** — Focus on anomaly detection, methodology change detector, comparison service (1-2d)
+- [ ] **P1 / Add Lighthouse CI** — Performance, accessibility, SEO scoring with GitHub Actions integration (4-8h)
+- [ ] **P1 / Add mobile-responsive testing** — Playwright tests at 375px/414px viewports (4-8h)
+- [ ] **P1 / Add visual regression testing** — Playwright visual comparison for homepage, /methods, /data-quality (4-8h)
+- [ ] **P1 / Add property-based testing (Hypothesis)** — Formal verification of ontology comparability logic (4-8h)
+- [ ] **P1 / Add end-to-end pipeline test** — Mock scrape → DB insert → API query → frontend render (4-8h)
+- [ ] **P1 / Add API integration tests** — Hit actual/mocked database for all 16 endpoints with error cases (1-2d)
+
+**Category: API & Backend Quality**
+- [ ] **P1 / Add API rate limiting** — In-memory or Upstash Redis middleware for all 16 routes with 429 responses (4-8h)
+- [ ] **P1 / Add OpenAPI/Swagger docs** — OpenAPI 3.0 spec for all endpoints with Swagger UI at `/api-docs` (1-2d)
+- [ ] **P1 / Add API input validation (Zod)** — Comprehensive validation for all query params across 16 routes (4-8h)
+- [ ] **P1 / Add structured logging to frontend** — JSON-formatted logging for all API routes (method, path, duration, status) (2-3h)
+- [ ] **P1 / Add API response time tracking** — Timing middleware with P50/P95/P99 latency metrics (2-3h)
+- [ ] **P1 / Add database health check enhancement** — Connection pool status, query latency, per-source freshness (2-3h)
+
+**Category: Type Safety & Code Quality**
+- [ ] **P1 / TypeScript strict mode audit** — Eliminate all `any`, `@ts-ignore`, `@ts-expect-error` in custom code (2-3h)
+- [ ] **P1 / Backend mypy strict mode** — Enable `--strict` flag and fix all type errors (4-8h)
+- [ ] **P1 / Database index optimization** — Add composite indexes for common query patterns with migration (2-3h)
+
+**Category: Documentation & Onboarding**
+- [ ] **P1 / Add mkdocs GitHub Pages deployment** — Live documentation site with `docs-deploy.yml` workflow (4-6h)
+- [ ] **P1 / Add data dictionary** — Document all 9 tables, columns, enums, constraints with ER diagram (4-6h)
+- [ ] **P1 / Add contributor onboarding guide** — Architecture walkthrough, how to add scraper/API/page (4-6h)
+- [ ] **P1 / Add database migration documentation** — `backend/migrations/README.md` with history and rollback procedures (2-3h)
+- [ ] **P1 / Add data flow documentation** — Per-scraper docs: source URL, format, parsing, ontology mapping, limitations (4-8h)
+- [ ] **P1 / Add methodology comparison table asset** — Downloadable CSV/HTML of cross-province comparison matrix (2-3h)
+
+**Category: Monitoring & Operations**
+- [ ] **P1 / Add uptime/status history page** — `/status` page with 30/90-day scraper uptime metrics (4-8h)
+- [ ] **P1 / Add data quality drift monitoring** — Weekly GitHub Action tracking measurement count, anomaly rate, success rate over time (4-8h)
+
+**Category: GitHub Project Governance**
+- [ ] **P1 / Add GitHub issue templates** — Bug report, feature request, data quality issue templates (1-2h)
+- [ ] **P1 / Add PR template** — `.github/PULL_REQUEST_TEMPLATE.md` with testing/docs checklists (1-2h)
+- [ ] **P1 / Add GitHub Project board** — Public roadmap with Backlog/In Progress/Done columns (1-2h)
+- [ ] **P1 / Populate stakeholder interview examples** — 2-3 example summaries demonstrating consent workflow (1-2h)
+
+### Later (6+ weeks) — Strategic Enhancements
+
+**High-Value Expansion Features:**
+- [ ] **P1 / French language support (i18n)** — next-intl with bilingual methodology warnings, emergency disclaimers, UI chrome (1-2w)
+  - **Category:** Impact/Adoption | **CanMEDS:** Health Advocate, Collaborator
+  - **Why:** Quebec hospitals serve French-speaking populations; demonstrates cultural competency
+  - **Deliverables:** `/fr` route prefix, bilingual methodology warnings, language toggle, translated emergency banner
+
+**Future Feature Development:**
+- [ ] **P2 / Additional provinces** — Nova Scotia, New Brunswick scrapers with methodology documentation
+- [ ] **P2 / Historical occupancy trends** — Daily/weekly patterns for Quebec stretcher occupancy
+- [ ] **P2 / Enhanced equity layer** — StatsCan census tract income overlays with real data (currently scaffold)
+- [ ] **P2 / Occupancy-based recommendations** — Smart hospital suggestions based on current occupancy
+- [ ] **P2 / Portfolio launch** — Complete stakeholder interview and publish launch communications when public hosting is re-enabled
+- [ ] **P2 / Performance optimization** — Smart scheduling (reduce frequency during overnight hours)
+- [ ] **P2 / Monitoring dashboard** — Prometheus/Grafana integration for operational visibility
+- [ ] **P2 / Advanced analytics** — Predictive wait time modeling based on historical patterns
 
 ---
 
@@ -85,17 +159,105 @@ Each feature maps to CanMEDS competencies for medical school admissions:
 
 | Competency | Features |
 |------------|----------|
-| **Scholar** | Metric ontology, comparability matrix, citation export, aggregation pipeline, anomaly detection, methodology change detection |
-| **Professional** | Clinical defensibility, divergence warnings, data quality transparency, peer benchmarking |
-| **Health Advocate** | Access Burden Estimator, equity layer, temporal access patterns |
-| **Leader** | Multi-province scaling, systems architecture, regional dashboards, data quality monitoring |
-| **Collaborator** | Province-aware telehealth routing, stakeholder interviews |
+| **Scholar** | Metric ontology, comparability matrix, citation export, aggregation pipeline, anomaly detection, methodology change detection, property-based testing, data dictionary, OpenAPI documentation, methodology comparison assets, Zenodo DOI |
+| **Professional** | Clinical defensibility, divergence warnings, data quality transparency, peer benchmarking, SECURITY.md, LICENSE, CODE_OF_CONDUCT, privacy policy, terms of use, error boundaries, security headers, uptime monitoring |
+| **Health Advocate** | Access Burden Estimator, equity layer, temporal access patterns, accessibility testing (WCAG), French language support, mobile responsiveness |
+| **Leader** | Multi-province scaling, systems architecture, regional dashboards, data quality monitoring, GitHub Project board, contributor onboarding, release management, operational documentation |
+| **Collaborator** | Province-aware telehealth routing, stakeholder interviews, issue/PR templates, CODE_OF_CONDUCT, CONTRIBUTING guidelines |
+
+---
+
+## Roadmap Item Categories & Admissions Value
+
+All 50 roadmap items are categorized by their primary OMSAS/CanMEDS impact:
+
+### Impact/Adoption (Evidence of Real-World Reach)
+- **#7: French i18n** — Demonstrates cultural competency and expands genuine reach to Quebec FQN populations
+
+### Leadership/Collaboration (Governance & Team Readiness)
+- **#3: CODE_OF_CONDUCT.md** — Community governance
+- **#46: GitHub issue templates** — Structured contribution workflow
+- **#47: GitHub Project board** — Visible project management
+- **#40: Contributor onboarding** — Architecture walkthrough for new contributors
+- **#45: Stakeholder interview examples** — Demonstrates governance framework
+
+### Communication/Documentation (Clarity & Professionalism)
+- **#4: CHANGELOG.md** — Release history and semantic versioning
+- **#10: OpenAPI/Swagger docs** — API reference for researchers
+- **#18: README badges** — CI, coverage, license signals
+- **#23: Architecture diagram** — Visual system design (Mermaid)
+- **#27: Automated screenshots** — Portfolio artifacts (10+ views)
+- **#36: Methodology comparison table** — Downloadable research artifact
+- **#48: mkdocs GitHub Pages** — Live documentation site
+- **#50: Data dictionary** — Formal documentation of all tables/columns/enums
+- **#24: Data flow per-scraper** — Source-to-database pipeline documentation
+
+### Professionalism/Governance (Legal & Ethical Standards)
+- **#1: SECURITY.md** — Responsible disclosure policy
+- **#2: LICENSE** — Legal clarity (MIT/Apache-2.0)
+- **#8: Privacy Policy** — PIPEDA/PHIPA awareness
+- **#26: Terms of Use** — Data disclaimers, no medical advice
+- **#17: GitHub Releases** — Versioned release management
+- **#20: Migration documentation** — Database evolution tracking
+- **#30: Commitlint** — Enforced conventional commits
+
+### Privacy/Security/Ethics (Responsible Data Handling)
+- **#16: Content Security Policy** — XSS prevention, OWASP best practices
+- **#11: .pre-commit-config.yaml** — Secrets detection, code quality gates
+- **#12: Dependabot/Renovate** — Automated security updates
+- **#28: CORS configuration** — Explicit origin policy
+
+### Reliability/Quality (Engineering Excellence)
+- **#5: Error boundaries** — Graceful failure handling (error.tsx, not-found.tsx)
+- **#6: Accessibility testing (axe-core)** — WCAG compliance
+- **#9: Rate limiting** — Abuse prevention
+- **#13: Increase backend coverage to 85%+** — Thorough testing
+- **#14: Lighthouse CI** — Performance/accessibility scoring
+- **#15: robots.txt & sitemap** — SEO fundamentals
+- **#19: Loading states** — Skeleton UX for all pages
+- **#21: API input validation (Zod)** — All 16 routes validated
+- **#22: API integration tests** — Database-backed E2E tests
+- **#25: Structured logging (frontend)** — Professional log format
+- **#29: Database health check** — Connection pool monitoring
+- **#31: Data freshness badge** — Live "Last scrape: X mins ago"
+- **#33: Visual regression testing** — Playwright pixel-diff
+- **#34: TypeScript strict audit** — Zero `@ts-ignore` in custom code
+- **#35: mypy strict mode** — Full backend type coverage
+- **#38: Database index optimization** — Query performance tuning
+- **#39: End-to-end pipeline test** — Scrape → DB → API → render
+- **#44: Mobile-responsive testing** — 375px/414px viewport tests
+- **#49: API response time tracking** — P50/P95/P99 latency monitoring
+
+### Scholarship/Evaluation (Research Infrastructure)
+- **#32: Property-based testing (Hypothesis)** — Formal verification of ontology comparability
+- **#37: Uptime/status history page** — 30/90-day operational transparency
+- **#41: CITATION.cff** — "Cite this repository" button
+- **#42: Zenodo DOI** — Permanent citation link
+- **#43: Data quality drift monitoring** — Weekly trend tracking
+
+---
+
+## Top 10 Highest-Impact Items for Admissions (Quick Wins)
+
+Ranked by **admissions credibility per hour of effort**:
+
+1. **#42: Zenodo DOI** — Instant research-grade artifact (1-2h)
+2. **#41: CITATION.cff** — GitHub cite button (30min)
+3. **#2: LICENSE** — Legal clarity (30min)
+4. **#1: SECURITY.md** — Professional governance (1-2h)
+5. **#18: README badges** — Visual credibility signals (1h)
+6. **#23: Architecture diagram** — System clarity (1-2h)
+7. **#31: Data freshness badge** — Proof of live system (4-6h)
+8. **#3: CODE_OF_CONDUCT** — Community readiness (30min)
+9. **#4: CHANGELOG.md** — Release discipline (4-6h)
+10. **#48: mkdocs site** — Professional docs (4-6h)
 
 ---
 
 ## Implementation Plans
 
 Active milestone plans in `docs/planning/implementation/`:
+- `docs/planning/implementation/milestone-19-governance-quality.md` — **M19: Governance, Quality & Professional Polish (18 items: #1-5, #8, #11-12, #15-16, #18-19, #23, #26, #28, #30, #41, #46)**
 - `docs/planning/implementation/milestone-9-launch.md` — Production deployment & stakeholder validation
 - `docs/planning/implementation/milestone-11-equity.md` — Access Burden Estimator & equity layer
 - `docs/planning/implementation/milestone-12-research.md` — Citation export & alert system
@@ -182,3 +344,112 @@ Archived (delivered):
 | Nominatim (OSM) | Geocoding | Free (1 req/sec) |
 | Netlify | Frontend hosting (release-gated; intentionally offline) | Free (300 credits/month) |
 | GitHub Actions | CI/CD + scrapers | Free (2000 min/month) |
+
+---
+
+## Complete Item Tracking (All 50 Improvements)
+
+**Legend:** S = Small (1-3h), M = Medium (1-2d), L = Large (1-4w)
+
+### Governance & Legal (7 items)
+| # | Item | Effort | Status |
+|---|------|--------|--------|
+| 1 | Add SECURITY.md with responsible disclosure policy | S | ⏸️ On hold - Claude content filtering issue |
+| 2 | Add LICENSE file (MIT/Apache-2.0) | S | ✅ Complete |
+| 3 | Add CODE_OF_CONDUCT.md (Contributor Covenant) | S | ⏸️ On hold - potential content filtering issue |
+| 4 | Add CHANGELOG.md with semantic versioning | M | ✅ Complete |
+| 8 | Add Privacy Policy page (/privacy) | S | ✅ Complete |
+| 26 | Add Terms of Use page (/terms) | S | ✅ Complete |
+| 30 | Add git commit hooks (commitlint) | S | ✅ Complete |
+
+### Documentation & Communication (11 items)
+| # | Item | Effort | Status |
+|---|------|--------|--------|
+| 10 | Add OpenAPI/Swagger documentation | M | ⬜ Not Started |
+| 18 | Add README badges (CI, coverage, license) | S | ⬜ Not Started |
+| 20 | Add database migration documentation | S | ⬜ Not Started |
+| 23 | Add architecture diagram (Mermaid) | S | ⬜ Not Started |
+| 24 | Add data flow documentation per scraper | M | ⬜ Not Started |
+| 36 | Add methodology comparison table as static asset | S | ⬜ Not Started |
+| 40 | Add contributor onboarding guide | M | ⬜ Not Started |
+| 46 | Add GitHub issue templates | S | ✅ Complete |
+| 47 | Add GitHub Project board | S | ⬜ Not Started |
+| 48 | Add mkdocs GitHub Pages deployment | M | ⬜ Not Started |
+| 50 | Add data dictionary with ER diagram | M | ⬜ Not Started |
+
+### Security & Privacy (5 items)
+| # | Item | Effort | Status |
+|---|------|--------|--------|
+| 11 | Add .pre-commit-config.yaml | S | ✅ Complete |
+| 12 | Add Dependabot/Renovate config | S | ✅ Complete |
+| 16 | Add Content Security Policy headers | S | ⬜ Not Started |
+| 28 | Add CORS configuration | S | ⬜ Not Started |
+| 49 | Add API response time tracking | S | ⬜ Not Started |
+
+### Frontend Quality (9 items)
+| # | Item | Effort | Status |
+|---|------|--------|--------|
+| 5 | Add error boundaries (error.tsx, not-found.tsx, global-error.tsx) | S | ✅ Complete |
+| 6 | Add accessibility testing (axe-core) | M | ⬜ Not Started |
+| 7 | Add French language support (i18n) | L | ⬜ Not Started |
+| 15 | Add robots.txt and dynamic sitemap | S | ⬜ Not Started |
+| 19 | Add loading states for all pages | S | ✅ Complete |
+| 33 | Add visual regression testing | M | ⬜ Not Started |
+| 34 | Add TypeScript strict mode audit | S | ⬜ Not Started |
+| 44 | Add mobile-responsive testing | M | ⬜ Not Started |
+| 25 | Add structured logging to frontend API routes | S | ⬜ Not Started |
+
+### Backend Quality & Testing (10 items)
+| # | Item | Effort | Status |
+|---|------|--------|--------|
+| 9 | Add API rate limiting | M | ⬜ Not Started |
+| 13 | Increase backend test coverage to 85%+ | M | ⬜ Not Started |
+| 21 | Add API input validation (Zod) on all routes | M | ⬜ Not Started |
+| 22 | Add comprehensive API integration tests | M | ⬜ Not Started |
+| 29 | Add database health check enhancement | S | ⬜ Not Started |
+| 32 | Add property-based testing (Hypothesis) | M | ⬜ Not Started |
+| 35 | Add backend mypy strict mode | M | ⬜ Not Started |
+| 38 | Add database index optimization | S | ⬜ Not Started |
+| 39 | Add end-to-end data pipeline test | M | ⬜ Not Started |
+| 43 | Add data quality drift monitoring | M | ⬜ Not Started |
+
+### CI/CD & Automation (5 items)
+| # | Item | Effort | Status |
+|---|------|--------|--------|
+| 14 | Add Lighthouse CI to GitHub Actions | M | ⬜ Not Started |
+| 17 | Add GitHub Releases with tagged versions | M | ⬜ Not Started |
+| 27 | Expand automated screenshot generation | M | ⬜ Not Started |
+| 31 | Add data freshness badge (dynamic) | M | ⬜ Not Started |
+| 37 | Add uptime/status history page | M | ⬜ Not Started |
+
+### Research & Citations (3 items)
+| # | Item | Effort | Status |
+|---|------|--------|--------|
+| 41 | Add CITATION.cff file | S | ✅ Complete |
+| 42 | Add Zenodo integration for DOI | S | ⬜ Not Started |
+| 45 | Populate stakeholder interview examples | S | ⬜ Not Started |
+
+---
+
+**Total Progress: 11/50 completed (2 on hold)** | **Estimated Total Effort:** ~150-200 hours (3-4 weeks full-time equivalent)
+
+**Recommended Execution Order (Week-by-Week):**
+
+**Week 1 (Quick Wins - 20h):**
+Items #2, #3, #1, #41, #42, #18, #23, #11, #12, #30 → LICENSE, CODE_OF_CONDUCT, SECURITY.md, CITATION.cff, Zenodo DOI, badges, architecture diagram, pre-commit hooks, Dependabot, commitlint
+
+**Week 2 (Frontend & Docs - 20h):**
+Items #5, #8, #26, #15, #19, #16, #28, #4, #20, #46, #47 → Error boundaries, Privacy/Terms pages, robots/sitemap, loading states, CSP, CORS, CHANGELOG, migration docs, issue templates, project board
+
+**Week 3 (Quality & Testing - 25h):**
+Items #6, #13, #14, #21, #22, #29, #38, #39, #44, #34, #35 → Accessibility testing, backend coverage, Lighthouse CI, Zod validation, API integration tests, health check, DB indexes, E2E pipeline, mobile testing, TS/mypy strict
+
+**Week 4 (Documentation & Advanced - 25h):**
+Items #10, #24, #36, #40, #48, #50, #25, #9, #27, #31, #37, #43, #45 → OpenAPI docs, scraper docs, methodology table, onboarding, mkdocs site, data dictionary, structured logging, rate limiting, screenshots, freshness badge, status page, drift monitoring, interview examples
+
+**Week 5-8 (Strategic - variable):**
+Item #7 (French i18n) → Full bilingual support with next-intl, methodology warnings, emergency disclaimers, UI translations
+
+---
+
+**Next Action:** Review and approve this roadmap, then begin execution with Week 1 quick wins for immediate admissions credibility boost.

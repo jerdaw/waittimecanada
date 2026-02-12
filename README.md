@@ -435,9 +435,21 @@ This is a **portfolio project for medical school applications**. While not activ
 
 ---
 
+## 🤝 Contributing
+
+Contributions are welcome! Please see:
+
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) - Development workflow and guidelines
+- [`CHANGELOG.md`](CHANGELOG.md) - Project history and versioning
+- [`CITATION.cff`](CITATION.cff) - How to cite this project
+
+Use GitHub issue templates for feature requests and data quality reports.
+
+---
+
 ## 📄 License
 
-Educational/Portfolio Project
+MIT License - See [`LICENSE`](LICENSE) for details.
 
 **Data Sources:**
 - Quebec: Ministère de la Santé et des Services sociaux (MSSS)

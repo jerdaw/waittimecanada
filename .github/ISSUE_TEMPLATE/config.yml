@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: FAQ
+    url: https://github.com/jerdaw/waittimecanada/blob/main/docs/faq.md
+    about: Frequently asked questions about the project
+  - name: Documentation
+    url: https://github.com/jerdaw/waittimecanada/blob/main/README.md
+    about: Project documentation and setup guide

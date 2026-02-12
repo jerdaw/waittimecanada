@@ -1,0 +1,66 @@
+name: Data Quality Issue
+description: Report incorrect or missing hospital data
+title: "[Data]: "
+labels: ["data-quality"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve data accuracy!
+
+  - type: input
+    id: hospital
+    attributes:
+      label: Hospital Name
+      description: Which hospital has incorrect data?
+      placeholder: e.g., Ottawa Hospital - Civic Campus
+    validations:
+      required: true
+
+  - type: dropdown
+    id: province
+    attributes:
+      label: Province
+      description: Which province?
+      options:
+        - Ontario
+        - Quebec
+        - Alberta
+        - British Columbia
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Value
+      description: What should the data show?
+      placeholder: Describe the correct value...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Value
+      description: What is currently shown?
+      placeholder: Describe what you see...
+    validations:
+      required: true
+
+  - type: input
+    id: source
+    attributes:
+      label: Official Source URL
+      description: Link to the official provincial data source
+      placeholder: https://...
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot (Optional)
+      description: Drag and drop a screenshot if helpful
+    validations:
+      required: false

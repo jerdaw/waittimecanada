@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { EmergencyBanner } from "@/components/EmergencyBanner";
+import { Footer } from "@/components/Footer";
 import "./globals.css";
 
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
@@ -36,13 +37,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={inter.variable}>
-      <body className="font-sans antialiased bg-background text-foreground transition-colors duration-300">
+      <body className="font-sans antialiased bg-background text-foreground transition-colors duration-300 flex flex-col min-h-screen">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <StructuredData />
           <EmergencyBanner />
           <ServiceWorkerRegister />
           <InstallPrompt />
           {children}
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

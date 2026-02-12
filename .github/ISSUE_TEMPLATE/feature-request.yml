@@ -1,0 +1,51 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature for WaitTime Canada!
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: What would you like to see added or improved?
+      placeholder: Describe the feature...
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: How would this feature help you or others?
+      placeholder: Explain the use case...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: competency
+    attributes:
+      label: CanMEDS Competency (Optional)
+      description: Which competency does this align with?
+      options:
+        - Scholar
+        - Professional
+        - Health Advocate
+        - Leader
+        - Collaborator
+        - Not applicable
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: What would make this feature complete?
+      placeholder: List success criteria...
+    validations:
+      required: false

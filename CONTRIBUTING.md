@@ -4,6 +4,15 @@ Thanks for contributing to WaitTime Canada.
 
 This repository is a clinical data observatory. Contributions should prioritize methodological clarity, auditability, and operational safety over feature volume.
 
+## Community Standards
+
+When contributing, please:
+
+- Follow our governance policies in `LICENSE` and `CHANGELOG.md`
+- Use GitHub issue templates for feature requests and data quality reports
+- Follow the Pull Request template for all contributions
+- Respect all contributors and maintainers
+
 ## Before You Start
 
 - Read `AGENTS.md` for security and attribution constraints.
