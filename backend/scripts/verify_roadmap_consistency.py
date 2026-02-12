@@ -154,16 +154,17 @@ def check_roadmap_items_formatting(roadmap_path: Path) -> Tuple[bool, str]:
     """Verify roadmap items use consistent checkbox formatting."""
     content = roadmap_path.read_text()
 
-    # Find roadmap sections (Now/Next/Later)
-    sections = re.findall(r"### (Now|Next|Later) \([^)]+\)\s*\n((?:- \[[ x]\] .+\n?)+)", content)
+    # Find roadmap sections (Now/Next/Later) - extract the full section content
+    section_pattern = r"### (Now|Next|Later) \([^)]+\)(.*?)(?=###|\Z)"
+    sections = re.findall(section_pattern, content, re.DOTALL)
 
     if not sections:
         return False, "Could not find Now/Next/Later roadmap sections"
 
     issues = []
     for section_name, section_content in sections:
-        # Check each line starts with - [ ] or - [x] and has proper formatting
-        lines = section_content.strip().split("\n")
+        # Extract only lines that are checkbox items (start with "- [")
+        lines = [line for line in section_content.split("\n") if line.strip().startswith("- [")]
         for line in lines:
             # Allow strikethrough for removed items: ~~**P1 / Name:**~~
             # Allow "Deferred" prefix for deprioritized items
