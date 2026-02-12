@@ -40,9 +40,7 @@ export default function PrivacyPage() {
             </h2>
             <div className="space-y-4 text-foreground/90">
               <div>
-                <h3 className="text-lg font-medium mb-2">
-                  Public Health Data
-                </h3>
+                <h3 className="text-lg font-medium mb-2">Public Health Data</h3>
                 <p className="leading-relaxed">
                   We collect publicly available wait time data from official
                   provincial health authority sources:
@@ -142,15 +140,18 @@ export default function PrivacyPage() {
             </h2>
             <div className="text-foreground/90 space-y-3">
               <p className="leading-relaxed">
-                <strong>PIPEDA (Personal Information Protection and Electronic
-                Documents Act):</strong>{" "}
+                <strong>
+                  PIPEDA (Personal Information Protection and Electronic
+                  Documents Act):
+                </strong>{" "}
                 This project does not collect, use, or disclose personal
                 information as defined by PIPEDA. We exclusively use aggregate,
                 anonymized, publicly available health system data.
               </p>
               <p className="leading-relaxed">
-                <strong>PHIPA (Personal Health Information Protection Act -
-                Ontario):</strong>{" "}
+                <strong>
+                  PHIPA (Personal Health Information Protection Act - Ontario):
+                </strong>{" "}
                 This project does not handle personal health information (PHI).
                 Wait time data does not identify individuals, reveal patient
                 conditions, or contain health records.
@@ -234,7 +235,10 @@ export default function PrivacyPage() {
               <ul className="list-disc ml-6 space-y-1">
                 <li>
                   You can view all data sources and methodology documentation at{" "}
-                  <Link href="/methods" className="text-primary hover:underline">
+                  <Link
+                    href="/methods"
+                    className="text-primary hover:underline"
+                  >
                     /methods
                   </Link>
                 </li>
@@ -293,8 +297,8 @@ export default function PrivacyPage() {
             </h2>
             <p className="text-foreground/90 leading-relaxed">
               We may update this privacy policy as the project evolves. Changes
-              will be reflected in the &quot;Last updated&quot; date above. Material
-              changes will be documented in the project{" "}
+              will be reflected in the &quot;Last updated&quot; date above.
+              Material changes will be documented in the project{" "}
               <Link href="/" className="text-primary hover:underline">
                 CHANGELOG
               </Link>

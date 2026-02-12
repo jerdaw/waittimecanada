@@ -30,7 +30,10 @@ export default function DataQualityLoading() {
         {/* Source Quality Cards Skeleton */}
         <div className="space-y-4 mb-8">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-card border border-border rounded-lg p-6">
+            <div
+              key={i}
+              className="bg-card border border-border rounded-lg p-6"
+            >
               <div className="flex items-start justify-between mb-4">
                 <div className="space-y-2 flex-1">
                   <div className="h-6 w-48 bg-muted rounded animate-pulse" />

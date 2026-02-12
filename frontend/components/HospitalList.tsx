@@ -148,7 +148,9 @@ export function HospitalList({
 
         {/* Quebec Occupancy Info Banner */}
         {selectedProvince === "QC" &&
-          displayedHospitals.some((h) => h.occupancy_percentage !== undefined) && (
+          displayedHospitals.some(
+            (h) => h.occupancy_percentage !== undefined,
+          ) && (
             <div className="mt-2 px-3 py-2 bg-primary/5 border border-primary/10 rounded-lg text-xs text-muted-foreground">
               <span className="font-medium text-foreground">
                 Stretcher Occupancy:

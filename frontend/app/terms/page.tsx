@@ -24,9 +24,7 @@ export default function TermsPage() {
         <div className="prose prose-slate dark:prose-invert max-w-none space-y-8">
           {/* Acceptance */}
           <section>
-            <h2 className="text-2xl font-semibold mb-4">
-              Acceptance of Terms
-            </h2>
+            <h2 className="text-2xl font-semibold mb-4">Acceptance of Terms</h2>
             <p className="text-foreground/90 leading-relaxed">
               By accessing and using WaitTime Canada, you accept and agree to be
               bound by these Terms of Use. If you do not agree to these terms,
@@ -91,8 +89,11 @@ export default function TermsPage() {
             </h2>
             <div className="text-foreground/90 space-y-3">
               <p className="leading-relaxed">
-                <strong>Wait time estimates are approximate and subject to rapid
-                change.</strong> Actual wait times depend on:
+                <strong>
+                  Wait time estimates are approximate and subject to rapid
+                  change.
+                </strong>{" "}
+                Actual wait times depend on:
               </p>
               <ul className="list-disc ml-6 space-y-1">
                 <li>Patient acuity (severity of condition)</li>
@@ -131,8 +132,10 @@ export default function TermsPage() {
             </h2>
             <div className="text-foreground/90 space-y-3">
               <p className="leading-relaxed">
-                <strong>Different provinces use different wait time
-                metrics.</strong> For example:
+                <strong>
+                  Different provinces use different wait time metrics.
+                </strong>{" "}
+                For example:
               </p>
               <ul className="list-disc ml-6 space-y-1">
                 <li>
@@ -190,9 +193,7 @@ export default function TermsPage() {
                   Attempt to reverse-engineer, decompile, or disassemble the
                   platform
                 </li>
-                <li>
-                  Use the platform for any unlawful or fraudulent purpose
-                </li>
+                <li>Use the platform for any unlawful or fraudulent purpose</li>
                 <li>
                   Misrepresent this platform as an official government service
                 </li>
@@ -256,8 +257,8 @@ export default function TermsPage() {
               </div>
               <p className="leading-relaxed">
                 Always attribute original data sources (Ontario Health, Quebec
-                MSSS, Alberta AHS, BC PHSA) when using or republishing wait
-                time data.
+                MSSS, Alberta AHS, BC PHSA) when using or republishing wait time
+                data.
               </p>
             </div>
           </section>
@@ -269,9 +270,9 @@ export default function TermsPage() {
             </h2>
             <div className="text-foreground/90 space-y-3">
               <p className="leading-relaxed">
-                This platform is provided <strong>&quot;as is&quot;</strong> without
-                warranties of any kind, express or implied. To the maximum
-                extent permitted by law:
+                This platform is provided <strong>&quot;as is&quot;</strong>{" "}
+                without warranties of any kind, express or implied. To the
+                maximum extent permitted by law:
               </p>
               <ul className="list-disc ml-6 space-y-1">
                 <li>
@@ -313,8 +314,8 @@ export default function TermsPage() {
                 <li>Update these terms of use as the project evolves</li>
               </ul>
               <p className="leading-relaxed mt-3">
-                Material changes will be reflected in the &quot;Last updated&quot; date
-                and documented in the project CHANGELOG.
+                Material changes will be reflected in the &quot;Last
+                updated&quot; date and documented in the project CHANGELOG.
               </p>
             </div>
           </section>

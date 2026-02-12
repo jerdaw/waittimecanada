@@ -81,9 +81,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-8 pt-6 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-            <p>
-              © {new Date().getFullYear()} WaitTime Canada. MIT License.
-            </p>
+            <p>© {new Date().getFullYear()} WaitTime Canada. MIT License.</p>
             <div className="flex items-center gap-2 text-xs">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
                 <svg

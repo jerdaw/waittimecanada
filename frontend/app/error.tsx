@@ -65,10 +65,7 @@ export default function Error({
             >
               Try Again
             </button>
-            <Link
-              href="/"
-              className="text-primary hover:underline font-medium"
-            >
+            <Link href="/" className="text-primary hover:underline font-medium">
               Go to Homepage
             </Link>
           </div>

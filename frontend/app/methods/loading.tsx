@@ -50,7 +50,10 @@ export default function MethodsLoading() {
           <div className="h-7 w-72 bg-muted rounded animate-pulse mb-6" />
           <div className="grid gap-6 md:grid-cols-2">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-card border border-border rounded-lg p-6">
+              <div
+                key={i}
+                className="bg-card border border-border rounded-lg p-6"
+              >
                 <div className="space-y-4">
                   <div className="h-6 w-40 bg-muted rounded animate-pulse" />
                   <div className="space-y-2">

@@ -35,9 +35,7 @@ export function OccupancyBadge({
     <div
       className={clsx(
         "inline-flex items-center gap-1 rounded font-medium tabular-nums",
-        isSmall
-          ? "px-1.5 py-0.5 text-[10px]"
-          : "px-2 py-1 text-xs",
+        isSmall ? "px-1.5 py-0.5 text-[10px]" : "px-2 py-1 text-xs",
         color === "success" &&
           "bg-success/10 text-success border border-success/20",
         color === "warning" &&
