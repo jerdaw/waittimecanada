@@ -67,8 +67,8 @@ All planned milestones through M18 and Operations verification are complete. Fut
 - [ ] **P1 / Add CODE_OF_CONDUCT.md** — Contributor Covenant v2.1 for community governance (30min) ⏸️ On hold - content filtering
 - [x] **P1 / Add CITATION.cff** — GitHub "Cite this repository" button for research credibility (30min)
 - [ ] **P1 / Add Zenodo DOI integration** — Permanent citation link and DOI badge (1-2h)
-- [ ] **P1 / Add README badges** — CI status, coverage, license, language badges for professional polish (1h)
-- [ ] **P1 / Add architecture diagram (Mermaid)** — Visual system architecture in README for reviewer clarity (1-2h)
+- [x] **P1 / Add README badges** — CI status, coverage, license, language badges for professional polish (1h)
+- [x] **P1 / Add architecture diagram (Mermaid)** — Visual system architecture in README for reviewer clarity (1-2h)
 
 **Priority: Frontend Quality & Accessibility**
 - [x] **P1 / Add error boundaries** — `error.tsx`, `not-found.tsx`, `global-error.tsx` for graceful failure handling (2-3h)

@@ -5,6 +5,11 @@
 [![Frontend CI](https://github.com/jerdaw/waittimecanada/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/jerdaw/waittimecanada/actions/workflows/frontend-ci.yml)
 [![Scraper CI](https://github.com/jerdaw/waittimecanada/actions/workflows/scraper-ci.yml/badge.svg)](https://github.com/jerdaw/waittimecanada/actions/workflows/scraper-ci.yml)
 [![Production Readiness](https://github.com/jerdaw/waittimecanada/actions/workflows/production-readiness.yml/badge.svg)](https://github.com/jerdaw/waittimecanada/actions/workflows/production-readiness.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![Node.js 20+](https://img.shields.io/badge/node.js-20+-green.svg)](https://nodejs.org/)
+[![Tests](https://img.shields.io/badge/tests-660%2B%20passing-success.svg)](https://github.com/jerdaw/waittimecanada)
+[![Coverage](https://img.shields.io/badge/coverage-77%25-yellowgreen.svg)](https://github.com/jerdaw/waittimecanada)
 
 ---
 
@@ -79,6 +84,80 @@ Provincial health authorities report ER wait times using **fundamentally differe
 ---
 
 ## 🏗️ Technical Architecture
+
+```mermaid
+graph TD
+    subgraph "Provincial Sources"
+        QC[Quebec MSSS<br/>BeautifulSoup]
+        ON[Ontario Health<br/>Playwright]
+        AB[Alberta AHS<br/>Playwright]
+        BC[BC PHSA<br/>JSON/__NEXT_DATA__]
+    end
+
+    subgraph "GitHub Actions"
+        CRON[15-Minute Cron<br/>Scrapers]
+        HB[30-Minute Heartbeat<br/>Monitor]
+    end
+
+    subgraph "Database (Neon PostgreSQL)"
+        SOURCES[(sources)]
+        HOSPITALS[(hospitals)]
+        MEASUREMENTS[(measurements)]
+        AGGREGATES[(measurement_aggregates)]
+        QUALITY[(data_quality_snapshots)]
+        STATUS[(scraper_status)]
+    end
+
+    subgraph "Next.js 14 Frontend"
+        API[API Routes<br/>/api/hospitals<br/>/api/analytics<br/>/api/data-quality]
+        PAGES[Pages<br/>Map View<br/>Analytics Dashboard<br/>Methods Page]
+        MAP[Mapbox GL JS<br/>380+ Hospital Markers]
+    end
+
+    subgraph "Services"
+        DB_SVC[DatabaseService]
+        AGG_SVC[AggregationService]
+        DQ_SVC[DataQualityService]
+        ANOM_SVC[AnomalyDetectionService]
+    end
+
+    QC --> CRON
+    ON --> CRON
+    AB --> CRON
+    BC --> CRON
+
+    CRON --> DB_SVC
+    DB_SVC --> MEASUREMENTS
+    DB_SVC --> STATUS
+
+    HB --> STATUS
+    HB -->|Alert if stale| PUSHOVER[Pushover Notifications]
+
+    MEASUREMENTS --> AGG_SVC
+    AGG_SVC --> AGGREGATES
+
+    MEASUREMENTS --> ANOM_SVC
+    ANOM_SVC --> DQ_SVC
+    DQ_SVC --> QUALITY
+
+    SOURCES -.-> API
+    HOSPITALS -.-> API
+    MEASUREMENTS -.-> API
+    AGGREGATES -.-> API
+    QUALITY -.-> API
+
+    API --> PAGES
+    PAGES --> MAP
+
+    style QC fill:#4A90E2
+    style ON fill:#4A90E2
+    style AB fill:#4A90E2
+    style BC fill:#4A90E2
+    style CRON fill:#F5A623
+    style HB fill:#F5A623
+    style PUSHOVER fill:#D0021B
+    style MAP fill:#50E3C2
+```
 
 ### Backend
 - **Language:** Python 3.12+
