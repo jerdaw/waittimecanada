@@ -85,7 +85,7 @@ All planned milestones through M18 and Operations verification are complete. Fut
 - [x] **P1 / Add git commit hooks** — Commitlint for conventional commits enforcement (1-2h)
 
 **Priority: Deployment & Operational Artifacts**
-- [ ] **P1 / Add GitHub Releases** — Tag M1-M18 as versioned releases with release notes (4-6h)
+- [x] **P1 / Add GitHub Releases** — Tag M1-M18 as versioned releases with release notes (4-6h)
 - [x] **P1 / Add CHANGELOG.md** — Semantic versioning with Keep a Changelog format, retroactive from git history (4-6h)
 - [ ] **P1 / Expand portfolio screenshots** — Capture all 10+ views (light/dark, mobile, occupancy, divergence warnings) (4-8h)
 - [ ] **P1 / Add data freshness badge** — Dynamic README badge showing "Last scrape: X mins ago" (4-6h)
