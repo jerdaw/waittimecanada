@@ -30,6 +30,10 @@ describe("ComparabilityMatrix", () => {
 
     vi.mocked(useSearchParams).mockReturnValue(mockSearchParams);
     vi.mocked(useRouter).mockReturnValue(mockRouter);
+
+    // Mock URL.createObjectURL for CSV export tests
+    global.URL.createObjectURL = vi.fn(() => "blob:mock-url");
+    global.URL.revokeObjectURL = vi.fn();
   });
 
   const mockSources = [

@@ -20,6 +20,12 @@ export async function GET(request: Request) {
         success: false,
         error: `Equity layer is not scaffolded for province ${province}`,
         setup_required: true,
+        setup_steps: [
+          "Acquire Statistics Canada census tract data for province",
+          "Process GeoJSON with income quantile fields",
+          "Place processed layer in backend/data/layers/",
+          "Update SUPPORTED_PROVINCES in equity-layer API route",
+        ],
       },
       { status: 404 },
     );
@@ -46,6 +52,10 @@ export async function GET(request: Request) {
           success: false,
           error: "Equity layer data not found (run preparation script)",
           setup_required: true,
+          setup_steps: [
+            "Run backend data preparation script",
+            "Verify GeoJSON layer generated in backend/data/layers/",
+          ],
         },
         { status: 404 },
       );
