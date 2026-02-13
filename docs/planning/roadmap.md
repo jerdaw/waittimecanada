@@ -121,7 +121,7 @@ All planned milestones through M18 and Operations verification are complete. Fut
 - [ ] **P1 / Add contributor onboarding guide** — Architecture walkthrough, how to add scraper/API/page (4-6h)
 - [x] **P1 / Add database migration documentation** — `backend/migrations/README.md` with history and rollback procedures (2-3h)
 - [ ] **P1 / Add data flow documentation** — Per-scraper docs: source URL, format, parsing, ontology mapping, limitations (4-8h)
-- [ ] **P1 / Add methodology comparison table asset** — Downloadable CSV/HTML of cross-province comparison matrix (2-3h)
+- [x] **P1 / Add methodology comparison table asset** — Downloadable CSV/HTML of cross-province comparison matrix (2-3h)
 
 **Category: Monitoring & Operations**
 - [ ] **P1 / Add uptime/status history page** — `/status` page with 30/90-day scraper uptime metrics (4-8h)

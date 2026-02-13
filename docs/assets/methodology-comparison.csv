@@ -1,0 +1,5 @@
+province,province_code,source_id,metric_family,start_event,end_event,statistic_type,update_frequency,data_source,notes
+Ontario,ON,ontario-health,TIME_TO_PROVIDER,TRIAGE,PHYSICIAN,POINT_ESTIMATE,~15 min,Ontario Health (ER Watch),Real-time instantaneous wait times
+Alberta,AB,alberta-ahs,TIME_TO_PROVIDER,TRIAGE,PHYSICIAN,POINT_ESTIMATE,~2 min,Alberta Health Services (AHS) Wait Times Portal,"Real-time instantaneous wait times, fastest update frequency"
+British Columbia,BC,bc-phsa,TIME_TO_PROVIDER,TRIAGE,PHYSICIAN,P90,~5 min,BC PHSA (edwaittimes.ca),"90th percentile statistic, not directly comparable to real-time estimates"
+Quebec,QC,quebec-msss,TIME_TO_PROVIDER,REGISTRATION,PHYSICIAN,ROLLING_AVG,Periodic,MSSS Emergency Room Situation Portal,Uses REGISTRATION (not TRIAGE) start event; rolling average statistic; incomparable to all other provinces on two ontology dimensions
