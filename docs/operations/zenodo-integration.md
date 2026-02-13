@@ -1,12 +1,19 @@
 # Zenodo DOI Integration Guide
 
+> **⏸️ Status: Deferred Until User Approval**
+>
+> Automated setup is complete (`.zenodo.json`, DOI badge, documentation). User activation steps below are **deferred until explicit approval** to proceed with external service integration.
+
 ## Overview
 
 This guide walks you through linking your GitHub repository to Zenodo to generate a permanent Digital Object Identifier (DOI) for academic citations.
 
-**Current Status:** ✅ Repository prepared with `.zenodo.json` metadata and DOI badge in README
+**Current Status:**
+- ✅ Repository prepared with `.zenodo.json` metadata and DOI badge in README
+- ✅ Comprehensive integration guide created (this document)
+- ⏸️ User activation deferred until approval given
 
-**What's Left:** 🔄 User action required (10 minutes total)
+**What's Left:** 🔄 User action required (10 minutes total - when approved)
 
 ---
 
