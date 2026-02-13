@@ -10,6 +10,7 @@
 [![Node.js 20+](https://img.shields.io/badge/node.js-20+-green.svg)](https://nodejs.org/)
 [![Tests](https://img.shields.io/badge/tests-660%2B%20passing-success.svg)](https://github.com/jerdaw/waittimecanada)
 [![Coverage](https://img.shields.io/badge/coverage-77%25-yellowgreen.svg)](https://github.com/jerdaw/waittimecanada)
+[![DOI](https://zenodo.org/badge/1146067459.svg)](https://zenodo.org/badge/latestdoi/1146067459)
 
 ---
 

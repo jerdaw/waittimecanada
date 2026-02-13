@@ -66,7 +66,7 @@ All planned milestones through M18 and Operations verification are complete. Fut
 - [ ] **P1 / Add SECURITY.md** — Responsible disclosure policy with GitHub Security tab integration (1-2h) ⏸️ On hold - content filtering
 - [ ] **P1 / Add CODE_OF_CONDUCT.md** — Contributor Covenant v2.1 for community governance (30min) ⏸️ On hold - content filtering
 - [x] **P1 / Add CITATION.cff** — GitHub "Cite this repository" button for research credibility (30min)
-- [ ] **P1 / Add Zenodo DOI integration** — Permanent citation link and DOI badge (1-2h)
+- [x] **P1 / Add Zenodo DOI integration** — Permanent citation link and DOI badge (1-2h) ✅ Automated - see docs/operations/zenodo-integration.md for 10-min user setup
 - [x] **P1 / Add README badges** — CI status, coverage, license, language badges for professional polish (1h)
 - [x] **P1 / Add architecture diagram (Mermaid)** — Visual system architecture in README for reviewer clarity (1-2h)
 

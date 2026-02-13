@@ -1,0 +1,74 @@
+{
+  "title": "WaitTime Canada - Health Systems Observatory for Emergency Department Wait Times",
+  "description": "A clinically defensible Health Systems Observatory for Canadian emergency department wait-time methodology and data quality. This project audits and exposes methodological inconsistencies in ER reporting across provinces (ON, QC, AB, BC), providing real-time data for 380+ hospitals with comprehensive analytics, data quality monitoring, and first-in-Canada stretcher occupancy visualization.",
+  "creators": [
+    {
+      "name": "Dawson, Jeremy",
+      "affiliation": "Independent Researcher"
+    }
+  ],
+  "keywords": [
+    "healthcare",
+    "health systems",
+    "emergency department",
+    "wait times",
+    "data quality",
+    "health informatics",
+    "Canada",
+    "Ontario",
+    "Quebec",
+    "Alberta",
+    "British Columbia",
+    "data observatory",
+    "methodology",
+    "health analytics",
+    "clinical informatics",
+    "health equity",
+    "public health data"
+  ],
+  "license": {
+    "id": "MIT"
+  },
+  "upload_type": "software",
+  "access_right": "open",
+  "language": "eng",
+  "related_identifiers": [
+    {
+      "scheme": "url",
+      "identifier": "https://github.com/jerdaw/waittimecanada",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Dawson, Jeremy",
+      "type": "ProjectLeader",
+      "affiliation": "Independent Researcher"
+    }
+  ],
+  "communities": [
+    {
+      "identifier": "zenodo"
+    }
+  ],
+  "subjects": [
+    {
+      "term": "Emergency Medicine",
+      "scheme": "MeSH"
+    },
+    {
+      "term": "Health Services Research",
+      "scheme": "MeSH"
+    },
+    {
+      "term": "Quality of Health Care",
+      "scheme": "MeSH"
+    },
+    {
+      "term": "Canada",
+      "scheme": "MeSH"
+    }
+  ],
+  "notes": "This is a portfolio project demonstrating health systems research methodology, full-stack software development, data quality monitoring, and clinical defensibility in health informatics. Developed for medical school admissions portfolio."
+}
