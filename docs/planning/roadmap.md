@@ -128,8 +128,8 @@ All planned milestones through M18 and Operations verification are complete. Fut
 - [ ] **P1 / Add data quality drift monitoring** — Weekly GitHub Action tracking measurement count, anomaly rate, success rate over time (4-8h)
 
 **Category: GitHub Project Governance**
-- [ ] **P1 / Add GitHub issue templates** — Bug report, feature request, data quality issue templates (1-2h)
-- [ ] **P1 / Add PR template** — `.github/PULL_REQUEST_TEMPLATE.md` with testing/docs checklists (1-2h)
+- [x] **P1 / Add GitHub issue templates** — Bug report, feature request, data quality issue templates (1-2h)
+- [x] **P1 / Add PR template** — `.github/PULL_REQUEST_TEMPLATE.md` with testing/docs checklists (1-2h)
 - [ ] **P1 / Add GitHub Project board** — Public roadmap with Backlog/In Progress/Done columns (1-2h)
 - [ ] **P1 / Populate stakeholder interview examples** — 2-3 example summaries demonstrating consent workflow (1-2h)
 
