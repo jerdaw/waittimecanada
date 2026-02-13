@@ -496,8 +496,8 @@ Update "Now" section to reflect completion. Move progress counter from 0/50 to 1
 - [x] Footer component renders on all pages with Privacy/Terms links
 - [x] /privacy page renders with PIPEDA-aware content
 - [x] /terms page renders with medical disclaimer content
-- [ ] /robots.txt serves correct content
-- [ ] /sitemap.xml serves correct content
+- [x] /robots.txt serves correct content
+- [x] /sitemap.xml serves correct content
 
 ### Security & Configuration
 - [ ] Security headers present in response (X-Content-Type-Options, X-Frame-Options, etc.)

@@ -75,7 +75,7 @@ All planned milestones through M18 and Operations verification are complete. Fut
 - [x] **P1 / Add loading states** — Proper `loading.tsx` for all pages (/analytics, /data-quality, /methods, /faq) (2-3h)
 - [x] **P1 / Add Privacy Policy page (/privacy)** — PIPEDA/PHIPA awareness, no-PII documentation (2-3h)
 - [x] **P1 / Add Terms of Use page (/terms)** — Data accuracy disclaimers, no medical advice warning (2-3h)
-- [ ] **P1 / Add robots.txt and sitemap** — SEO basics via Next.js metadata API (`robots.ts`, `sitemap.ts`) (1-2h)
+- [x] **P1 / Add robots.txt and sitemap** — SEO basics via Next.js metadata API (`robots.ts`, `sitemap.ts`) (1-2h)
 
 **Priority: Security & Configuration**
 - [ ] **P1 / Add Content Security Policy** — CSP and security headers in `next.config.js` (2-3h)
@@ -392,7 +392,7 @@ Archived (delivered):
 | 5 | Add error boundaries (error.tsx, not-found.tsx, global-error.tsx) | S | ✅ Complete |
 | 6 | Add accessibility testing (axe-core) | M | ⬜ Not Started |
 | 7 | Add French language support (i18n) | L | ⬜ Not Started |
-| 15 | Add robots.txt and dynamic sitemap | S | ⬜ Not Started |
+| 15 | Add robots.txt and dynamic sitemap | S | ✅ Complete |
 | 19 | Add loading states for all pages | S | ✅ Complete |
 | 33 | Add visual regression testing | M | ⬜ Not Started |
 | 34 | Add TypeScript strict mode audit | S | ⬜ Not Started |
@@ -431,7 +431,7 @@ Archived (delivered):
 
 ---
 
-**Total Progress: 11/50 completed (2 on hold)** | **Estimated Total Effort:** ~150-200 hours (3-4 weeks full-time equivalent)
+**Total Progress: 12/50 completed (2 on hold)** | **Estimated Total Effort:** ~150-200 hours (3-4 weeks full-time equivalent)
 
 **Recommended Execution Order (Week-by-Week):**
 
