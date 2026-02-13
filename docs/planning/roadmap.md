@@ -57,38 +57,116 @@ All planned milestones through M18 and Operations verification are complete. Fut
 - Production smoke workflow remains disabled until a public frontend URL is intentionally re-enabled.
 - Scraper reliability workflows (`scraper-cron`, heartbeat monitor, readiness checks) remain active.
 
-## Active Roadmap (Now / Next / Later)
+## Active Roadmap (Now / Deferred / Later)
 
-### Now (0-2 weeks) — High-Impact Portfolio Improvements
+### Now (0-2 weeks) — CRITICAL PATH TO DEPLOYMENT
 
-**Priority: Documentation & Governance (Quick wins for admissions credibility)**
-- [x] **P1 / Add LICENSE file** — MIT or Apache-2.0 license for legal clarity and professional governance (30min)
-- [ ] **P1 / Add SECURITY.md** — Responsible disclosure policy with GitHub Security tab integration (1-2h) ⏸️ On hold - content filtering
-- [ ] **P1 / Add CODE_OF_CONDUCT.md** — Contributor Covenant v2.1 for community governance (30min) ⏸️ On hold - content filtering
-- [x] **P1 / Add CITATION.cff** — GitHub "Cite this repository" button for research credibility (30min)
-- [x] **P1 / Add Zenodo DOI integration** — Permanent citation link and DOI badge (1-2h) ✅ Automated setup complete (.zenodo.json, badge, guide) | ⏸️ User activation deferred - see docs/operations/zenodo-integration.md when ready
-- [x] **P1 / Add README badges** — CI status, coverage, license, language badges for professional polish (1h)
-- [x] **P1 / Add architecture diagram (Mermaid)** — Visual system architecture in README for reviewer clarity (1-2h)
+**PRIORITY 0: Deploy and Validate Core Product**
 
-**Priority: Frontend Quality & Accessibility**
-- [x] **P1 / Add error boundaries** — `error.tsx`, `not-found.tsx`, `global-error.tsx` for graceful failure handling (2-3h)
-- [x] **P1 / Add loading states** — Proper `loading.tsx` for all pages (/analytics, /data-quality, /methods, /faq) (2-3h)
-- [x] **P1 / Add Privacy Policy page (/privacy)** — PIPEDA/PHIPA awareness, no-PII documentation (2-3h)
-- [x] **P1 / Add Terms of Use page (/terms)** — Data accuracy disclaimers, no medical advice warning (2-3h)
-- [x] **P1 / Add robots.txt and sitemap** — SEO basics via Next.js metadata API (`robots.ts`, `sitemap.ts`) (1-2h)
+This section focuses on **making the product work and accessible** before polishing.
 
-**Priority: Security & Configuration**
-- [x] **P1 / Add Content Security Policy** — CSP and security headers in `next.config.js` (2-3h)
-- [x] **P1 / Add .pre-commit-config.yaml** — Ruff, mypy, Prettier, ESLint, secrets detection hooks (1-2h)
-- [x] **P1 / Add Dependabot/Renovate** — Automated dependency updates via `.github/dependabot.yml` (1h)
-- [x] **P1 / Add CORS configuration** — Explicit allowed origins via Next.js middleware (1-2h)
-- [x] **P1 / Add git commit hooks** — Commitlint for conventional commits enforcement (1-2h)
+- [ ] **P0 / Deploy frontend to production** — Re-enable Netlify or deploy to Vercel free tier for public access (2-4h)
+  - **Blocker:** Cost concern resolved or alternative found
+  - **Deliverables:** Live URL, environment variables configured, deployment automated
+  - **Why Critical:** Cannot validate product, capture screenshots, or test with users without deployment
 
-**Priority: Deployment & Operational Artifacts**
-- [x] **P1 / Add GitHub Releases** — Tag M1-M18 as versioned releases with release notes (4-6h)
-- [x] **P1 / Add CHANGELOG.md** — Semantic versioning with Keep a Changelog format, retroactive from git history (4-6h)
+- [ ] **P0 / Verify scrapers working in production** — Manual verification that all 4 scrapers run and populate database (1-2h)
+  - **Verification:** Check `scraper_status` table, verify measurements inserted in last 24h, confirm no errors in logs
+  - **Why Critical:** Core functionality may be broken and we don't know it
+
+- [ ] **P0 / Spot-check data quality against official sources** — Manually compare 5-10 hospitals per province to source websites (2-3h)
+  - **Verification:** ON hospital vs ER Watch, QC hospital vs MSSS portal, AB hospital vs AHS, BC hospital vs edwaittimes.ca
+  - **Why Critical:** Methodology tags and values may be incorrect
+
+- [ ] **P0 / End-to-end smoke test** — Test complete user journey: homepage → map → hospital detail → methodology comparison (30min)
+  - **Verification:** All pages load, no console errors, data displays correctly, divergence warnings show when expected
+  - **Why Critical:** Basic usability validation
+
+- [ ] **P0 / Document deployment blockers** — If deployment fails, document exactly what's blocking and what's needed (1h)
+  - **Deliverables:** Clear list of blockers, workarounds attempted, decisions needed
+  - **Why Critical:** Can't move forward without understanding what's preventing deployment
+
+### Deferred - Waiting for Deployment & Validation
+
+**These items are valuable but BLOCKED until core product is deployed and validated.**
+
+**Prerequisite: Frontend deployed and accessible to public**
+
 - [ ] **P1 / Expand portfolio screenshots** — Capture all 10+ views (light/dark, mobile, occupancy, divergence warnings) (4-8h)
+  - 🚫 **Blocked by:** Frontend offline, no public URL to screenshot
+  - ⏸️ **Defer until:** Frontend deployed and stable for 48+ hours
+
 - [ ] **P1 / Add data freshness badge** — Dynamic README badge showing "Last scrape: X mins ago" (4-6h)
+  - 🚫 **Blocked by:** Frontend offline, no live API to query
+  - ⏸️ **Defer until:** Frontend deployed and scrapers verified working
+
+**Prerequisite: Product validated by real users**
+
+- [ ] **P1 / Add GitHub Project board** — Public roadmap with Backlog/In Progress/Done columns (1-2h)
+  - 🚫 **Blocked by:** Don't know real priorities until users test product
+  - ⏸️ **Defer until:** Product deployed and initial user feedback received
+
+- [ ] **P1 / Populate stakeholder interview examples** — 2-3 example summaries demonstrating consent workflow (1-2h)
+  - 🚫 **Blocked by:** No stakeholders to interview until product is public
+  - ⏸️ **Defer until:** Product deployed and users identified
+
+**Prerequisite: Schema and architecture stable**
+
+- [ ] **P1 / Add mkdocs GitHub Pages deployment** — Live documentation site with `docs-deploy.yml` workflow (4-6h)
+  - 🚫 **Blocked by:** Documentation may change after deployment validation
+  - ⏸️ **Defer until:** Core functionality validated and stable
+
+- [ ] **P1 / Add data dictionary** — Document all 9 tables, columns, enums, constraints with ER diagram (4-6h)
+  - 🚫 **Blocked by:** Schema may change after production validation
+  - ⏸️ **Defer until:** Database schema stable (no migrations for 2+ weeks)
+
+- [ ] **P1 / Add contributor onboarding guide** — Architecture walkthrough, how to add scraper/API/page (4-6h)
+  - 🚫 **Blocked by:** Architecture may change after deployment issues found
+  - ⏸️ **Defer until:** Architecture proven stable in production
+
+- [ ] **P1 / Add data flow documentation** — Per-scraper docs: source URL, format, parsing, ontology mapping, limitations (4-8h)
+  - 🚫 **Blocked by:** Scrapers may need fixes after validation
+  - ⏸️ **Defer until:** Scrapers verified accurate in production
+
+**Prerequisite: No critical bugs or performance issues**
+
+- [ ] **P1 / Add uptime/status history page** — `/status` page with 30/90-day scraper uptime metrics (4-8h)
+  - 🚫 **Blocked by:** No uptime data until scrapers verified working
+  - ⏸️ **Defer until:** Scrapers stable for 30+ days
+
+- [ ] **P1 / Add data quality drift monitoring** — Weekly GitHub Action tracking measurement count, anomaly rate, success rate over time (4-8h)
+  - 🚫 **Blocked by:** Need baseline data quality first
+  - ⏸️ **Defer until:** Data quality validated and baseline established
+
+### Completed - Already Done (But Maybe Premature)
+
+**These were completed but may have been done too early:**
+
+- [x] **P1 / Add LICENSE file** — Done, but doesn't matter if product not deployed
+- [x] **P1 / Add CITATION.cff** — Done, but can't cite until product is public
+- [x] **P1 / Add Zenodo DOI integration** — Automated setup done, but deferred activation
+- [x] **P1 / Add README badges** — Done, but less valuable without live product
+- [x] **P1 / Add architecture diagram** — Done, but may change after deployment
+- [x] **P1 / Add error boundaries** — Done, good defensive coding
+- [x] **P1 / Add loading states** — Done, good UX practice
+- [x] **P1 / Add Privacy Policy** — Done, legally required
+- [x] **P1 / Add Terms of Use** — Done, legally required
+- [x] **P1 / Add robots.txt and sitemap** — Done, but useless without deployment
+- [x] **P1 / Add CSP and security headers** — Done, good security practice
+- [x] **P1 / Add .pre-commit-config.yaml** — Done, good dev practice
+- [x] **P1 / Add Dependabot** — Done, good maintenance
+- [x] **P1 / Add CORS configuration** — Done, needed for API
+- [x] **P1 / Add git commit hooks** — Done, good dev practice
+- [x] **P1 / Add GitHub Releases** — Done, but premature (not deployed yet)
+- [x] **P1 / Add CHANGELOG.md** — Done, but premature
+- [x] **P1 / Add GitHub issue templates** — Done, but no users to file issues yet
+- [x] **P1 / Add PR template** — Done, but no contributors yet
+- [x] **P1 / Add database migration documentation** — Done, good ops practice
+- [x] **P1 / Add methodology comparison table asset** — Done, but can't share without deployment
+
+⏸️ **On hold - Content filtering:**
+- [ ] **P1 / Add SECURITY.md** — Blocked by Claude content policy
+- [ ] **P1 / Add CODE_OF_CONDUCT.md** — Blocked by Claude content policy
 
 ### Next (2-6 weeks) — Medium-Impact Quality Improvements
 
