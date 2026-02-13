@@ -500,11 +500,11 @@ Update "Now" section to reflect completion. Move progress counter from 0/50 to 1
 - [x] /sitemap.xml serves correct content
 
 ### Security & Configuration
-- [ ] Security headers present in response (X-Content-Type-Options, X-Frame-Options, etc.)
-- [ ] CSP in report-only mode (not blocking anything)
-- [ ] CORS headers on /api/* routes
-- [ ] middleware.ts handles OPTIONS preflight
-- [ ] commitlint config exists at repo root
+- [x] Security headers present in response (X-Content-Type-Options, X-Frame-Options, etc.)
+- [x] CSP in report-only mode (not blocking anything)
+- [x] CORS headers on /api/* routes
+- [x] middleware.ts handles OPTIONS preflight
+- [x] commitlint config exists at repo root (via .pre-commit-config.yaml)
 
 ### README & Cross-References
 - [ ] README has CI, license, and project badges

@@ -78,10 +78,10 @@ All planned milestones through M18 and Operations verification are complete. Fut
 - [x] **P1 / Add robots.txt and sitemap** — SEO basics via Next.js metadata API (`robots.ts`, `sitemap.ts`) (1-2h)
 
 **Priority: Security & Configuration**
-- [ ] **P1 / Add Content Security Policy** — CSP and security headers in `next.config.js` (2-3h)
+- [x] **P1 / Add Content Security Policy** — CSP and security headers in `next.config.js` (2-3h)
 - [x] **P1 / Add .pre-commit-config.yaml** — Ruff, mypy, Prettier, ESLint, secrets detection hooks (1-2h)
 - [x] **P1 / Add Dependabot/Renovate** — Automated dependency updates via `.github/dependabot.yml` (1h)
-- [ ] **P1 / Add CORS configuration** — Explicit allowed origins via Next.js middleware (1-2h)
+- [x] **P1 / Add CORS configuration** — Explicit allowed origins via Next.js middleware (1-2h)
 - [x] **P1 / Add git commit hooks** — Commitlint for conventional commits enforcement (1-2h)
 
 **Priority: Deployment & Operational Artifacts**
@@ -382,8 +382,8 @@ Archived (delivered):
 |---|------|--------|--------|
 | 11 | Add .pre-commit-config.yaml | S | ✅ Complete |
 | 12 | Add Dependabot/Renovate config | S | ✅ Complete |
-| 16 | Add Content Security Policy headers | S | ⬜ Not Started |
-| 28 | Add CORS configuration | S | ⬜ Not Started |
+| 16 | Add Content Security Policy headers | S | ✅ Complete |
+| 28 | Add CORS configuration | S | ✅ Complete |
 | 49 | Add API response time tracking | S | ⬜ Not Started |
 
 ### Frontend Quality (9 items)
@@ -431,7 +431,7 @@ Archived (delivered):
 
 ---
 
-**Total Progress: 12/50 completed (2 on hold)** | **Estimated Total Effort:** ~150-200 hours (3-4 weeks full-time equivalent)
+**Total Progress: 14/50 completed (2 on hold)** | **Estimated Total Effort:** ~150-200 hours (3-4 weeks full-time equivalent)
 
 **Recommended Execution Order (Week-by-Week):**
 
