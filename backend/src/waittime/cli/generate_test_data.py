@@ -11,7 +11,7 @@ Usage:
 import argparse
 import hashlib
 import logging
-import random
+import secrets
 import sys
 from datetime import UTC, datetime
 
@@ -40,7 +40,7 @@ def generate_measurement_for_hospital(hospital_id: str, source_id: str) -> Measu
     """
     # Generate realistic wait time values (in minutes)
     # P90 times typically range from 60-300 minutes
-    value = random.randint(60, 300)  # noqa: S311 (Using random for test data, not cryptographic)
+    value = 60 + secrets.randbelow(241)
 
     # Create synthetic payload
     payload = f"{{hospital_id: {hospital_id}, value: {value}, timestamp: {datetime.now(UTC)}}}"

@@ -4,8 +4,19 @@ import argparse
 import sys
 from datetime import UTC, datetime
 
+from waittime.cli.scraper import SCRAPERS
 from waittime.services.alerts import AlertService
 from waittime.services.database import DatabaseService
+
+
+def _get_sources_to_check(source: str | None) -> list[str]:
+    """Resolve source IDs to monitor.
+
+    Defaults to operational scrapers (registry), not every seeded source.
+    """
+    if source:
+        return [source]
+    return sorted(SCRAPERS.keys())
 
 
 def main() -> None:
@@ -33,13 +44,8 @@ def main() -> None:
     db = DatabaseService()
     alerts = AlertService()
 
-    # Get latest heartbeats from database
-    if args.source:
-        sources = [args.source]
-    else:
-        # Check all known sources
-        all_sources = db.list_sources()
-        sources = [s.id for s in all_sources]
+    # Check operational scrapers by default to avoid alerting on dormant seeded sources.
+    sources = _get_sources_to_check(args.source)
 
     all_healthy = True
 
