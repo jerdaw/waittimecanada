@@ -1,10 +1,10 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-02-13)
+## Current Status (Updated 2026-02-14)
 
 **Progress:** M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
-**Strategic Direction:** **Four-province breadth achieved** (ON, QC, AB, BC). All four scrapers active in production on 15-minute schedule via GitHub Actions, 380+ hospitals visible across all provinces, methodology documentation complete for all provinces, regional analytics data seeded for 15 regions. **Quebec stretcher occupancy fully operational end-to-end** - scraper extraction, API endpoint, and visual indicators on hospital cards. **Heartbeat monitoring operational** with Pushover alerting for stale data. **All 662 tests passing** (375 backend + 287 frontend) with 77% backend coverage.
+**Strategic Direction:** **Four-province breadth achieved** (ON, QC, AB, BC). All four scrapers active in production via GitHub Actions, 380+ hospitals visible across all provinces, methodology documentation complete for all provinces, regional analytics data seeded for 15 regions. **Quebec stretcher occupancy fully operational end-to-end** - scraper extraction, API endpoint, and visual indicators on hospital cards. **Heartbeat monitoring operational** with Pushover alerting for stale data. **Temporary cost-control cadence is active as of February 14, 2026** (`scraper-cron: */30`, heartbeat `--max-age 90`) due to Neon transfer usage. **All 662 tests passing** (375 backend + 287 frontend) with 77% backend coverage.
 
 **Deployment Note (2026-02-08):** Frontend public hosting is intentionally offline for now to avoid unnecessary free-tier credit usage. Production smoke workflow is disabled until a public URL is intentionally re-enabled.
 
@@ -30,7 +30,7 @@
 | **M16: Multi-Province Operationalization** | Trusted source auto-approval, hospital seed data (65 hospitals for AB/BC/QC), methodology docs for all 4 provinces, region data (15 regions), 380+ hospitals visible |
 | **M17: Quebec Occupancy Implementation** | Quebec scraper extracts stretcher occupancy percentages, API endpoint returns real-time occupancy data, 17 unit tests, STRETCHER_OCCUPANCY metric family |
 | **M18: Occupancy Frontend UI** | OccupancyBadge component with color-coded indicators, hospital API includes occupancy data, visual display on Quebec hospital cards, methodology note, 15 unit tests |
-| **Operations: Production Verification** | Verified all 4 scrapers operational on 15-min schedule, heartbeat monitoring active, BC source metadata corrected, comprehensive operations documentation created |
+| **Operations: Production Verification** | Verified all 4 scrapers operational, heartbeat monitoring active, BC source metadata corrected, comprehensive operations documentation created |
 
 ---
 
@@ -56,6 +56,8 @@ All planned milestones through M18 and Operations verification are complete. Fut
 - Netlify deploys are intentionally release-gated and frontend public hosting is intentionally offline.
 - Production smoke workflow remains disabled until a public frontend URL is intentionally re-enabled.
 - Scraper reliability workflows (`scraper-cron`, heartbeat monitor, readiness checks) remain active.
+- Temporary cost-control mode is active from **February 14, 2026** through post-reset review: `scraper-cron` at `*/30` and heartbeat `--max-age 90`.
+- Post-reset target (review on **March 3, 2026**): move to less aggressive but still cost-saving defaults `scraper-cron: */20` and heartbeat `--max-age 75`.
 
 ## Active Roadmap (Now / Deferred / Later)
 
@@ -81,6 +83,11 @@ This section focuses on **making the product work and accessible** before polish
 - [ ] **P0 / End-to-end smoke test** — Test complete user journey: homepage → map → hospital detail → methodology comparison (30min)
   - **Verification:** All pages load, no console errors, data displays correctly, divergence warnings show when expected
   - **Why Critical:** Basic usability validation
+
+- [ ] **P0 / Post-reset scraper cadence adjustment (due March 3, 2026)** — Replace temporary throttle with balanced cost-saving settings (30min)
+  - **Current temporary mode:** `scraper-cron */30`, heartbeat `--max-age 90`
+  - **Target mode:** `scraper-cron */20`, heartbeat `--max-age 75`
+  - **Verification:** Monitor Neon transfer trend for 48h after change; ensure no stale-heartbeat alerts
 
 - [x] **P0 / Document deployment blockers** — Comprehensive assessment of deployment readiness completed (1h)
   - **Deliverables:** `docs/planning/deployment-blockers.md` with full analysis, priority matrix, deployment sequence
