@@ -42,57 +42,8 @@ class AnomalyDetectionService:
             Dict with is_anomaly, reason, and optional details
         """
         lookback_start = timestamp - timedelta(days=self.LOOKBACK_DAYS)
-
-        recent = self.db.get_measurements_in_range(hospital_id, lookback_start, timestamp)
-        values = [r["value"] for r in recent]
-
-        # Insufficient data — can't judge, safe default
-        if len(values) < self.MIN_SAMPLES_FOR_DETECTION:
-            return {"is_anomaly": False, "reason": None, "details": None}
-
-        mean = statistics.mean(values)
-        std = statistics.stdev(values)
-        z_score = self._compute_z_score(value, values)
-        iqr_bounds = self._compute_iqr_bounds(values)
-
-        reasons: list[str] = []
-
-        # Z-score check
-        if z_score is not None and abs(z_score) > self.Z_SCORE_THRESHOLD:
-            direction = "above" if z_score > 0 else "below"
-            reasons.append(f"Z-score {z_score:.1f} ({direction} mean of {mean:.0f} min)")
-
-        # IQR check
-        if iqr_bounds is not None:
-            lower, upper = iqr_bounds
-            if value < lower:
-                reasons.append(f"Below IQR lower bound ({value:.0f} < {lower:.0f})")
-            elif value > upper:
-                reasons.append(f"Above IQR upper bound ({value:.0f} > {upper:.0f})")
-
-        if reasons:
-            reason = "; ".join(reasons)
-            logger.info(
-                "Anomaly detected for %s: value=%.0f, %s",
-                hospital_id,
-                value,
-                reason,
-            )
-            return {
-                "is_anomaly": True,
-                "reason": reason,
-                "details": {
-                    "value": value,
-                    "baseline_mean": round(mean, 1),
-                    "baseline_std": round(std, 1),
-                    "z_score": round(z_score, 2) if z_score is not None else None,
-                    "iqr_lower": round(iqr_bounds[0], 1) if iqr_bounds else None,
-                    "iqr_upper": round(iqr_bounds[1], 1) if iqr_bounds else None,
-                    "sample_count": len(values),
-                },
-            }
-
-        return {"is_anomaly": False, "reason": None, "details": None}
+        stats = self._get_baseline_stats(hospital_id, lookback_start, timestamp)
+        return self._evaluate_with_stats(hospital_id, value, stats)
 
     def check_batch(self, measurements: list[dict]) -> list[dict]:
         """Check a batch of measurements from a scraper run.
@@ -106,64 +57,27 @@ class AnomalyDetectionService:
         Returns:
             List of anomaly check results (same order as input)
         """
-        # Group by hospital to load baselines once
-        hospitals: dict[str, list[float]] = {}
-        results: list[dict] = []
+        if not measurements:
+            return []
 
-        for m in measurements:
-            hospital_id = m["hospital_id"]
+        hospital_windows: dict[str, tuple[str, datetime, datetime]] = {}
+        for measurement in measurements:
+            hospital_id = measurement["hospital_id"]
+            if hospital_id not in hospital_windows:
+                end_time = measurement["timestamp"]
+                lookback_start = end_time - timedelta(days=self.LOOKBACK_DAYS)
+                hospital_windows[hospital_id] = (hospital_id, lookback_start, end_time)
 
-            if hospital_id not in hospitals:
-                lookback_start = m["timestamp"] - timedelta(days=self.LOOKBACK_DAYS)
-                recent = self.db.get_measurements_in_range(
-                    hospital_id, lookback_start, m["timestamp"]
-                )
-                hospitals[hospital_id] = [r["value"] for r in recent]
+        stats_by_hospital = self._get_baseline_stats_batch(list(hospital_windows.values()))
 
-            baseline = hospitals[hospital_id]
-
-            if len(baseline) < self.MIN_SAMPLES_FOR_DETECTION:
-                results.append({"is_anomaly": False, "reason": None, "details": None})
-                continue
-
-            mean = statistics.mean(baseline)
-            std = statistics.stdev(baseline)
-            z_score = self._compute_z_score(m["value"], baseline)
-            iqr_bounds = self._compute_iqr_bounds(baseline)
-
-            reasons: list[str] = []
-
-            if z_score is not None and abs(z_score) > self.Z_SCORE_THRESHOLD:
-                direction = "above" if z_score > 0 else "below"
-                reasons.append(f"Z-score {z_score:.1f} ({direction} mean of {mean:.0f} min)")
-
-            if iqr_bounds is not None:
-                lower, upper = iqr_bounds
-                if m["value"] < lower:
-                    reasons.append(f"Below IQR lower bound ({m['value']:.0f} < {lower:.0f})")
-                elif m["value"] > upper:
-                    reasons.append(f"Above IQR upper bound ({m['value']:.0f} > {upper:.0f})")
-
-            if reasons:
-                results.append(
-                    {
-                        "is_anomaly": True,
-                        "reason": "; ".join(reasons),
-                        "details": {
-                            "value": m["value"],
-                            "baseline_mean": round(mean, 1),
-                            "baseline_std": round(std, 1),
-                            "z_score": round(z_score, 2) if z_score else None,
-                            "iqr_lower": round(iqr_bounds[0], 1) if iqr_bounds else None,
-                            "iqr_upper": round(iqr_bounds[1], 1) if iqr_bounds else None,
-                            "sample_count": len(baseline),
-                        },
-                    }
-                )
-            else:
-                results.append({"is_anomaly": False, "reason": None, "details": None})
-
-        return results
+        return [
+            self._evaluate_with_stats(
+                measurement["hospital_id"],
+                measurement["value"],
+                stats_by_hospital.get(measurement["hospital_id"]),
+            )
+            for measurement in measurements
+        ]
 
     def get_recent_anomalies(self, source_id: str | None = None, days: int = 7) -> list[dict]:
         """Get recent anomalies for display/review.
@@ -190,6 +104,116 @@ class AnomalyDetectionService:
         if std == 0:
             return 0.0
         return (value - mean) / std
+
+    def _get_baseline_stats(
+        self, hospital_id: str, lookback_start: datetime, end_time: datetime
+    ) -> dict | None:
+        get_stats = getattr(self.db, "get_measurement_baseline_stats", None)
+        if callable(get_stats):
+            stats = get_stats(hospital_id, lookback_start, end_time)
+            if isinstance(stats, dict):
+                return stats
+
+        recent = self.db.get_measurements_in_range(hospital_id, lookback_start, end_time)
+        values = [float(row["value"]) for row in recent]
+        if not values:
+            return None
+
+        q1 = None
+        q3 = None
+        if len(values) >= 4:
+            sorted_values = sorted(values)
+            n = len(sorted_values)
+            q1 = sorted_values[n // 4]
+            q3 = sorted_values[3 * n // 4]
+
+        return {
+            "sample_count": len(values),
+            "mean_value": statistics.mean(values),
+            "std_dev": statistics.stdev(values) if len(values) > 1 else 0.0,
+            "q1": q1,
+            "q3": q3,
+        }
+
+    def _get_baseline_stats_batch(
+        self, hospital_windows: list[tuple[str, datetime, datetime]]
+    ) -> dict[str, dict]:
+        get_stats_batch = getattr(self.db, "get_measurement_baseline_stats_batch", None)
+        if callable(get_stats_batch):
+            stats_by_hospital = get_stats_batch(hospital_windows)
+            if isinstance(stats_by_hospital, dict):
+                return stats_by_hospital
+
+        stats: dict[str, dict] = {}
+        for hospital_id, lookback_start, end_time in hospital_windows:
+            result = self._get_baseline_stats(hospital_id, lookback_start, end_time)
+            if result is not None:
+                stats[hospital_id] = result
+        return stats
+
+    def _evaluate_with_stats(self, hospital_id: str, value: float, stats: dict | None) -> dict:
+        if not stats:
+            return {"is_anomaly": False, "reason": None, "details": None}
+
+        sample_count = int(stats.get("sample_count") or 0)
+        if sample_count < self.MIN_SAMPLES_FOR_DETECTION:
+            return {"is_anomaly": False, "reason": None, "details": None}
+
+        mean = float(stats.get("mean_value") or 0.0)
+        std = float(stats.get("std_dev") or 0.0)
+
+        z_score = None
+        if sample_count >= 3:
+            z_score = 0.0 if std == 0 else (value - mean) / std
+
+        q1 = stats.get("q1")
+        q3 = stats.get("q3")
+        iqr_bounds = None
+        if sample_count >= 4 and q1 is not None and q3 is not None:
+            q1_value = float(q1)
+            q3_value = float(q3)
+            iqr = q3_value - q1_value
+            iqr_bounds = (
+                q1_value - self.IQR_MULTIPLIER * iqr,
+                q3_value + self.IQR_MULTIPLIER * iqr,
+            )
+
+        reasons: list[str] = []
+
+        if z_score is not None and abs(z_score) > self.Z_SCORE_THRESHOLD:
+            direction = "above" if z_score > 0 else "below"
+            reasons.append(f"Z-score {z_score:.1f} ({direction} mean of {mean:.0f} min)")
+
+        if iqr_bounds is not None:
+            lower, upper = iqr_bounds
+            if value < lower:
+                reasons.append(f"Below IQR lower bound ({value:.0f} < {lower:.0f})")
+            elif value > upper:
+                reasons.append(f"Above IQR upper bound ({value:.0f} > {upper:.0f})")
+
+        if reasons:
+            reason = "; ".join(reasons)
+            logger.info(
+                "Anomaly detected for %s: value=%.0f, %s",
+                hospital_id,
+                value,
+                reason,
+            )
+            return {
+                "is_anomaly": True,
+                "reason": reason,
+                "details": {
+                    "value": value,
+                    "baseline_mean": round(mean, 1),
+                    "baseline_std": round(std, 1),
+                    "z_score": round(z_score, 2) if z_score is not None else None,
+                    "iqr_lower": round(iqr_bounds[0], 1) if iqr_bounds else None,
+                    "iqr_upper": round(iqr_bounds[1], 1) if iqr_bounds else None,
+                    "sample_count": sample_count,
+                },
+            }
+
+        return {"is_anomaly": False, "reason": None, "details": None}
 
     @staticmethod
     def _compute_iqr_bounds(

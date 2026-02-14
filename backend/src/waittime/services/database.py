@@ -471,6 +471,105 @@ class DatabaseService:
                 )
                 return [dict(row) for row in cur.fetchall()]
 
+    def get_measurement_baseline_stats(
+        self, hospital_id: str, start: datetime, end: datetime
+    ) -> dict[str, Any] | None:
+        """Get summary stats used for anomaly detection without transferring raw rows."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT
+                        COUNT(*)::int AS sample_count,
+                        AVG(value)::float8 AS mean_value,
+                        STDDEV_SAMP(value)::float8 AS std_dev,
+                        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY value)::float8 AS q1,
+                        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY value)::float8 AS q3
+                    FROM measurements
+                    WHERE hospital_id = %s
+                      AND timestamp_utc >= %s
+                      AND timestamp_utc < %s
+                      AND metric_family = 'TIME_TO_PROVIDER'
+                    """,
+                    (hospital_id, start, end),
+                )
+                row = cur.fetchone()
+                if row is None:
+                    return None
+
+                sample_count = int(row["sample_count"] or 0)
+                if sample_count == 0:
+                    return None
+
+                return {
+                    "sample_count": sample_count,
+                    "mean_value": float(row["mean_value"])
+                    if row["mean_value"] is not None
+                    else None,
+                    "std_dev": float(row["std_dev"]) if row["std_dev"] is not None else None,
+                    "q1": float(row["q1"]) if row["q1"] is not None else None,
+                    "q3": float(row["q3"]) if row["q3"] is not None else None,
+                }
+
+    def get_measurement_baseline_stats_batch(
+        self, hospital_windows: list[tuple[str, datetime, datetime]]
+    ) -> dict[str, dict[str, Any]]:
+        """Get anomaly-detection baseline stats for multiple hospitals in one query."""
+        if not hospital_windows:
+            return {}
+
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                rows = psycopg2.extras.execute_values(
+                    cur,
+                    """
+                    SELECT
+                        q.hospital_id,
+                        COALESCE(stats.sample_count, 0)::int AS sample_count,
+                        stats.mean_value,
+                        stats.std_dev,
+                        stats.q1,
+                        stats.q3
+                    FROM (
+                        VALUES %s
+                    ) AS q(hospital_id, start_time, end_time)
+                    LEFT JOIN LATERAL (
+                        SELECT
+                            COUNT(*)::int AS sample_count,
+                            AVG(m.value)::float8 AS mean_value,
+                            STDDEV_SAMP(m.value)::float8 AS std_dev,
+                            PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY m.value)::float8 AS q1,
+                            PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY m.value)::float8 AS q3
+                        FROM measurements m
+                        WHERE m.hospital_id = q.hospital_id
+                          AND m.timestamp_utc >= q.start_time
+                          AND m.timestamp_utc < q.end_time
+                          AND m.metric_family = 'TIME_TO_PROVIDER'
+                    ) AS stats ON TRUE
+                    """,
+                    hospital_windows,
+                    template="(%s, %s, %s)",
+                    fetch=True,
+                )
+
+                results: dict[str, dict[str, Any]] = {}
+                for row in rows:
+                    sample_count = int(row["sample_count"] or 0)
+                    if sample_count == 0:
+                        continue
+
+                    results[row["hospital_id"]] = {
+                        "sample_count": sample_count,
+                        "mean_value": float(row["mean_value"])
+                        if row["mean_value"] is not None
+                        else None,
+                        "std_dev": float(row["std_dev"]) if row["std_dev"] is not None else None,
+                        "q1": float(row["q1"]) if row["q1"] is not None else None,
+                        "q3": float(row["q3"]) if row["q3"] is not None else None,
+                    }
+
+                return results
+
     def insert_aggregate(self, aggregate: MeasurementAggregate) -> bool:
         """Insert an aggregate, skipping if a duplicate already exists.
 

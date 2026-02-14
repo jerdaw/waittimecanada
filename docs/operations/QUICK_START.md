@@ -102,6 +102,19 @@ FROM hospitals
 GROUP BY province;
 ```
 
+### Transfer Alert Triage (Neon)
+```sql
+SELECT
+  source_id,
+  COUNT(*) AS measurements_24h
+FROM measurements
+WHERE timestamp_utc > NOW() - INTERVAL '24 hours'
+GROUP BY source_id
+ORDER BY source_id;
+```
+
+If counts are normal but transfer is still high, use the runbook in `docs/operations/scraper-scheduling.md` under "Neon Public Transfer Guardrails".
+
 ---
 
 ## GitHub Actions

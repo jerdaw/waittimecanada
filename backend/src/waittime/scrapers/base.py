@@ -208,15 +208,30 @@ class BaseScraper(ABC):
         is metadata that enables data quality transparency.
         """
         try:
+            from waittime.core import MetricFamily
             from waittime.services.anomaly_detection import AnomalyDetectionService
 
             anomaly_service = AnomalyDetectionService(self.db)  # type: ignore[arg-type]
-            for measurement in measurements:
-                result = anomaly_service.check_measurement(
-                    hospital_id=measurement.hospital_id,
-                    value=measurement.value,
-                    timestamp=measurement.timestamp_utc,
-                )
+            candidate_indices = [
+                idx
+                for idx, measurement in enumerate(measurements)
+                if measurement.metric_family == MetricFamily.TIME_TO_PROVIDER
+            ]
+            if not candidate_indices:
+                return
+
+            batch_payload = [
+                {
+                    "hospital_id": measurements[idx].hospital_id,
+                    "value": measurements[idx].value,
+                    "timestamp": measurements[idx].timestamp_utc,
+                }
+                for idx in candidate_indices
+            ]
+            results = anomaly_service.check_batch(batch_payload)
+
+            for idx, result in zip(candidate_indices, results, strict=False):
+                measurement = measurements[idx]
                 if result["is_anomaly"]:
                     measurement.is_anomaly = True
                     measurement.anomaly_reason = result["reason"]

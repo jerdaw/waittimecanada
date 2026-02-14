@@ -1,6 +1,6 @@
 # Scraper Scheduling & Operations
 
-**Last Updated:** 2026-02-11
+**Last Updated:** 2026-02-14
 **Status:** ✅ All 4 provincial scrapers operational
 
 ---
@@ -333,6 +333,30 @@ When adding a new scraper:
 1. Reduce scraper frequency to 30 minutes (save 50%)
 2. Use self-hosted runner (free, but requires infrastructure)
 3. Optimize scraper runtime (currently ~10 min average)
+
+### Neon Public Transfer Guardrails
+
+If Neon sends a public transfer warning (for example 80% usage), apply this runbook immediately:
+
+1. Confirm write volume is within expected range:
+   ```sql
+   SELECT
+     source_id,
+     COUNT(*) AS measurements_24h
+   FROM measurements
+   WHERE timestamp_utc > NOW() - INTERVAL '24 hours'
+   GROUP BY source_id
+   ORDER BY source_id;
+   ```
+2. Temporarily reduce scrape cadence to 30 minutes if needed:
+   - `scraper-cron.yml`: `*/15` -> `*/30`
+   - `heartbeat-monitor.yml`: `--max-age 60` -> `--max-age 90`
+3. Confirm anomaly detection is running in batched baseline-stats mode (no raw 7-day history fetch per hospital).
+4. Keep read-heavy API routes cached at 5-10 minute shared TTL, and `no-store` only for user-specific/export routes.
+
+Notes:
+- The scraper anomaly pipeline now computes baseline stats in SQL (count/mean/stddev/quartiles) to reduce transfer from Neon to scraper workers.
+- Escalate to Launch plan only after guardrails are applied and usage trend is still above budget.
 
 ---
 
