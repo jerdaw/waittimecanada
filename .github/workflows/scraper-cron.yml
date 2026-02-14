@@ -1,9 +1,10 @@
 name: Scraper Cron Job
 
-# Run every 15 minutes
+# Temporary cost-control throttle: run every 30 minutes.
+# Review target date: 2026-03-03 (revert to */15 if Neon transfer is back within budget).
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:  # Allow manual trigger
 
 env:

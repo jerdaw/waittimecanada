@@ -35,4 +35,6 @@ jobs:
           PUSHOVER_API_TOKEN: ${{ secrets.PUSHOVER_API_TOKEN }}
         run: |
           cd backend
-          python -m waittime.cli.check_heartbeat --max-age 60
+          # Temporary cost-control throttle companion setting.
+          # Review target date: 2026-03-03 (revert to --max-age 60 with */15 scraper cadence).
+          python -m waittime.cli.check_heartbeat --max-age 90

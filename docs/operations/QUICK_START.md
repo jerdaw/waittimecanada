@@ -160,9 +160,12 @@ playwright install chromium
 ## Production Status
 
 **Current Schedule:**
-- Scrapers run every 15 minutes
+- Temporary (cost-control): Scrapers run every 30 minutes
 - Heartbeat checks every 30 minutes
+- Heartbeat stale threshold is 90 minutes
 - All 4 provinces operational
+
+**Review Reminder:** Reassess and revert to normal cadence on or before **March 3, 2026** if Neon transfer usage is back within budget.
 
 **Monitoring:**
 - Pushover alerts on failures

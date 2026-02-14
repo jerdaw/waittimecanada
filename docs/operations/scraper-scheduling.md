@@ -3,6 +3,8 @@
 **Last Updated:** 2026-02-14
 **Status:** ✅ All 4 provincial scrapers operational
 
+> Temporary cost-control mode (enabled February 14, 2026): scraper cadence is `*/30` and heartbeat stale threshold is `90` minutes. Review on or before **March 3, 2026** and revert to normal cadence when Neon transfer usage stabilizes.
+
 ---
 
 ## Overview
