@@ -9,11 +9,6 @@ const nextConfig = {
     NEXT_PUBLIC_MAPBOX_TOKEN: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
   },
 
-  // Disable image optimization to save on Netlify usage limits
-  images: {
-    unoptimized: true,
-  },
-
   // Security headers
   async headers() {
     return [
