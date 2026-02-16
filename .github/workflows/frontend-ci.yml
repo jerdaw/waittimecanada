@@ -130,7 +130,7 @@ jobs:
 
       - name: Upload coverage
         if: hashFiles('frontend/coverage/coverage-final.json') != ''
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: ./frontend/coverage/coverage-final.json
           flags: frontend
