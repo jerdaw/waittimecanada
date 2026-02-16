@@ -66,38 +66,19 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 
 ## Active Roadmap (Now / Deferred / Later)
 
-### Now (0-2 weeks) — CRITICAL PATH TO DEPLOYMENT
+### Now (0-2 weeks) — CORE ENGINEERING & VERIFICATION
+(Production Deployment Blocked until March 1, 2026)
 
-**PRIORITY 0: Deploy and Validate Core Product**
+**PRIORITY 0: Data Quality Verification (Local)**
+- [ ] **P0 / Verification: ON hospital vs ER Watch** — Verify latest data accuracy
+- [ ] **P0 / Verification: QC hospital vs MSSS portal** — Verify latest data accuracy
+- [ ] **P0 / Verification: AB hospital vs AHS** — Verify latest data accuracy
+- [ ] **P0 / Verification: BC hospital vs edwaittimes.ca** — Verify latest data accuracy
 
-This section focuses on **making the product work and accessible** before polishing.
-
-- [ ] **P0 / Deploy frontend to production** — Re-enable Netlify or deploy to Vercel free tier for public access (2-4h)
-  - **Blocker:** Cost concern resolved or alternative found
-  - **Deliverables:** Live URL, environment variables configured, deployment automated
-  - **Why Critical:** Cannot validate product, capture screenshots, or test with users without deployment
-
-- [ ] **P0 / Verify scrapers working in production** — Manual verification that all 4 scrapers run and populate database (1-2h)
-  - **Verification:** Check `scraper_status` table, verify measurements inserted in last 24h, confirm no errors in logs
-  - **Why Critical:** Core functionality may be broken and we don't know it
-
-- [ ] **P0 / Spot-check data quality against official sources** — Manually compare 5-10 hospitals per province to source websites (2-3h)
-  - **Verification:** ON hospital vs ER Watch, QC hospital vs MSSS portal, AB hospital vs AHS, BC hospital vs edwaittimes.ca
-  - **Why Critical:** Methodology tags and values may be incorrect
-
-- [ ] **P0 / End-to-end smoke test** — Test complete user journey: homepage → map → hospital detail → methodology comparison (30min)
-  - **Verification:** All pages load, no console errors, data displays correctly, divergence warnings show when expected
-  - **Why Critical:** Basic usability validation
-
-- [ ] **P0 / Post-reset scraper cadence adjustment (due March 3, 2026)** — Replace temporary throttle with balanced cost-saving settings (30min)
-  - **Current temporary mode:** `scraper-cron */30`, heartbeat `--max-age 90`
-  - **Target mode:** `scraper-cron */20`, heartbeat `--max-age 75`
-  - **Verification:** Monitor Neon transfer trend for 48h after change; ensure no stale-heartbeat alerts
-
-- [x] **P0 / Document deployment blockers** — Comprehensive assessment of deployment readiness completed (1h)
-  - **Deliverables:** `docs/planning/deployment-blockers.md` with full analysis, priority matrix, deployment sequence
-  - **Status:** Product 85% ready for deployment - main blocker is hosting platform decision
-  - **Finding:** Frontend and backend codebases complete and tested, scrapers configured, monitoring active
+**PRIORITY 1: Engineering Reliability (Local)**
+- [ ] **P1 / Add end-to-end pipeline test** (#39) — Mock scrape → DB insert → API → render (4-8h)
+- [ ] **P1 / Add API response time tracking** (#49) — Timing middleware (2-3h)
+- [ ] **P2 / Visual regression testing** (#33) — Scaffold for screenshot comparison (High maintenance)
 
 ### Deferred / On Hold (Non-Core / Too Reaching)
 
@@ -117,7 +98,6 @@ This section focuses on **making the product work and accessible** before polish
 
 **Advanced Testing & Monitoring (Deferred):**
 - [ ] **P2 / Add Lighthouse CI** (#14) — Optimization metrics
-- [ ] **P2 / Add visual regression testing** (#33) — High maintenance
 - [ ] **P2 / Add property-based testing (Hypothesis)** (#32) — Formal verification
 - [ ] **P2 / Add data quality drift monitoring** (#43) — Advanced analytics
 - [ ] **P2 / Add uptime/status history page** (#37) — Public transparency page
