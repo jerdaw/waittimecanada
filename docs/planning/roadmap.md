@@ -54,12 +54,12 @@ All planned milestones through M18 and Operations verification are complete. Fut
 - Operational impact confirmed (alerts, workflows, secrets, deployment posture).
 - Item status reflected in this roadmap and no duplicate open tasks remain.
 
-### Release and Cost Policy (Current)
-- Netlify deploys are intentionally release-gated and frontend public hosting is intentionally offline.
-- Production smoke workflow remains disabled until a public frontend URL is intentionally re-enabled.
-- Scraper reliability workflows (`scraper-cron`, heartbeat monitor, readiness checks) remain active.
-- Temporary cost-control mode is active from **February 14, 2026** through post-reset review: `scraper-cron` at `*/30` and heartbeat `--max-age 90`.
-- Post-reset target (review on **March 3, 2026**): move to less aggressive but still cost-saving defaults `scraper-cron: */20` and heartbeat `--max-age 75`.
+### Release and Cost Policy (Updated 2026-02-16)
+- **Netlify Deploys:** Paused due to credit exhaustion. Waiting for monthly reset (**March 1, 2026**).
+- **Public Hosting:** Offline until reset.
+- Scraper reliability workflows (`scraper-cron`, heartbeat monitor, readiness checks) remain active on GitHub Actions.
+- Temporary cost-control mode is active: `scraper-cron` at `*/30` and heartbeat `--max-age 90`.
+- Post-reset target (review on **March 3, 2026**): Reactivate deploys and move to `scraper-cron: */20`.
 
 ### Focus Shift (2026-02-15)
 Per recent direction, the roadmap has been refocused on **Core Functionality, Features, and Code**. Peripheral items (portfolio artifacts, academic integrations, advanced documentation, and non-critical expansions) have been moved to "Deferred / On Hold".
