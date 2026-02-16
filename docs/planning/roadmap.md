@@ -54,10 +54,10 @@ All planned milestones through M18 and Operations verification are complete. Fut
 - Operational impact confirmed (alerts, workflows, secrets, deployment posture).
 - Item status reflected in this roadmap and no duplicate open tasks remain.
 
-### Release and Cost Policy (Updated 2026-02-16)
-- **Vercel Migration:** Project migrated to Vercel (Hobby Tier) due to Netlify credit exhaustion.
-- **Frontend Hosting:** Public hosting is restored on Vercel.
-- Scraper reliability workflows (`scraper-cron`, heartbeat monitor, readiness checks) remain active on GitHub Actions.
+### Release and Cost Policy (Current)
+- Netlify deploys are intentionally release-gated and frontend public hosting is intentionally offline.
+- Production smoke workflow remains disabled until a public frontend URL is intentionally re-enabled.
+- Scraper reliability workflows (`scraper-cron`, heartbeat monitor, readiness checks) remain active.
 - Temporary cost-control mode is active from **February 14, 2026** through post-reset review: `scraper-cron` at `*/30` and heartbeat `--max-age 90`.
 - Post-reset target (review on **March 3, 2026**): move to less aggressive but still cost-saving defaults `scraper-cron: */20` and heartbeat `--max-age 75`.
 
