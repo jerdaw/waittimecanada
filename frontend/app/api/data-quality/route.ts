@@ -15,12 +15,28 @@ import { publicCacheHeaders } from "@/utils/cache";
 const EXPECTED_SCRAPES_PER_DAY = 96;
 const SCRAPE_INTERVAL_MINUTES = 15;
 
+import { DataQualityQuerySchema } from "@/utils/validations";
+
 export async function GET(request: Request) {
   try {
     const sql = getDb();
     const { searchParams } = new URL(request.url);
-    const hospitalId = searchParams.get("hospital_id");
-    const days = Math.min(parseInt(searchParams.get("days") ?? "30", 10), 90);
+    const rawParams = Object.fromEntries(searchParams.entries());
+
+    const validation = DataQualityQuerySchema.safeParse(rawParams);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Validation Error",
+          details: validation.error.format(),
+        },
+        { status: 400 },
+      );
+    }
+
+    const { hospital_id: hospitalId, days } = validation.data;
 
     if (hospitalId) {
       return await getHospitalQuality(sql, hospitalId, days);

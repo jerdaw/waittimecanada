@@ -6,9 +6,11 @@ Usage:
 """
 
 import argparse
-import logging
 import sys
 from typing import Any, NoReturn
+
+# Configure logging
+import structlog
 
 from waittime.core import Hospital, Measurement, Source
 from waittime.scrapers import (
@@ -23,13 +25,35 @@ from waittime.scrapers import (
 )
 from waittime.services import DatabaseService, GeocodingService
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
+# Determine if we are in a TTY (development) or not (production/CI)
+# If TTY, use colored console output. If not, use JSON.
+is_tty = sys.stderr.isatty()
+
+shared_processors: list[Any] = [
+    structlog.contextvars.merge_contextvars,
+    structlog.processors.add_log_level,
+    structlog.processors.TimeStamper(fmt="iso"),
+]
+
+processors: list[Any]
+
+if is_tty:
+    processors = shared_processors + [
+        structlog.dev.ConsoleRenderer(),
+    ]
+else:
+    processors = shared_processors + [
+        structlog.processors.dict_tracebacks,
+        structlog.processors.JSONRenderer(),
+    ]
+
+structlog.configure(
+    processors=processors,
+    logger_factory=structlog.PrintLoggerFactory(),
+    cache_logger_on_first_use=True,
 )
-logger = logging.getLogger(__name__)
+
+logger = structlog.get_logger()
 
 # Registry of available scrapers
 SCRAPERS = {

@@ -1,8 +1,8 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-02-14)
+## Current Status (Updated 2026-02-16)
 
-**Progress:** M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
+**Progress:** M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
 **Strategic Direction:** **Four-province breadth achieved** (ON, QC, AB, BC). All four scrapers active in production via GitHub Actions, 380+ hospitals visible across all provinces, methodology documentation complete for all provinces, regional analytics data seeded for 15 regions. **Quebec stretcher occupancy fully operational end-to-end** - scraper extraction, API endpoint, and visual indicators on hospital cards. **Heartbeat monitoring operational** with Pushover alerting for stale data. **Temporary cost-control cadence is active as of February 14, 2026** (`scraper-cron: */30`, heartbeat `--max-age 90`) due to Neon transfer usage. **All 662 tests passing** (375 backend + 287 frontend) with 77% backend coverage.
 
@@ -30,6 +30,8 @@
 | **M16: Multi-Province Operationalization** | Trusted source auto-approval, hospital seed data (65 hospitals for AB/BC/QC), methodology docs for all 4 provinces, region data (15 regions), 380+ hospitals visible |
 | **M17: Quebec Occupancy Implementation** | Quebec scraper extracts stretcher occupancy percentages, API endpoint returns real-time occupancy data, 17 unit tests, STRETCHER_OCCUPANCY metric family |
 | **M18: Occupancy Frontend UI** | OccupancyBadge component with color-coded indicators, hospital API includes occupancy data, visual display on Quebec hospital cards, methodology note, 15 unit tests |
+| **M19: Governance & Quality** | Added LICENSE, SECURITY.md, CODE_OF_CONDUCT, CITATION.cff, CHANGELOG, dependabot, issue/PR templates, error boundaries, and loading states |
+| **Operations: Test Stabilization** | Resolved intermittent Map legend failures, optimized viewport constraints (45vh Hero), restored aria-labels for toggles, verified full suite (15/15 passing) |
 | **Operations: Production Verification** | Verified all 4 scrapers operational, heartbeat monitoring active, BC source metadata corrected, comprehensive operations documentation created |
 
 ---
@@ -58,6 +60,9 @@ All planned milestones through M18 and Operations verification are complete. Fut
 - Scraper reliability workflows (`scraper-cron`, heartbeat monitor, readiness checks) remain active.
 - Temporary cost-control mode is active from **February 14, 2026** through post-reset review: `scraper-cron` at `*/30` and heartbeat `--max-age 90`.
 - Post-reset target (review on **March 3, 2026**): move to less aggressive but still cost-saving defaults `scraper-cron: */20` and heartbeat `--max-age 75`.
+
+### Focus Shift (2026-02-15)
+Per recent direction, the roadmap has been refocused on **Core Functionality, Features, and Code**. Peripheral items (portfolio artifacts, academic integrations, advanced documentation, and non-critical expansions) have been moved to "Deferred / On Hold".
 
 ## Active Roadmap (Now / Deferred / Later)
 
@@ -94,130 +99,56 @@ This section focuses on **making the product work and accessible** before polish
   - **Status:** Product 85% ready for deployment - main blocker is hosting platform decision
   - **Finding:** Frontend and backend codebases complete and tested, scrapers configured, monitoring active
 
-### Deferred - Waiting for Deployment & Validation
+### Deferred / On Hold (Non-Core / Too Reaching)
 
-**These items are valuable but BLOCKED until core product is deployed and validated.**
+**Portfolio & Academic Artifacts (Deferred):**
+- [ ] **P2 / Add Zenodo integration for DOI** (#42) — Academic credit
+- [ ] **P2 / Add data freshness badge** (#31) — Portfolio signal
+- [ ] **P2 / Expand automated screenshot generation** (#27) — Portfolio signal
+- [ ] **P2 / Add methodology comparison table as static asset** (#36) — External artifact
+- [ ] **P2 / Populate stakeholder interview examples** (#45) — Governance artifact
 
-**Prerequisite: Frontend deployed and accessible to public**
+**Advanced Documentation (Deferred):**
+- [ ] **P2 / Add OpenAPI/Swagger docs** (#10) — Secondary to core API
+- [ ] **P2 / Add mkdocs GitHub Pages deployment** (#48) — External docs site
+- [ ] **P2 / Add data dictionary** (#50) — Paperwork (schema flux)
+- [ ] **P2 / Add data flow documentation** (#24) — Paperwork
+- [ ] **P2 / Add contributor onboarding guide** (#40) — Paperwork
 
-- [ ] **P1 / Expand portfolio screenshots** — Capture all 10+ views (light/dark, mobile, occupancy, divergence warnings) (4-8h)
-  - 🚫 **Blocked by:** Frontend offline, no public URL to screenshot
-  - ⏸️ **Defer until:** Frontend deployed and stable for 48+ hours
+**Advanced Testing & Monitoring (Deferred):**
+- [ ] **P2 / Add Lighthouse CI** (#14) — Optimization metrics
+- [ ] **P2 / Add visual regression testing** (#33) — High maintenance
+- [ ] **P2 / Add property-based testing (Hypothesis)** (#32) — Formal verification
+- [ ] **P2 / Add data quality drift monitoring** (#43) — Advanced analytics
+- [ ] **P2 / Add uptime/status history page** (#37) — Public transparency page
 
-- [ ] **P1 / Add data freshness badge** — Dynamic README badge showing "Last scrape: X mins ago" (4-6h)
-  - 🚫 **Blocked by:** Frontend offline, no live API to query
-  - ⏸️ **Defer until:** Frontend deployed and scrapers verified working
+**Project Management (Deferred):**
+- [ ] **P2 / Add GitHub Project board** (#47) — Process overhead
 
-**Prerequisite: Product validated by real users**
+**Expansion (Deferred):**
+- [ ] **P2 / French language support (i18n)** (#7) — Major scope expansion
 
-- [ ] **P1 / Add GitHub Project board** — Public roadmap with Backlog/In Progress/Done columns (1-2h)
-  - 🚫 **Blocked by:** Don't know real priorities until users test product
-  - ⏸️ **Defer until:** Product deployed and initial user feedback received
+### Next (2-6 weeks) — Core Engineering & Reliability
 
-- [ ] **P1 / Populate stakeholder interview examples** — 2-3 example summaries demonstrating consent workflow (1-2h)
-  - 🚫 **Blocked by:** No stakeholders to interview until product is public
-  - ⏸️ **Defer until:** Product deployed and users identified
+**Priority 1: System Reliability & Correctness**
+- [x] **P1 / Increase backend test coverage to 85%+** (#13) — Focus on anomaly detection, methodology change detector, comparison service (1-2d)
+- [x] **P1 / Add API integration tests** (#22) — Hit actual/mocked database for all 16 endpoints with error cases (1-2d)
+- [x] **P1 / Add database health check enhancement** (#29) — Connection pool status, query latency, per-source freshness (2-3h)
+- [x] **P1 / Add structured logging via structlog** (#25) — JSON-formatted logging for backend/frontend (2-3h)
 
-**Prerequisite: Schema and architecture stable**
+**Priority 1: Security & Guardrails**
+- [x] **P1 / Add API input validation (Zod)** (#21) — Comprehensive validation for all query params across 16 routes (4-8h)
+- [x] **P1 / Add API rate limiting** (#9) — In-memory or Upstash Redis middleware for all 16 routes with 429 responses (4-8h)
 
-- [ ] **P1 / Add mkdocs GitHub Pages deployment** — Live documentation site with `docs-deploy.yml` workflow (4-6h)
-  - 🚫 **Blocked by:** Documentation may change after deployment validation
-  - ⏸️ **Defer until:** Core functionality validated and stable
+**Priority 1: Code Quality & Performance**
+- [x] **P1 / TypeScript strict mode audit** (#34) — Eliminate all `any`, `@ts-ignore`, `@ts-expect-error` in custom code (2-3h)
+- [x] **P1 / Backend mypy strict mode** (#35) — Enable `--strict` flag and fix all type errors (4-8h)
+- [x] **P1 / Database index optimization** (#38) — Add composite indexes for common query patterns with migration (2-3h)
 
-- [ ] **P1 / Add data dictionary** — Document all 9 tables, columns, enums, constraints with ER diagram (4-6h)
-  - 🚫 **Blocked by:** Schema may change after production validation
-  - ⏸️ **Defer until:** Database schema stable (no migrations for 2+ weeks)
-
-- [ ] **P1 / Add contributor onboarding guide** — Architecture walkthrough, how to add scraper/API/page (4-6h)
-  - 🚫 **Blocked by:** Architecture may change after deployment issues found
-  - ⏸️ **Defer until:** Architecture proven stable in production
-
-- [ ] **P1 / Add data flow documentation** — Per-scraper docs: source URL, format, parsing, ontology mapping, limitations (4-8h)
-  - 🚫 **Blocked by:** Scrapers may need fixes after validation
-  - ⏸️ **Defer until:** Scrapers verified accurate in production
-
-**Prerequisite: No critical bugs or performance issues**
-
-- [ ] **P1 / Add uptime/status history page** — `/status` page with 30/90-day scraper uptime metrics (4-8h)
-  - 🚫 **Blocked by:** No uptime data until scrapers verified working
-  - ⏸️ **Defer until:** Scrapers stable for 30+ days
-
-- [ ] **P1 / Add data quality drift monitoring** — Weekly GitHub Action tracking measurement count, anomaly rate, success rate over time (4-8h)
-  - 🚫 **Blocked by:** Need baseline data quality first
-  - ⏸️ **Defer until:** Data quality validated and baseline established
-
-### Completed - Already Done (But Maybe Premature)
-
-**These were completed but may have been done too early:**
-
-- [x] **P1 / Add LICENSE file** — Done, but doesn't matter if product not deployed
-- [x] **P1 / Add CITATION.cff** — Done, but can't cite until product is public
-- [x] **P1 / Add Zenodo DOI integration** — Automated setup done, but deferred activation
-- [x] **P1 / Add README badges** — Done, but less valuable without live product
-- [x] **P1 / Add architecture diagram** — Done, but may change after deployment
-- [x] **P1 / Add error boundaries** — Done, good defensive coding
-- [x] **P1 / Add loading states** — Done, good UX practice
-- [x] **P1 / Add Privacy Policy** — Done, legally required
-- [x] **P1 / Add Terms of Use** — Done, legally required
-- [x] **P1 / Add robots.txt and sitemap** — Done, but useless without deployment
-- [x] **P1 / Add CSP and security headers** — Done, good security practice
-- [x] **P1 / Add .pre-commit-config.yaml** — Done, good dev practice
-- [x] **P1 / Add Dependabot** — Done, good maintenance
-- [x] **P1 / Add CORS configuration** — Done, needed for API
-- [x] **P1 / Add git commit hooks** — Done, good dev practice
-- [x] **P1 / Add GitHub Releases** — Done, but premature (not deployed yet)
-- [x] **P1 / Add CHANGELOG.md** — Done, but premature
-- [x] **P1 / Add GitHub issue templates** — Done, but no users to file issues yet
-- [x] **P1 / Add PR template** — Done, but no contributors yet
-- [x] **P1 / Add database migration documentation** — Done, good ops practice
-- [x] **P1 / Add methodology comparison table asset** — Done, but can't share without deployment
-
-⏸️ **On hold - Content filtering:**
-- [ ] **P1 / Add SECURITY.md** — Blocked by Claude content policy
-- [ ] **P1 / Add CODE_OF_CONDUCT.md** — Blocked by Claude content policy
-
-### Next (2-6 weeks) — Medium-Impact Quality Improvements
-
-**Category: Testing & Reliability**
-- [ ] **P1 / Add accessibility testing (axe-core)** — WCAG compliance testing in Playwright E2E with CI checks (1-2d)
-- [ ] **P1 / Increase backend test coverage to 85%+** — Focus on anomaly detection, methodology change detector, comparison service (1-2d)
-- [ ] **P1 / Add Lighthouse CI** — Performance, accessibility, SEO scoring with GitHub Actions integration (4-8h)
-- [ ] **P1 / Add mobile-responsive testing** — Playwright tests at 375px/414px viewports (4-8h)
-- [ ] **P1 / Add visual regression testing** — Playwright visual comparison for homepage, /methods, /data-quality (4-8h)
-- [ ] **P1 / Add property-based testing (Hypothesis)** — Formal verification of ontology comparability logic (4-8h)
-- [ ] **P1 / Add end-to-end pipeline test** — Mock scrape → DB insert → API query → frontend render (4-8h)
-- [ ] **P1 / Add API integration tests** — Hit actual/mocked database for all 16 endpoints with error cases (1-2d)
-
-**Category: API & Backend Quality**
-- [ ] **P1 / Add API rate limiting** — In-memory or Upstash Redis middleware for all 16 routes with 429 responses (4-8h)
-- [ ] **P1 / Add OpenAPI/Swagger docs** — OpenAPI 3.0 spec for all endpoints with Swagger UI at `/api-docs` (1-2d)
-- [ ] **P1 / Add API input validation (Zod)** — Comprehensive validation for all query params across 16 routes (4-8h)
-- [ ] **P1 / Add structured logging to frontend** — JSON-formatted logging for all API routes (method, path, duration, status) (2-3h)
-- [ ] **P1 / Add API response time tracking** — Timing middleware with P50/P95/P99 latency metrics (2-3h)
-- [ ] **P1 / Add database health check enhancement** — Connection pool status, query latency, per-source freshness (2-3h)
-
-**Category: Type Safety & Code Quality**
-- [ ] **P1 / TypeScript strict mode audit** — Eliminate all `any`, `@ts-ignore`, `@ts-expect-error` in custom code (2-3h)
-- [ ] **P1 / Backend mypy strict mode** — Enable `--strict` flag and fix all type errors (4-8h)
-- [ ] **P1 / Database index optimization** — Add composite indexes for common query patterns with migration (2-3h)
-
-**Category: Documentation & Onboarding**
-- [ ] **P1 / Add mkdocs GitHub Pages deployment** — Live documentation site with `docs-deploy.yml` workflow (4-6h)
-- [ ] **P1 / Add data dictionary** — Document all 9 tables, columns, enums, constraints with ER diagram (4-6h)
-- [ ] **P1 / Add contributor onboarding guide** — Architecture walkthrough, how to add scraper/API/page (4-6h)
-- [x] **P1 / Add database migration documentation** — `backend/migrations/README.md` with history and rollback procedures (2-3h)
-- [ ] **P1 / Add data flow documentation** — Per-scraper docs: source URL, format, parsing, ontology mapping, limitations (4-8h)
-- [x] **P1 / Add methodology comparison table asset** — Downloadable CSV/HTML of cross-province comparison matrix (2-3h)
-
-**Category: Monitoring & Operations**
-- [ ] **P1 / Add uptime/status history page** — `/status` page with 30/90-day scraper uptime metrics (4-8h)
-- [ ] **P1 / Add data quality drift monitoring** — Weekly GitHub Action tracking measurement count, anomaly rate, success rate over time (4-8h)
-
-**Category: GitHub Project Governance**
-- [x] **P1 / Add GitHub issue templates** — Bug report, feature request, data quality issue templates (1-2h)
-- [x] **P1 / Add PR template** — `.github/PULL_REQUEST_TEMPLATE.md` with testing/docs checklists (1-2h)
-- [ ] **P1 / Add GitHub Project board** — Public roadmap with Backlog/In Progress/Done columns (1-2h)
-- [ ] **P1 / Populate stakeholder interview examples** — 2-3 example summaries demonstrating consent workflow (1-2h)
+**Priority 2: Validated Improvements**
+- [x] **P2 / Add mobile-responsive testing** (#44) — Playwright tests at 375px/414px viewports (4-8h)
+- [ ] **P2 / Add end-to-end pipeline test** (#39) — Mock scrape → DB insert → API → render (4-8h)
+- [ ] **P2 / Add API response time tracking** (#49) — Timing middleware (2-3h)
 
 ### Later (6+ weeks) — Strategic Enhancements
 
@@ -440,9 +371,9 @@ Archived (delivered):
 ### Governance & Legal (7 items)
 | # | Item | Effort | Status |
 |---|------|--------|--------|
-| 1 | Add SECURITY.md with responsible disclosure policy | S | ⏸️ On hold - Claude content filtering issue |
+| 1 | Add SECURITY.md with responsible disclosure policy | S | ✅ Complete |
 | 2 | Add LICENSE file (MIT/Apache-2.0) | S | ✅ Complete |
-| 3 | Add CODE_OF_CONDUCT.md (Contributor Covenant) | S | ⏸️ On hold - potential content filtering issue |
+| 3 | Add CODE_OF_CONDUCT.md (Contributor Covenant) | S | ✅ Complete |
 | 4 | Add CHANGELOG.md with semantic versioning | M | ✅ Complete |
 | 8 | Add Privacy Policy page (/privacy) | S | ✅ Complete |
 | 26 | Add Terms of Use page (/terms) | S | ✅ Complete |
@@ -490,8 +421,8 @@ Archived (delivered):
 |---|------|--------|--------|
 | 9 | Add API rate limiting | M | ⬜ Not Started |
 | 13 | Increase backend test coverage to 85%+ | M | ⬜ Not Started |
-| 21 | Add API input validation (Zod) on all routes | M | ⬜ Not Started |
-| 22 | Add comprehensive API integration tests | M | ⬜ Not Started |
+| 21 | Add API input validation (Zod) on all routes | M | ✅ Complete |
+| 22 | Add comprehensive API integration tests | M | ✅ Complete |
 | 29 | Add database health check enhancement | S | ⬜ Not Started |
 | 32 | Add property-based testing (Hypothesis) | M | ⬜ Not Started |
 | 35 | Add backend mypy strict mode | M | ⬜ Not Started |

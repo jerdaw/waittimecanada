@@ -118,22 +118,33 @@ async function getHospitalWithMeasurement(hospitalId: string) {
   };
 }
 
+import { CompareQuerySchema } from "@/utils/validations";
+
+import { checkRateLimit } from "@/utils/rate-limit";
+
 export async function GET(request: Request) {
+  // 1. Rate Limit
+  const rateLimitResponse = await checkRateLimit(request as any);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const { searchParams } = new URL(request.url);
-    const hospitalA = searchParams.get("a");
-    const hospitalB = searchParams.get("b");
+    const rawParams = Object.fromEntries(searchParams.entries());
 
-    if (!hospitalA || !hospitalB) {
+    const validation = CompareQuerySchema.safeParse(rawParams);
+
+    if (!validation.success) {
       return NextResponse.json(
         {
           success: false,
-          error: "Missing required parameters",
-          message: "Both 'a' and 'b' hospital IDs are required",
+          error: "Validation Error",
+          details: validation.error.format(),
         },
         { status: 400 },
       );
     }
+
+    const { a: hospitalA, b: hospitalB } = validation.data;
 
     if (hospitalA === hospitalB) {
       return NextResponse.json(

@@ -19,7 +19,7 @@ describe("Benchmarks API", () => {
 
     expect(response.status).toBe(400);
     expect(json.success).toBe(false);
-    expect(json.error).toBe("Missing required parameter");
+    expect(json.error).toBe("Validation Error");
   });
 
   it("returns ranked hospitals for a valid request", async () => {

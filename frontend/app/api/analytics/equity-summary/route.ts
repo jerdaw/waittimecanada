@@ -28,31 +28,30 @@ function normalizeProvince(value: string | null): string {
   return (value ?? "").trim().toUpperCase();
 }
 
+import { RegionQuerySchema } from "@/utils/validations";
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const province = normalizeProvince(searchParams.get("province"));
-  const periodConfig = parsePeriod(searchParams.get("period"));
+  const rawParams = Object.fromEntries(searchParams.entries());
 
-  if (!province) {
+  const validation = RegionQuerySchema.safeParse(rawParams);
+
+  if (!validation.success) {
     return NextResponse.json(
       {
         success: false,
-        error: "Missing required parameter",
-        message: "Query parameter 'province' is required",
+        error: "Validation Error",
+        details: validation.error.format(),
       },
       { status: 400 },
     );
   }
 
+  const { province, period } = validation.data;
+  const periodConfig = parsePeriod(period);
+
   if (!periodConfig) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Invalid period",
-        message: "Supported period values: 24h, 7d, 30d",
-      },
-      { status: 400 },
-    );
+     return NextResponse.json({ success: false, error: "Invalid period config" }, { status: 500 });
   }
 
   if (province !== "ON") {

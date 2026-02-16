@@ -19,7 +19,7 @@ describe("Occupancy Analytics API", () => {
 
     expect(response.status).toBe(400);
     expect(json.success).toBe(false);
-    expect(json.error).toBe("Missing required parameter");
+    expect(json.error).toBe("Validation Error");
   });
 
   it("returns explicit not_available_yet when no occupancy data is available", async () => {

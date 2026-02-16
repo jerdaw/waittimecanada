@@ -72,36 +72,29 @@ function formatDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
+import { PatternsQuerySchema } from "@/utils/validations";
+
 export async function GET(request: Request) {
   try {
     const sql = getDb();
     const { searchParams } = new URL(request.url);
+    const rawParams = Object.fromEntries(searchParams.entries());
 
-    const hospitalId = searchParams.get("hospital_id");
-    if (!hospitalId) {
+    const validation = PatternsQuerySchema.safeParse(rawParams);
+
+    if (!validation.success) {
       return NextResponse.json(
         {
           success: false,
-          error: "Missing required parameter",
-          message: "Query parameter 'hospital_id' is required",
+          error: "Validation Error",
+          details: validation.error.format(),
         },
         { status: 400 },
       );
     }
 
-    let patternType: PatternType;
-    try {
-      patternType = parseType(searchParams.get("type"));
-    } catch {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid pattern type",
-          message: "Supported type values: hour_of_day, day_of_week, monthly",
-        },
-        { status: 400 },
-      );
-    }
+    const { hospital_id: hospitalId, type: patternType, lookback_days, lookback_months } = validation.data;
+    // patternType is already typed as PatternType by Zod enum
 
     const hospitalRows = await sql`
       SELECT id, name

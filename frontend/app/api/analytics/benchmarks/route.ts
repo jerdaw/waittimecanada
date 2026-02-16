@@ -129,36 +129,42 @@ function computeTrendChangePercent(
   );
 }
 
+import { BenchmarkQuerySchema } from "@/utils/validations";
+
+import { checkRateLimit } from "@/utils/rate-limit";
+
 export async function GET(request: Request) {
+  // 1. Rate Limit
+  const rateLimitResponse = await checkRateLimit(request as any);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const sql = getDb();
     const { searchParams } = new URL(request.url);
+    const rawParams = Object.fromEntries(searchParams.entries());
 
-    const province = searchParams.get("province");
-    if (!province) {
+    const validation = BenchmarkQuerySchema.safeParse(rawParams);
+
+    if (!validation.success) {
       return NextResponse.json(
         {
           success: false,
-          error: "Missing required parameter",
-          message: "Query parameter 'province' is required",
+          error: "Validation Error",
+          details: validation.error.format(),
         },
         { status: 400 },
       );
     }
 
-    const periodConfig = parsePeriod(searchParams.get("period"));
+    const { province, period, hospital_id: hospitalId } = validation.data;
+    const periodConfig = parsePeriod(period);
+    // Zod ensures period is valid, but parsePeriod returns the config object with days
+
     if (!periodConfig) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid period",
-          message: "Supported period values: 24h, 7d, 30d",
-        },
-        { status: 400 },
-      );
+       // Should not happen given Zod schema
+       return NextResponse.json({ success: false, error: "Invalid period config" }, { status: 500 });
     }
 
-    const hospitalId = searchParams.get("hospital_id");
     const normalizedProvince = province.toUpperCase();
 
     const now = new Date();

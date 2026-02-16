@@ -9,6 +9,7 @@ import MapGL, {
   Layer,
   type LayerProps,
 } from "react-map-gl";
+import type { Expression } from "mapbox-gl";
 import type { Hospital } from "@/app/api/hospitals/route";
 import { ComparisonModal } from "./ComparisonModal";
 import { DivergenceWarning } from "./DivergenceWarning";
@@ -53,7 +54,7 @@ const EQUITY_FILL_LAYER: LayerProps = {
       5,
       EQUITY_QUINTILE_COLORS[5],
       "#CBD5E1",
-    ] as any,
+    ] as Expression,
     "fill-opacity": 0.24,
   },
 };
@@ -256,16 +257,16 @@ function HospitalPopup({
       onClose={onClose}
       closeOnClick={false}
       closeButton={false}
-      anchor="bottom"
-      offset={20}
+      anchor="top" // Ensure it shows below markers on mobile if they are towards the top
+      offset={10}
       className="hospital-popup"
     >
-      <div className="w-72 bg-white rounded-xl shadow-xl overflow-hidden">
+      <div className="w-64 sm:w-72 bg-white rounded-xl shadow-xl overflow-hidden">
         {/* Header */}
         <div className="px-4 pt-4 pb-3">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-slate-900 text-base leading-tight truncate">
+              <h3 className="font-semibold text-slate-900 text-base leading-tight">
                 {hospital.name}
               </h3>
               <p className="text-sm text-slate-500 mt-0.5">
@@ -318,14 +319,15 @@ function HospitalPopup({
           )}
         </div>
 
-        {/* Trend Chart (only if we have an ID) */}
+        {/* Trend Chart (only if we have an ID) - Hide on mobile popups */}
         {hospital.id && (
-          <div className="px-4 mb-3">
+          <div className="hidden lg:block px-4 mb-3">
             <TrendChart hospitalId={hospital.id} />
           </div>
         )}
 
-        <div className="px-4 mb-3">
+        {/* Benchmark Card - Hide on mobile popups */}
+        <div className="hidden lg:block px-4 mb-3">
           <BenchmarkCard hospital={hospital} compact />
         </div>
 
@@ -522,14 +524,12 @@ function MapLegend() {
   );
 }
 
-// Stats badge
+// Status Badge component
 function StatsBadge({ count, label }: { count: number; label: string }) {
   return (
-    <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg px-4 py-3 border border-slate-200">
-      <div className="flex items-baseline gap-1.5">
-        <span className="text-2xl font-bold text-slate-900">{count}</span>
-        <span className="text-sm text-slate-500">{label}</span>
-      </div>
+    <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg px-4 py-2 border border-slate-200 flex items-center gap-2">
+      <span className="text-2xl font-bold text-slate-900">{count}</span>
+      <span className="text-sm text-slate-500">{label}</span>
     </div>
   );
 }
@@ -537,11 +537,19 @@ function StatsBadge({ count, label }: { count: number; label: string }) {
 // Loading skeleton
 function MapSkeleton() {
   return (
-    <div className="flex h-screen items-center justify-center bg-slate-100">
-      <div className="text-center">
-        <div className="inline-flex items-center gap-3">
-          <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          <span className="text-lg text-slate-600">Loading hospitals...</span>
+    <div className="h-full w-full bg-slate-50 flex flex-col items-center justify-center p-8 mapboxgl-map">
+      <div className="w-full max-w-md space-y-6 text-center">
+        <div className="relative mx-auto w-16 h-16">
+          <div className="absolute inset-0 border-4 border-blue-100 rounded-full" />
+          <div className="absolute inset-0 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        </div>
+        <div className="space-y-2">
+          <span className="text-lg font-medium text-slate-900 block">
+            Initializing Map...
+          </span>
+          <span className="text-sm text-slate-500">
+            Loading hospital locations and regional data...
+          </span>
         </div>
       </div>
     </div>
@@ -804,7 +812,6 @@ export default function Map({
 
   // Render states
   if (!MAPBOX_TOKEN) return <MissingTokenError />;
-  if (loading) return <MapSkeleton />;
   if (error) return <MapError message={error} />;
 
   return (
@@ -825,7 +832,7 @@ export default function Map({
             <Source
               id={`equity-${normalizedProvince}`}
               type="geojson"
-              data={activeEquityData as any}
+              data={activeEquityData}
             >
               <Layer {...EQUITY_FILL_LAYER} />
               <Layer {...EQUITY_OUTLINE_LAYER} />
@@ -866,9 +873,16 @@ export default function Map({
         )}
       </MapGL>
 
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="absolute inset-0 z-10">
+          <MapSkeleton />
+        </div>
+      )}
+
       {/* Comparison Mode UI */}
       {comparisonMode && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30">
           <div className="bg-white rounded-xl shadow-lg border-2 border-blue-200 p-4 min-w-80">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-slate-900">Comparison Mode</h3>
@@ -978,12 +992,12 @@ export default function Map({
             </div>
           )}
       </div>
-
-      <div className="absolute top-4 right-4 z-10">
+      {/* Overlays */}
+      <div className="absolute top-4 right-4 z-30">
         <StatsBadge count={hospitals.length} label="hospitals" />
       </div>
 
-      <div className="absolute bottom-8 left-4 z-10 flex flex-col gap-3">
+      <div className="absolute bottom-8 left-4 z-30 flex flex-col gap-3">
         {showEquityLayer &&
           activeEquityData &&
           activeEquityData.features.length > 0 && (
@@ -993,7 +1007,7 @@ export default function Map({
       </div>
 
       {/* Navigation & Branding */}
-      <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-2">
+      <div className="absolute bottom-4 right-4 z-30 flex flex-col items-end gap-2">
         {!comparisonMode && (
           <>
             <button

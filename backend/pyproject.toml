@@ -49,6 +49,8 @@ ignore = ["E501"]  # Line too long (formatter handles this)
 "src/waittime/cli/*.py" = ["T201"]  # Allow print in CLI tools
 "tests/**/*.py" = ["S101"]  # Allow assert in pytest tests
 "tests/unit/test_geocoding.py" = ["S101", "S106"]  # Allow test tokens
+"tests/unit/services/test_alert_service.py" = ["S101", "S105", "S106"]  # Allow test tokens
+"scripts/*.py" = ["T201"]  # Allow print in scripts
 
 [tool.ruff.format]
 quote-style = "double"
@@ -57,10 +59,10 @@ indent-style = "space"
 [tool.mypy]
 python_version = "3.12"
 # Pragmatic type checking - catch actual bugs without being pedantic
-strict = false
+strict = true
 warn_return_any = false  # Too noisy with external libs
 warn_unused_configs = true
-disallow_untyped_defs = false  # Allow gradual typing
+disallow_untyped_defs = true  # Force typing everywhere
 disallow_any_generics = false  # Allow dict without type params
 check_untyped_defs = true
 no_implicit_optional = true
@@ -71,7 +73,7 @@ disallow_untyped_calls = false  # Don't require all dependencies to be typed
 disallow_incomplete_defs = true  # Catch partially typed functions
 warn_unreachable = true  # Catch dead code
 allow_untyped_calls = true  # Allow calls to untyped functions
-allow_untyped_defs = true  # Allow untyped function definitions
+allow_untyped_defs = false  # strict usually implies this is false, making sure
 disallow_untyped_decorators = false  # Allow untyped decorators
 
 [[tool.mypy.overrides]]
@@ -83,6 +85,14 @@ module = [
     "bs4.*",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "tests.*",
+    "scripts.*",
+]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

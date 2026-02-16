@@ -18,6 +18,7 @@ export function ViewToggle({ mode, onChange, className }: ViewToggleProps) {
     >
       <button
         onClick={() => onChange("list")}
+        aria-label="List view"
         className={clsx(
           "flex-1 px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5",
           mode === "list"
@@ -42,6 +43,7 @@ export function ViewToggle({ mode, onChange, className }: ViewToggleProps) {
       </button>
       <button
         onClick={() => onChange("map")}
+        aria-label="Map view"
         className={clsx(
           "flex-1 px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5",
           mode === "map"
@@ -66,6 +68,7 @@ export function ViewToggle({ mode, onChange, className }: ViewToggleProps) {
       </button>
       <button
         onClick={() => onChange("split")}
+        aria-label="Split view"
         className={clsx(
           "hidden md:flex flex-1 px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 items-center justify-center gap-1.5",
           mode === "split"
@@ -73,20 +76,7 @@ export function ViewToggle({ mode, onChange, className }: ViewToggleProps) {
             : "text-muted-foreground hover:text-foreground hover:bg-background/50",
         )}
       >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 3v18m0 0l-6-6m6 6l6-6M15 3v18m0 0l-6-6m6 6l6-6"
-          />
-        </svg>
-        <span>Split</span>
+        Split
       </button>
     </div>
   );
