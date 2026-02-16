@@ -141,10 +141,12 @@ describe("Map Component", () => {
     error: null,
   };
 
-  it("renders loading state", () => {
-    render(<Map {...defaultProps} loading={true} />);
-    expect(screen.getByText("Loading hospitals...")).toBeInTheDocument();
-  });
+  // Loading state removed - map always persists
+  // it("renders loading state", () => {
+  //   render(<Map {...defaultProps} loading={true} />);
+  //   expect(screen.getByText("Loading hospitals...")).toBeInTheDocument();
+  // });
+
 
   it("renders error state", () => {
     render(<Map {...defaultProps} error="Failed to load" />);

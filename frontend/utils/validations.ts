@@ -1,0 +1,109 @@
+import { z } from "zod";
+
+export const ProvinceEnum = z.enum([
+  "ON",
+  "QC",
+  "AB",
+  "BC",
+  "MB",
+  "SK",
+  "NS",
+  "NB",
+  "NL",
+  "PE",
+  "NT",
+  "NU",
+  "YT",
+]);
+
+export const PeriodEnum = z.enum(["weekly", "monthly"]);
+
+export const LookbackEnum = z.enum(["3m", "6m", "1y"]);
+
+// Common parameter schemas
+export const ProvinceSchema = ProvinceEnum;
+export const OptionalProvinceSchema = ProvinceEnum.optional();
+
+export const PeriodSchema = PeriodEnum.default("monthly");
+export const OptionalPeriodSchema = PeriodEnum.optional();
+
+export const LookbackSchema = LookbackEnum.default("6m");
+export const OptionalLookbackSchema = LookbackEnum.optional();
+
+export const PaginationSchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(20),
+});
+
+// Specific Enums (Must be defined before use)
+export const BenchmarkPeriodSchema = z.enum(["24h", "7d", "30d"]);
+export const HospitalTrendPeriodSchema = z.enum(["24h", "7d", "30d", "90d", "6m", "1y"]);
+
+// Query schemas for specific routes
+export const TrendsQuerySchema = z.object({
+  province: ProvinceSchema,
+  period: PeriodSchema,
+  lookback: LookbackSchema,
+});
+
+export const HospitalQuerySchema = z.object({
+  province: OptionalProvinceSchema,
+  ...PaginationSchema.shape,
+});
+
+export const RegionQuerySchema = z.object({
+  province: ProvinceSchema,
+  period: BenchmarkPeriodSchema.default("7d"),
+});
+
+export const OccupancyQuerySchema = z.object({
+  province: ProvinceSchema,
+});
+
+export const PatternsQuerySchema = z.object({
+  hospital_id: z.string(),
+  type: z.enum(["hour_of_day", "day_of_week", "monthly"]).default("hour_of_day"),
+  lookback_days: z.coerce.number().int().positive().optional(),
+  lookback_months: z.coerce.number().int().positive().optional(),
+});
+
+export const HospitalTrendQuerySchema = z.object({
+  period: HospitalTrendPeriodSchema.default("24h"),
+});
+
+export const BenchmarkQuerySchema = z.object({
+  province: ProvinceSchema,
+  period: BenchmarkPeriodSchema.default("7d"),
+  hospital_id: z.string().optional(),
+});
+
+export const CompareQuerySchema = z.object({
+  a: z.string(),
+  b: z.string(),
+});
+
+export const GeolocationQuerySchema = z.object({
+  latitude: z.coerce.number().min(-90).max(90),
+  longitude: z.coerce.number().min(-180).max(180),
+  radius: z.coerce.number().positive().max(500).default(50), // km
+  limit: z.coerce.number().int().positive().max(50).default(10),
+});
+
+export const AnomaliesQuerySchema = z.object({
+  source_id: z.string().optional(),
+  days: z.coerce.number().int().positive().max(30).default(7),
+});
+
+export const DataQualityQuerySchema = z.object({
+  hospital_id: z.string().optional(),
+  days: z.coerce.number().int().positive().max(90).default(30),
+});
+
+export const ExportQuerySchema = z.object({
+  province: ProvinceSchema.optional(),
+  start_date: z.string().datetime().optional(), // ISO string
+  end_date: z.string().datetime().optional(),
+  format: z.enum(["csv", "json"]).default("csv"),
+  include_methodology: z.enum(["true", "false"]).transform((val) => val !== "false").default("true"),
+  granularity: z.enum(["raw", "hourly", "daily", "weekly", "monthly"]).default("raw"),
+});

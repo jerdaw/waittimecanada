@@ -2,15 +2,31 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { NO_STORE_HEADERS } from "@/utils/cache";
 
+import { ExportQuerySchema } from "@/utils/validations";
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const province = searchParams.get("province");
-  const startDate = searchParams.get("start_date");
-  const endDate = searchParams.get("end_date");
-  const format = searchParams.get("format") || "csv";
-  const includeMethodology =
-    searchParams.get("include_methodology") !== "false";
-  const granularity = searchParams.get("granularity") || "raw";
+  const rawParams = Object.fromEntries(searchParams.entries());
+
+  // Handle include_methodology defaulting logic manually if needed or via Zod transformer
+  // Zod transformer in schema handles "true"/"false" strings -> boolean.
+  // But rawParams from URLSearchParams are strings.
+  // ExportQuerySchema handles this.
+
+  const validation = ExportQuerySchema.safeParse(rawParams);
+
+  if (!validation.success) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Validation Error",
+        details: validation.error.format(),
+      },
+      { status: 400 },
+    );
+  }
+
+  const { province, start_date: startDate, end_date: endDate, format, include_methodology: includeMethodology, granularity } = validation.data;
 
   try {
     const sql = getDb();

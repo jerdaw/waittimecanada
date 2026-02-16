@@ -307,44 +307,46 @@ function buildTrendPoints(rows: AggregateRow[]): TrendPoint[] {
     });
 }
 
+import { TrendsQuerySchema } from "@/utils/validations";
+
+import { checkRateLimit } from "@/utils/rate-limit";
+
 export async function GET(request: Request) {
+  // 1. Rate Limit
+  const rateLimitResponse = await checkRateLimit(request as any);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const sql = getDb();
     const { searchParams } = new URL(request.url);
+    const rawParams = Object.fromEntries(searchParams.entries());
 
-    const province = searchParams.get("province");
-    if (!province) {
+    const validation = TrendsQuerySchema.safeParse(rawParams);
+
+    if (!validation.success) {
       return NextResponse.json(
         {
           success: false,
-          error: "Missing required parameter",
-          message: "Query parameter 'province' is required",
+          error: "Validation Error",
+          details: validation.error.format(),
         },
         { status: 400 },
       );
     }
 
-    const period = parsePeriod(searchParams.get("period"));
-    if (!period) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid period",
-          message: "Supported period values: weekly, monthly",
-        },
-        { status: 400 },
-      );
-    }
+    const { province, period, lookback } = validation.data;
 
-    const lookbackConfig = parseLookback(searchParams.get("lookback"));
+    // Convert Zod's lookback string (e.g. "6m") to the object expected by logic
+    const lookbackConfig = parseLookback(lookback);
+    // Note: Zod already validated it's a valid enum, so parseLookback should generally succeed,
+    // but we can keep the check if we want safety or update logic to trust Zod.
+    // However, parseLookback returns { label, months } which we need.
+
     if (!lookbackConfig) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid lookback",
-          message: "Supported lookback values: 3m, 6m, 1y",
-        },
-        { status: 400 },
+      // Should not happen if Zod schema is correct
+       return NextResponse.json(
+        { success: false, error: "Invalid lookback configuration" },
+        { status: 500 }
       );
     }
 

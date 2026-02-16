@@ -1,4 +1,3 @@
-"use client";
 import { useState, useEffect } from "react";
 import {
   LineChart,
@@ -12,8 +11,22 @@ import {
   ComposedChart,
 } from "recharts";
 import { clsx } from "clsx";
+import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
 
 type Period = "24h" | "7d" | "30d" | "90d" | "6m" | "1y";
+
+interface TrendDataPoint {
+  timestamp: string;
+  waitTime: number;
+  minWaitTime?: number;
+  maxWaitTime?: number;
+}
+
+interface TrendData {
+  dataPoints: TrendDataPoint[];
+  dataSource: string;
+  error?: string;
+}
 
 interface TrendChartProps {
   hospitalId: string;
@@ -21,8 +34,7 @@ interface TrendChartProps {
 
 export function TrendChart({ hospitalId }: TrendChartProps) {
   const [period, setPeriod] = useState<Period>("24h");
-  // eslint-disable-next-line
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<TrendData | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,8 +68,7 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
 
   const isAggregated = data?.dataSource === "aggregated";
   const hasMinMax = data?.dataPoints?.some(
-    // eslint-disable-next-line
-    (d: any) => d.minWaitTime != null && d.maxWaitTime != null,
+    (d: TrendDataPoint) => d.minWaitTime != null && d.maxWaitTime != null,
   );
 
   // Format tick labels
@@ -72,8 +83,7 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
     return date.toLocaleDateString([], { month: "short", day: "numeric" });
   };
 
-  // eslint-disable-next-line
-  const formatTooltip = (value: any, name: string | undefined) => {
+  const formatTooltip = (value: ValueType | undefined, name: NameType | undefined) => {
     if (name === "waitTime")
       return [`${value} min`, isAggregated ? "Mean" : "Wait Time"];
     if (name === "minWaitTime") return [`${value} min`, "Min"];
@@ -81,7 +91,6 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
     return [`${value}`, name ?? ""];
   };
 
-  // eslint-disable-next-line
   const formatTooltipLabel = (label: any) => {
     if (!label) return "";
     const date = new Date(label);

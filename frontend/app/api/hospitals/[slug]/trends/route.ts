@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { publicCacheHeaders } from "@/utils/cache";
+import { HospitalTrendQuerySchema } from "@/utils/validations";
 
 // GET /api/hospitals/[slug]/trends?period=24h|7d|30d|90d|6m|1y
 //
@@ -29,7 +30,22 @@ export async function GET(
   try {
     const sql = getDb();
     const { searchParams } = new URL(request.url);
-    const period = searchParams.get("period") || "24h";
+    const rawParams = Object.fromEntries(searchParams.entries());
+
+    const validation = HospitalTrendQuerySchema.safeParse(rawParams);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Validation Error",
+          details: validation.error.format(),
+        },
+        { status: 400 },
+      );
+    }
+
+    const { period } = validation.data;
 
     // Calculate time boundaries
     const now = new Date();

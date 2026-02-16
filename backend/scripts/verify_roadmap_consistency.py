@@ -13,7 +13,6 @@ Prevents documentation drift by checking:
 import re
 import sys
 from pathlib import Path
-from typing import List, Tuple
 
 
 def get_repo_root() -> Path:
@@ -25,7 +24,7 @@ def get_repo_root() -> Path:
     raise RuntimeError("Could not find repository root (no .git directory)")
 
 
-def check_schema_table_count(roadmap_path: Path) -> Tuple[bool, str]:
+def check_schema_table_count(roadmap_path: Path) -> tuple[bool, str]:
     """Verify declared table count matches listed tables."""
     content = roadmap_path.read_text()
 
@@ -42,12 +41,15 @@ def check_schema_table_count(roadmap_path: Path) -> Tuple[bool, str]:
     actual_count = len(tables)
 
     if declared_count != actual_count:
-        return False, f"Schema table count mismatch: header says {declared_count}, but {actual_count} tables listed: {', '.join(tables)}"
+        return (
+            False,
+            f"Schema table count mismatch: header says {declared_count}, but {actual_count} tables listed: {', '.join(tables)}",
+        )
 
     return True, f"✓ Schema table count correct: {actual_count} tables"
 
 
-def check_adr_files(roadmap_path: Path, repo_root: Path) -> Tuple[bool, str]:
+def check_adr_files(roadmap_path: Path, repo_root: Path) -> tuple[bool, str]:
     """Verify all referenced ADR files exist."""
     content = roadmap_path.read_text()
     adr_dir = repo_root / "docs" / "adr"
@@ -66,12 +68,12 @@ def check_adr_files(roadmap_path: Path, repo_root: Path) -> Tuple[bool, str]:
             missing.append(f"ADR-{adr_num}: {filename}")
 
     if missing:
-        return False, f"Missing ADR files:\n  " + "\n  ".join(missing)
+        return False, "Missing ADR files:\n  " + "\n  ".join(missing)
 
     return True, f"✓ All {len(references)} referenced ADRs exist"
 
 
-def check_implementation_plans(roadmap_path: Path, repo_root: Path) -> Tuple[bool, str]:
+def check_implementation_plans(roadmap_path: Path, repo_root: Path) -> tuple[bool, str]:
     """Verify all referenced implementation plan files exist."""
     content = roadmap_path.read_text()
 
@@ -89,12 +91,12 @@ def check_implementation_plans(roadmap_path: Path, repo_root: Path) -> Tuple[boo
             missing.append(plan_path_str)
 
     if missing:
-        return False, f"Missing implementation plan files:\n  " + "\n  ".join(missing)
+        return False, "Missing implementation plan files:\n  " + "\n  ".join(missing)
 
     return True, f"✓ All {len(references)} referenced implementation plans exist"
 
 
-def check_milestone_completion_consistency(roadmap_path: Path) -> Tuple[bool, str]:
+def check_milestone_completion_consistency(roadmap_path: Path) -> tuple[bool, str]:
     """Verify completed milestones in table match milestone list."""
     content = roadmap_path.read_text()
 
@@ -102,7 +104,7 @@ def check_milestone_completion_consistency(roadmap_path: Path) -> Tuple[bool, st
     table_section = re.search(
         r"## Completed Milestones\s*\n\s*\| Milestone \| Summary \|\s*\n\s*\|[-|]+\|\s*\n((?:\| \*\*M\d+:.*\n)+)",
         content,
-        re.MULTILINE
+        re.MULTILINE,
     )
 
     if not table_section:
@@ -114,12 +116,15 @@ def check_milestone_completion_consistency(roadmap_path: Path) -> Tuple[bool, st
 
     # Check if milestone descriptions exist (basic sanity check)
     if len(table_milestones) < 8:  # We know we have at least M1-M8, M10-M15
-        return False, f"Only {len(table_milestones)} completed milestones found in table, expected more"
+        return (
+            False,
+            f"Only {len(table_milestones)} completed milestones found in table, expected more",
+        )
 
     return True, f"✓ Found {len(table_milestones)} completed milestones"
 
 
-def check_status_summary_freshness(roadmap_path: Path) -> Tuple[bool, str]:
+def check_status_summary_freshness(roadmap_path: Path) -> tuple[bool, str]:
     """Verify Current Status section mentions latest completed work."""
     content = roadmap_path.read_text()
 
@@ -127,7 +132,7 @@ def check_status_summary_freshness(roadmap_path: Path) -> Tuple[bool, str]:
     status_match = re.search(
         r"## Current Status \(Updated ([\d-]+)\)\s*\n\s*\*\*Progress:\*\* (.+?)(?=\n\n|\*\*)",
         content,
-        re.DOTALL
+        re.DOTALL,
     )
 
     if not status_match:
@@ -145,12 +150,15 @@ def check_status_summary_freshness(roadmap_path: Path) -> Tuple[bool, str]:
     missing_keywords = [kw for kw in expected_keywords if kw not in progress_text]
 
     if missing_keywords:
-        return False, f"Current Status may be stale - doesn't mention: {', '.join(missing_keywords)}"
+        return (
+            False,
+            f"Current Status may be stale - doesn't mention: {', '.join(missing_keywords)}",
+        )
 
     return True, f"✓ Current Status updated {update_date} and mentions recent milestones"
 
 
-def check_roadmap_items_formatting(roadmap_path: Path) -> Tuple[bool, str]:
+def check_roadmap_items_formatting(roadmap_path: Path) -> tuple[bool, str]:
     """Verify roadmap items use consistent checkbox formatting."""
     content = roadmap_path.read_text()
 
@@ -174,7 +182,7 @@ def check_roadmap_items_formatting(roadmap_path: Path) -> Tuple[bool, str]:
     if issues:
         return False, "Roadmap item formatting issues:\n  " + "\n  ".join(issues[:5])
 
-    return True, f"✓ All roadmap items use consistent checkbox formatting"
+    return True, "✓ All roadmap items use consistent checkbox formatting"
 
 
 def main() -> int:
@@ -218,7 +226,7 @@ def main() -> int:
                 print(f"  {message}\n")
                 all_passed = False
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         if all_passed:
             print("✅ All roadmap consistency checks passed!")
             return 0

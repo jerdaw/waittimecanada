@@ -11,12 +11,28 @@ import { publicCacheHeaders } from "@/utils/cache";
  *   source_id (optional) - filter by source
  *   days (optional, default 7) - lookback period
  */
+import { AnomaliesQuerySchema } from "@/utils/validations";
+
 export async function GET(request: Request) {
   try {
     const sql = getDb();
     const { searchParams } = new URL(request.url);
-    const sourceId = searchParams.get("source_id");
-    const days = Math.min(parseInt(searchParams.get("days") ?? "7", 10), 30);
+    const rawParams = Object.fromEntries(searchParams.entries());
+
+    const validation = AnomaliesQuerySchema.safeParse(rawParams);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Validation Error",
+          details: validation.error.format(),
+        },
+        { status: 400 },
+      );
+    }
+
+    const { source_id: sourceId, days } = validation.data;
 
     let anomalies;
 

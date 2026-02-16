@@ -8,6 +8,7 @@ interface HeroProps {
   onExplore: () => void;
   className?: string;
   userLocation?: { lat: number; lon: number } | null;
+  loading?: boolean;
 }
 
 export function Hero({
@@ -15,6 +16,7 @@ export function Hero({
   onExplore,
   className,
   userLocation,
+  loading,
 }: HeroProps) {
   // Find the featured hospital based on location
   const featuredHospital = (() => {
@@ -185,7 +187,7 @@ export function Hero({
                   </span>
                 </div>
 
-                {featuredHospital ? (
+                {!loading && featuredHospital ? (
                   <div className="space-y-4">
                     <div>
                       <h3 className="text-xl font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">

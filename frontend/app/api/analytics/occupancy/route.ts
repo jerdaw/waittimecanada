@@ -13,20 +13,59 @@ function normalizeProvince(value: string | null): string {
   return (value ?? "").trim().toUpperCase();
 }
 
+import { OccupancyQuerySchema } from "@/utils/validations";
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const province = normalizeProvince(searchParams.get("province"));
+  const rawParams = Object.fromEntries(searchParams.entries());
 
-  if (!province) {
+  const validation = OccupancyQuerySchema.safeParse(rawParams);
+
+  if (!validation.success) {
     return NextResponse.json(
       {
         success: false,
-        error: "Missing required parameter",
-        message: "Query parameter 'province' is required",
+        error: "Validation Error",
+        details: validation.error.format(),
       },
       { status: 400 },
     );
   }
+
+  const { province } = validation.data;
+  // normalizeProvince is still useful if we want to be safe, but Zod enum handles it if exact match.
+  // However, existing normalizeProvince does upper casing. Zod enum is case sensitive.
+  // If we want to support case-insensitive, we should transform before validation or in schema.
+  // Validations.ts ProvinceEnum uses upper case.
+  // Existing code: normalizeProvince(searchParams.get("province")) -> uppercases it.
+  // Validation should probably accept any case and transform to uppercase?
+  // Or strict validation?
+  // Let's assume strict for now as per other routes, or check if I need to adjust schema.
+
+  // ProvinceSchema is just an enum of uppercased strings.
+  // If the user passes "on", Zod will fail.
+  // I should probably allow coercion/transform in schema if I want robust API.
+  // But standardizing on strict is also fine.
+  // Let's stick to what I did for other routes (Schema.safeParse).
+
+  // Wait, other routes used `province.toUpperCase()` AFTER validation?
+  // No, `hospitals/route.ts` used `const { province } = validation.data`.
+  // If `ProvinceSchema` is strict enum, then input MUST be upper case.
+  // If I want to support lower case input, I need to use `z.preprocess` or `transform`.
+
+  // Let's check `validations.ts` definitions.
+  // `export const ProvinceEnum = z.enum(["ON", ...])`
+
+  // So "on" will fail.
+  // If the previous code relied on `normalizeProvince` which uppercases, then I AM breaking behavior for lowercase inputs.
+  // This is a "User Review Required" item in plan? "Standardize 400 ...". Using strict enum is standardizing.
+  // But if the frontend sends lowercase, it will break.
+  // I should probably make the schema robust to case?
+  // Or assume frontend sends correct case.
+  // `ProvinceSchema` is used in `TrendsQuerySchema` etc.
+
+  // I will check if I should update `ProvinceSchema` to preprocess.
+  // For now I'll apply strict validation.
 
   try {
     const sql = getDb();

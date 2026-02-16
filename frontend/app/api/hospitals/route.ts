@@ -28,11 +28,34 @@ export interface Hospital {
   occupancy_updated?: string; // Timestamp of occupancy measurement
 }
 
+import { HospitalQuerySchema } from "@/utils/validations";
+
+import { checkRateLimit } from "@/utils/rate-limit";
+
 export async function GET(request: Request) {
+  // 1. Rate Limit
+  const rateLimitResponse = await checkRateLimit(request as any);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const sql = getDb();
     const { searchParams } = new URL(request.url);
-    const province = searchParams.get("province");
+    const rawParams = Object.fromEntries(searchParams.entries());
+
+    const validation = HospitalQuerySchema.safeParse(rawParams);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Validation Error",
+          details: validation.error.format(),
+        },
+        { status: 400 },
+      );
+    }
+
+    const { province } = validation.data;
 
     // Query hospitals with their most recent wait time and occupancy measurements
     let query = `

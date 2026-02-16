@@ -303,67 +303,60 @@ export default function Home() {
         showStats={!showHero}
       />
 
-      <div
-        className={clsx(
-          "flex-1 w-full flex flex-col relative",
-          showHero ? "overflow-y-auto" : "overflow-hidden",
-        )}
-      >
-        {/* Hero Section */}
-        {showHero && (
-          <div className="flex-shrink-0 animate-in fade-in slide-in-from-top-10 duration-500">
-            {loading ? (
-              <HeroSkeleton />
-            ) : (
+        <div
+          className={clsx(
+            "flex-1 w-full flex flex-col relative overflow-y-auto"
+          )}
+        >
+          {/* Hero Section */}
+          {showHero && (
+            <div className="flex-shrink-0 animate-in fade-in slide-in-from-top-10 duration-500">
               <Hero
                 hospitals={hospitals}
                 onExplore={handleExplore}
                 userLocation={userLocation}
+                loading={loading}
               />
-            )}
-            {!loading && <AboutSection />}
-            {!loading && featuredTestimonial && (
-              <div className="mx-auto w-full max-w-4xl px-4 pb-8">
-                <Testimonial testimonial={featuredTestimonial} />
-              </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
 
-        {/* Access Insights Section */}
-        {!showHero && !loading && (
-          <div className="flex-shrink-0 px-4 sm:px-6 lg:px-8 pt-6">
-            <div className="max-w-screen-2xl mx-auto">
-              <h2 className="text-lg font-semibold mb-4 text-foreground">
-                Access Insights
-              </h2>
-              <AccessInsightsSummary
-                hospitals={hospitals}
-                userLocation={userLocation}
-                province={selectedProvince}
-              />
-              <div className="mt-4">
-                <RegionDashboard
+          {/* Access Insights Section - Only show when Hero is dismissed */}
+          {!showHero && !loading && hospitals.length > 0 && (
+            <div className={clsx(
+              "flex-shrink-0 px-4 sm:px-6 lg:px-8 pt-6",
+              viewMode === "map" && "hidden lg:block"
+            )}>
+              <div className="max-w-screen-2xl mx-auto">
+                <h2 className="text-lg font-semibold mb-4 text-foreground">
+                  Access Insights
+                </h2>
+                <AccessInsightsSummary
+                  hospitals={hospitals}
+                  userLocation={userLocation}
                   province={selectedProvince}
-                  period={REGION_PERIOD}
-                  regions={regionRows}
-                  provinceMean={provinceRegionMean}
-                  loading={regionsLoading}
-                  selectedRegionId={selectedRegionId}
-                  onSelectRegion={setSelectedRegionId}
                 />
+                <div className="mt-4">
+                  <RegionDashboard
+                    province={selectedProvince}
+                    period={REGION_PERIOD}
+                    regions={regionRows}
+                    provinceMean={provinceRegionMean}
+                    loading={regionsLoading}
+                    selectedRegionId={selectedRegionId}
+                    onSelectRegion={setSelectedRegionId}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Main Split View Content - Responsive with max-width */}
-        <div
-          className={clsx(
-            "flex-1 min-h-0 p-4 sm:p-6 lg:p-8",
-            showHero && "h-[65vh] min-h-[65vh]", // Fixed height when scrolling to constrain map/list
           )}
-        >
+
+          {/* Main Split View Content - Responsive with max-width */}
+          <div
+            className={clsx(
+              "flex-1 p-4 sm:p-6 lg:p-8",
+              showHero ? "h-[45vh] min-h-[45vh]" : "h-full min-h-[650px]",
+            )}
+          >
           <div className="h-full max-w-screen-2xl mx-auto">
             {/* Desktop: Side by side | Mobile: Show one view at a time */}
             <div className="h-full flex gap-4 sm:gap-6 lg:gap-8">

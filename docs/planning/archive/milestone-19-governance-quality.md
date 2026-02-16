@@ -507,18 +507,18 @@ Update "Now" section to reflect completion. Move progress counter from 0/50 to 1
 - [x] commitlint config exists at repo root (via .pre-commit-config.yaml)
 
 ### README & Cross-References
-- [ ] README has CI, license, and project badges
-- [ ] README has Mermaid architecture diagram rendering correctly
-- [ ] README references LICENSE, SECURITY.md, CODE_OF_CONDUCT, CITATION.cff, CHANGELOG
-- [ ] CONTRIBUTING.md references CODE_OF_CONDUCT and issue/PR templates
+- [x] README has CI, license, and project badges
+- [x] README has Mermaid architecture diagram rendering correctly
+- [x] README references LICENSE, SECURITY.md, CODE_OF_CONDUCT, CITATION.cff, CHANGELOG
+- [x] CONTRIBUTING.md references CODE_OF_CONDUCT and issue/PR templates
 
 ### CI
-- [ ] `npm run build` succeeds
-- [ ] `npm run type-check` passes
-- [ ] `npm run test:unit` passes (no regressions)
-- [ ] `npm run lint` passes
-- [ ] Backend CI passes (ruff, mypy, pytest)
-- [ ] Docs CI passes
+- [x] `npm run build` succeeds
+- [x] `npm run type-check` passes
+- [x] `npm run test:unit` passes (no regressions)
+- [x] `npm run lint` passes
+- [x] Backend CI passes (ruff, mypy, pytest)
+- [x] Docs CI passes
 
 ---
 

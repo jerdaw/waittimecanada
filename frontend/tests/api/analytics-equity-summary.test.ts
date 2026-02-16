@@ -21,7 +21,7 @@ describe("Equity Summary API", () => {
 
     expect(response.status).toBe(400);
     expect(json.success).toBe(false);
-    expect(json.error).toBe("Missing required parameter");
+    expect(json.error).toBe("Validation Error");
   });
 
   it("returns not_available_yet for unsupported province", async () => {
