@@ -27,11 +27,11 @@ fi
 
 commit_message="$(git log -1 --pretty=%B "${current_ref}" 2>/dev/null || git log -1 --pretty=%B)"
 
-# Require explicit release intent in commit message to deploy production.
-if printf '%s' "${commit_message}" | grep -Eiq '\[(release|deploy)\]'; then
-  echo "[netlify-ignore] release tag detected in commit message -> allowing build"
+# Allow build if we are on the production branch.
+if [ "${branch}" == "${production_branch}" ]; then
+  echo "[netlify-ignore] production branch detected -> allowing build"
   exit 1
 fi
 
-echo "[netlify-ignore] missing release marker ([release] or [deploy]) -> skipping build"
+echo "[netlify-ignore] non-production branch -> skipping build"
 exit 0
