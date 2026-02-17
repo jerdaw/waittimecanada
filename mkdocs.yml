@@ -1,9 +1,10 @@
 site_name: WaitTime Canada
-site_url: https://waittime-canada.github.io/docs
+site_url: https://jerdaw.github.io/waittimecanada
 site_description: A clinically defensible Health Systems Observatory for Canadian ER wait times
-site_author: Your Name
-repo_url: https://github.com/YOUR_USERNAME/waittime-canada
-repo_name: waittime-canada
+site_author: Jeremy Dawson
+repo_url: https://github.com/jerdaw/waittimecanada
+repo_name: waittimecanada
+strict: true
 edit_uri: edit/main/docs/
 
 theme:
@@ -128,6 +129,7 @@ nav:
     - Data Ontology: architecture/data-ontology.md
     - Database: architecture/database.md
     - API: architecture/api.md
+    - OpenAPI Spec: openapi.yaml
     - Scrapers: architecture/scrapers.md
 
   - Development:
@@ -163,4 +165,4 @@ nav:
     - Database Migrations: guides/database-migrations.md
     - Troubleshooting: guides/troubleshooting.md
 
-copyright: Copyright &copy; 2024-2026 Your Name
+copyright: Copyright &copy; 2024-2026 Jeremy Dawson

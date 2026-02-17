@@ -59,6 +59,23 @@ jobs:
           # This could trigger alerts if multiple failures detected
           echo "Scraper run failed - check logs"
 
+      - name: Generate Freshness Badge
+        if: always()
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        working-directory: ./backend
+        run: |
+          python scripts/generate_freshness_badge.py freshness.json
+          cat freshness.json
+
+      - name: Upload Badge Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: freshness-badge
+          path: backend/freshness.json
+          retention-days: 1
+
       - name: Send Pushover alert on failure
         if: failure()
         env:

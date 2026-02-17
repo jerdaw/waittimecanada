@@ -8,9 +8,29 @@ afterEach(() => {
   cleanup();
 });
 
+import messages from '../messages/en.json';
+
+const getNestedValue = (obj: any, path: string) => {
+  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+};
+
 // Mock next-intl
 vi.mock('next-intl', () => ({
-  useTranslations: () => (key: string) => key,
+  useTranslations: (namespace?: string) => (key: string, params?: Record<string, string>) => {
+    const fullPath = namespace ? `${namespace}.${key}` : key;
+    let value = getNestedValue(messages, fullPath);
+
+    // Fallback if not found (return key or path)
+    if (!value) return key;
+
+    // Handle interpolation if params exist and value is a string
+    if (params && typeof value === 'string') {
+      Object.entries(params).forEach(([k, v]) => {
+        value = value.replace(`{${k}}`, v as string);
+      });
+    }
+    return value;
+  },
   useLocale: () => 'en',
   useTimeZone: () => 'America/Toronto',
 }));

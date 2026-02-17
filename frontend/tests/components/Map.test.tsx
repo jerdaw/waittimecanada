@@ -217,18 +217,19 @@ describe("Map Component", () => {
     expect(screen.getByText("Call Health Info")).toBeInTheDocument();
   });
 
-  it("loads equity layer when income overlay is enabled", async () => {
-    render(<Map {...defaultProps} hospitals={mockHospitals} />);
+  // Equity Layer Toggle is currently commented out in Map.tsx
+  // it("loads equity layer when income overlay is enabled", async () => {
+  //   render(<Map {...defaultProps} hospitals={mockHospitals} />);
 
-    fireEvent.click(
-      screen.getByRole("button", { name: "Enable income overlay" }),
-    );
+  //   fireEvent.click(
+  //     screen.getByRole("button", { name: "Enable income overlay" }),
+  //   );
 
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
-        "/api/equity-layer?province=ON",
-      );
-    });
-    expect(screen.getByText("Income Quintile")).toBeInTheDocument();
-  });
+  //   await waitFor(() => {
+  //     expect(global.fetch).toHaveBeenCalledWith(
+  //       "/api/equity-layer?province=ON",
+  //     );
+  //   });
+  //   expect(screen.getByText("Income Quintile")).toBeInTheDocument();
+  // });
 });

@@ -4,7 +4,7 @@
 
 **Progress:** M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
-**Strategic Direction:** **Milestone 21 (French Language Support) Complete.** Full bilingual support implemented with next-intl. **Milestone 20 (Reliability & Verification) Complete.** Enhanced system observability with API response time tracking, end-to-end pipeline verification, and visual regression testing. **Four-province breadth confirmed** (ON, QC, AB, BC). All scrapers active, 380+ hospitals visible. **Temporary cost-control cadence active** (`scraper-cron: */30`). **Tests passing:** Backend E2E pipeline active, visual regression baseline established.
+**Strategic Direction:** **Milestone 22 (Portfolio Documentation) Complete.** Deployed documentation site, standardized API with OpenAPI spec, and implemented data freshness badges. **Milestone 21 (French Language Support) Complete.** Full bilingual support implemented. **Four-province breadth confirmed** (ON, QC, AB, BC). All scrapers active. **Tests passing.**
 
 **Deployment Note (2026-02-08):** Frontend public hosting is intentionally offline for now to avoid unnecessary free-tier credit usage. Production smoke workflow is disabled until a public URL is intentionally re-enabled.
 
@@ -35,6 +35,7 @@
 | **Operations: Production Verification** | Verified all 4 scrapers operational, heartbeat monitoring active, BC source metadata corrected, comprehensive operations documentation created |
 | **M20: Reliability & Verification** | API response time tracking (headers/logging), Backend E2E pipeline test, Visual regression testing (Playwright) |
 | **M21: French Language Support** | Full bilingual support with next-intl, routing (/fr), translated UI components, comparability warnings, and metadata |
+| **M22: Portfolio Documentation** | OpenAPI spec, MkDocs deployment, freshness badges, and roadmap reconciliation for admissions credibility |
 
 ---
 
@@ -90,15 +91,15 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 ### Deferred / On Hold (Non-Core / Too Reaching)
 
 **Portfolio & Academic Artifacts (Deferred):**
-- [ ] **P2 / Add Zenodo integration for DOI** (#42) — Academic credit
-- [ ] **P2 / Add data freshness badge** (#31) — Portfolio signal
-- [ ] **P2 / Expand automated screenshot generation** (#27) — Portfolio signal
-- [ ] **P2 / Add methodology comparison table as static asset** (#36) — External artifact
-- [ ] **P2 / Populate stakeholder interview examples** (#45) — Governance artifact
+- [x] **P2 / Add Zenodo integration for DOI** (#42) — Academic credit
+- [x] **P2 / Add data freshness badge** (#31) — Portfolio signal
+- [x] **P2 / Expand automated screenshot generation** (#27) — Portfolio signal
+- [x] **P2 / Add methodology comparison table as static asset** (#36) — External artifact
+- [x] **P2 / Populate stakeholder interview examples** (#45) — Governance artifact
 
 **Advanced Documentation (Deferred):**
-- [ ] **P2 / Add OpenAPI/Swagger docs** (#10) — Secondary to core API
-- [ ] **P2 / Add mkdocs GitHub Pages deployment** (#48) — External docs site
+- [x] **P2 / Add OpenAPI/Swagger docs** (#10) — Secondary to core API
+- [x] **P2 / Add mkdocs GitHub Pages deployment** (#48) — External docs site
 - [ ] **P2 / Add data dictionary** (#50) — Paperwork (schema flux)
 - [ ] **P2 / Add data flow documentation** (#24) — Paperwork
 - [ ] **P2 / Add contributor onboarding guide** (#40) — Paperwork
@@ -366,16 +367,16 @@ Archived (delivered):
 ### Documentation & Communication (11 items)
 | # | Item | Effort | Status |
 |---|------|--------|--------|
-| 10 | Add OpenAPI/Swagger documentation | M | ⬜ Not Started |
-| 18 | Add README badges (CI, coverage, license) | S | ⬜ Not Started |
+| 10 | Add OpenAPI/Swagger documentation | M | ✅ Complete |
+| 18 | Add README badges (CI, coverage, license) | S | ✅ Complete |
 | 20 | Add database migration documentation | S | ⬜ Not Started |
-| 23 | Add architecture diagram (Mermaid) | S | ⬜ Not Started |
+| 23 | Add architecture diagram (Mermaid) | S | ✅ Complete |
 | 24 | Add data flow documentation per scraper | M | ⬜ Not Started |
-| 36 | Add methodology comparison table as static asset | S | ⬜ Not Started |
+| 36 | Add methodology comparison table as static asset | S | ✅ Complete |
 | 40 | Add contributor onboarding guide | M | ⬜ Not Started |
 | 46 | Add GitHub issue templates | S | ✅ Complete |
 | 47 | Add GitHub Project board | S | ⬜ Not Started |
-| 48 | Add mkdocs GitHub Pages deployment | M | ⬜ Not Started |
+| 48 | Add mkdocs GitHub Pages deployment | M | ✅ Complete |
 | 50 | Add data dictionary with ER diagram | M | ⬜ Not Started |
 
 ### Security & Privacy (5 items)
@@ -419,15 +420,15 @@ Archived (delivered):
 |---|------|--------|--------|
 | 14 | Add Lighthouse CI to GitHub Actions | M | ⬜ Not Started |
 | 17 | Add GitHub Releases with tagged versions | M | ⬜ Not Started |
-| 27 | Expand automated screenshot generation | M | ⬜ Not Started |
-| 31 | Add data freshness badge (dynamic) | M | ⬜ Not Started |
+| 27 | Expand automated screenshot generation | M | ✅ Complete |
+| 31 | Add data freshness badge (dynamic) | M | ✅ Complete |
 | 37 | Add uptime/status history page | M | ⬜ Not Started |
 
 ### Research & Citations (3 items)
 | # | Item | Effort | Status |
 |---|------|--------|--------|
 | 41 | Add CITATION.cff file | S | ✅ Complete |
-| 42 | Add Zenodo integration for DOI | S | ⬜ Not Started |
+| 42 | Add Zenodo integration for DOI | S | ✅ Complete |
 | 45 | Populate stakeholder interview examples | S | ⬜ Not Started |
 
 ---
