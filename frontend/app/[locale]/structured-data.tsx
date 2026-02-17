@@ -1,32 +1,35 @@
 import Script from "next/script";
+import { useTranslations } from "next-intl";
 
 export function StructuredData() {
+  const t = useTranslations('StructuredData');
+
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     mainEntity: [
       {
         "@type": "Question",
-        name: "How does WaitTime Canada measure ER wait times?",
+        name: t('faq.q1'),
         acceptedAnswer: {
           "@type": "Answer",
-          text: "We aggregate data from provincial health authorities. For Ontario, we report P90 (90th percentile) wait times from triage to physician assessment.",
+          text: t('faq.a1'),
         },
       },
       {
         "@type": "Question",
-        name: "Why can't I compare Ontario and Quebec wait times directly?",
+        name: t('faq.q2'),
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Ontario reports P90 (90th percentile) triage-to-physician times, while Quebec reports rolling average registration-to-physician times. These different methodologies mean direct comparison is statistically invalid.",
+          text: t('faq.a2'),
         },
       },
       {
         "@type": "Question",
-        name: "Is this data real-time?",
+        name: t('faq.q3'),
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Yes, we scrape official provincial data sources every 15 minutes. Check the 'Updated' timestamp on each hospital card for specific data freshness.",
+          text: t('faq.a3'),
         },
       },
     ],
@@ -36,8 +39,7 @@ export function StructuredData() {
     "@context": "https://schema.org",
     "@type": "MedicalWebPage",
     name: "WaitTime Canada",
-    description:
-      "Real-time emergency room wait times and methodology auditing for Canadian hospitals.",
+    description: t('medicalPage.desc'),
     audience: {
       "@type": "Patient",
       audienceType: "public",
@@ -64,18 +66,18 @@ export function StructuredData() {
     step: [
       {
         "@type": "HowToStep",
-        name: "Allow location access",
-        text: "Optionally enable browser geolocation to see hospitals sorted by distance.",
+        name: t('howTo.step1.name'),
+        text: t('howTo.step1.text'),
       },
       {
         "@type": "HowToStep",
-        name: "Browse wait time data",
-        text: "Explore the publicly reported wait times from official provincial health sources.",
+        name: t('howTo.step2.name'),
+        text: t('howTo.step2.text'),
       },
       {
         "@type": "HowToStep",
-        name: "Understand the methodology",
-        text: "Click on a hospital to learn how its wait time is measured and reported by provincial authorities.",
+        name: t('howTo.step3.name'),
+        text: t('howTo.step3.text'),
       },
     ],
   };

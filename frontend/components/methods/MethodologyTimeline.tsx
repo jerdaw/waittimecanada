@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 interface MethodologyEvent {
   id: number;
@@ -28,6 +29,7 @@ interface MethodologyTimelineProps {
 export function MethodologyTimeline({
   sources = [],
 }: MethodologyTimelineProps) {
+  const t = useTranslations('Methods.MethodologyTimeline');
   const [events, setEvents] = useState<MethodologyEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,11 +70,7 @@ export function MethodologyTimeline({
 
   // Helper to format date
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    return new Date(dateString).toLocaleDateString();
   };
 
   if (loading) {
@@ -86,7 +84,7 @@ export function MethodologyTimeline({
   if (error) {
     return (
       <div className="text-center py-8 text-red-600">
-        Error loading methodology changes: {error}
+        {t('error', {message: error})}
       </div>
     );
   }
@@ -100,7 +98,7 @@ export function MethodologyTimeline({
             htmlFor="source-filter"
             className="text-sm font-medium text-slate-700"
           >
-            Filter by province:
+            {t('filter')}
           </label>
           <select
             id="source-filter"
@@ -108,7 +106,7 @@ export function MethodologyTimeline({
             onChange={(e) => setSelectedSource(e.target.value)}
             className="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="all">All provinces</option>
+            <option value="all">{t('allProvinces')}</option>
             {sources.map((source) => (
               <option key={source.id} value={source.id}>
                 {source.province}
@@ -134,10 +132,9 @@ export function MethodologyTimeline({
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <p className="font-medium">No methodology changes detected</p>
+          <p className="font-medium">{t('noEvents.title')}</p>
           <p className="text-sm mt-1">
-            The system continuously monitors for distributional shifts. Changes
-            will appear here when detected.
+            {t('noEvents.description')}
           </p>
         </div>
       ) : (
@@ -161,7 +158,7 @@ export function MethodologyTimeline({
                         {getSourceName(event.source_id)}
                       </h4>
                       <p className="text-sm text-slate-500">
-                        Detected {formatDate(event.detected_at)}
+                        {t('detected', {date: formatDate(event.detected_at)})}
                       </p>
                     </div>
                     <div
@@ -185,7 +182,7 @@ export function MethodologyTimeline({
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                     <div>
                       <p className="text-xs text-slate-500 mb-1">
-                        Previous Period
+                        {t('previousPeriod')}
                       </p>
                       <p className="text-sm font-medium text-slate-900">
                         {event.previous_period.mean.toFixed(0)} min
@@ -197,7 +194,7 @@ export function MethodologyTimeline({
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 mb-1">
-                        Current Period
+                        {t('currentPeriod')}
                       </p>
                       <p className="text-sm font-medium text-slate-900">
                         {event.current_period.mean.toFixed(0)} min
@@ -211,8 +208,7 @@ export function MethodologyTimeline({
 
                   {/* Metadata */}
                   <div className="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-500">
-                    Analyzed {event.hospitals_analyzed} hospital
-                    {event.hospitals_analyzed !== 1 ? "s" : ""}
+                    {event.hospitals_analyzed !== 1 ? t('analyzedPlural', {count: event.hospitals_analyzed}) : t('analyzed', {count: event.hospitals_analyzed})}
                   </div>
                 </div>
               </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ViewMode, ViewToggle } from "./ViewToggle";
 import { ThemeToggle } from "./ThemeToggle";
+import { useTranslations } from "next-intl";
 
 interface HeaderProps {
   viewMode?: ViewMode;
@@ -22,6 +23,9 @@ export function Header({
   liveCount,
   showStats = false,
 }: HeaderProps) {
+  const t = useTranslations('Header');
+  const tCommon = useTranslations('Common');
+
   return (
     <header className="sticky top-0 z-30 w-full border-b border-border/40 bg-background/70 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm transition-all">
       {/* Main Header Row */}
@@ -51,10 +55,10 @@ export function Header({
           </div>
           <div className="hidden sm:block">
             <span className="font-bold text-base tracking-tight">
-              WaitTime Canada
+              {tCommon('title')}
             </span>
           </div>
-          <span className="font-bold text-base sm:hidden">WTC</span>
+          <span className="font-bold text-base sm:hidden">{t('mobileLogo')}</span>
         </Link>
 
         {/* Central Search Bar - Only shown when showStats is true */}
@@ -77,7 +81,7 @@ export function Header({
               </svg>
               <input
                 type="text"
-                placeholder="Search hospitals..."
+                placeholder={t('searchExample')}
                 className="w-full pl-9 pr-8 py-2 rounded-lg border border-border bg-muted/30 focus:bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 outline-none text-sm"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
@@ -119,25 +123,25 @@ export function Header({
               href="/data-quality"
               className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >
-              Data Quality
+              {tCommon('nav.dataQuality')}
             </Link>
             <Link
               href="/methods"
               className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >
-              Methods
+              {tCommon('nav.methodology')}
             </Link>
             <Link
               href="/analytics"
               className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >
-              Analytics
+              {tCommon('nav.analytics')}
             </Link>
             <Link
               href="/faq"
               className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >
-              FAQ
+              {tCommon('nav.faq')}
             </Link>
           </nav>
           <ThemeToggle />
@@ -151,7 +155,7 @@ export function Header({
             {/* Stats */}
             <div className="flex items-center gap-4 text-xs sm:text-sm">
               <div className="flex items-center gap-1.5">
-                <span className="text-muted-foreground">Hospitals:</span>
+                <span className="text-muted-foreground">{t('stats.hospitals')}</span>
                 <span className="font-semibold tabular-nums">
                   {hospitalCount ?? "--"}
                 </span>
@@ -161,7 +165,7 @@ export function Header({
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
                 </span>
-                <span className="text-muted-foreground">Live:</span>
+                <span className="text-muted-foreground">{t('stats.live')}</span>
                 <span className="font-semibold text-success tabular-nums">
                   {liveCount ?? "--"}
                 </span>
@@ -188,7 +192,7 @@ export function Header({
                   </svg>
                   <input
                     type="text"
-                    placeholder="Search..."
+                    placeholder={t('searchMobile')}
                     className="w-full pl-8 pr-2 py-1.5 rounded-md border border-border bg-background text-xs"
                     value={searchQuery}
                     onChange={(e) => onSearchChange(e.target.value)}

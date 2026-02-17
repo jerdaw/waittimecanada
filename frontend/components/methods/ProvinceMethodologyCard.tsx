@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 interface Source {
   id: string;
   name: string;
@@ -45,39 +47,10 @@ const provinceColors: Record<
   },
 };
 
-const metricFamilyDescriptions: Record<string, string> = {
-  TIME_TO_PROVIDER:
-    "Time until first contact with physician or healthcare provider",
-  TOTAL_LOS: "Complete length of stay in emergency department",
-  STRETCHER_OCCUPANCY: "Percentage of stretchers currently occupied",
-};
-
-const startEventDescriptions: Record<string, string> = {
-  TRIAGE: "Clock starts when patient completes triage assessment",
-  REGISTRATION: "Clock starts when patient registers at ED",
-  DOOR: "Clock starts when patient enters ED",
-  UNKNOWN: "Start point varies or is not standardized",
-};
-
-const endEventDescriptions: Record<string, string> = {
-  PHYSICIAN: "Clock stops at first physician contact",
-  PROVIDER: "Clock stops at first healthcare provider contact (MD, NP, PA)",
-  DISCHARGE: "Clock stops when patient is discharged",
-  FIRST_ASSESSMENT: "Clock stops at initial clinical assessment",
-};
-
-const statisticTypeDescriptions: Record<string, string> = {
-  P90: "90th percentile - 9 out of 10 patients seen faster than this",
-  MEDIAN: "50th percentile - typical middle-of-the-road wait time",
-  MEAN: "Average of all wait times",
-  ROLLING_AVG: "Moving average over recent time period",
-  ALGORITHMIC: "Calculated estimate based on current conditions",
-  POINT_ESTIMATE: "Real-time snapshot of current wait",
-};
-
 export function ProvinceMethodologyCard({
   source,
 }: ProvinceMethodologyCardProps) {
+  const t = useTranslations('Methods.ProvinceMethodologyCard');
   const colors = provinceColors[source.province] || {
     bg: "bg-slate-50",
     border: "border-slate-200",
@@ -104,22 +77,22 @@ export function ProvinceMethodologyCard({
         <MethodologyField
           label="Metric Family"
           value={source.default_metric_family}
-          description={metricFamilyDescriptions[source.default_metric_family]}
+          description={t(`metricFamily.${source.default_metric_family}`)}
         />
         <MethodologyField
           label="Start Event"
           value={source.default_start_event}
-          description={startEventDescriptions[source.default_start_event]}
+          description={t(`startEvent.${source.default_start_event}`)}
         />
         <MethodologyField
           label="End Event"
           value={source.default_end_event}
-          description={endEventDescriptions[source.default_end_event]}
+          description={t(`endEvent.${source.default_end_event}`)}
         />
         <MethodologyField
           label="Statistic Type"
           value={source.default_statistic_type}
-          description={statisticTypeDescriptions[source.default_statistic_type]}
+          description={t(`statisticType.${source.default_statistic_type}`)}
         />
       </div>
 
@@ -135,7 +108,7 @@ export function ProvinceMethodologyCard({
               ${colors.accent} hover:underline
             `}
           >
-            View Official Methodology
+            {t('viewOfficial')}
             <svg
               className="w-4 h-4"
               fill="none"
@@ -152,7 +125,7 @@ export function ProvinceMethodologyCard({
           </a>
         ) : (
           <span className="text-sm text-slate-500">
-            Official methodology documentation not available
+            {t('notAvailable')}
           </span>
         )}
       </div>

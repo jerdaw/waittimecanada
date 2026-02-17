@@ -4,7 +4,7 @@
 
 **Progress:** M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
-**Strategic Direction:** **Four-province breadth achieved** (ON, QC, AB, BC). All four scrapers active in production via GitHub Actions, 380+ hospitals visible across all provinces, methodology documentation complete for all provinces, regional analytics data seeded for 15 regions. **Quebec stretcher occupancy fully operational end-to-end** - scraper extraction, API endpoint, and visual indicators on hospital cards. **Heartbeat monitoring operational** with Pushover alerting for stale data. **Temporary cost-control cadence is active as of February 14, 2026** (`scraper-cron: */30`, heartbeat `--max-age 90`) due to Neon transfer usage. **All 662 tests passing** (375 backend + 287 frontend) with 77% backend coverage.
+**Strategic Direction:** **Milestone 21 (French Language Support) Complete.** Full bilingual support implemented with next-intl. **Milestone 20 (Reliability & Verification) Complete.** Enhanced system observability with API response time tracking, end-to-end pipeline verification, and visual regression testing. **Four-province breadth confirmed** (ON, QC, AB, BC). All scrapers active, 380+ hospitals visible. **Temporary cost-control cadence active** (`scraper-cron: */30`). **Tests passing:** Backend E2E pipeline active, visual regression baseline established.
 
 **Deployment Note (2026-02-08):** Frontend public hosting is intentionally offline for now to avoid unnecessary free-tier credit usage. Production smoke workflow is disabled until a public URL is intentionally re-enabled.
 
@@ -33,6 +33,8 @@
 | **M19: Governance & Quality** | Added LICENSE, SECURITY.md, CODE_OF_CONDUCT, CITATION.cff, CHANGELOG, dependabot, issue/PR templates, error boundaries, and loading states |
 | **Operations: Test Stabilization** | Resolved intermittent Map legend failures, optimized viewport constraints (45vh Hero), restored aria-labels for toggles, verified full suite (15/15 passing) |
 | **Operations: Production Verification** | Verified all 4 scrapers operational, heartbeat monitoring active, BC source metadata corrected, comprehensive operations documentation created |
+| **M20: Reliability & Verification** | API response time tracking (headers/logging), Backend E2E pipeline test, Visual regression testing (Playwright) |
+| **M21: French Language Support** | Full bilingual support with next-intl, routing (/fr), translated UI components, comparability warnings, and metadata |
 
 ---
 
@@ -75,10 +77,15 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 - [x] **P0 / Verification: AB hospital vs AHS** — Verified exact match
 - [x] **P0 / Verification: BC hospital vs edwaittimes.ca** — Verified close match
 
+**PRIORITY 0: High-Value Expansion (Active)**
+- [x] **P0 / French language support (i18n)** (M21) — Full bilingual support with next-intl.
+  - **Plan:** `docs/planning/archive/milestone-21-i18n.md`
+  - **Status:** Complete
+
 **PRIORITY 1: Engineering Reliability (Local)**
-- [ ] **P1 / Add end-to-end pipeline test** (#39) — Mock scrape → DB insert → API → render (4-8h)
-- [ ] **P1 / Add API response time tracking** (#49) — Timing middleware (2-3h)
-- [ ] **P2 / Visual regression testing** (#33) — Scaffold for screenshot comparison (High maintenance)
+- [x] **P1 / Add end-to-end pipeline test** (#39) — Mock scrape → DB insert → API → render (4-8h)
+- [x] **P1 / Add API response time tracking** (#49) — Timing middleware (2-3h)
+- [x] **P2 / Visual regression testing** (#33) — Scaffold for screenshot comparison (High maintenance)
 
 ### Deferred / On Hold (Non-Core / Too Reaching)
 
@@ -133,10 +140,7 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 ### Later (6+ weeks) — Strategic Enhancements
 
 **High-Value Expansion Features:**
-- [ ] **P1 / French language support (i18n)** — next-intl with bilingual methodology warnings, emergency disclaimers, UI chrome (1-2w)
-  - **Category:** Impact/Adoption | **CanMEDS:** Health Advocate, Collaborator
-  - **Why:** Quebec hospitals serve French-speaking populations; demonstrates cultural competency
-  - **Deliverables:** `/fr` route prefix, bilingual methodology warnings, language toggle, translated emergency banner
+
 
 **Future Feature Development:**
 - [ ] **P2 / Additional provinces** — Nova Scotia, New Brunswick scrapers with methodology documentation
@@ -381,7 +385,7 @@ Archived (delivered):
 | 12 | Add Dependabot/Renovate config | S | ✅ Complete |
 | 16 | Add Content Security Policy headers | S | ✅ Complete |
 | 28 | Add CORS configuration | S | ✅ Complete |
-| 49 | Add API response time tracking | S | ⬜ Not Started |
+| 49 | Add API response time tracking | S | ✅ Complete |
 
 ### Frontend Quality (9 items)
 | # | Item | Effort | Status |
@@ -391,7 +395,7 @@ Archived (delivered):
 | 7 | Add French language support (i18n) | L | ⬜ Not Started |
 | 15 | Add robots.txt and dynamic sitemap | S | ✅ Complete |
 | 19 | Add loading states for all pages | S | ✅ Complete |
-| 33 | Add visual regression testing | M | ⬜ Not Started |
+| 33 | Add visual regression testing | M | ✅ Complete |
 | 34 | Add TypeScript strict mode audit | S | ⬜ Not Started |
 | 44 | Add mobile-responsive testing | M | ⬜ Not Started |
 | 25 | Add structured logging to frontend API routes | S | ⬜ Not Started |
@@ -407,7 +411,7 @@ Archived (delivered):
 | 32 | Add property-based testing (Hypothesis) | M | ⬜ Not Started |
 | 35 | Add backend mypy strict mode | M | ⬜ Not Started |
 | 38 | Add database index optimization | S | ⬜ Not Started |
-| 39 | Add end-to-end data pipeline test | M | ⬜ Not Started |
+| 39 | Add end-to-end data pipeline test | M | ✅ Complete |
 | 43 | Add data quality drift monitoring | M | ⬜ Not Started |
 
 ### CI/CD & Automation (5 items)

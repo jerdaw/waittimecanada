@@ -1,0 +1,536 @@
+{
+  "Common": {
+    "title": "WaitTime Canada",
+    "description": "Un observatoire des systèmes de santé auditant les temps d'attente aux urgences à travers le Canada avec transparence méthodologique.",
+    "emergency": {
+      "label": "Urgence ?",
+      "call": "Appelez le",
+      "number": "911",
+      "text": "immédiatement. Les temps d'attente sont à titre informatif seulement.",
+      "disclaimer": "Ceci n'est pas un avis médical. Appelez le 911 en cas d'urgence."
+    },
+    "nav": {
+      "methodology": "Méthodologie",
+      "analytics": "Analytique",
+      "dataQuality": "Qualité des données",
+      "faq": "FAQ",
+      "resources": "Ressources",
+      "project": "Projet",
+      "github": "Dépôt GitHub",
+      "privacy": "Politique de confidentialité",
+      "terms": "Conditions d'utilisation"
+    },
+    "footer": {
+      "dataSources": "Données provenant des autorités sanitaires provinciales officielles.",
+      "copyright": "© {year} WaitTime Canada. Licence MIT."
+    }
+  },
+  "Header": {
+    "mobileLogo": "WTC",
+    "searchExample": "Rechercher un hôpital...",
+    "searchMobile": "Rechercher...",
+    "stats": {
+      "hospitals": "Hôpitaux :",
+      "live": "En direct :"
+    }
+  },
+  "Hero": {
+    "badge": "Données Urgences Canada en temps réel",
+    "title": "Canada",
+    "subtitle": "Observatoire des",
+    "subtitle2": "Temps d'Attente",
+    "description": "Explorez les données publiques sur les temps d'attente provenant de sources provinciales officielles. Parcourez {count} hôpitaux canadiens et comparez les méthodologies.",
+    "cta": {
+      "explore": "Explorer les Hôpitaux",
+      "methodologies": "Comprendre les Méthodologies"
+    },
+    "card": {
+      "nearest": "Urgence la plus proche",
+      "featured": "En vedette",
+      "live": "EN DIRECT",
+      "min": "min",
+      "p90": "Performance P90",
+      "updatedNow": "Mis à jour à l'instant",
+      "loading": "Chargement des données..."
+    }
+  },
+  "SystemStatus": {
+    "checking": "Vérification...",
+    "healthy": "Systèmes opérationnels",
+    "degraded": "Données possiblement périmées",
+    "down": "Données indisponibles",
+    "updatedAgo": "(mis à jour il y a {minutes}m)"
+  },
+  "ExpandedCardDetails": {
+    "metric": "Métrique",
+    "status": "Statut",
+    "statusLive": "Données en direct",
+    "statusStale": "Données périmées",
+    "medicalAdvice": "Besoin d'un avis médical ?",
+    "callNurse": "Appelez le {number} pour parler à une infirmière (24/7).",
+    "directions": "Itinéraire",
+    "callHealthInfo": "Appeler Info-Santé",
+    "lastUpdated": "Dernière mise à jour : {time}",
+    "methodology": {
+      "registrationToDoctor": "Inscription au médecin",
+      "triageToDoctor": "Triage au médecin"
+    }
+  },
+
+  "HospitalList": {
+    "liveOnly": "En direct seulement",
+    "results": "{count} résultats",
+    "qcOccupancy": {
+      "label": "Occupation des civières :",
+      "text": "Le Québec signale la capacité des urgences en temps réel. >100% indique un surpeuplement."
+    },
+    "empty": {
+      "title": "Aucun hôpital trouvé",
+      "clearSearch": "Effacer la recherche"
+    }
+  },
+  "HospitalCard": {
+    "min": "min",
+    "live": "EN DIRECT",
+    "patientsWaiting": "Patients en attente",
+    "methodology": "Méthodologie"
+  },
+  "ViewToggle": {
+    "list": "Liste",
+    "map": "Carte",
+    "split": "Partagé"
+  },
+  "Map": {
+    "loading": {
+      "title": "Initialisation de la carte...",
+      "subtitle": "Chargement des emplacements et données régionales..."
+    },
+    "error": {
+      "title": "Impossible de charger la carte",
+      "tokenTitle": "Jeton Mapbox requis",
+      "tokenMessage": "Ajoutez votre jeton Mapbox pour voir la carte interactive."
+    },
+    "legend": {
+      "title": "Temps d'Attente",
+      "short": "< 60 min",
+      "moderate": "60-120 min",
+      "long": "> 120 min",
+      "shortDesc": "Attente courte",
+      "moderateDesc": "Modéré",
+      "longDesc": "Attente longue"
+    },
+    "popup": {
+      "noData": "Aucune donnée",
+      "shortWait": "Attente courte",
+      "moderateWait": "Attente modérée",
+      "longWait": "Attente longue",
+      "min": "min",
+      "noDataAvailable": "Aucune donnée disponible",
+      "methodology": "MÉTHODOLOGIE",
+      "measure": "Mesure :",
+      "type": "Type :",
+      "updated": "Mise à jour {time}",
+      "directions": "Itinéraire",
+      "callHealthInfo": "Appeler Info-Santé",
+      "needAdvice": "Besoin d'un avis médical ?",
+      "call": "Appelez"
+    },
+    "freshness": {
+      "stale": "Données possiblement périmées",
+      "updated": "Mis à jour {time}"
+    },
+    "ontology": {
+      "triage": "Triage",
+      "registration": "Inscription",
+      "door": "Porte",
+      "arrival": "Arrivée",
+      "physician": "Médecin",
+      "provider": "Prestataire",
+      "discharge": "Départ",
+      "firstAssessment": "Première évaluation",
+      "p90": "90e centile",
+      "mean": "Moyenne",
+      "median": "Médiane",
+      "p95": "95e centile",
+      "pointEstimate": "Estimation actuelle",
+      "rollingAvg": "Moyenne mobile",
+      "algorithmic": "Estimation calculée",
+      "unknown": "Inconnu"
+    }
+  },
+  "RegionDashboard": {
+    "title": "Intelligence Régionale",
+    "subtitle": "Régions sanitaires de {province}, moyennes {period}",
+    "clearFilter": "Effacer le filtre régional",
+    "provinceMean": "Moyenne régionale provinciale :",
+    "mappingCoverage": "Couverture cartographique :",
+    "incompleteMetrics": "— les métriques régionales peuvent être incomplètes.",
+    "loading": "Chargement des analyses régionales...",
+    "metrics": {
+      "mean": "Moyenne",
+      "median": "Médiane",
+      "best": "Meilleur",
+      "worst": "Pire"
+    },
+    "reporting": "Hôpitaux signalant :",
+    "trend": {
+      "improving": "Amélioration {percent}",
+      "worsening": "Détérioration {percent}",
+      "stable": "Stable"
+    }
+  },
+  "AccessInsights": {
+    "disclaimer": "Estimations logistiques seulement. Ne retardez jamais les soins pour le coût. Appelez le 911 en cas d'urgence.",
+    "stats": {
+      "erWithin30km": "Urgences à moins de 30km",
+      "totalHospitals": "sur {total} au total",
+      "avgCost": "Coût d'accès moyen",
+      "costDesc": "Carburant + Stationnement (rayon 30km)",
+      "nearestEr": "Urgence la plus proche"
+    },
+    "noErNearby": "Note : Aucune urgence à moins de 30 km. L'urgence la plus proche est à {distance} km à {city}.",
+    "costRange": "Les coûts d'accès varient de {min} $ (plus proche) à {max} $ (plus éloigné dans les 30 km). Les coûts incluent le carburant ({price} $/L en {province}) et le stationnement.",
+    "noHospitals": "Aucun hôpital disponible pour calculer les informations d'accès",
+    "enableLocation": {
+      "title": "Activez l'accès à la localisation pour voir vos informations personnelles",
+      "subtitle": "Nous vous montrerons combien d'urgences sont à proximité et les coûts de déplacement estimés"
+    },
+    "equity": {
+      "title": "Aperçu de l'accès équitable (7j)",
+      "description": "Lien au niveau du secteur entre les zones à faible revenu (quintiles 1-2) et les temps d'attente des urgences à proximité.",
+      "loading": "Chargement du résumé...",
+      "unavailable": "Aucun résumé disponible.",
+      "notReady": "Résumé non disponible pour le moment",
+      "lowIncomeTracts": "Secteurs à faible revenu",
+      "tractsCount": "sur {total} secteurs",
+      "hospitalsNear": "Hôpitaux à proximité",
+      "withinKm": "dans un rayon de {distance} km",
+      "waitGap": "Écart d'attente vs Province",
+      "reportingCount": "Hôpitaux signalant : {count}",
+      "nearTractMean": "Attente moyenne secteur :",
+      "provinceMean": "Attente moyenne province :",
+      "placeholder": "Jeu de données fictif utilisé. Remplacer par les données liées de Statistique Canada avant de tirer des conclusions."
+    }
+  },
+  "HomePage": {
+    "footer": {
+      "methodology": "Méthodologie"
+    },
+    "accessInsights": "Aperçu de l'Accès"
+  },
+  "AboutSection": {
+    "badge": "À Propos",
+    "title": "Pourquoi j'ai créé WaitTime Canada",
+    "p1": "En tant qu'étudiant en prémédecine, j'ai remarqué quelque chose de troublant : les provinces canadiennes rapportent les temps d'attente aux urgences en utilisant des <strong>méthodologies complètement différentes</strong>. L'Ontario mesure du triage au médecin (90e centile). Le Québec mesure de l'inscription au médecin (moyenne mobile). Ces chiffres ne peuvent pas être comparés directement, mais la plupart des applications les présentent côte à côte.",
+    "p2": "<strong>WaitTime Canada est différent.</strong> Au lieu de prétendre que les données sont comparables, nous les auditons. Nous marquons chaque mesure avec sa méthodologie et avertissons les utilisateurs lorsque la comparaison directe est statistiquement invalide. C'est ce que j'appelle un « Observatoire des Systèmes de Santé » — un outil qui expose la boîte noire des rapports de santé.",
+    "p3": "Ce projet démontre mon approche de la médecine : méthodologie rigoureuse, transparence sur les limites et engagement à aider les patients à prendre des décisions éclairées, même lorsque cela signifie leur dire ce que nous ne <em>savons pas</em>.",
+    "aria": {
+      "expand": "Développer la section à propos",
+      "collapse": "Réduire la section à propos",
+      "avatar": "Avatar de l'auteur",
+      "github": "Voir sur GitHub",
+      "linkedin": "Profil LinkedIn",
+      "email": "Contact courriel"
+    },
+    "author": {
+      "name": "Jeremy Dawson",
+      "role": "Étudiant en Prémédecine"
+    }
+  },
+  "RegionSelector": {
+    "label": "Région",
+    "allRegions": "Toutes les Régions"
+  },
+  "Testimonial": {
+    "label": "Retour des Parties Prenantes",
+    "anonymous": "Anonyme"
+  },
+  "StructuredData": {
+    "faq": {
+      "q1": "Comment WaitTime Canada mesure-t-il les temps d'attente aux urgences ?",
+      "a1": "Nous agrégeons les données des autorités sanitaires provinciales. Pour l'Ontario, nous rapportons les temps d'attente au 90e centile (P90) du triage à l'évaluation par un médecin.",
+      "q2": "Pourquoi ne puis-je pas comparer directement les temps d'attente de l'Ontario et du Québec ?",
+      "a2": "L'Ontario rapporte les temps P90 (90e centile) du triage au médecin, tandis que le Québec rapporte la moyenne mobile de l'inscription au médecin. Ces méthodologies différentes rendent la comparaison directe statistiquement invalide.",
+      "q3": "Ces données sont-elles en temps réel ?",
+      "a3": "Oui, nous collectons les données des sources provinciales officielles toutes les 15 minutes. Vérifiez l'horodatage « Mis à jour » sur chaque carte d'hôpital pour la fraîcheur spécifique des données."
+    },
+    "medicalPage": {
+      "desc": "Temps d'attente aux urgences en temps réel et audit méthodologique pour les hôpitaux canadiens."
+    },
+    "howTo": {
+      "step1": {
+        "name": "Autoriser l'accès à la localisation",
+        "text": "Activez facultativement la géolocalisation du navigateur pour voir les hôpitaux triés par distance."
+      },
+      "step2": {
+        "name": "Parcourir les données",
+        "text": "Explorez les temps d'attente rapportés publiquement par les sources officielles de santé provinciales."
+      },
+      "step3": {
+        "name": "Comprendre la méthodologie",
+        "text": "Cliquez sur un hôpital pour savoir comment son temps d'attente est mesuré et rapporté par les autorités provinciales."
+      }
+    }
+  },
+  "Metadata": {
+    "title": "WaitTime Canada | Temps d'attente aux Urgences en Temps Réel & Audit Méthodologique",
+    "description": "Un Observatoire des Systèmes de Santé cliniquement défendable suivant les temps d'attente aux urgences à travers le Canada. Comparez les méthodologies, visualisez les données en temps réel et accédez aux analyses du système de santé.",
+    "keywords": "temps d'attente urgences, salles d'urgence Canada, méthodologie santé, temps d'attente hôpital, urgences Québec, urgences Ontario, urgences Alberta, urgences C-B"
+  },
+  "TrendChart": {
+    "title": "Tendances des Temps d'Attente",
+    "aggregated": "Agrégé",
+    "waitTime": "Temps d'Attente",
+    "mean": "Moyen",
+    "min": "Min",
+    "max": "Max",
+    "error": "Échec du chargement des tendances",
+    "noData": "Aucune donnée historique disponible",
+    "periods": {
+      "24h": "24h",
+      "7d": "7j",
+      "30d": "30j",
+      "90d": "90j",
+      "6m": "6m",
+      "1y": "1an"
+    }
+  },
+  "MethodsPage": {
+    "header": {
+      "backToMap": "Retour à la Carte",
+      "title": "Comprendre les Métriques d'Attente",
+      "description": "Les provinces canadiennes mesurent les temps d'attente aux urgences en utilisant différentes méthodologies. La comparaison directe nécessite de comprendre ces différences."
+    },
+    "sections": {
+      "comparabilityMatrix": {
+        "title": "Matrice de Comparabilité Provinciale",
+        "description": "Cette matrice montre quelles provinces peuvent être directement comparées. Cliquez sur n'importe quelle cellule pour voir les différences méthodologiques détaillées."
+      },
+      "provincialMethodologies": {
+        "title": "Méthodologies Provinciales",
+        "description": "Chaque province a choisi différentes approches de mesure en fonction de ses priorités en matière de système de santé et de son infrastructure de données."
+      },
+      "methodologyTimeline": {
+        "title": "Historique des Changements Méthodologiques",
+        "description": "Cette chronologie montre les changements détectés dans la façon dont les provinces calculent les temps d'attente. Notre système surveille les changements de distribution qui peuvent indiquer des mises à jour méthodologiques."
+      },
+      "dataForResearchers": {
+        "title": "Données pour les Chercheurs",
+        "description": "Téléchargez les données sur les temps d'attente avec des balises méthodologiques complètes pour une utilisation de recherche. Toutes les exportations incluent nos colonnes d'ontologie métrique pour garantir une attribution appropriée et une analyse de comparabilité."
+      }
+    },
+    "cta": {
+      "title": "Prêt à explorer les temps d'attente ?",
+      "description": "Maintenant que vous comprenez comment les mesures diffèrent, parcourez la carte interactive en toute confiance.",
+      "button": "Voir la Carte Interactive"
+    },
+    "footer": {
+      "tagline": "WaitTime Canada - Un Observatoire des Systèmes de Santé",
+      "lastUpdated": "Dernière mise à jour"
+    }
+  },
+  "Methods": {
+    "ComparabilityMatrix": {
+      "noData": "Aucune source de données configurée pour le moment.",
+      "levels": {
+        "comparable": "Directement comparable",
+        "partial": "Partiellement comparable",
+        "notComparable": "Non comparable"
+      },
+      "legend": {
+        "comparable": "Directement comparable",
+        "partial": "Partiellement comparable (2-3 correspondances)",
+        "notComparable": "Non comparable (0-1 correspondance)"
+      },
+      "export": "Exporter CSV",
+      "comparing": "Comparaison de {p1} avec {p2}",
+      "metrics": {
+        "family": "Famille de Métriques",
+        "start": "Événement de Début",
+        "end": "Événement de Fin",
+        "stat": "Type de Statistique"
+      },
+      "explanations": {
+        "comparable": "✓ Ces provinces utilisent des méthodologies identiques et peuvent être directement comparées.",
+        "partial": "⚠ Ces provinces diffèrent sur certaines dimensions. Les comparaisons doivent noter ces différences.",
+        "notComparable": "✗ Ces provinces utilisent des méthodologies fondamentalement différentes. La comparaison directe est statistiquement invalide."
+      }
+    },
+    "ProvinceMethodologyCard": {
+      "viewOfficial": "Voir la Méthodologie Officielle",
+      "notAvailable": "Documentation méthodologique officielle non disponible",
+      "metricFamily": {
+        "TIME_TO_PROVIDER": "Temps jusqu'au premier contact avec un médecin ou un fournisseur de soins",
+        "TOTAL_LOS": "Durée complète du séjour aux urgences",
+        "STRETCHER_OCCUPANCY": "Pourcentage de civières actuellement occupées"
+      },
+      "startEvent": {
+        "TRIAGE": "L'horloge démarre lorsque le patient termine l'évaluation au triage",
+        "REGISTRATION": "L'horloge démarre lorsque le patient s'inscrit aux urgences",
+        "DOOR": "L'horloge démarre lorsque le patient entre aux urgences",
+        "UNKNOWN": "Le point de départ varie ou n'est pas standardisé"
+      },
+      "endEvent": {
+        "PHYSICIAN": "L'horloge s'arrête au premier contact avec un médecin",
+        "PROVIDER": "L'horloge s'arrête au premier contact avec un fournisseur de soins (MD, IP, AA)",
+        "DISCHARGE": "L'horloge s'arrête lorsque le patient sort de l'établissement",
+        "FIRST_ASSESSMENT": "L'horloge s'arrête à l'évaluation clinique initiale"
+      },
+      "statisticType": {
+        "P90": "90e centile - 9 patients sur 10 vus plus rapidement que ce temps",
+        "MEDIAN": "50e centile - temps d'attente médian typique",
+        "MEAN": "Moyenne de tous les temps d'attente",
+        "ROLLING_AVG": "Moyenne mobile sur une période récente",
+        "ALGORITHMIC": "Estimation calculée basée sur les conditions actuelles",
+        "POINT_ESTIMATE": "Aperçu en temps réel de l'attente actuelle"
+      }
+    },
+    "FAQ": {
+      "title": "Foire Aux Questions",
+      "subtitle": "Questions fréquentes sur les données de temps d'attente et la méthodologie",
+      "items": {
+        "q1": {
+          "question": "Pourquoi ne puis-je pas comparer Ottawa et Gatineau directement ?",
+          "answer": "Ottawa (Ontario) et Gatineau (Québec) utilisent des méthodologies de mesure différentes. L'Ontario rapporte le temps triage-médecin au 90e centile, tandis que le Québec rapporte la moyenne mobile inscription-fournisseur. Ces différences signifient qu'une comparaison directe serait statistiquement invalide. Notre plateforme affiche un avertissement de divergence méthodologique lorsque vous tentez de telles comparaisons."
+        },
+        "q2": {
+          "question": "Que signifie « 90e centile » en pratique ?",
+          "answer": "Un temps d'attente P90 de 120 minutes signifie que 90 % des patients sont vus en moins de 2 heures, et seulement 10 % attendent plus longtemps. C'est une estimation prudente utilisée pour la planification du pire scénario. C'est plus élevé que la médiane (temps typique) car cela tient compte des valeurs aberrantes et des périodes d'affluence."
+        },
+        "q3": {
+          "question": "Pourquoi certains hôpitaux affichent-ils « Pas de données » ?",
+          "answer": "Les hôpitaux affichent « Pas de données » lorsque : (1) Le scraper n'a pas fonctionné récemment (problème technique), (2) L'hôpital source n'a pas rapporté de données, ou (3) L'hôpital a été récemment ajouté et est en attente de vérification. Notre système de surveillance suit la fraîcheur des données et affiche un avertissement lorsqu'elles sont obsolètes."
+        },
+        "q4": {
+          "question": "À quelle fréquence ces données sont-elles mises à jour ?",
+          "answer": "La fréquence de mise à jour varie selon la province. Les sources de l'Ontario mettent à jour toutes les 15 minutes, le Québec toutes les heures. Nos scrapers s'exécutent automatiquement via GitHub Actions à des intervalles de 15 minutes. Vous pouvez voir l'horodatage de la dernière mise à jour dans le coin supérieur gauche de la carte."
+        },
+        "q5": {
+          "question": "D'où viennent ces données ?",
+          "answer": "Nous agrégeons les données des sources provinciales officielles : ER Watch pour l'Ontario, Index Santé pour le Québec, et les portails officiels des autorités sanitaires pour les autres provinces. Toutes les sources sont documentées dans nos pages méthodologiques avec des liens vers les sources originales."
+        },
+        "q6": {
+          "question": "Et si j'ai besoin d'aide médicale maintenant ?",
+          "answer": "Ceci est un outil d'information à des fins de planification uniquement, pas pour le triage d'urgence. Si vous avez une urgence médicale, appelez immédiatement le 911. Pour des soins urgents mais non urgents, appelez votre ligne de santé provinciale : Health811 en Ontario, Info-Santé 811 au Québec, ou Health Link 811 en Alberta."
+        },
+        "q7": {
+          "question": "Puis-je utiliser ces données pour la recherche ou le journalisme ?",
+          "answer": "Oui, toutes les données affichées proviennent de sources publiques. Nous encourageons une utilisation responsable pour la recherche, le journalisme et la défense des droits. Veuillez attribuer les données aux sources provinciales originales et citer notre documentation méthodologique. Contactez-nous pour un accès aux données en masse."
+        },
+        "q8": {
+          "question": "Pourquoi les différences de méthodologie sont-elles importantes ?",
+          "answer": "Les systèmes de santé sont complexes et les choix de mesure affectent les résultats. Une province qui rapporte le temps triage-médecin mesure quelque chose de fondamentalement différent d'une province rapportant le temps inscription-fournisseur. Sans comprendre ces différences, les comparaisons peuvent être trompeuses. Notre plateforme rend ces différences explicites."
+        }
+      },
+      "cta": {
+        "title": "Vous avez d'autres questions ?",
+        "description": "Nous améliorons continuellement notre documentation méthodologique et nos sources de données. Si vous avez des questions ou des commentaires, nous aimerions vous entendre.",
+        "button": "Envoyer des commentaires sur GitHub"
+      }
+    },
+    "MethodologyTimeline": {
+      "filter": "Filtrer par province :",
+      "allProvinces": "Toutes les provinces",
+      "noEvents": {
+        "title": "Aucun changement méthodologique détecté",
+        "description": "Le système surveille en permanence les changements de distribution. Les changements apparaîtront ici lorsqu'ils seront détectés."
+      },
+      "detected": "Détecté le {date}",
+      "previousPeriod": "Période Précédente",
+      "currentPeriod": "Période Actuelle",
+      "analyzed": "Analysé {count} hôpital",
+      "analyzedPlural": "Analysé {count} hôpitaux",
+      "error": "Erreur lors du chargement des changements méthodologiques : {message}"
+    },
+    "OntologyExplainer": {
+      "title": "Les Quatre Dimensions de la Mesure du Temps d'Attente",
+      "subtitle": "Pour que deux mesures soient comparables, les quatre dimensions doivent correspondre. Comprendre ces dimensions est crucial pour interpréter les temps d'attente publiés.",
+      "dimensions": {
+        "metricFamily": {
+          "title": "Famille de Métriques",
+          "subtitle": "Qu'est-ce qui est mesuré ?",
+          "description": "La catégorie fondamentale de mesure. Différentes familles de métriques répondent à différentes questions cliniques.",
+          "examples": {
+            "timeToProvider": {
+              "label": "Temps jusqu'au Fournisseur",
+              "explanation": "Combien de temps avant qu'un patient soit évalué pour la première fois par un fournisseur de soins"
+            },
+            "totalLos": {
+              "label": "Durée Totale du Séjour",
+              "explanation": "Durée complète de l'arrivée à la sortie des urgences"
+            },
+            "stretcherOccupancy": {
+              "label": "Occupation des Civières",
+              "explanation": "Pourcentage de lits sur civière disponibles actuellement occupés"
+            }
+          }
+        },
+        "startEvent": {
+          "title": "Événement de Début",
+          "subtitle": "Quand l'horloge démarre-t-elle ?",
+          "description": "L'événement déclencheur qui commence la mesure. Cela peut affecter considérablement les temps rapportés.",
+          "examples": {
+            "door": {
+              "label": "Porte (Arrivée)",
+              "explanation": "L'horloge démarre lorsque le patient entre physiquement aux urgences"
+            },
+            "triage": {
+              "label": "Triage",
+              "explanation": "L'horloge démarre lorsque l'évaluation de l'infirmière au triage est terminée"
+            },
+            "registration": {
+              "label": "Inscription",
+              "explanation": "L'horloge démarre lorsque l'enregistrement administratif est terminé"
+            }
+          }
+        },
+        "endEvent": {
+          "title": "Événement de Fin",
+          "subtitle": "Quand l'horloge s'arrête-t-elle ?",
+          "description": "L'événement qui conclut la mesure. Les différences ici peuvent rendre les provinces incomparables.",
+          "examples": {
+            "physician": {
+              "label": "Contact Médecin",
+              "explanation": "L'horloge s'arrête lorsque le patient voit un médecin pour la première fois"
+            },
+            "provider": {
+              "label": "Contact Fournisseur",
+              "explanation": "L'horloge s'arrête au premier contact avec un MD, une IP ou un AA"
+            },
+            "discharge": {
+              "label": "Sortie",
+              "explanation": "L'horloge s'arrête lorsque le patient quitte les urgences"
+            }
+          }
+        },
+        "statisticType": {
+          "title": "Type de Statistique",
+          "subtitle": "Comment le nombre est-il calculé ?",
+          "description": "La méthode mathématique utilisée pour agréger les temps d'attente individuels. Cela affecte profondément l'interprétation.",
+          "examples": {
+            "p90": {
+              "label": "90e Centile",
+              "explanation": "90 % des patients sont vus plus rapidement que ce temps (planification du pire scénario)"
+            },
+            "median": {
+              "label": "Médiane (50e Centile)",
+              "explanation": "Expérience typique de milieu de gamme pour un patient moyen"
+            },
+            "rollingAvg": {
+              "label": "Moyenne Mobile",
+              "explanation": "Moyenne lissée sur une période récente, réduit le bruit"
+            },
+            "pointEstimate": {
+              "label": "Estimation Temps Réel",
+              "explanation": "Instantané actuel basé sur les conditions actuelles et la file d'attente"
+            }
+          }
+        }
+      },
+      "summary": {
+        "title": "Pourquoi C'est Important",
+        "description": "Une attente de 60 minutes en Ontario (P90, Triage→Médecin) est fondamentalement différente d'une attente de 60 minutes au Québec (Moyenne Mobile, Inscription→Fournisseur). Notre plateforme détecte automatiquement ces différences et vous avertit lorsque vous comparez des mesures incompatibles."
+      }
+    }
+  }
+}

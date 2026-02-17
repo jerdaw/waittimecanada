@@ -2,6 +2,7 @@ import type { Hospital } from "@/app/api/hospitals/route";
 import { clsx } from "clsx";
 import Link from "next/link";
 import { calculateDistance } from "@/utils/distance";
+import { useTranslations } from "next-intl";
 
 interface HeroProps {
   hospitals: Hospital[];
@@ -18,6 +19,8 @@ export function Hero({
   userLocation,
   loading,
 }: HeroProps) {
+  const t = useTranslations('Hero');
+
   // Find the featured hospital based on location
   const featuredHospital = (() => {
     const hospitalsWithData = hospitals.filter(
@@ -100,21 +103,16 @@ export function Hero({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
             </span>
-            Real-Time Ontario ER Data
+            {t('badge')}
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground animate-in fade-in slide-in-from-bottom-5 duration-700 delay-100">
-            Ontario <span className="text-primary">ER Wait Time</span> <br />
-            Observatory
+            {t('title')} <span className="text-primary">{t('subtitle')}</span> <br />
+            {t('subtitle2')}
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200 leading-relaxed">
-            Explore publicly reported wait time data from official provincial
-            sources. Browse{" "}
-            <strong className="text-foreground">
-              {hospitals.length || "..."}
-            </strong>{" "}
-            Ontario hospitals and compare methodologies.
+            {t('description', {count: hospitals.length || "..."})}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start animate-in fade-in slide-in-from-bottom-7 duration-700 delay-300 pt-2">
@@ -123,7 +121,7 @@ export function Hero({
               className="group px-8 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:bg-primary-hover hover:scale-[1.02] transition-all duration-200 active:scale-[0.98]"
             >
               <span className="flex items-center gap-2">
-                Explore Hospitals
+                {t('cta.explore')}
                 <svg
                   className="w-5 h-5 group-hover:translate-x-0.5 transition-transform"
                   fill="none"
@@ -143,7 +141,7 @@ export function Hero({
               href="/methods"
               className="text-muted-foreground hover:text-foreground font-medium flex items-center gap-1.5 transition-colors"
             >
-              Understand Methodologies
+              {t('cta.methodologies')}
               <svg
                 className="w-4 h-4"
                 fill="none"
@@ -175,15 +173,15 @@ export function Hero({
                 <div className="flex justify-between items-center mb-6">
                   <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                     {featuredHospital?.type === "nearest"
-                      ? "Nearest ER"
-                      : "Featured"}
+                      ? t('card.nearest')
+                      : t('card.featured')}
                   </span>
                   <span className="flex items-center gap-1.5 text-success bg-success/10 px-2.5 py-1 rounded-full text-xs font-bold ring-1 ring-inset ring-success/20">
                     <span className="relative flex h-1.5 w-1.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
                       <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success" />
                     </span>
-                    LIVE
+                    {t('card.live')}
                   </span>
                 </div>
 
@@ -213,7 +211,7 @@ export function Hero({
                         )}
                       </span>
                       <span className="text-xl font-medium text-muted-foreground">
-                        min
+                        {t('card.min')}
                       </span>
                     </div>
 
@@ -221,16 +219,16 @@ export function Hero({
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <span className="flex items-center gap-1.5">
                           <span className="w-1 h-1 rounded-full bg-success" />
-                          P90 Performance
+                          {t('card.p90')}
                         </span>
-                        <span>Updated just now</span>
+                        <span>{t('card.updatedNow')}</span>
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-40 space-y-3 text-muted-foreground">
                     <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                    <span className="text-sm">Loading hospital data...</span>
+                    <span className="text-sm">{t('card.loading')}</span>
                   </div>
                 )}
               </div>

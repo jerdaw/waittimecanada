@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface Source {
   id: string;
@@ -60,18 +61,7 @@ function getComparabilityIcon(level: ComparabilityLevel): string {
   }
 }
 
-function getComparabilityLabel(level: ComparabilityLevel): string {
-  switch (level) {
-    case "comparable":
-      return "Directly comparable";
-    case "partial":
-      return "Partially comparable";
-    case "not-comparable":
-      return "Not comparable";
-  }
-}
-
-function exportMatrixToCSV(sources: Source[]) {
+function exportMatrixToCSV(sources: Source[], tLevels: any) {
   // Build CSV content
   const rows: string[][] = [];
 
@@ -84,7 +74,12 @@ function exportMatrixToCSV(sources: Source[]) {
     const row = [rowSource.province];
     sources.forEach((colSource) => {
       const level = areComparable(rowSource, colSource);
-      row.push(getComparabilityLabel(level));
+      // Determine label key based on level
+      let labelKey = "notComparable";
+      if (level === "comparable") labelKey = "comparable";
+      else if (level === "partial") labelKey = "partial";
+
+      row.push(tLevels(labelKey));
     });
     rows.push(row);
   });
@@ -110,6 +105,7 @@ function exportMatrixToCSV(sources: Source[]) {
 }
 
 export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
+  const t = useTranslations('Methods.ComparabilityMatrix');
   const [selectedCell, setSelectedCell] = useState<{
     row: Source;
     col: Source;
@@ -141,10 +137,21 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
     }
   };
 
+  const getComparabilityLabel = (level: ComparabilityLevel): string => {
+    switch (level) {
+      case "comparable":
+        return t('levels.comparable');
+      case "partial":
+        return t('levels.partial');
+      case "not-comparable":
+        return t('levels.notComparable');
+    }
+  };
+
   if (sources.length === 0) {
     return (
       <div className="text-center py-8 text-slate-500">
-        No data sources configured yet.
+        {t('noData')}
       </div>
     );
   }
@@ -213,27 +220,27 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
             <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-emerald-100 text-emerald-700 border-emerald-200 font-semibold">
               ✓
             </div>
-            <span className="text-slate-700">Directly comparable</span>
+            <span className="text-slate-700">{t('legend.comparable')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-amber-100 text-amber-700 border-amber-200 font-semibold">
               ⚠
             </div>
             <span className="text-slate-700">
-              Partially comparable (2-3 matches)
+              {t('legend.partial')}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-red-100 text-red-700 border-red-200 font-semibold">
               ✗
             </div>
-            <span className="text-slate-700">Not comparable (0-1 matches)</span>
+            <span className="text-slate-700">{t('legend.notComparable')}</span>
           </div>
         </div>
 
         {/* Export Button */}
         <button
-          onClick={() => exportMatrixToCSV(sources)}
+          onClick={() => exportMatrixToCSV(sources, (key: string) => t(`levels.${key}`))}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm font-medium"
           title="Export matrix as CSV"
         >
@@ -250,7 +257,7 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
               d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          Export CSV
+          {t('export')}
         </button>
       </div>
 
@@ -258,27 +265,26 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
       {selectedCell && selectedCell.row.id !== selectedCell.col.id && (
         <div className="mt-6 p-6 rounded-xl border-2 border-blue-200 bg-blue-50">
           <h4 className="font-semibold text-blue-900 mb-3">
-            Comparing {selectedCell.row.province} with{" "}
-            {selectedCell.col.province}
+            {t('comparing', {p1: selectedCell.row.province, p2: selectedCell.col.province})}
           </h4>
           <div className="space-y-2 text-sm">
             <ComparisonRow
-              label="Metric Family"
+              label={t('metrics.family')}
               value1={selectedCell.row.default_metric_family}
               value2={selectedCell.col.default_metric_family}
             />
             <ComparisonRow
-              label="Start Event"
+              label={t('metrics.start')}
               value1={selectedCell.row.default_start_event}
               value2={selectedCell.col.default_start_event}
             />
             <ComparisonRow
-              label="End Event"
+              label={t('metrics.end')}
               value1={selectedCell.row.default_end_event}
               value2={selectedCell.col.default_end_event}
             />
             <ComparisonRow
-              label="Statistic Type"
+              label={t('metrics.stat')}
               value1={selectedCell.row.default_statistic_type}
               value2={selectedCell.col.default_statistic_type}
             />
@@ -287,22 +293,19 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
             {areComparable(selectedCell.row, selectedCell.col) ===
               "comparable" && (
               <>
-                ✓ These provinces use identical methodologies and can be
-                directly compared.
+                {t('explanations.comparable')}
               </>
             )}
             {areComparable(selectedCell.row, selectedCell.col) ===
               "partial" && (
               <>
-                ⚠ These provinces differ in some dimensions. Comparisons should
-                note these differences.
+                {t('explanations.partial')}
               </>
             )}
             {areComparable(selectedCell.row, selectedCell.col) ===
               "not-comparable" && (
               <>
-                ✗ These provinces use fundamentally different methodologies.
-                Direct comparison is statistically invalid.
+                {t('explanations.notComparable')}
               </>
             )}
           </p>

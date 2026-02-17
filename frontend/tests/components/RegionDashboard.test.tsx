@@ -2,6 +2,11 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { RegionDashboard } from "@/components/RegionDashboard";
 
+// Mock next-intl explicitly here
+vi.mock('next-intl', () => ({
+  useTranslations: () => (key: string) => key,
+}));
+
 describe("RegionDashboard", () => {
   it("renders region cards with metrics", () => {
     render(
@@ -37,11 +42,18 @@ describe("RegionDashboard", () => {
       />,
     );
 
-    expect(screen.getByText("Regional Intelligence")).toBeInTheDocument();
+    // Expect keys instead of values
+    expect(screen.getByText("title")).toBeInTheDocument();
     expect(screen.getByText("East Health Region")).toBeInTheDocument();
-    expect(screen.getByText("Improving 8.4%")).toBeInTheDocument();
+    // Trend label logic:
+    // getTrendLabel returns t('trend.improving', {percent: ...}) -> "trend.improving"
+    expect(screen.getByText("trend.improving")).toBeInTheDocument();
+
+    // Values are formatted numbers
     expect(screen.getByText("120 min")).toBeInTheDocument();
-    expect(screen.getByText(/Mapping coverage:/)).toBeInTheDocument();
+
+    // Mapping coverage: t('mappingCoverage') -> "mappingCoverage"
+    expect(screen.getByText(/^mappingCoverage/)).toBeInTheDocument();
   });
 
   it("calls onSelectRegion for card and clear button", () => {
@@ -78,7 +90,8 @@ describe("RegionDashboard", () => {
     fireEvent.click(screen.getByText("East Health Region"));
     expect(onSelectRegion).toHaveBeenCalledWith("ca-on-region-east");
 
-    fireEvent.click(screen.getByText("Clear Region Filter"));
+    // "Clear Region Filter" -> "clearFilter"
+    fireEvent.click(screen.getByText("clearFilter"));
     expect(onSelectRegion).toHaveBeenCalledWith(null);
   });
 
@@ -95,8 +108,9 @@ describe("RegionDashboard", () => {
       />,
     );
 
+    // "Loading regional analytics..." -> "loading"
     expect(
-      screen.getByText("Loading regional analytics..."),
+      screen.getByText("loading"),
     ).toBeInTheDocument();
   });
 });

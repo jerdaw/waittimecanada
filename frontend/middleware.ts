@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import createMiddleware from 'next-intl/middleware';
+
+const i18nMiddleware = createMiddleware({
+  // A list of all locales that are supported
+  locales: ['en', 'fr'],
+
+  // Used when no locale matches
+  defaultLocale: 'en'
+});
 
 export function middleware(request: NextRequest) {
+  const start = performance.now();
+
   // Handle CORS preflight requests for API routes
   if (request.method === "OPTIONS" && request.nextUrl.pathname.startsWith("/api/")) {
     return new NextResponse(null, {
@@ -15,11 +26,48 @@ export function middleware(request: NextRequest) {
     });
   }
 
-  // Continue with the request
-  return NextResponse.next();
+  // Handle actual API requests with timing
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    const response = NextResponse.next();
+
+    // Calculate duration
+    const duration = performance.now() - start;
+
+    // Add timing header
+    response.headers.set("X-Response-Time", `${duration.toFixed(2)}ms`); // X-Response-Time in ms
+    response.headers.set("Server-Timing", `total;dur=${duration.toFixed(2)}`); // Standard Server-Timing header
+
+    // Log for observability (primitive but effective for now)
+    // In production, this would go to a structured logger
+    console.log(JSON.stringify({
+      timestamp: new Date().toISOString(),
+      method: request.method,
+      path: request.nextUrl.pathname,
+      status: response.status,
+      duration_ms: duration.toFixed(2),
+      user_agent: request.headers.get("user-agent") || "unknown",
+    }));
+
+    return response;
+  }
+
+  // Handle i18n for non-API routes
+  return i18nMiddleware(request);
 }
 
 // Configure which paths the middleware runs on
 export const config = {
-  matcher: "/api/:path*",
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - api (API routes - handled manually in middleware function but exclusion here prevents double processing if we wanted, but we WANT processing for API timing)
+     * Actually, we want to match everything so we can handle API timing.
+     * But i18nMiddleware only wants to match pages.
+     * The logic above handles API separately, so it's fine.
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
 };
