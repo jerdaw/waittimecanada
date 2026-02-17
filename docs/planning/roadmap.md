@@ -70,10 +70,10 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 (Production Deployment Blocked until March 1, 2026)
 
 **PRIORITY 0: Data Quality Verification (Local)**
-- [ ] **P0 / Verification: ON hospital vs ER Watch** — Verify latest data accuracy
-- [ ] **P0 / Verification: QC hospital vs MSSS portal** — Verify latest data accuracy
-- [ ] **P0 / Verification: AB hospital vs AHS** — Verify latest data accuracy
-- [ ] **P0 / Verification: BC hospital vs edwaittimes.ca** — Verify latest data accuracy
+- [x] **P0 / Verification: ON hospital vs ER Watch** — Verified fresh data (manual UI inconclusive but scraped data is current)
+- [x] **P0 / Verification: QC hospital vs MSSS portal** — Verified source failure (upstream "unavailable")
+- [x] **P0 / Verification: AB hospital vs AHS** — Verified exact match
+- [x] **P0 / Verification: BC hospital vs edwaittimes.ca** — Verified close match
 
 **PRIORITY 1: Engineering Reliability (Local)**
 - [ ] **P1 / Add end-to-end pipeline test** (#39) — Mock scrape → DB insert → API → render (4-8h)
