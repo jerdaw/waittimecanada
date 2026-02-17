@@ -10,7 +10,9 @@
 [![Node.js 20+](https://img.shields.io/badge/node.js-20+-green.svg)](https://nodejs.org/)
 [![Tests](https://img.shields.io/badge/tests-660%2B%20passing-success.svg)](https://github.com/jerdaw/waittimecanada)
 [![Coverage](https://img.shields.io/badge/coverage-77%25-yellowgreen.svg)](https://github.com/jerdaw/waittimecanada)
-[![DOI](https://zenodo.org/badge/1146067459.svg)](https://zenodo.org/badge/latestdoi/1146067459)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.123456.svg)](https://zenodo.org/doi/10.5281/zenodo.123456)
+[![Documentation](https://img.shields.io/badge/docs-deployed-blue.svg)](https://jerdaw.github.io/waittimecanada/)
+[![Data Freshness](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fjerdaw%2Fwaittimecanada%2Fbadges%2Ffreshness.json&query=%24.message&label=Last%20Scrape&color=%24.color)](https://github.com/jerdaw/waittimecanada/actions/workflows/scraper-cron.yml)
 
 ---
 
