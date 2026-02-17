@@ -4,6 +4,7 @@ import { AccessBurdenEstimator } from "./AccessBurdenEstimator";
 import { BenchmarkCard } from "./BenchmarkCard";
 import { TemporalPatterns } from "./TemporalPatterns";
 import { calculateDistance } from "@/utils/distance";
+import { useTranslations } from "next-intl";
 
 interface ExpandedCardDetailsProps {
   hospital: Hospital;
@@ -14,6 +15,8 @@ export function ExpandedCardDetails({
   hospital,
   userLocation,
 }: ExpandedCardDetailsProps) {
+  const t = useTranslations('ExpandedCardDetails');
+
   // Format dates
   const updatedDate = hospital.last_updated
     ? new Date(hospital.last_updated)
@@ -38,8 +41,8 @@ export function ExpandedCardDetails({
 
   // Methodology labels
   const getMethodologyLabel = () => {
-    if (hospital.province === "QC") return "Registration to Doctor";
-    return "Triage to Doctor";
+    if (hospital.province === "QC") return t('methodology.registrationToDoctor');
+    return t('methodology.triageToDoctor');
   };
 
   return (
@@ -48,7 +51,7 @@ export function ExpandedCardDetails({
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="bg-gradient-to-br from-muted/50 to-muted/30 p-3 rounded-xl border border-border/30">
           <span className="text-[10px] uppercase text-muted-foreground font-semibold tracking-wider block mb-1">
-            Metric
+            {t('metric')}
           </span>
           <div className="text-xs font-medium text-foreground">
             {getMethodologyLabel()}
@@ -56,7 +59,7 @@ export function ExpandedCardDetails({
         </div>
         <div className="bg-gradient-to-br from-muted/50 to-muted/30 p-3 rounded-xl border border-border/30">
           <span className="text-[10px] uppercase text-muted-foreground font-semibold tracking-wider block mb-1">
-            Status
+            {t('status')}
           </span>
           <div className="text-xs font-medium text-foreground flex items-center gap-1.5">
             <span
@@ -65,7 +68,7 @@ export function ExpandedCardDetails({
                 isLive ? "bg-success" : "bg-warning",
               )}
             />
-            {isLive ? "Live Data" : "Stale Data"}
+            {isLive ? t('statusLive') : t('statusStale')}
           </div>
         </div>
       </div>
@@ -88,14 +91,13 @@ export function ExpandedCardDetails({
               />
             </svg>
           </div>
-          Need medical advice?
+          {t('medicalAdvice')}
         </div>
         <p className="text-muted-foreground ml-8">
-          Call{" "}
-          <span className="font-bold text-foreground">
-            {hospital.telehealth_number || "811"}
-          </span>{" "}
-          to speak with a registered nurse 24/7.
+          {t.rich('callNurse', {
+            number: hospital.telehealth_number || "811",
+            span: (children) => <span className="font-bold text-foreground">{children}</span>
+          })}
         </p>
       </div>
 
@@ -140,7 +142,7 @@ export function ExpandedCardDetails({
               d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
             />
           </svg>
-          <span className="text-[10px] font-semibold">Directions</span>
+          <span className="text-[10px] font-semibold">{t('directions')}</span>
         </a>
 
         <a
@@ -161,12 +163,12 @@ export function ExpandedCardDetails({
               d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
             />
           </svg>
-          <span className="text-[10px] font-semibold">Call Health Info</span>
+          <span className="text-[10px] font-semibold">{t('callHealthInfo')}</span>
         </a>
       </div>
 
       <div className="mt-4 text-[10px] text-center text-muted-foreground">
-        Last updated: {timeString}
+        {t('lastUpdated', {time: timeString})}
       </div>
     </div>
   );

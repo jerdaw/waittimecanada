@@ -5,6 +5,7 @@ import { FAQ } from "@/components/methods/FAQ";
 import { MethodologyTimeline } from "@/components/methods/MethodologyTimeline";
 import { DataExport } from "@/components/DataExport";
 import { getDb } from "@/utils/db";
+import { getTranslations } from "next-intl/server";
 
 interface Source {
   id: string;
@@ -64,6 +65,7 @@ async function getSources(): Promise<Source[]> {
 
 export default async function MethodsPage() {
   const sources = await getSources();
+  const t = await getTranslations('MethodsPage');
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -89,15 +91,13 @@ export default async function MethodsPage() {
                     d="M10 19l-7-7m0 0l7-7m-7 7h18"
                   />
                 </svg>
-                Back to Map
+                {t('header.backToMap')}
               </a>
               <h1 className="text-4xl font-bold text-slate-900 mb-2">
-                Understanding Wait Time Metrics
+                {t('header.title')}
               </h1>
               <p className="text-lg text-slate-600 max-w-3xl">
-                Canadian provinces measure emergency department wait times using
-                different methodologies. Direct comparison requires
-                understanding these differences.
+                {t('header.description')}
               </p>
             </div>
           </div>
@@ -111,11 +111,10 @@ export default async function MethodsPage() {
           <section>
             <div className="mb-8">
               <h2 className="text-3xl font-bold text-slate-900 mb-3">
-                Provincial Comparability Matrix
+                {t('sections.comparabilityMatrix.title')}
               </h2>
               <p className="text-slate-600 leading-relaxed max-w-3xl">
-                This matrix shows which provinces can be directly compared.
-                Click any cell to see detailed methodology differences.
+                {t('sections.comparabilityMatrix.description')}
               </p>
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
@@ -127,11 +126,10 @@ export default async function MethodsPage() {
           <section>
             <div className="mb-8">
               <h2 className="text-3xl font-bold text-slate-900 mb-3">
-                Provincial Methodologies
+                {t('sections.provincialMethodologies.title')}
               </h2>
               <p className="text-slate-600 leading-relaxed max-w-3xl">
-                Each province has chosen different measurement approaches based
-                on their health system priorities and data infrastructure.
+                {t('sections.provincialMethodologies.description')}
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -145,12 +143,10 @@ export default async function MethodsPage() {
           <section>
             <div className="mb-8">
               <h2 className="text-3xl font-bold text-slate-900 mb-3">
-                Methodology Change History
+                {t('sections.methodologyTimeline.title')}
               </h2>
               <p className="text-slate-600 leading-relaxed max-w-3xl">
-                This timeline shows detected changes in how provinces calculate
-                wait times. Our system monitors for distributional shifts that
-                may indicate methodology updates.
+                {t('sections.methodologyTimeline.description')}
               </p>
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
@@ -176,12 +172,10 @@ export default async function MethodsPage() {
           <section>
             <div className="mb-8">
               <h2 className="text-3xl font-bold text-slate-900 mb-3">
-                Data for Researchers
+                {t('sections.dataForResearchers.title')}
               </h2>
               <p className="text-slate-600 leading-relaxed max-w-3xl">
-                Download wait time data with full methodology tags for research
-                use. All exports include our metric ontology columns to ensure
-                proper attribution and comparability analysis.
+                {t('sections.dataForResearchers.description')}
               </p>
             </div>
             <DataExport />
@@ -191,17 +185,16 @@ export default async function MethodsPage() {
           <section className="text-center py-12">
             <div className="inline-block p-8 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xl">
               <h3 className="text-2xl font-bold mb-3">
-                Ready to explore wait times?
+                {t('cta.title')}
               </h3>
               <p className="text-blue-100 mb-6 max-w-md">
-                Now that you understand how measurements differ, browse the
-                interactive map with confidence.
+                {t('cta.description')}
               </p>
               <a
                 href="/"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors"
               >
-                View Interactive Map
+                {t('cta.button')}
                 <svg
                   className="w-5 h-5"
                   fill="none"
@@ -225,8 +218,8 @@ export default async function MethodsPage() {
       <footer className="border-t border-slate-200 bg-white mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between text-sm text-slate-500">
-            <span>WaitTime Canada - A Health Systems Observatory</span>
-            <span>Last updated: {new Date().toLocaleDateString()}</span>
+            <span>{t('footer.tagline')}</span>
+            <span>{t('footer.lastUpdated')}: {new Date().toLocaleDateString()}</span>
           </div>
         </div>
       </footer>

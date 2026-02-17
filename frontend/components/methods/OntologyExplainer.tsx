@@ -1,125 +1,116 @@
 "use client";
 
 import { useState } from "react";
-
-const dimensions = [
-  {
-    title: "Metric Family",
-    subtitle: "What is being measured?",
-    description:
-      "The fundamental category of measurement. Different metric families answer different clinical questions.",
-    examples: [
-      {
-        value: "TIME_TO_PROVIDER",
-        label: "Time to Provider",
-        explanation:
-          "How long until a patient is first assessed by a healthcare provider",
-      },
-      {
-        value: "TOTAL_LOS",
-        label: "Total Length of Stay",
-        explanation: "Complete duration from arrival to discharge from the ED",
-      },
-      {
-        value: "STRETCHER_OCCUPANCY",
-        label: "Stretcher Occupancy",
-        explanation:
-          "Percentage of available stretcher beds currently occupied",
-      },
-    ],
-  },
-  {
-    title: "Start Event",
-    subtitle: "When does the clock start?",
-    description:
-      "The triggering event that begins the measurement. This can significantly affect reported times.",
-    examples: [
-      {
-        value: "DOOR",
-        label: "Door (Arrival)",
-        explanation: "Clock starts when patient physically enters the ED",
-      },
-      {
-        value: "TRIAGE",
-        label: "Triage",
-        explanation: "Clock starts when triage nurse assessment is completed",
-      },
-      {
-        value: "REGISTRATION",
-        label: "Registration",
-        explanation: "Clock starts when administrative check-in is completed",
-      },
-    ],
-  },
-  {
-    title: "End Event",
-    subtitle: "When does the clock stop?",
-    description:
-      "The event that concludes the measurement. Differences here can make provinces incomparable.",
-    examples: [
-      {
-        value: "PHYSICIAN",
-        label: "Physician Contact",
-        explanation: "Clock stops when patient first sees a medical doctor",
-      },
-      {
-        value: "PROVIDER",
-        label: "Any Provider Contact",
-        explanation:
-          "Clock stops at first contact with MD, nurse practitioner, or physician assistant",
-      },
-      {
-        value: "DISCHARGE",
-        label: "Discharge",
-        explanation: "Clock stops when patient leaves the ED",
-      },
-    ],
-  },
-  {
-    title: "Statistic Type",
-    subtitle: "How is the number calculated?",
-    description:
-      "The mathematical method used to aggregate individual wait times. This profoundly affects interpretation.",
-    examples: [
-      {
-        value: "P90",
-        label: "90th Percentile",
-        explanation:
-          "90% of patients are seen faster than this time (worst-case planning)",
-      },
-      {
-        value: "MEDIAN",
-        label: "Median (50th Percentile)",
-        explanation:
-          "Typical middle-of-the-road experience for an average patient",
-      },
-      {
-        value: "ROLLING_AVG",
-        label: "Rolling Average",
-        explanation: "Smoothed average over recent time period, reduces noise",
-      },
-      {
-        value: "POINT_ESTIMATE",
-        label: "Real-Time Estimate",
-        explanation: "Current snapshot based on current conditions and queue",
-      },
-    ],
-  },
-];
+import { useTranslations } from "next-intl";
 
 export function OntologyExplainer() {
+  const t = useTranslations('Methods.OntologyExplainer');
   const [expandedDimension, setExpandedDimension] = useState<number | null>(0);
+
+  const dimensions = [
+    {
+      title: t('dimensions.metricFamily.title'),
+      subtitle: t('dimensions.metricFamily.subtitle'),
+      description: t('dimensions.metricFamily.description'),
+      examples: [
+        {
+          value: "TIME_TO_PROVIDER",
+          label: t('dimensions.metricFamily.examples.timeToProvider.label'),
+          explanation: t('dimensions.metricFamily.examples.timeToProvider.explanation'),
+        },
+        {
+          value: "TOTAL_LOS",
+          label: t('dimensions.metricFamily.examples.totalLos.label'),
+          explanation: t('dimensions.metricFamily.examples.totalLos.explanation'),
+        },
+        {
+          value: "STRETCHER_OCCUPANCY",
+          label: t('dimensions.metricFamily.examples.stretcherOccupancy.label'),
+          explanation: t('dimensions.metricFamily.examples.stretcherOccupancy.explanation'),
+        },
+      ],
+    },
+    {
+      title: t('dimensions.startEvent.title'),
+      subtitle: t('dimensions.startEvent.subtitle'),
+      description: t('dimensions.startEvent.description'),
+      examples: [
+        {
+          value: "DOOR",
+          label: t('dimensions.startEvent.examples.door.label'),
+          explanation: t('dimensions.startEvent.examples.door.explanation'),
+        },
+        {
+          value: "TRIAGE",
+          label: t('dimensions.startEvent.examples.triage.label'),
+          explanation: t('dimensions.startEvent.examples.triage.explanation'),
+        },
+        {
+          value: "REGISTRATION",
+          label: t('dimensions.startEvent.examples.registration.label'),
+          explanation: t('dimensions.startEvent.examples.registration.explanation'),
+        },
+      ],
+    },
+    {
+      title: t('dimensions.endEvent.title'),
+      subtitle: t('dimensions.endEvent.subtitle'),
+      description: t('dimensions.endEvent.description'),
+      examples: [
+        {
+          value: "PHYSICIAN",
+          label: t('dimensions.endEvent.examples.physician.label'),
+          explanation: t('dimensions.endEvent.examples.physician.explanation'),
+        },
+        {
+          value: "PROVIDER",
+          label: t('dimensions.endEvent.examples.provider.label'),
+          explanation: t('dimensions.endEvent.examples.provider.explanation'),
+        },
+        {
+          value: "DISCHARGE",
+          label: t('dimensions.endEvent.examples.discharge.label'),
+          explanation: t('dimensions.endEvent.examples.discharge.explanation'),
+        },
+      ],
+    },
+    {
+      title: t('dimensions.statisticType.title'),
+      subtitle: t('dimensions.statisticType.subtitle'),
+      description: t('dimensions.statisticType.description'),
+      examples: [
+        {
+          value: "P90",
+          label: t('dimensions.statisticType.examples.p90.label'),
+          explanation: t('dimensions.statisticType.examples.p90.explanation'),
+        },
+        {
+          value: "MEDIAN",
+          label: t('dimensions.statisticType.examples.median.label'),
+          explanation: t('dimensions.statisticType.examples.median.explanation'),
+        },
+        {
+          value: "ROLLING_AVG",
+          label: t('dimensions.statisticType.examples.rollingAvg.label'),
+          explanation: t('dimensions.statisticType.examples.rollingAvg.explanation'),
+        },
+        {
+          value: "POINT_ESTIMATE",
+          label: t('dimensions.statisticType.examples.pointEstimate.label'),
+          explanation: t('dimensions.statisticType.examples.pointEstimate.explanation'),
+        },
+      ],
+    },
+  ];
 
   return (
     <div className="space-y-4">
       <div className="text-center mb-8">
         <h3 className="text-2xl font-bold text-slate-900 mb-2">
-          The Four Dimensions of Wait Time Measurement
+          {t('title')}
         </h3>
         <p className="text-slate-600 max-w-2xl mx-auto">
-          For two measurements to be comparable, all four dimensions must match.
-          Understanding these dimensions is crucial for interpreting published
-          wait times.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -219,14 +210,10 @@ export function OntologyExplainer() {
           </div>
           <div>
             <h4 className="font-semibold text-blue-900 mb-2">
-              Why This Matters
+              {t('summary.title')}
             </h4>
             <p className="text-blue-800 text-sm leading-relaxed">
-              A 60-minute wait in Ontario (P90, Triage→Physician) is
-              fundamentally different from a 60-minute wait in Quebec (Rolling
-              Avg, Registration→Provider). Our platform automatically detects
-              these differences and warns you when comparing incompatible
-              measurements.
+              {t('summary.description')}
             </p>
           </div>
         </div>

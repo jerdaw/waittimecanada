@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Activity, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type Status = "healthy" | "degraded" | "down" | "loading";
 
@@ -15,6 +16,7 @@ interface HealthData {
 const HEALTH_CHECK_INTERVAL_MS = 5 * 60 * 1000;
 
 export function SystemStatus() {
+  const t = useTranslations('SystemStatus');
   const [health, setHealth] = useState<HealthData>({
     status: "loading",
     lastUpdate: null,
@@ -82,18 +84,18 @@ export function SystemStatus() {
   }, []);
 
   const statusConfig = {
-    loading: { icon: Activity, color: "text-slate-400", label: "Checking..." },
+    loading: { icon: Activity, color: "text-slate-400", label: t('checking') },
     healthy: {
       icon: CheckCircle,
       color: "text-green-500",
-      label: "All Systems Operational",
+      label: t('healthy'),
     },
     degraded: {
       icon: AlertTriangle,
       color: "text-amber-500",
-      label: "Data May Be Stale",
+      label: t('degraded'),
     },
-    down: { icon: XCircle, color: "text-red-500", label: "Data Unavailable" },
+    down: { icon: XCircle, color: "text-red-500", label: t('down') },
   };
 
   const { icon: Icon, color, label } = statusConfig[health.status];
@@ -104,7 +106,7 @@ export function SystemStatus() {
       <span className="text-slate-500 dark:text-slate-400">{label}</span>
       {health.ageMinutes < 999 && (
         <span className="text-slate-400 text-xs">
-          (updated {health.ageMinutes}m ago)
+          {t('updatedAgo', {minutes: health.ageMinutes})}
         </span>
       )}
     </div>

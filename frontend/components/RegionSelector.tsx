@@ -1,6 +1,8 @@
 "use client";
 
-interface RegionOption {
+import { useTranslations } from "next-intl";
+
+export interface RegionOption {
   region_id: string;
   region_name: string;
   hospital_count: number;
@@ -20,11 +22,12 @@ export function RegionSelector({
   onRegionChange,
   disabled = false,
 }: RegionSelectorProps) {
+  const t = useTranslations('RegionSelector');
   const value = selectedRegionId ?? "all";
 
   return (
     <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-      <span className="font-medium">Region</span>
+      <span className="font-medium">{t('label')}</span>
       <select
         value={value}
         disabled={disabled}
@@ -34,7 +37,7 @@ export function RegionSelector({
         }}
         className="rounded-md border border-border bg-background px-2 py-1 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
       >
-        <option value="all">All Regions</option>
+        <option value="all">{t('allRegions')}</option>
         {regions.map((region) => (
           <option key={region.region_id} value={region.region_id}>
             {region.region_name} ({region.reporting_count}/
@@ -45,5 +48,3 @@ export function RegionSelector({
     </label>
   );
 }
-
-export type { RegionOption };

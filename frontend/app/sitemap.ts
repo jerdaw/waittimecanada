@@ -3,49 +3,30 @@ import { MetadataRoute } from "next";
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://waittimecanada.vercel.app";
   const currentDate = new Date();
+  const locales = ['en', 'fr'];
 
-  return [
-    {
-      url: baseUrl,
-      lastModified: currentDate,
-      changeFrequency: "hourly" as const,
-      priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/methods`,
-      lastModified: currentDate,
-      changeFrequency: "weekly" as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/analytics`,
-      lastModified: currentDate,
-      changeFrequency: "daily" as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/data-quality`,
-      lastModified: currentDate,
-      changeFrequency: "daily" as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/faq`,
-      lastModified: currentDate,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/privacy`,
-      lastModified: currentDate,
-      changeFrequency: "monthly" as const,
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/terms`,
-      lastModified: currentDate,
-      changeFrequency: "monthly" as const,
-      priority: 0.5,
-    },
+  const routes = [
+    "",
+    "/methods",
+    "/analytics",
+    "/data-quality",
+    "/faq",
+    "/privacy",
+    "/terms",
   ];
+
+  const sitemapEntries: MetadataRoute.Sitemap = [];
+
+  for (const locale of locales) {
+    for (const route of routes) {
+      sitemapEntries.push({
+        url: `${baseUrl}/${locale}${route}`,
+        lastModified: currentDate,
+        changeFrequency: route === "" ? "hourly" : route === "/analytics" || route === "/data-quality" ? "daily" : "monthly",
+        priority: route === "" ? 1.0 : route === "/methods" ? 0.9 : 0.8,
+      });
+    }
+  }
+
+  return sitemapEntries;
 }

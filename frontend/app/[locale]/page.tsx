@@ -24,8 +24,10 @@ import type { RegionOption } from "@/components/RegionSelector";
 import { getFeaturedTestimonial } from "@/content/stakeholderTestimonials";
 
 import { isRecent } from "@/utils/date";
+import { useTranslations } from "next-intl";
 
 export default function Home() {
+  const t = useTranslations('HomePage');
   const REGION_PERIOD = "7d";
   const featuredTestimonial = getFeaturedTestimonial();
 
@@ -328,7 +330,7 @@ export default function Home() {
             )}>
               <div className="max-w-screen-2xl mx-auto">
                 <h2 className="text-lg font-semibold mb-4 text-foreground">
-                  Access Insights
+                  {t('accessInsights')}
                 </h2>
                 <AccessInsightsSummary
                   hospitals={hospitals}
@@ -365,8 +367,8 @@ export default function Home() {
                 <div
                   className={`${
                     viewMode === "split"
-                      ? "hidden lg:block lg:w-[35%]" // Hidden on mobile, 35% on desktop
-                      : "w-full"
+                    ? "hidden lg:block lg:w-[35%]" // Hidden on mobile, 35% on desktop
+                    : "w-full"
                   } h-full`}
                 >
                   <div className="h-full bg-card rounded-xl border border-border/50 shadow-sm overflow-hidden">
@@ -403,8 +405,8 @@ export default function Home() {
                 <div
                   className={`${
                     viewMode === "split"
-                      ? "w-full lg:w-[65%]" // Full on mobile, 65% on desktop
-                      : "w-full"
+                    ? "w-full lg:w-[65%]" // Full on mobile, 65% on desktop
+                    : "w-full"
                   } h-full`}
                 >
                   <div className="h-full bg-card rounded-xl border border-border/50 shadow-sm overflow-hidden">
@@ -439,7 +441,7 @@ export default function Home() {
                   href="/methods"
                   className="hover:text-foreground transition-colors"
                 >
-                  Methodology
+                  {t('footer.methodology')}
                 </a>
               </div>
               <SystemStatus />

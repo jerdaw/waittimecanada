@@ -1,0 +1,536 @@
+{
+  "Common": {
+    "title": "WaitTime Canada",
+    "description": "A health systems observatory auditing emergency room wait times across Canada with methodological transparency.",
+    "emergency": {
+      "label": "Emergency?",
+      "call": "Call",
+      "number": "911",
+      "text": "immediately. Wait times are for informational purposes only.",
+      "disclaimer": "Not medical advice. Call 911 for emergencies."
+    },
+    "nav": {
+      "methodology": "Methodology",
+      "analytics": "Analytics",
+      "dataQuality": "Data Quality",
+      "faq": "FAQ",
+      "resources": "Resources",
+      "project": "Project",
+      "github": "GitHub Repository",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Use"
+    },
+    "footer": {
+      "dataSources": "Data from official provincial health authorities.",
+      "copyright": "© {year} WaitTime Canada. MIT License."
+    }
+  },
+  "Header": {
+    "mobileLogo": "WTC",
+    "searchExample": "Search hospitals...",
+    "searchMobile": "Search...",
+    "stats": {
+      "hospitals": "Hospitals:",
+      "live": "Live:"
+    }
+  },
+  "Hero": {
+    "badge": "Real-Time Canadian ER Data",
+    "title": "Canada",
+    "subtitle": "ER Wait Time",
+    "subtitle2": "Observatory",
+    "description": "Explore publicly reported wait time data from official provincial sources. Browse {count} Canadian hospitals and compare methodologies.",
+    "cta": {
+      "explore": "Explore Hospitals",
+      "methodologies": "Understand Methodologies"
+    },
+    "card": {
+      "nearest": "Nearest ER",
+      "featured": "Featured",
+      "live": "LIVE",
+      "min": "min",
+      "p90": "P90 Performance",
+      "updatedNow": "Updated just now",
+      "loading": "Loading hospital data..."
+    }
+  },
+  "SystemStatus": {
+    "checking": "Checking...",
+    "healthy": "All Systems Operational",
+    "degraded": "Data May Be Stale",
+    "down": "Data Unavailable",
+    "updatedAgo": "(updated {minutes}m ago)"
+  },
+  "ExpandedCardDetails": {
+    "metric": "Metric",
+    "status": "Status",
+    "statusLive": "Live Data",
+    "statusStale": "Stale Data",
+    "medicalAdvice": "Need medical advice?",
+    "callNurse": "Call {number} to speak with a registered nurse 24/7.",
+    "directions": "Directions",
+    "callHealthInfo": "Call Health Info",
+    "lastUpdated": "Last updated: {time}",
+    "methodology": {
+      "registrationToDoctor": "Registration to Doctor",
+      "triageToDoctor": "Triage to Doctor"
+    }
+  },
+
+  "HospitalList": {
+    "liveOnly": "Live Only",
+    "results": "{count} results",
+    "qcOccupancy": {
+      "label": "Stretcher Occupancy:",
+      "text": "Quebec reports real-time ED capacity. >100% indicates overcrowding."
+    },
+    "empty": {
+      "title": "No hospitals found",
+      "clearSearch": "Clear search"
+    }
+  },
+  "HospitalCard": {
+    "min": "min",
+    "live": "LIVE",
+    "patientsWaiting": "Patients Waiting",
+    "methodology": "Methodology"
+  },
+  "ViewToggle": {
+    "list": "List",
+    "map": "Map",
+    "split": "Split"
+  },
+  "Map": {
+    "loading": {
+      "title": "Initializing Map...",
+      "subtitle": "Loading hospital locations and regional data..."
+    },
+    "error": {
+      "title": "Unable to load map",
+      "tokenTitle": "Mapbox token required",
+      "tokenMessage": "Add your Mapbox token to view the interactive map."
+    },
+    "legend": {
+      "title": "Wait Time",
+      "short": "< 60 min",
+      "moderate": "60-120 min",
+      "long": "> 120 min",
+      "shortDesc": "Short wait",
+      "moderateDesc": "Moderate",
+      "longDesc": "Long wait"
+    },
+    "popup": {
+      "noData": "No data",
+      "shortWait": "Short wait",
+      "moderateWait": "Moderate wait",
+      "longWait": "Long wait",
+      "min": "min",
+      "noDataAvailable": "No data available",
+      "methodology": "METHODOLOGY",
+      "measure": "Measure:",
+      "type": "Type:",
+      "updated": "Updated {time}",
+      "directions": "Directions",
+      "callHealthInfo": "Call Health Info",
+      "needAdvice": "Need medical advice?",
+      "call": "Call"
+    },
+    "freshness": {
+      "stale": "Data may be stale",
+      "updated": "Updated {time}"
+    },
+    "ontology": {
+      "triage": "Triage",
+      "registration": "Registration",
+      "door": "Door",
+      "arrival": "Arrival",
+      "physician": "Physician",
+      "provider": "Provider",
+      "discharge": "Discharge",
+      "firstAssessment": "First Assessment",
+      "p90": "90th percentile",
+      "mean": "Average",
+      "median": "Median",
+      "p95": "95th percentile",
+      "pointEstimate": "Current estimate",
+      "rollingAvg": "Rolling average",
+      "algorithmic": "Calculated estimate",
+      "unknown": "Unknown"
+    }
+  },
+  "RegionDashboard": {
+    "title": "Regional Intelligence",
+    "subtitle": "{province} health regions, {period} averages",
+    "clearFilter": "Clear Region Filter",
+    "provinceMean": "Provincial regional mean:",
+    "mappingCoverage": "Mapping coverage:",
+    "incompleteMetrics": "— regional metrics may be incomplete.",
+    "loading": "Loading regional analytics...",
+    "metrics": {
+      "mean": "Mean",
+      "median": "Median",
+      "best": "Best",
+      "worst": "Worst"
+    },
+    "reporting": "Reporting hospitals:",
+    "trend": {
+      "improving": "Improving {percent}",
+      "worsening": "Worsening {percent}",
+      "stable": "Stable"
+    }
+  },
+  "AccessInsights": {
+    "disclaimer": "Logistical estimates only. Never delay care for cost. Call 911 for emergencies.",
+    "stats": {
+      "erWithin30km": "ERs Within 30km",
+      "totalHospitals": "of {total} total",
+      "avgCost": "Avg Access Cost",
+      "costDesc": "Fuel + Parking (30km radius)",
+      "nearestEr": "Nearest ER"
+    },
+    "noErNearby": "Note: No emergency rooms within 30km. The nearest ER is {distance}km away in {city}.",
+    "costRange": "Access costs range from ${min} (nearest) to ${max} (furthest within 30km). Costs include fuel (${price}/L in {province}) and parking.",
+    "noHospitals": "No hospitals available to calculate access insights",
+    "enableLocation": {
+      "title": "Enable location access to see personal access insights",
+      "subtitle": "We'll show you how many ERs are nearby and estimated travel costs"
+    },
+    "equity": {
+      "title": "Equity Access Snapshot (7d)",
+      "description": "Tract-level linkage of low-income areas (income quintiles 1-2) and nearby reporting ER wait times.",
+      "loading": "Loading equity linkage summary...",
+      "unavailable": "No equity linkage summary available.",
+      "notReady": "Equity linkage summary not available yet",
+      "lowIncomeTracts": "Low-Income Tracts",
+      "tractsCount": "of {total} tracts",
+      "hospitalsNear": "Hospitals Near Tracts",
+      "withinKm": "within {distance}km",
+      "waitGap": "Wait Gap vs Province",
+      "reportingCount": "Reporting hospitals: {count}",
+      "nearTractMean": "Near-tract mean wait:",
+      "provinceMean": "Province mean wait:",
+      "placeholder": "Placeholder tract dataset in use. Replace with StatsCan-linked tract data before making policy conclusions."
+    }
+  },
+  "HomePage": {
+    "footer": {
+      "methodology": "Methodology"
+    },
+    "accessInsights": "Access Insights"
+  },
+  "AboutSection": {
+    "badge": "About This Project",
+    "title": "Why I Built WaitTime Canada",
+    "p1": "As a pre-medical student, I noticed something troubling: Canadian provinces report emergency room wait times using <strong>completely different methodologies</strong>. Ontario measures from triage to physician (90th percentile). Quebec measures from registration to physician (rolling average). These numbers can't be directly compared—but most apps present them side-by-side anyway.",
+    "p2": "<strong>WaitTime Canada is different.</strong> Instead of pretending the data is comparable, we audit it. We tag every measurement with its methodology and warn users when direct comparison is statistically invalid. This is what I call a \"Health Systems Observatory\"—a tool that exposes the black box of healthcare reporting.",
+    "p3": "This project demonstrates my approach to medicine: rigorous methodology, transparent limitations, and a commitment to helping patients make informed decisions—even when that means telling them what we <em>don't</em> know.",
+    "aria": {
+      "expand": "Expand about section",
+      "collapse": "Collapse about section",
+      "avatar": "Author avatar",
+      "github": "View on GitHub",
+      "linkedin": "LinkedIn profile",
+      "email": "Email contact"
+    },
+    "author": {
+      "name": "Jeremy Dawson",
+      "role": "Pre-Medical Student"
+    }
+  },
+  "RegionSelector": {
+    "label": "Region",
+    "allRegions": "All Regions"
+  },
+  "Testimonial": {
+    "label": "Stakeholder Feedback",
+    "anonymous": "Anonymous"
+  },
+  "StructuredData": {
+    "faq": {
+      "q1": "How does WaitTime Canada measure ER wait times?",
+      "a1": "We aggregate data from provincial health authorities. For Ontario, we report P90 (90th percentile) wait times from triage to physician assessment.",
+      "q2": "Why can't I compare Ontario and Quebec wait times directly?",
+      "a2": "Ontario reports P90 (90th percentile) triage-to-physician times, while Quebec reports rolling average registration-to-physician times. These different methodologies mean direct comparison is statistically invalid.",
+      "q3": "Is this data real-time?",
+      "a3": "Yes, we scrape official provincial data sources every 15 minutes. Check the 'Updated' timestamp on each hospital card for specific data freshness."
+    },
+    "medicalPage": {
+      "desc": "Real-time emergency room wait times and methodology auditing for Canadian hospitals."
+    },
+    "howTo": {
+      "step1": {
+        "name": "Allow location access",
+        "text": "Optionally enable browser geolocation to see hospitals sorted by distance."
+      },
+      "step2": {
+        "name": "Browse wait time data",
+        "text": "Explore the publicly reported wait times from official provincial health sources."
+      },
+      "step3": {
+        "name": "Understand the methodology",
+        "text": "Click on a hospital to learn how its wait time is measured and reported by provincial authorities."
+      }
+    }
+  },
+  "Metadata": {
+    "title": "WaitTime Canada | Real-Time ER Wait Times & Methodology Audit",
+    "description": "A clinically defensible Health Systems Observatory tracking emergency department wait times across Canada. Compare methodologies, view real-time data, and access health system analytics.",
+    "keywords": "ER wait times, Canada emergency rooms, health methodology, hospital wait times, Quebec ER, Ontario ER, Alberta ER, BC ER"
+  },
+  "TrendChart": {
+    "title": "Wait Time Trends",
+    "aggregated": "Aggregated",
+    "waitTime": "Wait Time",
+    "mean": "Mean",
+    "min": "Min",
+    "max": "Max",
+    "error": "Failed to load trends",
+    "noData": "No historical data available",
+    "periods": {
+      "24h": "24h",
+      "7d": "7d",
+      "30d": "30d",
+      "90d": "90d",
+      "6m": "6m",
+      "1y": "1y"
+    }
+  },
+  "MethodsPage": {
+    "header": {
+      "backToMap": "Back to Map",
+      "title": "Understanding Wait Time Metrics",
+      "description": "Canadian provinces measure emergency department wait times using different methodologies. Direct comparison requires understanding these differences."
+    },
+    "sections": {
+      "comparabilityMatrix": {
+        "title": "Provincial Comparability Matrix",
+        "description": "This matrix shows which provinces can be directly compared. Click any cell to see detailed methodology differences."
+      },
+      "provincialMethodologies": {
+        "title": "Provincial Methodologies",
+        "description": "Each province has chosen different measurement approaches based on their health system priorities and data infrastructure."
+      },
+      "methodologyTimeline": {
+        "title": "Methodology Change History",
+        "description": "This timeline shows detected changes in how provinces calculate wait times. Our system monitors for distributional shifts that may indicate methodology updates."
+      },
+      "dataForResearchers": {
+        "title": "Data for Researchers",
+        "description": "Download wait time data with full methodology tags for research use. All exports include our metric ontology columns to ensure proper attribution and comparability analysis."
+      }
+    },
+    "cta": {
+      "title": "Ready to explore wait times?",
+      "description": "Now that you understand how measurements differ, browse the interactive map with confidence.",
+      "button": "View Interactive Map"
+    },
+    "footer": {
+      "tagline": "WaitTime Canada - A Health Systems Observatory",
+      "lastUpdated": "Last updated"
+    }
+  },
+  "Methods": {
+    "ComparabilityMatrix": {
+      "noData": "No data sources configured yet.",
+      "levels": {
+        "comparable": "Directly comparable",
+        "partial": "Partially comparable",
+        "notComparable": "Not comparable"
+      },
+      "legend": {
+        "comparable": "Directly comparable",
+        "partial": "Partially comparable (2-3 matches)",
+        "notComparable": "Not comparable (0-1 matches)"
+      },
+      "export": "Export CSV",
+      "comparing": "Comparing {p1} with {p2}",
+      "metrics": {
+        "family": "Metric Family",
+        "start": "Start Event",
+        "end": "End Event",
+        "stat": "Statistic Type"
+      },
+      "explanations": {
+        "comparable": "✓ These provinces use identical methodologies and can be directly compared.",
+        "partial": "⚠ These provinces differ in some dimensions. Comparisons should note these differences.",
+        "notComparable": "✗ These provinces use fundamentally different methodologies. Direct comparison is statistically invalid."
+      }
+    },
+    "ProvinceMethodologyCard": {
+      "viewOfficial": "View Official Methodology",
+      "notAvailable": "Official methodology documentation not available",
+      "metricFamily": {
+        "TIME_TO_PROVIDER": "Time until first contact with physician or healthcare provider",
+        "TOTAL_LOS": "Complete length of stay in emergency department",
+        "STRETCHER_OCCUPANCY": "Percentage of stretchers currently occupied"
+      },
+      "startEvent": {
+        "TRIAGE": "Clock starts when patient completes triage assessment",
+        "REGISTRATION": "Clock starts when patient registers at ED",
+        "DOOR": "Clock starts when patient enters ED",
+        "UNKNOWN": "Start point varies or is not standardized"
+      },
+      "endEvent": {
+        "PHYSICIAN": "Clock stops at first physician contact",
+        "PROVIDER": "Clock stops at first healthcare provider contact (MD, NP, PA)",
+        "DISCHARGE": "Clock stops when patient is discharged",
+        "FIRST_ASSESSMENT": "Clock stops at initial clinical assessment"
+      },
+      "statisticType": {
+        "P90": "90th percentile - 9 out of 10 patients seen faster than this",
+        "MEDIAN": "50th percentile - typical middle-of-the-road wait time",
+        "MEAN": "Average of all wait times",
+        "ROLLING_AVG": "Moving average over recent time period",
+        "ALGORITHMIC": "Calculated estimate based on current conditions",
+        "POINT_ESTIMATE": "Real-time snapshot of current wait"
+      }
+    },
+    "FAQ": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Common questions about wait time data and methodology",
+      "items": {
+        "q1": {
+          "question": "Why can't I compare Ottawa and Gatineau directly?",
+          "answer": "Ottawa (Ontario) and Gatineau (Quebec) use different measurement methodologies. Ontario reports 90th percentile triage-to-physician time, while Quebec reports rolling average registration-to-provider time. These differences mean direct comparison would be statistically invalid. Our platform displays a methodology divergence warning when you attempt such comparisons."
+        },
+        "q2": {
+          "question": "What does '90th percentile' mean in practice?",
+          "answer": "A P90 wait time of 120 minutes means that 90% of patients are seen faster than 2 hours, and only 10% wait longer. This is a conservative estimate used for worst-case planning. It's higher than the median (typical) wait time because it accounts for outliers and busy periods."
+        },
+        "q3": {
+          "question": "Why do some hospitals show 'No Data'?",
+          "answer": "Hospitals show 'No Data' when: (1) The scraper hasn't run recently (technical issue), (2) The source hospital hasn't reported data, or (3) The hospital was recently added and awaits verification. Our heartbeat monitoring system tracks data freshness and displays a warning when data is stale."
+        },
+        "q4": {
+          "question": "How often is this data updated?",
+          "answer": "Update frequency varies by province. Ontario sources update every 15 minutes, Quebec updates hourly. Our scrapers run automatically via GitHub Actions on 15-minute intervals. You can see the last update timestamp in the top-left corner of the map."
+        },
+        "q5": {
+          "question": "Where does this data come from?",
+          "answer": "We aggregate data from official provincial sources: ER Watch for Ontario (which consolidates Ontario Health data), Index Santé for Quebec (which uses MSSS data), and official health authority portals for other provinces. All sources are documented in our methodology pages with links to original sources."
+        },
+        "q6": {
+          "question": "What if I need medical help right now?",
+          "answer": "This is an informational tool for planning purposes only, not for emergency triage. If you have a medical emergency, call 911 immediately. For urgent but non-emergency care advice, call your provincial health line: Health811 in Ontario, Info-Santé 811 in Quebec, or Health Link 811 in Alberta/other provinces."
+        },
+        "q7": {
+          "question": "Can I use this data for research or journalism?",
+          "answer": "Yes, all data displayed is from public sources. We encourage responsible use for research, journalism, and advocacy. Please attribute data to the original provincial sources and cite our methodology documentation. Contact us if you need bulk data access or have questions about our ontology system."
+        },
+        "q8": {
+          "question": "Why are methodology differences important?",
+          "answer": "Healthcare systems are complex, and measurement choices affect outcomes. A province that reports triage-to-physician time is measuring something fundamentally different than one reporting registration-to-provider time. Without understanding these differences, comparisons can be misleading and policy decisions can be based on faulty data. Our platform makes these differences explicit."
+        }
+      },
+      "cta": {
+        "title": "Have more questions?",
+        "description": "We're continuously improving our methodology documentation and data sources. If you have questions or feedback, we'd love to hear from you.",
+        "button": "Submit feedback on GitHub"
+      }
+    },
+    "MethodologyTimeline": {
+      "filter": "Filter by province:",
+      "allProvinces": "All provinces",
+      "noEvents": {
+        "title": "No methodology changes detected",
+        "description": "The system continuously monitors for distributional shifts. Changes will appear here when detected."
+      },
+      "detected": "Detected {date}",
+      "previousPeriod": "Previous Period",
+      "currentPeriod": "Current Period",
+      "analyzed": "Analyzed {count} hospital",
+      "analyzedPlural": "Analyzed {count} hospitals",
+      "error": "Error loading methodology changes: {message}"
+    },
+    "OntologyExplainer": {
+      "title": "The Four Dimensions of Wait Time Measurement",
+      "subtitle": "For two measurements to be comparable, all four dimensions must match. Understanding these dimensions is crucial for interpreting published wait times.",
+      "dimensions": {
+        "metricFamily": {
+          "title": "Metric Family",
+          "subtitle": "What is being measured?",
+          "description": "The fundamental category of measurement. Different metric families answer different clinical questions.",
+          "examples": {
+            "timeToProvider": {
+              "label": "Time to Provider",
+              "explanation": "How long until a patient is first assessed by a healthcare provider"
+            },
+            "totalLos": {
+              "label": "Total Length of Stay",
+              "explanation": "Complete duration from arrival to discharge from the ED"
+            },
+            "stretcherOccupancy": {
+              "label": "Stretcher Occupancy",
+              "explanation": "Percentage of available stretcher beds currently occupied"
+            }
+          }
+        },
+        "startEvent": {
+          "title": "Start Event",
+          "subtitle": "When does the clock start?",
+          "description": "The triggering event that begins the measurement. This can significantly affect reported times.",
+          "examples": {
+            "door": {
+              "label": "Door (Arrival)",
+              "explanation": "Clock starts when patient physically enters the ED"
+            },
+            "triage": {
+              "label": "Triage",
+              "explanation": "Clock starts when triage nurse assessment is completed"
+            },
+            "registration": {
+              "label": "Registration",
+              "explanation": "Clock starts when administrative check-in is completed"
+            }
+          }
+        },
+        "endEvent": {
+          "title": "End Event",
+          "subtitle": "When does the clock stop?",
+          "description": "The event that concludes the measurement. Differences here can make provinces incomparable.",
+          "examples": {
+            "physician": {
+              "label": "Physician Contact",
+              "explanation": "Clock stops when patient first sees a medical doctor"
+            },
+            "provider": {
+              "label": "Any Provider Contact",
+              "explanation": "Clock stops at first contact with MD, nurse practitioner, or physician assistant"
+            },
+            "discharge": {
+              "label": "Discharge",
+              "explanation": "Clock stops when patient leaves the ED"
+            }
+          }
+        },
+        "statisticType": {
+          "title": "Statistic Type",
+          "subtitle": "How is the number calculated?",
+          "description": "The mathematical method used to aggregate individual wait times. This profoundly affects interpretation.",
+          "examples": {
+            "p90": {
+              "label": "90th Percentile",
+              "explanation": "90% of patients are seen faster than this time (worst-case planning)"
+            },
+            "median": {
+              "label": "Median (50th Percentile)",
+              "explanation": "Typical middle-of-the-road experience for an average patient"
+            },
+            "rollingAvg": {
+              "label": "Rolling Average",
+              "explanation": "Smoothed average over recent time period, reduces noise"
+            },
+            "pointEstimate": {
+              "label": "Real-Time Estimate",
+              "explanation": "Current snapshot based on current conditions and queue"
+            }
+          }
+        }
+      },
+      "summary": {
+        "title": "Why This Matters",
+        "description": "A 60-minute wait in Ontario (P90, Triage→Physician) is fundamentally different from a 60-minute wait in Quebec (Rolling Avg, Registration→Provider). Our platform automatically detects these differences and warns you when comparing incompatible measurements."
+      }
+    }
+  }
+}

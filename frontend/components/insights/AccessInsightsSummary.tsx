@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { MapPin, DollarSign, Navigation, AlertTriangle } from "lucide-react";
 import { Hospital } from "@/app/api/hospitals/route";
 import { calculateDistance } from "@/utils/distance";
+import { useTranslations } from "next-intl";
 
 interface AccessInsightsSummaryProps {
   hospitals: Hospital[];
@@ -74,6 +75,7 @@ export function AccessInsightsSummary({
   userLocation,
   province,
 }: AccessInsightsSummaryProps) {
+  const t = useTranslations('AccessInsights');
   const [equitySummary, setEquitySummary] =
     useState<EquitySummarySnapshot | null>(null);
   const [equityLoading, setEquityLoading] = useState(true);
@@ -165,8 +167,7 @@ export function AccessInsightsSummary({
           <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
             <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
             <p className="text-xs text-amber-800 dark:text-amber-200">
-              <strong>Logistical estimates only.</strong> Never delay care for
-              cost. Call 911 for emergencies.
+              {t('disclaimer')}
             </p>
           </div>
 
@@ -175,21 +176,21 @@ export function AccessInsightsSummary({
               {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <StatCard
-                  title="ERs Within 30km"
+                  title={t('stats.erWithin30km')}
                   value={within30km.length}
-                  subtitle={`of ${hospitals.length} total`}
+                  subtitle={t('stats.totalHospitals', {total: hospitals.length})}
                   icon={<MapPin className="w-5 h-5" />}
                 />
 
                 <StatCard
-                  title="Avg Access Cost"
+                  title={t('stats.avgCost')}
                   value={`$${Math.round(avgAccessCost)}`}
-                  subtitle="Fuel + Parking (30km radius)"
+                  subtitle={t('stats.costDesc')}
                   icon={<DollarSign className="w-5 h-5" />}
                 />
 
                 <StatCard
-                  title="Nearest ER"
+                  title={t('stats.nearestEr')}
                   value={`${nearest.distance.toFixed(1)}km`}
                   subtitle={nearest.name}
                   icon={<Navigation className="w-5 h-5" />}
@@ -200,9 +201,7 @@ export function AccessInsightsSummary({
               {within30km.length === 0 && within50km.length > 0 && (
                 <div className="p-3 bg-muted/50 border border-border rounded-lg">
                   <p className="text-xs text-muted-foreground">
-                    <strong>Note:</strong> No emergency rooms within 30km. The
-                    nearest ER is {nearest.distance.toFixed(1)}km away in{" "}
-                    {nearest.city}.
+                    {t('noErNearby', {distance: nearest.distance.toFixed(1), city: nearest.city})}
                   </p>
                 </div>
               )}
@@ -211,16 +210,12 @@ export function AccessInsightsSummary({
               {within30km.length > 0 && (
                 <div className="p-3 bg-muted/50 border border-border rounded-lg">
                   <p className="text-xs text-muted-foreground">
-                    Access costs range from{" "}
-                    <strong>${Math.round(nearest.accessCost)}</strong> (nearest)
-                    to{" "}
-                    <strong>
-                      $
-                      {Math.round(within30km[within30km.length - 1].accessCost)}
-                    </strong>{" "}
-                    (furthest within 30km). Costs include fuel ($
-                    {(GAS_PRICES[province] || 1.55).toFixed(2)}/L in {province})
-                    and parking.
+                    {t('costRange', {
+                      min: Math.round(nearest.accessCost),
+                      max: Math.round(within30km[within30km.length - 1].accessCost),
+                      price: (GAS_PRICES[province] || 1.55).toFixed(2),
+                      province: province
+                    })}
                   </p>
                 </div>
               )}
@@ -229,7 +224,7 @@ export function AccessInsightsSummary({
             <div className="p-6 text-center bg-card border border-border rounded-lg">
               <MapPin className="w-8 h-8 mx-auto mb-2 text-muted-foreground opacity-50" />
               <p className="text-sm font-medium text-muted-foreground">
-                No hospitals available to calculate access insights
+                {t('noHospitals')}
               </p>
             </div>
           )}
@@ -238,38 +233,36 @@ export function AccessInsightsSummary({
         <div className="p-6 text-center bg-card border border-border rounded-lg">
           <MapPin className="w-8 h-8 mx-auto mb-2 text-muted-foreground opacity-50" />
           <p className="text-sm font-medium text-muted-foreground">
-            Enable location access to see personal access insights
+            {t('enableLocation.title')}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            We&apos;ll show you how many ERs are nearby and estimated travel
-            costs
+            {t('enableLocation.subtitle')}
           </p>
         </div>
       )}
 
       <div className="rounded-lg border border-border bg-card p-4">
         <h3 className="text-sm font-semibold text-foreground">
-          Equity Access Snapshot (7d)
+          {t('equity.title')}
         </h3>
         <p className="mt-1 text-xs text-muted-foreground">
-          Tract-level linkage of low-income areas (income quintiles 1-2) and
-          nearby reporting ER wait times.
+          {t('equity.description')}
         </p>
 
         {equityLoading ? (
           <p className="mt-3 text-sm text-muted-foreground">
-            Loading equity linkage summary...
+            {t('equity.loading')}
           </p>
         ) : equityError ? (
           <p className="mt-3 text-sm text-muted-foreground">{equityError}</p>
         ) : !equitySummary ? (
           <p className="mt-3 text-sm text-muted-foreground">
-            No equity linkage summary available.
+            {t('equity.unavailable')}
           </p>
         ) : equitySummary.status === "not_available_yet" ? (
           <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
             <p className="font-medium">
-              Equity linkage summary not available yet
+              {t('equity.notReady')}
             </p>
             <p className="mt-1">{equitySummary.message}</p>
             {Array.isArray(equitySummary.setup_steps) &&
@@ -289,19 +282,19 @@ export function AccessInsightsSummary({
           <div className="mt-3 space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <StatCard
-                title="Low-Income Tracts"
+                title={t('equity.lowIncomeTracts')}
                 value={equitySummary.low_income_tracts ?? 0}
-                subtitle={`of ${equitySummary.total_tracts ?? 0} tracts`}
+                subtitle={t('equity.tractsCount', {total: equitySummary.total_tracts ?? 0})}
                 icon={<MapPin className="w-5 h-5" />}
               />
               <StatCard
-                title="Hospitals Near Tracts"
+                title={t('equity.hospitalsNear')}
                 value={equitySummary.hospitals_near_low_income ?? 0}
-                subtitle={`within ${equitySummary.threshold_km ?? 30}km`}
+                subtitle={t('equity.withinKm', {distance: equitySummary.threshold_km ?? 30})}
                 icon={<Navigation className="w-5 h-5" />}
               />
               <StatCard
-                title="Wait Gap vs Province"
+                title={t('equity.waitGap')}
                 value={
                   equitySummary.wait_gap_minutes === null ||
                   equitySummary.wait_gap_minutes === undefined
@@ -310,20 +303,20 @@ export function AccessInsightsSummary({
                         equitySummary.wait_gap_minutes,
                       )} min`
                 }
-                subtitle={`Reporting hospitals: ${equitySummary.reporting_hospitals ?? 0}`}
+                subtitle={t('equity.reportingCount', {count: equitySummary.reporting_hospitals ?? 0})}
                 icon={<AlertTriangle className="w-5 h-5" />}
               />
             </div>
 
             <p className="text-xs text-muted-foreground">
-              Near-tract mean wait:{" "}
+              {t('equity.nearTractMean')}{" "}
               <strong>
                 {equitySummary.near_low_income_avg_wait === null ||
                 equitySummary.near_low_income_avg_wait === undefined
                   ? "n/a"
                   : `${Math.round(equitySummary.near_low_income_avg_wait)} min`}
               </strong>{" "}
-              • Province mean wait:{" "}
+              • {t('equity.provinceMean')}{" "}
               <strong>
                 {equitySummary.province_avg_wait === null ||
                 equitySummary.province_avg_wait === undefined
@@ -334,8 +327,7 @@ export function AccessInsightsSummary({
 
             {equitySummary.is_placeholder && (
               <p className="text-xs text-amber-700">
-                Placeholder tract dataset in use. Replace with StatsCan-linked
-                tract data before making policy conclusions.
+                {t('equity.placeholder')}
               </p>
             )}
           </div>

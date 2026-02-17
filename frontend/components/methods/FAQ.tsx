@@ -1,61 +1,31 @@
 "use client";
 
 import { useState } from "react";
-
-const faqs = [
-  {
-    question: "Why can't I compare Ottawa and Gatineau directly?",
-    answer:
-      "Ottawa (Ontario) and Gatineau (Quebec) use different measurement methodologies. Ontario reports 90th percentile triage-to-physician time, while Quebec reports rolling average registration-to-provider time. These differences mean direct comparison would be statistically invalid. Our platform displays a methodology divergence warning when you attempt such comparisons.",
-  },
-  {
-    question: "What does '90th percentile' mean in practice?",
-    answer:
-      "A P90 wait time of 120 minutes means that 90% of patients are seen faster than 2 hours, and only 10% wait longer. This is a conservative estimate used for worst-case planning. It's higher than the median (typical) wait time because it accounts for outliers and busy periods.",
-  },
-  {
-    question: "Why do some hospitals show 'No Data'?",
-    answer:
-      "Hospitals show 'No Data' when: (1) The scraper hasn't run recently (technical issue), (2) The source hospital hasn't reported data, or (3) The hospital was recently added and awaits verification. Our heartbeat monitoring system tracks data freshness and displays a warning when data is stale.",
-  },
-  {
-    question: "How often is this data updated?",
-    answer:
-      "Update frequency varies by province. Ontario sources update every 15 minutes, Quebec updates hourly. Our scrapers run automatically via GitHub Actions on 15-minute intervals. You can see the last update timestamp in the top-left corner of the map.",
-  },
-  {
-    question: "Where does this data come from?",
-    answer:
-      "We aggregate data from official provincial sources: ER Watch for Ontario (which consolidates Ontario Health data), Index Santé for Quebec (which uses MSSS data), and official health authority portals for other provinces. All sources are documented in our methodology pages with links to original sources.",
-  },
-  {
-    question: "What if I need medical help right now?",
-    answer:
-      "This is an informational tool for planning purposes only, not for emergency triage. If you have a medical emergency, call 911 immediately. For urgent but non-emergency care advice, call your provincial health line: Health811 in Ontario, Info-Santé 811 in Quebec, or Health Link 811 in Alberta/other provinces.",
-  },
-  {
-    question: "Can I use this data for research or journalism?",
-    answer:
-      "Yes, all data displayed is from public sources. We encourage responsible use for research, journalism, and advocacy. Please attribute data to the original provincial sources and cite our methodology documentation. Contact us if you need bulk data access or have questions about our ontology system.",
-  },
-  {
-    question: "Why are methodology differences important?",
-    answer:
-      "Healthcare systems are complex, and measurement choices affect outcomes. A province that reports triage-to-physician time is measuring something fundamentally different than one reporting registration-to-provider time. Without understanding these differences, comparisons can be misleading and policy decisions can be based on faulty data. Our platform makes these differences explicit.",
-  },
-];
+import { useTranslations } from "next-intl";
 
 export function FAQ() {
+  const t = useTranslations('Methods.FAQ');
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+  const faqs = [
+    { question: t('items.q1.question'), answer: t('items.q1.answer') },
+    { question: t('items.q2.question'), answer: t('items.q2.answer') },
+    { question: t('items.q3.question'), answer: t('items.q3.answer') },
+    { question: t('items.q4.question'), answer: t('items.q4.answer') },
+    { question: t('items.q5.question'), answer: t('items.q5.answer') },
+    { question: t('items.q6.question'), answer: t('items.q6.answer') },
+    { question: t('items.q7.question'), answer: t('items.q7.answer') },
+    { question: t('items.q8.question'), answer: t('items.q8.answer') },
+  ];
 
   return (
     <div className="space-y-4">
       <div className="text-center mb-8">
         <h3 className="text-2xl font-bold text-slate-900 mb-2">
-          Frequently Asked Questions
+          {t('title')}
         </h3>
         <p className="text-slate-600">
-          Common questions about wait time data and methodology
+          {t('subtitle')}
         </p>
       </div>
 
@@ -103,12 +73,10 @@ export function FAQ() {
       {/* Contact CTA */}
       <div className="mt-8 p-6 rounded-xl bg-blue-50 border border-blue-200">
         <h4 className="font-semibold text-blue-900 mb-2">
-          Have more questions?
+          {t('cta.title')}
         </h4>
         <p className="text-blue-800 text-sm mb-4">
-          We&apos;re continuously improving our methodology documentation and
-          data sources. If you have questions or feedback, we&apos;d love to
-          hear from you.
+          {t('cta.description')}
         </p>
         <a
           href="https://github.com/jerdaw/waittimecanada/issues"
@@ -116,7 +84,7 @@ export function FAQ() {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
         >
-          Submit feedback on GitHub
+          {t('cta.button')}
           <svg
             className="w-4 h-4"
             fill="none"

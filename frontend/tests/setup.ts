@@ -8,6 +8,13 @@ afterEach(() => {
   cleanup();
 });
 
+// Mock next-intl
+vi.mock('next-intl', () => ({
+  useTranslations: () => (key: string) => key,
+  useLocale: () => 'en',
+  useTimeZone: () => 'America/Toronto',
+}));
+
 // Mock Next.js router
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -90,7 +97,7 @@ global.fetch = vi.fn();
 
 // Mock environment variables
 process.env.NEXT_PUBLIC_MAPBOX_TOKEN = "pk.test.mock-token";
-process.env.DATABASE_URL = "postgresql://test:test@localhost:5432/test";
+process.env.DATABASE_URL = "postgresql://test:test@localhost:5432/test"; // pragma: allowlist secret
 
 // Suppress console errors in tests (optional)
 // global.console = {

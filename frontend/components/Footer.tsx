@@ -1,6 +1,10 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export function Footer() {
+  const t = useTranslations('Common');
+  const year = new Date().getFullYear();
+
   return (
     <footer className="border-t border-border bg-muted/30 mt-auto">
       <div className="container max-w-6xl mx-auto px-4 py-8">
@@ -8,51 +12,50 @@ export function Footer() {
           {/* About Section */}
           <div className="space-y-3">
             <h3 className="font-semibold text-sm text-foreground">
-              WaitTime Canada
+              {t('title')}
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              A health systems observatory auditing emergency room wait times
-              across Canada with methodological transparency.
+              {t('description')}
             </p>
             <p className="text-xs text-muted-foreground">
-              Data from official provincial health authorities.
+              {t('footer.dataSources')}
             </p>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-3">
-            <h3 className="font-semibold text-sm text-foreground">Resources</h3>
+            <h3 className="font-semibold text-sm text-foreground">{t('nav.resources')}</h3>
             <nav className="flex flex-col gap-2 text-sm">
               <Link
                 href="/methods"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                Methodology
+                {t('nav.methodology')}
               </Link>
               <Link
                 href="/analytics"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                Analytics
+                {t('nav.analytics')}
               </Link>
               <Link
                 href="/data-quality"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                Data Quality
+                {t('nav.dataQuality')}
               </Link>
               <Link
                 href="/faq"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                FAQ
+                {t('nav.faq')}
               </Link>
             </nav>
           </div>
 
           {/* Legal & Project Links */}
           <div className="space-y-3">
-            <h3 className="font-semibold text-sm text-foreground">Project</h3>
+            <h3 className="font-semibold text-sm text-foreground">{t('nav.project')}</h3>
             <nav className="flex flex-col gap-2 text-sm">
               <a
                 href="https://github.com/jerdaw/waittimecanada"
@@ -60,19 +63,19 @@ export function Footer() {
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                GitHub Repository
+                {t('nav.github')}
               </a>
               <Link
                 href="/privacy"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                Privacy Policy
+                {t('nav.privacy')}
               </Link>
               <Link
                 href="/terms"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                Terms of Use
+                {t('nav.terms')}
               </Link>
             </nav>
           </div>
@@ -81,7 +84,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-8 pt-6 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} WaitTime Canada. MIT License.</p>
+            <p>{t('footer.copyright', {year})}</p>
             <div className="flex items-center gap-2 text-xs">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
                 <svg
@@ -98,7 +101,7 @@ export function Footer() {
                   />
                 </svg>
                 <span className="font-medium">
-                  Not medical advice. Call 911 for emergencies.
+                  {t('emergency.disclaimer')}
                 </span>
               </span>
             </div>

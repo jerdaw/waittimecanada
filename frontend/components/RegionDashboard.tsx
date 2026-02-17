@@ -1,6 +1,7 @@
 "use client";
 
 import { clsx } from "clsx";
+import { useTranslations } from "next-intl";
 
 type RegionTrend = "improving" | "stable" | "worsening";
 
@@ -37,6 +38,7 @@ interface RegionDashboardProps {
 }
 
 function provinceLabel(code: string): string {
+  // Simplistic mapping, ideally translations should handle this or backend sends proper name
   const labels: Record<string, string> = {
     ON: "Ontario",
     QC: "Quebec",
@@ -49,13 +51,6 @@ function provinceLabel(code: string): string {
 function formatWait(value: number | null): string {
   if (value === null) return "--";
   return `${Math.round(value)} min`;
-}
-
-function trendLabel(trend: RegionTrend, change: number): string {
-  const pct = `${Math.abs(change).toFixed(1)}%`;
-  if (trend === "improving") return `Improving ${pct}`;
-  if (trend === "worsening") return `Worsening ${pct}`;
-  return "Stable";
 }
 
 function trendClasses(trend: RegionTrend): string {
@@ -81,8 +76,17 @@ export function RegionDashboard({
   selectedRegionId,
   onSelectRegion,
 }: RegionDashboardProps) {
+  const t = useTranslations('RegionDashboard');
+
   if (!loading && regions.length === 0) {
     return null;
+  }
+
+  const getTrendLabel = (trend: RegionTrend, change: number) => {
+    const pct = `${Math.abs(change).toFixed(1)}%`;
+    if (trend === "improving") return t('trend.improving', {percent: pct});
+    if (trend === "worsening") return t('trend.worsening', {percent: pct});
+    return t('trend.stable');
   }
 
   return (
@@ -90,24 +94,25 @@ export function RegionDashboard({
       <div className="flex items-start justify-between gap-3 mb-4">
         <div>
           <h3 className="text-sm font-semibold text-foreground">
-            Regional Intelligence
+            {t('title')}
           </h3>
           <p className="text-xs text-muted-foreground">
-            {provinceLabel(province)} health regions, {period} averages
+            {t('subtitle', {province: provinceLabel(province), period})}
           </p>
         </div>
         <button
           onClick={() => onSelectRegion(null)}
           className="text-xs text-primary hover:underline"
           type="button"
+          aria-label={t('clearFilter')}
         >
-          Clear Region Filter
+          {t('clearFilter')}
         </button>
       </div>
 
       {provinceMean !== null && (
         <p className="text-xs text-muted-foreground mb-3">
-          Provincial regional mean:{" "}
+          {t('provinceMean')}{" "}
           <span className="font-semibold">{Math.round(provinceMean)} min</span>
         </p>
       )}
@@ -121,19 +126,19 @@ export function RegionDashboard({
               : "text-muted-foreground",
           )}
         >
-          Mapping coverage:{" "}
+          {t('mappingCoverage')}{" "}
           <span className="font-semibold">
             {mappingCoverage.mapped_hospitals}/{mappingCoverage.total_hospitals}
           </span>{" "}
-          hospitals ({mappingCoverage.coverage_percent.toFixed(1)}%)
+          ({mappingCoverage.coverage_percent.toFixed(1)}%)
           {mappingCoverage.coverage_percent < 60 &&
-            " — regional metrics may be incomplete."}
+            t('incompleteMetrics')}
         </p>
       )}
 
       {loading ? (
         <div className="text-sm text-muted-foreground">
-          Loading regional analytics...
+          {t('loading')}
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -167,31 +172,31 @@ export function RegionDashboard({
                       trendClasses(region.trend),
                     )}
                   >
-                    {trendLabel(region.trend, region.trend_change_percent)}
+                    {getTrendLabel(region.trend, region.trend_change_percent)}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
-                    <p className="text-muted-foreground">Mean</p>
+                    <p className="text-muted-foreground">{t('metrics.mean')}</p>
                     <p className="font-semibold text-foreground">
                       {formatWait(region.period_mean)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Median</p>
+                    <p className="text-muted-foreground">{t('metrics.median')}</p>
                     <p className="font-semibold text-foreground">
                       {formatWait(region.period_median)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Best</p>
+                    <p className="text-muted-foreground">{t('metrics.best')}</p>
                     <p className="font-semibold text-emerald-700">
                       {formatWait(region.best_wait)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Worst</p>
+                    <p className="text-muted-foreground">{t('metrics.worst')}</p>
                     <p className="font-semibold text-red-700">
                       {formatWait(region.worst_wait)}
                     </p>
@@ -199,7 +204,7 @@ export function RegionDashboard({
                 </div>
 
                 <p className="text-[11px] text-muted-foreground mt-2">
-                  Reporting hospitals: {region.reporting_count}/
+                  {t('reporting')} {region.reporting_count}/
                   {region.hospital_count}
                 </p>
               </button>
