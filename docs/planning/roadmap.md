@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-02-16)
+## Current Status (Updated 2026-02-17)
 
 **Progress:** M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
@@ -58,7 +58,7 @@ All planned milestones through M18 and Operations verification are complete. Fut
 - Operational impact confirmed (alerts, workflows, secrets, deployment posture).
 - Item status reflected in this roadmap and no duplicate open tasks remain.
 
-### Release and Cost Policy (Updated 2026-02-16)
+### Release and Cost Policy (Updated 2026-02-17)
 - **Netlify Deploys:** Paused due to credit exhaustion. Waiting for monthly reset (**March 1, 2026**).
 - **Public Hosting:** Offline until reset.
 - Scraper reliability workflows (`scraper-cron`, heartbeat monitor, readiness checks) remain active on GitHub Actions.
@@ -115,7 +115,7 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 - [ ] **P2 / Add GitHub Project board** (#47) — Process overhead
 
 **Expansion (Deferred):**
-- [ ] **P2 / French language support (i18n)** (#7) — Major scope expansion
+- [x] **P2 / French language support (i18n)** (#7) — Major scope expansion
 
 ### Next (2-6 weeks) — Core Engineering & Reliability
 
@@ -260,13 +260,15 @@ Ranked by **admissions credibility per hour of effort**:
 ## Implementation Plans
 
 Active milestone plans in `docs/planning/implementation/`:
-- `docs/planning/implementation/milestone-19-governance-quality.md` — **M19: Governance, Quality & Professional Polish (18 items: #1-5, #8, #11-12, #15-16, #18-19, #23, #26, #28, #30, #41, #46)**
-- `docs/planning/implementation/milestone-9-launch.md` — Production deployment & stakeholder validation
-- `docs/planning/implementation/milestone-11-equity.md` — Access Burden Estimator & equity layer
-- `docs/planning/implementation/milestone-12-research.md` — Citation export & alert system
-- `docs/planning/implementation/m9-remaining-user-actions.md` — M9 manual user action guide (active)
+(None at this time)
 
 Archived (delivered):
+- `docs/planning/archive/milestone-25-reliability-verification.md` — Reliability & Verification Phase 2 (M25)
+- `docs/planning/archive/milestone-19-governance-quality.md` — Governance, Quality & Professional Polish (M19)
+- `docs/planning/implementation/archived/milestone-9-launch.md` — Production deployment & stakeholder validation (M9)
+- `docs/planning/implementation/archived/milestone-11-equity.md` — Access Burden Estimator & equity layer (M11)
+- `docs/planning/implementation/archived/milestone-12-research.md` — Citation export & alert system (M12)
+- `docs/planning/implementation/archived/m9-remaining-user-actions.md` — M9 manual user action guide
 - `docs/planning/archive/operations-production-verification.md` — Production verification & operational documentation
 - `docs/planning/archive/milestone-18-occupancy-frontend.md` — Occupancy Frontend UI (M18)
 - `docs/planning/archive/milestone-17-quebec-occupancy.md` — Quebec Occupancy Implementation (M17)
@@ -374,7 +376,7 @@ Archived (delivered):
 | 23 | Add architecture diagram (Mermaid) | S | ✅ Complete |
 | 24 | Add data flow documentation per scraper | M | ⬜ Not Started |
 | 36 | Add methodology comparison table as static asset | S | ✅ Complete |
-| 40 | Add contributor onboarding guide | M | ⬜ Not Started |
+| 40 | Add contributor onboarding guide | M | ✅ Complete |
 | 46 | Add GitHub issue templates | S | ✅ Complete |
 | 47 | Add GitHub Project board | S | ⬜ Not Started |
 | 48 | Add mkdocs GitHub Pages deployment | M | ✅ Complete |
@@ -394,7 +396,7 @@ Archived (delivered):
 |---|------|--------|--------|
 | 5 | Add error boundaries (error.tsx, not-found.tsx, global-error.tsx) | S | ✅ Complete |
 | 6 | Add accessibility testing (axe-core) | M | ⬜ Not Started |
-| 7 | Add French language support (i18n) | L | ⬜ Not Started |
+| 7 | Add French language support (i18n) | L | ✅ Complete |
 | 15 | Add robots.txt and dynamic sitemap | S | ✅ Complete |
 | 19 | Add loading states for all pages | S | ✅ Complete |
 | 33 | Add visual regression testing | M | ✅ Complete |
@@ -434,7 +436,7 @@ Archived (delivered):
 
 ---
 
-**Total Progress: 14/50 completed (2 on hold)** | **Estimated Total Effort:** ~150-200 hours (3-4 weeks full-time equivalent)
+**Total Progress: 33/50 completed (0 on hold)** | **Estimated Total Effort:** ~150-200 hours (3-4 weeks full-time equivalent)
 
 **Recommended Execution Order (Week-by-Week):**
 
