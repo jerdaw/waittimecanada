@@ -113,10 +113,10 @@ export async function GET(request: NextRequest) {
 
       const csvRows = [
         aggHeaders.join(","),
-        ...results.map((row: any) =>
+        ...results.map((row: Record<string, unknown>) =>
           aggHeaders
             .map((h) => {
-              const val = row[h];
+              const val = row[h] as string | number | null | undefined;
               if (
                 typeof val === "string" &&
                 (val.includes(",") || val.includes('"'))
@@ -220,10 +220,10 @@ export async function GET(request: NextRequest) {
 
     const csvRows = [
       headers.join(","),
-      ...results.map((row: any) =>
+      ...results.map((row: Record<string, unknown>) =>
         headers
           .map((h) => {
-            const val = row[h];
+            const val = row[h] as string | number | null | undefined;
             // Escape commas and quotes
             if (
               typeof val === "string" &&

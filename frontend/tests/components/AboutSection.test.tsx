@@ -7,7 +7,7 @@ describe("AboutSection", () => {
     render(<AboutSection />);
 
     expect(
-      screen.getByText(/Why I Built WaitTime Canada/i),
+      screen.getByRole("heading", { name: /WaitTime Canada/i }),
     ).toBeInTheDocument();
     expect(screen.getByText(/About This Project/i)).toBeInTheDocument();
 

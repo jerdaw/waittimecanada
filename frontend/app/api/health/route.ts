@@ -15,7 +15,7 @@ export interface SourceHealth {
 export interface DatabaseHealth {
   status: "connected" | "disconnected" | "unknown";
   latency_ms: number | null;
-  pool_status?: any; // Postgres.js doesn't expose pool stats easily, can be added later if needed
+  pool_status?: unknown; // Postgres.js doesn't expose pool stats easily, can be added later if needed
 }
 
 export interface HealthResponse {
@@ -50,9 +50,20 @@ export async function GET(req: NextRequest) {
     try {
       await sql`SELECT 1`;
       const latency = Math.round(performance.now() - start);
+
+      // Access internal pool stats if available (Postgres.js)
+      // Note: These are not officially documented public APIs but exist on the instance
+      const sqlAny = sql as any;
+
       healthResponse.database = {
         status: "connected",
         latency_ms: latency,
+        pool_status: {
+            max: sqlAny.options?.max || 10, // Default is usually 10
+            idle: typeof sqlAny.idle === 'number' ? sqlAny.idle : null,
+            active: typeof sqlAny.active === 'number' ? sqlAny.active : null,
+            waiting: typeof sqlAny.waiting === 'number' ? sqlAny.waiting : null,
+        }
       };
     } catch (dbError) {
       logger.error("Database health check failed", dbError); // Use structured logger

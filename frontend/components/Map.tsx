@@ -853,6 +853,7 @@ export default function Map({
         onClick={(e) => {
           // If equity layer is active and we clicked a tract, could show popup
           // For now just handle hospital layer click via marker component
+          onSelect(null);
         }}
         scrollZoom={true}
       >

@@ -207,11 +207,14 @@ class BaseScraper(ABC):
         Anomalies are flagged but never excluded from saving — the flag
         is metadata that enables data quality transparency.
         """
+        if self.db is None:
+            return
+
         try:
             from waittime.core import MetricFamily
             from waittime.services.anomaly_detection import AnomalyDetectionService
 
-            anomaly_service = AnomalyDetectionService(self.db)  # type: ignore[arg-type]
+            anomaly_service = AnomalyDetectionService(self.db)
             candidate_indices = [
                 idx
                 for idx, measurement in enumerate(measurements)

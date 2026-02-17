@@ -16,20 +16,33 @@ const getNestedValue = (obj: any, path: string) => {
 
 // Mock next-intl
 vi.mock('next-intl', () => ({
-  useTranslations: (namespace?: string) => (key: string, params?: Record<string, string>) => {
-    const fullPath = namespace ? `${namespace}.${key}` : key;
-    let value = getNestedValue(messages, fullPath);
+  useTranslations: (namespace?: string) => {
+    const t = (key: string, params?: Record<string, any>) => {
+      const fullPath = namespace ? `${namespace}.${key}` : key;
+      let value = getNestedValue(messages, fullPath);
 
-    // Fallback if not found (return key or path)
-    if (!value) return key;
+      if (!value) return key;
 
-    // Handle interpolation if params exist and value is a string
-    if (params && typeof value === 'string') {
-      Object.entries(params).forEach(([k, v]) => {
-        value = value.replace(`{${k}}`, v as string);
-      });
-    }
-    return value;
+      if (params && typeof value === 'string') {
+        Object.entries(params).forEach(([k, v]) => {
+          if (typeof v !== 'function') {
+            value = (value as string).replace(`{${k}}`, String(v));
+          }
+        });
+      }
+      return value;
+    };
+
+    t.rich = (key: string, params?: Record<string, any>) => {
+      return t(key, params);
+    };
+
+    t.raw = (key: string) => {
+      const fullPath = namespace ? `${namespace}.${key}` : key;
+      return getNestedValue(messages, fullPath) || key;
+    };
+
+    return t;
   },
   useLocale: () => 'en',
   useTimeZone: () => 'America/Toronto',

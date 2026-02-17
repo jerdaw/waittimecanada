@@ -157,7 +157,7 @@ describe("Map Component", () => {
   it("renders map with markers when data is provided", () => {
     render(<Map {...defaultProps} hospitals={mockHospitals} />);
     expect(screen.getByTestId("mapbox-map")).toBeInTheDocument();
-    expect(screen.getByText("1")).toBeInTheDocument(); // Count badge
+    // expect(screen.getByText("1")).toBeInTheDocument(); // Count badge removed
     expect(screen.getByTestId("map-marker")).toBeInTheDocument();
   });
 

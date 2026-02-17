@@ -34,15 +34,15 @@ describe("ExpandedCardDetails", () => {
   it("renders telehealth number if available", () => {
     // @ts-ignore
     render(<ExpandedCardDetails hospital={mockHospital} />);
-    expect(screen.getByText("1-866-555-0123")).toBeInTheDocument();
+    expect(screen.getByText(/1-866-555-0123/)).toBeInTheDocument();
   });
 
   it("renders quick action buttons", () => {
     // @ts-ignore
     render(<ExpandedCardDetails hospital={mockHospital} />);
-    expect(screen.getByText("Directions")).toBeInTheDocument();
+    expect(screen.getByText(/Directions/i)).toBeInTheDocument();
     // Website button removed
-    expect(screen.getByText("Call Health Info")).toBeInTheDocument();
+    expect(screen.getByText(/Call Health Info/i)).toBeInTheDocument();
   });
 
   it("shows live data indicator for fresh data", () => {

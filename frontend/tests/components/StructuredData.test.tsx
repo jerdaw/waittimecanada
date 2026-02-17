@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
-import { StructuredData } from "@/app/structured-data";
+import { StructuredData } from "@/app/[locale]/structured-data";
 
 // Mock next/script
 vi.mock("next/script", () => ({
