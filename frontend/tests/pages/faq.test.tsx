@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import FAQPage from "@/app/faq/page";
+import FAQPage from "@/app/[locale]/faq/page";
 import { describe, it, expect, vi } from "vitest";
 
 // Mock Header because it uses Link and ViewToggle which uses router

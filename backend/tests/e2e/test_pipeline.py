@@ -37,6 +37,12 @@ def test_pipeline_flow(db_service: DatabaseService) -> None:
     3. Poll the local Next.js API until the data appears.
     4. Verify the API returns the exact values inserted.
     """
+    # 0. Pre-flight: Check if local server is running
+    api_url = "http://localhost:3000/api/hospitals"
+    try:
+        requests.get("http://localhost:3000/api/health", timeout=1)
+    except requests.RequestException:
+        pytest.skip("Local server not running at localhost:3000; skipping E2E smoke test")
 
     # 1. Setup Data
     # test_id = f"e2e-test-{uuid.uuid4().hex[:8]}" # Unused

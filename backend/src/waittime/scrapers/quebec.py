@@ -16,8 +16,8 @@ import time
 from collections.abc import Callable
 from datetime import UTC, datetime
 
-import requests  # type: ignore[import-untyped]
-from bs4 import BeautifulSoup, Tag  # type: ignore[import-untyped]
+import requests
+from bs4 import BeautifulSoup, Tag
 
 from waittime.core import (
     EndEvent,

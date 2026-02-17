@@ -37,16 +37,17 @@ export function middleware(request: NextRequest) {
     response.headers.set("X-Response-Time", `${duration.toFixed(2)}ms`); // X-Response-Time in ms
     response.headers.set("Server-Timing", `total;dur=${duration.toFixed(2)}`); // Standard Server-Timing header
 
-    // Log for observability (primitive but effective for now)
-    // In production, this would go to a structured logger
-    console.log(JSON.stringify({
-      timestamp: new Date().toISOString(),
-      method: request.method,
-      path: request.nextUrl.pathname,
-      status: response.status,
-      duration_ms: duration.toFixed(2),
-      user_agent: request.headers.get("user-agent") || "unknown",
-    }));
+    // Log for observability via our structured logger
+    // Note: Middleware runs in Edge Runtime, so this will use consoleLogger
+    import("@/utils/logger").then(({ logger }) => {
+      logger.info("API Request", {
+        method: request.method,
+        path: request.nextUrl.pathname,
+        status: response.status,
+        duration_ms: duration.toFixed(2),
+        user_agent: request.headers.get("user-agent") || "unknown",
+      });
+    });
 
     return response;
   }

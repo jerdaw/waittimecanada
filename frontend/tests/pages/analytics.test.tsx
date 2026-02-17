@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import AnalyticsPage from "@/app/analytics/page";
+import AnalyticsPage from "@/app/[locale]/analytics/page";
 
 vi.mock("@/components/Header", () => ({
   Header: () => <header data-testid="mock-header">Header</header>,

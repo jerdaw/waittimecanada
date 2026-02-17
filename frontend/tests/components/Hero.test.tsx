@@ -47,7 +47,7 @@ describe("Hero Component", () => {
     render(<Hero hospitals={mockHospitals} onExplore={() => {}} />);
     expect(
       screen.getByRole("heading", {
-        name: /Ontario.*ER.*Wait Time.*Observatory/i,
+        name: /Canada.*ER.*Wait Time.*Observatory/i,
       }),
     ).toBeInTheDocument();
   });

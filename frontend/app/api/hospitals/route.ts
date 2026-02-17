@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { publicCacheHeaders } from "@/utils/cache";
+import { logger } from "@/utils/logger";
 
 export interface Hospital {
   id: string;
@@ -129,7 +130,7 @@ export async function GET(request: Request) {
       { headers: publicCacheHeaders(300, 900) },
     );
   } catch (error) {
-    console.error("Failed to fetch hospitals:", error);
+    logger.error("Failed to fetch hospitals", error);
     return NextResponse.json(
       {
         success: false,
