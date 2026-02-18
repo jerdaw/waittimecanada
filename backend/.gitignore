@@ -74,6 +74,10 @@ tmp/
 temp/
 *.tmp
 
+# Raw census inputs (M28 equity layer processing)
+data/census/boundaries/
+data/census/income/
+
 # OS
 .DS_Store
 Thumbs.db

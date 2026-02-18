@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
 import { publicCacheHeaders } from "@/utils/cache";
-
-const SUPPORTED_PROVINCES = new Set(["ON"]);
+import {
+  isSupportedEquityProvince,
+  loadEquityLayerForProvinceWithSource,
+} from "@/utils/equityLayerData";
 
 function normalizeProvince(province: string | null): string {
   return (province ?? "ON").trim().toUpperCase();
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     new URL(request.url).searchParams.get("province"),
   );
 
-  if (!SUPPORTED_PROVINCES.has(province)) {
+  if (!isSupportedEquityProvince(province)) {
     return NextResponse.json(
       {
         success: false,
@@ -32,37 +32,12 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Determine path to the GeoJSON layer
-    // In production, this data should be in a known location
-    const dataPath = path.join(
-      process.cwd(),
-      "..",
-      "backend",
-      "data",
-      "layers",
-      "ontario-equity-layer.geojson",
+    const { data: geojson, source_file } =
+      await loadEquityLayerForProvinceWithSource(province);
+    const isPlaceholder = geojson.features.some(
+      (feature) => feature.properties.is_placeholder,
     );
-
-    // Check if file exists
-    try {
-      await fs.access(dataPath);
-    } catch {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Equity layer data not found (run preparation script)",
-          setup_required: true,
-          setup_steps: [
-            "Run backend data preparation script",
-            "Verify GeoJSON layer generated in backend/data/layers/",
-          ],
-        },
-        { status: 404 },
-      );
-    }
-
-    const fileContents = await fs.readFile(dataPath, "utf-8");
-    const geojson = JSON.parse(fileContents);
+    const usingOptimizedLayer = source_file.includes(".optimized.");
 
     return NextResponse.json(
       {
@@ -70,11 +45,25 @@ export async function GET(request: Request) {
         data: geojson,
         metadata: {
           province,
-          source: "Statistics Canada 2021 Census (Processed)",
+          source: isPlaceholder
+            ? "Scaffold placeholder tract dataset"
+            : "Statistics Canada 2021 Census (Processed)",
           attribution:
             "Contains information licensed under the Open Government Licence – Canada.",
           generated_at: new Date().toISOString(),
-          is_placeholder: false,
+          is_placeholder: isPlaceholder,
+          source_file,
+          optimized_geometry: usingOptimizedLayer,
+          reference_year: 2021,
+          interpretation: "descriptive_context_layer_only",
+          causal_inference: false,
+          temporal_alignment_note:
+            "Income values are from the 2021 Census; wait times are recent aggregates and may not be temporally aligned.",
+          note: isPlaceholder
+            ? "Placeholder tract layer loaded. Replace with processed Ontario census tract file."
+            : usingOptimizedLayer
+              ? "Ontario optimized layer loaded from Statistics Canada 2021 census tract data for descriptive equity context only."
+              : "Ontario canonical layer loaded from Statistics Canada 2021 census tract data for descriptive equity context only.",
         },
       },
       {
@@ -84,6 +73,22 @@ export async function GET(request: Request) {
     );
   } catch (error) {
     console.error("Failed to serve equity layer:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    if (errorMessage.includes("not found")) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Equity layer data not found (run preparation script)",
+          setup_required: true,
+          setup_steps: [
+            "Run backend/scripts/prepare_equity_layer.py with Ontario inputs",
+            "Verify backend/data/layers/ontario-equity-layer.geojson exists",
+          ],
+        },
+        { status: 404 },
+      );
+    }
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 },

@@ -12,11 +12,24 @@ vi.mock("react-map-gl", () => ({
   default: ({
     children,
     onClick,
+    onMouseMove,
+    onMouseLeave,
   }: {
     children: React.ReactNode;
-    onClick: () => void;
+    onClick?: (e?: unknown) => void;
+    onMouseMove?: (e?: unknown) => void;
+    onMouseLeave?: () => void;
   }) => (
-    <div data-testid="mapbox-map" onClick={onClick}>
+    <div
+      data-testid="mapbox-map"
+      onClick={() =>
+        onClick?.({ lngLat: { lat: 45.0, lng: -75.0 }, features: [] })
+      }
+      onMouseMove={() =>
+        onMouseMove?.({ lngLat: { lat: 45.0, lng: -75.0 }, features: [] })
+      }
+      onMouseLeave={onMouseLeave}
+    >
       {children}
     </div>
   ),
@@ -103,6 +116,13 @@ describe("Map Component", () => {
           attribution: "test attribution",
           generated_at: "2026-02-08T00:00:00.000Z",
           is_placeholder: true,
+          source_file: "ontario-equity-layer.optimized.geojson",
+          optimized_geometry: true,
+          reference_year: 2021,
+          interpretation: "descriptive_context_layer_only",
+          causal_inference: false,
+          temporal_alignment_note:
+            "Income values are from the 2021 Census; wait times are recent aggregates and may not be temporally aligned.",
           note: "test note",
         },
       }),
@@ -146,7 +166,6 @@ describe("Map Component", () => {
   //   render(<Map {...defaultProps} loading={true} />);
   //   expect(screen.getByText("Loading hospitals...")).toBeInTheDocument();
   // });
-
 
   it("renders error state", () => {
     render(<Map {...defaultProps} error="Failed to load" />);
@@ -217,19 +236,24 @@ describe("Map Component", () => {
     expect(screen.getByText("Call Health Info")).toBeInTheDocument();
   });
 
-  // Equity Layer Toggle is currently commented out in Map.tsx
-  // it("loads equity layer when income overlay is enabled", async () => {
-  //   render(<Map {...defaultProps} hospitals={mockHospitals} />);
+  it("loads equity layer when income overlay is enabled", async () => {
+    render(<Map {...defaultProps} hospitals={mockHospitals} />);
 
-  //   fireEvent.click(
-  //     screen.getByRole("button", { name: "Enable income overlay" }),
-  //   );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Enable income overlay" }),
+    );
 
-  //   await waitFor(() => {
-  //     expect(global.fetch).toHaveBeenCalledWith(
-  //       "/api/equity-layer?province=ON",
-  //     );
-  //   });
-  //   expect(screen.getByText("Income Quintile")).toBeInTheDocument();
-  // });
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/equity-layer?province=ON",
+      );
+    });
+    expect(screen.getByText("Income Quintile")).toBeInTheDocument();
+    expect(
+      screen.getByText("Census tract overlay loaded."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Descriptive association layer only/i),
+    ).toBeInTheDocument();
+  });
 });

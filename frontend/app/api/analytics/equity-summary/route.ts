@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
-import { buildPlaceholderEquityFeatureCollection } from "@/utils/equity";
+import type { EquityFeatureCollection } from "@/utils/equity";
 import {
   computeEquityLinkageSummary,
+  isDescriptiveEquityAssociation,
   type HospitalWaitPoint,
 } from "@/utils/equityInsights";
 import { publicCacheHeaders } from "@/utils/cache";
+import { loadEquityLayerForProvince } from "@/utils/equityLayerData";
+import { RegionQuerySchema } from "@/utils/validations";
 
 type EquitySummaryStatus = "ready" | "no_reporting_data" | "not_available_yet";
 
@@ -23,12 +26,6 @@ function parsePeriod(
   if (!days) return null;
   return { label, days };
 }
-
-function normalizeProvince(value: string | null): string {
-  return (value ?? "").trim().toUpperCase();
-}
-
-import { RegionQuerySchema } from "@/utils/validations";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -51,7 +48,10 @@ export async function GET(request: Request) {
   const periodConfig = parsePeriod(period);
 
   if (!periodConfig) {
-     return NextResponse.json({ success: false, error: "Invalid period config" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: "Invalid period config" },
+      { status: 500 },
+    );
   }
 
   if (province !== "ON") {
@@ -63,9 +63,9 @@ export async function GET(request: Request) {
           period: periodConfig.label,
           status: "not_available_yet" as EquitySummaryStatus,
           generated_at: new Date().toISOString(),
-          is_placeholder: true,
+          is_placeholder: false,
           message:
-            "Equity linkage summary is currently scaffolded for Ontario while province-specific tract datasets are onboarded.",
+            "Equity linkage summary is currently enabled for Ontario only while other provincial tract datasets are onboarded.",
           setup_steps: [
             "Integrate provincial census tract income dataset",
             "Enable equity summary calculations for this province",
@@ -77,6 +77,28 @@ export async function GET(request: Request) {
   }
 
   try {
+    let equityData: EquityFeatureCollection;
+    try {
+      equityData = await loadEquityLayerForProvince(province);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      if (message.includes("not found")) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Ontario equity layer data not found",
+            setup_required: true,
+            setup_steps: [
+              "Run backend/scripts/prepare_equity_layer.py to generate Ontario layer",
+              "Confirm backend/data/layers/ontario-equity-layer.geojson exists",
+            ],
+          },
+          { status: 404 },
+        );
+      }
+      throw error;
+    }
+
     const sql = getDb();
     const now = new Date();
     const periodStart = new Date(
@@ -121,8 +143,10 @@ export async function GET(request: Request) {
           : Number(row.period_mean),
     }));
 
-    const equityData = buildPlaceholderEquityFeatureCollection(province);
     const summary = computeEquityLinkageSummary(hospitalPoints, equityData, 30);
+    const isPlaceholder = equityData.features.some(
+      (feature) => feature.properties.is_placeholder,
+    );
 
     const status: EquitySummaryStatus =
       summary.reporting_hospitals > 0 ? "ready" : "no_reporting_data";
@@ -135,11 +159,24 @@ export async function GET(request: Request) {
           period: periodConfig.label,
           status,
           generated_at: new Date().toISOString(),
-          is_placeholder: true,
+          is_placeholder: isPlaceholder,
           message:
             status === "ready"
-              ? "Equity linkage summary computed using current scaffold tract dataset."
+              ? isPlaceholder
+                ? "Equity linkage summary computed from placeholder tract data."
+                : "Equity linkage summary computed from Statistics Canada census tract dataset."
               : "No hospital wait aggregates available for linkage in the selected period.",
+          methodology: {
+            interpretation: isDescriptiveEquityAssociation()
+              ? "descriptive_association_only"
+              : "unknown",
+            causal_inference: false,
+            uncertainty_method: "bootstrap_percentile_95ci",
+            census_income_reference_year: 2021,
+            wait_aggregation_period: periodConfig.label,
+            temporal_alignment_note:
+              "Income values are from the 2021 Census; wait aggregates use recent windows and are not temporally equivalent.",
+          },
           ...summary,
         },
       },

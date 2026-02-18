@@ -4,23 +4,37 @@ import {
   type IncomeQuintile,
 } from "@/utils/equity";
 
-const quintileRows: Array<{ quintile: IncomeQuintile; label: string }> = [
-  { quintile: 1, label: "Lowest 20%" },
-  { quintile: 2, label: "20-40%" },
-  { quintile: 3, label: "40-60%" },
-  { quintile: 4, label: "60-80%" },
-  { quintile: 5, label: "Highest 20%" },
-];
+const defaultQuintileRows: Array<{ quintile: IncomeQuintile; label: string }> =
+  [
+    { quintile: 0, label: "No Data" },
+    { quintile: 1, label: "Lowest 20%" },
+    { quintile: 2, label: "20-40%" },
+    { quintile: 3, label: "40-60%" },
+    { quintile: 4, label: "60-80%" },
+    { quintile: 5, label: "Highest 20%" },
+  ];
 
 interface EquityLegendProps {
   metadata?: EquityLayerMetadata;
+  title?: string;
+  rows?: Array<{ quintile: IncomeQuintile; label: string }>;
+  interpretationNote?: string;
+  temporalNote?: string;
 }
 
-export function EquityLegend({ metadata }: EquityLegendProps) {
+export function EquityLegend({
+  metadata,
+  title = "Income Quintile",
+  rows,
+  interpretationNote,
+  temporalNote,
+}: EquityLegendProps) {
+  const quintileRows = rows ?? defaultQuintileRows;
+
   return (
     <div className="max-w-[240px] rounded-xl border border-slate-200 bg-white/95 p-3 shadow-lg backdrop-blur-sm">
       <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-        Income Quintile
+        {title}
       </h4>
       <div className="space-y-1.5">
         {quintileRows.map((row) => (
@@ -35,11 +49,16 @@ export function EquityLegend({ metadata }: EquityLegendProps) {
       </div>
       <p className="mt-2 text-[10px] leading-tight text-slate-500">
         {metadata?.attribution ??
-          "Data attribution pending source integration."}
+          "Statistics Canada, Census of Population, 2021. Open Government Licence - Canada."}
       </p>
-      {metadata?.is_placeholder && (
-        <p className="mt-1 text-[10px] font-medium text-amber-700">
-          Placeholder layer (scaffold for integration)
+      {interpretationNote && (
+        <p className="mt-1 text-[10px] leading-tight text-slate-500">
+          {interpretationNote}
+        </p>
+      )}
+      {temporalNote && (
+        <p className="mt-1 text-[10px] leading-tight text-slate-500">
+          {temporalNote}
         </p>
       )}
     </div>

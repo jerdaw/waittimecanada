@@ -1,5 +1,5 @@
-from unittest.mock import MagicMock, Mock
 from typing import Any
+from unittest.mock import MagicMock, Mock
 
 import pytest
 from waittime.services.trends import SystemTrendService
@@ -10,8 +10,6 @@ class TestSystemTrendServiceCoverage:
 
     @pytest.fixture
     def service(self) -> SystemTrendService:
-        from unittest.mock import MagicMock
-
         db = MagicMock()
         return SystemTrendService(db)
 

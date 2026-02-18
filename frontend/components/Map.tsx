@@ -15,10 +15,11 @@ import { ComparisonModal } from "./ComparisonModal";
 // import { DivergenceWarning } from "./DivergenceWarning"; // Unused in this file explicitly? Kept if needed, but not in original? Ah it was in original.
 import { TrendChart } from "./TrendChart";
 import { BenchmarkCard } from "./BenchmarkCard";
-// import { EquityLayerToggle } from "./EquityLayerToggle"; // Unused?
-// import { EquityLegend } from "./EquityLegend"; // Unused?
+import { EquityLayerToggle } from "./EquityLayerToggle";
+import { EquityLegend } from "./EquityLegend";
 import {
   EQUITY_QUINTILE_COLORS,
+  type IncomeQuintile,
   type EquityFeatureCollection,
   type EquityLayerApiResponse,
   type EquityLayerMetadata,
@@ -26,9 +27,25 @@ import {
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useTranslations } from "next-intl";
 
-type Translator = (key: string, values?: Record<string, string | number>) => string;
+type Translator = (
+  key: string,
+  values?: Record<string, string | number>,
+) => string;
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+
+interface MapInteractionFeature {
+  layer?: { id?: string };
+  properties?: Record<string, unknown>;
+}
+
+interface MapInteractionEvent {
+  features?: MapInteractionFeature[];
+  lngLat?: {
+    lat: number;
+    lng: number;
+  };
+}
 
 // Design tokens
 const colors = {
@@ -46,6 +63,8 @@ const EQUITY_FILL_LAYER: LayerProps = {
     "fill-color": [
       "match",
       ["get", "income_quintile"],
+      0,
+      EQUITY_QUINTILE_COLORS[0],
       1,
       EQUITY_QUINTILE_COLORS[1],
       2,
@@ -82,10 +101,10 @@ function getWaitTimeColor(minutes: number | undefined): string {
 
 // Get status label - Refactored to use t function passed in
 function getWaitTimeStatus(minutes: number | undefined, t: Translator): string {
-  if (!minutes && minutes !== 0) return t('popup.noData');
-  if (minutes < 60) return t('popup.shortWait');
-  if (minutes < 120) return t('popup.moderateWait');
-  return t('popup.longWait');
+  if (!minutes && minutes !== 0) return t("popup.noData");
+  if (minutes < 60) return t("popup.shortWait");
+  if (minutes < 120) return t("popup.moderateWait");
+  return t("popup.longWait");
 }
 
 // Format relative time - Refactored
@@ -156,6 +175,68 @@ function formatStatistic(statType: string | undefined, t: Translator): string {
 
   const key = keyMap[statType] || "unknown";
   return t(`ontology.${key}`);
+}
+
+interface EquityTractPopupData {
+  latitude: number;
+  longitude: number;
+  tractName: string;
+  medianIncome: number | null;
+  incomeQuintile: IncomeQuintile;
+  population2021: number | null;
+}
+
+function parseNumber(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "string") {
+    const normalized = value.trim().replace(/,/g, "");
+    if (!normalized) return null;
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function parseIncomeQuintile(value: unknown): IncomeQuintile {
+  const parsed = parseNumber(value);
+  if (parsed === null) return 0;
+  const rounded = Math.round(parsed);
+  if (rounded <= 0) return 0;
+  if (rounded >= 5) return 5;
+  return rounded as IncomeQuintile;
+}
+
+function extractEquityPopupData(
+  event: MapInteractionEvent,
+): EquityTractPopupData | null {
+  const matchingFeature = (event.features ?? []).find(
+    (feature) => feature.layer?.id === "equity-fill",
+  );
+  if (!matchingFeature || !event.lngLat) {
+    return null;
+  }
+
+  const properties = matchingFeature.properties ?? {};
+  const tractId = String(properties.tract_id ?? properties.CTUID ?? "").trim();
+  const tractName = String(
+    properties.tract_name ?? properties.CTNAME ?? tractId,
+  ).trim();
+  if (!tractName) {
+    return null;
+  }
+
+  return {
+    latitude: event.lngLat.lat,
+    longitude: event.lngLat.lng,
+    tractName,
+    medianIncome: parseNumber(properties.median_household_income),
+    incomeQuintile: parseIncomeQuintile(properties.income_quintile),
+    population2021: parseNumber(
+      properties.population_2021 ?? properties.pop_2021,
+    ),
+  };
 }
 
 // Custom marker component
@@ -251,7 +332,7 @@ function HospitalPopup({
   hospital: Hospital;
   onClose: () => void;
 }) {
-  const t = useTranslations('Map');
+  const t = useTranslations("Map");
   const color = getWaitTimeColor(hospital.current_wait_time);
   const status = getWaitTimeStatus(hospital.current_wait_time, t);
   const hasData =
@@ -319,7 +400,9 @@ function HospitalPopup({
                 <span className="text-3xl font-bold" style={{ color }}>
                   {Math.round(hospital.current_wait_time!)}
                 </span>
-                <span className="text-lg font-medium text-slate-500">{t('popup.min')}</span>
+                <span className="text-lg font-medium text-slate-500">
+                  {t("popup.min")}
+                </span>
               </div>
               <div className="text-sm font-medium mt-1" style={{ color }}>
                 {status}
@@ -327,7 +410,9 @@ function HospitalPopup({
             </div>
           ) : (
             <div className="text-center py-2">
-              <div className="text-slate-400 text-sm">{t('popup.noDataAvailable')}</div>
+              <div className="text-slate-400 text-sm">
+                {t("popup.noDataAvailable")}
+              </div>
             </div>
           )}
         </div>
@@ -348,16 +433,16 @@ function HospitalPopup({
         {hasData && hospital.metric_family && (
           <div className="px-4 pb-3 border-t border-slate-100 pt-3">
             <div className="text-xs text-slate-500 mb-1.5 font-medium">
-              {t('popup.methodology')}
+              {t("popup.methodology")}
             </div>
             <div className="space-y-1">
               <div className="flex items-center text-xs text-slate-600">
-                <span className="font-medium mr-1">{t('popup.measure')}</span>
+                <span className="font-medium mr-1">{t("popup.measure")}</span>
                 <span>{formatMethodology(hospital, t)}</span>
               </div>
               {hospital.statistic_type && (
                 <div className="flex items-center text-xs text-slate-600">
-                  <span className="font-medium mr-1">{t('popup.type')}</span>
+                  <span className="font-medium mr-1">{t("popup.type")}</span>
                   <span>{formatStatistic(hospital.statistic_type, t)}</span>
                 </div>
               )}
@@ -386,10 +471,10 @@ function HospitalPopup({
               </div>
               <div className="flex-1">
                 <div className="text-xs text-slate-600 mb-1">
-                  <span className="font-medium">{t('popup.needAdvice')}</span>
+                  <span className="font-medium">{t("popup.needAdvice")}</span>
                 </div>
                 <div className="text-xs text-slate-900">
-                  {t('popup.call')}{" "}
+                  {t("popup.call")}{" "}
                   <span className="font-semibold">
                     {hospital.telehealth_name}
                   </span>
@@ -439,7 +524,9 @@ function HospitalPopup({
                 d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0121 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7m0 0a2 2 0 012-2h.01M9 17v5a2 2 0 01-2-2h.01M9 17H5"
               />
             </svg>
-            <span className="text-[10px] font-semibold">{t('popup.directions')}</span>
+            <span className="text-[10px] font-semibold">
+              {t("popup.directions")}
+            </span>
           </a>
 
           <a
@@ -459,13 +546,15 @@ function HospitalPopup({
                 d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
               />
             </svg>
-            <span className="text-[10px] font-semibold">{t('popup.callHealthInfo')}</span>
+            <span className="text-[10px] font-semibold">
+              {t("popup.callHealthInfo")}
+            </span>
           </a>
         </div>
 
         {/* Footer */}
         <div className="px-4 pb-4 flex items-center justify-between text-xs text-slate-500">
-          <span>{t('popup.updated', {time: timeStr})}</span>
+          <span>{t("popup.updated", { time: timeStr })}</span>
           <div className="flex items-center gap-1">
             <div
               className="w-2 h-2 rounded-full"
@@ -487,7 +576,7 @@ function DataFreshnessIndicator({
   lastUpdate: string | null;
   isStale: boolean;
 }) {
-  const t = useTranslations('Map');
+  const t = useTranslations("Map");
   const timeStr = formatRelativeTime(lastUpdate ?? undefined);
 
   return (
@@ -503,8 +592,8 @@ function DataFreshnessIndicator({
       />
       <span>
         {isStale
-          ? t('freshness.stale')
-          : t('freshness.updated', {time: timeStr})}
+          ? t("freshness.stale")
+          : t("freshness.updated", { time: timeStr })}
       </span>
     </div>
   );
@@ -512,17 +601,29 @@ function DataFreshnessIndicator({
 
 // Legend component
 function MapLegend() {
-  const t = useTranslations('Map');
+  const t = useTranslations("Map");
   const items = [
-    { color: colors.good, label: t('legend.short'), description: t('legend.shortDesc') },
-    { color: colors.moderate, label: t('legend.moderate'), description: t('legend.moderateDesc') },
-    { color: colors.busy, label: t('legend.long'), description: t('legend.longDesc') },
+    {
+      color: colors.good,
+      label: t("legend.short"),
+      description: t("legend.shortDesc"),
+    },
+    {
+      color: colors.moderate,
+      label: t("legend.moderate"),
+      description: t("legend.moderateDesc"),
+    },
+    {
+      color: colors.busy,
+      label: t("legend.long"),
+      description: t("legend.longDesc"),
+    },
   ];
 
   return (
     <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-4 border border-slate-200">
       <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
-        {t('legend.title')}
+        {t("legend.title")}
       </h4>
       <div className="space-y-2">
         {items.map((item) => (
@@ -553,7 +654,7 @@ function StatsBadge({ count, label }: { count: number; label: string }) {
 
 // Loading skeleton
 function MapSkeleton() {
-  const t = useTranslations('Map');
+  const t = useTranslations("Map");
   return (
     <div className="h-full w-full bg-slate-50 flex flex-col items-center justify-center p-8 mapboxgl-map">
       <div className="w-full max-w-md space-y-6 text-center">
@@ -563,10 +664,10 @@ function MapSkeleton() {
         </div>
         <div className="space-y-2">
           <span className="text-lg font-medium text-slate-900 block">
-            {t('loading.title')}
+            {t("loading.title")}
           </span>
           <span className="text-sm text-slate-500">
-            {t('loading.subtitle')}
+            {t("loading.subtitle")}
           </span>
         </div>
       </div>
@@ -576,7 +677,7 @@ function MapSkeleton() {
 
 // Error display
 function MapError({ message }: { message: string }) {
-  const t = useTranslations('Map');
+  const t = useTranslations("Map");
   return (
     <div className="flex h-screen items-center justify-center bg-slate-50">
       <div className="max-w-md text-center p-8">
@@ -596,7 +697,7 @@ function MapError({ message }: { message: string }) {
           </svg>
         </div>
         <h2 className="text-xl font-semibold text-slate-900 mb-2">
-          {t('error.title')}
+          {t("error.title")}
         </h2>
         <p className="text-slate-600">{message}</p>
       </div>
@@ -606,7 +707,7 @@ function MapError({ message }: { message: string }) {
 
 // Missing token display
 function MissingTokenError() {
-  const t = useTranslations('Map');
+  const t = useTranslations("Map");
   return (
     <div className="flex h-screen items-center justify-center bg-slate-50">
       <div className="max-w-md text-center p-8">
@@ -626,11 +727,9 @@ function MissingTokenError() {
           </svg>
         </div>
         <h2 className="text-xl font-semibold text-slate-900 mb-2">
-          {t('error.tokenTitle')}
+          {t("error.tokenTitle")}
         </h2>
-        <p className="text-slate-600 mb-4">
-          {t('error.tokenMessage')}
-        </p>
+        <p className="text-slate-600 mb-4">{t("error.tokenMessage")}</p>
         <code className="inline-block bg-slate-100 px-3 py-2 rounded text-sm text-slate-700">
           NEXT_PUBLIC_MAPBOX_TOKEN=pk.xxx
         </code>
@@ -665,6 +764,8 @@ export default function Map({
   className,
   userLocation,
 }: MapProps) {
+  const t = useTranslations("Map");
+
   // Comparison mode state
   const [comparisonMode, setComparisonMode] = useState(false);
   const [selectedForComparison, setSelectedForComparison] = useState<
@@ -682,13 +783,39 @@ export default function Map({
   const [equityMetadataByProvince, setEquityMetadataByProvince] = useState<
     Record<string, EquityLayerMetadata>
   >({});
+  const [equityPopup, setEquityPopup] = useState<EquityTractPopupData | null>(
+    null,
+  );
 
   const normalizedProvince = province.toUpperCase();
   const activeEquityData = equityDataByProvince[normalizedProvince] ?? null;
   const activeEquityMetadata =
     equityMetadataByProvince[normalizedProvince] ?? null;
+  const equityLegendRows: Array<{ quintile: IncomeQuintile; label: string }> =
+    useMemo(
+      () => [
+        { quintile: 0, label: t("equity.legend.noData") },
+        { quintile: 1, label: t("equity.legend.q1") },
+        { quintile: 2, label: t("equity.legend.q2") },
+        { quintile: 3, label: t("equity.legend.q3") },
+        { quintile: 4, label: t("equity.legend.q4") },
+        { quintile: 5, label: t("equity.legend.q5") },
+      ],
+      [t],
+    );
 
-  // ... rest of logic kept same, just rendering parts
+  const equityStatusMessage = useMemo(() => {
+    if (!showEquityLayer) return null;
+    if (equityStatus === "loading") return t("equity.status.loading");
+    if (equityStatus === "ready") return t("equity.status.ready");
+    if (equityStatus === "unavailable") {
+      return equityError ?? t("equity.status.unavailable");
+    }
+    if (equityStatus === "error") {
+      return equityError ?? t("equity.status.error");
+    }
+    return null;
+  }, [equityError, equityStatus, showEquityLayer, t]);
 
   // Find selected hospital object
   const selectedHospital = useMemo(
@@ -724,6 +851,36 @@ export default function Map({
   const handleClosePopup = useCallback(() => {
     onSelect(null);
   }, [onSelect]);
+
+  const handleMapClick = useCallback(
+    (event?: MapInteractionEvent) => {
+      const tractPopup =
+        showEquityLayer && event ? extractEquityPopupData(event) : null;
+      if (tractPopup) {
+        setEquityPopup(tractPopup);
+        return;
+      }
+      setEquityPopup(null);
+      onSelect(null);
+    },
+    [onSelect, showEquityLayer],
+  );
+
+  const handleMapMouseMove = useCallback(
+    (event?: MapInteractionEvent) => {
+      if (!showEquityLayer) return;
+      if (!event) return;
+      const tractPopup = extractEquityPopupData(event);
+      if (tractPopup) {
+        setEquityPopup(tractPopup);
+      }
+    },
+    [showEquityLayer],
+  );
+
+  const handleMapMouseLeave = useCallback(() => {
+    setEquityPopup(null);
+  }, []);
 
   // Toggle comparison mode
   const toggleComparisonMode = useCallback(() => {
@@ -775,6 +932,7 @@ export default function Map({
     if (!showEquityLayer) {
       setEquityStatus("idle");
       setEquityError(null);
+      setEquityPopup(null);
       return;
     }
 
@@ -832,6 +990,32 @@ export default function Map({
     };
   }, [showEquityLayer, normalizedProvince, activeEquityData]);
 
+  useEffect(() => {
+    setEquityPopup(null);
+  }, [normalizedProvince, showEquityLayer]);
+
+  const quintileLabel = useCallback(
+    (quintile: IncomeQuintile): string => {
+      switch (quintile) {
+        case 0:
+          return t("equity.legend.noData");
+        case 1:
+          return t("equity.legend.q1");
+        case 2:
+          return t("equity.legend.q2");
+        case 3:
+          return t("equity.legend.q3");
+        case 4:
+          return t("equity.legend.q4");
+        case 5:
+          return t("equity.legend.q5");
+        default:
+          return t("equity.legend.noData");
+      }
+    },
+    [t],
+  );
+
   if (!MAPBOX_TOKEN) {
     return <MissingTokenError />;
   }
@@ -852,11 +1036,11 @@ export default function Map({
         mapStyle="mapbox://styles/mapbox/light-v11"
         mapboxAccessToken={MAPBOX_TOKEN}
         interactiveLayerIds={["hospitals-layer", "equity-fill"]}
-        onClick={(e) => {
-          // If equity layer is active and we clicked a tract, could show popup
-          // For now just handle hospital layer click via marker component
-          onSelect(null);
-        }}
+        onClick={(e) => handleMapClick(e as unknown as MapInteractionEvent)}
+        onMouseMove={(e) =>
+          handleMapMouseMove(e as unknown as MapInteractionEvent)
+        }
+        onMouseLeave={handleMapMouseLeave}
         scrollZoom={true}
       >
         <NavigationControl position="bottom-right" />
@@ -903,18 +1087,85 @@ export default function Map({
             onClose={handleClosePopup}
           />
         )}
+
+        {equityPopup && showEquityLayer && (
+          <Popup
+            latitude={equityPopup.latitude}
+            longitude={equityPopup.longitude}
+            closeButton={true}
+            closeOnClick={false}
+            onClose={() => setEquityPopup(null)}
+            anchor="top"
+            offset={8}
+          >
+            <div className="w-56 text-xs">
+              <p className="font-semibold text-slate-900">
+                {equityPopup.tractName}
+              </p>
+              <p className="mt-1 text-slate-700">
+                {t("equity.popup.quintileLabel")}{" "}
+                <span className="font-medium">
+                  {quintileLabel(equityPopup.incomeQuintile)}
+                </span>
+              </p>
+              <p className="text-slate-700">
+                {t("equity.popup.medianIncomeLabel")}{" "}
+                <span className="font-medium">
+                  {equityPopup.medianIncome === null
+                    ? t("equity.popup.noData")
+                    : `$${Math.round(equityPopup.medianIncome).toLocaleString()}`}
+                </span>
+              </p>
+              {equityPopup.population2021 !== null && (
+                <p className="text-slate-700">
+                  {t("equity.popup.populationLabel")}{" "}
+                  <span className="font-medium">
+                    {Math.round(equityPopup.population2021).toLocaleString()}
+                  </span>
+                </p>
+              )}
+            </div>
+          </Popup>
+        )}
       </MapGL>
 
       {/* Overlays */}
       <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
         <DataFreshnessIndicator lastUpdate={lastUpdate} isStale={isStale} />
-
-        {/* Equity Controls removed or hidden? No, toggle logic is here but component import noted as maybe unused strings for now */}
-        {/* If EquityLayerToggle was used, it would be here */}
+        <EquityLayerToggle
+          enabled={showEquityLayer}
+          loading={equityStatus === "loading"}
+          onChange={setShowEquityLayer}
+          enabledLabel={t("equity.toggle.on")}
+          disabledLabel={t("equity.toggle.off")}
+          loadingLabel={t("equity.toggle.loading")}
+          enableAriaLabel={t("equity.toggle.enableAria")}
+          disableAriaLabel={t("equity.toggle.disableAria")}
+        />
+        {equityStatusMessage && (
+          <p
+            className={`max-w-[260px] rounded-lg border px-2.5 py-1.5 text-xs shadow-sm ${
+              equityStatus === "error" || equityStatus === "unavailable"
+                ? "border-amber-200 bg-amber-50 text-amber-800"
+                : "border-slate-200 bg-white/95 text-slate-600"
+            }`}
+          >
+            {equityStatusMessage}
+          </p>
+        )}
       </div>
 
-      <div className="absolute bottom-10 left-4 z-10">
+      <div className="absolute bottom-10 left-4 z-10 flex flex-col gap-2">
         <MapLegend />
+        {showEquityLayer && activeEquityData && (
+          <EquityLegend
+            metadata={activeEquityMetadata ?? undefined}
+            title={t("equity.legend.title")}
+            rows={equityLegendRows}
+            interpretationNote={t("equity.legend.interpretationNote")}
+            temporalNote={t("equity.legend.temporalNote")}
+          />
+        )}
       </div>
 
       {/* Comparison Modal */}

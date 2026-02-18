@@ -30,6 +30,12 @@ dev = [
     "types-psycopg2>=2.9.0",
     "hypothesis>=6.0.0",
 ]
+equity = [
+    "geopandas>=1.0.0",
+    "pyogrio>=0.10.0",
+    "pyproj>=3.6.0",
+    "shapely>=2.0.0",
+]
 
 [build-system]
 requires = ["setuptools>=68.0"]

@@ -91,7 +91,30 @@ This ensures missing source fields are explicit, not silently treated as zero.
 - `status: "no_reporting_data"`
 - `status: "not_available_yet"`
 
-`GET /api/equity-layer` returns setup guidance when province data is not scaffolded yet.
+When `status: "ready"`, the payload also includes:
+
+- `sensitivity_analysis` (threshold table, default 10/20/30/40 km)
+- `uncertainty` (bootstrap percentile 95% intervals, descriptive only)
+- `methodology` metadata including:
+  - `interpretation: "descriptive_association_only"`
+  - `causal_inference: false`
+  - `census_income_reference_year`
+  - `wait_aggregation_period`
+  - temporal alignment note
+
+`GET /api/equity-layer` returns setup guidance when province data is not scaffolded yet, and for successful ON responses includes metadata:
+
+- `reference_year`
+- `interpretation`
+- `causal_inference`
+- `temporal_alignment_note`
+- `source_file`
+- `optimized_geometry`
+
+Layer loading behavior is optimized-first with canonical fallback:
+
+1. `ontario-equity-layer.optimized.geojson` (preferred when present)
+2. `ontario-equity-layer.geojson` (fallback)
 
 ## Example Requests
 

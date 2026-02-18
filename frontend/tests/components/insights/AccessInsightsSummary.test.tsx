@@ -45,7 +45,7 @@ describe("AccessInsightsSummary", () => {
             period: "7d",
             status: "not_available_yet",
             generated_at: "2026-02-08T00:00:00.000Z",
-            is_placeholder: true,
+            is_placeholder: false,
             message: "Equity linkage summary not available yet.",
             setup_steps: [],
           },
@@ -205,6 +205,54 @@ describe("AccessInsightsSummary", () => {
     // BC should use $1.75/L (shown in the distribution insight)
     await waitFor(() => {
       expect(screen.getByText(/\$1\.75\/L in BC/i)).toBeInTheDocument();
+    });
+  });
+
+  it("shows non-causal and temporal limits when equity summary is ready", async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          success: true,
+          data: {
+            province: "ON",
+            period: "7d",
+            status: "ready",
+            generated_at: "2026-02-18T00:00:00.000Z",
+            is_placeholder: false,
+            message: "Computed from Ontario tract data",
+            low_income_tracts: 4,
+            total_tracts: 10,
+            reporting_hospitals: 2,
+            hospitals_near_low_income: 2,
+            province_avg_wait: 105,
+            near_low_income_avg_wait: 111,
+            wait_gap_minutes: 6,
+            threshold_km: 30,
+            methodology: {
+              interpretation: "descriptive_association_only",
+              causal_inference: false,
+              census_income_reference_year: 2021,
+              wait_aggregation_period: "7d",
+            },
+          },
+        }),
+    });
+
+    render(
+      <AccessInsightsSummary
+        hospitals={mockHospitals}
+        userLocation={{ lat: 45.4215, lon: -75.6972 }}
+        province="ON"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Interpretation limits")).toBeInTheDocument();
+      expect(
+        screen.getByText(/descriptive\/associational only/i),
+      ).toBeInTheDocument();
+      expect(screen.getByText(/Income reference year: 2021/i)).toBeInTheDocument();
     });
   });
 });

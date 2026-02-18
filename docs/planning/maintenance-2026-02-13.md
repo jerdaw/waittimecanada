@@ -12,7 +12,7 @@ Comprehensive maintenance sweep to ensure codebase quality, test coverage, and d
 
 ### 2. Attribution Audit ✅
 - **Git authors:** Verified only human author (Jeremy Dawson) in all commits
-- **Co-Authored-By:** No AI attribution found in commit messages
+- **Co-Authored-By:** No non-human co-author trailers found in commit messages
 - **Source code:** No AI author tags found in Python or TypeScript files
 - **Result:** CLAUDE.md correctly symlinked to AGENTS.md, all attribution is human-only
 

@@ -34,6 +34,7 @@ describe("Equity Summary API", () => {
     expect(response.status).toBe(200);
     expect(json.success).toBe(true);
     expect(json.data.status).toBe("not_available_yet");
+    expect(json.data.is_placeholder).toBe(false);
     expect(Array.isArray(json.data.setup_steps)).toBe(true);
   });
 
@@ -63,9 +64,21 @@ describe("Equity Summary API", () => {
     expect(json.success).toBe(true);
     expect(json.data.status).toBe("ready");
     expect(json.data.reporting_hospitals).toBe(2);
-    expect(json.data.hospitals_near_low_income).toBeGreaterThan(0);
+    expect(json.data.hospitals_near_low_income).toBeGreaterThanOrEqual(0);
+    expect(json.data.hospitals_near_low_income).toBeLessThanOrEqual(
+      json.data.reporting_hospitals,
+    );
+    expect(json.data.threshold_km).toBe(30);
     expect(json.data.province_avg_wait).toBe(150);
-    expect(json.data.is_placeholder).toBe(true);
+    expect(json.data.is_placeholder).toBe(false);
+    expect(json.data.methodology.interpretation).toBe(
+      "descriptive_association_only",
+    );
+    expect(json.data.methodology.causal_inference).toBe(false);
+    expect(json.data.methodology.census_income_reference_year).toBe(2021);
+    expect(json.data.methodology.wait_aggregation_period).toBe("7d");
+    expect(Array.isArray(json.data.sensitivity_analysis)).toBe(true);
+    expect(json.data.uncertainty.method).toBe("bootstrap_percentile");
   });
 
   it("returns no_reporting_data when there are no reporting means", async () => {
