@@ -7,6 +7,7 @@ tables, with optional caching to data_quality_snapshots.
 
 import logging
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from waittime.services.database import DatabaseService
 
@@ -32,7 +33,7 @@ class DataQualityService:
     def __init__(self, db: DatabaseService) -> None:
         self.db = db
 
-    def compute_hospital_quality(self, hospital_id: str, date: datetime) -> dict:
+    def compute_hospital_quality(self, hospital_id: str, date: datetime) -> dict[str, Any]:
         """Compute data quality metrics for a single hospital on a single day.
 
         Args:
@@ -70,7 +71,7 @@ class DataQualityService:
 
     def compute_source_quality(
         self, source_id: str, start_date: datetime, end_date: datetime
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Compute quality metrics for an entire source over a date range.
 
         Args:
@@ -93,7 +94,7 @@ class DataQualityService:
         overall_rate = total_actual / total_expected if total_expected > 0 else 0.0
 
         # Compute daily success rates
-        daily_rates: list[dict] = []
+        daily_rates: list[dict[str, Any]] = []
         current = start_date
         while current < end_date:
             next_day = current + timedelta(days=1)
@@ -158,7 +159,7 @@ class DataQualityService:
             "coverage_rate": min(coverage_rate, 1.0),
         }
 
-    def compute_system_quality(self) -> dict:
+    def compute_system_quality(self) -> dict[str, Any]:
         """Compute system-wide quality metrics (all sources, last 24h and 7d).
 
         Returns:
@@ -170,7 +171,7 @@ class DataQualityService:
         start_7d = now - timedelta(days=7)
 
         source_ids = self.db.get_all_source_ids()
-        sources_info: list[dict] = []
+        sources_info: list[dict[str, Any]] = []
         rates_24h: list[float] = []
 
         for source_id in source_ids:
@@ -230,7 +231,7 @@ class DataQualityService:
             "total_measurements_7d": total_7d,
         }
 
-    def get_coverage_timeline(self, hospital_id: str, days: int = 30) -> list[dict]:
+    def get_coverage_timeline(self, hospital_id: str, days: int = 30) -> list[dict[str, Any]]:
         """Get data availability timeline for a hospital.
 
         Args:
@@ -241,7 +242,7 @@ class DataQualityService:
             List of daily entries with date, scrape_count, success_rate, has_gaps
         """
         now = datetime.now(UTC)
-        timeline: list[dict] = []
+        timeline: list[dict[str, Any]] = []
 
         for i in range(days):
             day = now - timedelta(days=days - 1 - i)
@@ -321,7 +322,7 @@ class DataQualityService:
         timestamps: list[datetime],
         day_start: datetime,
         day_end: datetime,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Compute gaps between consecutive measurements.
 
         A gap is any period longer than 1.5x the expected scrape interval
@@ -336,7 +337,7 @@ class DataQualityService:
             List of gap dicts with start, end, duration_minutes
         """
         gap_threshold = DataQualityService.SCRAPE_INTERVAL_MINUTES * 1.5
-        gaps: list[dict] = []
+        gaps: list[dict[str, Any]] = []
 
         if not timestamps:
             # Entire day is one big gap

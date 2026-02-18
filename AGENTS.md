@@ -32,6 +32,7 @@ This file provides guidance to automated developer tools when working with code 
 - ❌ NEVER use `Co-Authored-By` trailers in git commits that reference an AI or automated tool.
 - ✅ ONLY humans should be listed as authors or contributors in any part of this repository.
 - ✅ Use generic terms like "automated tool" or "agent" if you need to reference your own actions in documentation.
+- ❌ Do NOT include any AI tool names (Claude, Gemini, ChatGPT, etc.) in source code, comments, or documentation unless referring to the tools themselves as external dependencies.
 
 ---
 

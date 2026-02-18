@@ -367,6 +367,8 @@ npm run test:unit    # Vitest unit tests
 
 ### API Reference
 - [`docs/API.md`](docs/API.md) - API contracts and examples
+- [`docs/reference/data-dictionary.md`](docs/reference/data-dictionary.md) - **Data Dictionary & Schema**
+- [`docs/architecture/data-flow.md`](docs/architecture/data-flow.md) - **Data Flow Architecture**
 - Endpoints: `/api/hospitals`, `/api/comparisons`, `/api/analytics/*`, `/api/data-quality`
 
 ---

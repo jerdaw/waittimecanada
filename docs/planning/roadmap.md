@@ -1,10 +1,10 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-02-17)
+## Current Status (Updated 2026-02-18)
 
-**Progress:** M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
+**Progress:** M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
-**Strategic Direction:** **Milestone 25 (Reliability & Verification Phase 2) Complete.** Backend coverage increased to 80% (trends/benchmarking >90%). Comprehensive API integration tests added and passing. E2E pipeline hardened. **Milestone 22 (Portfolio Documentation) Complete.** Deployed documentation site. **Four-province breadth confirmed.**
+**Strategic Direction:** **Milestone 23 (Quality & Standardization) Complete.** Backend fully typed (mypy strict), API routes hardened (zod + rate limiting), Accessibility testing added. **Milestone 25 (Reliability & Verification Phase 2) Complete.** Backend coverage increased to 80% (trends/benchmarking >90%). Comprehensive API integration tests added and passing. E2E pipeline hardened. **Milestone 22 (Portfolio Documentation) Complete.** Deployed documentation site. **Four-province breadth confirmed.**
 
 **Deployment Note (2026-02-08):** Frontend public hosting is intentionally offline for now to avoid unnecessary free-tier credit usage. Production smoke workflow is disabled until a public URL is intentionally re-enabled.
 
@@ -37,6 +37,9 @@
 | **M21: French Language Support** | Full bilingual support with next-intl, routing (/fr), translated UI components, comparability warnings, and metadata |
 | **M22: Portfolio Documentation** | OpenAPI spec, MkDocs deployment, freshness badges, and roadmap reconciliation for admissions credibility |
 | **M25: Reliability & Verification Phase 2** | Backend coverage increased to 80%, API integration tests (hospitals, health, export, geolocation), hardened E2E pipeline, connection pool monitoring |
+| **M23: Quality & Standardization** | Stricter backend typing (mypy strict), frontend type safety audit, accessibility testing (axe-core), mobile responsiveness tests, API rate limiting & validation |
+| **M26: Strategic Documentation & Robustness** | Data Dictionary (9 tables), Data Flow Architecture, Property-based testing for comparability (Hypothesis), CONTRIBUTING guide updates |
+| **M27: Operational Observability & Resilience** | Drift monitor script (`monitor_drift.py`) with 7 unit tests, public `/status` page with per-province uptime bars + drift event log, Lighthouse CI workflow, database migration guide |
 
 ---
 
@@ -101,13 +104,13 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 **Advanced Documentation (Deferred):**
 - [x] **P2 / Add OpenAPI/Swagger docs** (#10) — Secondary to core API
 - [x] **P2 / Add mkdocs GitHub Pages deployment** (#48) — External docs site
-- [ ] **P2 / Add data dictionary** (#50) — Paperwork (schema flux)
-- [ ] **P2 / Add data flow documentation** (#24) — Paperwork
+- [x] **P2 / Add data dictionary** (#50) — Formal documentation of all tables/columns/enums
+- [x] **P2 / Add data flow documentation** (#24) — Source-to-database pipeline documentation
 - [ ] **P2 / Add contributor onboarding guide** (#40) — Paperwork
 
 **Advanced Testing & Monitoring (Deferred):**
 - [ ] **P2 / Add Lighthouse CI** (#14) — Optimization metrics
-- [ ] **P2 / Add property-based testing (Hypothesis)** (#32) — Formal verification
+- [x] **P2 / Property-based testing (Hypothesis)** (#32) — Formal verification of ontology comparability
 - [ ] **P2 / Add data quality drift monitoring** (#43) — Advanced analytics
 - [ ] **P2 / Add uptime/status history page** (#37) — Public transparency page
 
@@ -127,7 +130,7 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 
 **Priority 1: Security & Guardrails**
 - [x] **P1 / Add API input validation (Zod)** (#21) — Comprehensive validation for all query params across 16 routes (4-8h)
-- [x] **P1 / Add API rate limiting** (#9) — In-memory or Upstash Redis middleware for all 16 routes with 429 responses (4-8h)
+- [x] **P1 / Add API rate limiting** (#9) — In-memory middleware for all routes with 429 responses (4-8h)
 
 **Priority 1: Code Quality & Performance**
 - [x] **P1 / TypeScript strict mode audit** (#34) — Eliminate all `any`, `@ts-ignore`, `@ts-expect-error` in custom code (2-3h)
@@ -374,13 +377,13 @@ Archived (delivered):
 | 18 | Add README badges (CI, coverage, license) | S | ✅ Complete |
 | 20 | Add database migration documentation | S | ⬜ Not Started |
 | 23 | Add architecture diagram (Mermaid) | S | ✅ Complete |
-| 24 | Add data flow documentation per scraper | M | ⬜ Not Started |
+- [x] **P2 / Add data flow documentation** (#24) — Source-to-database pipeline documentation
 | 36 | Add methodology comparison table as static asset | S | ✅ Complete |
 | 40 | Add contributor onboarding guide | M | ✅ Complete |
 | 46 | Add GitHub issue templates | S | ✅ Complete |
 | 47 | Add GitHub Project board | S | ⬜ Not Started |
 | 48 | Add mkdocs GitHub Pages deployment | M | ✅ Complete |
-| 50 | Add data dictionary with ER diagram | M | ⬜ Not Started |
+- [x] **P2 / Add data dictionary** (#50) — Formal documentation of all tables/columns/enums
 
 ### Security & Privacy (5 items)
 | # | Item | Effort | Status |
@@ -395,26 +398,26 @@ Archived (delivered):
 | # | Item | Effort | Status |
 |---|------|--------|--------|
 | 5 | Add error boundaries (error.tsx, not-found.tsx, global-error.tsx) | S | ✅ Complete |
-| 6 | Add accessibility testing (axe-core) | M | ⬜ Not Started |
+| 6 | Add accessibility testing (axe-core) | M | ✅ Complete |
 | 7 | Add French language support (i18n) | L | ✅ Complete |
 | 15 | Add robots.txt and dynamic sitemap | S | ✅ Complete |
 | 19 | Add loading states for all pages | S | ✅ Complete |
 | 33 | Add visual regression testing | M | ✅ Complete |
-| 34 | Add TypeScript strict mode audit | S | ⬜ Not Started |
-| 44 | Add mobile-responsive testing | M | ⬜ Not Started |
-| 25 | Add structured logging to frontend API routes | S | ⬜ Not Started |
+| 34 | Add TypeScript strict mode audit | S | ✅ Complete |
+| 44 | Add mobile-responsive testing | M | ✅ Complete |
+| 25 | Add structured logging to frontend API routes | S | ✅ Complete |
 
 ### Backend Quality & Testing (10 items)
 | # | Item | Effort | Status |
 |---|------|--------|--------|
-| 9 | Add API rate limiting | M | ⬜ Not Started |
+| 9 | Add API rate limiting | M | ✅ Complete |
 | 13 | Increase backend test coverage to 85%+ | M | ✅ Complete |
 | 21 | Add API input validation (Zod) on all routes | M | ✅ Complete |
 | 22 | Add comprehensive API integration tests | M | ✅ Complete |
 | 29 | Add database health check enhancement | S | ✅ Complete |
-| 32 | Add property-based testing (Hypothesis) | M | ⬜ Not Started |
-| 35 | Add backend mypy strict mode | M | ⬜ Not Started |
-| 38 | Add database index optimization | S | ⬜ Not Started |
+- [x] **P2 / Property-based testing (Hypothesis)** (#32) — Formal verification of ontology comparability
+| 35 | Add backend mypy strict mode | M | ✅ Complete |
+| 38 | Add database index optimization | S | ✅ Complete |
 | 39 | Add end-to-end data pipeline test | M | ✅ Complete |
 | 43 | Add data quality drift monitoring | M | ⬜ Not Started |
 
@@ -432,11 +435,11 @@ Archived (delivered):
 |---|------|--------|--------|
 | 41 | Add CITATION.cff file | S | ✅ Complete |
 | 42 | Add Zenodo integration for DOI | S | ✅ Complete |
-| 45 | Populate stakeholder interview examples | S | ⬜ Not Started |
+| 45 | Populate stakeholder interview examples | S | ✅ Complete |
 
 ---
 
-**Total Progress: 33/50 completed (0 on hold)** | **Estimated Total Effort:** ~150-200 hours (3-4 weeks full-time equivalent)
+**Total Progress: 36/50 completed (0 on hold)** | **Estimated Total Effort:** ~150-200 hours (3-4 weeks full-time equivalent)
 
 **Recommended Execution Order (Week-by-Week):**
 

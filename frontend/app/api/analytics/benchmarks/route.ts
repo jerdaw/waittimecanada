@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/utils/db";
 import { publicCacheHeaders } from "@/utils/cache";
 
@@ -133,9 +133,9 @@ import { BenchmarkQuerySchema } from "@/utils/validations";
 
 import { checkRateLimit } from "@/utils/rate-limit";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   // 1. Rate Limit
-  const rateLimitResponse = await checkRateLimit(request as any);
+  const rateLimitResponse = await checkRateLimit(request);
   if (rateLimitResponse) return rateLimitResponse;
 
   try {

@@ -7,6 +7,7 @@ change. This depends on M13 aggregation tables for efficient comparisons.
 
 import logging
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from waittime.services.database import DatabaseService
 
@@ -28,7 +29,7 @@ class MethodologyChangeDetector:
     def __init__(self, db: DatabaseService) -> None:
         self.db = db
 
-    def check_source(self, source_id: str) -> dict:
+    def check_source(self, source_id: str) -> dict[str, Any]:
         """Check a source for potential methodology changes.
 
         Compares mean wait times for the current period vs the previous
@@ -146,7 +147,7 @@ class MethodologyChangeDetector:
             "details": None,
         }
 
-    def check_all_sources(self) -> list[dict]:
+    def check_all_sources(self) -> list[dict[str, Any]]:
         """Check all active sources for methodology changes.
 
         Returns:
@@ -159,7 +160,7 @@ class MethodologyChangeDetector:
             results.append(result)
         return results
 
-    def get_change_history(self, source_id: str | None = None) -> list[dict]:
+    def get_change_history(self, source_id: str | None = None) -> list[dict[str, Any]]:
         """Get history of detected methodology changes.
 
         Args:

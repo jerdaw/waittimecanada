@@ -8,6 +8,7 @@ Provides utilities for:
 
 import logging
 from datetime import UTC, datetime
+from typing import Any
 
 from waittime.core import Measurement, are_comparable, generate_divergence_brief
 from waittime.services.database import DatabaseService
@@ -30,7 +31,7 @@ class ComparisonService:
         self,
         hospital_a_id: str,
         hospital_b_id: str,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Compare two hospitals and analyze methodology differences.
 
         Args:
@@ -105,7 +106,7 @@ class ComparisonService:
             "comparison_timestamp": datetime.now(UTC).isoformat(),
         }
 
-    def _get_hospital_with_measurement(self, hospital_id: str) -> dict | None:
+    def _get_hospital_with_measurement(self, hospital_id: str) -> dict[str, Any] | None:
         """Fetch hospital with its latest measurement.
 
         Args:
@@ -169,7 +170,7 @@ class ComparisonService:
                     },
                 }
 
-    def _dict_to_measurement(self, data: dict) -> Measurement:
+    def _dict_to_measurement(self, data: dict[str, Any]) -> Measurement:
         """Convert database dict to Measurement model.
 
         Args:

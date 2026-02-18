@@ -18,6 +18,8 @@ When contributing, please:
 - Read `AGENTS.md` for security and attribution constraints.
 - Read `docs/development/setup.md` for current environment setup.
 - Read `docs/development/testing-guidelines.md` for test expectations.
+- Read `docs/reference/data-dictionary.md` for schema details.
+- Read `docs/architecture/data-flow.md` for system context.
 - Check active priorities in `docs/planning/roadmap.md`.
 
 ## Environment Setup

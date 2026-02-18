@@ -1,5 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
+// Set mock token for tests
+process.env.NEXT_PUBLIC_MAPBOX_TOKEN = "pk.test-token";
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */

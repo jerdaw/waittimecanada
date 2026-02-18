@@ -249,7 +249,7 @@ export function HospitalList({
                           {hospital.name}
                         </h3>
                         {showLiveBadge && (
-                          <span className="shrink-0 flex items-center gap-0.5 text-[9px] font-bold text-success bg-success/10 px-1 py-0.5 rounded">
+                          <span className="shrink-0 flex items-center gap-0.5 text-[9px] font-bold text-emerald-700 bg-success/10 px-1 py-0.5 rounded">
                             <span className="w-1 h-1 rounded-full bg-success animate-pulse" />
                             {tCard('live')}
                           </span>

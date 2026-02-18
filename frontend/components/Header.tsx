@@ -54,9 +54,15 @@ export function Header({
             </div>
           </div>
           <div className="hidden sm:block">
-            <span className="font-bold text-base tracking-tight">
-              {tCommon('title')}
-            </span>
+            {showStats ? (
+              <h1 className="font-bold text-base tracking-tight">
+                {tCommon('title')}
+              </h1>
+            ) : (
+              <span className="font-bold text-base tracking-tight">
+                {tCommon('title')}
+              </span>
+            )}
           </div>
           <span className="font-bold text-base sm:hidden">{t('mobileLogo')}</span>
         </Link>
@@ -118,7 +124,7 @@ export function Header({
               <div className="w-px h-5 bg-border hidden sm:block" />
             </>
           )}
-          <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
+          <nav className="hidden md:flex items-center gap-1 text-sm font-medium" aria-label="Main">
             <Link
               href="/data-quality"
               className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"

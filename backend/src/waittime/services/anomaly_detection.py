@@ -8,6 +8,7 @@ metadata that enables transparency about data quality.
 import logging
 import statistics
 from datetime import datetime, timedelta
+from typing import Any
 
 from waittime.services.database import DatabaseService
 
@@ -26,7 +27,9 @@ class AnomalyDetectionService:
     def __init__(self, db: DatabaseService) -> None:
         self.db = db
 
-    def check_measurement(self, hospital_id: str, value: float, timestamp: datetime) -> dict:
+    def check_measurement(
+        self, hospital_id: str, value: float, timestamp: datetime
+    ) -> dict[str, Any]:
         """Check if a new measurement is anomalous compared to recent history.
 
         Uses a 7-day rolling window to compute baseline statistics, then
@@ -45,7 +48,7 @@ class AnomalyDetectionService:
         stats = self._get_baseline_stats(hospital_id, lookback_start, timestamp)
         return self._evaluate_with_stats(hospital_id, value, stats)
 
-    def check_batch(self, measurements: list[dict]) -> list[dict]:
+    def check_batch(self, measurements: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Check a batch of measurements from a scraper run.
 
         More efficient than checking one at a time — loads baselines
@@ -79,7 +82,9 @@ class AnomalyDetectionService:
             for measurement in measurements
         ]
 
-    def get_recent_anomalies(self, source_id: str | None = None, days: int = 7) -> list[dict]:
+    def get_recent_anomalies(
+        self, source_id: str | None = None, days: int = 7
+    ) -> list[dict[str, Any]]:
         """Get recent anomalies for display/review.
 
         Args:
@@ -107,7 +112,7 @@ class AnomalyDetectionService:
 
     def _get_baseline_stats(
         self, hospital_id: str, lookback_start: datetime, end_time: datetime
-    ) -> dict | None:
+    ) -> dict[str, Any] | None:
         get_stats = getattr(self.db, "get_measurement_baseline_stats", None)
         if callable(get_stats):
             stats = get_stats(hospital_id, lookback_start, end_time)
@@ -137,21 +142,23 @@ class AnomalyDetectionService:
 
     def _get_baseline_stats_batch(
         self, hospital_windows: list[tuple[str, datetime, datetime]]
-    ) -> dict[str, dict]:
+    ) -> dict[str, dict[str, Any]]:
         get_stats_batch = getattr(self.db, "get_measurement_baseline_stats_batch", None)
         if callable(get_stats_batch):
             stats_by_hospital = get_stats_batch(hospital_windows)
             if isinstance(stats_by_hospital, dict):
                 return stats_by_hospital
 
-        stats: dict[str, dict] = {}
+        stats: dict[str, dict[str, Any]] = {}
         for hospital_id, lookback_start, end_time in hospital_windows:
             result = self._get_baseline_stats(hospital_id, lookback_start, end_time)
             if result is not None:
                 stats[hospital_id] = result
         return stats
 
-    def _evaluate_with_stats(self, hospital_id: str, value: float, stats: dict | None) -> dict:
+    def _evaluate_with_stats(
+        self, hospital_id: str, value: float, stats: dict[str, Any] | None
+    ) -> dict[str, Any]:
         if not stats:
             return {"is_anomaly": False, "reason": None, "details": None}
 

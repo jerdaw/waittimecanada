@@ -19,6 +19,7 @@ We store only the TIME_TO_PROVIDER metric for comparability with other provinces
 import json
 import logging
 import re
+from typing import Any
 
 import requests
 from bs4 import BeautifulSoup
@@ -138,7 +139,7 @@ class BCScraper(BaseScraper):
 
         return measurements
 
-    def _parse_location(self, location: dict) -> Measurement | None:
+    def _parse_location(self, location: dict[str, Any]) -> Measurement | None:
         """Parse a single location entry into a Measurement.
 
         Args:

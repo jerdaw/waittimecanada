@@ -10,6 +10,7 @@ import logging
 import statistics
 from calendar import monthrange
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from waittime.core import MeasurementAggregate
 from waittime.services.database import DatabaseService
@@ -26,7 +27,7 @@ class AggregationService:
         self.db = db
 
     @staticmethod
-    def _compute_statistics(values: list[float]) -> dict | None:
+    def _compute_statistics(values: list[float]) -> dict[str, Any] | None:
         """Compute summary statistics from a list of measurement values.
 
         Returns:
@@ -37,7 +38,7 @@ class AggregationService:
         if not values:
             return None
 
-        result: dict = {
+        result: dict[str, Any] = {
             "mean": statistics.mean(values),
             "min": min(values),
             "max": max(values),
