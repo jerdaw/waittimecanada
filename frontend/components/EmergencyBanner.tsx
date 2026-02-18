@@ -5,7 +5,7 @@ export function EmergencyBanner() {
   const t = useTranslations('Common.emergency');
 
   return (
-    <div className="sticky top-0 z-50 bg-red-600 text-white px-4 py-2 text-center text-sm md:text-base font-medium shadow-md animate-in fade-in slide-in-from-top-2">
+    <div className="sticky top-0 z-50 bg-red-600 text-white px-4 py-2 text-center text-sm md:text-base font-medium shadow-md animate-in fade-in slide-in-from-top-2" role="alert">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
         <span className="flex items-center gap-2">
           <svg

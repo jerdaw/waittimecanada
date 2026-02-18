@@ -72,8 +72,8 @@ export async function GET(
         FROM measurements
         WHERE hospital_id = (SELECT id FROM hospitals WHERE id = ${params.slug} OR name ILIKE ${params.slug})
           AND timestamp_utc >= ${start.toISOString()}
-        GROUP BY date_trunc(${aggregation}, timestamp_utc)
-        ORDER BY timestamp ASC
+        GROUP BY 1
+        ORDER BY 1 ASC
       `;
 
       return NextResponse.json(

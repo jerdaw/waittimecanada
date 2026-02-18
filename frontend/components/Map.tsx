@@ -26,11 +26,13 @@ import {
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useTranslations } from "next-intl";
 
+type Translator = (key: string, values?: Record<string, string | number>) => string;
+
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 // Design tokens
 const colors = {
-  good: "#059669", // emerald-600
+  good: "#047857", // emerald-700 (improved contrast)
   moderate: "#D97706", // amber-600
   busy: "#DC2626", // red-600
   unknown: "#6B7280", // gray-500
@@ -79,7 +81,7 @@ function getWaitTimeColor(minutes: number | undefined): string {
 }
 
 // Get status label - Refactored to use t function passed in
-function getWaitTimeStatus(minutes: number | undefined, t: any): string {
+function getWaitTimeStatus(minutes: number | undefined, t: Translator): string {
   if (!minutes && minutes !== 0) return t('popup.noData');
   if (minutes < 60) return t('popup.shortWait');
   if (minutes < 120) return t('popup.moderateWait');
@@ -102,7 +104,7 @@ function formatRelativeTime(dateString: string | undefined): string {
 }
 
 // Format methodology for display - Refactored
-function formatMethodology(hospital: Hospital, t: any): string {
+function formatMethodology(hospital: Hospital, t: Translator): string {
   if (!hospital.metric_family) return "";
 
   const parts = [];
@@ -139,7 +141,7 @@ function formatMethodology(hospital: Hospital, t: any): string {
 }
 
 // Format statistic type for display - Refactored
-function formatStatistic(statType: string | undefined, t: any): string {
+function formatStatistic(statType: string | undefined, t: Translator): string {
   if (!statType) return "";
 
   const keyMap: Record<string, string> = {

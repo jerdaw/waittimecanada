@@ -188,9 +188,9 @@ export function Hero({
                 {!loading && featuredHospital ? (
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-xl font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
+                      <h2 className="text-xl font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
                         {featuredHospital.hospital.name}
-                      </h3>
+                      </h2>
                       <div className="flex items-center gap-2 text-sm mt-0.5">
                         <span className="text-muted-foreground">
                           {featuredHospital.hospital.city},{" "}

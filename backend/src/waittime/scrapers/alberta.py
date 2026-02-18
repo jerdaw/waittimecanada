@@ -165,7 +165,6 @@ class AlbertaScraper(BaseScraper):
             if spans:
                 return spans[0].get_text(" ", strip=True)
 
-        wait_span = card.select_one(".wt-times span")
         if wait_span:
             return wait_span.get_text(" ", strip=True)
         return ""

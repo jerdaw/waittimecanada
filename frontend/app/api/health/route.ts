@@ -12,6 +12,13 @@ export interface SourceHealth {
   age_minutes: number | null;
 }
 
+interface PostgresInternal {
+  options?: { max?: number };
+  idle?: number;
+  active?: number;
+  waiting?: number;
+}
+
 export interface DatabaseHealth {
   status: "connected" | "disconnected" | "unknown";
   latency_ms: number | null;
@@ -53,16 +60,17 @@ export async function GET(req: NextRequest) {
 
       // Access internal pool stats if available (Postgres.js)
       // Note: These are not officially documented public APIs but exist on the instance
-      const sqlAny = sql as any;
+      // Note: These are not officially documented public APIs but exist on the instance
+      const sqlInternal = sql as unknown as PostgresInternal;
 
       healthResponse.database = {
         status: "connected",
         latency_ms: latency,
         pool_status: {
-            max: sqlAny.options?.max || 10, // Default is usually 10
-            idle: typeof sqlAny.idle === 'number' ? sqlAny.idle : null,
-            active: typeof sqlAny.active === 'number' ? sqlAny.active : null,
-            waiting: typeof sqlAny.waiting === 'number' ? sqlAny.waiting : null,
+            max: sqlInternal.options?.max || 10, // Default is usually 10
+            idle: typeof sqlInternal.idle === 'number' ? sqlInternal.idle : null,
+            active: typeof sqlInternal.active === 'number' ? sqlInternal.active : null,
+            waiting: typeof sqlInternal.waiting === 'number' ? sqlInternal.waiting : null,
         }
       };
     } catch (dbError) {

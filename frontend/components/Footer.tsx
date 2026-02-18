@@ -25,7 +25,7 @@ export function Footer() {
           {/* Quick Links */}
           <div className="space-y-3">
             <h3 className="font-semibold text-sm text-foreground">{t('nav.resources')}</h3>
-            <nav className="flex flex-col gap-2 text-sm">
+            <nav className="flex flex-col gap-2 text-sm" aria-label={t('nav.resources')}>
               <Link
                 href="/methods"
                 className="text-muted-foreground hover:text-primary transition-colors"
@@ -56,7 +56,7 @@ export function Footer() {
           {/* Legal & Project Links */}
           <div className="space-y-3">
             <h3 className="font-semibold text-sm text-foreground">{t('nav.project')}</h3>
-            <nav className="flex flex-col gap-2 text-sm">
+            <nav className="flex flex-col gap-2 text-sm" aria-label={t('nav.project')}>
               <a
                 href="https://github.com/jerdaw/waittimecanada"
                 target="_blank"

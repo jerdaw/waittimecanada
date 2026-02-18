@@ -9,7 +9,7 @@ import logging
 import os
 import time
 from pathlib import Path
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 import httpx
 
@@ -356,7 +356,7 @@ class GeocodingService:
 
         return None
 
-    def _extract_city(self, feature: dict) -> str:
+    def _extract_city(self, feature: dict[str, Any]) -> str:
         """Extract city name from geocoding feature context."""
         # Try place_name first (often includes city)
         place_name: str = feature.get("place_name", "")

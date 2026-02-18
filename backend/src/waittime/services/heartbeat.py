@@ -6,6 +6,7 @@ Wraps the DatabaseService heartbeat methods with additional logic for stale dete
 
 import logging
 from datetime import UTC, datetime
+from typing import Any
 
 from waittime.core import ScraperStatus
 from waittime.services.database import DatabaseService
@@ -99,7 +100,7 @@ class HeartbeatService:
         self,
         source_id: str,
         max_age_minutes: int | None = None,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Check if a scraper is healthy.
 
         A scraper is considered healthy if:
@@ -194,7 +195,7 @@ class HeartbeatService:
     def check_all_sources(
         self,
         max_age_minutes: int | None = None,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Check health of all registered sources.
 
         Args:
