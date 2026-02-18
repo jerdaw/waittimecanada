@@ -375,7 +375,7 @@ Archived (delivered):
 |---|------|--------|--------|
 | 10 | Add OpenAPI/Swagger documentation | M | ✅ Complete |
 | 18 | Add README badges (CI, coverage, license) | S | ✅ Complete |
-| 20 | Add database migration documentation | S | ⬜ Not Started |
+| 20 | Add database migration documentation | S | ✅ Complete |
 | 23 | Add architecture diagram (Mermaid) | S | ✅ Complete |
 - [x] **P2 / Add data flow documentation** (#24) — Source-to-database pipeline documentation
 | 36 | Add methodology comparison table as static asset | S | ✅ Complete |
@@ -419,16 +419,16 @@ Archived (delivered):
 | 35 | Add backend mypy strict mode | M | ✅ Complete |
 | 38 | Add database index optimization | S | ✅ Complete |
 | 39 | Add end-to-end data pipeline test | M | ✅ Complete |
-| 43 | Add data quality drift monitoring | M | ⬜ Not Started |
+| 42 | Add data quality drift monitoring | M | ✅ Complete |
 
 ### CI/CD & Automation (5 items)
 | # | Item | Effort | Status |
 |---|------|--------|--------|
-| 14 | Add Lighthouse CI to GitHub Actions | M | ⬜ Not Started |
+| 14 | Add Lighthouse CI to GitHub Actions | M | ✅ Complete |
 | 17 | Add GitHub Releases with tagged versions | M | ⬜ Not Started |
 | 27 | Expand automated screenshot generation | M | ✅ Complete |
 | 31 | Add data freshness badge (dynamic) | M | ✅ Complete |
-| 37 | Add uptime/status history page | M | ⬜ Not Started |
+| 37 | Add uptime/status history page | M | ✅ Complete |
 
 ### Research & Citations (3 items)
 | # | Item | Effort | Status |
