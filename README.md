@@ -357,10 +357,10 @@ npm run test:unit    # Vitest unit tests
 ### Essential Reading
 - [`docs/planning/roadmap.md`](docs/planning/roadmap.md) - **Active roadmap and milestone status**
 - [`docs/operations/scraper-scheduling.md`](docs/operations/scraper-scheduling.md) - Production operations guide
-- [`CLAUDE.md`](CLAUDE.md) - AI agent instructions and project architecture
+- [`AGENTS.md`](AGENTS.md) - repository agent instructions and project architecture
 
 ### Deep Dives
-- [`docs/adr/`](docs/adr/) - Architecture Decision Records (14 ADRs)
+- [`docs/adr/`](docs/adr/) - Architecture Decision Records (16 ADRs)
 - [`backend/docs/methodologies/`](backend/docs/methodologies/) - Provincial methodology documentation
 - [`backend/README.md`](backend/README.md) - Backend architecture and testing
 - [`frontend/README.md`](frontend/README.md) - Frontend architecture and testing
@@ -461,7 +461,7 @@ waittimecanada/
 
 ---
 
-## 📊 Current Status (as of 2026-02-11)
+## 📊 Current Status (as of 2026-02-18)
 
 ### Milestones Completed
 - ✅ M1-M4: Database foundation, Ontario/Quebec scrapers, methodology warnings, PWA setup
@@ -475,12 +475,14 @@ waittimecanada/
 - ✅ M16: Multi-province operationalization (4 provinces, 380+ hospitals, region mapping)
 - ✅ M17: Quebec occupancy implementation (scraper + API)
 - ✅ M18: Occupancy frontend UI (visual indicators on hospital cards)
+- ✅ M28: Ontario real-data equity layer (StatsCan tract integration)
+- ✅ M29: Ontario equity academic rigor hardening (uncertainty + interpretation limits)
 - ✅ Operations: Production verification and comprehensive documentation
 
 ### Test Coverage
-- **Backend:** 375 tests passing, 77% code coverage
-- **Frontend:** 285/287 tests passing (2 pre-existing failures unrelated to core features)
-- **Total:** 660+ tests across full stack
+- **Backend:** 435 tests passing, 80% code coverage
+- **Frontend:** 342 tests passing
+- **Total:** 777 tests across full stack
 
 ### Data Freshness
 - **Update Frequency:** Every 15 minutes (automated)
@@ -505,17 +507,6 @@ waittimecanada/
 - [ ] Territories expansion (limited data availability)
 
 See [`docs/planning/roadmap.md`](docs/planning/roadmap.md) for detailed status and next steps.
-
----
-
-## 🤝 Contributing
-
-This is a **portfolio project for medical school applications**. While not actively seeking contributors, the codebase follows professional standards and is well-documented for educational purposes.
-
-**If you're interested in the methodology:**
-- Review [`backend/docs/methodologies/`](backend/docs/methodologies/) for provincial analysis
-- Check [`docs/adr/`](docs/adr/) for architectural decisions
-- Explore [`CLAUDE.md`](CLAUDE.md) for project principles
 
 ---
 

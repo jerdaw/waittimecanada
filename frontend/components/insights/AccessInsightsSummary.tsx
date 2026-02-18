@@ -30,6 +30,13 @@ interface EquitySummarySnapshot {
   wait_gap_minutes?: number | null;
   threshold_km?: number;
   setup_steps?: string[];
+  methodology?: {
+    interpretation?: string;
+    causal_inference?: boolean;
+    uncertainty_method?: string;
+    census_income_reference_year?: number;
+    wait_aggregation_period?: string;
+  };
 }
 
 // Gas prices from AccessBurdenEstimator
@@ -324,6 +331,28 @@ export function AccessInsightsSummary({
                   : `${Math.round(equitySummary.province_avg_wait)} min`}
               </strong>
             </p>
+
+            <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
+              <p className="text-xs font-medium text-foreground">
+                {t("equity.limitationsTitle")}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t("equity.descriptiveOnly")}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t("equity.notCausal")}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t("equity.temporalMismatch", {
+                  censusYear:
+                    equitySummary.methodology?.census_income_reference_year ??
+                    2021,
+                  period:
+                    equitySummary.methodology?.wait_aggregation_period ??
+                    equitySummary.period,
+                })}
+              </p>
+            </div>
 
             {equitySummary.is_placeholder && (
               <p className="text-xs text-amber-700">

@@ -2,9 +2,9 @@
 
 ## Current Status (Updated 2026-02-18)
 
-**Progress:** M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
+**Progress:** M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
-**Strategic Direction:** **Milestone 23 (Quality & Standardization) Complete.** Backend fully typed (mypy strict), API routes hardened (zod + rate limiting), Accessibility testing added. **Milestone 25 (Reliability & Verification Phase 2) Complete.** Backend coverage increased to 80% (trends/benchmarking >90%). Comprehensive API integration tests added and passing. E2E pipeline hardened. **Milestone 22 (Portfolio Documentation) Complete.** Deployed documentation site. **Four-province breadth confirmed.**
+**Strategic Direction:** **Milestone 29 (Equity Academic Rigor Hardening) Complete.** Ontario equity layer now includes ON-scoped quintile calibration, suppression provenance, uncertainty/sensitivity analytics, explicit interpretation limits, reproducible geospatial setup, and optimized layer serving fallback. **Milestone 25 (Reliability & Verification Phase 2) Complete.** Backend coverage increased to 80% (trends/benchmarking >90%). Comprehensive API integration tests added and passing. **Four-province breadth confirmed.**
 
 **Deployment Note (2026-02-08):** Frontend public hosting is intentionally offline for now to avoid unnecessary free-tier credit usage. Production smoke workflow is disabled until a public URL is intentionally re-enabled.
 
@@ -40,6 +40,8 @@
 | **M23: Quality & Standardization** | Stricter backend typing (mypy strict), frontend type safety audit, accessibility testing (axe-core), mobile responsiveness tests, API rate limiting & validation |
 | **M26: Strategic Documentation & Robustness** | Data Dictionary (9 tables), Data Flow Architecture, Property-based testing for comparability (Hypothesis), CONTRIBUTING guide updates |
 | **M27: Operational Observability & Resilience** | Drift monitor script (`monitor_drift.py`) with 7 unit tests, public `/status` page with per-province uptime bars + drift event log, Lighthouse CI workflow, database migration guide |
+| **M28: Ontario Real-Data Equity Layer** | Replaced scaffold linkage with real StatsCan CT overlays for ON; added acquisition provenance, processing manifest, ON-only rollout contract, and map/API integration |
+| **M29: Equity Academic Rigor Hardening (ON)** | ON-scoped quintiles, suppression provenance, sensitivity + uncertainty outputs, non-causal/temporal messaging, reproducibility hardening (`equity` extras/docs), optimized layer output + API loader preference |
 
 ---
 
@@ -83,9 +85,7 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 - [x] **P0 / Verification: BC hospital vs edwaittimes.ca** — Verified close match
 
 **PRIORITY 0: High-Value Expansion (Active)**
-- [x] **P0 / French language support (i18n)** (M21) — Full bilingual support with next-intl.
-  - **Plan:** `docs/planning/archive/milestone-21-i18n.md`
-  - **Status:** Complete
+- [ ] **P0 / No active P0 expansion item this cycle** — M28 and M29 are closed; next expansion work is multi-province equity onboarding (tracked in Later).
 
 **PRIORITY 1: Engineering Reliability (Local)**
 - [x] **P1 / Add end-to-end pipeline test** (#39) — Mock scrape → DB insert → API → render (4-8h)
@@ -150,7 +150,7 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 **Future Feature Development:**
 - [ ] **P2 / Additional provinces** — Nova Scotia, New Brunswick scrapers with methodology documentation
 - [ ] **P2 / Historical occupancy trends** — Daily/weekly patterns for Quebec stretcher occupancy
-- [ ] **P2 / Enhanced equity layer** — StatsCan census tract income overlays with real data (currently scaffold)
+- [ ] **P2 / Enhanced equity layer (multi-province rollout)** — Apply Ontario template to QC/AB/BC after ON real-data rollout is fully verified
 - [ ] **P2 / Occupancy-based recommendations** — Smart hospital suggestions based on current occupancy
 - [ ] **P2 / Portfolio launch** — Complete stakeholder interview and publish launch communications when public hosting is re-enabled
 - [x] **P2 / Performance optimization** — Smart scheduling (reduce frequency during overnight hours)
@@ -263,9 +263,11 @@ Ranked by **admissions credibility per hour of effort**:
 ## Implementation Plans
 
 Active milestone plans in `docs/planning/implementation/`:
-(None at this time)
+- none currently open.
 
 Archived (delivered):
+- `docs/planning/archive/milestone-28-equity-real-data-ontario.md` — Ontario real-data equity layer rollout (M28)
+- `docs/planning/archive/milestone-29-equity-academic-rigor-hardening.md` — Ontario equity methodology hardening and academic defensibility improvements (M29)
 - `docs/planning/archive/milestone-25-reliability-verification.md` — Reliability & Verification Phase 2 (M25)
 - `docs/planning/archive/milestone-19-governance-quality.md` — Governance, Quality & Professional Polish (M19)
 - `docs/planning/implementation/archived/milestone-9-launch.md` — Production deployment & stakeholder validation (M9)

@@ -75,6 +75,14 @@ Certain analytics endpoints return explicit states instead of silent nulls:
 
 This avoids overclaiming when source fields or tract datasets are not yet integrated.
 
+## Equity contract notes (M29)
+
+- `GET /api/analytics/equity-summary` emits descriptive-only methodology metadata and uncertainty/sensitivity fields.
+- `GET /api/equity-layer` emits reference-year and interpretation metadata.
+- Equity layer loading is optimized-first:
+  - `ontario-equity-layer.optimized.geojson` preferred
+  - canonical `ontario-equity-layer.geojson` fallback
+
 ## Data Flow
 
 1. Frontend component requests Next API route.

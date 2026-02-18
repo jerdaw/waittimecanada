@@ -156,6 +156,38 @@
       "rollingAvg": "Moyenne mobile",
       "algorithmic": "Estimation calculée",
       "unknown": "Inconnu"
+    },
+    "equity": {
+      "toggle": {
+        "on": "Couche revenu activée",
+        "off": "Couche revenu désactivée",
+        "loading": "Chargement...",
+        "enableAria": "Activer la couche de revenu",
+        "disableAria": "Désactiver la couche de revenu"
+      },
+      "status": {
+        "loading": "Chargement de la couche par secteur de recensement...",
+        "ready": "Couche par secteur de recensement chargée.",
+        "unavailable": "Couche d'équité indisponible pour cette province.",
+        "error": "Échec du chargement de la couche d'équité."
+      },
+      "legend": {
+        "title": "Quintile de revenu",
+        "noData": "Aucune donnée",
+        "q1": "20 % les plus faibles",
+        "q2": "20-40 %",
+        "q3": "40-60 %",
+        "q4": "60-80 %",
+        "q5": "20 % les plus élevés",
+        "interpretationNote": "Couche d'association descriptive seulement. Ne pas interpréter cette couche comme une preuve causale.",
+        "temporalNote": "Les revenus proviennent du Recensement 2021; les temps d'attente sont récents et peuvent ne pas être alignés temporellement."
+      },
+      "popup": {
+        "quintileLabel": "Quintile :",
+        "medianIncomeLabel": "Revenu médian :",
+        "populationLabel": "Population (2021) :",
+        "noData": "Aucune donnée"
+      }
     }
   },
   "RegionDashboard": {
@@ -209,6 +241,10 @@
       "reportingCount": "Hôpitaux signalant : {count}",
       "nearTractMean": "Attente moyenne secteur :",
       "provinceMean": "Attente moyenne province :",
+      "limitationsTitle": "Limites d'interprétation",
+      "descriptiveOnly": "Ce lien est descriptif/associatif seulement et n'établit pas de causalité.",
+      "notCausal": "N'utilisez pas ce résumé pour une inférence causale.",
+      "temporalMismatch": "Année de référence du revenu : {censusYear}. Période d'attente : {period}. Ces fenêtres ne sont pas équivalentes temporellement.",
       "placeholder": "Jeu de données fictif utilisé. Remplacer par les données liées de Statistique Canada avant de tirer des conclusions."
     }
   },

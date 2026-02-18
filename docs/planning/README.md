@@ -10,16 +10,15 @@ This directory is the planning control plane for WaitTime Canada.
 
 ## Active Milestone Plans
 
-- `docs/planning/implementation/milestone-9-launch.md`
-- `docs/planning/implementation/milestone-10-provinces.md`
-- `docs/planning/implementation/milestone-11-equity.md`
-- `docs/planning/implementation/milestone-12-research.md`
+- None currently open.
 
 ## Archived Milestone Plans
 
 - `docs/planning/archive/milestone-15-analytics.md` (closed, delivered)
 - `docs/planning/archive/milestone-14-data-quality.md` (closed, delivered)
 - `docs/planning/archive/milestone-13-aggregation.md` (closed, delivered)
+- `docs/planning/archive/milestone-28-equity-real-data-ontario.md` (closed, delivered)
+- `docs/planning/archive/milestone-29-equity-academic-rigor-hardening.md` (closed, delivered)
 - `docs/planning/archive/task-er-watch-features.md` (closed, delivered)
 - `docs/planning/archive/implementation-plan-m2-ontario.md`
 - `docs/planning/archive/IMPLEMENTATION_PLAN_SUMMARY.md`
@@ -42,4 +41,4 @@ These documents are retained for context and may not match current implementatio
 3. Archive implementation plans once a milestone is delivered and no longer actively edited.
 4. Keep completed milestone details in archived files; keep roadmap focused on active next steps.
 
-Last Updated: 2026-02-08
+Last Updated: 2026-02-18

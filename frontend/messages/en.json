@@ -156,6 +156,38 @@
       "rollingAvg": "Rolling average",
       "algorithmic": "Calculated estimate",
       "unknown": "Unknown"
+    },
+    "equity": {
+      "toggle": {
+        "on": "Income Overlay On",
+        "off": "Income Overlay Off",
+        "loading": "Loading...",
+        "enableAria": "Enable income overlay",
+        "disableAria": "Disable income overlay"
+      },
+      "status": {
+        "loading": "Loading census tract overlay...",
+        "ready": "Census tract overlay loaded.",
+        "unavailable": "Equity layer unavailable for this province.",
+        "error": "Failed to load equity layer."
+      },
+      "legend": {
+        "title": "Income Quintile",
+        "noData": "No Data",
+        "q1": "Lowest 20%",
+        "q2": "20-40%",
+        "q3": "40-60%",
+        "q4": "60-80%",
+        "q5": "Highest 20%",
+        "interpretationNote": "Descriptive association layer only. Do not interpret this overlay as causal evidence.",
+        "temporalNote": "Income values are from Census 2021; wait-time signals are recent and may not be temporally aligned."
+      },
+      "popup": {
+        "quintileLabel": "Quintile:",
+        "medianIncomeLabel": "Median income:",
+        "populationLabel": "Population (2021):",
+        "noData": "No Data"
+      }
     }
   },
   "RegionDashboard": {
@@ -209,6 +241,10 @@
       "reportingCount": "Reporting hospitals: {count}",
       "nearTractMean": "Near-tract mean wait:",
       "provinceMean": "Province mean wait:",
+      "limitationsTitle": "Interpretation limits",
+      "descriptiveOnly": "This linkage is descriptive/associational only and does not establish causality.",
+      "notCausal": "Do not use this summary as causal inference.",
+      "temporalMismatch": "Income reference year: {censusYear}. Wait period: {period}. These windows are not temporally equivalent.",
       "placeholder": "Placeholder tract dataset in use. Replace with StatsCan-linked tract data before making policy conclusions."
     }
   },

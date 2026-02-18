@@ -165,8 +165,13 @@ class AlbertaScraper(BaseScraper):
             if spans:
                 return spans[0].get_text(" ", strip=True)
 
+        wait_span = card.select_one(".wt-times span")
         if wait_span:
             return wait_span.get_text(" ", strip=True)
+
+        wait_container = card.select_one(".wt-times")
+        if wait_container:
+            return wait_container.get_text(" ", strip=True)
         return ""
 
     def _extract_wait_minutes(self, text: str) -> int | None:

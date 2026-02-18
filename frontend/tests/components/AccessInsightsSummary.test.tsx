@@ -37,7 +37,7 @@ describe("AccessInsightsSummary", () => {
             period: "7d",
             status: "not_available_yet",
             generated_at: "2026-02-08T00:00:00.000Z",
-            is_placeholder: true,
+            is_placeholder: false,
             message: "Equity linkage summary not available yet.",
             setup_steps: ["Integrate provincial census tract income dataset"],
           },
@@ -71,8 +71,8 @@ describe("AccessInsightsSummary", () => {
             period: "7d",
             status: "ready",
             generated_at: "2026-02-08T00:00:00.000Z",
-            is_placeholder: true,
-            message: "Computed with placeholder data",
+            is_placeholder: false,
+            message: "Computed from Ontario tract data",
             low_income_tracts: 3,
             total_tracts: 5,
             reporting_hospitals: 12,
@@ -81,6 +81,12 @@ describe("AccessInsightsSummary", () => {
             near_low_income_avg_wait: 135,
             wait_gap_minutes: 15,
             threshold_km: 30,
+            methodology: {
+              interpretation: "descriptive_association_only",
+              causal_inference: false,
+              census_income_reference_year: 2021,
+              wait_aggregation_period: "7d",
+            },
           },
         }),
     });
@@ -100,9 +106,13 @@ describe("AccessInsightsSummary", () => {
       expect(screen.getByText("Low-Income Tracts")).toBeInTheDocument();
       expect(screen.getByText("Hospitals Near Tracts")).toBeInTheDocument();
       expect(screen.getByText("Wait Gap vs Province")).toBeInTheDocument();
+      expect(screen.getByText("Interpretation limits")).toBeInTheDocument();
       expect(
-        screen.getByText(/Placeholder tract dataset in use/i),
+        screen.getByText(/does not establish causality/i),
       ).toBeInTheDocument();
+      expect(
+        screen.queryByText(/Placeholder tract dataset in use/i),
+      ).not.toBeInTheDocument();
     });
   });
 });

@@ -1,7 +1,7 @@
 # ADR 0011: Equity Layer Scaffold-First Delivery
 
 ## Status
-Accepted (2026-02-08)
+Partially Superseded by ADR-0015 (2026-02-18)
 
 ## Context
 Milestone 11 requires an income-overlay equity layer, but full census-tract integration depends on
@@ -37,3 +37,8 @@ This keeps the product honest while unblocking UX, API contracts, and testing:
 1. Ingest real StatsCan census tract boundaries + income variables.
 2. Replace placeholder GeoJSON payload with processed provincial datasets.
 3. Keep attribution and methodology notes synchronized with final data source/version.
+
+## Supersession Notes
+
+- Ontario real-data integration is now governed by ADR-0015.
+- Scaffold-first behavior remains relevant for provinces not yet onboarded with real tract datasets.
