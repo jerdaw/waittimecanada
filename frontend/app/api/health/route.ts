@@ -183,7 +183,7 @@ export async function GET(req: NextRequest) {
         last_update: lastUpdate || null,
         stale_threshold_minutes: STALE_THRESHOLD_MINUTES,
       } as HealthResponse,
-      { headers: publicCacheHeaders(120, 300) },
+      { headers: NO_STORE_HEADERS },
     );
   } catch (error) {
     logger.error("Failed to fetch health status", error);

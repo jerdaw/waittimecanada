@@ -80,11 +80,11 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 (Production Deployment Blocked until March 9, 2026)
 
 **PRIORITY 0: Active Reliability Fixes (Local)**
-- [ ] **P0 / Ops: Quebec parser zero-value guard** — MSSS occupancy occasionally returns `0`, which currently fails `Measurement.value > 0` validation and classifies as `parser_breakage/parse`; update parser handling to treat zero-value occupancy as explicit non-reporting/suppressed signal rather than hard failure, with regression tests.
+- [x] **P0 / Ops: Quebec parser zero-value guard** — MSSS occupancy occasionally returns `0`, which currently fails `Measurement.value > 0` validation and classifies as `parser_breakage/parse`; update parser handling to treat zero-value occupancy as explicit non-reporting/suppressed signal rather than hard failure, with regression tests.
 
 **PRIORITY 1: Engineering Reliability (Local)**
-- [ ] **P1 / Performance: Cache & polling audit** — Verify cache headers/TTLs for shared read-heavy routes; enforce `no-store` for user-specific and export endpoints; keep SystemStatus polling at 5m and tab-visible only (4-8h)
-- [ ] **P1 / Ops: CI quota conservation (temporary)** — Minimize free-tier GitHub Actions burn until reset (favor local preflight + targeted workflow triggers, defer non-critical heavy jobs such as Playwright to essential runs only).
+- [x] **P1 / Performance: Cache & polling audit** — Verify cache headers/TTLs for shared read-heavy routes; enforce `no-store` for user-specific and export endpoints; keep SystemStatus polling at 5m and tab-visible only (4-8h)
+- [x] **P1 / Ops: CI quota conservation (temporary)** — Minimize free-tier GitHub Actions burn until reset (favor local preflight + targeted workflow triggers, defer non-critical heavy jobs such as Playwright to essential runs only).
 
 ### Deferred / On Hold (Non-Core / Too Reaching)
 

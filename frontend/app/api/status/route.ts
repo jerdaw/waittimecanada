@@ -126,7 +126,7 @@ export async function GET() {
         })),
         generated_at: new Date().toISOString(),
       },
-      { headers: publicCacheHeaders(120, 360) },
+      { headers: publicCacheHeaders(300, 900) },
     );
   } catch (error) {
     console.error("Failed to fetch system status:", error);

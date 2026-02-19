@@ -380,7 +380,13 @@ class QuebecScraper(BaseScraper):
         # Look for percentage pattern (number followed by %)
         match = re.search(r"(\d+(?:\.\d+)?)\s*%", text)
         if match:
-            return float(match.group(1))
+            value = float(match.group(1))
+            # Per roadmap: Treat 0% occupancy as a suppressed/non-reporting signal.
+            # This prevents 0.0 values from potentially skewing data quality or causing
+            # downstream validation issues if constraints are tightened.
+            if value == 0.0:
+                return None
+            return value
         return None
 
     def _create_measurement(
