@@ -4,12 +4,12 @@ on:
   push:
     branches: [main]
     paths:
-      - 'database/migrations/**'
+      - 'backend/migrations/**'
+      - 'backend/run_migrations.py'
   workflow_dispatch:
-    inputs:
-      migration_file:
-        description: 'Specific migration file to run (optional)'
-        required: false
+
+env:
+  PYTHON_VERSION: '3.12'
 
 concurrency:
   group: database-migrate-${{ github.ref }}
@@ -23,37 +23,26 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
-          version: latest
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
 
-      - name: Link to Supabase project
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+      - name: Install dependencies
+        working-directory: ./backend
         run: |
-          supabase link --project-ref $SUPABASE_PROJECT_ID
+          python -m pip install --upgrade pip
+          # minimal requirements for migration script: psycopg2-binary, python-dotenv
+          # simpler than installing full project dependencies if we just need to run a script
+          pip install psycopg2-binary python-dotenv
 
       - name: Run migrations
-        if: github.event.inputs.migration_file == ''
-        run: |
-          supabase db push
-
-      - name: Run specific migration
-        if: github.event.inputs.migration_file != ''
+        working-directory: ./backend
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          psql $SUPABASE_URL -f database/migrations/${{ github.event.inputs.migration_file }}
-
-      - name: Verify migration
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-        run: |
-          # Query schema version or run simple health check
-          psql $SUPABASE_URL -c "SELECT COUNT(*) FROM sources;"
-          echo "Migration completed successfully"
+          python run_migrations.py
 
       - name: Notify on failure
         if: failure()
