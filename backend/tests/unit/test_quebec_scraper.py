@@ -1,6 +1,6 @@
 """Unit tests for Quebec scraper."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 from waittime.core import EndEvent, MetricFamily, StartEvent, StatisticType
@@ -208,6 +208,18 @@ class TestQuebecScraper:
         assert scraper._extract_occupancy_percentage("") is None
         assert scraper._extract_occupancy_percentage("Number of people waiting: 10") is None
 
+    def test_extract_wait_time_zero(self, scraper):
+        """Extract wait time when it is 0."""
+        assert scraper._extract_wait_time("0 min") == 0.0
+        assert scraper._extract_wait_time("0 minutes") == 0.0
+        assert scraper._extract_wait_time("0") == 0.0
+        assert scraper._extract_wait_time("0h 0min") == 0.0
+
+    def test_extract_occupancy_percentage_zero(self, scraper):
+        """Extract occupancy percentage when it is 0%."""
+        assert scraper._extract_occupancy_percentage("Occupancy rate: 0%") == 0.0
+        assert scraper._extract_occupancy_percentage("0%") == 0.0
+
     def test_parse_french_occupancy_text(self, scraper):
         """Extract occupancy from French text."""
         html = """
@@ -298,4 +310,5 @@ class TestQuebecScraper:
         scraper._heartbeat.record_success.assert_called_once_with(
             source_id="quebec-msss",
             measurements_count=1,
+            run_duration_ms=ANY,
         )

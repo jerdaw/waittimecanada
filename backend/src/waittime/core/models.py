@@ -28,7 +28,7 @@ class Measurement(BaseModel):
     hospital_id: str = Field(
         description="Unique hospital identifier (format: ca-{province}-{slug})"
     )
-    value: float = Field(gt=0, description="The measured value (usually minutes)")
+    value: float = Field(ge=0, description="The measured value (usually minutes)")
     timestamp_utc: datetime = Field(
         default_factory=lambda: datetime.now(UTC),
         description="When this measurement was recorded",
