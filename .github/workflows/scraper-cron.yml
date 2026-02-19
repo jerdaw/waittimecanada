@@ -4,10 +4,10 @@ name: Scraper Cron Job
 # Review target date: 2026-03-09 (revert to */15 if Neon transfer is back within budget).
 on:
   schedule:
-    # Day (12:00 - 04:00 UTC): Every 30 minutes
-    - cron: '*/30 12-23,0-3 * * *'
-    # Night (04:00 - 12:00 UTC): Every 60 minutes
-    - cron: '0 4-11 * * *'
+    # Day (12:00 - 04:00 UTC): Every 60 minutes
+    - cron: '0 12-23,0-3 * * *'
+    # Night (04:00 - 12:00 UTC): Every 120 minutes (2 hours)
+    - cron: '0 4,6,8,10 * * *'
   workflow_dispatch:  # Allow manual trigger
 
 env:

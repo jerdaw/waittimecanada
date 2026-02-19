@@ -216,9 +216,13 @@ class TestQuebecScraper:
         assert scraper._extract_wait_time("0h 0min") == 0.0
 
     def test_extract_occupancy_percentage_zero(self, scraper):
-        """Extract occupancy percentage when it is 0%."""
-        assert scraper._extract_occupancy_percentage("Occupancy rate: 0%") == 0.0
-        assert scraper._extract_occupancy_percentage("0%") == 0.0
+        """Extract occupancy percentage when it is 0%.
+
+        Per roadmap, 0% occupancy is treated as a suppressed signal (None),
+        not a valid measurement, to avoid data quality issues.
+        """
+        assert scraper._extract_occupancy_percentage("Occupancy rate: 0%") is None
+        assert scraper._extract_occupancy_percentage("0%") is None
 
     def test_parse_french_occupancy_text(self, scraper):
         """Extract occupancy from French text."""

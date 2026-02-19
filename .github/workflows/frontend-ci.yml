@@ -139,7 +139,7 @@ jobs:
   test-e2e:
     name: E2E Tests (Playwright)
     needs: [changes]
-    if: needs.changes.outputs.run_e2e == 'true'
+    if: needs.changes.outputs.run_e2e == 'true' && (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
