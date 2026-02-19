@@ -7,7 +7,7 @@ from waittime.core.enums import EndEvent, MetricFamily, PatientScope, StartEvent
 measurement_strategy = st.builds(
     Measurement,
     hospital_id=st.just("ca-qc-test"),
-    value=st.floats(min_value=0.1, max_value=1000.0),
+    value=st.floats(min_value=0.0, max_value=1000.0),
     metric_family=st.sampled_from(MetricFamily),
     start_event=st.sampled_from(StartEvent),
     end_event=st.sampled_from(EndEvent),

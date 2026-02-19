@@ -34,12 +34,26 @@ class TestMeasurement:
         assert m.value == 120.0
         assert m.metric_family == MetricFamily.TIME_TO_PROVIDER
 
-    def test_value_must_be_positive(self) -> None:
-        """Measurement value must be greater than zero."""
-        with pytest.raises(ValueError, match="greater than"):
+    def test_value_must_be_non_negative(self) -> None:
+        """Measurement value must be greater than or equal to zero."""
+        # Zero is now allowed (e.g., for occupancy)
+        m = Measurement(
+            hospital_id="ca-qc-chum",
+            value=0.0,
+            metric_family=MetricFamily.TIME_TO_PROVIDER,
+            start_event=StartEvent.REGISTRATION,
+            end_event=EndEvent.PHYSICIAN,
+            statistic_type=StatisticType.MEAN,
+            source_id="quebec-msss",
+            raw_payload_hash="a" * 64,
+        )
+        assert m.value == 0.0
+
+        # Negative is still rejected
+        with pytest.raises(ValueError, match="greater than or equal to 0"):
             Measurement(
                 hospital_id="ca-qc-chum",
-                value=0,
+                value=-1.0,
                 metric_family=MetricFamily.TIME_TO_PROVIDER,
                 start_event=StartEvent.REGISTRATION,
                 end_event=EndEvent.PHYSICIAN,
