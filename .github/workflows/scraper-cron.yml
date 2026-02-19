@@ -73,7 +73,7 @@ jobs:
 
       - name: Upload Badge Artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: freshness-badge
           path: backend/freshness.json
