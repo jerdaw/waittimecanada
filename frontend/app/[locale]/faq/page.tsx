@@ -3,7 +3,7 @@ import { FAQAccordion } from "@/components/FAQAccordion";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Frequently Asked Questions | WaitTime Canada",
+  title: "Frequently Asked Questions | Wait Time Canada",
   description:
     "Common questions about ER wait times, our methodology, and how we compare hospital data across provinces.",
   alternates: {

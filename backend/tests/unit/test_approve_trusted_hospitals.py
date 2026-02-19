@@ -85,9 +85,7 @@ class TestApproveTrustedHospitals:
         with patch("sys.argv", ["cmd"]):
             main()
 
-        called_sources = [
-            call.args[0] for call in db.get_hospitals_by_source.call_args_list
-        ]
+        called_sources = [call.args[0] for call in db.get_hospitals_by_source.call_args_list]
         for source_id in TRUSTED_SOURCE_IDS:
             assert source_id in called_sources
 

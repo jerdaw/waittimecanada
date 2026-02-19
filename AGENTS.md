@@ -38,7 +38,7 @@ This file provides guidance to automated developer tools when working with code 
 
 ## Overview
 
-This is the **WaitTime Canada** project - a "Health Systems Observatory" designed to audit and standardize Canadian emergency room wait time data across provinces. This is **NOT a simple wait time app**, but rather a clinically defensible auditing platform that exposes methodological inconsistencies in healthcare reporting.
+This is the **Wait Time Canada** project - a "Health Systems Observatory" designed to audit and standardize Canadian emergency room wait time data across provinces. This is **NOT a simple wait time app**, but rather a clinically defensible auditing platform that exposes methodological inconsistencies in healthcare reporting.
 
 **Current Status:** Milestone 16 (Multi-Province Operationalization) Complete. **Four-province breadth achieved** (ON, QC, AB, BC). All scrapers active, 380+ hospitals visible, methodology documentation complete for all provinces.
 

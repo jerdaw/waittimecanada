@@ -4,7 +4,6 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
-
 from waittime.core import MeasurementAggregate
 from waittime.services.patterns import TemporalPatternService
 
@@ -24,7 +23,9 @@ def service(mock_db: Mock) -> TemporalPatternService:
     return TemporalPatternService(mock_db)
 
 
-def _aggregate(period_type: str, period_start: datetime, mean: float, sample_count: int) -> MeasurementAggregate:
+def _aggregate(
+    period_type: str, period_start: datetime, mean: float, sample_count: int
+) -> MeasurementAggregate:
     """Create aggregate test fixture."""
     duration_by_period = {
         "hourly": timedelta(hours=1),
@@ -112,7 +113,9 @@ class TestTemporalPatternService:
 
         assert result["insights"]["weekend_vs_weekday_ratio"] == 1.25
 
-    def test_monthly_trend_chronological(self, service: TemporalPatternService, mock_db: Mock) -> None:
+    def test_monthly_trend_chronological(
+        self, service: TemporalPatternService, mock_db: Mock
+    ) -> None:
         """Monthly output should be sorted chronologically and include trend summary."""
         mock_db.get_aggregates.return_value = [
             _aggregate("monthly", datetime(2026, 3, 1, tzinfo=UTC), 120.0, 500),

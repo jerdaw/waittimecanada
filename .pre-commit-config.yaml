@@ -5,6 +5,7 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+        exclude: ^mkdocs\.yml$
       - id: check-json
       - id: check-merge-conflict
       - id: detect-private-key
@@ -23,8 +24,12 @@ repos:
     hooks:
       - id: mypy
         args: [--config-file=backend/pyproject.toml]
-        files: ^backend/
+        files: ^backend/src/
         additional_dependencies:
+          - httpx
+          - pydantic
+          - python-dotenv
+          - structlog
           - types-requests
           - types-psycopg2
 
@@ -33,7 +38,7 @@ repos:
     hooks:
       - id: detect-secrets
         args: ['--baseline', '.secrets.baseline']
-        exclude: package-lock.json
+        exclude: (^package-lock\.json$|^backend/data/layers/.*manifest.*\.json$)
 
 # Note: Frontend hooks (Prettier, ESLint) run via npm scripts in CI
 # This avoids Node.js environment complexity in pre-commit

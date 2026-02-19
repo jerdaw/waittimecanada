@@ -149,7 +149,7 @@ After getting your DOI, you can add it to `CITATION.cff`:
 
 ```yaml
 cff-version: 1.2.0
-title: "WaitTime Canada"
+title: "Wait Time Canada"
 message: "If you use this software, please cite it as below."
 type: software
 authors:
@@ -211,13 +211,13 @@ Every time you create a GitHub release:
 
 ### APA Format
 ```
-Dawson, J. (2026). WaitTime Canada (Version 1.0.0) [Computer software].
+Dawson, J. (2026). Wait Time Canada (Version 1.0.0) [Computer software].
 https://doi.org/10.5281/zenodo.XXXXXXX
 ```
 
 ### IEEE Format
 ```
-J. Dawson, "WaitTime Canada," Version 1.0.0, 2026. [Online].
+J. Dawson, "Wait Time Canada," Version 1.0.0, 2026. [Online].
 Available: https://doi.org/10.5281/zenodo.XXXXXXX
 ```
 
@@ -225,7 +225,7 @@ Available: https://doi.org/10.5281/zenodo.XXXXXXX
 ```bibtex
 @software{dawson2026waittimecanada,
   author = {Dawson, Jeremy},
-  title = {WaitTime Canada},
+  title = {Wait Time Canada},
   version = {1.0.0},
   year = {2026},
   doi = {10.5281/zenodo.XXXXXXX},

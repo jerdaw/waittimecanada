@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Test database connection."""
 
+# ruff: noqa: T201
+
 from waittime.services import DatabaseService
 
 try:
@@ -12,7 +14,7 @@ try:
         with db.get_cursor(conn) as cur:
             cur.execute("SELECT version()")
             version = cur.fetchone()
-            print(f"✓ Connected to PostgreSQL")
+            print("✓ Connected to PostgreSQL")
             print(f"  Version: {version['version'][:50]}...")
 
     print("\n✅ Database connection successful!")

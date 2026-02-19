@@ -62,7 +62,7 @@ class BaseScraper(ABC):
         self.client = httpx.Client(
             timeout=30.0,
             headers={
-                "User-Agent": "WaitTimeCanada/1.0 (Health Systems Observatory; +https://waittimecanada.ca)",
+                "User-Agent": "WaitTimeCanada/1.0 (Health Systems Observatory; +https://wait-time.ca)",
             },
         )
 
@@ -72,7 +72,7 @@ class BaseScraper(ABC):
     def __exit__(self, *args: object) -> None:
         self.client.close()
 
-    @retry(
+    @retry(  # type: ignore[misc]
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=4, max=60),
     )

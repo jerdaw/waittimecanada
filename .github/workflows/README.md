@@ -1,6 +1,6 @@
 # GitHub Actions Workflows
 
-This directory contains operational and CI workflows for WaitTime Canada.
+This directory contains operational and CI workflows for Wait Time Canada.
 
 ## Workflow Catalog
 

@@ -162,7 +162,7 @@ Actual wait times may differ due to:
 
 ## 5. Metric Ontology Mapping
 
-Based on the WaitTime Canada ontology system:
+Based on the Wait Time Canada ontology system:
 
 ### Wait Time to Physician
 
@@ -355,7 +355,7 @@ with sync_playwright() as p:
 
 ### Rate Limiting Recommendations
 - **Frequency:** Every 15 minutes (data updates every 5 min, but scraping every 15 min is respectful)
-- **User-Agent:** Include contact info: `WaitTimeCanada-Bot/1.0 (contact@waittimecanada.org)`
+- **User-Agent:** Include contact info: `WaitTimeCanada-Bot/1.0 (contact@wait-time.ca)`
 - **Caching:** Store `createdAt` timestamp to avoid duplicate records
 
 ---
@@ -413,7 +413,7 @@ with sync_playwright() as p:
 
 ---
 
-## 10. Critical Considerations for WaitTime Canada Integration
+## 10. Critical Considerations for Wait Time Canada Integration
 
 ### Strengths
 ✅ **Methodology transparency:** Clear definition of P90 for wait times
@@ -504,7 +504,7 @@ def scrape_bc_wait_times():
 
     url = "https://edwaittimes.ca/legacy"
     response = requests.get(url, headers={
-        'User-Agent': 'WaitTimeCanada-Bot/1.0 (contact@waittimecanada.org)'
+        'User-Agent': 'WaitTimeCanada-Bot/1.0 (contact@wait-time.ca)'
     })
 
     # Parse HTML
@@ -578,5 +578,5 @@ def write_heartbeat(source_id, status, record_count):
 **End of Methodology Document**
 
 **Last Updated:** February 6, 2026
-**Analyst:** Automated Research (WaitTime Canada Project)
+**Analyst:** Automated Research (Wait Time Canada Project)
 **Status:** ✅ Complete - Ready for scraper implementation

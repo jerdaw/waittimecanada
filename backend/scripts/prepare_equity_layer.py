@@ -433,7 +433,7 @@ def _generate_dummy_data(output_path: Path, manifest_path: Path, size_warning_by
         for j in range(10):
             lat = base_lat + (i * 0.05)
             lon = base_lon + (j * 0.05)
-            income = float(random.randint(30000, 150000))
+            income = float(random.randint(30000, 150000))  # noqa: S311
             incomes.append(income)
 
     cut_points = _calculate_quintile_cut_points(incomes)
@@ -453,7 +453,7 @@ def _generate_dummy_data(output_path: Path, manifest_path: Path, size_warning_by
                     "tract_name": f"Dummy tract {ctuid}",
                     "income_quintile": _get_quintile(income, cut_points),
                     "median_household_income": income,
-                    "population_2021": random.randint(2000, 8000),
+                    "population_2021": random.randint(2000, 8000),  # noqa: S311
                     "is_placeholder": True,
                 },
                 "geometry": {

@@ -4,7 +4,6 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
-
 from waittime.core import MeasurementAggregate
 from waittime.services.aggregation import AggregationService
 
@@ -230,9 +229,7 @@ class TestAggregatePeriod:
             _make_measurement_row(value=200.0),
         ]
 
-        result = service.aggregate_hourly(
-            "ca-on-test", datetime(2026, 2, 6, 14, 0, tzinfo=UTC)
-        )
+        result = service.aggregate_hourly("ca-on-test", datetime(2026, 2, 6, 14, 0, tzinfo=UTC))
 
         assert result is not None
         assert result.metric_family == "TOTAL_LOS"

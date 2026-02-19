@@ -8,7 +8,6 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
-
 from waittime.services.anomaly_detection import AnomalyDetectionService
 
 

@@ -1863,7 +1863,7 @@ When comparing Ontario to Quebec:
 ---
 
 *Last updated: January 2026*
-*Maintained by: WaitTime Canada Project*
+*Maintained by: Wait Time Canada Project*
 ```
 
 ### Files to Create

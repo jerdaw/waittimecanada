@@ -1,7 +1,7 @@
 [project]
 name = "waittime"
 version = "0.1.0"
-description = "Provincial ER wait time scrapers for WaitTime Canada"
+description = "Provincial ER wait time scrapers for Wait Time Canada"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

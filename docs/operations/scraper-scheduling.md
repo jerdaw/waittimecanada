@@ -9,7 +9,7 @@
 
 ## Overview
 
-WaitTime Canada operates 4 provincial emergency department wait time scrapers running on GitHub Actions. This document describes the scheduling, monitoring, and operational procedures.
+Wait Time Canada operates 4 provincial emergency department wait time scrapers running on GitHub Actions. This document describes the scheduling, monitoring, and operational procedures.
 
 ---
 
@@ -379,7 +379,7 @@ Notes:
 
 ## References
 
-- [Scraper CLI Documentation](../../backend/src/waittime/cli/scraper.py)
-- [Heartbeat Monitor CLI](../../backend/src/waittime/cli/check_heartbeat.py)
+- Scraper CLI: `backend/src/waittime/cli/scraper.py`
+- Heartbeat monitor CLI: `backend/src/waittime/cli/check_heartbeat.py`
 - [GitHub Actions Workflows](../../.github/workflows/)
 - [Provincial Methodologies](../methodologies/)

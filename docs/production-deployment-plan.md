@@ -143,7 +143,7 @@
 
 ### 3. Alerts for Scraper Failures
 - [x] **Pushover notifications** (mobile push notifications)
-- Required secrets: `PUSHOVER_USER_KEY`, `PUSHOVER_API_TOKEN`
+- Required credentials: `PUSHOVER_USER_KEY`, `PUSHOVER_API_TOKEN`
 
 ### 4. Hosting Tier
 - [x] **Free tier** (instances spin down after 15 min inactivity)

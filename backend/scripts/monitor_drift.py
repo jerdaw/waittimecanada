@@ -1,4 +1,4 @@
-"""Data drift monitoring script for WaitTime Canada.
+"""Data drift monitoring script for Wait Time Canada.
 
 Checks all provincial sources for potential methodology changes by comparing
 distributional statistics between consecutive time periods. Exits with code 1
@@ -27,7 +27,6 @@ from dotenv import load_dotenv  # noqa: E402
 load_dotenv()
 
 import structlog  # noqa: E402
-
 from waittime.services.database import DatabaseService  # noqa: E402
 from waittime.services.methodology_change import MethodologyChangeDetector  # noqa: E402
 

@@ -1,7 +1,6 @@
 """Unit tests for Ontario scraper."""
 
 import pytest
-
 from waittime.core import EndEvent, MetricFamily, PatientScope, StartEvent, StatisticType
 from waittime.scrapers.ontario import OntarioScraper, create_ontario_source
 
@@ -40,10 +39,7 @@ class TestOntarioScraper:
             scraper._normalize_hospital_id("The Ottawa Hospital - Civic Campus")
             == "ca-on-ottawa-civic"
         )
-        assert (
-            scraper._normalize_hospital_id("Toronto General Hospital")
-            == "ca-on-toronto-general"
-        )
+        assert scraper._normalize_hospital_id("Toronto General Hospital") == "ca-on-toronto-general"
 
     def test_normalize_hospital_id_fuzzy_match(self, scraper):
         """Normalize hospital name to ID (fuzzy match)."""
@@ -51,10 +47,7 @@ class TestOntarioScraper:
         assert scraper._normalize_hospital_id("SickKids Emergency") == "ca-on-sickkids"
 
         # Contains "The Ottawa Hospital"
-        assert (
-            scraper._normalize_hospital_id("The Ottawa Hospital - Civic")
-            == "ca-on-ottawa-civic"
-        )
+        assert scraper._normalize_hospital_id("The Ottawa Hospital - Civic") == "ca-on-ottawa-civic"
 
     def test_normalize_hospital_id_generates_slug(self, scraper):
         """Generate slug for unknown hospital."""

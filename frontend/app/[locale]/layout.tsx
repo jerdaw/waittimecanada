@@ -25,10 +25,11 @@ export async function generateMetadata({params: {locale}}: {params: {locale: str
   const t = await getTranslations({locale, namespace: 'Metadata'});
 
   return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? "https://wait-time.ca"),
     title: t('title'),
     description: t('description'),
     keywords: t('keywords'),
-    authors: [{ name: "WaitTime Canada Team" }],
+    authors: [{ name: "Wait Time Canada Team" }],
     viewport: "width=device-width, initial-scale=1, maximum-scale=1",
     icons: {
       icon: "/favicon.ico",

@@ -1,6 +1,6 @@
 {
-  "name": "WaitTime Canada",
-  "short_name": "WaitTime",
+  "name": "Wait Time Canada",
+  "short_name": "Wait Time",
   "description": "Real-time emergency room wait times across Canada.",
   "start_url": "/",
   "display": "standalone",

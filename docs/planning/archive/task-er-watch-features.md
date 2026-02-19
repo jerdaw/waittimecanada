@@ -18,7 +18,7 @@
 - [x] Add list/map synchronization (hover/select states)
 - [x] Mobile responsive layout (stacked vs side-by-side)
 
-### Wait Time Trend Charts  
+### Wait Time Trend Charts
 - [x] Create backend API: GET /api/hospitals/[slug]/trends
 - [x] Create TrendChart component with Recharts
 - [x] Add timeframe toggles (24h | 7d | 30d)

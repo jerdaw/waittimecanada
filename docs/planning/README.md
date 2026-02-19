@@ -1,6 +1,6 @@
 # Planning Documentation
 
-This directory is the planning control plane for WaitTime Canada.
+This directory is the planning control plane for Wait Time Canada.
 
 ## Source Of Truth
 
@@ -41,4 +41,4 @@ These documents are retained for context and may not match current implementatio
 3. Archive implementation plans once a milestone is delivered and no longer actively edited.
 4. Keep completed milestone details in archived files; keep roadmap focused on active next steps.
 
-Last Updated: 2026-02-18
+Last Updated: 2026-02-19

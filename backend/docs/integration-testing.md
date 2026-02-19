@@ -2,7 +2,7 @@
 
 ## Overview
 
-Integration tests verify the full stack of WaitTime Canada with real database interactions. Unlike unit tests that use mocks, integration tests connect to a real PostgreSQL database to ensure the entire system works correctly.
+Integration tests verify the full stack of Wait Time Canada with real database interactions. Unlike unit tests that use mocks, integration tests connect to a real PostgreSQL database to ensure the entire system works correctly.
 
 ## Test Coverage
 
@@ -25,7 +25,7 @@ Integration tests cover:
 
 2. **Environment Variable**: Set `DATABASE_URL` with connection string
    ```bash
-   export DATABASE_URL="postgresql://user:password@host/database"
+   export DATABASE_URL="postgresql://user@host/database"
    ```
 
 ### Run All Integration Tests
@@ -69,7 +69,7 @@ uv run pytest -m "not integration"
 3. Copy the connection string
 4. Set environment variable:
    ```bash
-   export DATABASE_URL="postgresql://user:password@host/waittimecanada_test"
+   export DATABASE_URL="postgresql://user@host/waittimecanada_test"
    ```
 
 ### Option 2: Use Local PostgreSQL
@@ -96,7 +96,7 @@ docker run -d \
   postgres:17
 
 # Set environment variable
-export DATABASE_URL="postgresql://postgres:testpass@localhost:5432/waittimecanada_test"
+export DATABASE_URL="postgresql://postgres@localhost:5432/waittimecanada_test"
 
 # Stop and remove when done
 docker stop waittime-test-db
@@ -268,7 +268,7 @@ jobs:
 
 **Solution:** Set the environment variable:
 ```bash
-export DATABASE_URL="postgresql://user:password@host/database"
+export DATABASE_URL="postgresql://user@host/database"
 ```
 
 ### Issue: "relation 'hospitals' does not exist"

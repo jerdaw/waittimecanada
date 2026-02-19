@@ -8,7 +8,6 @@ import os
 from collections.abc import Generator
 
 import pytest
-
 from waittime.services.database import DatabaseService
 
 

@@ -1,10 +1,10 @@
 # Database Migrations Guide
 
-This document explains how to create, apply, and roll back database migrations for WaitTime Canada.
+This document explains how to create, apply, and roll back database migrations for Wait Time Canada.
 
 > [!NOTE]
 > The canonical migration history and schema reference lives in
-> [`backend/migrations/README.md`](../../backend/migrations/README.md).
+> See `backend/migrations/README.md`.
 > This guide covers the **process** — when and how to create migrations.
 
 ---
@@ -169,4 +169,4 @@ The `database-migrate.yml` workflow can be triggered manually to apply migration
 | `regions` | 15 | Health region metadata |
 | `hospital_regions` | 380+ | Hospital-to-region mapping |
 
-For the full schema, see [`backend/migrations/README.md`](../../backend/migrations/README.md).
+For the full schema, see `backend/migrations/README.md`.

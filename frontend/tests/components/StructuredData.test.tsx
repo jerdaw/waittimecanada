@@ -50,6 +50,6 @@ describe("StructuredData", () => {
     const content = JSON.parse(script?.innerHTML || "{}");
 
     expect(content["@type"]).toBe("Organization");
-    expect(content.name).toBe("WaitTime Canada");
+    expect(content.name).toBe("Wait Time Canada");
   });
 });

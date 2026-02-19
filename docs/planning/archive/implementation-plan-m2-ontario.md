@@ -18,7 +18,7 @@
 
 ## Executive Summary
 
-This implementation plan details the complete end-to-end delivery of the **first provincial data pipeline** for WaitTime Canada, focusing exclusively on **Ontario**. This milestone represents our first complete vertical slice through the entire system architecture: data acquisition → storage → presentation.
+This implementation plan details the complete end-to-end delivery of the **first provincial data pipeline** for Wait Time Canada, focusing exclusively on **Ontario**. This milestone represents our first complete vertical slice through the entire system architecture: data acquisition → storage → presentation.
 
 **Strategic Importance:**
 - Validates core architectural assumptions (metric ontology, database schema)
@@ -450,7 +450,7 @@ This implementation plan details the complete end-to-end delivery of the **first
 **4.8 Main Page**
 - [ ] Update `frontend/app/page.tsx`
 - [ ] Render `<Map />` component
-- [ ] Add simple header: "WaitTime Canada - Ontario"
+- [ ] Add simple header: "Wait Time Canada - Ontario"
 - [ ] Add footer: "Data from Ontario Health"
 
 **Deliverables:**

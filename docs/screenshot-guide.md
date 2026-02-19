@@ -1,4 +1,4 @@
-# Screenshot Guide for WaitTime Canada
+# Screenshot Guide for Wait Time Canada
 
 > This guide explains what screenshots to capture for portfolio presentations, social media posts, and documentation.
 
@@ -11,7 +11,7 @@
 **Purpose:** Show clean, professional design and value proposition
 **What to capture:**
 - Full viewport showing hero section
-- "Why I Built WaitTime Canada" about section (expanded)
+- "Why I Built Wait Time Canada" about section (expanded)
 - Map partially visible below
 
 **Settings:**

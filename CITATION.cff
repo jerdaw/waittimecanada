@@ -1,12 +1,12 @@
 cff-version: 1.2.0
-title: "WaitTime Canada"
+title: "Wait Time Canada"
 message: "If you use this software, please cite it as below."
 type: software
 authors:
-  - family-names: "Daw"
+  - family-names: "Dawson"
     given-names: "Jeremy"
 repository-code: "https://github.com/jerdaw/waittimecanada"
-url: "https://github.com/jerdaw/waittimecanada"
+url: "https://wait-time.ca"
 abstract: "A clinically defensible Health Systems Observatory for Canadian emergency department wait-time methodology and data quality."
 keywords:
   - health systems

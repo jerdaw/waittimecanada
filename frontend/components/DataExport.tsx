@@ -199,18 +199,18 @@ export function DataExport() {
 
       {/* Citation Info */}
       <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
-        <div className="flex items-start gap-2">
-          <Info className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
-          <div className="text-xs text-slate-500 dark:text-slate-400">
-            <p className="font-medium mb-1">Suggested Citation:</p>
-            <p className="italic">
-              WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set].
-              https://waittimecanada.ca
-            </p>
-            <p className="mt-2">License: CC-BY-4.0 (Attribution Required)</p>
-          </div>
-        </div>
-      </div>
+	        <div className="flex items-start gap-2">
+	          <Info className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+	          <div className="text-xs text-slate-500 dark:text-slate-400">
+	            <p className="font-medium mb-1">Suggested Citation:</p>
+	            <p className="italic">
+	              Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set].
+	              https://wait-time.ca
+	            </p>
+	            <p className="mt-2">License: CC-BY-4.0 (Attribution Required)</p>
+	          </div>
+	        </div>
+	      </div>
     </div>
   );
 }

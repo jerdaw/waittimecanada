@@ -48,7 +48,8 @@ def main():
             print("Importing hospitals (upsert)...")
             upserted = 0
             for h in hospitals:
-                cur.execute("""
+                cur.execute(
+                    """
                     INSERT INTO hospitals (id, name, city, latitude, longitude, province, source_id, is_verified, is_visible)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, TRUE, TRUE)
                     ON CONFLICT (id) DO UPDATE SET
@@ -59,15 +60,17 @@ def main():
                         province = EXCLUDED.province,
                         is_verified = TRUE,
                         is_visible = TRUE
-                """, (
-                    h["id"],
-                    h["name"],
-                    h["city"],
-                    float(h["latitude"]),
-                    float(h["longitude"]),
-                    h["province"],
-                    "ontario-health",  # All Ontario hospitals
-                ))
+                """,
+                    (
+                        h["id"],
+                        h["name"],
+                        h["city"],
+                        float(h["latitude"]),
+                        float(h["longitude"]),
+                        h["province"],
+                        "ontario-health",  # All Ontario hospitals
+                    ),
+                )
                 upserted += 1
                 if upserted % 50 == 0:
                     print(f"  {upserted} hospitals processed...")
@@ -75,18 +78,22 @@ def main():
             conn.commit()
 
             # Verify
-            cur.execute("SELECT COUNT(*) FROM hospitals WHERE is_verified = TRUE AND is_visible = TRUE")
+            cur.execute(
+                "SELECT COUNT(*) FROM hospitals WHERE is_verified = TRUE AND is_visible = TRUE"
+            )
             count = cur.fetchone()[0]
             print(f"\n✅ Done! {count} verified and visible hospitals in database")
 
             # Show a few samples
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT name, city, latitude, longitude
                 FROM hospitals
                 WHERE is_verified = TRUE
                 ORDER BY name
                 LIMIT 5
-            """)
+            """
+            )
             print("\nSample hospitals:")
             for row in cur.fetchall():
                 print(f"  {row[0]} ({row[1]}): {row[2]:.4f}, {row[3]:.4f}")

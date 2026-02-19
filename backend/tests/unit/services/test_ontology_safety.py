@@ -4,7 +4,6 @@ from datetime import UTC, datetime
 from unittest.mock import MagicMock, Mock
 
 import pytest
-
 from waittime.services.trends import SystemTrendService
 
 
@@ -47,7 +46,7 @@ class TestOntologyMixing:
                 "mean_value": 30.0,
                 "min_value": 10.0,
                 "max_value": 60.0,
-                "sample_count": 1000, # Dominant (Triage->Nurse)
+                "sample_count": 1000,  # Dominant (Triage->Nurse)
                 "metric_family": "wait_time",
                 "start_event": "triage",
                 "end_event": "nurse_seen",
@@ -60,12 +59,12 @@ class TestOntologyMixing:
                 "mean_value": 120.0,
                 "min_value": 60.0,
                 "max_value": 240.0,
-                "sample_count": 100, # Minority (Triage->Doctor)
+                "sample_count": 100,  # Minority (Triage->Doctor)
                 "metric_family": "wait_time",
                 "start_event": "triage",
                 "end_event": "doctor_seen",
                 "statistic_type": "mean",
-            }
+            },
         ]
 
         # We need to mock the context manager for get_connection/get_cursor

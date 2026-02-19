@@ -86,7 +86,7 @@ Comprehensive review of all project documentation confirms the project is **port
 ### ✅ Consistency
 
 **Terminology:**
-- ✅ "WaitTime Canada" (consistent project name)
+- ✅ "Wait Time Canada" (consistent project name)
 - ✅ "Health Systems Observatory" (consistent tagline)
 - ✅ "Metric Ontology" (consistent terminology)
 - ✅ "Divergence Brief" (consistent naming)

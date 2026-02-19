@@ -1,7 +1,7 @@
 # Milestone 20: Reliability & Verification Implementation Plan
 
 ## Goal Description
-Enhance the reliability and observability of the WaitTime Canada platform by implementing API response time tracking, backend end-to-end pipeline testing, and visual regression testing. This milestone aims to close key verification gaps identified in the roadmap.
+Enhance the reliability and observability of the Wait Time Canada platform by implementing API response time tracking, backend end-to-end pipeline testing, and visual regression testing. This milestone aims to close key verification gaps identified in the roadmap.
 
 ## Proposed Changes
 

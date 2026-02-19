@@ -8,6 +8,7 @@ Coverage: 6+ cities across Alberta
 import logging
 import re
 import unicodedata
+from typing import cast
 
 from bs4 import BeautifulSoup, Tag
 from playwright.sync_api import TimeoutError as PlaywrightTimeout
@@ -73,7 +74,7 @@ class AlbertaScraper(BaseScraper):
                 # Give extra time for dynamic content
                 page.wait_for_timeout(2000)
 
-                html = page.content()
+                html = cast(str, page.content())
                 return html
             finally:
                 browser.close()
@@ -159,19 +160,19 @@ class AlbertaScraper(BaseScraper):
         if card.select_one(".dbl-wt"):
             spans = card.select(".dbl-wt span")
             for span in spans:
-                text = span.get_text(" ", strip=True)
+                text = str(span.get_text(" ", strip=True))
                 if "adult emergency" in text.lower():
                     return text
             if spans:
-                return spans[0].get_text(" ", strip=True)
+                return str(spans[0].get_text(" ", strip=True))
 
         wait_span = card.select_one(".wt-times span")
         if wait_span:
-            return wait_span.get_text(" ", strip=True)
+            return str(wait_span.get_text(" ", strip=True))
 
         wait_container = card.select_one(".wt-times")
         if wait_container:
-            return wait_container.get_text(" ", strip=True)
+            return str(wait_container.get_text(" ", strip=True))
         return ""
 
     def _extract_wait_minutes(self, text: str) -> int | None:

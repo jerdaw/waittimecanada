@@ -4,7 +4,7 @@ Subject: Quick feedback on ER wait-time transparency project?
 
 Hi [Name],
 
-I am building WaitTime Canada, a project that audits Canadian ER wait-time methodologies and warns when cross-hospital comparisons are not statistically valid.
+I am building Wait Time Canada, a project that audits Canadian ER wait-time methodologies and warns when cross-hospital comparisons are not statistically valid.
 
 I am looking for 15 minutes of feedback from ER professionals on whether this kind of methodology transparency is useful for patients and frontline teams.
 
@@ -24,5 +24,5 @@ Thank you,
 
 Follow-up (if no response after 5-7 days):
 
-Hi [Name], just following up on the note below in case it was missed.  
+Hi [Name], just following up on the note below in case it was missed.
 If now is not a good time, no problem at all.

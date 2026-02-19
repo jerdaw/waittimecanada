@@ -3,9 +3,9 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | WaitTime Canada",
+  title: "Privacy Policy | Wait Time Canada",
   description:
-    "Privacy policy and data handling practices for WaitTime Canada healthcare observatory.",
+    "Privacy policy and data handling practices for Wait Time Canada healthcare observatory.",
   alternates: {
     canonical: "/privacy",
   },
@@ -26,7 +26,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-2xl font-semibold mb-4">Overview</h2>
             <p className="text-foreground/90 leading-relaxed">
-              WaitTime Canada is a health systems observatory and portfolio
+              Wait Time Canada is a health systems observatory and portfolio
               project that collects publicly available emergency room wait time
               data from official provincial health authority websites. We are
               committed to transparency in our data handling practices.

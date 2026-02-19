@@ -3,7 +3,6 @@
 from datetime import UTC, datetime
 
 import pytest
-
 from waittime.core import (
     EndEvent,
     Hospital,
@@ -156,7 +155,7 @@ class TestDatabaseServiceIntegration:
             statistic_type=StatisticType.P90,
             patient_scope=PatientScope.MID_ACUITY,
             source_id="test-source-measurement",
-            raw_payload_hash="832363f4685e261faf4ee117e0afe46d10b926061eed98631e429d12d3726b77",
+            raw_payload_hash="0000000000000000000000000000000000000000000000000000000000000000",
             raw_payload_snippet="<html>Test snippet</html>",
             parser_version="v1.0.0",
         )
@@ -291,7 +290,7 @@ class TestDatabaseServiceIntegration:
             statistic_type=StatisticType.MEAN,
             patient_scope=PatientScope.ALL,
             source_id="test-source-cleanup",
-            raw_payload_hash="8e21a44ca86e897ee68a5557efa300b218dbc1702d9c23010b619ac895800091",
+            raw_payload_hash="0000000000000000000000000000000000000000000000000000000000000000",
             raw_payload_snippet="recent",
             parser_version="v1.0.0",
         )
@@ -415,7 +414,7 @@ class TestComparisonServiceIntegration:
                 statistic_type=StatisticType.P90,
                 patient_scope=PatientScope.MID_ACUITY,
                 source_id="test-source-comparison",
-                raw_payload_hash="400075069c197bbcb0114c66fdcaefa53e224de63bbe58f67f9af54691c996fa",
+                raw_payload_hash="0000000000000000000000000000000000000000000000000000000000000000",
                 raw_payload_snippet="snippet-a",
                 parser_version="v1.0.0",
             ),
@@ -429,7 +428,7 @@ class TestComparisonServiceIntegration:
                 statistic_type=StatisticType.P90,
                 patient_scope=PatientScope.MID_ACUITY,
                 source_id="test-source-comparison",
-                raw_payload_hash="580e36de86fe5fde24c0d67de903eacf0531bedc5c7e15020580624bf3fbd2f5",
+                raw_payload_hash="0000000000000000000000000000000000000000000000000000000000000000",
                 raw_payload_snippet="snippet-b",
                 parser_version="v1.0.0",
             ),

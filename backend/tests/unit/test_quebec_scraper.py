@@ -3,7 +3,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from waittime.core import EndEvent, MetricFamily, StartEvent, StatisticType
 from waittime.scrapers.quebec import QuebecScraper, create_quebec_source
 
@@ -46,10 +45,7 @@ class TestQuebecScraper:
     def test_normalize_hospital_id_exact_match(self, scraper):
         """Normalize hospital name to ID (exact match)."""
         assert scraper._normalize_hospital_id("CHUM") == "ca-qc-chum"
-        assert (
-            scraper._normalize_hospital_id("Jewish General Hospital")
-            == "ca-qc-jewish-general"
-        )
+        assert scraper._normalize_hospital_id("Jewish General Hospital") == "ca-qc-jewish-general"
 
     def test_normalize_hospital_id_fuzzy_match(self, scraper):
         """Normalize hospital name to ID (fuzzy match)."""
@@ -59,10 +55,7 @@ class TestQuebecScraper:
             == "ca-qc-jewish-general"
         )
         # Contains "Notre-Dame" - should find Hôpital Notre-Dame mapping
-        assert (
-            scraper._normalize_hospital_id("Hôpital Notre-Dame")
-            == "ca-qc-notre-dame"
-        )
+        assert scraper._normalize_hospital_id("Hôpital Notre-Dame") == "ca-qc-notre-dame"
 
     def test_normalize_hospital_id_generates_slug(self, scraper):
         """Generate slug for unknown hospital."""
@@ -128,7 +121,7 @@ class TestQuebecScraper:
 
         # Check second hospital (Jewish General) - wait time only
         assert measurements[2].hospital_id == "ca-qc-jewish-general"
-        assert measurements[2].value == 45.0   # 45 min
+        assert measurements[2].value == 45.0  # 45 min
         assert measurements[2].metric_family == MetricFamily.TIME_TO_PROVIDER
 
     def test_parse_extracts_occupancy_only(self, scraper):

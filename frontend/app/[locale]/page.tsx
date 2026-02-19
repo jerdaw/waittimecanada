@@ -435,7 +435,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-sm text-muted-foreground">
-                <span>WaitTime Canada</span>
+                <span>Wait Time Canada</span>
                 <span className="mx-2">•</span>
                 <a
                   href="/methods"

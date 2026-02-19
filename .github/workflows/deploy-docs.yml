@@ -31,7 +31,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install mkdocs-material mkdocs-git-revision-date-localized-plugin mkdocs-minify-plugin
+          pip install "mkdocs<2" mkdocs-material mkdocs-minify-plugin
 
       - name: Build and Deploy
         run: mkdocs gh-deploy --force

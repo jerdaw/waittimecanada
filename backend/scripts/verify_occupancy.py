@@ -1,6 +1,15 @@
 import sys
-from waittime.core import Measurement, MetricFamily, StartEvent, EndEvent, StatisticType, PatientScope
+
+from waittime.core import (
+    EndEvent,
+    Measurement,
+    MetricFamily,
+    PatientScope,
+    StartEvent,
+    StatisticType,
+)
 from waittime.services.database import DatabaseService
+
 
 def test_occupancy():
     print("Testing occupancy columns...")
@@ -20,32 +29,33 @@ def test_occupancy():
         raw_payload_hash="a" * 64,
         patients_waiting=10,
         patients_in_treatment=5,
-        total_treatment_spaces=50
+        total_treatment_spaces=50,
     )
 
     try:
         inserted = db.insert_measurement(m)
         print(f"Inserted: ID={inserted.get('id')}, Waiting={inserted.get('patients_waiting')}")
 
-        if inserted.get('patients_waiting') != 10:
+        if inserted.get("patients_waiting") != 10:
             print("ERROR: patients_waiting mismatch")
             sys.exit(1)
 
-        if inserted.get('patients_in_treatment') != 5:
+        if inserted.get("patients_in_treatment") != 5:
             print("ERROR: patients_in_treatment mismatch")
             sys.exit(1)
 
         # Retrieve it back to be sure
         fetched = db.get_latest_measurement("ca-on-toronto-general")
         if fetched and fetched.patients_waiting == 10:
-             print("✅ Verification Successful: Occupancy data round-tripped.")
+            print("✅ Verification Successful: Occupancy data round-tripped.")
         else:
-             print("❌ Verification Failed: Could not retrieve occupancy data.")
-             sys.exit(1)
+            print("❌ Verification Failed: Could not retrieve occupancy data.")
+            sys.exit(1)
 
     except Exception as e:
         print(f"❌ Verification Failed: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     test_occupancy()

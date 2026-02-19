@@ -297,4 +297,4 @@ When adding a new Alberta hospital measurement:
 ---
 
 *Last Updated: February 11, 2026*
-*Maintained by: WaitTime Canada Research Team*
+*Maintained by: Wait Time Canada Research Team*

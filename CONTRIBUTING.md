@@ -1,6 +1,6 @@
-# Contributing to WaitTime Canada
+# Contributing to Wait Time Canada
 
-Thanks for contributing to WaitTime Canada.
+Thanks for contributing to Wait Time Canada.
 
 This repository is a clinical data observatory. Contributions should prioritize methodological clarity, auditability, and operational safety over feature volume.
 

@@ -1,12 +1,12 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-02-18)
+## Current Status (Updated 2026-02-19)
 
 **Progress:** M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
 **Strategic Direction:** **Milestone 29 (Equity Academic Rigor Hardening) Complete.** Ontario equity layer now includes ON-scoped quintile calibration, suppression provenance, uncertainty/sensitivity analytics, explicit interpretation limits, reproducible geospatial setup, and optimized layer serving fallback. **Milestone 25 (Reliability & Verification Phase 2) Complete.** Backend coverage increased to 80% (trends/benchmarking >90%). Comprehensive API integration tests added and passing. **Four-province breadth confirmed.**
 
-**Deployment Note (2026-02-08):** Frontend public hosting is intentionally offline for now to avoid unnecessary free-tier credit usage. Production smoke workflow is disabled until a public URL is intentionally re-enabled.
+**Deployment Note (2026-02-19):** Frontend public hosting is currently unavailable because the Netlify project is paused (cost control / credit exhaustion). The `wait-time.ca` domain cutover is staged in-repo but should be treated as **on hold** until the project is unpaused (target: **March 9, 2026**).
 
 ---
 
@@ -63,12 +63,12 @@ All planned milestones through M18 and Operations verification are complete. Fut
 - Operational impact confirmed (alerts, workflows, secrets, deployment posture).
 - Item status reflected in this roadmap and no duplicate open tasks remain.
 
-### Release and Cost Policy (Updated 2026-02-17)
-- **Netlify Deploys:** Paused due to credit exhaustion. Waiting for monthly reset (**March 1, 2026**).
-- **Public Hosting:** Offline until reset.
+### Release and Cost Policy (Updated 2026-02-19)
+- **Netlify Deploys:** Paused due to credit exhaustion. Public hosting remains unavailable until the project is unpaused (target: **March 9, 2026**).
+- **Public Hosting:** Offline until unpause.
 - Scraper reliability workflows (`scraper-cron`, heartbeat monitor, readiness checks) remain active on GitHub Actions.
 - Temporary cost-control mode is active: `scraper-cron` at `*/30` and heartbeat `--max-age 90`.
-- Post-reset target (review on **March 3, 2026**): Reactivate deploys and move to `scraper-cron: */20`.
+- Post-unpause target (review on **March 9, 2026**): Reactivate deploys and move to `scraper-cron: */20`.
 
 ### Focus Shift (2026-02-15)
 Per recent direction, the roadmap has been refocused on **Core Functionality, Features, and Code**. Peripheral items (portfolio artifacts, academic integrations, advanced documentation, and non-critical expansions) have been moved to "Deferred / On Hold".
@@ -76,7 +76,7 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 ## Active Roadmap (Now / Deferred / Later)
 
 ### Now (0-2 weeks) — CORE ENGINEERING & VERIFICATION
-(Production Deployment Blocked until March 1, 2026)
+(Production Deployment Blocked until March 9, 2026)
 
 **PRIORITY 0: Data Quality Verification (Local)**
 - [x] **P0 / Verification: ON hospital vs ER Watch** — Verified fresh data (manual UI inconclusive but scraped data is current)
@@ -91,8 +91,15 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 - [x] **P1 / Add end-to-end pipeline test** (#39) — Mock scrape → DB insert → API → render (4-8h)
 - [x] **P1 / Add API response time tracking** (#49) — Timing middleware (2-3h)
 - [x] **P2 / Visual regression testing** (#33) — Scaffold for screenshot comparison (High maintenance)
+- [ ] **P1 / Ops: Scraper reliability hardening** — Standardize retry/backoff/timeouts; ensure `scraper_status` heartbeat/status writes on partial failures; classify upstream outage vs parser breakage (1-2d)
+- [ ] **P1 / Ops: Scraper failure visibility** — Consolidate last-known-good + last-error into a single operational view (CLI + `/api/health`), and add a short runbook for on-call verification (4-8h)
+- [ ] **P1 / Performance: Cache & polling audit** — Verify cache headers/TTLs for shared read-heavy routes; enforce `no-store` for user-specific and export endpoints; keep SystemStatus polling at 5m and tab-visible only (4-8h)
 
 ### Deferred / On Hold (Non-Core / Too Reaching)
+
+**Deployment / Domain Cutover (On Hold):**
+- [ ] **P1 / Ops: Unpause Netlify + verify `wait-time.ca` cutover** — Confirm TLS/cert, redirects, `NEXT_PUBLIC_BASE_URL`, and re-enable `production-smoke` (target **March 9, 2026**)
+- [ ] **P1 / Ops: Harden Netlify release gate** — Assert `netlify-ignore.sh` blocks non-release commits and add a minimal CI check to prevent accidental credit burn (2-3h)
 
 **Portfolio & Academic Artifacts (Deferred):**
 - [x] **P2 / Add Zenodo integration for DOI** (#42) — Academic credit
@@ -111,7 +118,6 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 **Advanced Testing & Monitoring (Deferred):**
 - [ ] **P2 / Add Lighthouse CI** (#14) — Optimization metrics
 - [x] **P2 / Property-based testing (Hypothesis)** (#32) — Formal verification of ontology comparability
-- [ ] **P2 / Add data quality drift monitoring** (#43) — Advanced analytics
 - [ ] **P2 / Add uptime/status history page** (#37) — Public transparency page
 
 **Project Management (Deferred):**
@@ -127,6 +133,13 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 - [x] **P1 / Add API integration tests** (#22) — Comprehensive test suite for hospitals, health, export, geolocation (1-2d)
 - [x] **P1 / Add database health check enhancement** (#29) — Connection pool status (idle/active/max) added to /api/health (2-3h)
 - [x] **P1 / Add structured logging via structlog** (#25) — JSON-formatted logging for backend/frontend (2-3h)
+
+**Priority 1: Comparability & Methodology UX**
+- [ ] **P1 / Divergence Briefs in analytics + export** — When ontology mismatches, generate a structured “divergence brief” (why non-comparable) and surface it in UI + export metadata (1-2d)
+
+**Priority 1: Data Quality Depth**
+- [ ] **P1 / Data quality snapshot diffs** — Diff `data_quality_snapshots` over time (coverage drops, missing hospitals, anomalies) and add an operator-friendly view for changes (1-2d)
+- [ ] **P1 / Data quality drift monitoring** (#43) — Track longitudinal drift (coverage drops, missing hospitals, anomaly rate shifts) and surface it for operators (4-8h)
 
 **Priority 1: Security & Guardrails**
 - [x] **P1 / Add API input validation (Zod)** (#21) — Comprehensive validation for all query params across 16 routes (4-8h)

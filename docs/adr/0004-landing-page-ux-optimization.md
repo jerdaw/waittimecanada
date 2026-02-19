@@ -13,7 +13,7 @@ Originally, the application followed a "Fixed Dashboard" pattern where the map a
 4. **Visual Depth**: Introduced subtle dot-grid textures and background gradients to the Hero section to improve modern aesthetics and reduce "flatness."
 
 ## Consequences
-- **Pros**: 
+- **Pros**:
   - Improved first-time user engagement via clearer value proposition in the Hero.
   - Reduced "Time to Insight" by automating the most logical sort order (Distance).
   - Cleaner interface via removal of redundant UI controls.

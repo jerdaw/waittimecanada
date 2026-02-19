@@ -148,13 +148,12 @@ class TemporalPatternService:
             weekend_means = [
                 float(row["mean"])
                 for row in patterns
-                if int(row["day_index"]) in {5, 6} and isinstance(row["mean"], (int, float))
+                if int(row["day_index"]) in {5, 6} and isinstance(row["mean"], int | float)
             ]
             weekday_means = [
                 float(row["mean"])
                 for row in patterns
-                if int(row["day_index"]) in {0, 1, 2, 3, 4}
-                and isinstance(row["mean"], (int, float))
+                if int(row["day_index"]) in {0, 1, 2, 3, 4} and isinstance(row["mean"], int | float)
             ]
 
             insights = {
@@ -215,7 +214,7 @@ class TemporalPatternService:
 
         sample_count = sum(int(row["sample_count"]) for row in patterns)
         mean_series = [
-            float(row["mean"]) for row in patterns if isinstance(row.get("mean"), (int, float))
+            float(row["mean"]) for row in patterns if isinstance(row.get("mean"), int | float)
         ]
 
         insights: dict[str, Any]

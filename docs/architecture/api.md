@@ -2,7 +2,7 @@
 
 ## Overview
 
-WaitTime Canada exposes server-side API routes through Next.js (`frontend/app/api/**`).
+Wait Time Canada exposes server-side API routes through Next.js (`frontend/app/api/**`).
 
 Characteristics:
 

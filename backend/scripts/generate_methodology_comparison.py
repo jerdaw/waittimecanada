@@ -192,7 +192,7 @@ def generate_main_html(provinces: list[dict]) -> str:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WaitTime Canada - Provincial Methodology Comparison</title>
+    <title>Wait Time Canada - Provincial Methodology Comparison</title>
     <style>
         body {{
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -268,7 +268,7 @@ def generate_main_html(provinces: list[dict]) -> str:
     <div class="container">
         <h1>🏥 Provincial Emergency Department Wait Time Methodology Comparison</h1>
         <div class="metadata">
-            <strong>WaitTime Canada</strong> - Health Systems Observatory<br>
+            <strong>Wait Time Canada</strong> - Health Systems Observatory<br>
             Generated: {timestamp}<br>
             Provinces: Ontario, Alberta, British Columbia, Quebec<br>
             Source: <a href="https://github.com/jerdaw/waittimecanada">github.com/jerdaw/waittimecanada</a>
@@ -336,7 +336,7 @@ def generate_main_html(provinces: list[dict]) -> str:
 
         <div class="footer">
             <strong>Citation:</strong><br>
-            WaitTime Canada. (2026). Provincial Emergency Department Wait Time Methodology Comparison.
+            Wait Time Canada. (2026). Provincial Emergency Department Wait Time Methodology Comparison.
             Retrieved from https://github.com/jerdaw/waittimecanada<br><br>
 
             <strong>License:</strong> MIT License<br>
@@ -359,7 +359,7 @@ def generate_pairwise_html(pairwise: list[dict]) -> str:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WaitTime Canada - Pairwise Comparability Matrix</title>
+    <title>Wait Time Canada - Pairwise Comparability Matrix</title>
     <style>
         body {{
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -445,7 +445,7 @@ def generate_pairwise_html(pairwise: list[dict]) -> str:
     <div class="container">
         <h1>🔍 Pairwise Province Comparability Matrix</h1>
         <div class="metadata">
-            <strong>WaitTime Canada</strong> - Health Systems Observatory<br>
+            <strong>Wait Time Canada</strong> - Health Systems Observatory<br>
             Generated: {timestamp}<br>
             Comparisons: 6 pairwise combinations (4 provinces)<br>
             Source: <a href="https://github.com/jerdaw/waittimecanada">github.com/jerdaw/waittimecanada</a>
@@ -503,7 +503,7 @@ def generate_pairwise_html(pairwise: list[dict]) -> str:
 
         <div class="footer">
             <strong>Citation:</strong><br>
-            WaitTime Canada. (2026). Provincial Emergency Department Wait Time Pairwise Comparability Matrix.
+            Wait Time Canada. (2026). Provincial Emergency Department Wait Time Pairwise Comparability Matrix.
             Retrieved from https://github.com/jerdaw/waittimecanada<br><br>
 
             <strong>License:</strong> MIT License<br>

@@ -140,7 +140,7 @@ if __name__ == '__main__':
    - `/analytics`
 
 **Required Secret:**
-- `PRODUCTION_BASE_URL` - e.g., `https://waittimecanada.ca`
+- `PRODUCTION_BASE_URL` - e.g., `https://wait-time.ca`
 
 ### 1.5 Production Readiness Verification Automation
 
@@ -221,7 +221,7 @@ export function AboutSection() {
               About This Project
             </span>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
-              Why I Built WaitTime Canada
+              Why I Built Wait Time Canada
             </h2>
           </div>
           {expanded ? <ChevronUp className="w-6 h-6" /> : <ChevronDown className="w-6 h-6" />}
@@ -238,7 +238,7 @@ export function AboutSection() {
             </p>
 
             <p>
-              <strong>WaitTime Canada is different.</strong> Instead of pretending the data is
+              <strong>Wait Time Canada is different.</strong> Instead of pretending the data is
               comparable, we audit it. We tag every measurement with its methodology and warn
               users when direct comparison is statistically invalid. This is what I call a
               "Health Systems Observatory"—a tool that exposes the black box of healthcare
@@ -320,7 +320,7 @@ Subject: Quick feedback on ER wait time transparency project?
 
 Hi [Name],
 
-I'm a pre-medical student building a project called WaitTime Canada—a tool
+I'm a pre-medical student building a project called Wait Time Canada—a tool
 that helps people understand ER wait times while being transparent about
 the limitations of provincial data.
 
@@ -457,7 +457,7 @@ Create screenshots showing:
 
 **One-paragraph summary for applications:**
 
-> WaitTime Canada is a Health Systems Observatory I built to audit Canadian emergency
+> Wait Time Canada is a Health Systems Observatory I built to audit Canadian emergency
 > room wait time data. Unlike typical wait time aggregators, it uses a "metric ontology"
 > to tag each measurement with its methodology (start event, end event, statistic type)
 > and automatically warns users when comparing hospitals that use incompatible methods.

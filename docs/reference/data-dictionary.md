@@ -1,6 +1,6 @@
 # Data Dictionary
 
-This document serves as the canonical reference for the WaitTime Canada database schema.
+This document serves as the canonical reference for the Wait Time Canada database schema.
 
 ## Core Schema
 

@@ -32,13 +32,13 @@ This document tracks all tasks requiring significant human intervention, browser
 
 2. **Create Application Token:**
    - Click "Create an Application/API Token"
-   - Name: "WaitTime Canada Heartbeat Monitor"
+   - Name: "Wait Time Canada Heartbeat Monitor"
    - Note the **API Token/Key**
 
-3. **Add to GitHub Secrets:**
+3. **Add to GitHub Actions encrypted values:**
    - Go to: https://github.com/jerdaw/waittimecanada/settings/secrets/actions
-   - Add secret: `PUSHOVER_USER_KEY` = your user key
-   - Add secret: `PUSHOVER_API_TOKEN` = your API token
+   - Add `PUSHOVER_USER_KEY` = your user key
+   - Add `PUSHOVER_API_TOKEN` = your API token
 
 **Result:** GitHub Actions will automatically send push notifications when scrapers fail.
 

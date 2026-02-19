@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-This milestone implements full French language support (i18n) for WaitTime Canada, addressing the "High-Value Expansion" priority in the roadmap. Given our coverage of Quebec (380+ hospitals) and the bilingual nature of Canadian healthcare, this is a critical step for "Adoption" and "Health Advocate" competencies.
+This milestone implements full French language support (i18n) for Wait Time Canada, addressing the "High-Value Expansion" priority in the roadmap. Given our coverage of Quebec (380+ hospitals) and the bilingual nature of Canadian healthcare, this is a critical step for "Adoption" and "Health Advocate" competencies.
 
 We will use `next-intl` for routing and content management, establishing a `/fr` sub-path strategy while maintaining `/` (English) as the default. This ensures SEO best practices with `hreflang` tags and minimal friction for existing users.
 

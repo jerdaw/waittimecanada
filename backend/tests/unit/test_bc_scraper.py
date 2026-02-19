@@ -3,7 +3,6 @@
 import json
 
 import pytest
-
 from waittime.core import EndEvent, MetricFamily, StartEvent, StatisticType
 from waittime.scrapers.bc import BCScraper, create_bc_source
 
@@ -35,8 +34,8 @@ class TestBCScraper:
                                 "waitTimeMinutes": 282,
                                 "elosMinutes": 601,
                                 "status": "normal",
-                                "createdAt": "2026-02-06T20:38:00.000Z"
-                            }
+                                "createdAt": "2026-02-06T20:38:00.000Z",
+                            },
                         },
                         {
                             "id": "st-pauls-ed",
@@ -48,8 +47,8 @@ class TestBCScraper:
                                 "waitTimeMinutes": 95,
                                 "elosMinutes": 274,
                                 "status": "normal",
-                                "createdAt": "2026-02-06T20:38:00.000Z"
-                            }
+                                "createdAt": "2026-02-06T20:38:00.000Z",
+                            },
                         },
                         {
                             "id": "ubc-upcc",
@@ -57,12 +56,12 @@ class TestBCScraper:
                             "type": "upcc",
                             "latitude": 49.2576,
                             "longitude": -123.2424,
-                            "waitTime": None
-                        }
+                            "waitTime": None,
+                        },
                     ]
                 }
             },
-            "page": "/legacy"
+            "page": "/legacy",
         }
 
         html = f"""
@@ -84,7 +83,10 @@ class TestBCScraper:
         assert scraper._generate_slug("Vancouver General Hospital") == "vancouver-general-hospital"
         assert scraper._generate_slug("St. Paul's Hospital") == "st-pauls-hospital"
         assert scraper._generate_slug("BC Children's") == "bc-childrens"
-        assert scraper._generate_slug("Surrey Memorial Hospital (Adult Emergency)") == "surrey-memorial-hospital-adult-emergency"
+        assert (
+            scraper._generate_slug("Surrey Memorial Hospital (Adult Emergency)")
+            == "surrey-memorial-hospital-adult-emergency"
+        )
 
     def test_parse_extracts_ed_locations(self, scraper, sample_html):
         """Parse should extract only ED locations, not UPCCs."""
@@ -119,9 +121,7 @@ class TestBCScraper:
                             "id": "new-hospital",
                             "name": "New Hospital Vancouver",
                             "type": "ed",
-                            "waitTime": {
-                                "waitTimeMinutes": 120
-                            }
+                            "waitTime": {"waitTimeMinutes": 120},
                         }
                     ]
                 }
@@ -179,16 +179,14 @@ class TestBCScraper:
                             "id": "closed-hospital",
                             "name": "Closed Hospital",
                             "type": "ed",
-                            "waitTime": None
+                            "waitTime": None,
                         },
                         {
                             "id": "open-hospital",
                             "name": "Richmond Hospital",
                             "type": "ed",
-                            "waitTime": {
-                                "waitTimeMinutes": 347
-                            }
-                        }
+                            "waitTime": {"waitTimeMinutes": 347},
+                        },
                     ]
                 }
             }
@@ -211,10 +209,7 @@ class TestBCScraper:
         location = {
             "name": "Test Hospital",
             "type": "ed",
-            "waitTime": {
-                "waitTimeMinutes": None,
-                "status": "closed"
-            }
+            "waitTime": {"waitTimeMinutes": None, "status": "closed"},
         }
 
         measurement = scraper._parse_location(location)

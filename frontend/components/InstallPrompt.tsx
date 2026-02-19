@@ -45,7 +45,7 @@ export function InstallPrompt() {
         <div className="flex-1">
           <h3 className="font-semibold text-sm">Install App</h3>
           <p className="text-xs text-muted-foreground">
-            Install WaitTime Canada for easier access.
+            Install Wait Time Canada for easier access.
           </p>
         </div>
         <div className="flex gap-2">

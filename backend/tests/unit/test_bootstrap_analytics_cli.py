@@ -103,7 +103,9 @@ def test_seed_region_mappings_delegates_to_seed_helpers(tmp_path: Path) -> None:
         patch("waittime.cli.bootstrap_analytics.load_regions_from_json", return_value=payload),
         patch("waittime.cli.bootstrap_analytics.seed_regions", return_value=(1, 2, 0)) as seed_mock,
     ):
-        result = seed_region_mappings(mock_db, region_file=region_file, province="ON", dry_run=False)
+        result = seed_region_mappings(
+            mock_db, region_file=region_file, province="ON", dry_run=False
+        )
 
     assert result == (1, 2, 0)
     seed_mock.assert_called_once_with(
@@ -145,7 +147,9 @@ def test_main_happy_path() -> None:
         patch("sys.argv", ["bootstrap_analytics.py", "--days", "120"]),
         patch("waittime.cli.bootstrap_analytics.DatabaseService"),
         patch("waittime.cli.bootstrap_analytics.apply_migrations", return_value=10) as migrations,
-        patch("waittime.cli.bootstrap_analytics.seed_region_mappings", return_value=(4, 20, 0)) as seed,
+        patch(
+            "waittime.cli.bootstrap_analytics.seed_region_mappings", return_value=(4, 20, 0)
+        ) as seed,
         patch(
             "waittime.cli.bootstrap_analytics.backfill_analytics_aggregates",
             return_value={"daily": 5, "weekly": 2, "monthly": 1},

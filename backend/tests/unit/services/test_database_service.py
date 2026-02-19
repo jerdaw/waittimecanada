@@ -19,10 +19,8 @@ from waittime.services.database import DatabaseService
 
 @pytest.fixture
 def mock_db_url(monkeypatch):
-    monkeypatch.setenv(
-        "DATABASE_URL", "postgresql://user:pass@localhost/db"
-    )  # pragma: allowlist secret
-    return "postgresql://user:pass@localhost/db"  # pragma: allowlist secret
+    monkeypatch.setenv("DATABASE_URL", "postgresql://user@localhost/db")
+    return "postgresql://user@localhost/db"
 
 
 @pytest.fixture

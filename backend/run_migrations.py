@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Run database migrations."""
 
+# ruff: noqa: T201
+
 import sys
 from pathlib import Path
 
@@ -16,6 +18,7 @@ def is_safe_duplicate_error(exc: Exception) -> bool:
         return True
     message = str(exc).lower()
     return "already exists" in message or "duplicate object" in message
+
 
 # Find migration files
 MIGRATIONS_DIR = Path(__file__).parent / "migrations"
@@ -39,7 +42,7 @@ for migration_file in migration_files:
             with conn.cursor() as cur:
                 cur.execute(sql)
 
-        print(f"  ✓ Success\n")
+        print("  ✓ Success\n")
 
     except Exception as e:
         if is_safe_duplicate_error(e):

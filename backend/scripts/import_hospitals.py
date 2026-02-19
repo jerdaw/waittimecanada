@@ -6,7 +6,6 @@ Usage:
 """
 
 import csv
-import hashlib
 import time
 from pathlib import Path
 
@@ -163,23 +162,34 @@ def main():
                 # Use city centroid as fallback
                 lat, lon = 0.0, 0.0
 
-        results.append({
-            "id": generate_hospital_id(name),
-            "name": name,
-            "city": city,
-            "address": address,
-            "latitude": lat,
-            "longitude": lon,
-            "phone": phone,
-            "province": "ON",
-        })
+        results.append(
+            {
+                "id": generate_hospital_id(name),
+                "name": name,
+                "city": city,
+                "address": address,
+                "latitude": lat,
+                "longitude": lon,
+                "phone": phone,
+                "province": "ON",
+            }
+        )
 
     # Write output CSV
     print(f"\nWriting {len(results)} hospitals to {output_csv}...")
     with open(output_csv, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
             f,
-            fieldnames=["id", "name", "city", "address", "latitude", "longitude", "phone", "province"],
+            fieldnames=[
+                "id",
+                "name",
+                "city",
+                "address",
+                "latitude",
+                "longitude",
+                "phone",
+                "province",
+            ],
         )
         writer.writeheader()
         writer.writerows(results)

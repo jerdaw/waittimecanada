@@ -1,6 +1,6 @@
 # Hospital Data Seeding Guide
 
-This guide explains how to seed hospitals and data sources into the WaitTime Canada database.
+This guide explains how to seed hospitals and data sources into the Wait Time Canada database.
 
 ## Overview
 

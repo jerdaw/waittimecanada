@@ -8,7 +8,7 @@
 
 ## Context
 
-WaitTime Canada initially supported Ontario and Quebec. To demonstrate national scalability and provide Western Canada coverage, we need to add British Columbia emergency department wait time data.
+Wait Time Canada initially supported Ontario and Quebec. To demonstrate national scalability and provide Western Canada coverage, we need to add British Columbia emergency department wait time data.
 
 **Data Source:** BC Provincial Health Services Authority (PHSA)
 **URL:** https://edwaittimes.ca

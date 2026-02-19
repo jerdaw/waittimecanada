@@ -5,7 +5,6 @@ from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
-
 from waittime.cli.seed import (
     load_hospitals_from_json,
     seed_hospitals,
@@ -196,9 +195,33 @@ def test_seed_hospitals_multiple():
     mock_db.get_hospital.side_effect = [None, existing_hospital, None]
 
     hospitals = [
-        Hospital(id="h1", name="H1", province="ON", city="C", latitude=45.0, longitude=-75.0, source_id="s"),
-        Hospital(id="h2", name="H2", province="ON", city="C", latitude=45.0, longitude=-75.0, source_id="s"),
-        Hospital(id="h3", name="H3", province="ON", city="C", latitude=45.0, longitude=-75.0, source_id="s"),
+        Hospital(
+            id="h1",
+            name="H1",
+            province="ON",
+            city="C",
+            latitude=45.0,
+            longitude=-75.0,
+            source_id="s",
+        ),
+        Hospital(
+            id="h2",
+            name="H2",
+            province="ON",
+            city="C",
+            latitude=45.0,
+            longitude=-75.0,
+            source_id="s",
+        ),
+        Hospital(
+            id="h3",
+            name="H3",
+            province="ON",
+            city="C",
+            latitude=45.0,
+            longitude=-75.0,
+            source_id="s",
+        ),
     ]
 
     inserted, skipped = seed_hospitals(mock_db, hospitals, dry_run=False)

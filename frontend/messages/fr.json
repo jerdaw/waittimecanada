@@ -1,6 +1,6 @@
 {
   "Common": {
-    "title": "WaitTime Canada",
+    "title": "Wait Time Canada",
     "description": "Un observatoire des systèmes de santé auditant les temps d'attente aux urgences à travers le Canada avec transparence méthodologique.",
     "emergency": {
       "label": "Urgence ?",
@@ -22,7 +22,7 @@
     },
     "footer": {
       "dataSources": "Données provenant des autorités sanitaires provinciales officielles.",
-      "copyright": "© {year} WaitTime Canada. Licence MIT."
+      "copyright": "© {year} Wait Time Canada. Licence MIT."
     }
   },
   "Header": {
@@ -256,9 +256,9 @@
   },
   "AboutSection": {
     "badge": "À Propos",
-    "title": "Pourquoi j'ai créé WaitTime Canada",
+    "title": "Pourquoi j'ai créé Wait Time Canada",
     "p1": "En tant qu'étudiant en prémédecine, j'ai remarqué quelque chose de troublant : les provinces canadiennes rapportent les temps d'attente aux urgences en utilisant des <strong>méthodologies complètement différentes</strong>. L'Ontario mesure du triage au médecin (90e centile). Le Québec mesure de l'inscription au médecin (moyenne mobile). Ces chiffres ne peuvent pas être comparés directement, mais la plupart des applications les présentent côte à côte.",
-    "p2": "<strong>WaitTime Canada est différent.</strong> Au lieu de prétendre que les données sont comparables, nous les auditons. Nous marquons chaque mesure avec sa méthodologie et avertissons les utilisateurs lorsque la comparaison directe est statistiquement invalide. C'est ce que j'appelle un « Observatoire des Systèmes de Santé » — un outil qui expose la boîte noire des rapports de santé.",
+    "p2": "<strong>Wait Time Canada est différent.</strong> Au lieu de prétendre que les données sont comparables, nous les auditons. Nous marquons chaque mesure avec sa méthodologie et avertissons les utilisateurs lorsque la comparaison directe est statistiquement invalide. C'est ce que j'appelle un « Observatoire des Systèmes de Santé » — un outil qui expose la boîte noire des rapports de santé.",
     "p3": "Ce projet démontre mon approche de la médecine : méthodologie rigoureuse, transparence sur les limites et engagement à aider les patients à prendre des décisions éclairées, même lorsque cela signifie leur dire ce que nous ne <em>savons pas</em>.",
     "aria": {
       "expand": "Développer la section à propos",
@@ -283,7 +283,7 @@
   },
   "StructuredData": {
     "faq": {
-      "q1": "Comment WaitTime Canada mesure-t-il les temps d'attente aux urgences ?",
+      "q1": "Comment Wait Time Canada mesure-t-il les temps d'attente aux urgences ?",
       "a1": "Nous agrégeons les données des autorités sanitaires provinciales. Pour l'Ontario, nous rapportons les temps d'attente au 90e centile (P90) du triage à l'évaluation par un médecin.",
       "q2": "Pourquoi ne puis-je pas comparer directement les temps d'attente de l'Ontario et du Québec ?",
       "a2": "L'Ontario rapporte les temps P90 (90e centile) du triage au médecin, tandis que le Québec rapporte la moyenne mobile de l'inscription au médecin. Ces méthodologies différentes rendent la comparaison directe statistiquement invalide.",
@@ -309,7 +309,7 @@
     }
   },
   "Metadata": {
-    "title": "WaitTime Canada | Temps d'attente aux Urgences en Temps Réel & Audit Méthodologique",
+    "title": "Wait Time Canada | Temps d'attente aux Urgences en Temps Réel & Audit Méthodologique",
     "description": "Un Observatoire des Systèmes de Santé cliniquement défendable suivant les temps d'attente aux urgences à travers le Canada. Comparez les méthodologies, visualisez les données en temps réel et accédez aux analyses du système de santé.",
     "keywords": "temps d'attente urgences, salles d'urgence Canada, méthodologie santé, temps d'attente hôpital, urgences Québec, urgences Ontario, urgences Alberta, urgences C-B"
   },
@@ -361,7 +361,7 @@
       "button": "Voir la Carte Interactive"
     },
     "footer": {
-      "tagline": "WaitTime Canada - Un Observatoire des Systèmes de Santé",
+      "tagline": "Wait Time Canada - Un Observatoire des Systèmes de Santé",
       "lastUpdated": "Dernière mise à jour"
     }
   },

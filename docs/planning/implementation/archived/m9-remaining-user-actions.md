@@ -80,7 +80,7 @@ All automated technical work for Milestone 9 (Portfolio Launch) is complete. The
 
    Hi [Name],
 
-   I'm a pre-medical student building a project called WaitTime Canada—a
+   I'm a pre-medical student building a project called Wait Time Canada—a
    tool that helps people understand ER wait times while being transparent
    about the limitations of provincial data.
 

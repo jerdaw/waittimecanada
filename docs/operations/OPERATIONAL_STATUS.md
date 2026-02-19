@@ -1,13 +1,15 @@
 # Operational Status Report
 
 **Date:** 2026-02-11
-**Status:** ✅ All Systems Operational
+**Status:** ✅ Scrapers Operational | ⚠️ Public Frontend Hosting Paused
+
+**Addendum (2026-02-19):** The Netlify frontend project is currently paused (cost control / credit exhaustion), so the public site is unavailable and domain cutover to `wait-time.ca` should be treated as **on hold** until the project is unpaused (target: **March 9, 2026**).
 
 ---
 
 ## Executive Summary
 
-WaitTime Canada's scraper infrastructure is **fully operational** with all 4 provincial scrapers running on automated schedules via GitHub Actions. This report verifies the operational status and documents the production configuration.
+Wait Time Canada's scraper infrastructure is **fully operational** with all 4 provincial scrapers running on automated schedules via GitHub Actions. This report verifies the operational status and documents the production configuration.
 
 ---
 
@@ -363,7 +365,7 @@ with db.get_connection() as conn:
 
 ✅ **All systems are operational and properly configured.**
 
-The WaitTime Canada scraper infrastructure is production-ready with:
+The Wait Time Canada scraper infrastructure is production-ready with:
 - 4 provincial scrapers running on automated schedules
 - Heartbeat monitoring and alerting
 - Comprehensive operational documentation
