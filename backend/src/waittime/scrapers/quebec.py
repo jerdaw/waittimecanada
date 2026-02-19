@@ -16,8 +16,8 @@ import time
 from collections.abc import Callable
 from datetime import UTC, datetime
 
-import requests
 from bs4 import BeautifulSoup, Tag
+from tenacity import retry, stop_after_attempt
 
 from waittime.core import (
     EndEvent,
@@ -28,6 +28,7 @@ from waittime.core import (
     StatisticType,
 )
 from waittime.scrapers.base import BaseScraper
+from waittime.scrapers.observability import HTTP_FETCH_ATTEMPTS, fetch_retry_wait
 
 logger = logging.getLogger(__name__)
 
@@ -83,54 +84,96 @@ class QuebecScraper(BaseScraper):
         """Fetch all pages of measurements and execute shared persistence hooks."""
         logger.info(f"Starting scrape for {self.source.id}")
         start_time = datetime.now(UTC)
-        measurements: list[Measurement] = []
+        failure_recorded = False
         max_pages = 20
 
         try:
+            measurements: list[Measurement] = []
+
             # We need to iterate through pages.
             # There are typically ~12 pages (116 results, 10 per page).
             # We'll stop when we get no results or hit a safety limit.
             for page in range(1, max_pages + 1):
+                logger.info(f"Fetching page {page}...")
+
                 try:
-                    logger.info(f"Fetching page {page}...")
                     html = self._fetch_page(page)
+                except Exception as error:
+                    self._record_failure(error, "fetch", start_time)
+                    failure_recorded = True
+                    raise
 
-                    # Check if we got valid content (if page is out of range, it might return empty or error)
-                    if not html or "hospital_element" not in html:
-                        if page > 1:
-                            logger.info(f"No results on page {page}, stopping.")
-                            break
+                # If page is out of range, endpoint returns fragment without hospital rows.
+                if not html or "hospital_element" not in html:
+                    if page == 1:
+                        parse_error = ValueError("No hospital elements found on first Quebec page")
+                        self._record_failure(parse_error, "parse", start_time)
+                        failure_recorded = True
+                        raise parse_error
 
-                    page_measurements = self.parse(html)
-                    if not page_measurements:
-                        if page > 1:
-                            logger.info(f"No measurements on page {page}, stopping.")
-                            break
-
-                    measurements.extend(page_measurements)
-
-                    # Be nice to the server
-                    time.sleep(1)
-
-                except Exception as e:
-                    logger.error(f"Error fetching page {page}: {e}")
-                    # Stop on page-level failure to avoid silently mixing stale/partial pages.
+                    logger.info(f"No results on page {page}, stopping.")
                     break
+
+                try:
+                    page_measurements = self.parse(html)
+                except Exception as error:
+                    self._record_failure(error, "parse", start_time)
+                    failure_recorded = True
+                    raise
+
+                if not page_measurements:
+                    if page == 1:
+                        parse_error = ValueError("No measurements parsed from first Quebec page")
+                        self._record_failure(parse_error, "parse", start_time)
+                        failure_recorded = True
+                        raise parse_error
+
+                    logger.info(f"No measurements on page {page}, stopping.")
+                    break
+
+                measurements.extend(page_measurements)
+
+                # Be nice to the server
+                time.sleep(1)
+
+            if not measurements:
+                parse_error = ValueError("No measurements collected from Quebec source")
+                self._record_failure(parse_error, "parse", start_time)
+                failure_recorded = True
+                raise parse_error
 
             if self.db is not None and measurements:
                 self._check_anomalies(measurements)
 
             if save_to_db and self.db is not None and measurements:
                 if before_save is not None:
-                    before_save(measurements)
-                self.db.insert_measurements(measurements)
+                    try:
+                        before_save(measurements)
+                    except Exception as error:
+                        self._record_failure(error, "before_save", start_time)
+                        failure_recorded = True
+                        raise
+
+                try:
+                    self.db.insert_measurements(measurements)
+                except Exception as error:
+                    self._record_failure(error, "persist", start_time)
+                    failure_recorded = True
+                    raise
                 logger.info(f"Saved {len(measurements)} measurements to database")
 
+            run_duration_ms = self._elapsed_ms(start_time)
             if self._heartbeat is not None:
-                self._heartbeat.record_success(
-                    source_id=self.source.id,
-                    measurements_count=len(measurements),
-                )
+                try:
+                    self._heartbeat.record_success(
+                        source_id=self.source.id,
+                        measurements_count=len(measurements),
+                        run_duration_ms=run_duration_ms,
+                    )
+                except Exception as error:
+                    self._record_failure(error, "heartbeat", start_time)
+                    failure_recorded = True
+                    raise
 
             elapsed = (datetime.now(UTC) - start_time).total_seconds()
             logger.info(
@@ -139,15 +182,15 @@ class QuebecScraper(BaseScraper):
             )
             return measurements
 
-        except Exception as e:
-            if self._heartbeat is not None:
-                self._heartbeat.record_failure(
-                    source_id=self.source.id,
-                    error_message=str(e),
-                )
-            logger.error(f"Scrape failed for {self.source.id}: {e}")
+        except Exception as error:
+            if not failure_recorded:
+                self._record_failure(error, "orchestration", start_time)
             raise
 
+    @retry(  # type: ignore[misc]
+        stop=stop_after_attempt(HTTP_FETCH_ATTEMPTS),
+        wait=fetch_retry_wait(),
+    )
     def _fetch_page(self, page_num: int) -> str:
         """Fetch a single page of results."""
         params = {
@@ -159,11 +202,7 @@ class QuebecScraper(BaseScraper):
             "type": "7382",
         }
 
-        # Use existing session if available (from base class context manager)
-        # But BaseScraper doesn't expose the session directly easily if we don't assume requests.
-        # We'll just plain requests here for simplicity as we aren't using the BaseScraper.fetch mechanism
-        # exactly the same way (due to pagination).
-        response = requests.get(self.BASE_URL, params=params, timeout=30)
+        response = self.client.get(self.BASE_URL, params=params)
         response.raise_for_status()
         return response.text
 

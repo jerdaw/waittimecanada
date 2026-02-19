@@ -18,6 +18,7 @@ from typing import Any
 from bs4 import BeautifulSoup
 from playwright.sync_api import TimeoutError as PlaywrightTimeout
 from playwright.sync_api import sync_playwright
+from tenacity import retry, stop_after_attempt
 
 from waittime.core import (
     EndEvent,
@@ -29,6 +30,13 @@ from waittime.core import (
     StatisticType,
 )
 from waittime.scrapers.base import BaseScraper
+from waittime.scrapers.observability import (
+    HTTP_FETCH_ATTEMPTS,
+    PLAYWRIGHT_PAGE_TIMEOUT_MS,
+    PLAYWRIGHT_RENDER_WAIT_MS,
+    PLAYWRIGHT_SELECTOR_TIMEOUT_MS,
+    fetch_retry_wait,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +79,10 @@ class OntarioScraper(BaseScraper):
         "William Osler Health System": "ca-on-william-osler",
     }
 
+    @retry(  # type: ignore[misc]
+        stop=stop_after_attempt(HTTP_FETCH_ATTEMPTS),
+        wait=fetch_retry_wait(),
+    )
     def fetch(self, url: str | None = None) -> str:
         """Fetch HTML using Playwright to handle JavaScript rendering.
 
@@ -95,14 +107,14 @@ class OntarioScraper(BaseScraper):
                 page = browser.new_page()
 
                 # Navigate to page
-                page.goto(target_url, timeout=30000)
+                page.goto(target_url, timeout=PLAYWRIGHT_PAGE_TIMEOUT_MS)
 
                 # Wait for data table to load
                 # HQOntario uses dynamic loading, so we need to wait
-                page.wait_for_selector("table", timeout=15000)
+                page.wait_for_selector("table", timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS)
 
                 # Give extra time for all rows to render
-                page.wait_for_timeout(2000)
+                page.wait_for_timeout(PLAYWRIGHT_RENDER_WAIT_MS)
 
                 # Get rendered HTML
                 html: str = page.content()

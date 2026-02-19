@@ -49,8 +49,17 @@ Heartbeat monitor for scraper health.
 | Column | Type | Description |
 |--------|------|-------------|
 | `source_id` | TEXT (PK) | Link to `sources.id`. |
-| `last_run` | TIMESTAMPTZ | Time of last successful execution. |
+| `last_run` | TIMESTAMPTZ | Time of last scraper attempt (success or failure). |
 | `status` | ENUM | `healthy`, `error`, or `stale`. |
+| `error_message` | TEXT | Latest error message when status is `error`. |
+| `measurements_count` | INTEGER | Measurements persisted in the most recent run. |
+| `last_success_run` | TIMESTAMPTZ | Timestamp of the last successful run (last-known-good). |
+| `last_success_measurements_count` | INTEGER | Measurement count from the last successful run. |
+| `last_error_run` | TIMESTAMPTZ | Timestamp of the most recent failed run. |
+| `last_error_category` | TEXT | Structured failure class (`upstream_unavailable`, `parser_breakage`, `infra_runtime`, `persistence_failure`, `unknown`). |
+| `last_error_stage` | TEXT | Failure stage (`fetch`, `parse`, `before_save`, `persist`, `heartbeat`, `orchestration`). |
+| `consecutive_failures` | INTEGER | Number of consecutive failed runs since last success. |
+| `last_run_duration_ms` | INTEGER | Last run duration in milliseconds. |
 
 ## Analytics & Aggregation
 

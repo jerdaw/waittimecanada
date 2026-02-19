@@ -11,6 +11,10 @@ This section contains the project planning control plane.
 
 - Human intervention tasks: `docs/planning/manual-tasks.md`
 
+## Active Implementation Plans
+
+- None currently open (latest delivered: `docs/planning/archive/milestone-30-scraper-visibility-reliability.md`)
+
 ## Maintenance Logs
 
 - `docs/planning/maintenance-2026-02-13.md`

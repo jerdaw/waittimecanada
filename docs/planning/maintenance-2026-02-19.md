@@ -42,3 +42,27 @@ Maintenance sweep focused on the `wait-time.ca` domain rebrand staging, document
 - Frontend unit tests: `cd frontend && npm run test:unit`
 - Backend tests: `python -m pytest -q backend/tests`
 - Pre-commit hooks: `pre-commit run -a`
+
+---
+
+## Additional Session (M30 Closeout + Backlog Hygiene)
+
+### 6. M30 Operational Rollout Validation ✅
+
+- Confirmed migration `013_add_scraper_observability_columns.sql` applied successfully in target environment
+- Confirmed scraper run + `check_heartbeat --verbose` surfaced structured failure diagnostics (including category/stage)
+- Confirmed frontend health route/component tests pass with new health fields
+
+### 7. Backlog and Planning Hygiene ✅
+
+- Confirmed M30 implementation plan is archived and marked delivered:
+  - `docs/planning/archive/milestone-30-scraper-visibility-reliability.md`
+- Pruned completed checklist items from active roadmap queues to keep backlog focused on open work
+- Added explicit open P0 item for Quebec zero-value parser handling discovered during post-rollout run
+
+### 8. Documentation + Governance Maintenance ✅
+
+- Added ADR for M30 architecture and operational contract:
+  - `docs/adr/0018-scraper-observability-and-reliability-hardening.md`
+- Updated API/database reference docs to include new health and `scraper_status` fields
+- Verified repository human-authorship policy is present in `AGENTS.md` and shared through `CLAUDE.md`/`GEMINI.md` symlinks

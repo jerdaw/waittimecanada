@@ -35,6 +35,17 @@ From `002_create_tables.sql`:
 - anomaly flags on `measurements` (`008_add_anomaly_columns.sql`)
 - `methodology_change_events` (`009_create_methodology_change_events.sql`)
 - `regions` and `hospital_regions` (`010_create_regions_tables.sql`)
+- scraper observability metadata on `scraper_status` (`013_add_scraper_observability_columns.sql`)
+
+## Scraper observability fields (M30)
+
+`scraper_status` now persists both last-known-good and structured failure state:
+
+- last success: `last_success_run`, `last_success_measurements_count`
+- last error: `last_error_run`, `last_error_category`, `last_error_stage`, `error_message`
+- reliability state: `consecutive_failures`, `last_run_duration_ms`
+
+These fields support deterministic triage in `check_heartbeat --verbose`, workflow alerts, and `/api/health`.
 
 ## Data Model Rules
 

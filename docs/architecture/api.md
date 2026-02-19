@@ -75,6 +75,21 @@ Certain analytics endpoints return explicit states instead of silent nulls:
 
 This avoids overclaiming when source fields or tract datasets are not yet integrated.
 
+## Health route contract (M30 operational visibility)
+
+`GET /api/health` exposes an additive operational contract for scraper triage:
+
+- `stale_threshold_minutes` to keep frontend status logic aligned with ops policy.
+- Per-source `last_success_*` fields for last-known-good visibility.
+- Per-source `last_error_*` fields (timestamp/category/stage) for failure triage.
+- `consecutive_failures` and `last_run_duration_ms` for alert sensitivity and runtime monitoring.
+
+Route compatibility rules:
+
+- Existing fields are preserved.
+- New fields are additive only.
+- Unknown/empty states remain explicit (`null` or `unknown`), never inferred as success.
+
 ## Equity contract notes (M29)
 
 - `GET /api/analytics/equity-summary` emits descriptive-only methodology metadata and uncertainty/sensitivity fields.

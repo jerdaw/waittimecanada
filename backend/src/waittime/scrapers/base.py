@@ -14,9 +14,19 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 import httpx
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, stop_after_attempt
 
 from waittime.core import Measurement, Source
+from waittime.scrapers.observability import (
+    DEFAULT_HTTP_CONNECT_TIMEOUT_SECONDS,
+    DEFAULT_HTTP_POOL_TIMEOUT_SECONDS,
+    DEFAULT_HTTP_READ_TIMEOUT_SECONDS,
+    DEFAULT_HTTP_WRITE_TIMEOUT_SECONDS,
+    HTTP_FETCH_ATTEMPTS,
+    FailureStage,
+    classify_scraper_failure,
+    fetch_retry_wait,
+)
 
 if TYPE_CHECKING:
     from waittime.services.database import DatabaseService
@@ -60,7 +70,12 @@ class BaseScraper(ABC):
             self._heartbeat = HeartbeatService(db)
 
         self.client = httpx.Client(
-            timeout=30.0,
+            timeout=httpx.Timeout(
+                connect=DEFAULT_HTTP_CONNECT_TIMEOUT_SECONDS,
+                read=DEFAULT_HTTP_READ_TIMEOUT_SECONDS,
+                write=DEFAULT_HTTP_WRITE_TIMEOUT_SECONDS,
+                pool=DEFAULT_HTTP_POOL_TIMEOUT_SECONDS,
+            ),
             headers={
                 "User-Agent": "WaitTimeCanada/1.0 (Health Systems Observatory; +https://wait-time.ca)",
             },
@@ -73,8 +88,8 @@ class BaseScraper(ABC):
         self.client.close()
 
     @retry(  # type: ignore[misc]
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=4, max=60),
+        stop=stop_after_attempt(HTTP_FETCH_ATTEMPTS),
+        wait=fetch_retry_wait(),
     )
     def fetch(self, url: str | None = None) -> str:
         """Fetch HTML content from the data source.
@@ -159,10 +174,22 @@ class BaseScraper(ABC):
         """
         logger.info(f"Starting scrape for {self.source.id}")
         start_time = datetime.now(UTC)
+        failure_recorded = False
 
         try:
-            html = self.fetch()
-            measurements = self.parse(html)
+            try:
+                html = self.fetch()
+            except Exception as error:
+                self._record_failure(error, "fetch", start_time)
+                failure_recorded = True
+                raise
+
+            try:
+                measurements = self.parse(html)
+            except Exception as error:
+                self._record_failure(error, "parse", start_time)
+                failure_recorded = True
+                raise
 
             # Check for anomalies before saving
             if self.db is not None and measurements:
@@ -171,16 +198,36 @@ class BaseScraper(ABC):
             # Save measurements to database if configured
             if save_to_db and self.db is not None and measurements:
                 if before_save is not None:
-                    before_save(measurements)
-                self.db.insert_measurements(measurements)
+                    try:
+                        before_save(measurements)
+                    except Exception as error:
+                        self._record_failure(error, "before_save", start_time)
+                        failure_recorded = True
+                        raise
+
+                try:
+                    self.db.insert_measurements(measurements)
+                except Exception as error:
+                    self._record_failure(error, "persist", start_time)
+                    failure_recorded = True
+                    raise
+
                 logger.info(f"Saved {len(measurements)} measurements to database")
+
+            run_duration_ms = self._elapsed_ms(start_time)
 
             # Record successful heartbeat
             if self._heartbeat is not None:
-                self._heartbeat.record_success(
-                    source_id=self.source.id,
-                    measurements_count=len(measurements),
-                )
+                try:
+                    self._heartbeat.record_success(
+                        source_id=self.source.id,
+                        measurements_count=len(measurements),
+                        run_duration_ms=run_duration_ms,
+                    )
+                except Exception as error:
+                    self._record_failure(error, "heartbeat", start_time)
+                    failure_recorded = True
+                    raise
 
             elapsed = (datetime.now(UTC) - start_time).total_seconds()
             logger.info(
@@ -189,17 +236,36 @@ class BaseScraper(ABC):
             )
 
             return measurements
-
-        except Exception as e:
-            # Record failure heartbeat
-            if self._heartbeat is not None:
-                self._heartbeat.record_failure(
-                    source_id=self.source.id,
-                    error_message=str(e),
-                )
-
-            logger.error(f"Scrape failed for {self.source.id}: {e}")
+        except Exception as error:
+            if not failure_recorded:
+                self._record_failure(error, "orchestration", start_time)
             raise
+
+    def _elapsed_ms(self, start_time: datetime) -> int:
+        """Get elapsed runtime in milliseconds."""
+        return max(int((datetime.now(UTC) - start_time).total_seconds() * 1000), 0)
+
+    def _record_failure(self, error: Exception, stage: FailureStage, start_time: datetime) -> None:
+        """Record a structured failure heartbeat when available."""
+        classified = classify_scraper_failure(error, stage)
+        run_duration_ms = self._elapsed_ms(start_time)
+
+        if self._heartbeat is not None:
+            self._heartbeat.record_failure(
+                source_id=self.source.id,
+                error_message=classified.message,
+                failure_category=classified.category,
+                failure_stage=classified.stage,
+                run_duration_ms=run_duration_ms,
+            )
+
+        logger.error(
+            "Scrape failed for %s [%s/%s]: %s",
+            self.source.id,
+            classified.category,
+            classified.stage,
+            classified.message,
+        )
 
     def _check_anomalies(self, measurements: list[Measurement]) -> None:
         """Check measurements for anomalies and flag them in-place.

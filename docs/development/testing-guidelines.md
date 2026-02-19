@@ -93,3 +93,12 @@ npm run test:unit
 - CI is the source of truth for merge readiness.
 - Treat local runs as fast preflight to reduce CI churn.
 - If local and CI disagree, prioritize reproducing and fixing CI conditions.
+
+## Free-Tier CI Conservation (Temporary)
+
+When GitHub Actions minutes are constrained:
+
+- Run targeted backend/frontend tests locally before pushing.
+- Prefer focused test commands for touched modules during iteration.
+- Avoid local Playwright runs unless diagnosing a browser-specific defect.
+- Reserve full CI-heavy runs (especially E2E) for final verification pushes.

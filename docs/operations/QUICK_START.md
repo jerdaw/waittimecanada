@@ -52,7 +52,7 @@ python -m waittime.cli.scraper --list
 
 ### Heartbeat Status
 ```bash
-python -m waittime.cli.check_heartbeat --max-age 60
+python -m waittime.cli.check_heartbeat --max-age 90
 ```
 
 ### Check Specific Source
@@ -62,7 +62,12 @@ python -m waittime.cli.check_heartbeat --source quebec-msss
 
 ### Dry Run (No Alerts)
 ```bash
-python -m waittime.cli.check_heartbeat --max-age 60 --dry-run
+python -m waittime.cli.check_heartbeat --max-age 90 --dry-run
+```
+
+### Detailed Operational View (Last Known Good + Last Error)
+```bash
+python -m waittime.cli.check_heartbeat --max-age 90 --dry-run --verbose
 ```
 
 ---
@@ -165,7 +170,7 @@ playwright install chromium
 - Heartbeat stale threshold is 90 minutes
 - All 4 provinces operational
 
-**Review Reminder:** Reassess and revert to normal cadence on or before **March 3, 2026** if Neon transfer usage is back within budget.
+**Review Reminder:** Reassess and revert to normal cadence on or before **March 9, 2026** if Neon transfer usage is back within budget.
 
 **Monitoring:**
 - Pushover alerts on failures

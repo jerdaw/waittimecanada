@@ -59,9 +59,9 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 4. `scraper-cron.yml` - Scheduled Scraper Execution
 
-**Trigger:** every 15 minutes + manual dispatch.
+**Trigger:** temporary cost-control cadence (every 30 minutes daytime, hourly overnight) + manual dispatch.
 
-**Purpose:** Run all provincial scrapers against production DB and emit failure alerts.
+**Purpose:** Run all provincial scrapers against production DB and emit classified operational alerts.
 
 **Optimization controls:**
 - Serialized concurrency group to avoid overlapping cron runs.
@@ -72,7 +72,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 **Trigger:** every 30 minutes + manual dispatch.
 
-**Purpose:** Ensure scraper heartbeat freshness remains within threshold.
+**Purpose:** Ensure scraper heartbeat freshness remains within threshold and report consecutive/classified failures.
 
 **Optimization controls:**
 - Serialized concurrency group to avoid overlapping checks.

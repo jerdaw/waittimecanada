@@ -29,13 +29,13 @@ Create a migration whenever you need to:
 
 ```bash
 ls backend/migrations/*.sql | tail -1
-# e.g. backend/migrations/012_optimize_indexes.sql → next is 013
+# e.g. backend/migrations/013_add_scraper_observability_columns.sql → next is 014
 ```
 
 ### 2. Create the migration file
 
 ```bash
-touch backend/migrations/013_your_descriptive_name.sql
+touch backend/migrations/014_your_descriptive_name.sql
 ```
 
 ### 3. Write the migration
@@ -43,7 +43,7 @@ touch backend/migrations/013_your_descriptive_name.sql
 Use idempotent SQL so migrations are safe to re-run:
 
 ```sql
--- 013_your_descriptive_name.sql
+-- 014_your_descriptive_name.sql
 -- Purpose: Brief description
 -- Depends on: 012_optimize_indexes.sql
 
@@ -123,7 +123,7 @@ Migrations do not auto-rollback. Each migration file includes rollback SQL in co
 
 **Steps:**
 
-1. Identify the migration to undo (e.g., `013_your_descriptive_name.sql`).
+1. Identify the migration to undo (e.g., `014_your_descriptive_name.sql`).
 2. Extract the rollback SQL from the file's comments.
 3. Execute it manually:
    ```bash
@@ -132,8 +132,8 @@ Migrations do not auto-rollback. Each migration file includes rollback SQL in co
    ```
 4. Rename the migration file to `.sql.skip` to prevent re-application:
    ```bash
-   mv backend/migrations/013_your_descriptive_name.sql \
-      backend/migrations/013_your_descriptive_name.sql.skip
+   mv backend/migrations/014_your_descriptive_name.sql \
+      backend/migrations/014_your_descriptive_name.sql.skip
    ```
 
 > [!CAUTION]

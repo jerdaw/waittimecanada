@@ -13,6 +13,7 @@ from typing import cast
 from bs4 import BeautifulSoup, Tag
 from playwright.sync_api import TimeoutError as PlaywrightTimeout
 from playwright.sync_api import sync_playwright
+from tenacity import retry, stop_after_attempt
 
 from waittime.core import (
     EndEvent,
@@ -24,6 +25,13 @@ from waittime.core import (
     StatisticType,
 )
 from waittime.scrapers.base import BaseScraper
+from waittime.scrapers.observability import (
+    HTTP_FETCH_ATTEMPTS,
+    PLAYWRIGHT_PAGE_TIMEOUT_MS,
+    PLAYWRIGHT_RENDER_WAIT_MS,
+    PLAYWRIGHT_SELECTOR_TIMEOUT_MS,
+    fetch_retry_wait,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +50,10 @@ class AlbertaScraper(BaseScraper):
     STATISTIC_TYPE = StatisticType.POINT_ESTIMATE  # Updated every 2 minutes
     PATIENT_SCOPE = PatientScope.ALL
 
+    @retry(  # type: ignore[misc]
+        stop=stop_after_attempt(HTTP_FETCH_ATTEMPTS),
+        wait=fetch_retry_wait(),
+    )
     def fetch(self, url: str | None = None) -> str:
         """
         Fetch wait time data using Playwright.
@@ -61,18 +73,21 @@ class AlbertaScraper(BaseScraper):
             browser = p.chromium.launch(headless=True)
             try:
                 page = browser.new_page()
-                page.goto(target_url, timeout=30000)
+                page.goto(target_url, timeout=PLAYWRIGHT_PAGE_TIMEOUT_MS)
 
                 # Wait for wait time content to load
                 # The page structure may vary, so we'll wait for common elements
                 try:
                     # Wait for AHS wait-time cards to render.
-                    page.wait_for_selector("div.wt-well, div.wt-times", timeout=15000)
+                    page.wait_for_selector(
+                        "div.wt-well, div.wt-times",
+                        timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS,
+                    )
                 except PlaywrightTimeout:
                     logger.warning("Wait time elements not found, capturing full page")
 
                 # Give extra time for dynamic content
-                page.wait_for_timeout(2000)
+                page.wait_for_timeout(PLAYWRIGHT_RENDER_WAIT_MS)
 
                 html = cast(str, page.content())
                 return html

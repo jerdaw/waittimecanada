@@ -1,7 +1,7 @@
 name: Scraper Cron Job
 
 # Temporary cost-control throttle: run every 30 minutes.
-# Review target date: 2026-03-03 (revert to */15 if Neon transfer is back within budget).
+# Review target date: 2026-03-09 (revert to */15 if Neon transfer is back within budget).
 on:
   schedule:
     # Day (12:00 - 04:00 UTC): Every 30 minutes
@@ -53,14 +53,13 @@ jobs:
         run: |
           python -m waittime.cli.scraper --all
 
-      - name: Check scraper health
-        if: failure()
+      - name: Summarize scraper operational status
+        if: always()
+        working-directory: ./backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          # Query scraper_status table for failures
-          # This could trigger alerts if multiple failures detected
-          echo "Scraper run failed - check logs"
+          python -m waittime.cli.check_heartbeat --max-age 90 --dry-run --verbose || true
 
       - name: Generate Freshness Badge
         if: always()
@@ -79,16 +78,12 @@ jobs:
           path: backend/freshness.json
           retention-days: 1
 
-      - name: Send Pushover alert on failure
+      - name: Send classified scraper alerts on failure
         if: failure()
+        working-directory: ./backend
         env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           PUSHOVER_USER_KEY: ${{ secrets.PUSHOVER_USER_KEY }}
           PUSHOVER_API_TOKEN: ${{ secrets.PUSHOVER_API_TOKEN }}
         run: |
-          curl -s \
-            --form-string "token=$PUSHOVER_API_TOKEN" \
-            --form-string "user=$PUSHOVER_USER_KEY" \
-            --form-string "title=🚨 Scraper Failure" \
-            --form-string "message=Scraper cron job failed. View logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-            --form-string "priority=1" \
-            https://api.pushover.net/1/messages.json
+          python -m waittime.cli.check_heartbeat --max-age 90 --max-consecutive-failures 1 || true

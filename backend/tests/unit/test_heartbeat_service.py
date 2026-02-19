@@ -42,6 +42,9 @@ class TestRecordSuccess:
             status="healthy",
             error_message=None,
             measurements_count=15,
+            failure_category=None,
+            failure_stage=None,
+            run_duration_ms=None,
         )
         assert result == mock_status
         assert result.status == "healthy"
@@ -85,6 +88,9 @@ class TestRecordFailure:
             status="error",
             error_message="Connection timeout",
             measurements_count=0,
+            failure_category="unknown",
+            failure_stage="orchestration",
+            run_duration_ms=None,
         )
         assert result.status == "error"
         assert result.error_message == "Connection timeout"
@@ -106,6 +112,32 @@ class TestRecordFailure:
         # Should truncate to 500 characters
         call_args = mock_db.update_heartbeat.call_args
         assert len(call_args.kwargs["error_message"]) == 500
+
+    def test_records_failure_with_classification_metadata(self, heartbeat_service, mock_db):
+        """Should persist explicit category/stage metadata when provided."""
+        mock_status = ScraperStatus(
+            source_id="qc-msss",
+            last_run=datetime.now(UTC),
+            status="error",
+            error_message="Parser broke",
+            measurements_count=0,
+            last_error_category="parser_breakage",
+            last_error_stage="parse",
+        )
+        mock_db.update_heartbeat.return_value = mock_status
+
+        heartbeat_service.record_failure(
+            "qc-msss",
+            "Parser broke",
+            failure_category="parser_breakage",
+            failure_stage="parse",
+            run_duration_ms=1234,
+        )
+
+        call_args = mock_db.update_heartbeat.call_args
+        assert call_args.kwargs["failure_category"] == "parser_breakage"
+        assert call_args.kwargs["failure_stage"] == "parse"
+        assert call_args.kwargs["run_duration_ms"] == 1234
 
     def test_handles_empty_error_message(self, heartbeat_service, mock_db):
         """Should use default message if error is empty."""
@@ -279,7 +311,7 @@ class TestCheckHealth:
 
         result = heartbeat_service.check_health("qc-msss")
 
-        # 50 minutes is less than DEFAULT_STALE_THRESHOLD (60), so should be healthy
+        # 50 minutes is less than DEFAULT_STALE_THRESHOLD, so should be healthy
         assert result["healthy"] is True
 
 
@@ -435,4 +467,4 @@ class TestGetStalescrapers:
 
         _result = heartbeat_service.get_stale_scrapers()
 
-        mock_db.get_stale_scrapers.assert_called_once_with(60)
+        mock_db.get_stale_scrapers.assert_called_once_with(HeartbeatService.DEFAULT_STALE_THRESHOLD)

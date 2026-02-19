@@ -25,6 +25,7 @@ describe("SystemStatus", () => {
       json: async () => ({
         healthy: true,
         last_update: recentTime.toISOString(),
+        stale_threshold_minutes: 90,
         sources: [{ source_id: "test", status: "healthy" }],
       }),
     });
@@ -41,12 +42,13 @@ describe("SystemStatus", () => {
     expect(screen.getByText(/updated 10m ago/i)).toBeInTheDocument();
   });
 
-  it("displays degraded status when data is stale (60-120 min)", async () => {
-    const staleTime = new Date(Date.now() - 90 * 60 * 1000); // 90 minutes ago
+  it("displays degraded status when data is stale (> threshold)", async () => {
+    const staleTime = new Date(Date.now() - 100 * 60 * 1000); // 100 minutes ago
     (global.fetch as any).mockResolvedValue({
       json: async () => ({
         healthy: true,
         last_update: staleTime.toISOString(),
+        stale_threshold_minutes: 90,
         sources: [{ source_id: "test", status: "stale" }],
       }),
     });
@@ -60,7 +62,7 @@ describe("SystemStatus", () => {
       { timeout: 3000 },
     );
 
-    expect(screen.getByText(/updated 90m ago/i)).toBeInTheDocument();
+    expect(screen.getByText(/updated 100m ago/i)).toBeInTheDocument();
   });
 
   it("displays down status when data is very stale (>120 min)", async () => {

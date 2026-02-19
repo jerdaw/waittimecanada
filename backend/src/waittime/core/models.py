@@ -198,6 +198,19 @@ class ScraperStatus(BaseModel):
     status: str = Field(pattern="^(healthy|error|stale)$")
     error_message: str | None = None
     measurements_count: int = Field(ge=0, default=0)
+    last_success_run: datetime | None = None
+    last_success_measurements_count: int | None = Field(default=None, ge=0)
+    last_error_run: datetime | None = None
+    last_error_category: str | None = Field(
+        default=None,
+        pattern="^(upstream_unavailable|parser_breakage|infra_runtime|persistence_failure|unknown)$",
+    )
+    last_error_stage: str | None = Field(
+        default=None,
+        pattern="^(fetch|parse|before_save|persist|heartbeat|orchestration)$",
+    )
+    consecutive_failures: int = Field(ge=0, default=0)
+    last_run_duration_ms: int | None = Field(default=None, ge=0)
 
 
 def are_comparable(a: Measurement, b: Measurement) -> bool:

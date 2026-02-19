@@ -80,4 +80,5 @@ class TestAlertService:
             service.alert_scraper_error("source_1", long_error)
             message = mock_send.call_args[1]["message"]
             assert len(message) < 250  # Should be truncated
+            assert "unknown/unknown" in message
             assert "Error:" in message

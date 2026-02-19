@@ -21,8 +21,9 @@ import logging
 import re
 from typing import Any
 
-import requests
+import httpx
 from bs4 import BeautifulSoup
+from tenacity import retry, stop_after_attempt
 
 from waittime.core import (
     EndEvent,
@@ -33,6 +34,7 @@ from waittime.core import (
     StatisticType,
 )
 from waittime.scrapers.base import BaseScraper
+from waittime.scrapers.observability import HTTP_FETCH_ATTEMPTS, fetch_retry_wait
 
 logger = logging.getLogger(__name__)
 
@@ -73,18 +75,20 @@ class BCScraper(BaseScraper):
         "Surrey Memorial Hospital (Pediatrics Emergency)": "ca-bc-surrey-memorial-pediatrics",
     }
 
+    @retry(  # type: ignore[misc]
+        stop=stop_after_attempt(HTTP_FETCH_ATTEMPTS),
+        wait=fetch_retry_wait(),
+    )
     def fetch(self, url: str | None = None) -> str:
         """Fetch the legacy page containing __NEXT_DATA__ JSON."""
         target_url = url or self.BASE_URL
         try:
-            response = requests.get(
+            response = self.client.get(
                 target_url,
-                timeout=30,
-                headers={"User-Agent": "WaitTimeCanada/1.0 (Health Data Research)"},
             )
             response.raise_for_status()
             return response.text
-        except requests.RequestException as e:
+        except httpx.HTTPError as e:
             logger.error(f"Failed to fetch BC data: {e}")
             raise
 

@@ -18,7 +18,7 @@ python run_migrations.py
 
 **Output:**
 ```
-Found 11 migration files:
+Found 13 migration files:
 
 Running: 001_create_enums.sql
   ✓ Success
@@ -45,7 +45,7 @@ Migrations use `DO $$ ... EXCEPTION WHEN duplicate_object THEN NULL; END $$;` bl
 NNN_descriptive_name.sql
 ```
 
-- `NNN`: Zero-padded sequential number (001, 002, ..., 011)
+- `NNN`: Zero-padded sequential number (001, 002, ..., 013)
 - `descriptive_name`: Action and target (e.g., `create_enums`, `add_occupancy_columns`)
 - **Always use `.sql` extension** (`.sql.skip` files are intentionally excluded)
 
@@ -59,7 +59,7 @@ Migrations run in **lexicographic order** (alphabetical). The numeric prefix ens
 
 **Behavior:**
 - Reads all `*.sql` files from `backend/migrations/`
-- Sorts alphabetically (001 → 011)
+- Sorts alphabetically (001 → 013)
 - Executes each in a transaction
 - Stops on first error (unless safe duplicate)
 - Safe duplicate errors (already exists): ⚠ Warning, continues
@@ -302,20 +302,57 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 
 ---
 
+### M23: Performance Optimization (012)
+
+#### 012_optimize_indexes.sql
+**Purpose:** Add composite indexes for common analytics and API query patterns
+**Created:** 2026-02-18
+**Milestone:** M23 (Quality & Standardization)
+
+**Highlights:**
+- Adds targeted indexes for high-frequency measurement queries
+- Improves trend, benchmark, and filtering performance
+- Leaves table contracts unchanged (index-only migration)
+
+---
+
+### M30: Scraper Observability (013)
+
+#### 013_add_scraper_observability_columns.sql
+**Purpose:** Add structured heartbeat metadata for failure visibility and reliability triage
+**Created:** 2026-02-19
+**Milestone:** M30 (Scraper Failure Visibility & Reliability Hardening)
+
+**Columns Added to `scraper_status`:**
+- `last_success_run`
+- `last_success_measurements_count`
+- `last_error_run`
+- `last_error_category`
+- `last_error_stage`
+- `consecutive_failures`
+- `last_run_duration_ms`
+
+**Indexes Added:**
+- `idx_scraper_status_last_success_run`
+- `idx_scraper_status_last_error_run`
+- `idx_scraper_status_consecutive_failures`
+
+---
+
 ## Creating New Migrations
 
 ### Step 1: Determine Next Number
 
 ```bash
 ls backend/migrations/*.sql | tail -1
-# Output: backend/migrations/011_add_occupancy_columns.sql
-# Next: 012
+# Output: backend/migrations/013_add_scraper_observability_columns.sql
+# Next: 014
 ```
 
 ### Step 2: Create Migration File
 
 ```bash
-touch backend/migrations/012_your_descriptive_name.sql
+touch backend/migrations/014_your_descriptive_name.sql
 ```
 
 ### Step 3: Write Migration
@@ -323,7 +360,7 @@ touch backend/migrations/012_your_descriptive_name.sql
 **Template:**
 
 ```sql
--- 012_your_descriptive_name.sql
+-- 014_your_descriptive_name.sql
 -- Brief description of what this migration does
 -- Depends on: NNN_previous_migration.sql (if applicable)
 
@@ -721,7 +758,7 @@ For migration questions or issues:
 
 ---
 
-**Last Updated:** 2026-02-13
-**Total Migrations:** 11
+**Last Updated:** 2026-02-19
+**Total Migrations:** 12
 **Database Provider:** Neon PostgreSQL 17
-**Schema Version:** 011 (Quebec Occupancy)
+**Schema Version:** 013 (Scraper Observability Metadata)
