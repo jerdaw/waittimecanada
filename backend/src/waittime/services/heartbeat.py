@@ -5,6 +5,7 @@ Wraps the DatabaseService heartbeat methods with additional logic for stale dete
 """
 
 import logging
+import os
 from datetime import UTC, datetime
 from typing import Any
 
@@ -31,7 +32,7 @@ class HeartbeatService:
     """
 
     # Default threshold for considering a scraper stale (in minutes)
-    DEFAULT_STALE_THRESHOLD = 60
+    DEFAULT_STALE_THRESHOLD = int(os.environ.get("HEARTBEAT_STALE_THRESHOLD_MINUTES", "90"))
 
     def __init__(self, db: DatabaseService) -> None:
         """Initialize with database service.
@@ -45,6 +46,7 @@ class HeartbeatService:
         self,
         source_id: str,
         measurements_count: int,
+        run_duration_ms: int | None = None,
     ) -> ScraperStatus:
         """Record a successful scraper run.
 
@@ -60,10 +62,14 @@ class HeartbeatService:
             status="healthy",
             error_message=None,
             measurements_count=measurements_count,
+            failure_category=None,
+            failure_stage=None,
+            run_duration_ms=run_duration_ms,
         )
 
         logger.info(
-            f"Heartbeat recorded for {source_id}: {measurements_count} measurements, status=healthy"
+            f"Heartbeat recorded for {source_id}: {measurements_count} measurements, "
+            f"status=healthy, run_duration_ms={run_duration_ms}"
         )
 
         return status
@@ -72,6 +78,9 @@ class HeartbeatService:
         self,
         source_id: str,
         error_message: str,
+        failure_category: str = "unknown",
+        failure_stage: str = "orchestration",
+        run_duration_ms: int | None = None,
     ) -> ScraperStatus:
         """Record a failed scraper run.
 
@@ -90,9 +99,18 @@ class HeartbeatService:
             status="error",
             error_message=truncated_error,
             measurements_count=0,
+            failure_category=failure_category,
+            failure_stage=failure_stage,
+            run_duration_ms=run_duration_ms,
         )
 
-        logger.error(f"Heartbeat error for {source_id}: {truncated_error}")
+        logger.error(
+            "Heartbeat error for %s [%s/%s]: %s",
+            source_id,
+            failure_category,
+            failure_stage,
+            truncated_error,
+        )
 
         return status
 
@@ -132,7 +150,18 @@ class HeartbeatService:
             with self.db.get_cursor(conn) as cur:
                 cur.execute(
                     """
-                    SELECT source_id, last_run, status, error_message, measurements_count
+                    SELECT
+                        source_id,
+                        last_run,
+                        status,
+                        error_message,
+                        measurements_count,
+                        last_success_run,
+                        last_success_measurements_count,
+                        last_error_run,
+                        last_error_category,
+                        last_error_stage,
+                        consecutive_failures
                     FROM scraper_status
                     WHERE source_id = %s
                     ORDER BY last_run DESC
@@ -152,6 +181,12 @@ class HeartbeatService:
                 "last_run": None,
                 "age_minutes": None,
                 "measurements_count": None,
+                "last_success_run": None,
+                "last_success_measurements_count": None,
+                "last_error_run": None,
+                "last_error_category": None,
+                "last_error_stage": None,
+                "consecutive_failures": 0,
             }
 
         last_run = row["last_run"]
@@ -167,6 +202,16 @@ class HeartbeatService:
                 "last_run": last_run.isoformat(),
                 "age_minutes": round(age_minutes, 1),
                 "measurements_count": row["measurements_count"],
+                "last_success_run": row["last_success_run"].isoformat()
+                if row.get("last_success_run")
+                else None,
+                "last_success_measurements_count": row.get("last_success_measurements_count"),
+                "last_error_run": row["last_error_run"].isoformat()
+                if row.get("last_error_run")
+                else None,
+                "last_error_category": row.get("last_error_category"),
+                "last_error_stage": row.get("last_error_stage"),
+                "consecutive_failures": row.get("consecutive_failures", 0),
             }
 
         # Data is stale
@@ -179,6 +224,16 @@ class HeartbeatService:
                 "last_run": last_run.isoformat(),
                 "age_minutes": round(age_minutes, 1),
                 "measurements_count": row["measurements_count"],
+                "last_success_run": row["last_success_run"].isoformat()
+                if row.get("last_success_run")
+                else None,
+                "last_success_measurements_count": row.get("last_success_measurements_count"),
+                "last_error_run": row["last_error_run"].isoformat()
+                if row.get("last_error_run")
+                else None,
+                "last_error_category": row.get("last_error_category"),
+                "last_error_stage": row.get("last_error_stage"),
+                "consecutive_failures": row.get("consecutive_failures", 0),
             }
 
         # Healthy
@@ -190,6 +245,16 @@ class HeartbeatService:
             "last_run": last_run.isoformat(),
             "age_minutes": round(age_minutes, 1),
             "measurements_count": row["measurements_count"],
+            "last_success_run": row["last_success_run"].isoformat()
+            if row.get("last_success_run")
+            else None,
+            "last_success_measurements_count": row.get("last_success_measurements_count"),
+            "last_error_run": row["last_error_run"].isoformat()
+            if row.get("last_error_run")
+            else None,
+            "last_error_category": row.get("last_error_category"),
+            "last_error_stage": row.get("last_error_stage"),
+            "consecutive_failures": row.get("consecutive_failures", 0),
         }
 
     def check_all_sources(

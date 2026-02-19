@@ -19,6 +19,7 @@ This directory is the planning control plane for Wait Time Canada.
 - `docs/planning/archive/milestone-13-aggregation.md` (closed, delivered)
 - `docs/planning/archive/milestone-28-equity-real-data-ontario.md` (closed, delivered)
 - `docs/planning/archive/milestone-29-equity-academic-rigor-hardening.md` (closed, delivered)
+- `docs/planning/archive/milestone-30-scraper-visibility-reliability.md` (closed, delivered)
 - `docs/planning/archive/task-er-watch-features.md` (closed, delivered)
 - `docs/planning/archive/implementation-plan-m2-ontario.md`
 - `docs/planning/archive/IMPLEMENTATION_PLAN_SUMMARY.md`

@@ -100,20 +100,31 @@ class AlertService:
             url="https://github.com/jerdaw/waittimecanada/actions",
         )
 
-    def alert_scraper_error(self, source_id: str, error: str) -> bool:
+    def alert_scraper_error(
+        self,
+        source_id: str,
+        error: str,
+        category: str | None = None,
+        stage: str | None = None,
+        run_url: str | None = None,
+    ) -> bool:
         """
         Alert that a scraper encountered an error.
 
         Args:
             source_id: ID of the scraper that errored
             error: Error message (truncated to 200 chars)
+            category: Optional failure category classification
+            stage: Optional pipeline stage classification
+            run_url: Optional workflow run URL for direct triage
 
         Returns:
             True if alert sent successfully
         """
+        classification = f"{category or 'unknown'}/{stage or 'unknown'}"
         return self.send_alert(
             title=f"🚨 Scraper Error: {source_id}",
-            message=f"Error: {error[:200]}",
+            message=f"Classification: {classification} | Error: {error[:200]}",
             priority=1,  # High priority
-            url="https://github.com/jerdaw/waittimecanada/actions",
+            url=run_url or "https://github.com/jerdaw/waittimecanada/actions",
         )

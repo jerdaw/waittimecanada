@@ -257,7 +257,10 @@ class TestRun:
                 mock_success.assert_called_once_with(
                     source_id="test-source",
                     measurements_count=1,
+                    run_duration_ms=mock_success.call_args.kwargs["run_duration_ms"],
                 )
+                assert isinstance(mock_success.call_args.kwargs["run_duration_ms"], int)
+                assert mock_success.call_args.kwargs["run_duration_ms"] >= 0
 
     def test_run_records_failure_heartbeat_on_error(self, scraper_with_db):
         """Should record failure heartbeat when scrape fails."""
@@ -269,7 +272,12 @@ class TestRun:
                 mock_failure.assert_called_once_with(
                     source_id="test-source",
                     error_message="Network error",
+                    failure_category="unknown",
+                    failure_stage="fetch",
+                    run_duration_ms=mock_failure.call_args.kwargs["run_duration_ms"],
                 )
+                assert isinstance(mock_failure.call_args.kwargs["run_duration_ms"], int)
+                assert mock_failure.call_args.kwargs["run_duration_ms"] >= 0
 
     def test_run_without_heartbeat_service_succeeds(self, scraper_without_db):
         """Should complete successfully even without heartbeat service."""

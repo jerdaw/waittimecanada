@@ -1,9 +1,9 @@
 # Scraper Scheduling & Operations
 
-**Last Updated:** 2026-02-14
+**Last Updated:** 2026-02-19
 **Status:** ✅ All 4 provincial scrapers operational
 
-> Temporary cost-control mode (enabled February 14, 2026): scraper cadence is `*/30` and heartbeat stale threshold is `90` minutes. Review on or before **March 3, 2026** and revert to normal cadence when Neon transfer usage stabilizes.
+> Temporary cost-control mode (enabled February 14, 2026): scraper cadence is `*/30` (day) and `0 *` (night) with heartbeat stale threshold `90` minutes. Review on or before **March 9, 2026** and revert to normal cadence when Neon transfer usage stabilizes.
 
 ---
 
@@ -17,10 +17,10 @@ Wait Time Canada operates 4 provincial emergency department wait time scrapers r
 
 | Province | Source ID | Status | Schedule | Last Verified |
 |----------|-----------|--------|----------|---------------|
-| **Quebec** | `quebec-msss` | ✅ Active | Every 15 min | 2026-02-11 |
-| **Ontario** | `ontario-health` | ✅ Active | Every 15 min | 2026-02-11 |
-| **Alberta** | `alberta-ahs` | ✅ Active | Every 15 min | 2026-02-11 |
-| **British Columbia** | `bc-phsa` | ✅ Active | Every 15 min | 2026-02-11 |
+| **Quebec** | `quebec-msss` | ✅ Active | 30 min daytime / 60 min overnight | 2026-02-19 |
+| **Ontario** | `ontario-health` | ✅ Active | 30 min daytime / 60 min overnight | 2026-02-19 |
+| **Alberta** | `alberta-ahs` | ✅ Active | 30 min daytime / 60 min overnight | 2026-02-19 |
+| **British Columbia** | `bc-phsa` | ✅ Active | 30 min daytime / 60 min overnight | 2026-02-19 |
 
 **Total Coverage:** 380+ hospitals across 4 provinces
 
@@ -31,7 +31,7 @@ Wait Time Canada operates 4 provincial emergency department wait time scrapers r
 ### 1. Scraper Cron (`scraper-cron.yml`)
 
 **Purpose:** Run all scrapers on schedule
-**Schedule:** `*/15 * * * *` (every 15 minutes)
+**Schedule:** `*/30 12-23,0-3 * * *` + `0 4-11 * * *` (30 minutes daytime, hourly overnight)
 **Runtime:** ~8-12 minutes (all 4 scrapers)
 **Timeout:** 20 minutes
 
@@ -57,21 +57,22 @@ Available via GitHub Actions UI (`workflow_dispatch`)
 
 **Purpose:** Dead Man's Switch - verify scrapers are running
 **Schedule:** `*/30 * * * *` (every 30 minutes)
-**Max Heartbeat Age:** 60 minutes
+**Max Heartbeat Age:** 90 minutes
 
 **Execution:**
 ```bash
-python -m waittime.cli.check_heartbeat --max-age 60
+python -m waittime.cli.check_heartbeat --max-age 90
 ```
 
 **Features:**
 - ✅ Dynamically discovers all sources from database
 - ✅ Checks `scraper_status` table for last run timestamp
-- ✅ Alerts via Pushover if heartbeat > 60 minutes old
+- ✅ Alerts via Pushover if heartbeat > 90 minutes old
+- ✅ Alerts include failure classification (`category/stage`) for error states
 - ✅ Alerts if no heartbeat ever recorded for a source
 
 **Alert Conditions:**
-- ⚠️ Heartbeat older than 60 minutes
+- ⚠️ Heartbeat older than 90 minutes
 - 🚨 No heartbeat found for source
 
 ---
@@ -82,7 +83,7 @@ python -m waittime.cli.check_heartbeat --max-age 60
 - **Methodology:** REGISTRATION → PHYSICIAN (ROLLING_AVG)
 - **Technology:** BeautifulSoup (HTML parsing)
 - **Coverage:** 110+ hospitals
-- **Update Frequency:** Every 15 minutes
+- **Update Frequency:** 30 min daytime / 60 min overnight (temporary throttle)
 - **Special Features:** ✅ Stretcher occupancy data (M17/M18)
 - **Data Quality:** 86% test coverage
 
@@ -90,21 +91,21 @@ python -m waittime.cli.check_heartbeat --max-age 60
 - **Methodology:** TRIAGE → PHYSICIAN (P90)
 - **Technology:** Playwright (JavaScript rendering required)
 - **Coverage:** 160+ hospitals
-- **Update Frequency:** Every 15 minutes
+- **Update Frequency:** 30 min daytime / 60 min overnight (temporary throttle)
 - **Browser:** Chromium (installed in GitHub Actions)
 
 ### Alberta (AHS)
 - **Methodology:** TRIAGE → PHYSICIAN (P90)
 - **Technology:** Playwright (JavaScript rendering required)
 - **Coverage:** 50+ hospitals
-- **Update Frequency:** Every 15 minutes
+- **Update Frequency:** 30 min daytime / 60 min overnight (temporary throttle)
 - **Browser:** Chromium (installed in GitHub Actions)
 
 ### British Columbia (PHSA)
 - **Methodology:** TRIAGE → PHYSICIAN (P90)
 - **Technology:** BeautifulSoup + JSON extraction (`__NEXT_DATA__`)
 - **Coverage:** 60+ hospitals
-- **Update Frequency:** Every 15 minutes
+- **Update Frequency:** 30 min daytime / 60 min overnight (temporary throttle)
 - **URL:** `https://edwaittimes.ca/legacy`
 
 ---
@@ -157,7 +158,12 @@ python -m waittime.cli.scraper --list
 
 ### Check Heartbeat Health
 ```bash
-python -m waittime.cli.check_heartbeat --max-age 60
+python -m waittime.cli.check_heartbeat --max-age 90
+```
+
+### Check Detailed Operational Status (last-known-good + last-error)
+```bash
+python -m waittime.cli.check_heartbeat --max-age 90 --dry-run --verbose
 ```
 
 ### Dry Run (No Database Writes)
@@ -177,13 +183,14 @@ python -m waittime.cli.scraper --all --dry-run
 
 **Alert Types:**
 1. **Scraper Failure** (scraper-cron.yml)
-   - Title: 🚨 Scraper Failure
-   - Trigger: Any scraper run exits with failure
+   - Title: 🚨 Scraper Error: `<source-id>`
+   - Trigger: Source has status `error` and consecutive failures >= threshold
+   - Payload: Includes `failure_category/failure_stage` classification
    - Priority: 1 (High)
 
 2. **Stale Heartbeat** (heartbeat-monitor.yml)
    - Title: ⚠️ Scraper Stale
-   - Trigger: No heartbeat in last 60 minutes
+   - Trigger: No heartbeat in last 90 minutes
    - Priority: 1 (High)
 
 **Manual Alert Test:**
@@ -265,7 +272,7 @@ ORDER BY source_id;
    ```
 
 3. **Check GitHub Actions Runs:**
-   - Ensure scraper-cron is actually running every 15 minutes
+   - Ensure scraper-cron is running on the temporary 30m/60m cadence
    - Check for workflow errors
 
 ### Low Measurement Count
@@ -310,12 +317,12 @@ When adding a new scraper:
 
 | Metric | Target | Current |
 |--------|--------|---------|
-| Scraper Run Frequency | Every 15 min | ✅ Configured |
+| Scraper Run Frequency | Every 30 min day / 60 min night | ✅ Configured |
 | Max Scraper Runtime | < 15 min | ✅ ~8-12 min |
 | Heartbeat Check Frequency | Every 30 min | ✅ Configured |
-| Max Heartbeat Age | < 60 min | ✅ Monitored |
+| Max Heartbeat Age | < 90 min | ✅ Monitored |
 | Scraper Success Rate | > 95% | ✅ Tolerant design |
-| Data Freshness | < 30 min | ✅ 15 min cadence |
+| Data Freshness | < 90 min | ✅ Temporary throttle cadence |
 
 ---
 

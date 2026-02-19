@@ -65,6 +65,31 @@ Additional optional export params:
 
 ## Key Contracts
 
+## Health endpoint operational contract (M30)
+
+`GET /api/health` remains backward-compatible and now includes structured scraper diagnostics.
+
+Top-level fields:
+
+- `healthy: boolean`
+- `database: { status, latency_ms, pool_status }`
+- `last_update: string | null`
+- `stale_threshold_minutes: number`
+- `sources: SourceHealth[]`
+
+Per-source diagnostics (`SourceHealth`) include:
+
+- Existing: `source_id`, `source_name`, `last_run`, `status`, `error_message`, `measurements_count`, `age_minutes`
+- Added: `last_success_run`, `last_success_measurements_count`, `last_error_run`, `last_error_category`, `last_error_stage`, `consecutive_failures`, `last_run_duration_ms`
+
+Failure categories currently emitted by backend heartbeat/classification logic:
+
+- `upstream_unavailable`
+- `parser_breakage`
+- `infra_runtime`
+- `persistence_failure`
+- `unknown`
+
 ## Comparability endpoint
 
 `GET /api/compare` returns:

@@ -2,9 +2,9 @@
 
 ## Current Status (Updated 2026-02-19)
 
-**Progress:** M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
+**Progress:** M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
-**Strategic Direction:** **Milestone 29 (Equity Academic Rigor Hardening) Complete.** Ontario equity layer now includes ON-scoped quintile calibration, suppression provenance, uncertainty/sensitivity analytics, explicit interpretation limits, reproducible geospatial setup, and optimized layer serving fallback. **Milestone 25 (Reliability & Verification Phase 2) Complete.** Backend coverage increased to 80% (trends/benchmarking >90%). Comprehensive API integration tests added and passing. **Four-province breadth confirmed.**
+**Strategic Direction:** **Milestone 30 (Scraper Visibility & Reliability Hardening) Complete.** Operational observability now includes last-known-good + failure classification across ON/QC/AB/BC, with standardized retry/backoff policies and workflow-integrated heartbeat checks. Immediate execution focus is a **P0 Quebec parser regression** (zero-value occupancy handling) followed by the cache/polling audit. **Four-province breadth remains confirmed.**
 
 **Deployment Note (2026-02-19):** Frontend public hosting is currently unavailable because the Netlify project is paused (cost control / credit exhaustion). The `wait-time.ca` domain cutover is staged in-repo but should be treated as **on hold** until the project is unpaused (target: **March 9, 2026**).
 
@@ -42,12 +42,13 @@
 | **M27: Operational Observability & Resilience** | Drift monitor script (`monitor_drift.py`) with 7 unit tests, public `/status` page with per-province uptime bars + drift event log, Lighthouse CI workflow, database migration guide |
 | **M28: Ontario Real-Data Equity Layer** | Replaced scaffold linkage with real StatsCan CT overlays for ON; added acquisition provenance, processing manifest, ON-only rollout contract, and map/API integration |
 | **M29: Equity Academic Rigor Hardening (ON)** | ON-scoped quintiles, suppression provenance, sensitivity + uncertainty outputs, non-causal/temporal messaging, reproducibility hardening (`equity` extras/docs), optimized layer output + API loader preference |
+| **M30: Scraper Visibility & Reliability Hardening** | Added structured failure taxonomy + heartbeat metadata (`last_success`, `last_error`, `consecutive_failures`, run duration), standardized retry/backoff for ON/AB/BC/QC fetch paths, enhanced `/api/health` + `check_heartbeat --verbose`, and updated workflow/runbook operations |
 
 ---
 
 ## Next Steps
 
-All planned milestones through M18 and Operations verification are complete. Future work items are tracked in the "Later" section below.
+M30 is complete and archived. Immediate priorities are: (1) Quebec zero-value parser regression fix, and (2) cache/polling audit hardening for shared API routes. Completed work remains tracked in the milestones table above; active and deferred backlog items are listed below.
 
 ## Roadmap Operating Model
 
@@ -78,22 +79,12 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 ### Now (0-2 weeks) — CORE ENGINEERING & VERIFICATION
 (Production Deployment Blocked until March 9, 2026)
 
-**PRIORITY 0: Data Quality Verification (Local)**
-- [x] **P0 / Verification: ON hospital vs ER Watch** — Verified fresh data (manual UI inconclusive but scraped data is current)
-- [x] **P0 / Verification: QC hospital vs MSSS portal** — Verified source failure (upstream "unavailable")
-- [x] **P0 / Verification: AB hospital vs AHS** — Verified exact match
-- [x] **P0 / Verification: BC hospital vs edwaittimes.ca** — Verified close match
-
-**PRIORITY 0: High-Value Expansion (Active)**
-- [ ] **P0 / No active P0 expansion item this cycle** — M28 and M29 are closed; next expansion work is multi-province equity onboarding (tracked in Later).
+**PRIORITY 0: Active Reliability Fixes (Local)**
+- [ ] **P0 / Ops: Quebec parser zero-value guard** — MSSS occupancy occasionally returns `0`, which currently fails `Measurement.value > 0` validation and classifies as `parser_breakage/parse`; update parser handling to treat zero-value occupancy as explicit non-reporting/suppressed signal rather than hard failure, with regression tests.
 
 **PRIORITY 1: Engineering Reliability (Local)**
-- [x] **P1 / Add end-to-end pipeline test** (#39) — Mock scrape → DB insert → API → render (4-8h)
-- [x] **P1 / Add API response time tracking** (#49) — Timing middleware (2-3h)
-- [x] **P2 / Visual regression testing** (#33) — Scaffold for screenshot comparison (High maintenance)
-- [ ] **P1 / Ops: Scraper reliability hardening** — Standardize retry/backoff/timeouts; ensure `scraper_status` heartbeat/status writes on partial failures; classify upstream outage vs parser breakage (1-2d)
-- [ ] **P1 / Ops: Scraper failure visibility** — Consolidate last-known-good + last-error into a single operational view (CLI + `/api/health`), and add a short runbook for on-call verification (4-8h)
 - [ ] **P1 / Performance: Cache & polling audit** — Verify cache headers/TTLs for shared read-heavy routes; enforce `no-store` for user-specific and export endpoints; keep SystemStatus polling at 5m and tab-visible only (4-8h)
+- [ ] **P1 / Ops: CI quota conservation (temporary)** — Minimize free-tier GitHub Actions burn until reset (favor local preflight + targeted workflow triggers, defer non-critical heavy jobs such as Playwright to essential runs only).
 
 ### Deferred / On Hold (Non-Core / Too Reaching)
 
@@ -101,64 +92,25 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 - [ ] **P1 / Ops: Unpause Netlify + verify `wait-time.ca` cutover** — Confirm TLS/cert, redirects, `NEXT_PUBLIC_BASE_URL`, and re-enable `production-smoke` (target **March 9, 2026**)
 - [ ] **P1 / Ops: Harden Netlify release gate** — Assert `netlify-ignore.sh` blocks non-release commits and add a minimal CI check to prevent accidental credit burn (2-3h)
 
-**Portfolio & Academic Artifacts (Deferred):**
-- [x] **P2 / Add Zenodo integration for DOI** (#42) — Academic credit
-- [x] **P2 / Add data freshness badge** (#31) — Portfolio signal
-- [x] **P2 / Expand automated screenshot generation** (#27) — Portfolio signal
-- [x] **P2 / Add methodology comparison table as static asset** (#36) — External artifact
-- [x] **P2 / Populate stakeholder interview examples** (#45) — Governance artifact
-
 **Advanced Documentation (Deferred):**
-- [x] **P2 / Add OpenAPI/Swagger docs** (#10) — Secondary to core API
-- [x] **P2 / Add mkdocs GitHub Pages deployment** (#48) — External docs site
-- [x] **P2 / Add data dictionary** (#50) — Formal documentation of all tables/columns/enums
-- [x] **P2 / Add data flow documentation** (#24) — Source-to-database pipeline documentation
 - [ ] **P2 / Add contributor onboarding guide** (#40) — Paperwork
 
 **Advanced Testing & Monitoring (Deferred):**
 - [ ] **P2 / Add Lighthouse CI** (#14) — Optimization metrics
-- [x] **P2 / Property-based testing (Hypothesis)** (#32) — Formal verification of ontology comparability
 - [ ] **P2 / Add uptime/status history page** (#37) — Public transparency page
 
 **Project Management (Deferred):**
 - [ ] **P2 / Add GitHub Project board** (#47) — Process overhead
 
-**Expansion (Deferred):**
-- [x] **P2 / French language support (i18n)** (#7) — Major scope expansion
-
 ### Next (2-6 weeks) — Core Engineering & Reliability
 
 **Priority 1: System Reliability & Correctness**
-- [x] **P1 / Increase backend test coverage to 85%+** (#13) — Achieved 80% aggregate (Trends/Benchmarking >90%); added unit tests for core services (1-2d)
-- [x] **P1 / Add API integration tests** (#22) — Comprehensive test suite for hospitals, health, export, geolocation (1-2d)
-- [x] **P1 / Add database health check enhancement** (#29) — Connection pool status (idle/active/max) added to /api/health (2-3h)
-- [x] **P1 / Add structured logging via structlog** (#25) — JSON-formatted logging for backend/frontend (2-3h)
-
-**Priority 1: Comparability & Methodology UX**
 - [ ] **P1 / Divergence Briefs in analytics + export** — When ontology mismatches, generate a structured “divergence brief” (why non-comparable) and surface it in UI + export metadata (1-2d)
 
-**Priority 1: Data Quality Depth**
 - [ ] **P1 / Data quality snapshot diffs** — Diff `data_quality_snapshots` over time (coverage drops, missing hospitals, anomalies) and add an operator-friendly view for changes (1-2d)
 - [ ] **P1 / Data quality drift monitoring** (#43) — Track longitudinal drift (coverage drops, missing hospitals, anomaly rate shifts) and surface it for operators (4-8h)
 
-**Priority 1: Security & Guardrails**
-- [x] **P1 / Add API input validation (Zod)** (#21) — Comprehensive validation for all query params across 16 routes (4-8h)
-- [x] **P1 / Add API rate limiting** (#9) — In-memory middleware for all routes with 429 responses (4-8h)
-
-**Priority 1: Code Quality & Performance**
-- [x] **P1 / TypeScript strict mode audit** (#34) — Eliminate all `any`, `@ts-ignore`, `@ts-expect-error` in custom code (2-3h)
-- [x] **P1 / Backend mypy strict mode** (#35) — Enable `--strict` flag and fix all type errors (4-8h)
-- [x] **P1 / Database index optimization** (#38) — Add composite indexes for common query patterns with migration (2-3h)
-
-**Priority 2: Validated Improvements**
-- [x] **P2 / Add mobile-responsive testing** (#44) — Playwright tests at 375px/414px viewports (4-8h)
-- [x] **P2 / Add end-to-end pipeline test** (#39) — Mock scrape → DB insert → API → render (4-8h)
-- [x] **P2 / Add API response time tracking** (#49) — Timing middleware (2-3h)
-
 ### Later (6+ weeks) — Strategic Enhancements
-
-**High-Value Expansion Features:**
-
 
 **Future Feature Development:**
 - [ ] **P2 / Additional provinces** — Nova Scotia, New Brunswick scrapers with methodology documentation
@@ -166,7 +118,6 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 - [ ] **P2 / Enhanced equity layer (multi-province rollout)** — Apply Ontario template to QC/AB/BC after ON real-data rollout is fully verified
 - [ ] **P2 / Occupancy-based recommendations** — Smart hospital suggestions based on current occupancy
 - [ ] **P2 / Portfolio launch** — Complete stakeholder interview and publish launch communications when public hosting is re-enabled
-- [x] **P2 / Performance optimization** — Smart scheduling (reduce frequency during overnight hours)
 - [ ] **P2 / Monitoring dashboard** — Prometheus/Grafana integration for operational visibility
 - [ ] **P2 / Advanced analytics** — Predictive wait time modeling based on historical patterns
 

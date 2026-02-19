@@ -1218,6 +1218,9 @@ class DatabaseService:
         status: str = "healthy",
         error_message: str | None = None,
         measurements_count: int = 0,
+        failure_category: str | None = None,
+        failure_stage: str | None = None,
+        run_duration_ms: int | None = None,
     ) -> ScraperStatus:
         """Update scraper heartbeat status."""
         with self.get_connection() as conn:
@@ -1225,17 +1228,81 @@ class DatabaseService:
                 cur.execute(
                     """
                     INSERT INTO scraper_status (
-                        source_id, last_run, status, error_message, measurements_count
-                    ) VALUES (%s, NOW(), %s, %s, %s)
+                        source_id,
+                        last_run,
+                        status,
+                        error_message,
+                        measurements_count,
+                        last_success_run,
+                        last_success_measurements_count,
+                        last_error_run,
+                        last_error_category,
+                        last_error_stage,
+                        consecutive_failures,
+                        last_run_duration_ms
+                    ) VALUES (
+                        %s,
+                        NOW(),
+                        %s,
+                        %s,
+                        %s,
+                        CASE WHEN %s = 'healthy' THEN NOW() ELSE NULL END,
+                        CASE WHEN %s = 'healthy' THEN %s ELSE NULL END,
+                        CASE WHEN %s = 'error' THEN NOW() ELSE NULL END,
+                        CASE WHEN %s = 'error' THEN %s ELSE NULL END,
+                        CASE WHEN %s = 'error' THEN %s ELSE NULL END,
+                        CASE WHEN %s = 'error' THEN 1 ELSE 0 END,
+                        %s
+                    )
                     ON CONFLICT (source_id) DO UPDATE SET
                         last_run = NOW(),
                         status = EXCLUDED.status,
                         error_message = EXCLUDED.error_message,
                         measurements_count = EXCLUDED.measurements_count,
+                        last_success_run = CASE
+                            WHEN EXCLUDED.status = 'healthy' THEN NOW()
+                            ELSE scraper_status.last_success_run
+                        END,
+                        last_success_measurements_count = CASE
+                            WHEN EXCLUDED.status = 'healthy' THEN EXCLUDED.measurements_count
+                            ELSE scraper_status.last_success_measurements_count
+                        END,
+                        last_error_run = CASE
+                            WHEN EXCLUDED.status = 'error' THEN NOW()
+                            ELSE scraper_status.last_error_run
+                        END,
+                        last_error_category = CASE
+                            WHEN EXCLUDED.status = 'error' THEN EXCLUDED.last_error_category
+                            ELSE scraper_status.last_error_category
+                        END,
+                        last_error_stage = CASE
+                            WHEN EXCLUDED.status = 'error' THEN EXCLUDED.last_error_stage
+                            ELSE scraper_status.last_error_stage
+                        END,
+                        consecutive_failures = CASE
+                            WHEN EXCLUDED.status = 'error' THEN scraper_status.consecutive_failures + 1
+                            ELSE 0
+                        END,
+                        last_run_duration_ms = EXCLUDED.last_run_duration_ms,
                         updated_at = NOW()
                     RETURNING *
                     """,
-                    (source_id, status, error_message, measurements_count),
+                    (
+                        source_id,
+                        status,
+                        error_message,
+                        measurements_count,
+                        status,
+                        status,
+                        measurements_count,
+                        status,
+                        status,
+                        failure_category,
+                        status,
+                        failure_stage,
+                        status,
+                        run_duration_ms,
+                    ),
                 )
                 row = cur.fetchone()
                 if row is None:
@@ -1247,6 +1314,13 @@ class DatabaseService:
                     status=row_dict["status"],
                     error_message=row_dict.get("error_message"),
                     measurements_count=row_dict["measurements_count"],
+                    last_success_run=row_dict.get("last_success_run"),
+                    last_success_measurements_count=row_dict.get("last_success_measurements_count"),
+                    last_error_run=row_dict.get("last_error_run"),
+                    last_error_category=row_dict.get("last_error_category"),
+                    last_error_stage=row_dict.get("last_error_stage"),
+                    consecutive_failures=row_dict.get("consecutive_failures") or 0,
+                    last_run_duration_ms=row_dict.get("last_run_duration_ms"),
                 )
 
     def get_stale_scrapers(self, threshold_minutes: int = 60) -> list[ScraperStatus]:
@@ -1268,6 +1342,13 @@ class DatabaseService:
                         status=row["status"],
                         error_message=row.get("error_message"),
                         measurements_count=row["measurements_count"],
+                        last_success_run=row.get("last_success_run"),
+                        last_success_measurements_count=row.get("last_success_measurements_count"),
+                        last_error_run=row.get("last_error_run"),
+                        last_error_category=row.get("last_error_category"),
+                        last_error_stage=row.get("last_error_stage"),
+                        consecutive_failures=row.get("consecutive_failures") or 0,
+                        last_run_duration_ms=row.get("last_run_duration_ms"),
                     )
                     for row in cur.fetchall()
                 ]

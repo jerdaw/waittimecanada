@@ -11,6 +11,7 @@ interface HealthData {
   lastUpdate: string | null;
   ageMinutes: number;
   sourceCount: number;
+  staleThresholdMinutes: number;
 }
 
 const HEALTH_CHECK_INTERVAL_MS = 5 * 60 * 1000;
@@ -22,6 +23,7 @@ export function SystemStatus() {
     lastUpdate: null,
     ageMinutes: 0,
     sourceCount: 0,
+    staleThresholdMinutes: 90,
   });
 
   useEffect(() => {
@@ -29,6 +31,7 @@ export function SystemStatus() {
       try {
         const res = await fetch("/api/health");
         const data = await res.json();
+        const staleThreshold = Number(data.stale_threshold_minutes ?? 90);
 
         // Calculate age from most recent update
         let ageMinutes = 999;
@@ -39,9 +42,9 @@ export function SystemStatus() {
 
         // Determine status based on overall health and age
         let status: Status = "healthy";
-        if (!data.healthy || ageMinutes > 120) {
+        if (!data.healthy || ageMinutes > staleThreshold * 2) {
           status = "down";
-        } else if (ageMinutes > 60) {
+        } else if (ageMinutes > staleThreshold) {
           status = "degraded";
         }
 
@@ -50,6 +53,7 @@ export function SystemStatus() {
           lastUpdate: data.last_update,
           ageMinutes,
           sourceCount: data.sources?.length || 0,
+          staleThresholdMinutes: staleThreshold,
         });
       } catch {
         setHealth({
@@ -57,6 +61,7 @@ export function SystemStatus() {
           lastUpdate: null,
           ageMinutes: 999,
           sourceCount: 0,
+          staleThresholdMinutes: 90,
         });
       }
     }
