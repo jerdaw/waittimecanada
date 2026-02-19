@@ -1,4 +1,4 @@
-"""Service layer for WaitTime Canada.
+"""Service layer for Wait Time Canada.
 
 Contains business logic and external integrations.
 """

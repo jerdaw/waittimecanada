@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://waittimecanada.vercel.app";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://wait-time.ca";
   const currentDate = new Date();
   const locales = ['en', 'fr'];
 

@@ -1,10 +1,10 @@
-# LinkedIn Launch Post - WaitTime Canada
+# LinkedIn Launch Post - Wait Time Canada
 
 ## Final Recommended Post (Ready To Publish)
 
 ER wait times across Canada are often presented as if they are directly comparable. They are not.
 
-I built **WaitTime Canada** as a Health Systems Observatory to audit methodology differences instead of hiding them.
+I built **Wait Time Canada** as a Health Systems Observatory to audit methodology differences instead of hiding them.
 
 Why this matters:
 - Ontario and Quebec can report similar-looking wait numbers that represent different measurement methods.
@@ -39,7 +39,7 @@ Live demo: [INSERT_PRODUCTION_URL]
 
 ## Optional Short Version
 
-I built **WaitTime Canada** to make ER wait-time methodology differences explicit across provinces.
+I built **Wait Time Canada** to make ER wait-time methodology differences explicit across provinces.
 
 Instead of normalizing incompatible metrics, it tags each measurement with ontology metadata and warns users when direct comparisons are invalid.
 

@@ -1,6 +1,6 @@
 # Data Flow Architecture
 
-This document visualizes the end-to-end journey of data within the WaitTime Canada platform, from provincial sources to the public API.
+This document visualizes the end-to-end journey of data within the Wait Time Canada platform, from provincial sources to the public API.
 
 ## 1. Scraper Pipeline (Ingestion)
 

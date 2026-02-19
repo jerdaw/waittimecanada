@@ -12,6 +12,28 @@ const i18nMiddleware = createMiddleware({
 export function middleware(request: NextRequest) {
   const start = performance.now();
 
+  // Canonical host redirect (domain rebrand)
+  const canonicalBaseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://wait-time.ca";
+  const canonical = new URL(canonicalBaseUrl);
+  const canonicalHostname = canonical.hostname.toLowerCase();
+  const canonicalProtocol = canonical.protocol;
+
+  const host = (request.headers.get("host") ?? "").toLowerCase();
+  const legacyHosts = new Set([
+    "waittimecanada.ca",
+    "www.waittimecanada.ca",
+    "waittime.ca",
+    "www.waittime.ca",
+  ]);
+
+  if (host && legacyHosts.has(host) && host !== canonicalHostname) {
+    const url = request.nextUrl.clone();
+    url.protocol = canonicalProtocol;
+    url.hostname = canonicalHostname;
+    url.port = "";
+    return NextResponse.redirect(url, 308);
+  }
+
   // Handle CORS preflight requests for API routes
   if (request.method === "OPTIONS" && request.nextUrl.pathname.startsWith("/api/")) {
     return new NextResponse(null, {

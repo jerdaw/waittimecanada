@@ -1,6 +1,6 @@
 # Development Setup
 
-This guide documents the supported local development workflow for WaitTime Canada.
+This guide documents the supported local development workflow for Wait Time Canada.
 
 ## Prerequisites
 

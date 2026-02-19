@@ -4,7 +4,6 @@ from datetime import UTC, datetime
 from unittest.mock import patch
 
 import pytest
-
 from waittime.core import Hospital, Source
 from waittime.scrapers.base import BaseScraper
 from waittime.services.database import DatabaseService
@@ -114,7 +113,7 @@ class TestScraperDatabase:
             statistic_type=StatisticType.POINT_ESTIMATE,
             patient_scope=PatientScope.ALL,
             source_id=test_source.id,
-            raw_payload_hash="e939a7f967df05da93ceb498af665a355d9e3bb0d6b7afd5b701c815c67d5382",
+            raw_payload_hash="0000000000000000000000000000000000000000000000000000000000000000",
             raw_payload_snippet="<html>test</html>",
             parser_version="v1.0.0",
         )
@@ -130,9 +129,7 @@ class TestScraperDatabase:
         assert latest.value == 75.5
 
     @pytest.mark.integration
-    def test_scraper_heartbeat_workflow(
-        self, clean_database: DatabaseService, test_source: Source
-    ):
+    def test_scraper_heartbeat_workflow(self, clean_database: DatabaseService, test_source: Source):
         """Test the complete scraper heartbeat workflow."""
         from waittime.scrapers.base import BaseScraper
         from waittime.services.heartbeat import HeartbeatService
@@ -235,9 +232,7 @@ class TestScraperDatabase:
 class TestScraperErrorHandling:
     """Test scraper error handling with database."""
 
-    def test_scraper_handles_duplicate_hospital(
-        self, clean_database: DatabaseService
-    ):
+    def test_scraper_handles_duplicate_hospital(self, clean_database: DatabaseService):
         """Test that scraper handles duplicate hospital insertions gracefully."""
         from waittime.core import EndEvent, MetricFamily, Source, StartEvent, StatisticType
 
@@ -301,12 +296,13 @@ class TestScraperErrorHandling:
             statistic_type=StatisticType.P90,
             patient_scope=PatientScope.ALL,
             source_id="nonexistent-source",
-            raw_payload_hash="d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa",
+            raw_payload_hash="0000000000000000000000000000000000000000000000000000000000000000",
             raw_payload_snippet="snippet",
             parser_version="v1.0.0",
         )
 
         # Should fail due to foreign key constraint
         import psycopg2
+
         with pytest.raises(psycopg2.IntegrityError):
             clean_database.insert_measurement(measurement)

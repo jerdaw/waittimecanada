@@ -7,7 +7,7 @@ describe("AboutSection", () => {
     render(<AboutSection />);
 
     expect(
-      screen.getByRole("heading", { name: /WaitTime Canada/i }),
+      screen.getByRole("heading", { name: /Wait Time Canada/i }),
     ).toBeInTheDocument();
     expect(screen.getByText(/About This Project/i)).toBeInTheDocument();
 
@@ -117,7 +117,7 @@ describe("AboutSection", () => {
 
     // Check for emphasized text
     const strongElements = screen.getAllByText(
-      /completely different methodologies|WaitTime Canada is different/i,
+      /completely different methodologies|Wait Time Canada is different/i,
     );
     expect(strongElements.length).toBeGreaterThan(0);
   });

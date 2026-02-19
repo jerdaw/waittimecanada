@@ -1,6 +1,6 @@
 # Getting Started
 
-This section provides the fastest path to run WaitTime Canada locally.
+This section provides the fastest path to run Wait Time Canada locally.
 
 ## Recommended Path
 

@@ -6,7 +6,6 @@ These tests verify the comparison feature works end-to-end with real seeded data
 from datetime import datetime
 
 import pytest
-
 from waittime.services.comparison import ComparisonService
 from waittime.services.database import DatabaseService
 
@@ -173,7 +172,9 @@ class TestComparisonWithRealData:
         result = comparison_service.compare_hospitals("test-hospital-a", "test-hospital-b")
 
         # Verify divergence detection
-        assert result["comparable"] is False, "Hospitals with different methodologies should not be comparable"
+        assert (
+            result["comparable"] is False
+        ), "Hospitals with different methodologies should not be comparable"
         assert result["divergence_brief"] is not None, "Should have divergence brief"
         assert "TRIAGE vs REGISTRATION" in result["divergence_brief"]
         assert "P90 vs ROLLING_AVG" in result["divergence_brief"]
@@ -193,9 +194,7 @@ class TestComparisonWithRealData:
     ):
         """Should raise ValueError when hospital doesn't exist."""
         with pytest.raises(ValueError, match="Hospital not found"):
-            comparison_service.compare_hospitals(
-                "nonexistent-hospital-a", "nonexistent-hospital-b"
-            )
+            comparison_service.compare_hospitals("nonexistent-hospital-a", "nonexistent-hospital-b")
 
     def test_compare_with_unverified_hospital(
         self, db_transaction: DatabaseService, comparison_service: ComparisonService
@@ -248,9 +247,7 @@ class TestComparisonWithRealData:
 
         # Try to compare with unverified hospital
         with pytest.raises(ValueError, match="Hospital not found"):
-            comparison_service.compare_hospitals(
-                "test-unverified-hospital", "test-hospital-a"
-            )
+            comparison_service.compare_hospitals("test-unverified-hospital", "test-hospital-a")
 
     def test_comparison_includes_all_required_fields(
         self, db_transaction: DatabaseService, comparison_service: ComparisonService
@@ -347,8 +344,8 @@ class TestComparisonWithRealData:
         result = comparison_service.compare_hospitals(hospital_a_id, hospital_b_id)
 
         # Verify wait times are numeric
-        assert isinstance(result["hospital_a"]["wait_time"], (int, float))
-        assert isinstance(result["hospital_b"]["wait_time"], (int, float))
+        assert isinstance(result["hospital_a"]["wait_time"], int | float)
+        assert isinstance(result["hospital_b"]["wait_time"], int | float)
         assert result["hospital_a"]["wait_time"] > 0
         assert result["hospital_b"]["wait_time"] > 0
 

@@ -1,5 +1,5 @@
 -- 002_create_tables.sql
--- Create core tables for WaitTime Canada
+-- Create core tables for Wait Time Canada
 -- Depends on: 001_create_enums.sql
 
 -- Provincial data sources with provenance tracking

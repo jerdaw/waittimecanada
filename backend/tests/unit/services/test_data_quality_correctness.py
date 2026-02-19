@@ -4,7 +4,6 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
-
 from waittime.services.data_quality import DataQualityService
 
 
@@ -42,7 +41,7 @@ class TestHospitalOnboardingLogic:
         - Total Expected: 2 * 96 * 3 = 576
         """
         start = datetime(2026, 2, 1, tzinfo=UTC)  # Day 1
-        end = datetime(2026, 2, 4, tzinfo=UTC)    # Day 4 (Exclusive)
+        end = datetime(2026, 2, 4, tzinfo=UTC)  # Day 4 (Exclusive)
 
         # Mock Hospitals
         hosp_a = Mock(id="hosp-a")
@@ -75,9 +74,9 @@ class TestHospitalOnboardingLogic:
         # The Key Assertion:
         # If incorrectly calculating (old way), expected would be 576.
         # If correctly calculating (new way), expected should be 384.
-        assert result["total_expected"] == 384, (
-            f"Expected 384 (dynamic), got {result['total_expected']}"
-        )
+        assert (
+            result["total_expected"] == 384
+        ), f"Expected 384 (dynamic), got {result['total_expected']}"
 
         # Success rate should be 100% because everyone reported perfectly
         # for the time they were active.

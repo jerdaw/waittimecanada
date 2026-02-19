@@ -1,6 +1,6 @@
 # Database Migrations
 
-This directory contains SQL migration files for the WaitTime Canada database schema.
+This directory contains SQL migration files for the Wait Time Canada database schema.
 
 ---
 
@@ -474,7 +474,7 @@ Migrations are tested in GitHub Actions:
 
 ```bash
 # Test migrations on a fresh database
-export DATABASE_URL="postgresql://user:pass@localhost:5432/waittimecanada_test"
+export DATABASE_URL="postgresql://user@localhost:5432/waittimecanada_test"
 
 # Drop and recreate test database
 dropdb waittimecanada_test

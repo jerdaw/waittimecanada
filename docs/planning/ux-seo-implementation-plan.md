@@ -48,7 +48,7 @@ Add healthcare-specific meta tags:
 // New metadata additions
 other: {
   'geo.region': 'CA-ON',
-  'geo.placename': 'Ontario', 
+  'geo.placename': 'Ontario',
   'geo.position': '43.6532;-79.3832',
   'revisit-after': '1 day',
   'category': 'health',
@@ -71,7 +71,7 @@ Skeleton screens improve perceived performance by showing content-shaped placeho
 Create skeleton directory with:
 
 - **HospitalCardSkeleton.tsx** - Matches HospitalList card dimensions
-- **HeroSkeleton.tsx** - Matches Hero component layout  
+- **HeroSkeleton.tsx** - Matches Hero component layout
 - **MapSkeleton.tsx** - Already exists, may enhance
 
 Skeleton pattern:

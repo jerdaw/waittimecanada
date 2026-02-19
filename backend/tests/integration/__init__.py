@@ -1,4 +1,4 @@
-"""Integration tests for WaitTime Canada.
+"""Integration tests for Wait Time Canada.
 
 These tests verify the full stack with real database interactions.
 They require a PostgreSQL database connection via DATABASE_URL environment variable.

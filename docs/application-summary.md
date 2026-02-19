@@ -1,20 +1,20 @@
-# WaitTime Canada - Application Summary
+# Wait Time Canada - Application Summary
 
 ## Primary Summary (Applications)
 
-WaitTime Canada is a Health Systems Observatory I built to audit Canadian emergency department wait-time data across provinces. Rather than treating all wait numbers as directly comparable, the platform applies a strict metric ontology to each measurement (metric family, start event, end event, statistic type) and warns users when cross-hospital comparisons are methodologically invalid. For example, Ontario commonly reports P90 triage-to-physician time, while Quebec reports rolling-average registration-to-physician time; those metrics answer different operational questions and should not be compared as equivalent. The project combines full-stack technical execution (Python scrapers, PostgreSQL, Next.js analytics/dashboard tooling) with clinical defensibility principles: transparent limitations, explicit provenance, and safety-oriented communication for patients and decision-makers.
+Wait Time Canada is a Health Systems Observatory I built to audit Canadian emergency department wait-time data across provinces. Rather than treating all wait numbers as directly comparable, the platform applies a strict metric ontology to each measurement (metric family, start event, end event, statistic type) and warns users when cross-hospital comparisons are methodologically invalid. For example, Ontario commonly reports P90 triage-to-physician time, while Quebec reports rolling-average registration-to-physician time; those metrics answer different operational questions and should not be compared as equivalent. The project combines full-stack technical execution (Python scrapers, PostgreSQL, Next.js analytics/dashboard tooling) with clinical defensibility principles: transparent limitations, explicit provenance, and safety-oriented communication for patients and decision-makers.
 
 ---
 
 ## 60-Second Version (Interviews)
 
-I built WaitTime Canada because most ER wait tools compare numbers that are not methodologically equivalent. My platform tags each measurement with structured ontology metadata and automatically blocks invalid comparisons through divergence warnings. Technically, it includes scraper pipelines, database constraints, analytics endpoints, and operational monitoring workflows. Conceptually, it demonstrates that health informatics should prioritize methodological clarity over superficial comparability.
+I built Wait Time Canada because most ER wait tools compare numbers that are not methodologically equivalent. My platform tags each measurement with structured ontology metadata and automatically blocks invalid comparisons through divergence warnings. Technically, it includes scraper pipelines, database constraints, analytics endpoints, and operational monitoring workflows. Conceptually, it demonstrates that health informatics should prioritize methodological clarity over superficial comparability.
 
 ---
 
 ## Technical Summary (Engineering Context)
 
-WaitTime Canada is a full-stack system using Python-based provincial scrapers, PostgreSQL with ontology-aligned constraints, and a Next.js frontend/API layer. The architecture emphasizes:
+Wait Time Canada is a full-stack system using Python-based provincial scrapers, PostgreSQL with ontology-aligned constraints, and a Next.js frontend/API layer. The architecture emphasizes:
 
 - Ontology-enforced measurement tagging for comparability analysis
 - Verification workflows to prevent accidental publication of unverified facilities

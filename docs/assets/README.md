@@ -1,6 +1,6 @@
 # Downloadable Assets
 
-This directory contains downloadable research assets for WaitTime Canada.
+This directory contains downloadable research assets for Wait Time Canada.
 
 ---
 
@@ -102,7 +102,7 @@ Reference these files when:
 
 **Citation:**
 ```
-WaitTime Canada. (2026). Provincial Emergency Department Wait Time
+Wait Time Canada. (2026). Provincial Emergency Department Wait Time
 Methodology Comparison. Retrieved from
 https://github.com/jerdaw/waittimecanada/docs/assets/
 ```
@@ -114,7 +114,7 @@ https://github.com/jerdaw/waittimecanada/docs/assets/
   title = {Provincial Emergency Department Wait Time Methodology Comparison},
   year = {2026},
   publisher = {GitHub},
-  journal = {WaitTime Canada},
+  journal = {Wait Time Canada},
   howpublished = {\url{https://github.com/jerdaw/waittimecanada}}
 }
 ```

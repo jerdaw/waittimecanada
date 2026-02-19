@@ -69,7 +69,7 @@ Adopt Contributor Covenant v2.1 (industry standard). Customize enforcement conta
 
 Follow Citation File Format (CFF) specification v1.2.0:
 - `type: software`
-- `title: "WaitTime Canada"`
+- `title: "Wait Time Canada"`
 - `message: "If you use this software, please cite it as below."`
 - `authors:` — Human author(s) only (per AGENTS.md rule)
 - `version: "1.0.0"`
@@ -271,7 +271,7 @@ Content sections:
 - **Children's Privacy:** No data collected from anyone, including children.
 - **Contact:** Link to GitHub repository for questions.
 
-Metadata: `title: "Privacy Policy | WaitTime Canada"`, canonical `/privacy`.
+Metadata: `title: "Privacy Policy | Wait Time Canada"`, canonical `/privacy`.
 
 ### 3.4 Add Terms of Use Page
 
@@ -285,7 +285,7 @@ Content sections:
 - **Limitation of Liability:** Standard limitation clause appropriate for a free, open-source project.
 - **Changes:** We may update these terms; check the date at the top.
 
-Metadata: `title: "Terms of Use | WaitTime Canada"`, canonical `/terms`.
+Metadata: `title: "Terms of Use | Wait Time Canada"`, canonical `/terms`.
 
 ### 3.5 Add robots.ts (Next.js Metadata API)
 
@@ -301,7 +301,7 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/api/',
     },
-    sitemap: 'https://waittimecanada.ca/sitemap.xml',
+    sitemap: 'https://wait-time.ca/sitemap.xml',
   }
 }
 ```
@@ -317,13 +317,13 @@ import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
-    { url: 'https://waittimecanada.ca', lastModified: new Date(), changeFrequency: 'hourly', priority: 1 },
-    { url: 'https://waittimecanada.ca/methods', lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
-    { url: 'https://waittimecanada.ca/analytics', lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-    { url: 'https://waittimecanada.ca/data-quality', lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-    { url: 'https://waittimecanada.ca/faq', lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: 'https://waittimecanada.ca/privacy', lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
-    { url: 'https://waittimecanada.ca/terms', lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
+    { url: 'https://wait-time.ca', lastModified: new Date(), changeFrequency: 'hourly', priority: 1 },
+    { url: 'https://wait-time.ca/methods', lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: 'https://wait-time.ca/analytics', lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+    { url: 'https://wait-time.ca/data-quality', lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+    { url: 'https://wait-time.ca/faq', lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: 'https://wait-time.ca/privacy', lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
+    { url: 'https://wait-time.ca/terms', lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
   ]
 }
 ```

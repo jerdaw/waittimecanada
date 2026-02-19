@@ -2,7 +2,6 @@
 
 
 import pytest
-
 from waittime.core import (
     EndEvent,
     Hospital,

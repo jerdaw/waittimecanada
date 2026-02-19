@@ -1,6 +1,6 @@
 # Architecture Overview
 
-WaitTime Canada is structured as a data observatory pipeline:
+Wait Time Canada is structured as a data observatory pipeline:
 
 1. Provincial source pages are scraped by backend jobs.
 2. Measurements are stored with strict ontology metadata in Neon PostgreSQL.

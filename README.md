@@ -1,4 +1,4 @@
-# WaitTime Canada
+# Wait Time Canada
 
 > A clinically defensible Health Systems Observatory for Canadian emergency department wait-time methodology and data quality.
 
@@ -18,7 +18,7 @@
 
 ## 📊 Overview
 
-**WaitTime Canada is not a simple wait-time leaderboard.** It's a comprehensive health systems observatory that audits and exposes methodological inconsistencies in Canadian emergency department reporting across provinces.
+**Wait Time Canada is not a simple wait-time leaderboard.** It's a comprehensive health systems observatory that audits and exposes methodological inconsistencies in Canadian emergency department reporting across provinces.
 
 ### Current Coverage
 
@@ -422,7 +422,7 @@ waittimecanada/
 - **Docs CI:** Documentation quality checks
 
 ### Deployment Configuration
-- **Frontend:** Netlify (release-gated, currently offline for cost control)
+- **Frontend:** Netlify (release-gated; project paused for cost control; expected resume **March 9, 2026**)
 - **Backend:** GitHub Actions runners
 - **Database:** Neon PostgreSQL (free tier: 512 MB)
 - **Secrets Management:** GitHub Secrets for `DATABASE_URL`, `PUSHOVER_*`, `MAPBOX_TOKEN`
@@ -461,7 +461,7 @@ waittimecanada/
 
 ---
 
-## 📊 Current Status (as of 2026-02-18)
+## 📊 Current Status (as of 2026-02-19)
 
 ### Milestones Completed
 - ✅ M1-M4: Database foundation, Ontario/Quebec scrapers, methodology warnings, PWA setup
@@ -485,8 +485,8 @@ waittimecanada/
 - **Total:** 777 tests across full stack
 
 ### Data Freshness
-- **Update Frequency:** Every 15 minutes (automated)
-- **Heartbeat Threshold:** 60 minutes (alerts if exceeded)
+- **Update Frequency:** Every 30 minutes (12:00–04:00 UTC) + hourly overnight (04:00–12:00 UTC) — temporary cost-control throttle
+- **Heartbeat Threshold:** 90 minutes (alerts if exceeded) — temporary companion setting
 - **Current Status:** All 4 scrapers operational ✅
 
 ---
@@ -497,6 +497,10 @@ waittimecanada/
 - [ ] Additional provinces (Nova Scotia, New Brunswick)
 - [ ] Historical occupancy trends (daily/weekly patterns)
 - [ ] Enhanced equity layer with census tract income overlays
+- [ ] Scraper reliability hardening (retry/backoff, clearer failure visibility)
+- [ ] Divergence briefs across analytics and exports (non-comparability explanations)
+- [ ] Data quality snapshot diffs + drift monitoring (coverage drops, anomalies over time)
+- [ ] Cache header + polling audit (tight TTLs, `no-store` where required, low-frequency health checks)
 - [ ] Prometheus/Grafana monitoring dashboard
 - [ ] Smart scheduling (reduce frequency during overnight hours)
 - [ ] Occupancy-based hospital recommendations

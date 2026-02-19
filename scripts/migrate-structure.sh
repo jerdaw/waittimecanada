@@ -4,7 +4,7 @@
 
 set -e  # Exit on error
 
-echo "🚀 WaitTime Canada - Repository Structure Migration"
+echo "🚀 Wait Time Canada - Repository Structure Migration"
 echo "===================================================="
 echo ""
 
@@ -153,7 +153,7 @@ fi
 cat > docs/getting-started/index.md << 'EOF'
 # Getting Started
 
-Welcome to WaitTime Canada! This section will help you get up and running quickly.
+Welcome to Wait Time Canada! This section will help you get up and running quickly.
 
 ## Quick Links
 
@@ -180,7 +180,7 @@ EOF
 cat > docs/architecture/index.md << 'EOF'
 # Architecture
 
-WaitTime Canada is built on a modern, scalable architecture designed for data integrity and transparency.
+Wait Time Canada is built on a modern, scalable architecture designed for data integrity and transparency.
 
 ## Key Components
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-WaitTime Canada implements a **30-day retention policy** for raw measurement data to ensure storage safety and prevent database bloat. This is a core architectural requirement from the strategic plan.
+Wait Time Canada implements a **30-day retention policy** for raw measurement data to ensure storage safety and prevent database bloat. This is a core architectural requirement from the strategic plan.
 
 ## Why 30 Days?
 
@@ -132,7 +132,7 @@ Check that `DATABASE_URL` environment variable is set correctly:
 
 ```bash
 echo $DATABASE_URL
-# Should output: postgresql://user:pass@host/database
+# Should output: postgresql://user@host/database
 ```
 
 ### Manual Recovery

@@ -1,4 +1,4 @@
-# WaitTime Canada Backend
+# Wait Time Canada Backend
 
 Python backend for scraping, ontology enforcement, aggregation, and operational health checks.
 

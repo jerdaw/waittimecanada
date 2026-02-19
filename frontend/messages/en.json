@@ -1,6 +1,6 @@
 {
   "Common": {
-    "title": "WaitTime Canada",
+    "title": "Wait Time Canada",
     "description": "A health systems observatory auditing emergency room wait times across Canada with methodological transparency.",
     "emergency": {
       "label": "Emergency?",
@@ -22,7 +22,7 @@
     },
     "footer": {
       "dataSources": "Data from official provincial health authorities.",
-      "copyright": "© {year} WaitTime Canada. MIT License."
+      "copyright": "© {year} Wait Time Canada. MIT License."
     }
   },
   "Header": {
@@ -256,9 +256,9 @@
   },
   "AboutSection": {
     "badge": "About This Project",
-    "title": "Why I Built WaitTime Canada",
+    "title": "Why I Built Wait Time Canada",
     "p1": "As a pre-medical student, I noticed something troubling: Canadian provinces report emergency room wait times using <strong>completely different methodologies</strong>. Ontario measures from triage to physician (90th percentile). Quebec measures from registration to physician (rolling average). These numbers can't be directly compared—but most apps present them side-by-side anyway.",
-    "p2": "<strong>WaitTime Canada is different.</strong> Instead of pretending the data is comparable, we audit it. We tag every measurement with its methodology and warn users when direct comparison is statistically invalid. This is what I call a \"Health Systems Observatory\"—a tool that exposes the black box of healthcare reporting.",
+    "p2": "<strong>Wait Time Canada is different.</strong> Instead of pretending the data is comparable, we audit it. We tag every measurement with its methodology and warn users when direct comparison is statistically invalid. This is what I call a \"Health Systems Observatory\"—a tool that exposes the black box of healthcare reporting.",
     "p3": "This project demonstrates my approach to medicine: rigorous methodology, transparent limitations, and a commitment to helping patients make informed decisions—even when that means telling them what we <em>don't</em> know.",
     "aria": {
       "expand": "Expand about section",
@@ -283,7 +283,7 @@
   },
   "StructuredData": {
     "faq": {
-      "q1": "How does WaitTime Canada measure ER wait times?",
+      "q1": "How does Wait Time Canada measure ER wait times?",
       "a1": "We aggregate data from provincial health authorities. For Ontario, we report P90 (90th percentile) wait times from triage to physician assessment.",
       "q2": "Why can't I compare Ontario and Quebec wait times directly?",
       "a2": "Ontario reports P90 (90th percentile) triage-to-physician times, while Quebec reports rolling average registration-to-physician times. These different methodologies mean direct comparison is statistically invalid.",
@@ -309,7 +309,7 @@
     }
   },
   "Metadata": {
-    "title": "WaitTime Canada | Real-Time ER Wait Times & Methodology Audit",
+    "title": "Wait Time Canada | Real-Time ER Wait Times & Methodology Audit",
     "description": "A clinically defensible Health Systems Observatory tracking emergency department wait times across Canada. Compare methodologies, view real-time data, and access health system analytics.",
     "keywords": "ER wait times, Canada emergency rooms, health methodology, hospital wait times, Quebec ER, Ontario ER, Alberta ER, BC ER"
   },
@@ -361,7 +361,7 @@
       "button": "View Interactive Map"
     },
     "footer": {
-      "tagline": "WaitTime Canada - A Health Systems Observatory",
+      "tagline": "Wait Time Canada - A Health Systems Observatory",
       "lastUpdated": "Last updated"
     }
   },

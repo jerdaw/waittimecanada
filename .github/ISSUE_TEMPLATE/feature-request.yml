@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for suggesting a feature for WaitTime Canada!
+        Thanks for suggesting a feature for Wait Time Canada!
 
   - type: textarea
     id: description

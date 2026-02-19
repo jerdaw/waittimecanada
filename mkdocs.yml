@@ -1,4 +1,4 @@
-site_name: WaitTime Canada
+site_name: Wait Time Canada
 site_url: https://jerdaw.github.io/waittimecanada
 site_description: A clinically defensible Health Systems Observatory for Canadian ER wait times
 site_author: Jeremy Dawson
@@ -6,6 +6,29 @@ repo_url: https://github.com/jerdaw/waittimecanada
 repo_name: waittimecanada
 strict: true
 edit_uri: edit/main/docs/
+exclude_docs: |
+  # Keep repo-readable indexes, but avoid MkDocs strict-mode warnings.
+  README.md
+
+  # Historical snapshots (retain in repo, exclude from site build).
+  REPO_STRUCTURE_PLAN.md
+  final-documentation-review.md
+
+  # Archived planning/implementation artifacts are retained for context only.
+  planning/archive/*
+  planning/implementation/archived/*
+  implementation/*
+
+  # Non-site planning artifacts (retain in repo, exclude from site build).
+  planning/competitor-design-analysis.md
+  planning/deployment-blockers.md
+  planning/expansion-roadmap.md
+  planning/scraper-status-2026-02-04.md
+  planning/strategic-plan.md
+  planning/ux-seo-implementation-plan.md
+
+  # Templates should not fail strict builds.
+  adr/template.md
 
 theme:
   name: material
@@ -58,10 +81,6 @@ theme:
 plugins:
   - search:
       lang: en
-
-  - git-revision-date-localized:
-      enable_creation_date: true
-      type: timeago
 
   - minify:
       minify_html: true
@@ -120,49 +139,50 @@ nav:
   - Getting Started:
     - getting-started/index.md
     - Quick Start: getting-started/quick-start.md
-    - Installation: getting-started/installation.md
-    - First Scraper: getting-started/first-scraper.md
 
   - Architecture:
     - architecture/index.md
-    - Overview: architecture/overview.md
-    - Data Ontology: architecture/data-ontology.md
+    - Data Flow: architecture/data-flow.md
     - Database: architecture/database.md
-    - API: architecture/api.md
+    - API Architecture: architecture/api.md
+
+  - API:
+    - Reference: API.md
     - OpenAPI Spec: openapi.yaml
-    - Scrapers: architecture/scrapers.md
+
+  - Operations:
+    - operations/QUICK_START.md
+    - operations/OPERATIONAL_STATUS.md
+    - operations/scraper-scheduling.md
+    - operations/zenodo-integration.md
+    - Production Deployment Plan: production-deployment-plan.md
 
   - Development:
-    - development/index.md
-    - Environment Setup: development/setup.md
-    - Testing: development/testing.md
-    - Code Style: development/code-style.md
-    - Contributing: development/contributing.md
-    - Debugging: development/debugging.md
-
-  - Deployment:
-    - deployment/index.md
-    - CI/CD: deployment/ci-cd.md
-    - Monitoring: deployment/monitoring.md
-    - Scaling: deployment/scaling.md
+    - development/setup.md
+    - Database Migrations: development/database-migrations.md
+    - Testing Guidelines: development/testing-guidelines.md
+    - Documentation Guidelines: development/documentation-guidelines.md
 
   - Reference:
-    - Database Schema: reference/database-schema.md
+    - Data Dictionary: reference/data-dictionary.md
     - Environment Variables: reference/environment-variables.md
 
   - ADRs:
     - adr/index.md
-    - "0001: Use Supabase": adr/0001-use-supabase.md
     - "0002: Metric Ontology": adr/0002-metric-ontology.md
-    - "0003: Serverless Scrapers": adr/0003-serverless-scrapers.md
+    - "0006: Dead Man's Switch Monitoring": adr/0006-dead-mans-switch-monitoring.md
+    - "0007: BC Scraper Implementation": adr/0007-bc-scraper-implementation.md
+    - "0008: Aggregation Pipeline": adr/0008-aggregation-pipeline.md
+    - "0009: Data Quality & Anomaly Detection": adr/0009-data-quality-anomaly-detection.md
+    - "0016: Equity Academic Rigor Hardening": adr/0016-equity-academic-rigor-hardening-ontario.md
+    - "0017: Domain Rebrand (wait-time.ca)": adr/0017-domain-rebrand-wait-time-ca.md
 
   - Planning:
-    - Roadmap: planning/roadmap.md
-    - Strategic Plan: planning/strategic-plan.md
-
-  - Guides:
-    - Adding a Province: guides/adding-province.md
-    - Database Migrations: guides/database-migrations.md
-    - Troubleshooting: guides/troubleshooting.md
+    - planning/roadmap.md
+    - planning/index.md
+    - planning/roadmap-process.md
+    - planning/manual-tasks.md
+    - Maintenance 2026-02-13: planning/maintenance-2026-02-13.md
+    - Maintenance 2026-02-19: planning/maintenance-2026-02-19.md
 
 copyright: Copyright &copy; 2024-2026 Jeremy Dawson

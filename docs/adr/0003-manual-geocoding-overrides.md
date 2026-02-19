@@ -4,7 +4,7 @@
 Accepted
 
 ## Context
-Automated geocoding services (Nominatim, Mapbox) frequently fail to resolve specific hospital sites, especially those within larger health networks or with ambiguous names (e.g., "Main Site" vs "General Site"). 
+Automated geocoding services (Nominatim, Mapbox) frequently fail to resolve specific hospital sites, especially those within larger health networks or with ambiguous names (e.g., "Main Site" vs "General Site").
 
 In Ontario, approximately 53% (82 hospitals) failed automated geocoding during the initial run, returning placeholder coordinates (0.0, 0.0). While improving fuzzy matching or adding premium APIs (Google Places) are options, they are either non-deterministic or incur ongoing costs. We need a reliable, deterministic way to ensure 100% geocoding accuracy for known facilities.
 

@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-
 from waittime.core import Source
 from waittime.scrapers import (
     create_alberta_source,
@@ -69,26 +68,32 @@ class TestSourceConsistency:
 
         # Province
         if json_source.province != code_source.province:
-            errors.append(f"Province mismatch: JSON={json_source.province}, Code={code_source.province}")
+            errors.append(
+                f"Province mismatch: JSON={json_source.province}, Code={code_source.province}"
+            )
 
         # URL (normalized by stripping trailing slash)
         json_url = (json_source.url or "").rstrip("/")
         code_url = (code_source.url or "").rstrip("/")
         if json_url != code_url:
-             errors.append(f"URL mismatch: JSON={json_url}, Code={code_url}")
+            errors.append(f"URL mismatch: JSON={json_url}, Code={code_url}")
 
         # Methodology URL
         json_meth = (json_source.methodology_url or "").rstrip("/")
         code_meth = (code_source.methodology_url or "").rstrip("/")
         if json_meth != code_meth:
-             errors.append(f"Methodology URL mismatch: JSON={json_meth}, Code={code_meth}")
+            errors.append(f"Methodology URL mismatch: JSON={json_meth}, Code={code_meth}")
 
         # Telehealth
         if json_source.telehealth_number != code_source.telehealth_number:
-            errors.append(f"Telehealth Number mismatch: JSON={json_source.telehealth_number}, Code={code_source.telehealth_number}")
+            errors.append(
+                f"Telehealth Number mismatch: JSON={json_source.telehealth_number}, Code={code_source.telehealth_number}"
+            )
 
         if json_source.telehealth_name != code_source.telehealth_name:
-             errors.append(f"Telehealth Name mismatch: JSON='{json_source.telehealth_name}', Code='{code_source.telehealth_name}'")
+            errors.append(
+                f"Telehealth Name mismatch: JSON='{json_source.telehealth_name}', Code='{code_source.telehealth_name}'"
+            )
 
         # Ontology
         ontology_fields = [

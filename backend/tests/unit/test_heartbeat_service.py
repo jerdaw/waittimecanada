@@ -4,7 +4,6 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, Mock
 
 import pytest
-
 from waittime.core import ScraperStatus
 from waittime.services.heartbeat import HeartbeatService
 

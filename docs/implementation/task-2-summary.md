@@ -109,7 +109,7 @@ npm run dev
 
 **Direct URL:**
 - `http://localhost:3000/methods` (dev)
-- `https://waittimecanada.ca/methods` (prod)
+- `https://wait-time.ca/methods` (prod)
 
 ### How to Update Content
 

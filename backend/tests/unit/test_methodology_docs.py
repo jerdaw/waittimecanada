@@ -12,12 +12,7 @@ class TestOntarioMethodologyJSON:
     @pytest.fixture
     def ontario_json(self):
         """Load Ontario methodology JSON."""
-        json_path = (
-            Path(__file__).parents[2]
-            / "docs"
-            / "methodologies"
-            / "ontario-reference.json"
-        )
+        json_path = Path(__file__).parents[2] / "docs" / "methodologies" / "ontario-reference.json"
         with open(json_path) as f:
             return json.load(f)
 
@@ -153,27 +148,15 @@ class TestMethodologyDocumentationExists:
 
     def test_ontario_markdown_exists(self):
         """Ontario methodology markdown should exist."""
-        doc_path = (
-            Path(__file__).parents[2]
-            / "docs"
-            / "methodologies"
-            / "ontario-methodology.md"
-        )
+        doc_path = Path(__file__).parents[2] / "docs" / "methodologies" / "ontario-methodology.md"
         assert doc_path.exists(), "Ontario methodology.md not found"
 
     def test_methodologies_readme_exists(self):
         """Methodologies README should exist."""
-        readme_path = (
-            Path(__file__).parents[2] / "docs" / "methodologies" / "README.md"
-        )
+        readme_path = Path(__file__).parents[2] / "docs" / "methodologies" / "README.md"
         assert readme_path.exists(), "Methodologies README.md not found"
 
     def test_ontario_json_exists(self):
         """Ontario JSON reference should exist."""
-        json_path = (
-            Path(__file__).parents[2]
-            / "docs"
-            / "methodologies"
-            / "ontario-reference.json"
-        )
+        json_path = Path(__file__).parents[2] / "docs" / "methodologies" / "ontario-reference.json"
         assert json_path.exists(), "ontario-reference.json not found"

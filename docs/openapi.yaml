@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: WaitTime Canada API
+  title: Wait Time Canada API
   description: |
     Clinically defensible Health Systems Observatory for Canadian emergency department wait-time methodology and data quality.
 
@@ -17,7 +17,7 @@ info:
     url: https://opensource.org/licenses/MIT
 
 servers:
-  - url: https://waittime-canada.github.io/api
+  - url: https://wait-time.ca/api
     description: Production API (when deployed)
   - url: http://localhost:3000/api
     description: Local Development

@@ -1,6 +1,6 @@
 ---
 
-# Master Implementation Bible: WaitTime Canada
+# Master Implementation Bible: Wait Time Canada
 
 **Project Code:** `WAITTIME-CANADA`
 **Document Type:** Comprehensive Strategic & Technical Specification
@@ -20,7 +20,7 @@
 
 ### 1.1. The Core Mission
 
-We are **not** building a "Wait Time App." We are building **WaitTime Canada.**
+We are **not** building a "Wait Time App." We are building **Wait Time Canada.**
 
 **The Pivot:** Instead of claiming to "fix" the data, we **audit** the data. We expose the "black box" of Canadian healthcare by standardizing *how we describe* the wait.
 

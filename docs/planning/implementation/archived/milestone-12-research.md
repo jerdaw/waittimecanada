@@ -25,7 +25,7 @@
 
 ## Overview
 
-These features position WaitTime Canada as research infrastructure, not just a consumer app. The citation-ready export lets researchers use the data properly, while the alert system ensures operational reliability.
+These features position Wait Time Canada as research infrastructure, not just a consumer app. The citation-ready export lets researchers use the data properly, while the alert system ensures operational reliability.
 
 **Narrative for Applications:**
 > "I designed the system to be citation-ready—every data export includes methodology tags so researchers can properly attribute and compare data. This isn't just a wait time tracker; it's a Health Systems Observatory that produces auditable, reproducible datasets."
@@ -52,7 +52,7 @@ These features position WaitTime Canada as research infrastructure, not just a c
 Content-Type: text/csv
 Content-Disposition: attachment; filename="waittime-canada-export-2026-02-04.csv"
 X-Data-License: CC-BY-4.0
-X-Citation: "WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set]. https://waittimecanada.ca"
+X-Citation: "Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set]. https://wait-time.ca"
 ```
 
 ### 1.2 CSV Schema
@@ -161,7 +161,7 @@ export async function GET(request: NextRequest) {
         record_count: results.length,
         filters: { province, startDate, endDate },
         license: 'CC-BY-4.0',
-        citation: 'WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set]. https://waittimecanada.ca',
+        citation: 'Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set]. https://wait-time.ca',
       },
     });
   }
@@ -196,7 +196,7 @@ export async function GET(request: NextRequest) {
       'Content-Type': 'text/csv',
       'Content-Disposition': `attachment; filename="${filename}"`,
       'X-Data-License': 'CC-BY-4.0',
-      'X-Citation': 'WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set]. https://waittimecanada.ca',
+      'X-Citation': 'Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set]. https://wait-time.ca',
     },
   });
 }
@@ -335,8 +335,8 @@ export function DataExport() {
           <div className="text-xs text-slate-500 dark:text-slate-400">
             <p className="font-medium mb-1">Suggested Citation:</p>
             <p className="italic">
-              WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set].
-              https://waittimecanada.ca
+              Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set].
+              https://wait-time.ca
             </p>
             <p className="mt-2">License: CC-BY-4.0 (Attribution Required)</p>
           </div>
@@ -398,7 +398,7 @@ import { DataExport } from '@/components/DataExport';
 **Setup:**
 1. Create Pushover account at https://pushover.net
 2. Get User Key and API Token
-3. Add to GitHub Secrets: `PUSHOVER_USER_KEY`, `PUSHOVER_API_TOKEN`
+3. Add to GitHub Actions encrypted values: `PUSHOVER_USER_KEY`, `PUSHOVER_API_TOKEN`
 
 **File:** `backend/src/waittime/services/alerts.py`
 
@@ -776,7 +776,7 @@ measurement = Measurement(
 **File:** `docs/API.md`
 
 ```markdown
-# WaitTime Canada API Documentation
+# Wait Time Canada API Documentation
 
 ## Endpoints
 
@@ -837,7 +837,7 @@ System health status.
 All data is provided under CC-BY-4.0 (Creative Commons Attribution 4.0).
 
 **Required Attribution:**
-> WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set]. https://waittimecanada.ca
+> Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set]. https://wait-time.ca
 
 ## Methodology
 

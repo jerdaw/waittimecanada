@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
               filters: { province, startDate, endDate },
               license: "CC-BY-4.0",
               citation:
-                "WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set]. https://waittimecanada.ca",
+                "Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set]. https://wait-time.ca",
             },
           },
           { headers: NO_STORE_HEADERS },
@@ -130,7 +130,7 @@ export async function GET(request: NextRequest) {
       ];
 
       const csv = csvRows.join("\n");
-      const filename = `waittime-canada-${granularity}-export-${new Date().toISOString().split("T")[0]}.csv`;
+      const filename = `wait-time-ca-${granularity}-export-${new Date().toISOString().split("T")[0]}.csv`;
 
       return new NextResponse(csv, {
         headers: {
@@ -187,7 +187,7 @@ export async function GET(request: NextRequest) {
             filters: { province, startDate, endDate },
             license: "CC-BY-4.0",
             citation:
-              "WaitTime Canada. (2026). Canadian ER Wait Time Data [Data set]. https://waittimecanada.ca",
+              "Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set]. https://wait-time.ca",
           },
         },
         { headers: NO_STORE_HEADERS },
@@ -238,7 +238,7 @@ export async function GET(request: NextRequest) {
     ];
 
     const csv = csvRows.join("\n");
-    const filename = `waittime-canada-export-${new Date().toISOString().split("T")[0]}.csv`;
+    const filename = `wait-time-ca-export-${new Date().toISOString().split("T")[0]}.csv`;
 
     return new NextResponse(csv, {
       headers: {

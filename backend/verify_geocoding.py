@@ -1,15 +1,17 @@
-import sys
 import os
-from pathlib import Path
+import sys
+
+# ruff: noqa: E402, T201
 
 # Add src to path
 sys.path.append(os.path.join(os.getcwd(), "src"))
 
 from waittime.services.geocoding import GeocodingService
 
+
 def verify():
     service = GeocodingService()
-    
+
     test_cases = [
         ("ca-on-sunnybrook", "Sunnybrook Health Sciences Centre"),
         ("ca-on-tor-east-hlth-ntwrk-michael-garron-hosp", "Michael Garron Hospital"),
@@ -17,9 +19,9 @@ def verify():
         ("ca-on-niagara-health-system-marotta-family-hosp", "Marotta Family Hospital"),
         ("ca-on-thunder-bay-regional-hlth-sciences-ctr", "Thunder Bay Regional"),
     ]
-    
+
     print(f"Loaded {len(service._manual_overrides)} overrides.")
-    
+
     success_count = 0
     for hospital_id, name in test_cases:
         result = service.geocode_hospital(name, "ON", hospital_id=hospital_id)
@@ -28,7 +30,7 @@ def verify():
             success_count += 1
         else:
             print(f"❌ {hospital_id}: Failed or returned 0,0")
-            
+
     # Check for junk data removal
     junk_id = "ca-on-202502"
     if junk_id not in service._manual_overrides:
@@ -42,6 +44,7 @@ def verify():
     else:
         print(f"\n{len(test_cases) - success_count} tests failed.")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     verify()

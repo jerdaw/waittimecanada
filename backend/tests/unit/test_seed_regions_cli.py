@@ -5,7 +5,6 @@ from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
-
 from waittime.cli.seed_regions import load_regions_from_json, seed_regions
 
 
@@ -34,7 +33,9 @@ def sample_region_payload() -> dict[str, object]:
     }
 
 
-def test_load_regions_from_json_success(tmp_path: Path, sample_region_payload: dict[str, object]) -> None:
+def test_load_regions_from_json_success(
+    tmp_path: Path, sample_region_payload: dict[str, object]
+) -> None:
     """Load and normalize valid region payload."""
     json_file = tmp_path / "regions.json"
     json_file.write_text(json.dumps(sample_region_payload))

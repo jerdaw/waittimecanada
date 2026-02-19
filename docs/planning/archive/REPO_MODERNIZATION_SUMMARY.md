@@ -7,7 +7,7 @@
 
 ## What Was Created
 
-We've created a comprehensive plan and ready-to-use files to modernize the WaitTime Canada repository structure using industry best practices.
+We've created a comprehensive plan and ready-to-use files to modernize the Wait Time Canada repository structure using industry best practices.
 
 ---
 
@@ -424,7 +424,7 @@ After running the script, complete these manual steps:
 
 ---
 
-**This modernization will make WaitTime Canada a showcase repository! 🚀**
+**This modernization will make Wait Time Canada a showcase repository! 🚀**
 
 The combination of:
 - Professional documentation (MkDocs Material)

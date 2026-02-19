@@ -238,7 +238,7 @@ Quebec's health system is organized into regional CISSS/CIUSSS:
 
 ### Outaouais-Ottawa Corridor
 
-The Gatineau/Hull hospitals are particularly important for the WaitTime Canada cross-province comparison narrative:
+The Gatineau/Hull hospitals are particularly important for the Wait Time Canada cross-province comparison narrative:
 - **Hopital de Gatineau** is 15 km from **The Ottawa Hospital - Civic Campus**
 - These facilities serve overlapping populations in the National Capital Region
 - Despite geographic proximity, their methodologies are completely incomparable
@@ -318,4 +318,4 @@ When adding a new Quebec hospital measurement:
 ---
 
 *Last Updated: February 11, 2026*
-*Maintained by: WaitTime Canada Research Team*
+*Maintained by: Wait Time Canada Research Team*

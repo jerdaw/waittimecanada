@@ -3,9 +3,9 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Use | WaitTime Canada",
+  title: "Terms of Use | Wait Time Canada",
   description:
-    "Terms of use, disclaimers, and acceptable use policy for WaitTime Canada.",
+    "Terms of use, disclaimers, and acceptable use policy for Wait Time Canada.",
   alternates: {
     canonical: "/terms",
   },
@@ -26,9 +26,9 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-semibold mb-4">Acceptance of Terms</h2>
             <p className="text-foreground/90 leading-relaxed">
-              By accessing and using WaitTime Canada, you accept and agree to be
-              bound by these Terms of Use. If you do not agree to these terms,
-              please do not use this platform.
+              By accessing and using Wait Time Canada, you accept and agree to
+              be bound by these Terms of Use. If you do not agree to these
+              terms, please do not use this platform.
             </p>
           </section>
 
@@ -37,11 +37,12 @@ export default function TermsPage() {
             <h2 className="text-2xl font-semibold mb-4">Project Description</h2>
             <div className="text-foreground/90 space-y-3">
               <p className="leading-relaxed">
-                WaitTime Canada is a <strong>health systems observatory</strong>{" "}
-                and portfolio project developed for medical school application
-                purposes. It collects publicly available emergency room wait
-                time data from official provincial health authority websites and
-                analyzes methodology differences across provinces.
+                Wait Time Canada is a{" "}
+                <strong>health systems observatory</strong> and portfolio
+                project developed for medical school application purposes. It
+                collects publicly available emergency room wait time data from
+                official provincial health authority websites and analyzes
+                methodology differences across provinces.
               </p>
               <p className="leading-relaxed font-medium text-amber-700 dark:text-amber-400">
                 This is an independent research project, not an official
@@ -57,7 +58,7 @@ export default function TermsPage() {
             </h2>
             <div className="text-red-800 dark:text-red-300 space-y-3">
               <p className="font-semibold leading-relaxed">
-                WaitTime Canada does not provide medical advice, diagnosis,
+                Wait Time Canada does not provide medical advice, diagnosis,
                 treatment, or triage services.
               </p>
               <ul className="list-disc ml-6 space-y-2">
@@ -249,7 +250,7 @@ export default function TermsPage() {
                 please cite:
               </p>
               <div className="bg-muted p-4 rounded-lg font-mono text-sm my-4">
-                WaitTime Canada: A Health Systems Observatory
+                Wait Time Canada: A Health Systems Observatory
                 <br />
                 https://github.com/jerdaw/waittimecanada
                 <br />

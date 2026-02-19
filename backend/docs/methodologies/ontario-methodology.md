@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Ontario reports emergency department (ED) wait times through multiple channels, each with distinct methodologies. This document provides a comprehensive analysis of Ontario's wait time measurement approaches, data sources, and comparability considerations for the WaitTime Canada project.
+Ontario reports emergency department (ED) wait times through multiple channels, each with distinct methodologies. This document provides a comprehensive analysis of Ontario's wait time measurement approaches, data sources, and comparability considerations for the Wait Time Canada project.
 
 **Key Findings:**
 - Ontario uses **two primary methodologies**: real-time point estimates and historical P90 statistics (HQO)
@@ -394,4 +394,4 @@ If the P90 wait time is 180 minutes, it means:
 ---
 
 *Last Updated: February 1, 2026*
-*Maintained by: WaitTime Canada Research Team*
+*Maintained by: Wait Time Canada Research Team*

@@ -3,7 +3,6 @@
 from unittest.mock import MagicMock, Mock
 
 import pytest
-
 from waittime.services.database import DatabaseService
 
 
@@ -11,7 +10,7 @@ from waittime.services.database import DatabaseService
 def mock_db_with_cleanup():
     """Create DatabaseService with mocked connection for cleanup testing."""
     db = DatabaseService.__new__(DatabaseService)
-    db.database_url = "postgresql://test:test@localhost/test"
+    db.database_url = "postgresql://test@localhost/test"
     return db
 
 
@@ -59,9 +58,7 @@ class TestCleanupOldMeasurements:
         assert "DELETE FROM measurements" in query
         assert "INTERVAL" in query
 
-    def test_deletes_with_custom_retention_period(
-        self, mock_db_with_cleanup, monkeypatch
-    ):
+    def test_deletes_with_custom_retention_period(self, mock_db_with_cleanup, monkeypatch):
         """Should accept custom retention period."""
         mock_cursor = setup_cursor_mock(rowcount=15)
         mock_conn = setup_connection_mock(mock_cursor)
@@ -79,9 +76,7 @@ class TestCleanupOldMeasurements:
         params = mock_cursor.execute.call_args[0][1]
         assert params == (60,)
 
-    def test_returns_zero_when_no_old_measurements(
-        self, mock_db_with_cleanup, monkeypatch
-    ):
+    def test_returns_zero_when_no_old_measurements(self, mock_db_with_cleanup, monkeypatch):
         """Should return 0 when no measurements need deletion."""
         mock_cursor = setup_cursor_mock(rowcount=0)
         mock_conn = setup_connection_mock(mock_cursor)
@@ -117,9 +112,7 @@ class TestCleanupOldMeasurements:
 class TestGetMeasurementAgeStats:
     """Test get_measurement_age_stats method."""
 
-    def test_returns_stats_when_measurements_exist(
-        self, mock_db_with_cleanup, monkeypatch
-    ):
+    def test_returns_stats_when_measurements_exist(self, mock_db_with_cleanup, monkeypatch):
         """Should return statistics about measurement ages."""
         mock_row = {
             "oldest_age_days": 45.5,
@@ -143,9 +136,7 @@ class TestGetMeasurementAgeStats:
         assert stats["newest_measurement_age_days"] == 0.5
         assert stats["measurements_older_than_30_days"] == 20
 
-    def test_returns_none_when_no_measurements(
-        self, mock_db_with_cleanup, monkeypatch
-    ):
+    def test_returns_none_when_no_measurements(self, mock_db_with_cleanup, monkeypatch):
         """Should return None values when no measurements in database."""
         mock_row = {
             "oldest_age_days": None,

@@ -38,7 +38,7 @@ export function StructuredData() {
   const medicalWebPageSchema = {
     "@context": "https://schema.org",
     "@type": "MedicalWebPage",
-    name: "WaitTime Canada",
+    name: "Wait Time Canada",
     description: t('medicalPage.desc'),
     audience: {
       "@type": "Patient",
@@ -53,9 +53,9 @@ export function StructuredData() {
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "WaitTime Canada",
-    url: "https://waittime.ca",
-    logo: "https://waittime.ca/icon.png",
+    name: "Wait Time Canada",
+    url: "https://wait-time.ca",
+    logo: "https://wait-time.ca/icon-512.png",
     sameAs: ["https://github.com/jerdaw/waittimecanada"],
   };
 

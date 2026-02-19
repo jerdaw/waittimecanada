@@ -1,5 +1,12 @@
-"""Test script to inspect Alberta wait times page structure."""
+"""Inspect Alberta wait times page structure.
 
+This script is intended for local, ad-hoc debugging of the Alberta scraper.
+It intentionally avoids saving full HTML payloads to disk.
+"""
+
+# ruff: noqa: E402, T201
+
+import hashlib
 import sys
 from pathlib import Path
 
@@ -11,7 +18,7 @@ from waittime.services.database import DatabaseService
 
 
 def main():
-    """Run Alberta scraper and save HTML for inspection."""
+    """Run Alberta scraper and print a small, non-sensitive report."""
     db = DatabaseService()
     source = db.get_source("alberta-ahs")
 
@@ -24,12 +31,28 @@ def main():
     print("Fetching Alberta wait times page...")
     html = scraper.fetch()
 
-    # Save full HTML for inspection
-    output_path = Path(__file__).parent / "alberta_output.html"
-    output_path.write_text(html, encoding="utf-8")
+    payload_hash = hashlib.sha256(html.encode("utf-8")).hexdigest()
+    snippet = html[:500]
 
-    print(f"\nFull HTML saved to: {output_path}")
+    output_path = Path(__file__).parent / "alberta_output_report.txt"
+    output_path.write_text(
+        "\n".join(
+            [
+                "Alberta scraper fetch report",
+                f"sha256: {payload_hash}",
+                f"length: {len(html)} bytes",
+                "",
+                "snippet (first 500 chars):",
+                snippet,
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    print(f"\nReport saved to: {output_path}")
     print(f"HTML length: {len(html)} characters")
+    print(f"HTML sha256: {payload_hash}")
 
     # Try to parse
     print("\nAttempting to parse...")

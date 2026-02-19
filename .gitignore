@@ -34,6 +34,7 @@ env/
 node_modules/
 .next/
 out/
+site/
 .cache/
 .vercel/
 .turbo/
@@ -55,6 +56,7 @@ coverage/
 .hypothesis/
 playwright-report/
 test-results/
+frontend/test-results*.json
 
 # IDE
 .idea/

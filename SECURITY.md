@@ -11,7 +11,7 @@ We currently support the latest version on the `main` branch. Security updates a
 
 ## Reporting a Vulnerability
 
-We take security seriously. If you discover a security vulnerability in WaitTime Canada, please report it responsibly.
+We take security seriously. If you discover a security vulnerability in Wait Time Canada, please report it responsibly.
 
 ### How to Report
 

@@ -1,8 +1,8 @@
-# WaitTime Canada API Reference
+# Wait Time Canada API Reference
 
 ## Overview
 
-WaitTime Canada APIs are served from Next.js route handlers in `frontend/app/api/`.
+Wait Time Canada APIs are served from Next.js route handlers in `frontend/app/api/`.
 
 Base URL:
 

@@ -4,7 +4,7 @@
 > Historical planning snapshot. This file is preserved for context and may reference superseded tooling or paths.
 > Use `docs/planning/roadmap.md` and `docs/development/documentation-guidelines.md` as current source of truth.
 
-**Goal:** Transform the WaitTime Canada repository into a best-practice exemplar with:
+**Goal:** Transform the Wait Time Canada repository into a best-practice exemplar with:
 - MkDocs Material for beautiful, searchable documentation
 - Architecture Decision Records (ADRs) for design choices
 - Well-organized tests with clear conventions
@@ -271,7 +271,7 @@ pip install mkdocs-macros-plugin
 
 ```yaml
 # mkdocs.yml
-site_name: WaitTime Canada
+site_name: Wait Time Canada
 site_url: https://waittime-canada.github.io/docs
 site_description: A clinically defensible Health Systems Observatory for Canadian ER wait times
 site_author: Your Name
@@ -709,7 +709,7 @@ Create `docs/adr/index.md`:
 ```markdown
 # Architecture Decision Records
 
-This directory contains Architecture Decision Records (ADRs) for WaitTime Canada.
+This directory contains Architecture Decision Records (ADRs) for Wait Time Canada.
 
 ## What is an ADR?
 
@@ -1631,4 +1631,4 @@ indent_style = tab
 - Review ADR examples: https://adr.github.io/
 - Review pytest best practices: https://docs.pytest.org/
 
-This structure will make WaitTime Canada a showcase repository! 🚀
+This structure will make Wait Time Canada a showcase repository! 🚀

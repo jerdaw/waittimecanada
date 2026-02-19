@@ -1,6 +1,6 @@
 # Documentation Index
 
-This directory is the documentation control plane for WaitTime Canada.
+This directory is the documentation control plane for Wait Time Canada.
 
 ## Start Here
 

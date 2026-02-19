@@ -234,7 +234,7 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
 def main() -> NoReturn:
     """CLI entry point."""
     parser = argparse.ArgumentParser(
-        description="Run WaitTime Canada scrapers",
+        description="Run Wait Time Canada scrapers",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(

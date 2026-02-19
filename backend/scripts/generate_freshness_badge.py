@@ -3,7 +3,6 @@ import os
 import sys
 from datetime import datetime
 
-
 import psycopg2
 from dotenv import load_dotenv
 from psycopg2.extensions import connection

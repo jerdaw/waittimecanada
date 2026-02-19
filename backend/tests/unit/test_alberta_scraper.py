@@ -1,7 +1,6 @@
 """Unit tests for Alberta scraper."""
 
 import pytest
-
 from waittime.core import EndEvent, MetricFamily, PatientScope, StartEvent, StatisticType
 from waittime.scrapers.alberta import AlbertaScraper, create_alberta_source
 
@@ -138,7 +137,10 @@ class TestAlbertaScraper:
         assert source.name == "Alberta Health Services"
         assert source.province == "AB"
         assert source.url == "https://www.albertahealthservices.ca/waittimes/Page14230.aspx"
-        assert source.methodology_url == "https://www.albertahealthservices.ca/waittimes/Page14230.aspx"
+        assert (
+            source.methodology_url
+            == "https://www.albertahealthservices.ca/waittimes/Page14230.aspx"
+        )
         assert source.telehealth_name == "Health Link 811"
         assert source.telehealth_number == "811"
         assert source.default_metric_family == MetricFamily.TIME_TO_PROVIDER

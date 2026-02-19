@@ -265,12 +265,12 @@ export default function AnalyticsPage() {
   const datasetSchema = {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    name: "WaitTime Canada Analytics Dashboard",
+    name: "Wait Time Canada Analytics Dashboard",
     description:
       "Province-level emergency wait-time trends, regional benchmarking, and hospital peer rankings generated from standardized Canadian ER data.",
     creator: {
       "@type": "Organization",
-      name: "WaitTime Canada",
+      name: "Wait Time Canada",
     },
     variableMeasured: [
       "province_mean_wait_minutes",
@@ -278,7 +278,7 @@ export default function AnalyticsPage() {
       "hospital_percentile_rank",
       "trend_change_percent",
     ],
-    url: "https://waittimecanada.ca/analytics",
+    url: "https://wait-time.ca/analytics",
   };
 
   return (

@@ -1,4 +1,4 @@
-# WaitTime Canada Frontend
+# Wait Time Canada Frontend
 
 Next.js 14 App Router frontend for map visualization, methodology transparency, and analytics dashboards.
 

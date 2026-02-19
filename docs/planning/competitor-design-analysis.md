@@ -1,6 +1,6 @@
 # Competitor Design Analysis & Feature Mapping
 
-> Deep evaluation of competitor UI/UX and web design with actionable recommendations for WaitTime Canada.
+> Deep evaluation of competitor UI/UX and web design with actionable recommendations for Wait Time Canada.
 >
 > Historical analysis snapshot. For active implementation scope, use `docs/planning/roadmap.md`.
 
@@ -12,7 +12,7 @@ The competitor is an Ontario-focused ER wait time tracker serving 180+ hospitals
 
 ### Key Differentiators
 
-| Aspect | Competitor | WaitTime Canada |
+| Aspect | Competitor | Wait Time Canada |
 |--------|----------|-----------------|
 | **Scope** | Ontario only (180+ hospitals) | Pan-Canadian (213+ Ontario, Quebec planned) |
 | **Value Proposition** | "Find the Fastest ER" | "Clinically Defensible Health Systems Observatory" |
@@ -272,7 +272,7 @@ _Screenshot captured during competitor review (stored outside repo)._
 
 ### ✅ Features We Already Have
 
-| Feature | Competitor | WaitTime Canada | Notes |
+| Feature | Competitor | Wait Time Canada | Notes |
 |---------|----------|-----------------|-------|
 | Interactive Map | ✅ | ✅ | We use Mapbox |
 | Wait Time Display | ✅ | ✅ | Color-coded |
@@ -435,7 +435,7 @@ export function SplitView({ hospitals, selectedId, onSelect }: SplitViewProps) {
   return (
     <div className="grid grid-cols-5 h-[calc(100vh-200px)]">
       <div className="col-span-3 overflow-y-auto border-r">
-        <HospitalList 
+        <HospitalList
           hospitals={hospitals}
           selectedId={selectedId}
           onSelect={onSelect}
@@ -443,7 +443,7 @@ export function SplitView({ hospitals, selectedId, onSelect }: SplitViewProps) {
         />
       </div>
       <div className="col-span-2 relative">
-        <Map 
+        <Map
           hospitals={hospitals}
           highlightedId={selectedId}
           onMarkerClick={onSelect}
@@ -461,7 +461,7 @@ export function SplitView({ hospitals, selectedId, onSelect }: SplitViewProps) {
 const [expandedId, setExpandedId] = useState<string | null>(null);
 
 return hospitals.map(hospital => (
-  <div 
+  <div
     key={hospital.id}
     className="border rounded-lg cursor-pointer transition-all"
     onClick={() => setExpandedId(expandedId === hospital.id ? null : hospital.id)}
@@ -496,7 +496,7 @@ The competitor is a well-executed, focused tool for Ontario ER wait times. Their
 - Mobile-first responsive design
 - Simple, clear value proposition
 
-**However**, WaitTime Canada has significant advantages:
+**However**, Wait Time Canada has significant advantages:
 - Pan-Canadian scope with multi-province architecture
 - Methodology transparency (our key differentiator)
 - Clinical defensibility through ontology enforcement

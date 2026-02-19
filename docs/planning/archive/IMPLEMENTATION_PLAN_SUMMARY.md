@@ -7,7 +7,7 @@
 
 ## What Was Accomplished
 
-We transformed the high-level strategic document (`er-times-plan.md`) into a **comprehensive, modern, best-practice implementation plan** for the WaitTime Canada project.
+We transformed the high-level strategic document (`er-times-plan.md`) into a **comprehensive, modern, best-practice implementation plan** for the Wait Time Canada project.
 
 ---
 
@@ -288,7 +288,7 @@ This implementation plan represents **~30 hours of planning work** distilled int
 - ❌ "Bikeshedding" (standards are set)
 - ❌ "Scope creep" (features are prioritized)
 
-**You now have everything needed to build WaitTime Canada.**
+**You now have everything needed to build Wait Time Canada.**
 
 The only thing left is to execute. Good luck! 🚀
 

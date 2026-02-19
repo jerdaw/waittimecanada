@@ -42,7 +42,7 @@ describe("DataExport", () => {
 
     expect(screen.getByText("Suggested Citation:")).toBeInTheDocument();
     expect(
-      screen.getByText(/WaitTime Canada.*2026.*Canadian ER Wait Time Data/i),
+      screen.getByText(/Wait Time Canada.*2026.*Canadian ER Wait Time Data/i),
     ).toBeInTheDocument();
     expect(screen.getByText(/License: CC-BY-4.0/i)).toBeInTheDocument();
   });

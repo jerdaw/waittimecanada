@@ -3,7 +3,6 @@
 from unittest.mock import MagicMock, Mock
 
 import pytest
-
 from waittime.services.benchmarking import BenchmarkingService
 
 
@@ -51,10 +50,10 @@ class TestBenchmarkingOntologySafety:
             "metric_family": "wait_time",
             "start_event": "triage",
             "end_event": "nurse_seen",
-            "statistic_type": "mean"
+            "statistic_type": "mean",
         }
 
-        benchmark_rows = [] # empty is fine, we care about the query params
+        benchmark_rows = []  # empty is fine, we care about the query params
 
         # We use side_effect to return different things for different calls
         # checks based on query string presence? Or just order.
@@ -64,11 +63,11 @@ class TestBenchmarkingOntologySafety:
         # 2. _query_benchmark_rows
 
         mock_cursor.fetchone.side_effect = [
-            dominant_ontology_row, # for _get_dominant_ontology
+            dominant_ontology_row,  # for _get_dominant_ontology
         ]
 
         mock_cursor.fetchall.side_effect = [
-            benchmark_rows, # for _query_benchmark_rows
+            benchmark_rows,  # for _query_benchmark_rows
         ]
 
         # Execute
@@ -84,7 +83,7 @@ class TestBenchmarkingOntologySafety:
         assert len(calls) >= 2
         dominant_query_call = calls[0]
         assert "SELECT" in dominant_query_call[0][0]
-        assert "COUNT(*)" in dominant_query_call[0][0] # ensure it's the counting query
+        assert "COUNT(*)" in dominant_query_call[0][0]  # ensure it's the counting query
 
         # Second call: Benchmark Query
         benchmark_query_call = calls[1]

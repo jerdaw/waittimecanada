@@ -1168,7 +1168,10 @@ class DatabaseService:
                     ),
                 )
                 row = cur.fetchone()
-                return row["id"] if row else 0
+                if not row:
+                    return 0
+                event_id = row.get("id")
+                return int(event_id) if event_id is not None else 0
 
     def get_methodology_changes(
         self, source_id: str | None = None, limit: int = 20
