@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Area, ComposedChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { DataQualityCard } from "@/components/DataQualityCard";
 import { AnomalyFeed } from "@/components/AnomalyFeed";
+import { QualityDriftPanel } from "@/components/QualityDriftPanel";
 
 interface SourceQuality {
   source_id: string;
@@ -235,6 +236,15 @@ export default function DataQualityPage() {
                   <DataQualityCard key={source.source_id} source={source} />
                 ))}
               </div>
+            </section>
+
+            {/* 7-Day Quality Drift */}
+            <section>
+              <h2 className="text-lg font-semibold mb-4">7-Day Quality Drift</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Changes in collection performance and reporting coverage compared to a 7-day baseline.
+              </p>
+              <QualityDriftPanel sources={quality.sources} />
             </section>
 
             {/* Recent Anomalies */}

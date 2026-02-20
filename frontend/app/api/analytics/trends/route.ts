@@ -311,6 +311,48 @@ import { TrendsQuerySchema } from "@/utils/validations";
 
 import { checkRateLimit } from "@/utils/rate-limit";
 
+async function queryMethodologyContext(
+  sql: ReturnType<typeof getDb>,
+  province: string,
+  lookbackStartIso: string
+) {
+  const groups = await sql`
+    SELECT
+      ma.metric_family,
+      ma.start_event,
+      ma.end_event,
+      ma.statistic_type,
+      COUNT(DISTINCT ma.hospital_id) as hospital_count
+    FROM measurement_aggregates ma
+    JOIN hospitals h ON h.id = ma.hospital_id
+    WHERE h.province = ${province}
+      AND h.is_visible = true
+      AND h.is_verified = true
+      AND ma.period_start >= ${lookbackStartIso}::timestamptz
+    GROUP BY ma.metric_family, ma.start_event, ma.end_event, ma.statistic_type
+    ORDER BY hospital_count DESC
+  `;
+
+  const distinct_groups = groups.length;
+  const is_homogeneous = distinct_groups <= 1;
+  const divergence_note = is_homogeneous
+    ? null
+    : `This trend mixes measurements from ${distinct_groups} distinct methodology groups. Direct comparison of hospitals across these groups is scientifically invalid.`;
+
+  return {
+    distinct_groups,
+    is_homogeneous,
+    divergence_note,
+    groups: groups.map((g) => ({
+      metric_family: String(g.metric_family),
+      start_event: String(g.start_event),
+      end_event: String(g.end_event),
+      statistic_type: String(g.statistic_type),
+      hospital_count: Number(g.hospital_count),
+    })),
+  };
+}
+
 export async function GET(request: NextRequest) {
   // 1. Rate Limit
   const rateLimitResponse = await checkRateLimit(request);
@@ -357,12 +399,18 @@ export async function GET(request: NextRequest) {
     );
 
     const lookbackStartIso = lookbackStart.toISOString();
-    let aggregateRows = await queryAggregateRows(
-      sql,
-      normalizedProvince,
-      period,
-      lookbackStartIso,
-    );
+
+    const [methodologyContext, aggregateRowsResult] = await Promise.all([
+      queryMethodologyContext(sql, normalizedProvince, lookbackStartIso),
+      queryAggregateRows(
+        sql,
+        normalizedProvince,
+        period,
+        lookbackStartIso,
+      )
+    ]);
+
+    let aggregateRows = aggregateRowsResult;
     let fallbackSource: "none" | "daily_rollup" = "none";
 
     if (aggregateRows.length === 0) {
@@ -407,6 +455,7 @@ export async function GET(request: NextRequest) {
           data_source:
             fallbackSource === "none" ? "precomputed" : "derived_from_daily",
           fallback_used: fallbackSource !== "none",
+          methodology_context: methodologyContext,
           data_points: dataPoints,
           trend_summary: {
             direction,
