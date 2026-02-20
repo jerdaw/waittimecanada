@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Area, ComposedChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { DataQualityCard } from "@/components/DataQualityCard";
 import { AnomalyFeed } from "@/components/AnomalyFeed";
 
@@ -34,16 +35,131 @@ function getStatusBadge(status: string) {
   return styles[status] ?? styles.critical;
 }
 
+function QualityTrendSection({ sourceId, sourceName }: { sourceId: string; sourceName: string }) {
+  const [trend, setTrend] = useState<any>(null);
+  const [diff, setDiff] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+
+    Promise.all([
+      fetch(`/api/data-quality?view=trend&source_id=${sourceId}&days=30`).then((r) => r.json()),
+      fetch(`/api/data-quality?view=diff&source_id=${sourceId}&compare_days=7`).then((r) => r.json())
+    ])
+      .then(([trendData, diffData]) => {
+        if (!mounted) return;
+        setTrend(trendData.trend?.reverse() || []); // reverse because API returns DESC, chart ASC
+        setDiff(diffData);
+        setLoading(false);
+      })
+      .catch(() => {
+        if (mounted) setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [sourceId]);
+
+  if (loading) {
+    return <div className="animate-pulse h-48 bg-muted/20 rounded-lg"></div>;
+  }
+
+  if (!trend || trend.length === 0) {
+    return (
+      <div className="text-sm text-muted-foreground p-4 text-center border rounded-lg bg-card">
+        No historical snapshot data yet for {sourceName}.
+      </div>
+    );
+  }
+
+  const chartData = trend.map((t: any) => {
+    const d = new Date(t.snapshot_date);
+    return {
+      ...t,
+      success_pct: t.avg_success_rate * 100,
+      label: `${d.getUTCMonth() + 1}/${d.getUTCDate()}`,
+    };
+  });
+
+  return (
+    <div className="space-y-4">
+      {diff?.has_baseline && (
+        <div className="rounded-lg border border-border/50 bg-card p-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+          <div>
+            <h4 className="font-medium text-sm">7-Day Delta</h4>
+            <p className="text-sm text-muted-foreground mt-1">{diff.summary}</p>
+          </div>
+          <div className="flex gap-6">
+            <div className="text-center">
+              <div className="text-xs text-muted-foreground">Coverage</div>
+              <div
+                className={`font-semibold ${
+                  diff.deltas.success_rate_delta > 0.02
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : diff.deltas.success_rate_delta < -0.02
+                      ? "text-red-600 dark:text-red-400"
+                      : "text-foreground"
+                }`}
+              >
+                {diff.deltas.success_rate_delta > 0 ? "+" : ""}
+                {(diff.deltas.success_rate_delta * 100).toFixed(1)}%
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-xs text-muted-foreground">Hospitals</div>
+              <div className="font-semibold text-foreground">
+                {diff.deltas.hospitals_reporting_delta > 0 ? "+" : ""}
+                {diff.deltas.hospitals_reporting_delta}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="h-[240px] w-full rounded-lg border border-border/50 bg-card p-4">
+        <h4 className="text-sm font-medium mb-4">30-Day Success Rate</h4>
+        <ResponsiveContainer width="100%" height="80%">
+          <ComposedChart data={chartData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+            <XAxis dataKey="label" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} domain={[0, 100]} />
+            <Tooltip
+              formatter={(value: number | undefined) => [`${(value ?? 0).toFixed(1)}%`, "Success Rate"]}
+              labelStyle={{ color: "black" }}
+            />
+            <Area
+              type="monotone"
+              dataKey="success_pct"
+              fill="var(--primary)"
+              fillOpacity={0.15}
+              stroke="var(--primary)"
+              strokeWidth={2}
+              isAnimationActive={false}
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
+
 export default function DataQualityPage() {
   const [quality, setQuality] = useState<SystemQuality | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedSourceId, setSelectedSourceId] = useState<string>("");
 
   useEffect(() => {
     fetch("/api/data-quality")
       .then((r) => r.json())
       .then((data) => {
         setQuality(data);
+        if (data.sources && data.sources.length > 0) {
+          setSelectedSourceId(data.sources[0].source_id);
+        }
         setLoading(false);
       })
       .catch(() => {
@@ -130,6 +246,36 @@ export default function DataQualityPage() {
                 not a filter.
               </p>
               <AnomalyFeed />
+            </section>
+
+            {/* Quality Trend */}
+            <section>
+              <h2 className="text-lg font-semibold mb-2">Quality Trend</h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Longitudinal coverage patterns mapped from active operations snapshots.
+              </p>
+              <div className="mb-4">
+                <select
+                  className="rounded-md border border-border bg-background px-3 py-1.5 text-sm"
+                  value={selectedSourceId}
+                  onChange={(e) => setSelectedSourceId(e.target.value)}
+                >
+                  {quality.sources.map((s) => (
+                    <option key={s.source_id} value={s.source_id}>
+                      {s.province} - {s.source_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {selectedSourceId && (
+                <QualityTrendSection
+                  sourceId={selectedSourceId}
+                  sourceName={
+                    quality.sources.find((s) => s.source_id === selectedSourceId)
+                      ?.source_name || selectedSourceId
+                  }
+                />
+              )}
             </section>
 
             {/* Methodology Notes */}

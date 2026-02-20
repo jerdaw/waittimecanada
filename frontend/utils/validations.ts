@@ -95,8 +95,11 @@ export const AnomaliesQuerySchema = z.object({
 });
 
 export const DataQualityQuerySchema = z.object({
+  view: z.enum(["system", "hospital", "trend", "diff"]).optional(),
   hospital_id: z.string().optional(),
+  source_id: z.string().optional(),
   days: z.coerce.number().int().positive().max(90).default(30),
+  compare_days: z.coerce.number().int().positive().max(90).default(7),
 });
 
 export const ExportQuerySchema = z.object({

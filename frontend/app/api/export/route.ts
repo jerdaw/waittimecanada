@@ -4,6 +4,35 @@ import { NO_STORE_HEADERS } from "@/utils/cache";
 
 import { ExportQuerySchema } from "@/utils/validations";
 
+function computeMethodologyHomogeneity(results: Record<string, unknown>[]) {
+  const groupsMap = new Map<string, any>();
+  for (const row of results) {
+    const key = `${row.metric_family}|${row.start_event}|${row.end_event}|${row.statistic_type}`;
+    if (!groupsMap.has(key)) {
+      groupsMap.set(key, {
+        metric_family: String(row.metric_family),
+        start_event: String(row.start_event),
+        end_event: String(row.end_event),
+        statistic_type: String(row.statistic_type),
+        record_count: 0,
+      });
+    }
+    groupsMap.get(key)!.record_count++;
+  }
+
+  const groups = Array.from(groupsMap.values());
+  const is_homogeneous = groups.length <= 1;
+
+  return {
+    is_homogeneous,
+    distinct_methodology_groups: groups.length,
+    divergence_note: is_homogeneous
+      ? null
+      : `This export contains measurements from ${groups.length} distinct methodology groups. Direct comparison across groups is scientifically invalid. See methodology_url per record for details.`,
+    groups,
+  };
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const rawParams = Object.fromEntries(searchParams.entries());
@@ -78,6 +107,7 @@ export async function GET(request: NextRequest) {
               data_type: "aggregated",
               granularity,
               filters: { province, startDate, endDate },
+              methodology_homogeneity: computeMethodologyHomogeneity(results),
               license: "CC-BY-4.0",
               citation:
                 "Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set]. https://wait-time.ca",
@@ -185,6 +215,7 @@ export async function GET(request: NextRequest) {
             data_type: "raw",
             granularity: "raw",
             filters: { province, startDate, endDate },
+            methodology_homogeneity: computeMethodologyHomogeneity(results),
             license: "CC-BY-4.0",
             citation:
               "Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set]. https://wait-time.ca",

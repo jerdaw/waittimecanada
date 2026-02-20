@@ -14,6 +14,10 @@ interface BenchmarkHospital {
   quartile: 1 | 2 | 3 | 4;
   trend: BenchmarkTrend;
   trend_change_percent: number;
+  metric_family: string;
+  start_event: string;
+  end_event: string;
+  statistic_type: string;
 }
 
 interface ProvinceStats {
@@ -129,6 +133,36 @@ function computeTrendChangePercent(
   );
 }
 
+function computeMethodologyHomogeneity(hospitals: BenchmarkHospital[]) {
+  const groupsMap = new Map<string, any>();
+  for (const hosp of hospitals) {
+    if (!hosp.metric_family) continue;
+    const key = `${hosp.metric_family}|${hosp.start_event}|${hosp.end_event}|${hosp.statistic_type}`;
+    if (!groupsMap.has(key)) {
+      groupsMap.set(key, {
+        metric_family: hosp.metric_family,
+        start_event: hosp.start_event,
+        end_event: hosp.end_event,
+        statistic_type: hosp.statistic_type,
+        record_count: 0,
+      });
+    }
+    groupsMap.get(key)!.record_count++;
+  }
+
+  const groups = Array.from(groupsMap.values());
+  const is_homogeneous = groups.length <= 1;
+
+  return {
+    is_homogeneous,
+    distinct_groups: groups.length,
+    divergence_note: is_homogeneous
+      ? null
+      : `This view contains measurements from ${groups.length} distinct methodology groups. Direct ranking comparison across groups is scientifically invalid.`,
+    groups,
+  };
+}
+
 import { BenchmarkQuerySchema } from "@/utils/validations";
 
 import { checkRateLimit } from "@/utils/rate-limit";
@@ -201,11 +235,15 @@ export async function GET(request: NextRequest) {
         h.name AS hospital_name,
         h.city,
         lm.value AS current_wait,
+        lm.metric_family,
+        lm.start_event,
+        lm.end_event,
+        lm.statistic_type,
         cp.period_mean,
         pp.previous_period_mean
       FROM hospitals h
       LEFT JOIN LATERAL (
-        SELECT value
+        SELECT value, metric_family, start_event, end_event, statistic_type
         FROM measurements
         WHERE hospital_id = h.id
         ORDER BY timestamp_utc DESC
@@ -232,6 +270,10 @@ export async function GET(request: NextRequest) {
           row.previous_period_mean === null
             ? null
             : Number(row.previous_period_mean),
+        metric_family: String(row.metric_family ?? "UNKNOWN"),
+        start_event: String(row.start_event ?? "UNKNOWN"),
+        end_event: String(row.end_event ?? "UNKNOWN"),
+        statistic_type: String(row.statistic_type ?? "UNKNOWN"),
       }))
       .sort((a, b) => a.period_mean - b.period_mean);
 
@@ -252,6 +294,10 @@ export async function GET(request: NextRequest) {
           row.period_mean,
           row.previous_period_mean,
         ),
+        metric_family: row.metric_family,
+        start_event: row.start_event,
+        end_event: row.end_event,
+        statistic_type: row.statistic_type,
       };
     });
 
@@ -283,6 +329,7 @@ export async function GET(request: NextRequest) {
           period: periodConfig.label,
           generated_at: new Date().toISOString(),
           hospital_count: hospitals.length,
+          methodology_summary: computeMethodologyHomogeneity(selectedHospitals),
           province_stats: provinceStats,
           hospitals: selectedHospitals,
         },
