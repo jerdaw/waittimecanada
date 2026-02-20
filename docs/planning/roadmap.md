@@ -2,9 +2,9 @@
 
 ## Current Status (Updated 2026-02-19)
 
-**Progress:** M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
+**Progress:** M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
-**Strategic Direction:** **Milestone 30 (Scraper Visibility & Reliability Hardening) Complete.** Operational observability now includes last-known-good + failure classification across ON/QC/AB/BC, with standardized retry/backoff policies and workflow-integrated heartbeat checks. Immediate execution focus is a **P0 Quebec parser regression** (zero-value occupancy handling) followed by the cache/polling audit. **Four-province breadth remains confirmed.**
+**Strategic Direction:** **Milestone 31 (Divergence Briefs & Quality Drift UI) Complete.** Upgraded the analytics API with methodology divergence context to prevent invalid hospital comparisons, and surfaced quality drift metrics on the data quality dashboard. Immediate execution focus returns to cache/polling audit hardening. **Four-province breadth remains confirmed.**
 
 **Deployment Note (2026-02-19):** Frontend public hosting is currently unavailable because the Netlify project is paused (cost control / credit exhaustion). The `wait-time.ca` domain cutover is staged in-repo but should be treated as **on hold** until the project is unpaused (target: **March 9, 2026**).
 
@@ -43,6 +43,7 @@
 | **M28: Ontario Real-Data Equity Layer** | Replaced scaffold linkage with real StatsCan CT overlays for ON; added acquisition provenance, processing manifest, ON-only rollout contract, and map/API integration |
 | **M29: Equity Academic Rigor Hardening (ON)** | ON-scoped quintiles, suppression provenance, sensitivity + uncertainty outputs, non-causal/temporal messaging, reproducibility hardening (`equity` extras/docs), optimized layer output + API loader preference |
 | **M30: Scraper Visibility & Reliability Hardening** | Added structured failure taxonomy + heartbeat metadata (`last_success`, `last_error`, `consecutive_failures`, run duration), standardized retry/backoff for ON/AB/BC/QC fetch paths, enhanced `/api/health` + `check_heartbeat --verbose`, and updated workflow/runbook operations |
+| **M31: Divergence Briefs & Quality Drift UI** | Scheduled daily data quality snapshots (cron + CLI), added methodology divergence context to analytics trends API, added 7-Day Quality Drift UI panel to `/data-quality` page |
 
 ---
 
@@ -105,10 +106,7 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 ### Next (2-6 weeks) — Core Engineering & Reliability
 
 **Priority 1: System Reliability & Correctness**
-- [ ] **P1 / Divergence Briefs in analytics + export** — When ontology mismatches, generate a structured “divergence brief” (why non-comparable) and surface it in UI + export metadata (1-2d)
-
-- [ ] **P1 / Data quality snapshot diffs** — Diff `data_quality_snapshots` over time (coverage drops, missing hospitals, anomalies) and add an operator-friendly view for changes (1-2d)
-- [ ] **P1 / Data quality drift monitoring** (#43) — Track longitudinal drift (coverage drops, missing hospitals, anomaly rate shifts) and surface it for operators (4-8h)
+- [ ] **P1 / Divergence Briefs in analytics + export** — When ontology mismatches, generate a structured “divergence brief” (why non-comparable) and surface it in UI + export metadata (M31 Complete - Partial: analytics coverage added, export coverage pending context review)
 
 ### Later (6+ weeks) — Strategic Enhancements
 
@@ -230,6 +228,7 @@ Active milestone plans in `docs/planning/implementation/`:
 - none currently open.
 
 Archived (delivered):
+- `docs/planning/archive/milestone-31-divergence-drift.md` — Divergence Briefs & Quality Drift UI (M31)
 - `docs/planning/archive/milestone-28-equity-real-data-ontario.md` — Ontario real-data equity layer rollout (M28)
 - `docs/planning/archive/milestone-29-equity-academic-rigor-hardening.md` — Ontario equity methodology hardening and academic defensibility improvements (M29)
 - `docs/planning/archive/milestone-25-reliability-verification.md` — Reliability & Verification Phase 2 (M25)

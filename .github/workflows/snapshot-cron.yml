@@ -1,0 +1,35 @@
+name: Snapshot Quality Cron
+
+on:
+  schedule:
+    # Run daily at 01:00 UTC, after scrapers have had a chance to collect data
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+    # Allows manual trigger for testing or backfills
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    name: Run Daily Quality Snapshot
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -e '.[dev]'
+
+      - name: Run Snapshot Quality CLI
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          cd backend
+          python -m waittime.cli.snapshot_quality --verbose

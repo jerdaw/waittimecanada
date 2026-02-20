@@ -32,7 +32,15 @@ describe("System Trends API", () => {
   });
 
   it("returns trend points and summary for valid request", async () => {
-    mockSql.mockResolvedValue([
+    mockSql.mockResolvedValueOnce([
+      {
+         metric_family: "TOTAL_LOS",
+         start_event: "TRIAGE",
+         end_event: "DISCHARGE",
+         statistic_type: "P90",
+         hospital_count: 2,
+      },
+    ]).mockResolvedValueOnce([
       {
         hospital_id: "h1",
         period_start: "2025-11-01T00:00:00.000Z",
@@ -88,6 +96,9 @@ describe("System Trends API", () => {
     expect(json.data.data_points[0].province_mean).toBe(110);
     expect(json.data.data_points[1].province_mean).toBe(147.1);
 
+    expect(json.data.methodology_context).toBeDefined();
+    expect(json.data.methodology_context.is_homogeneous).toBeDefined();
+
     expect(json.data.trend_summary.direction).toBe("worsening");
     expect(json.data.trend_summary.narrative).toMatch(
       /Ontario ER wait times have increased/i,
@@ -109,7 +120,15 @@ describe("System Trends API", () => {
   });
 
   it("falls back to daily rollups when requested period has no rows", async () => {
-    mockSql.mockResolvedValueOnce([]).mockResolvedValueOnce([
+    mockSql.mockResolvedValueOnce([
+       {
+         metric_family: "TOTAL_LOS",
+         start_event: "TRIAGE",
+         end_event: "DISCHARGE",
+         statistic_type: "P90",
+         hospital_count: 2,
+       }
+    ]).mockResolvedValueOnce([]).mockResolvedValueOnce([
       {
         hospital_id: "h1",
         period_start: "2025-12-01T00:00:00.000Z",
