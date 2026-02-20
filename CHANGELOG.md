@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-02-19
+
+### Added
+- Divergence Briefs & Quality Drift UI (M31)
+- Scraper Visibility & Reliability Hardening (M30)
+- Equity Academic Rigor Hardening (M29)
+- Ontario Real-Data Equity Layer (M28)
+- Operational Observability: Drift monitor, `/status` page, Lighthouse CI (M27)
+- Strategic Documentation: Data dictionary, data flow architecture, property-based testing (M26)
+- Reliability & Verification Phase 2: 80% backend coverage, API integration tests (M25)
+- Quality & Standardization: `mypy strict`, axe-core, mobile responsive tests, rate limiting (M23)
+- Portfolio Documentation: OpenAPI spec, MkDocs deployment (M22)
+- French Language Support (`next-intl` bilingual routing) (M21)
+- Reliability & Verification: API response time tracking, E2E pipeline, visual regression (M20)
+- Governance & Quality: LICENSE, SECURITY.md, CODE_OF_CONDUCT, CITATION.cff, issue templates (M19)
+
+### Fixed
+- Quebec parser zero-value guard (`ge=0`)
+- Cache & polling audit (tight TTLs, `no-store` on user-specific routes)
+- Netlify release gate hardening
+
 ## [1.0.0] - 2026-02-11
 
 ### Added
