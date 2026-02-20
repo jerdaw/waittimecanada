@@ -50,6 +50,7 @@ def main() -> int:
     args = parser.parse_args()
     setup_logging(args.verbose)
 
+    db = None
     try:
         db = DatabaseService()
         quality_service = DataQualityService(db)
