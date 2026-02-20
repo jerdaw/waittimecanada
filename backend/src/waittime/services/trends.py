@@ -51,12 +51,17 @@ class SystemTrendService:
         )
 
         if not rows:
+            family = (
+                ontology.get("metric_family", "TIME_TO_PROVIDER")
+                if ontology
+                else "TIME_TO_PROVIDER"
+            )
             return {
                 "province": normalized_province,
                 "period": period_type,
                 "lookback": self._lookback_label(lookback_months),
                 "data_points": [],
-                "trend_summary": self._empty_summary(normalized_province, lookback_months),
+                "trend_summary": self._empty_summary(normalized_province, lookback_months, family),
                 "ontology": ontology or {},
             }
 
@@ -119,6 +124,7 @@ class SystemTrendService:
             province=normalized_province,
             data_points=data_points,
             lookback_months=lookback_months,
+            metric_family=selected_ontology["metric_family"],
         )
 
         return {
@@ -130,7 +136,9 @@ class SystemTrendService:
             "ontology": selected_ontology,
         }
 
-    def _empty_summary(self, province: str, lookback_months: int) -> dict[str, Any]:
+    def _empty_summary(
+        self, province: str, lookback_months: int, metric_family: str
+    ) -> dict[str, Any]:
         """Return a stable/no-data summary."""
         return {
             "direction": "stable",
@@ -138,7 +146,13 @@ class SystemTrendService:
             "start_mean": None,
             "end_mean": None,
             "narrative": self.generate_narrative(
-                province, "stable", 0.0, None, None, self._lookback_label(lookback_months)
+                province,
+                "stable",
+                0.0,
+                None,
+                None,
+                self._lookback_label(lookback_months),
+                metric_family,
             ),
         }
 
@@ -150,13 +164,18 @@ class SystemTrendService:
         start_mean: float | None,
         end_mean: float | None,
         lookback: str,
+        metric_family: str = "TIME_TO_PROVIDER",
     ) -> str:
         """Generate human-readable trend narrative."""
         province_name = self._province_name(province)
 
+        is_occupancy = metric_family == "STRETCHER_OCCUPANCY"
+        metric_name = "ER stretcher occupancy" if is_occupancy else "ER wait times"
+        unit = "%" if is_occupancy else " minutes"
+
         if start_mean is None or end_mean is None:
             return (
-                f"Not enough data to determine a province-wide emergency wait time trend "
+                f"Not enough data to determine a province-wide {metric_name} trend "
                 f"for {province_name} over the past {lookback}."
             )
 
@@ -164,22 +183,19 @@ class SystemTrendService:
         rounded_end = round(end_mean)
 
         if direction == "improving":
+            verb = "decreased"
+        elif direction == "worsening":
+            verb = "increased"
+        else:
             return (
-                f"{province_name} ER wait times have decreased approximately "
-                f"{abs(change_pct):.1f}% over the past {lookback}, from an average of "
-                f"{rounded_start} minutes to {rounded_end} minutes."
-            )
-
-        if direction == "worsening":
-            return (
-                f"{province_name} ER wait times have increased approximately "
-                f"{abs(change_pct):.1f}% over the past {lookback}, from an average of "
-                f"{rounded_start} minutes to {rounded_end} minutes."
+                f"{province_name} {metric_name} have remained stable over the past {lookback}, "
+                f"holding near {rounded_end}{unit} on average."
             )
 
         return (
-            f"{province_name} ER wait times have remained stable over the past {lookback}, "
-            f"holding near {rounded_end} minutes on average."
+            f"{province_name} {metric_name} have {verb} approximately "
+            f"{abs(change_pct):.1f}% over the past {lookback}, from an average of "
+            f"{rounded_start}{unit} to {rounded_end}{unit}."
         )
 
     def _query_period_rows(
@@ -241,6 +257,7 @@ class SystemTrendService:
         province: str,
         data_points: list[dict[str, Any]],
         lookback_months: int,
+        metric_family: str,
     ) -> dict[str, Any]:
         """Summarize trend direction and generate narrative."""
         if len(data_points) < 2:
@@ -251,6 +268,7 @@ class SystemTrendService:
                 start_mean=(float(data_points[0]["province_mean"]) if data_points else None),
                 end_mean=float(data_points[-1]["province_mean"]) if data_points else None,
                 lookback=self._lookback_label(lookback_months),
+                metric_family=metric_family,
             )
             return {
                 "direction": "stable",
@@ -273,6 +291,7 @@ class SystemTrendService:
             start_mean=start_mean,
             end_mean=end_mean,
             lookback=self._lookback_label(lookback_months),
+            metric_family=metric_family,
         )
 
         return {

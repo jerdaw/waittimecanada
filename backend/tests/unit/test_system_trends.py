@@ -163,6 +163,7 @@ class TestSystemTrendService:
             province="ON",
             data_points=single_point,
             lookback_months=3,
+            metric_family="TIME_TO_PROVIDER",
         )
 
         assert summary["direction"] == "stable"

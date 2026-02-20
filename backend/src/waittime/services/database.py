@@ -573,7 +573,7 @@ class DatabaseService:
     def insert_aggregate(self, aggregate: MeasurementAggregate) -> bool:
         """Insert an aggregate, skipping if a duplicate already exists.
 
-        Uses ON CONFLICT DO NOTHING on the (hospital_id, period_type, period_start)
+        Uses ON CONFLICT DO NOTHING on the (hospital_id, period_type, period_start, metric_family)
         unique constraint.
 
         Returns:
@@ -590,7 +590,7 @@ class DatabaseService:
                         min_value, max_value, std_dev, sample_count,
                         metric_family, start_event, end_event, statistic_type
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    ON CONFLICT (hospital_id, period_type, period_start) DO NOTHING
+                    ON CONFLICT (hospital_id, period_type, period_start, metric_family) DO NOTHING
                     """,
                     (
                         aggregate.hospital_id,

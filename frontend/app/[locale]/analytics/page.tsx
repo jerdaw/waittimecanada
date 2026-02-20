@@ -442,6 +442,22 @@ export default function AnalyticsPage() {
           )}
         </section>
 
+        {occupancy?.status === "available" && occupancy?.occupancy_percentage && (
+          <details className="rounded-xl border border-border/50 bg-card group overflow-hidden">
+            <summary className="p-4 font-semibold text-foreground cursor-pointer list-none flex justify-between items-center hover:bg-muted/30 transition-colors">
+              Historical Occupancy Trend
+              <span className="text-muted-foreground group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <div className="border-t border-border/50">
+              <SystemTrendChart
+                province={province}
+                metricFamily="STRETCHER_OCCUPANCY"
+                className="p-4 bg-transparent"
+              />
+            </div>
+          </details>
+        )}
+
         <section className="rounded-xl border border-border/50 bg-card p-4">
           <div className="flex items-center justify-between gap-2 mb-4">
             <div>
