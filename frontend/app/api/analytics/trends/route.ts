@@ -174,6 +174,7 @@ async function queryAggregateRows(
   province: string,
   periodType: PeriodType | "daily",
   lookbackStartIso: string,
+  metricFamily: string,
 ): Promise<AggregateRow[]> {
   const rows = await sql`
     SELECT
@@ -191,6 +192,7 @@ async function queryAggregateRows(
       AND h.is_verified = true
       AND ma.period_type = ${periodType}
       AND ma.period_start >= ${lookbackStartIso}::timestamptz
+      AND ma.metric_family = ${metricFamily}
     ORDER BY ma.period_start ASC, ma.hospital_id ASC
   `;
 
@@ -314,7 +316,8 @@ import { checkRateLimit } from "@/utils/rate-limit";
 async function queryMethodologyContext(
   sql: ReturnType<typeof getDb>,
   province: string,
-  lookbackStartIso: string
+  lookbackStartIso: string,
+  metricFamily: string,
 ) {
   const groups = await sql`
     SELECT
@@ -329,6 +332,7 @@ async function queryMethodologyContext(
       AND h.is_visible = true
       AND h.is_verified = true
       AND ma.period_start >= ${lookbackStartIso}::timestamptz
+      AND ma.metric_family = ${metricFamily}
     GROUP BY ma.metric_family, ma.start_event, ma.end_event, ma.statistic_type
     ORDER BY hospital_count DESC
   `;
@@ -376,7 +380,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { province, period, lookback } = validation.data;
+    const { province, period, lookback, metric_family } = validation.data;
 
     // Convert Zod's lookback string (e.g. "6m") to the object expected by logic
     const lookbackConfig = parseLookback(lookback);
@@ -401,12 +405,13 @@ export async function GET(request: NextRequest) {
     const lookbackStartIso = lookbackStart.toISOString();
 
     const [methodologyContext, aggregateRowsResult] = await Promise.all([
-      queryMethodologyContext(sql, normalizedProvince, lookbackStartIso),
+      queryMethodologyContext(sql, normalizedProvince, lookbackStartIso, metric_family),
       queryAggregateRows(
         sql,
         normalizedProvince,
         period,
         lookbackStartIso,
+        metric_family,
       )
     ]);
 
@@ -419,6 +424,7 @@ export async function GET(request: NextRequest) {
         normalizedProvince,
         "daily",
         lookbackStartIso,
+        metric_family,
       );
       if (dailyRows.length > 0) {
         aggregateRows = rollupDailyRows(dailyRows, period);

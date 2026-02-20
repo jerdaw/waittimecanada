@@ -9,6 +9,7 @@ research and long-range trend analysis.
 import logging
 import statistics
 from calendar import monthrange
+from collections import defaultdict
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -63,7 +64,7 @@ class AggregationService:
         period_type: str,
         period_start: datetime,
         period_end: datetime,
-    ) -> MeasurementAggregate | None:
+    ) -> list[MeasurementAggregate]:
         """Compute aggregate statistics for a hospital over an arbitrary time window.
 
         Args:
@@ -73,61 +74,76 @@ class AggregationService:
             period_end: End of the period (exclusive)
 
         Returns:
-            MeasurementAggregate if data exists, None if no measurements in window
+            List of MeasurementAggregate (one per distinct methodology/ontology), empty if no measurements
         """
         rows = self.db.get_measurements_in_range(hospital_id, period_start, period_end)
         if not rows:
-            return None
+            return []
 
-        values = [row["value"] for row in rows]
-        stats = self._compute_statistics(values)
-        if stats is None:
-            return None
+        # Group by ontology to prevent mixing metric families or events
+        by_ontology = defaultdict(list)
+        for row in rows:
+            key = (
+                row["metric_family"],
+                row["start_event"],
+                row["end_event"],
+                row["statistic_type"],
+            )
+            by_ontology[key].append(row)
 
-        # Use ontology from the first measurement (denormalized snapshot)
-        first = rows[0]
+        aggregates = []
+        for _, ontology_rows in by_ontology.items():
+            values = [row["value"] for row in ontology_rows]
+            stats = self._compute_statistics(values)
+            if stats is None:
+                continue
 
-        return MeasurementAggregate(
-            hospital_id=hospital_id,
-            source_id=first["source_id"],
-            period_type=period_type,
-            period_start=period_start,
-            period_end=period_end,
-            mean_value=stats["mean"],
-            median_value=stats["median"],
-            p90_value=stats["p90"],
-            min_value=stats["min"],
-            max_value=stats["max"],
-            std_dev=stats["std_dev"],
-            sample_count=stats["count"],
-            metric_family=first["metric_family"],
-            start_event=first["start_event"],
-            end_event=first["end_event"],
-            statistic_type=first["statistic_type"],
-        )
+            first = ontology_rows[0]
+            aggregates.append(
+                MeasurementAggregate(
+                    hospital_id=hospital_id,
+                    source_id=first["source_id"],
+                    period_type=period_type,
+                    period_start=period_start,
+                    period_end=period_end,
+                    mean_value=stats["mean"],
+                    median_value=stats["median"],
+                    p90_value=stats["p90"],
+                    min_value=stats["min"],
+                    max_value=stats["max"],
+                    std_dev=stats["std_dev"],
+                    sample_count=stats["count"],
+                    metric_family=first["metric_family"],
+                    start_event=first["start_event"],
+                    end_event=first["end_event"],
+                    statistic_type=first["statistic_type"],
+                )
+            )
+
+        return aggregates
 
     def aggregate_hourly(
         self, hospital_id: str, hour_start: datetime
-    ) -> MeasurementAggregate | None:
+    ) -> list[MeasurementAggregate]:
         """Compute aggregate for a single hour."""
         hour_end = hour_start + timedelta(hours=1)
         return self.aggregate_period(hospital_id, "hourly", hour_start, hour_end)
 
-    def aggregate_daily(self, hospital_id: str, day_start: datetime) -> MeasurementAggregate | None:
+    def aggregate_daily(self, hospital_id: str, day_start: datetime) -> list[MeasurementAggregate]:
         """Compute aggregate for a full day (00:00 to next 00:00)."""
         day_end = day_start + timedelta(days=1)
         return self.aggregate_period(hospital_id, "daily", day_start, day_end)
 
     def aggregate_weekly(
         self, hospital_id: str, week_start: datetime
-    ) -> MeasurementAggregate | None:
+    ) -> list[MeasurementAggregate]:
         """Compute aggregate for a full week (7 days from week_start)."""
         week_end = week_start + timedelta(weeks=1)
         return self.aggregate_period(hospital_id, "weekly", week_start, week_end)
 
     def aggregate_monthly(
         self, hospital_id: str, year: int, month: int
-    ) -> MeasurementAggregate | None:
+    ) -> list[MeasurementAggregate]:
         """Compute aggregate for a full calendar month."""
         month_start = datetime(year, month, 1, tzinfo=UTC)
         days_in_month = monthrange(year, month)[1]
@@ -151,6 +167,7 @@ class AggregationService:
         end_date: datetime | None = None,
         period_types: list[str] | None = None,
         dry_run: bool = False,
+        force: bool = False,
     ) -> dict[str, int]:
         """Backfill missing aggregates for a hospital or all hospitals.
 
@@ -160,6 +177,7 @@ class AggregationService:
             end_date: End of backfill range (defaults to now)
             period_types: Which periods to compute (default: all four)
             dry_run: If True, count what would be computed without saving
+            force: If True, bypass existing checks and recompute all periods in range
 
         Returns:
             Dict with counts per period type, e.g. {'hourly': 48, 'daily': 2, ...}
@@ -181,7 +199,7 @@ class AggregationService:
         for h_id in hospital_ids:
             for period_type in period_types:
                 computed = self._backfill_hospital_period(
-                    h_id, period_type, start_date, end_date, dry_run
+                    h_id, period_type, start_date, end_date, dry_run, force
                 )
                 counts[period_type] += computed
 
@@ -195,11 +213,14 @@ class AggregationService:
         start_date: datetime,
         end_date: datetime,
         dry_run: bool,
+        force: bool,
     ) -> int:
         """Backfill a single period type for a single hospital. Returns count of new aggregates."""
-        existing = self.db.get_existing_aggregate_periods(
-            hospital_id, period_type, start_date, end_date
-        )
+        existing = set()
+        if not force:
+            existing = self.db.get_existing_aggregate_periods(
+                hospital_id, period_type, start_date, end_date
+            )
 
         periods = self._generate_periods(period_type, start_date, end_date)
         computed = 0
@@ -208,14 +229,15 @@ class AggregationService:
             if period_start in existing:
                 continue
 
-            agg = self.aggregate_period(hospital_id, period_type, period_start, period_end)
-            if agg is None:
+            aggs = self.aggregate_period(hospital_id, period_type, period_start, period_end)
+            if not aggs:
                 continue
 
             if not dry_run:
-                self.save_aggregate(agg)
+                for agg in aggs:
+                    self.save_aggregate(agg)
 
-            computed += 1
+            computed += len(aggs)
 
         return computed
 

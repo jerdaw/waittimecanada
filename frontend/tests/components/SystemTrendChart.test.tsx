@@ -88,7 +88,7 @@ describe("SystemTrendChart", () => {
       expect(screen.getByTestId("recharts-mock")).toBeInTheDocument();
     });
 
-    expect(screen.getByText(/System Trend/i)).toBeInTheDocument();
+    expect(screen.getByText(/Wait Time Trend/i)).toBeInTheDocument();
     expect(
       screen.getByText(/Ontario ER wait times have increased/i),
     ).toBeInTheDocument();
@@ -144,5 +144,41 @@ describe("SystemTrendChart", () => {
         expect.any(Object),
       );
     });
+  });
+
+  it("renders Occupancy Trend when metricFamily is STRETCHER_OCCUPANCY", async () => {
+    // @ts-ignore
+    global.fetch.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          success: true,
+          data: {
+            province: "QC",
+            period: "monthly",
+            lookback: "6m",
+            generated_at: "2026-02-07T00:00:00.000Z",
+            data_points: [],
+            trend_summary: {
+              direction: "stable",
+              change_percent: 0,
+              start_mean: null,
+              end_mean: null,
+              narrative: "Not enough data",
+            },
+          },
+        }),
+    });
+
+    render(<SystemTrendChart province="QC" metricFamily="STRETCHER_OCCUPANCY" />);
+
+    // Wait for data to load (mock returns success)
+    await waitFor(() => {
+      // The ER occupancy badge label is rendered when data loads
+      expect(screen.getByText(/ER occupancy/i)).toBeInTheDocument();
+    });
+
+    // Confirm heading matches occupancy variant
+    expect(screen.getByText("Occupancy Trend")).toBeInTheDocument();
   });
 });

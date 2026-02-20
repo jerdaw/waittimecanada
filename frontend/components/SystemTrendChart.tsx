@@ -50,6 +50,8 @@ interface TrendsApiResponse {
 
 interface SystemTrendChartProps {
   province?: string;
+  metricFamily?: string;
+  className?: string;
 }
 
 const LOOKBACK_OPTIONS: Array<{ value: Lookback; label: string }> = [
@@ -106,7 +108,11 @@ function formatPeriodLabel(point: TrendPoint, period: PeriodType): string {
   return `${month} '${String(start.getUTCFullYear()).slice(2)}`;
 }
 
-export function SystemTrendChart({ province = "ON" }: SystemTrendChartProps) {
+export function SystemTrendChart({
+  province = "ON",
+  metricFamily = "TIME_TO_PROVIDER",
+  className = "rounded-xl border border-border/50 bg-card p-4",
+}: SystemTrendChartProps) {
   const [period, setPeriod] = useState<PeriodType>("monthly");
   const [lookback, setLookback] = useState<Lookback>("6m");
   const [payload, setPayload] = useState<TrendsApiResponse["data"] | null>(
@@ -128,6 +134,7 @@ export function SystemTrendChart({ province = "ON" }: SystemTrendChartProps) {
           province,
           period,
           lookback,
+          metric_family: metricFamily,
         });
 
         const response = await fetch(
@@ -163,7 +170,7 @@ export function SystemTrendChart({ province = "ON" }: SystemTrendChartProps) {
       mounted = false;
       controller.abort();
     };
-  }, [province, period, lookback]);
+  }, [province, period, lookback, metricFamily]);
 
   const chartData = useMemo(() => {
     if (!payload) return [];
@@ -179,14 +186,16 @@ export function SystemTrendChart({ province = "ON" }: SystemTrendChartProps) {
   const hasData = chartData.length > 0;
 
   return (
-    <section className="rounded-xl border border-border/50 bg-card p-4">
+    <section className={className}>
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">
-            System Trend
+            {metricFamily === "STRETCHER_OCCUPANCY" ? "Occupancy Trend" : "Wait Time Trend"}
           </h2>
           <p className="text-xs text-muted-foreground">
-            Province-wide emergency wait trend for {provinceLabel(province)}
+            {metricFamily === "STRETCHER_OCCUPANCY"
+              ? `Province-wide emergency stretcher occupancy trend for ${provinceLabel(province)}`
+              : `Province-wide emergency wait trend for ${provinceLabel(province)}`}
           </p>
         </div>
 
@@ -241,7 +250,7 @@ export function SystemTrendChart({ province = "ON" }: SystemTrendChartProps) {
             {Math.abs(trendSummary.change_percent).toFixed(1)}%
           </span>
           <span className="text-xs text-muted-foreground">
-            {provinceLabel(province)} ER waits over {lookback}
+            {provinceLabel(province)} {metricFamily === "STRETCHER_OCCUPANCY" ? "ER occupancy" : "ER waits"} over {lookback}
           </span>
         </div>
       )}

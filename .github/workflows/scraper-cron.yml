@@ -1,7 +1,8 @@
 name: Scraper Cron Job
 
-# Temporary cost-control throttle: run every 30 minutes.
-# Review target date: 2026-03-09 (revert to */15 if Neon transfer is back within budget).
+# Cost-control throttle: day=60min, night=120min (current).
+# Post-unpause target (≥ 2026-03-09): change both schedules to */20 cron cadence.
+# Intent: run every 20 minutes once Neon transfer costs return to normal budget.
 on:
   schedule:
     # Day (12:00 - 04:00 UTC): Every 60 minutes

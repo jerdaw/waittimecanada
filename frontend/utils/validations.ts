@@ -44,6 +44,7 @@ export const TrendsQuerySchema = z.object({
   province: ProvinceSchema,
   period: PeriodSchema,
   lookback: LookbackSchema,
+  metric_family: z.string().default("TIME_TO_PROVIDER"),
 });
 
 export const HospitalQuerySchema = z.object({

@@ -136,23 +136,24 @@ class TestAggregatePeriod:
 
         result = service.aggregate_hourly("ca-on-test", hour_start)
 
-        assert result is not None
-        assert result.hospital_id == "ca-on-test"
-        assert result.period_type == "hourly"
-        assert result.period_start == hour_start
-        assert result.period_end == hour_start + timedelta(hours=1)
-        assert result.mean_value == 200.0
-        assert result.min_value == 100.0
-        assert result.max_value == 300.0
-        assert result.sample_count == 3
-        assert result.source_id == "ontario-health"
-        assert result.metric_family == "TIME_TO_PROVIDER"
+        assert len(result) == 1
+        agg = result[0]
+        assert agg.hospital_id == "ca-on-test"
+        assert agg.period_type == "hourly"
+        assert agg.period_start == hour_start
+        assert agg.period_end == hour_start + timedelta(hours=1)
+        assert agg.mean_value == 200.0
+        assert agg.min_value == 100.0
+        assert agg.max_value == 300.0
+        assert agg.sample_count == 3
+        assert agg.source_id == "ontario-health"
+        assert agg.metric_family == "TIME_TO_PROVIDER"
 
     def test_aggregate_hourly_no_data(self, service, mock_db) -> None:
-        """Should return None when no measurements exist."""
+        """Should return empty list when no measurements exist."""
         mock_db.get_measurements_in_range.return_value = []
         result = service.aggregate_hourly("ca-on-test", datetime(2026, 2, 6, 14, 0, tzinfo=UTC))
-        assert result is None
+        assert result == []
 
     def test_aggregate_daily_window(self, service, mock_db) -> None:
         """Should query the correct 24-hour window."""
@@ -166,8 +167,8 @@ class TestAggregatePeriod:
         mock_db.get_measurements_in_range.assert_called_once_with(
             "ca-on-test", day_start, day_start + timedelta(days=1)
         )
-        assert result is not None
-        assert result.period_type == "daily"
+        assert len(result) == 1
+        assert result[0].period_type == "daily"
 
     def test_aggregate_weekly_window(self, service, mock_db) -> None:
         """Should query the correct 7-day window."""
@@ -183,8 +184,8 @@ class TestAggregatePeriod:
         mock_db.get_measurements_in_range.assert_called_once_with(
             "ca-on-test", week_start, week_start + timedelta(weeks=1)
         )
-        assert result is not None
-        assert result.period_type == "weekly"
+        assert len(result) == 1
+        assert result[0].period_type == "weekly"
 
     def test_aggregate_monthly_window(self, service, mock_db) -> None:
         """Should query the correct calendar month window."""
@@ -199,8 +200,8 @@ class TestAggregatePeriod:
         mock_db.get_measurements_in_range.assert_called_once_with(
             "ca-on-test", expected_start, expected_end
         )
-        assert result is not None
-        assert result.period_type == "monthly"
+        assert len(result) == 1
+        assert result[0].period_type == "monthly"
 
     def test_aggregate_monthly_leap_year(self, service, mock_db) -> None:
         """February in a leap year should span 29 days."""
@@ -216,8 +217,8 @@ class TestAggregatePeriod:
             "ca-on-test", expected_start, expected_end
         )
 
-    def test_ontology_from_first_measurement(self, service, mock_db) -> None:
-        """Should use ontology tags from the first measurement in the window."""
+    def test_aggregates_grouped_by_ontology(self, service, mock_db) -> None:
+        """Should return separate aggregates for distinct methodology tags in the same window."""
         mock_db.get_measurements_in_range.return_value = [
             _make_measurement_row(
                 value=100.0,
@@ -226,16 +227,22 @@ class TestAggregatePeriod:
                 end_event="DISCHARGE",
                 statistic_type="P90",
             ),
-            _make_measurement_row(value=200.0),
+            _make_measurement_row(value=200.0),  # Defaults to TIME_TO_PROVIDER
         ]
 
         result = service.aggregate_hourly("ca-on-test", datetime(2026, 2, 6, 14, 0, tzinfo=UTC))
 
-        assert result is not None
-        assert result.metric_family == "TOTAL_LOS"
-        assert result.start_event == "DOOR"
-        assert result.end_event == "DISCHARGE"
-        assert result.statistic_type == "P90"
+        assert len(result) == 2
+
+        # Sort or find by family
+        metrics = {agg.metric_family: agg for agg in result}
+
+        assert "TOTAL_LOS" in metrics
+        assert metrics["TOTAL_LOS"].start_event == "DOOR"
+        assert metrics["TOTAL_LOS"].end_event == "DISCHARGE"
+        assert metrics["TOTAL_LOS"].statistic_type == "P90"
+
+        assert "TIME_TO_PROVIDER" in metrics
 
 
 # ─────────────────────────────────────────────────────────────────
