@@ -97,6 +97,8 @@ export async function GET(request: NextRequest) {
         LIMIT 10000
       `;
 
+      const homogeneity = computeMethodologyHomogeneity(results);
+
       if (format === "json") {
         return NextResponse.json(
           {
@@ -107,7 +109,7 @@ export async function GET(request: NextRequest) {
               data_type: "aggregated",
               granularity,
               filters: { province, startDate, endDate },
-              methodology_homogeneity: computeMethodologyHomogeneity(results),
+              methodology_homogeneity: homogeneity,
               license: "CC-BY-4.0",
               citation:
                 "Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set]. https://wait-time.ca",
@@ -141,8 +143,13 @@ export async function GET(request: NextRequest) {
         "methodology_url",
       ];
 
-      const csvRows = [
-        aggHeaders.join(","),
+      const csvRows = [];
+      if (!homogeneity.is_homogeneous) {
+        csvRows.push(`# METHODOLOGY DIVERGENCE WARNING: ${homogeneity.divergence_note}`);
+      }
+      csvRows.push(aggHeaders.join(","));
+
+      csvRows.push(
         ...results.map((row: Record<string, unknown>) =>
           aggHeaders
             .map((h) => {
@@ -157,7 +164,7 @@ export async function GET(request: NextRequest) {
             })
             .join(","),
         ),
-      ];
+      );
 
       const csv = csvRows.join("\n");
       const filename = `wait-time-ca-${granularity}-export-${new Date().toISOString().split("T")[0]}.csv`;
@@ -169,6 +176,8 @@ export async function GET(request: NextRequest) {
           "X-Data-License": "CC-BY-4.0",
           "X-Data-Type": "aggregated",
           "X-Granularity": granularity,
+          "X-Methodology-Divergence": String(!homogeneity.is_homogeneous),
+          "X-Methodology-Groups": String(homogeneity.distinct_methodology_groups),
           ...NO_STORE_HEADERS,
         },
       });
@@ -204,6 +213,8 @@ export async function GET(request: NextRequest) {
       LIMIT 10000
     `;
 
+    const homogeneity = computeMethodologyHomogeneity(results);
+
     // Format response as JSON
     if (format === "json") {
       return NextResponse.json(
@@ -215,7 +226,7 @@ export async function GET(request: NextRequest) {
             data_type: "raw",
             granularity: "raw",
             filters: { province, startDate, endDate },
-            methodology_homogeneity: computeMethodologyHomogeneity(results),
+            methodology_homogeneity: homogeneity,
             license: "CC-BY-4.0",
             citation:
               "Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set]. https://wait-time.ca",
@@ -249,8 +260,13 @@ export async function GET(request: NextRequest) {
       "methodology_url",
     ];
 
-    const csvRows = [
-      headers.join(","),
+    const csvRows = [];
+    if (!homogeneity.is_homogeneous) {
+      csvRows.push(`# METHODOLOGY DIVERGENCE WARNING: ${homogeneity.divergence_note}`);
+    }
+    csvRows.push(headers.join(","));
+
+    csvRows.push(
       ...results.map((row: Record<string, unknown>) =>
         headers
           .map((h) => {
@@ -266,7 +282,7 @@ export async function GET(request: NextRequest) {
           })
           .join(","),
       ),
-    ];
+    );
 
     const csv = csvRows.join("\n");
     const filename = `wait-time-ca-export-${new Date().toISOString().split("T")[0]}.csv`;
@@ -277,6 +293,8 @@ export async function GET(request: NextRequest) {
         "Content-Disposition": `attachment; filename="${filename}"`,
         "X-Data-License": "CC-BY-4.0",
         "X-Data-Type": "raw",
+        "X-Methodology-Divergence": String(!homogeneity.is_homogeneous),
+        "X-Methodology-Groups": String(homogeneity.distinct_methodology_groups),
         ...NO_STORE_HEADERS,
       },
     });

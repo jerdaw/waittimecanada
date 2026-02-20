@@ -1,0 +1,50 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract Release Notes
+        id: extract-notes
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "Extracting notes for version: $VERSION"
+
+          # Extract the section from CHANGELOG.md corresponding to this version
+          # It looks for `## [VERSION]` and grabs everything until the next `## [`
+          awk -v ver="$VERSION" '
+            /^## \[.*\]/ {
+              if (match($0, "## \\[" ver "\\]")) {
+                capture = 1
+                next
+              } else if (capture) {
+                exit
+              }
+            }
+            capture { print }
+          ' CHANGELOG.md > release-notes.md
+
+          # If the file is empty (e.g., tag without changelog entry), provide a default
+          if [ ! -s release-notes.md ]; then
+            echo "Release $GITHUB_REF_NAME" > release-notes.md
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          body_path: release-notes.md
+          draft: false
+          prerelease: false

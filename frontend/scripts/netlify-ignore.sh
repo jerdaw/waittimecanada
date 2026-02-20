@@ -27,10 +27,14 @@ fi
 
 commit_message="$(git log -1 --pretty=%B "${current_ref}" 2>/dev/null || git log -1 --pretty=%B)"
 
-# Allow build if we are on the production branch.
+# Allow build if we are on the production branch AND commit is a release
 if [ "${branch}" == "${production_branch}" ]; then
-  echo "[netlify-ignore] production branch detected -> allowing build"
-  exit 1
+  if echo "${commit_message}" | grep -qE '\[(release|deploy)\]'; then
+    echo "[netlify-ignore] release commit detected -> allowing build"
+    exit 1
+  fi
+  echo "[netlify-ignore] non-release commit on production branch -> skipping build"
+  exit 0
 fi
 
 echo "[netlify-ignore] non-production branch -> skipping build"

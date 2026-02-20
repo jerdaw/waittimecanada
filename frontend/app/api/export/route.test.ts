@@ -99,6 +99,43 @@ describe("GET /api/export", () => {
     const text = await res.text();
 
     expect(res.headers.get("content-type")).toContain("text/csv");
-    expect(text).not.toContain("methodology_homogeneity"); // CSV is just flat rows
+    expect(res.headers.get("x-methodology-divergence")).toBe("false");
+    expect(res.headers.get("x-methodology-groups")).toBe("1");
+    expect(text).not.toContain("METHODOLOGY DIVERGENCE WARNING");
+  });
+
+  it("adds diverange warning comment to raw CSV when methodology is mixed", async () => {
+    const mockResults = [
+      { metric_family: "A", start_event: "B", end_event: "C", statistic_type: "D" },
+      { metric_family: "X", start_event: "Y", end_event: "Z", statistic_type: "W" },
+    ];
+    mockSql.mockResolvedValue(mockResults);
+
+    const req = createRequest("/api/export?format=csv");
+    const res = await GET(req);
+    const text = await res.text();
+
+    expect(res.headers.get("content-type")).toContain("text/csv");
+    expect(res.headers.get("x-methodology-divergence")).toBe("true");
+    expect(res.headers.get("x-methodology-groups")).toBe("2");
+    expect(text.split("\n")[0]).toContain("# METHODOLOGY DIVERGENCE WARNING");
+    expect(text.split("\n")[0]).toContain("scientifically invalid");
+  });
+
+  it("adds diverange warning comment to aggregated CSV when methodology is mixed", async () => {
+    const mockResults = [
+      { metric_family: "A", start_event: "B", end_event: "C", statistic_type: "D", period_start: "2026-01-01" },
+      { metric_family: "X", start_event: "Y", end_event: "Z", statistic_type: "W", period_start: "2026-01-02" },
+    ];
+    mockSql.mockResolvedValue(mockResults);
+
+    const req = createRequest("/api/export?format=csv&granularity=daily&include_methodology=true");
+    const res = await GET(req);
+    const text = await res.text();
+
+    expect(res.headers.get("content-type")).toContain("text/csv");
+    expect(res.headers.get("x-methodology-divergence")).toBe("true");
+    expect(res.headers.get("x-methodology-groups")).toBe("2");
+    expect(text.split("\n")[0]).toContain("# METHODOLOGY DIVERGENCE WARNING");
   });
 });

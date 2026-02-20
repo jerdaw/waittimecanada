@@ -2,9 +2,9 @@
 
 ## Current Status (Updated 2026-02-19)
 
-**Progress:** M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
+**Progress:** M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
-**Strategic Direction:** **Milestone 31 (Divergence Briefs & Quality Drift UI) Complete.** Upgraded the analytics API with methodology divergence context to prevent invalid hospital comparisons, and surfaced quality drift metrics on the data quality dashboard. Immediate execution focus returns to cache/polling audit hardening. **Four-province breadth remains confirmed.**
+**Strategic Direction:** **Milestone 32 (Deployment Readiness) Complete.** Enhanced research validity by injecting methodology divergence warnings into all CSV data exports, hardened the Netlify release gate to prevent accidental preview credit burn, and wired up `release.yml` for automated GitHub Releases with CHANGELOG notes.
 
 **Deployment Note (2026-02-19):** Frontend public hosting is currently unavailable because the Netlify project is paused (cost control / credit exhaustion). The `wait-time.ca` domain cutover is staged in-repo but should be treated as **on hold** until the project is unpaused (target: **March 9, 2026**).
 
@@ -44,6 +44,7 @@
 | **M29: Equity Academic Rigor Hardening (ON)** | ON-scoped quintiles, suppression provenance, sensitivity + uncertainty outputs, non-causal/temporal messaging, reproducibility hardening (`equity` extras/docs), optimized layer output + API loader preference |
 | **M30: Scraper Visibility & Reliability Hardening** | Added structured failure taxonomy + heartbeat metadata (`last_success`, `last_error`, `consecutive_failures`, run duration), standardized retry/backoff for ON/AB/BC/QC fetch paths, enhanced `/api/health` + `check_heartbeat --verbose`, and updated workflow/runbook operations |
 | **M31: Divergence Briefs & Quality Drift UI** | Scheduled daily data quality snapshots (cron + CLI), added methodology divergence context to analytics trends API, added 7-Day Quality Drift UI panel to `/data-quality` page |
+| **M32: Deployment Readiness & CSV Divergence** | Injected methodology divergence warnings into raw and aggregated CSV exports, fixed `netlify-ignore.sh` to enforce `[release]` gate logic on `main`, and implemented `release.yml` GitHub Actions workflow for automated version releases |
 
 ---
 
@@ -91,7 +92,7 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 
 **Deployment / Domain Cutover (On Hold):**
 - [ ] **P1 / Ops: Unpause Netlify + verify `wait-time.ca` cutover** — Confirm TLS/cert, redirects, `NEXT_PUBLIC_BASE_URL`, and re-enable `production-smoke` (target **March 9, 2026**)
-- [ ] **P1 / Ops: Harden Netlify release gate** — Assert `netlify-ignore.sh` blocks non-release commits and add a minimal CI check to prevent accidental credit burn (2-3h)
+- [x] **P1 / Ops: Harden Netlify release gate** — Assert `netlify-ignore.sh` blocks non-release commits and add a minimal CI check to prevent accidental credit burn (M32 Complete)
 
 **Advanced Documentation (Deferred):**
 - [ ] **P2 / Add contributor onboarding guide** (#40) — Paperwork
@@ -106,7 +107,7 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 ### Next (2-6 weeks) — Core Engineering & Reliability
 
 **Priority 1: System Reliability & Correctness**
-- [ ] **P1 / Divergence Briefs in analytics + export** — When ontology mismatches, generate a structured “divergence brief” (why non-comparable) and surface it in UI + export metadata (M31 Complete - Partial: analytics coverage added, export coverage pending context review)
+- [x] **P1 / Divergence Briefs in analytics + export** — When ontology mismatches, generate a structured “divergence brief” (why non-comparable) and surface it in UI + export metadata (M32 Complete - CSV and analytics coverage complete)
 
 ### Later (6+ weeks) — Strategic Enhancements
 
@@ -390,7 +391,7 @@ Archived (delivered):
 | # | Item | Effort | Status |
 |---|------|--------|--------|
 | 14 | Add Lighthouse CI to GitHub Actions | M | ✅ Complete |
-| 17 | Add GitHub Releases with tagged versions | M | ⬜ Not Started |
+| 17 | Add GitHub Releases with tagged versions | M | ✅ Complete |
 | 27 | Expand automated screenshot generation | M | ✅ Complete |
 | 31 | Add data freshness badge (dynamic) | M | ✅ Complete |
 | 37 | Add uptime/status history page | M | ✅ Complete |
