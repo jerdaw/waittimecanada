@@ -35,6 +35,17 @@ interface BenchmarkRow {
   quartile: 1 | 2 | 3 | 4;
   trend: TrendDirection;
   trend_change_percent: number;
+  metric_family: string;
+  start_event: string;
+  end_event: string;
+  statistic_type: string;
+}
+
+interface MethodologySummary {
+  is_homogeneous: boolean;
+  distinct_groups: number;
+  divergence_note: string | null;
+  groups: any[];
 }
 
 interface RegionMappingCoverage {
@@ -111,6 +122,7 @@ export default function AnalyticsPage() {
   const [selectedRegionId, setSelectedRegionId] = useState<string | null>(null);
   const [loadingRegions, setLoadingRegions] = useState(true);
   const [loadingBenchmarks, setLoadingBenchmarks] = useState(true);
+  const [methodologySummary, setMethodologySummary] = useState<MethodologySummary | null>(null);
   const [loadingOccupancy, setLoadingOccupancy] = useState(true);
   const [occupancy, setOccupancy] = useState<OccupancySnapshot | null>(null);
 
@@ -200,12 +212,15 @@ export default function AnalyticsPage() {
         if (!mounted) return;
         if (response.ok && json.success && json.data) {
           setBenchmarks(json.data.hospitals ?? []);
+          setMethodologySummary(json.data.methodology_summary ?? null);
         } else {
           setBenchmarks([]);
+          setMethodologySummary(null);
         }
       } catch {
         if (!mounted) return;
         setBenchmarks([]);
+        setMethodologySummary(null);
       } finally {
         if (mounted) {
           setLoadingBenchmarks(false);
@@ -442,6 +457,20 @@ export default function AnalyticsPage() {
             )}
           </div>
 
+          {!loadingBenchmarks && methodologySummary && !methodologySummary.is_homogeneous && (
+            <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+              <p className="font-semibold flex items-center gap-2">
+                <span aria-hidden="true">⚠️</span> Methodology Divergence
+              </p>
+              <p className="mt-1">{methodologySummary.divergence_note}</p>
+              <div className="mt-2 text-xs">
+                <Link href="/methods" className="font-medium underline hover:text-amber-700">
+                  View comparability matrix &rarr;
+                </Link>
+              </div>
+            </div>
+          )}
+
           {loadingBenchmarks ? (
             <div className="text-sm text-muted-foreground">
               Loading benchmark rankings...
@@ -470,7 +499,12 @@ export default function AnalyticsPage() {
                       className="border-b border-border/40"
                     >
                       <td className="py-2 pr-2 font-medium text-foreground">
-                        {row.hospital_name}
+                        <div>{row.hospital_name}</div>
+                        <div className="mt-0.5">
+                          <span className="inline-flex items-center rounded-sm bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                            {row.statistic_type} / {row.start_event}&rarr;{row.end_event}
+                          </span>
+                        </div>
                       </td>
                       <td className="py-2 pr-2 text-muted-foreground">
                         {row.city}
