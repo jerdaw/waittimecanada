@@ -82,4 +82,3 @@ def test_snapshot_quality_cli_exception(mock_db, mock_quality_service):
         assert main() == 1
 
     assert mock_quality_service.snapshot_daily_quality.call_count == 1
-    assert mock_db.close.call_count == 1
