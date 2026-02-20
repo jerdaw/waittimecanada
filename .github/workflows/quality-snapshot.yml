@@ -1,0 +1,24 @@
+name: Daily Quality Snapshot
+on:
+  schedule:
+    - cron: '30 6 * * *'  # 06:30 UTC each day (after overnight scraper runs)
+  workflow_dispatch:
+
+jobs:
+  quality-snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -e ./backend
+      - name: Run daily quality snapshot
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m waittime.cli.snapshot
+      - name: Run drift check
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python scripts/monitor_drift.py || true
