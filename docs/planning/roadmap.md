@@ -2,9 +2,9 @@
 
 ## Current Status (Updated 2026-02-19)
 
-**Progress:** M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
+**Progress:** M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
 
-**Strategic Direction:** **Milestone 32 (Deployment Readiness) Complete.** Enhanced research validity by injecting methodology divergence warnings into all CSV data exports, hardened the Netlify release gate to prevent accidental preview credit burn, and wired up `release.yml` for automated GitHub Releases with CHANGELOG notes.
+**Strategic Direction:** **Milestone 33 (Historical Occupancy Trends) Complete.** Extended the aggregation pipeline to include Quebec's `STRETCHER_OCCUPANCY` metric family, added metric-family-aware filtering to the analytics trends API, added a collapsible "Historical Occupancy Trend" panel to the analytics dashboard, and documented the aggregation grouping decision in ADR-0019.
 
 **Deployment Note (2026-02-19):** Frontend public hosting is currently unavailable because the Netlify project is paused (cost control / credit exhaustion). The `wait-time.ca` domain cutover is staged in-repo but should be treated as **on hold** until the project is unpaused (target: **March 9, 2026**).
 
@@ -45,12 +45,13 @@
 | **M30: Scraper Visibility & Reliability Hardening** | Added structured failure taxonomy + heartbeat metadata (`last_success`, `last_error`, `consecutive_failures`, run duration), standardized retry/backoff for ON/AB/BC/QC fetch paths, enhanced `/api/health` + `check_heartbeat --verbose`, and updated workflow/runbook operations |
 | **M31: Divergence Briefs & Quality Drift UI** | Scheduled daily data quality snapshots (cron + CLI), added methodology divergence context to analytics trends API, added 7-Day Quality Drift UI panel to `/data-quality` page |
 | **M32: Deployment Readiness & CSV Divergence** | Injected methodology divergence warnings into raw and aggregated CSV exports, fixed `netlify-ignore.sh` to enforce `[release]` gate logic on `main`, and implemented `release.yml` GitHub Actions workflow for automated version releases |
+| **M33: Historical Occupancy Trends** | Extended aggregation pipeline to include `STRETCHER_OCCUPANCY`, added `metric_family` filtering to analytics trends API and `SystemTrendChart`, collapsible occupancy trend panel on analytics page, DB migration `015`, ADR-0019 |
 
 ---
 
 ## Next Steps
 
-M30 is complete and archived. Immediate priorities are: (1) Quebec zero-value parser regression fix, and (2) cache/polling audit hardening for shared API routes. Completed work remains tracked in the milestones table above; active and deferred backlog items are listed below.
+M33 is complete and archived. Immediate priority is M34 (multi-province equity layer — blocked on StatsCan CT data manual download). M35 (Nova Scotia scraper) is researched and ready for execution when bandwidth allows.
 
 ## Roadmap Operating Model
 
@@ -112,9 +113,9 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 ### Later (6+ weeks) — Strategic Enhancements
 
 **Future Feature Development:**
-- [ ] **P2 / Additional provinces** — Nova Scotia, New Brunswick scrapers with methodology documentation
-- [ ] **P2 / Historical occupancy trends** — Daily/weekly patterns for Quebec stretcher occupancy
-- [ ] **P2 / Enhanced equity layer (multi-province rollout)** — Apply Ontario template to QC/AB/BC after ON real-data rollout is fully verified
+- [x] **P2 / Historical occupancy trends** — Daily/weekly patterns for Quebec stretcher occupancy (M33 Complete)
+- [ ] **P2 / Enhanced equity layer (multi-province rollout)** — Apply Ontario template to QC/AB/BC (M34 — blocked on StatsCan CT data manual download)
+- [ ] **P2 / Additional provinces** — Nova Scotia scraper with methodology documentation (M35 — pre-research done)
 - [ ] **P2 / Occupancy-based recommendations** — Smart hospital suggestions based on current occupancy
 - [ ] **P2 / Portfolio launch** — Complete stakeholder interview and publish launch communications when public hosting is re-enabled
 - [ ] **P2 / Monitoring dashboard** — Prometheus/Grafana integration for operational visibility
@@ -229,6 +230,7 @@ Active milestone plans in `docs/planning/implementation/`:
 - none currently open.
 
 Archived (delivered):
+- `docs/planning/archive/milestone-33-historical-occupancy-trends.md` — M33-M35 planning doc (M33 delivered)
 - `docs/planning/archive/milestone-31-divergence-drift.md` — Divergence Briefs & Quality Drift UI (M31)
 - `docs/planning/archive/milestone-28-equity-real-data-ontario.md` — Ontario real-data equity layer rollout (M28)
 - `docs/planning/archive/milestone-29-equity-academic-rigor-hardening.md` — Ontario equity methodology hardening and academic defensibility improvements (M29)
@@ -306,6 +308,11 @@ Archived (delivered):
 | [0012](../adr/0012-occupancy-availability-contract.md) | Occupancy availability contract |
 | [0013](../adr/0013-testimonial-governance-guardrails.md) | Testimonial governance guardrails |
 | [0014](../adr/0014-unified-scraper-runtime-pipeline.md) | Unified scraper runtime pipeline |
+| [0015](../adr/0015-real-equity-layer-ontario.md) | Ontario real-data equity layer |
+| [0016](../adr/0016-equity-academic-rigor-hardening-ontario.md) | Ontario equity academic rigor hardening |
+| [0017](../adr/0017-domain-rebrand-wait-time-ca.md) | Domain rebrand to wait-time.ca |
+| [0018](../adr/0018-scraper-observability-and-reliability-hardening.md) | Scraper observability & reliability hardening |
+| [0019](../adr/0019-occupancy-trend-aggregation.md) | Include STRETCHER_OCCUPANCY in aggregation pipeline |
 
 ---
 
