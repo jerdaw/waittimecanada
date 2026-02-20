@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-02-19
+
+### Added
+- **M33: Historical Occupancy Trends**
+  - Extended aggregation pipeline to include `STRETCHER_OCCUPANCY` metric family.
+  - Added metric-family-aware filtering to analytics trends API.
+  - Added collapsible "Historical Occupancy Trend" panel to Analytics dashboard.
+  - Refactored `SystemTrendChart` to be generic for both wait times and occupancy.
+  - Documented aggregation grouping decision in ADR-0019.
+  - Updated operational cadence targets in `scraper-cron.yml`.
+
 ## [1.1.0] - 2026-02-19
 
 ### Added

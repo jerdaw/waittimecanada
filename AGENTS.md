@@ -40,17 +40,17 @@ This file provides guidance to automated developer tools when working with code 
 
 This is the **Wait Time Canada** project - a "Health Systems Observatory" designed to audit and standardize Canadian emergency room wait time data across provinces. This is **NOT a simple wait time app**, but rather a clinically defensible auditing platform that exposes methodological inconsistencies in healthcare reporting.
 
-**Current Status:** Milestone 16 (Multi-Province Operationalization) Complete. **Four-province breadth achieved** (ON, QC, AB, BC). All scrapers active, 380+ hospitals visible, methodology documentation complete for all provinces.
+**Current Status:** Milestone 33 (Historical Occupancy Trends) Complete. **Four-province breadth achieved** (ON, QC, AB, BC). All scrapers active, 380+ hospitals visible, methodology documentation complete for all provinces. Occupancy trend aggregation pipeline operational.
 
 **Current Architecture:**
 - **Database**: Neon PostgreSQL 17 (9 tables: sources, hospitals, measurements, scraper_status, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions)
 - **Backend**: Python 3.12+ with psycopg2, pytest
-  - **Tests**: 350+ passing (unit + integration)
+  - **Tests**: 454+ passing (unit + integration)
   - Scrapers: Quebec (BeautifulSoup), Ontario (Playwright), Alberta (Playwright), BC (JSON/__NEXT_DATA__)
   - Services: DatabaseService, AggregationService, DataQualityService, AnomalyDetectionService, MethodologyChangeDetector, GeocodingService
   - CLI tools: scraper runner, database cleanup, seeding, aggregation, trusted hospital approval, region mapping
 - **Frontend**: Next.js 14 + TypeScript + Mapbox GL JS
-  - **Tests**: 218+ passing (Vitest + React Testing Library)
+  - **Tests**: 359+ passing (Vitest + React Testing Library)
   - Map component with hospital markers and methodology display
   - Data quality dashboard (`/data-quality`)
   - Analytics & benchmarking dashboard (`/analytics`)
@@ -63,7 +63,7 @@ This is the **Wait Time Canada** project - a "Health Systems Observatory" design
 
 ### Technology Stack
 
-- **Backend:** Python 3.12+ scrapers via GitHub Actions (15-minute cron configured)
+- **Backend:** Python 3.12+ scrapers via GitHub Actions (cost-control mode: ~60min day / ~120min night; post-unpause target: */20)
 - **Database:** Neon PostgreSQL 17 with strict schema constraints
 - **Frontend:** Next.js 14 App Router + TypeScript + Mapbox GL JS
 - **Testing:** pytest (backend), Vitest (frontend), Playwright (E2E in CI)
@@ -221,6 +221,8 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 
 - [x] **Milestones 1-15:** Database foundation, multi-province scrapers, methodology comparisons, data quality monitoring, aggregation pipeline, analytics & benchmarking.
 - [x] **Milestone 16 (Complete):** Multi-Province Operationalization - 4 provinces active (ON, QC, AB, BC), 380+ hospitals visible, methodology documentation complete for all provinces, 15 health regions mapped, hospital seed data for all provinces.
+- [x] **Milestones 17-32 (Complete):** Quebec occupancy implementation, occupancy frontend UI, governance & quality, reliability, i18n, documentation, equity layer (ON real data + academic rigor hardening), scraper observability hardening, divergence briefs, deployment readiness & CSV divergence.
+- [x] **Milestone 33 (Complete):** Historical Occupancy Trends — STRETCHER_OCCUPANCY in aggregation pipeline, metric-family analytics API filter, occupancy trend panel on analytics page, DB migration 015, ADR-0019.
 
 ---
 
