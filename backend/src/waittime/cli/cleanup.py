@@ -12,6 +12,7 @@ Usage:
 import argparse
 import logging
 import sys
+from datetime import UTC, datetime, timedelta
 
 from waittime.services.aggregation import AggregationService
 from waittime.services.database import DatabaseService
@@ -76,8 +77,12 @@ def main() -> int:
         # Aggregate before cleanup to ensure no data is lost
         logger.info("\nAggregating measurements before cleanup...")
         agg_service = AggregationService(db)
+
+        # Reduced lookback range (3 days) to save Neon network transfer.
+        # Since cleanup runs daily, a 3-day buffer is sufficient.
+        three_days_ago = datetime.now(UTC) - timedelta(days=3)
         agg_counts = agg_service.backfill(
-            start_date=None,  # defaults to 30 days back
+            start_date=three_days_ago,
             end_date=None,
             period_types=["hourly", "daily"],
         )

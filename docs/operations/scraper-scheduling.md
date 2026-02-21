@@ -3,7 +3,7 @@
 **Last Updated:** 2026-02-19
 **Status:** ✅ All 4 provincial scrapers operational
 
-> Temporary cost-control mode (enabled February 14, 2026): scraper cadence is `*/30` (day) and `0 *` (night) with heartbeat stale threshold `90` minutes. Review on or before **March 9, 2026** and revert to normal cadence when Neon transfer usage stabilizes.
+> Temporary cost-control mode (updated February 21, 2026): scraper cadence is `every 4 hours` with heartbeat stale threshold `250` minutes. Review on or before **March 9, 2026** and revert to normal cadence when Neon transfer usage stabilizes.
 
 ---
 
@@ -17,10 +17,10 @@ Wait Time Canada operates 4 provincial emergency department wait time scrapers r
 
 | Province | Source ID | Status | Schedule | Last Verified |
 |----------|-----------|--------|----------|---------------|
-| **Quebec** | `quebec-msss` | ✅ Active | 30 min daytime / 60 min overnight | 2026-02-19 |
-| **Ontario** | `ontario-health` | ✅ Active | 30 min daytime / 60 min overnight | 2026-02-19 |
-| **Alberta** | `alberta-ahs` | ✅ Active | 30 min daytime / 60 min overnight | 2026-02-19 |
-| **British Columbia** | `bc-phsa` | ✅ Active | 30 min daytime / 60 min overnight | 2026-02-19 |
+| **Quebec** | `quebec-msss` | ✅ Active | Every 4 hours | 2026-02-21 |
+| **Ontario** | `ontario-health` | ✅ Active | Every 4 hours | 2026-02-21 |
+| **Alberta** | `alberta-ahs` | ✅ Active | Every 4 hours | 2026-02-21 |
+| **British Columbia** | `bc-phsa` | ✅ Active | Every 4 hours | 2026-02-21 |
 
 **Total Coverage:** 380+ hospitals across 4 provinces
 
@@ -31,7 +31,7 @@ Wait Time Canada operates 4 provincial emergency department wait time scrapers r
 ### 1. Scraper Cron (`scraper-cron.yml`)
 
 **Purpose:** Run all scrapers on schedule
-**Schedule:** `*/30 12-23,0-3 * * *` + `0 4-11 * * *` (30 minutes daytime, hourly overnight)
+**Schedule:** `0 */4 * * *` (Every 4 hours)
 **Runtime:** ~8-12 minutes (all 4 scrapers)
 **Timeout:** 20 minutes
 
@@ -317,12 +317,12 @@ When adding a new scraper:
 
 | Metric | Target | Current |
 |--------|--------|---------|
-| Scraper Run Frequency | Every 30 min day / 60 min night | ✅ Configured |
+| Scraper Run Frequency | Every 4 hours | ✅ Configured |
 | Max Scraper Runtime | < 15 min | ✅ ~8-12 min |
 | Heartbeat Check Frequency | Every 30 min | ✅ Configured |
-| Max Heartbeat Age | < 90 min | ✅ Monitored |
+| Max Heartbeat Age | < 250 min | ✅ Monitored |
 | Scraper Success Rate | > 95% | ✅ Tolerant design |
-| Data Freshness | < 90 min | ✅ Temporary throttle cadence |
+| Data Freshness | < 250 min | ✅ Temporary throttle cadence |
 
 ---
 
@@ -357,10 +357,10 @@ If Neon sends a public transfer warning (for example 80% usage), apply this runb
    GROUP BY source_id
    ORDER BY source_id;
    ```
-2. Temporarily reduce scrape cadence to 30 minutes if needed:
-   - `scraper-cron.yml`: `*/15` -> `*/30`
-   - `heartbeat-monitor.yml`: `--max-age 60` -> `--max-age 90`
-3. Confirm anomaly detection is running in batched baseline-stats mode (no raw 7-day history fetch per hospital).
+2. Temporarily reduce scrape cadence to 4 hours if needed:
+   - `scraper-cron.yml`: `*/15` -> `0 */4 * * *`
+   - `heartbeat-monitor.yml`: `--max-age 60` -> `--max-age 250`
+3. Confirm connection reuse is active in `DatabaseService` (constructor accepts `conn`).
 4. Keep read-heavy API routes cached at 5-10 minute shared TTL, and `no-store` only for user-specific/export routes.
 
 Notes:

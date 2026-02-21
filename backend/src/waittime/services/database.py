@@ -35,25 +35,26 @@ class DatabaseService:
     Uses direct psycopg2 connections for maximum compatibility.
     """
 
-    def __init__(self, database_url: str | None = None) -> None:
+    def __init__(self, database_url: str | None = None, conn: Any = None) -> None:
         """Initialize database connection.
 
         Args:
             database_url: PostgreSQL connection string (defaults to DATABASE_URL env var)
-
-        Raises:
-            ValueError: If connection string is not provided
+            conn: Optional existing connection to reuse
         """
         self.database_url = database_url or os.environ.get("DATABASE_URL")
+        self._provided_conn = conn
 
-        if not self.database_url:
-            raise ValueError(
-                "Database URL required. Set DATABASE_URL environment variable or pass it directly."
-            )
+        if not self.database_url and not self._provided_conn:
+            raise ValueError("Database URL or connection required.")
 
     @contextmanager
     def get_connection(self) -> Generator[psycopg2.extensions.connection, None, None]:
         """Get a database connection context manager."""
+        if self._provided_conn:
+            yield self._provided_conn
+            return
+
         conn = psycopg2.connect(self.database_url)
         try:
             yield conn

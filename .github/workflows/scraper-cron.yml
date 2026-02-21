@@ -5,14 +5,12 @@ name: Scraper Cron Job
 # Intent: run every 20 minutes once Neon transfer costs return to normal budget.
 on:
   schedule:
-    # Day (12:00 - 04:00 UTC): Every 60 minutes
-    - cron: '0 12-23,0-3 * * *'
-    # Night (04:00 - 12:00 UTC): Every 120 minutes (2 hours)
-    - cron: '0 4,6,8,10 * * *'
-  workflow_dispatch:  # Allow manual trigger
+    # Reduced frequency (every 4 hours) to save Neon network transfer
+    - cron: "0 */4 * * *"
+  workflow_dispatch: # Allow manual trigger
 
 env:
-  PYTHON_VERSION: '3.12'
+  PYTHON_VERSION: "3.12"
 
 concurrency:
   group: scraper-cron
@@ -32,7 +30,7 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
+          cache: "pip"
 
       - name: Install dependencies
         working-directory: ./backend

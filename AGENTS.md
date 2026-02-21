@@ -63,7 +63,7 @@ This is the **Wait Time Canada** project - a "Health Systems Observatory" design
 
 ### Technology Stack
 
-- **Backend:** Python 3.12+ scrapers via GitHub Actions (cost-control mode: ~60min day / ~120min night; post-unpause target: */20)
+- **Backend:** Python 3.12+ scrapers via GitHub Actions (cost-control mode: every 4 hours; post-unpause target: */20)
 - **Database:** Neon PostgreSQL 17 with strict schema constraints
 - **Frontend:** Next.js 14 App Router + TypeScript + Mapbox GL JS
 - **Testing:** pytest (backend), Vitest (frontend), Playwright (E2E in CI)

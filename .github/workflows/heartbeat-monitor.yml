@@ -37,4 +37,4 @@ jobs:
           cd backend
           # Temporary cost-control throttle companion setting.
           # Review target date: 2026-03-09 (revert to --max-age 60 with */15 scraper cadence).
-          python -m waittime.cli.check_heartbeat --max-age 90 --max-consecutive-failures 1
+          python -m waittime.cli.check_heartbeat --max-age 250 --max-consecutive-failures 1
