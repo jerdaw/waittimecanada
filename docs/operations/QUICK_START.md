@@ -52,7 +52,7 @@ python -m waittime.cli.scraper --list
 
 ### Heartbeat Status
 ```bash
-python -m waittime.cli.check_heartbeat --max-age 90
+python -m waittime.cli.check_heartbeat --max-age 250
 ```
 
 ### Check Specific Source
@@ -165,9 +165,9 @@ playwright install chromium
 ## Production Status
 
 **Current Schedule:**
-- Temporary (cost-control): Scrapers run every 30 minutes
+- Temporary (cost-control): Scrapers run every 4 hours
 - Heartbeat checks every 30 minutes
-- Heartbeat stale threshold is 90 minutes
+- Heartbeat stale threshold is 250 minutes
 - All 4 provinces operational
 
 **Review Reminder:** Reassess and revert to normal cadence on or before **March 9, 2026** if Neon transfer usage is back within budget.

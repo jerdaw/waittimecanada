@@ -191,11 +191,18 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
     logger.info(f"Starting scraper for {source.name} ({source_id})")
 
     try:
-        db = DatabaseService() if not dry_run else None
-        geocoder = GeocodingService() if not dry_run else None
+        if dry_run:
+            scraper_db = None
+            geocoder = None
+        else:
+            # Use a single connection for the entire scraper run to save network transfer
+            base_db = DatabaseService()
+            conn = base_db.get_connection().__enter__()
+            scraper_db = DatabaseService(conn=conn)
+            geocoder = GeocodingService()
 
         before_save = None
-        if db is not None and geocoder is not None:
+        if scraper_db is not None and geocoder is not None:
 
             def before_save(measurements: list[Measurement]) -> None:
                 _upsert_hospitals_for_measurements(
@@ -203,15 +210,19 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
                     source_id=source_id,
                     source=source,
                     scraper_class=scraper_class,
-                    db=db,
+                    db=scraper_db,
                     geocoder=geocoder,
                 )
 
-        with scraper_class(source, db=db) as scraper:
+        with scraper_class(source, db=scraper_db) as scraper:
             measurements = scraper.run(
                 save_to_db=not dry_run,
                 before_save=before_save,
             )
+
+        if not dry_run and scraper_db and scraper_db._provided_conn:
+            # Manually close because we bypassed the 'with' context for the shared connection
+            scraper_db._provided_conn.close()
 
         logger.info(f"Collected {len(measurements)} measurements")
 

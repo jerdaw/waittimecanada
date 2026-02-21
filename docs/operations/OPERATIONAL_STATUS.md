@@ -28,7 +28,7 @@ Wait Time Canada's scraper infrastructure is **fully operational** with all 4 pr
 
 ### Scheduling: ✅ OPERATIONAL
 
-- **Scraper Cron:** Runs every 30 minutes daytime and hourly overnight (`*/30 12-23,0-3 * * *`, `0 4-11 * * *`)
+- **Scraper Cron:** Runs every 4 hours (`0 */4 * * *`)
 - **Heartbeat Monitor:** Checks every 30 minutes (`*/30 * * * *`)
 - **Execution:** `python -m waittime.cli.scraper --all`
 - **Runtime:** ~8-12 minutes per cycle
@@ -36,7 +36,7 @@ Wait Time Canada's scraper infrastructure is **fully operational** with all 4 pr
 
 ### Monitoring: ✅ OPERATIONAL
 
-- **Heartbeat Checks:** Active (90-minute threshold)
+- **Heartbeat Checks:** Active (250-minute threshold)
 - **Failure Alerts:** Pushover configured
 - **Dead Man's Switch:** `check_heartbeat` CLI monitors all sources
 - **Dynamic Discovery:** Sources auto-detected from database
@@ -49,7 +49,7 @@ Wait Time Canada's scraper infrastructure is **fully operational** with all 4 pr
 
 **scraper-cron.yml:**
 - ✅ YAML syntax valid
-- ✅ Runs every 30 minutes daytime and hourly overnight
+- ✅ Runs every 4 hours
 - ✅ Installs Playwright browsers
 - ✅ Runs all 4 scrapers with `--all` flag
 - ✅ Failure alerting configured
@@ -59,7 +59,7 @@ Wait Time Canada's scraper infrastructure is **fully operational** with all 4 pr
 - ✅ YAML syntax valid
 - ✅ Runs every 30 minutes
 - ✅ Checks all sources dynamically
-- ✅ 90-minute heartbeat threshold
+- ✅ 250-minute heartbeat threshold
 - ✅ Pushover alerts configured
 
 ### 2. Scraper CLI ✅
@@ -189,11 +189,11 @@ concurrency:
 
 | Metric | Target | Status |
 |--------|--------|--------|
-| Scraper Frequency | Every 30 min day / 60 min night | ✅ Configured |
+| Scraper Frequency | Every 4 hours | ✅ Configured |
 | Scraper Runtime | < 15 min | ✅ ~10 min avg |
 | Heartbeat Frequency | Every 30 min | ✅ Configured |
-| Max Heartbeat Age | < 90 min | ✅ Monitored |
-| Data Freshness | < 90 min | ✅ temporary throttle cadence |
+| Max Heartbeat Age | < 250 min | ✅ Monitored |
+| Data Freshness | < 250 min | ✅ temporary throttle cadence |
 
 ### Cost Estimate
 
