@@ -1,5 +1,7 @@
 name: Production Smoke
 
+# PAUSED (2026-02-22): Scheduled runs disabled due to exhausted GitHub Actions quota.
+# Keep manual dispatch available for explicit smoke checks.
 on:
   workflow_dispatch:
     inputs:
@@ -7,9 +9,6 @@ on:
         description: "Optional override (defaults to PRODUCTION_BASE_URL secret)"
         required: false
         type: string
-  schedule:
-    - cron: "17 */6 * * *"
-
 concurrency:
   group: production-smoke
   cancel-in-progress: true

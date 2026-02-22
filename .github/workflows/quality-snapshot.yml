@@ -1,7 +1,7 @@
 name: Daily Quality Snapshot
+# PAUSED (2026-02-22): Scheduled runs disabled due to exhausted GitHub Actions quota.
+# Keep manual dispatch available for one-off snapshots.
 on:
-  schedule:
-    - cron: '30 6 * * *'  # 06:30 UTC each day (after overnight scraper runs)
   workflow_dispatch:
 
 jobs:

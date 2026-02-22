@@ -1,9 +1,8 @@
 name: Heartbeat Monitor (Dead Man's Switch)
 
-# Check every 30 minutes if scrapers are running
+# PAUSED (2026-02-22): Scheduled runs disabled due to exhausted GitHub Actions quota.
+# Keep manual dispatch available for one-off checks if needed.
 on:
-  schedule:
-    - cron: '*/30 * * * *'  # Every 30 minutes
   workflow_dispatch:
 
 concurrency:

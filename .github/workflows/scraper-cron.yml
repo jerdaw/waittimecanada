@@ -1,12 +1,9 @@
 name: Scraper Cron Job
 
-# Cost-control throttle: day=60min, night=120min (current).
-# Post-unpause target (≥ 2026-03-09): change both schedules to */20 cron cadence.
-# Intent: run every 20 minutes once Neon transfer costs return to normal budget.
+# PAUSED (2026-02-22): Scheduled runs disabled due to exhausted GitHub Actions quota.
+# Keep manual dispatch available for one-off runs if needed.
+# Post-unpause target (>= 2026-03-09): restore schedule and move to */20 cadence.
 on:
-  schedule:
-    # Reduced frequency (every 4 hours) to save Neon network transfer
-    - cron: "0 */4 * * *"
   workflow_dispatch: # Allow manual trigger
 
 env:
