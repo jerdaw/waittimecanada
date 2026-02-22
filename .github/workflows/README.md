@@ -59,7 +59,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 4. `scraper-cron.yml` - Scheduled Scraper Execution
 
-**Trigger:** temporary cost-control cadence (every 30 minutes daytime, hourly overnight) + manual dispatch.
+**Trigger:** currently manual dispatch only (scheduled cron temporarily paused due to GitHub Actions quota exhaustion).
 
 **Purpose:** Run all provincial scrapers against production DB and emit classified operational alerts.
 
@@ -70,7 +70,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 5. `heartbeat-monitor.yml` - Dead Man's Switch
 
-**Trigger:** every 30 minutes + manual dispatch.
+**Trigger:** currently manual dispatch only (scheduled cron temporarily paused due to GitHub Actions quota exhaustion).
 
 **Purpose:** Ensure scraper heartbeat freshness remains within threshold and report consecutive/classified failures.
 
@@ -81,7 +81,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 6. `database-cleanup.yml` - Measurement Retention Cleanup
 
-**Trigger:** daily + manual dispatch.
+**Trigger:** currently manual dispatch only (scheduled cron temporarily paused due to GitHub Actions quota exhaustion).
 
 **Purpose:** Enforce retention policy for old measurement rows.
 
@@ -103,7 +103,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 8. `production-smoke.yml` - Live Route Smoke Checks
 
-**Trigger:** every 6 hours + manual dispatch.
+**Trigger:** currently manual dispatch only (scheduled cron temporarily paused due to GitHub Actions quota exhaustion).
 
 **Purpose:** Verify public production routes respond with expected markers.
 

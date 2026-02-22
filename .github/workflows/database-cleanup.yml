@@ -1,9 +1,8 @@
 name: Database Cleanup
 
-# Run daily at 2 AM UTC to clean up old measurements (30-day retention policy)
+# PAUSED (2026-02-22): Scheduled runs disabled due to exhausted GitHub Actions quota.
+# Keep manual dispatch available if a retention cleanup is needed before quota reset.
 on:
-  schedule:
-    - cron: '0 2 * * *'  # Daily at 2 AM UTC
   workflow_dispatch:  # Allow manual triggering
 
 concurrency:
