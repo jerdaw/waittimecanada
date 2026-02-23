@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-02-23
+
+### Changed
+- Upgraded react-map-gl 7→8; migrated import path to `react-map-gl/mapbox`
+- Upgraded date-fns 3→4
+- Upgraded playwright / `@playwright/test` 1.40→1.58.2
+- Bumped ruff pre-commit hook to v0.14.14 (matches venv and CI)
+- Bumped mirrors-mypy pre-commit hook to v1.19.0; added `playwright` and `tenacity` to hook `additional_dependencies` for consistent stub resolution
+
+### Fixed
+- Removed stale `# type: ignore[misc]` from `@retry` decorators in all scrapers (redundant with mypy v1.19.0)
+- Corrected `# type: ignore[assignment,misc]` placement in optional Playwright import fallback (`observability.py`)
+- Removed redundant `cast(str, ...)` in Alberta scraper
+- Fixed pytest match string in `test_database_service.py` to match actual error message
+- Fixed E2E fixture to skip gracefully when `DATABASE_URL` is absent
+- Fixed 41 ruff I001 import-sort violations across backend test files
+- Updated Map.tsx event handler types for react-map-gl v8 API
+- Pruned stale remote-tracking branch after dependabot PR squash-merge
+
 ## [1.2.0] - 2026-02-19
 
 ### Added
@@ -104,6 +123,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Basic scraper architecture
 - Core ontology design
 
+[1.2.1]: https://github.com/jerdaw/waittimecanada/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/jerdaw/waittimecanada/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/jerdaw/waittimecanada/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/jerdaw/waittimecanada/compare/v0.9.0...v1.0.0
 [0.9.0]: https://github.com/jerdaw/waittimecanada/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/jerdaw/waittimecanada/compare/v0.1.0...v0.8.0

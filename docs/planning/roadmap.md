@@ -1,12 +1,12 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-02-19)
+## Current Status (Updated 2026-02-23)
 
-**Progress:** M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived | M9 production smoke + readiness automation implemented | M9 repo polish + launch copy artifacts completed | M9 screenshot automation implemented | M9 testimonial governance hardening implemented | M9 About section component completed | M11 equity layer scaffold + linkage summary implemented | M12 occupancy availability contract implemented | CI optimization pass implemented | Documentation modernization + docs quality automation implemented
+**Progress:** M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | CI/Tooling Maintenance Complete (2026-02-23) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived
 
-**Strategic Direction:** **Milestone 33 (Historical Occupancy Trends) Complete.** Extended the aggregation pipeline to include Quebec's `STRETCHER_OCCUPANCY` metric family, added metric-family-aware filtering to the analytics trends API, added a collapsible "Historical Occupancy Trend" panel to the analytics dashboard, and documented the aggregation grouping decision in ADR-0019.
+**Strategic Direction:** **CI tooling maintenance complete (2026-02-23).** Resolved all mypy and pytest CI failures from the scraper-ci workflow. Upgraded ruff (v0.14.14), mypy (v1.19.0), react-map-gl (v8), playwright (1.58.2), and date-fns (v4). All 359 frontend and 454+ backend tests passing. Pre-commit hooks fully aligned across hook env, venv, and CI.
 
-**Deployment Note (2026-02-19):** Frontend public hosting is currently unavailable because the Netlify project is paused (cost control / credit exhaustion). The `wait-time.ca` domain cutover is staged in-repo but should be treated as **on hold** until the project is unpaused (target: **March 9, 2026**).
+**Deployment Note (2026-02-23):** Frontend public hosting is currently unavailable because the Netlify project is paused (cost control / credit exhaustion). The `wait-time.ca` domain cutover is staged in-repo but should be treated as **on hold** until the project is unpaused (target: **March 9, 2026**).
 
 ---
 
@@ -51,7 +51,7 @@
 
 ## Next Steps
 
-M33 is complete and archived. Immediate priority is M34 (multi-province equity layer — blocked on StatsCan CT data manual download). M35 (Nova Scotia scraper) is researched and ready for execution when bandwidth allows.
+CI tooling maintenance complete (2026-02-23). Netlify unpause target is **March 9, 2026** — plan to reactivate production hosting and run production smoke verification at that time. Beyond that: M34 (multi-province equity layer) when StatsCan CT data is available; M35 (Nova Scotia scraper) when bandwidth allows.
 
 ## Roadmap Operating Model
 
@@ -88,6 +88,7 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 **PRIORITY 1: Engineering Reliability (Local)**
 - [x] **P1 / Performance: Cache & polling audit** — Verify cache headers/TTLs for shared read-heavy routes; enforce `no-store` for user-specific and export endpoints; keep SystemStatus polling at 5m and tab-visible only (4-8h)
 - [x] **P1 / Ops: CI quota conservation (temporary)** — Minimize free-tier GitHub Actions burn until reset (favor local preflight + targeted workflow triggers, defer non-critical heavy jobs such as Playwright to essential runs only).
+- [x] **P1 / Ops: CI/tooling maintenance (2026-02-23)** — Resolved all mypy/pytest CI failures; upgraded ruff, mypy, react-map-gl v8, playwright, date-fns; aligned pre-commit hook env with venv and CI; pruned stale remote-tracking branch.
 
 ### Deferred / On Hold (Non-Core / Too Reaching)
 
@@ -230,6 +231,9 @@ Active milestone plans in `docs/planning/implementation/`:
 - none currently open.
 
 Archived (delivered):
+- `docs/planning/archive/maintenance-2026-02-23.md` — CI/tooling maintenance (2026-02-23)
+- `docs/planning/archive/maintenance-2026-02-19.md` — Domain rebrand staging, M30 closeout (2026-02-19)
+- `docs/planning/archive/milestone-32-deployment-readiness.md` — Deployment Readiness & CSV Divergence (M32)
 - `docs/planning/archive/milestone-33-historical-occupancy-trends.md` — M33-M35 planning doc (M33 delivered)
 - `docs/planning/archive/milestone-31-divergence-drift.md` — Divergence Briefs & Quality Drift UI (M31)
 - `docs/planning/archive/milestone-28-equity-real-data-ontario.md` — Ontario real-data equity layer rollout (M28)
