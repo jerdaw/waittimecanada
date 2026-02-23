@@ -187,7 +187,7 @@ class QuebecScraper(BaseScraper):
                 self._record_failure(error, "orchestration", start_time)
             raise
 
-    @retry(  # type: ignore[misc]
+    @retry(
         stop=stop_after_attempt(HTTP_FETCH_ATTEMPTS),
         wait=fetch_retry_wait(),
     )

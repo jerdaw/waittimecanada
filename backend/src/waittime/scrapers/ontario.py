@@ -79,7 +79,7 @@ class OntarioScraper(BaseScraper):
         "William Osler Health System": "ca-on-william-osler",
     }
 
-    @retry(  # type: ignore[misc]
+    @retry(
         stop=stop_after_attempt(HTTP_FETCH_ATTEMPTS),
         wait=fetch_retry_wait(),
     )

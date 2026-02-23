@@ -87,7 +87,7 @@ class BaseScraper(ABC):
     def __exit__(self, *args: object) -> None:
         self.client.close()
 
-    @retry(  # type: ignore[misc]
+    @retry(
         stop=stop_after_attempt(HTTP_FETCH_ATTEMPTS),
         wait=fetch_retry_wait(),
     )

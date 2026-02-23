@@ -75,7 +75,7 @@ class BCScraper(BaseScraper):
         "Surrey Memorial Hospital (Pediatrics Emergency)": "ca-bc-surrey-memorial-pediatrics",
     }
 
-    @retry(  # type: ignore[misc]
+    @retry(
         stop=stop_after_attempt(HTTP_FETCH_ATTEMPTS),
         wait=fetch_retry_wait(),
     )

@@ -8,7 +8,6 @@ Coverage: 6+ cities across Alberta
 import logging
 import re
 import unicodedata
-from typing import cast
 
 from bs4 import BeautifulSoup, Tag
 from playwright.sync_api import TimeoutError as PlaywrightTimeout
@@ -50,7 +49,7 @@ class AlbertaScraper(BaseScraper):
     STATISTIC_TYPE = StatisticType.POINT_ESTIMATE  # Updated every 2 minutes
     PATIENT_SCOPE = PatientScope.ALL
 
-    @retry(  # type: ignore[misc]
+    @retry(
         stop=stop_after_attempt(HTTP_FETCH_ATTEMPTS),
         wait=fetch_retry_wait(),
     )
@@ -89,7 +88,7 @@ class AlbertaScraper(BaseScraper):
                 # Give extra time for dynamic content
                 page.wait_for_timeout(PLAYWRIGHT_RENDER_WAIT_MS)
 
-                html = cast(str, page.content())
+                html = page.content()
                 return html
             finally:
                 browser.close()

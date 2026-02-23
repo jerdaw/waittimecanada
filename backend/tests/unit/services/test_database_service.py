@@ -31,7 +31,7 @@ def db_service(mock_db_url):
 class TestDatabaseService:
     def test_init_raises_if_no_url(self, monkeypatch):
         monkeypatch.delenv("DATABASE_URL", raising=False)
-        with pytest.raises(ValueError, match="Database URL required"):
+        with pytest.raises(ValueError, match="Database URL or connection required"):
             DatabaseService(database_url=None)
 
     @patch("psycopg2.connect")
