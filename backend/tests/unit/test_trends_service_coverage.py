@@ -2,6 +2,7 @@ from typing import Any
 from unittest.mock import MagicMock, Mock
 
 import pytest
+
 from waittime.services.trends import SystemTrendService
 
 

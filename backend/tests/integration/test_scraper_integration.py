@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from unittest.mock import patch
 
 import pytest
+
 from waittime.core import Hospital, Source
 from waittime.scrapers.base import BaseScraper
 from waittime.services.database import DatabaseService

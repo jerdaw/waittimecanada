@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
+
 from waittime.core import MeasurementAggregate
 from waittime.services.patterns import TemporalPatternService
 

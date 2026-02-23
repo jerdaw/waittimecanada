@@ -3,6 +3,7 @@
 from datetime import UTC, datetime
 
 import pytest
+
 from waittime.core import (
     EndEvent,
     Hospital,

@@ -3,6 +3,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from waittime.cli.seed_sources import load_source_from_json, main, seed_source
 
 

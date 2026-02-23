@@ -6,6 +6,7 @@ These tests verify the comparison feature works end-to-end with real seeded data
 from datetime import datetime
 
 import pytest
+
 from waittime.services.comparison import ComparisonService
 from waittime.services.database import DatabaseService
 
@@ -172,9 +173,9 @@ class TestComparisonWithRealData:
         result = comparison_service.compare_hospitals("test-hospital-a", "test-hospital-b")
 
         # Verify divergence detection
-        assert (
-            result["comparable"] is False
-        ), "Hospitals with different methodologies should not be comparable"
+        assert result["comparable"] is False, (
+            "Hospitals with different methodologies should not be comparable"
+        )
         assert result["divergence_brief"] is not None, "Should have divergence brief"
         assert "TRIAGE vs REGISTRATION" in result["divergence_brief"]
         assert "P90 vs ROLLING_AVG" in result["divergence_brief"]
@@ -310,9 +311,9 @@ class TestComparisonWithRealData:
             "statistic_type",
         ]
         for field in methodology_fields:
-            assert (
-                field in result["hospital_a"]["methodology"]
-            ), f"Missing methodology field: {field}"
+            assert field in result["hospital_a"]["methodology"], (
+                f"Missing methodology field: {field}"
+            )
 
     def test_wait_times_are_numeric(
         self, db_transaction: DatabaseService, comparison_service: ComparisonService

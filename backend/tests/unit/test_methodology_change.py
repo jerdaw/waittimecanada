@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 from unittest.mock import Mock
 
 import pytest
+
 from waittime.services.methodology_change import MethodologyChangeDetector
 
 

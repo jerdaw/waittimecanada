@@ -3,6 +3,7 @@
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
+
 from waittime.core import (
     EndEvent,
     Measurement,

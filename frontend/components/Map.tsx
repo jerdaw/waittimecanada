@@ -8,7 +8,7 @@ import MapGL, {
   Source,
   Layer,
   type LayerProps,
-} from "react-map-gl";
+} from "react-map-gl/mapbox";
 import type { Expression } from "mapbox-gl";
 import type { Hospital } from "@/app/api/hospitals/route";
 import { ComparisonModal } from "./ComparisonModal";
@@ -1036,8 +1036,8 @@ export default function Map({
         mapStyle="mapbox://styles/mapbox/light-v11"
         mapboxAccessToken={MAPBOX_TOKEN}
         interactiveLayerIds={["hospitals-layer", "equity-fill"]}
-        onClick={(e) => handleMapClick(e as unknown as MapInteractionEvent)}
-        onMouseMove={(e) =>
+        onClick={(e: unknown) => handleMapClick(e as unknown as MapInteractionEvent)}
+        onMouseMove={(e: unknown) =>
           handleMapMouseMove(e as unknown as MapInteractionEvent)
         }
         onMouseLeave={handleMapMouseLeave}
@@ -1066,7 +1066,7 @@ export default function Map({
               latitude={hospital.latitude}
               longitude={hospital.longitude}
               anchor="bottom"
-              onClick={(e) => {
+              onClick={(e: { originalEvent: Event }) => {
                 e.originalEvent.stopPropagation();
                 handleMarkerClick(hospital);
               }}

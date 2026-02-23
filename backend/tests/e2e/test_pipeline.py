@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 
 import pytest
 import requests
+
 from waittime.core import (
     EndEvent,
     Measurement,
@@ -156,7 +157,9 @@ def test_pipeline_flow(db_service: DatabaseService) -> None:
         time.sleep(1)  # Wait 1s between retries
 
     # 4. Assertion
-    assert found, f"API did not return the expected wait time of {expected_wait_minutes} within {max_retries} seconds."
+    assert found, (
+        f"API did not return the expected wait time of {expected_wait_minutes} within {max_retries} seconds."
+    )
 
     # 5. Teardown (Optional but good practice)
     # Using a DELETE cleanup would be nice to keep the DB clean

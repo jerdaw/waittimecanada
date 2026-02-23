@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import httpx
 import pytest
+
 from waittime.services.alerts import AlertConfig, AlertService
 
 

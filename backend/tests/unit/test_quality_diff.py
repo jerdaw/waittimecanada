@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from unittest.mock import MagicMock, Mock
 
 import pytest
+
 from waittime.services.quality_diff import QualityDiffService
 
 

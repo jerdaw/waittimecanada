@@ -8,7 +8,7 @@ import Map from "@/components/Map";
 import { Hospital } from "@/app/api/hospitals/route";
 
 // Mock MapboxGL
-vi.mock("react-map-gl", () => ({
+vi.mock("react-map-gl/mapbox", () => ({
   default: ({
     children,
     onClick,
