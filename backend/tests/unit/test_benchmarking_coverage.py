@@ -2,6 +2,7 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
+
 from waittime.services.benchmarking import BenchmarkingService
 
 

@@ -3,6 +3,7 @@
 from unittest.mock import ANY, MagicMock, patch
 
 import pytest
+
 from waittime.core import EndEvent, MetricFamily, StartEvent, StatisticType
 from waittime.scrapers.quebec import QuebecScraper, create_quebec_source
 

@@ -4,6 +4,7 @@ from unittest.mock import Mock
 
 import httpx
 import psycopg2
+
 from waittime.scrapers.observability import (
     ClassifiedFailure,
     classify_scraper_failure,

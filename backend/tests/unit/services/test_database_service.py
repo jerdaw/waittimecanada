@@ -2,6 +2,7 @@ from datetime import UTC, datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from waittime.core.enums import (
     EndEvent,
     MetricFamily,

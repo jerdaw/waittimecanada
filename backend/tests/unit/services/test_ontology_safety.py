@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from unittest.mock import MagicMock, Mock
 
 import pytest
+
 from waittime.services.trends import SystemTrendService
 
 

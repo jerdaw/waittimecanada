@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from waittime.cli.scraper import SCRAPERS, hospital_id_to_name, main, run_scraper
 
 

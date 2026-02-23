@@ -1,6 +1,7 @@
 """Unit tests for Ontario scraper."""
 
 import pytest
+
 from waittime.core import EndEvent, MetricFamily, PatientScope, StartEvent, StatisticType
 from waittime.scrapers.ontario import OntarioScraper, create_ontario_source
 

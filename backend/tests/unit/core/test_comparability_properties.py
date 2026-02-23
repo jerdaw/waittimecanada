@@ -1,5 +1,6 @@
 from hypothesis import given
 from hypothesis import strategies as st
+
 from waittime.core import Measurement, are_comparable, generate_divergence_brief
 from waittime.core.enums import EndEvent, MetricFamily, PatientScope, StartEvent, StatisticType
 

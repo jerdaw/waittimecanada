@@ -117,7 +117,7 @@ vi.mock("mapbox-gl", () => ({
 }));
 
 // Mock react-map-gl
-vi.mock("react-map-gl", () => ({
+vi.mock("react-map-gl/mapbox", () => ({
   __esModule: true,
   default: vi.fn(({ children }) => children),
   Marker: vi.fn(({ children }) => children),

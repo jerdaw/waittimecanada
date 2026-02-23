@@ -8,6 +8,7 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
+
 from waittime.services.data_quality import DataQualityService
 
 
@@ -114,9 +115,9 @@ class TestGapDetection:
 
         # Should have the 3-hour gap
         gap_durations = [g["duration_minutes"] for g in result["gaps"]]
-        assert any(
-            170 <= d <= 195 for d in gap_durations
-        ), f"Expected a ~180 min gap, got durations: {gap_durations}"
+        assert any(170 <= d <= 195 for d in gap_durations), (
+            f"Expected a ~180 min gap, got durations: {gap_durations}"
+        )
 
     @pytest.mark.unit
     def test_multiple_gaps(self, service, mock_db):

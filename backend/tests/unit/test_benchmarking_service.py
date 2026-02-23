@@ -3,6 +3,7 @@
 from unittest.mock import Mock
 
 import pytest
+
 from waittime.services.benchmarking import BenchmarkingService
 
 

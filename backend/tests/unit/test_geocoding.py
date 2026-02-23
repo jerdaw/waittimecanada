@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, mock_open, patch
 
 import httpx
 import pytest
+
 from waittime.services.geocoding import GeocodingResult, GeocodingService
 
 

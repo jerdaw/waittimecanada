@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
+
 from waittime.cli.seed_regions import load_regions_from_json, seed_regions
 
 

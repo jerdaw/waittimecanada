@@ -1,7 +1,7 @@
 """Unit tests for core domain models."""
 
-
 import pytest
+
 from waittime.core import (
     EndEvent,
     Hospital,

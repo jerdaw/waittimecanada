@@ -3,6 +3,7 @@
 import json
 
 import pytest
+
 from waittime.core import EndEvent, MetricFamily, StartEvent, StatisticType
 from waittime.scrapers.bc import BCScraper, create_bc_source
 
