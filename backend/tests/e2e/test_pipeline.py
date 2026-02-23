@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import os
 import time
 from collections.abc import Generator
 from datetime import UTC, datetime
@@ -24,6 +25,8 @@ logger = logging.getLogger(__name__)
 @pytest.fixture
 def db_service() -> Generator[DatabaseService, None, None]:
     """Fixture to provide database service."""
+    if not os.environ.get("DATABASE_URL"):
+        pytest.skip("DATABASE_URL not set; skipping E2E pipeline test")
     service = DatabaseService()
     yield service
     # Cleanup logic could go here if needed, but we used a unique ID to avoid collisions

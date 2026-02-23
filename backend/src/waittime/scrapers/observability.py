@@ -14,8 +14,8 @@ try:
     from playwright.sync_api import Error as PlaywrightError
     from playwright.sync_api import TimeoutError as PlaywrightTimeout
 except Exception:  # pragma: no cover - optional in some test environments
-    PlaywrightError = Exception
-    PlaywrightTimeout = Exception
+    PlaywrightError = Exception  # type: ignore[assignment,misc]
+    PlaywrightTimeout = Exception  # type: ignore[assignment,misc]
 
 FailureCategory = Literal[
     "upstream_unavailable",
