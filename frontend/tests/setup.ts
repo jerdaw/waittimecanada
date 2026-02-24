@@ -48,6 +48,38 @@ vi.mock('next-intl', () => ({
   useTimeZone: () => 'America/Toronto',
 }));
 
+// Mock next-intl/server (for server components like FAQPage)
+vi.mock('next-intl/server', () => ({
+  getTranslations: async (namespace?: string) => {
+    const t = (key: string, params?: Record<string, any>) => {
+      const fullPath = namespace ? `${namespace}.${key}` : key;
+      let value = getNestedValue(messages, fullPath);
+
+      if (!value) return key;
+
+      if (params && typeof value === 'string') {
+        Object.entries(params).forEach(([k, v]) => {
+          if (typeof v !== 'function') {
+            value = (value as string).replace(`{${k}}`, String(v));
+          }
+        });
+      }
+      return value;
+    };
+
+    t.rich = (key: string, params?: Record<string, any>) => {
+      return t(key, params);
+    };
+
+    t.raw = (key: string) => {
+      const fullPath = namespace ? `${namespace}.${key}` : key;
+      return getNestedValue(messages, fullPath) || key;
+    };
+
+    return t;
+  },
+}));
+
 // Mock Next.js router
 vi.mock("next/navigation", () => ({
   useRouter: () => ({

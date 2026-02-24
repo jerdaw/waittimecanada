@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest";
 import { AboutSection } from "@/components/AboutSection";
 
 describe("AboutSection", () => {
-  it("renders with collapsed view by default", () => {
+  it("renders with expanded view by default", () => {
     render(<AboutSection />);
 
     expect(
@@ -11,50 +11,46 @@ describe("AboutSection", () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/About This Project/i)).toBeInTheDocument();
 
-    // Content should not be visible when collapsed
+    // Content should be visible when expanded by default
+    expect(
+      screen.getByText(/As a pre-medical student/i),
+    ).toBeInTheDocument();
+  });
+
+  it("collapses to hide narrative when clicked", () => {
+    render(<AboutSection />);
+
+    const button = screen.getByRole("button", {
+      name: /collapse about section/i,
+    });
+    fireEvent.click(button);
+
+    // Content should no longer be visible
     expect(
       screen.queryByText(/As a pre-medical student/i),
     ).not.toBeInTheDocument();
   });
 
-  it("expands to show full narrative when clicked", () => {
-    render(<AboutSection />);
-
-    const button = screen.getByRole("button", {
-      name: /expand about section/i,
-    });
-    fireEvent.click(button);
-
-    // Content should now be visible
-    expect(screen.getByText(/As a pre-medical student/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(/completely different methodologies/i),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/Health Systems Observatory/i)).toBeInTheDocument();
-  });
-
-  it("collapses when clicked again", () => {
+  it("re-expands when clicked again", () => {
     render(<AboutSection />);
 
     const button = screen.getByRole("button");
-
-    // Expand
-    fireEvent.click(button);
-    expect(screen.getByText(/As a pre-medical student/i)).toBeInTheDocument();
 
     // Collapse
     fireEvent.click(button);
     expect(
       screen.queryByText(/As a pre-medical student/i),
     ).not.toBeInTheDocument();
+
+    // Re-expand
+    fireEvent.click(button);
+    expect(screen.getByText(/As a pre-medical student/i)).toBeInTheDocument();
   });
 
   it("displays author information when expanded", () => {
     render(<AboutSection />);
 
-    const button = screen.getByRole("button");
-    fireEvent.click(button);
-
+    // Expanded by default — no click needed
     expect(screen.getByText(/Jeremy Dawson/i)).toBeInTheDocument();
     // Use getAllByText since "Pre-Medical Student" appears in the narrative too
     const premedText = screen.getAllByText(/Pre-Medical Student/i);
@@ -64,9 +60,7 @@ describe("AboutSection", () => {
   it("renders social links when expanded", () => {
     render(<AboutSection />);
 
-    const button = screen.getByRole("button");
-    fireEvent.click(button);
-
+    // Expanded by default — no click needed
     const githubLink = screen.getByLabelText(/view on github/i);
     const linkedinLink = screen.getByLabelText(/linkedin profile/i);
     const emailLink = screen.getByLabelText(/email contact/i);
@@ -87,19 +81,17 @@ describe("AboutSection", () => {
 
     const button = screen.getByRole("button");
 
-    // Should have aria-expanded attribute
-    expect(button).toHaveAttribute("aria-expanded", "false");
+    // Should start expanded
+    expect(button).toHaveAttribute("aria-expanded", "true");
 
     fireEvent.click(button);
-    expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(button).toHaveAttribute("aria-expanded", "false");
   });
 
   it("opens external links in new tab with security attributes", () => {
     render(<AboutSection />);
 
-    const button = screen.getByRole("button");
-    fireEvent.click(button);
-
+    // Expanded by default — no click needed
     const githubLink = screen.getByLabelText(/view on github/i);
     const linkedinLink = screen.getByLabelText(/linkedin profile/i);
 
@@ -112,10 +104,7 @@ describe("AboutSection", () => {
   it("emphasizes key concepts in the narrative", () => {
     render(<AboutSection />);
 
-    const button = screen.getByRole("button");
-    fireEvent.click(button);
-
-    // Check for emphasized text
+    // Expanded by default — no click needed
     const strongElements = screen.getAllByText(
       /completely different methodologies|Wait Time Canada is different/i,
     );

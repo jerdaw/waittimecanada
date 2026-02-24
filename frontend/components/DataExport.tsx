@@ -59,15 +59,15 @@ export function DataExport() {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+    <div className="bg-card rounded-xl border border-border p-6">
       <div className="flex items-center gap-2 mb-4">
-        <FileSpreadsheet className="w-5 h-5 text-blue-600" />
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+        <FileSpreadsheet className="w-5 h-5 text-primary" />
+        <h3 className="text-lg font-bold text-foreground">
           Download Data
         </h3>
       </div>
 
-      <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+      <p className="text-sm text-muted-foreground mb-4">
         Export wait time data with full methodology tags for research use. All
         exports include metric ontology columns for proper attribution.
       </p>
@@ -77,7 +77,7 @@ export function DataExport() {
         <div>
           <label
             htmlFor="province-select"
-            className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+            className="block text-sm font-medium text-foreground mb-1"
           >
             Province
           </label>
@@ -85,7 +85,7 @@ export function DataExport() {
             id="province-select"
             value={province}
             onChange={(e) => setProvince(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground"
           >
             <option value="">All Provinces</option>
             <option value="ON">Ontario</option>
@@ -97,7 +97,7 @@ export function DataExport() {
         <div>
           <label
             htmlFor="daterange-select"
-            className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+            className="block text-sm font-medium text-foreground mb-1"
           >
             Date Range
           </label>
@@ -105,7 +105,7 @@ export function DataExport() {
             id="daterange-select"
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value as DateRange)}
-            className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground"
           >
             <option value="24h">Last 24 Hours</option>
             <option value="7d">Last 7 Days</option>
@@ -122,7 +122,7 @@ export function DataExport() {
       <div className="mb-4">
         <label
           htmlFor="granularity-select"
-          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+          className="block text-sm font-medium text-foreground mb-1"
         >
           Data Granularity
         </label>
@@ -130,7 +130,7 @@ export function DataExport() {
           id="granularity-select"
           value={granularity}
           onChange={(e) => setGranularity(e.target.value as Granularity)}
-          className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+          className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground"
         >
           {Object.entries(GRANULARITY_LABELS).map(([value, label]) => (
             <option key={value} value={value}>
@@ -138,7 +138,7 @@ export function DataExport() {
             </option>
           ))}
         </select>
-        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+        <p className="mt-1 text-xs text-muted-foreground">
           {isAggregated
             ? "Aggregated data includes mean, median, P90, min, max, and sample count per period."
             : "Raw data is available for the last 30 days. For longer ranges, use aggregated data."}
@@ -147,8 +147,8 @@ export function DataExport() {
 
       {/* Warning for raw data with long range */}
       {!isAggregated && rangeExceedsRaw && (
-        <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-          <p className="text-xs text-amber-700 dark:text-amber-400">
+        <div className="mb-4 p-3 bg-warning/5 border border-warning/30 rounded-lg">
+          <p className="text-xs text-warning">
             Raw measurements are retained for 30 days. For ranges beyond 30
             days, switch to an aggregated granularity (daily, weekly, or
             monthly) to access permanent statistical summaries.
@@ -158,7 +158,7 @@ export function DataExport() {
 
       {/* Format Toggle */}
       <div className="flex items-center gap-4 mb-6">
-        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+        <span className="text-sm font-medium text-foreground">
           Format:
         </span>
         <div className="flex gap-2">
@@ -166,8 +166,8 @@ export function DataExport() {
             onClick={() => setFormat("csv")}
             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
               format === "csv"
-                ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600"
+                ? "bg-primary/10 text-primary"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
             }`}
           >
             <FileSpreadsheet className="w-4 h-4" />
@@ -177,8 +177,8 @@ export function DataExport() {
             onClick={() => setFormat("json")}
             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
               format === "json"
-                ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600"
+                ? "bg-primary/10 text-primary"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
             }`}
           >
             <Code className="w-4 h-4" />
@@ -191,26 +191,26 @@ export function DataExport() {
       <button
         onClick={handleExport}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-primary-hover text-primary-foreground font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Download className="w-5 h-5" />
         {loading ? "Preparing..." : "Download Data"}
       </button>
 
       {/* Citation Info */}
-      <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
-	        <div className="flex items-start gap-2">
-	          <Info className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
-	          <div className="text-xs text-slate-500 dark:text-slate-400">
-	            <p className="font-medium mb-1">Suggested Citation:</p>
-	            <p className="italic">
-	              Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set].
-	              https://wait-time.ca
-	            </p>
-	            <p className="mt-2">License: CC-BY-4.0 (Attribution Required)</p>
-	          </div>
-	        </div>
-	      </div>
+      <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+        <div className="flex items-start gap-2">
+          <Info className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+          <div className="text-xs text-muted-foreground">
+            <p className="font-medium mb-1">Suggested Citation:</p>
+            <p className="italic">
+              Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set].
+              https://wait-time.ca
+            </p>
+            <p className="mt-2">License: CC-BY-4.0 (Attribution Required)</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

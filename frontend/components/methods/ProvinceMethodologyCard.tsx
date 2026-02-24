@@ -16,60 +16,21 @@ interface ProvinceMethodologyCardProps {
   source: Source;
 }
 
-const provinceColors: Record<
-  string,
-  { bg: string; border: string; accent: string }
-> = {
-  Ontario: {
-    bg: "bg-blue-50",
-    border: "border-blue-200",
-    accent: "text-blue-700",
-  },
-  Quebec: {
-    bg: "bg-indigo-50",
-    border: "border-indigo-200",
-    accent: "text-indigo-700",
-  },
-  Alberta: {
-    bg: "bg-red-50",
-    border: "border-red-200",
-    accent: "text-red-700",
-  },
-  Manitoba: {
-    bg: "bg-green-50",
-    border: "border-green-200",
-    accent: "text-green-700",
-  },
-  "British Columbia": {
-    bg: "bg-purple-50",
-    border: "border-purple-200",
-    accent: "text-purple-700",
-  },
-};
-
 export function ProvinceMethodologyCard({
   source,
 }: ProvinceMethodologyCardProps) {
   const t = useTranslations('Methods.ProvinceMethodologyCard');
-  const colors = provinceColors[source.province] || {
-    bg: "bg-slate-50",
-    border: "border-slate-200",
-    accent: "text-slate-700",
-  };
 
   return (
     <div
-      className={`
-        rounded-xl border-2 ${colors.border} ${colors.bg}
-        p-6 transition-all duration-200 hover:shadow-lg
-      `}
+      className="rounded-xl border border-border bg-card p-6 transition-all duration-200 hover:shadow-lg"
     >
       {/* Header */}
-      <div className="mb-4 pb-4 border-b-2 border-slate-200">
-        <h3 className={`text-xl font-bold ${colors.accent} mb-1`}>
+      <div className="mb-4 pb-4 border-b border-border">
+        <h3 className="text-xl font-bold text-primary mb-1">
           {source.province}
         </h3>
-        <p className="text-sm text-slate-600">{source.name}</p>
+        <p className="text-sm text-muted-foreground">{source.name}</p>
       </div>
 
       {/* Methodology details */}
@@ -97,16 +58,13 @@ export function ProvinceMethodologyCard({
       </div>
 
       {/* Footer */}
-      <div className="mt-6 pt-4 border-t-2 border-slate-200">
+      <div className="mt-6 pt-4 border-t border-border">
         {source.methodology_url ? (
           <a
             href={source.methodology_url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`
-              inline-flex items-center gap-2 text-sm font-medium
-              ${colors.accent} hover:underline
-            `}
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
           >
             {t('viewOfficial')}
             <svg
@@ -124,7 +82,7 @@ export function ProvinceMethodologyCard({
             </svg>
           </a>
         ) : (
-          <span className="text-sm text-slate-500">
+          <span className="text-sm text-muted-foreground">
             {t('notAvailable')}
           </span>
         )}
@@ -145,15 +103,15 @@ function MethodologyField({
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
           {label}
         </span>
-        <code className="px-2 py-1 rounded bg-white text-xs font-mono text-slate-700 border border-slate-200">
+        <code className="px-2 py-1 rounded bg-muted text-xs font-mono text-foreground border border-border">
           {value}
         </code>
       </div>
       {description && (
-        <p className="text-sm text-slate-600 leading-relaxed">{description}</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
       )}
     </div>
   );

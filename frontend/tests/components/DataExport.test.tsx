@@ -217,7 +217,7 @@ describe("DataExport", () => {
       render(<DataExport />);
 
       const csvButton = screen.getByRole("button", { name: /CSV/i });
-      expect(csvButton).toHaveClass("bg-blue-100");
+      expect(csvButton).toHaveClass("bg-primary/10");
     });
 
     it("allows switching to JSON format", () => {
@@ -226,7 +226,7 @@ describe("DataExport", () => {
       const jsonButton = screen.getByRole("button", { name: /JSON/i });
       fireEvent.click(jsonButton);
 
-      expect(jsonButton).toHaveClass("bg-blue-100");
+      expect(jsonButton).toHaveClass("bg-primary/10");
     });
 
     it("highlights only selected format", () => {
@@ -236,13 +236,13 @@ describe("DataExport", () => {
       const jsonButton = screen.getByRole("button", { name: /JSON/i });
 
       // Initially CSV is selected
-      expect(csvButton).toHaveClass("bg-blue-100");
-      expect(jsonButton).not.toHaveClass("bg-blue-100");
+      expect(csvButton).toHaveClass("bg-primary/10");
+      expect(jsonButton).not.toHaveClass("bg-primary/10");
 
       // Click JSON
       fireEvent.click(jsonButton);
-      expect(jsonButton).toHaveClass("bg-blue-100");
-      expect(csvButton).not.toHaveClass("bg-blue-100");
+      expect(jsonButton).toHaveClass("bg-primary/10");
+      expect(csvButton).not.toHaveClass("bg-primary/10");
     });
   });
 

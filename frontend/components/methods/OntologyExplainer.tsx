@@ -106,10 +106,10 @@ export function OntologyExplainer() {
   return (
     <div className="space-y-4">
       <div className="text-center mb-8">
-        <h3 className="text-2xl font-bold text-slate-900 mb-2">
+        <h3 className="text-2xl font-bold text-foreground mb-2">
           {t('title')}
         </h3>
-        <p className="text-slate-600 max-w-2xl mx-auto">
+        <p className="text-muted-foreground max-w-2xl mx-auto">
           {t('subtitle')}
         </p>
       </div>
@@ -120,26 +120,26 @@ export function OntologyExplainer() {
         return (
           <div
             key={index}
-            className="border-2 border-slate-200 rounded-xl overflow-hidden bg-white transition-all duration-200 hover:border-blue-300"
+            className="border-2 border-border rounded-xl overflow-hidden bg-card transition-all duration-200 hover:border-primary/40"
           >
             {/* Header - Always visible */}
             <button
               onClick={() => setExpandedDimension(isExpanded ? null : index)}
-              className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-lg">
+                <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
                   {index + 1}
                 </div>
                 <div className="text-left">
-                  <h4 className="font-semibold text-slate-900 text-lg">
+                  <h4 className="font-semibold text-foreground text-lg">
                     {dimension.title}
                   </h4>
-                  <p className="text-sm text-slate-500">{dimension.subtitle}</p>
+                  <p className="text-sm text-muted-foreground">{dimension.subtitle}</p>
                 </div>
               </div>
               <svg
-                className={`w-6 h-6 text-slate-400 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+                className={`w-6 h-6 text-muted-foreground transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -155,8 +155,8 @@ export function OntologyExplainer() {
 
             {/* Expanded content */}
             {isExpanded && (
-              <div className="px-6 pb-6 border-t border-slate-200 bg-slate-50">
-                <p className="text-slate-700 mb-4 pt-4">
+              <div className="px-6 pb-6 border-t border-border bg-muted/30">
+                <p className="text-muted-foreground mb-4 pt-4">
                   {dimension.description}
                 </p>
 
@@ -164,19 +164,19 @@ export function OntologyExplainer() {
                   {dimension.examples.map((example, exIndex) => (
                     <div
                       key={exIndex}
-                      className="p-4 rounded-lg bg-white border border-slate-200"
+                      className="p-4 rounded-lg bg-card border border-border"
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <span className="font-semibold text-slate-900">
+                          <span className="font-semibold text-foreground">
                             {example.label}
                           </span>
-                          <code className="ml-2 px-2 py-0.5 rounded bg-slate-100 text-xs text-slate-600 font-mono">
+                          <code className="ml-2 px-2 py-0.5 rounded bg-muted text-xs text-muted-foreground font-mono">
                             {example.value}
                           </code>
                         </div>
                       </div>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-muted-foreground">
                         {example.explanation}
                       </p>
                     </div>
@@ -189,10 +189,10 @@ export function OntologyExplainer() {
       })}
 
       {/* Summary callout */}
-      <div className="mt-8 p-6 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200">
+      <div className="mt-8 p-6 rounded-xl bg-primary/5 border-2 border-primary/20">
         <div className="flex gap-4">
           <div className="flex-shrink-0">
-            <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -209,10 +209,10 @@ export function OntologyExplainer() {
             </div>
           </div>
           <div>
-            <h4 className="font-semibold text-blue-900 mb-2">
+            <h4 className="font-semibold text-foreground mb-2">
               {t('summary.title')}
             </h4>
-            <p className="text-blue-800 text-sm leading-relaxed">
+            <p className="text-muted-foreground text-sm leading-relaxed">
               {t('summary.description')}
             </p>
           </div>

@@ -39,19 +39,56 @@
     "title": "Canada",
     "subtitle": "ER Wait Time",
     "subtitle2": "Observatory",
-    "description": "Explore publicly reported wait time data from official provincial sources. Browse {count} Canadian hospitals and compare methodologies.",
+    "description": "See real wait times at Canadian emergency rooms — with full transparency about how each number is calculated. No hidden assumptions.",
     "cta": {
       "explore": "Explore Hospitals",
-      "methodologies": "Understand Methodologies"
+      "methodologies": "How We Measure This"
+    },
+    "stats": {
+      "provinces": "4 Provinces",
+      "hospitals": "{count}+ Hospitals",
+      "cadence": "Fresh Data Every 4 Hours"
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "step1": {
+        "title": "Allow Location",
+        "desc": "We sort ERs by distance so you see the most relevant options first."
+      },
+      "step2": {
+        "title": "Browse Wait Times",
+        "desc": "Explore data from official provincial health authority sources."
+      },
+      "step3": {
+        "title": "Understand the Methodology",
+        "desc": "See exactly how each wait time is measured — and when comparisons are invalid."
+      }
+    },
+    "provinces": {
+      "title": "Data from official sources",
+      "on": "Ontario Health",
+      "qc": "Québec MSSS",
+      "ab": "Alberta Health Services",
+      "bc": "BC PHSA"
     },
     "card": {
       "nearest": "Nearest ER",
+      "shortest": "Shortest Wait",
       "featured": "Featured",
       "live": "LIVE",
       "min": "min",
-      "p90": "P90 Performance",
+      "statisticType": {
+        "P90": "P90 Performance",
+        "MEDIAN": "Median Wait",
+        "MEAN": "Mean Wait",
+        "ROLLING_AVG": "Rolling Average",
+        "ALGORITHMIC": "Calculated Estimate",
+        "POINT_ESTIMATE": "Real-Time Estimate"
+      },
       "updatedNow": "Updated just now",
-      "loading": "Loading hospital data..."
+      "loading": "Loading hospital data...",
+      "methodology": "Methodology",
+      "explore": "Tap to explore"
     }
   },
   "SystemStatus": {
@@ -252,14 +289,19 @@
     "footer": {
       "methodology": "Methodology"
     },
-    "accessInsights": "Access Insights"
+    "accessInsights": "Access Insights",
+    "mobileHint": "Tap <strong>List</strong> in the header to browse hospitals",
+    "error": {
+      "loadFailed": "Failed to load data",
+      "fetchFailed": "Failed to load hospitals. Please try again later."
+    }
   },
   "AboutSection": {
     "badge": "About This Project",
     "title": "Why I Built Wait Time Canada",
-    "p1": "As a pre-medical student, I noticed something troubling: Canadian provinces report emergency room wait times using <strong>completely different methodologies</strong>. Ontario measures from triage to physician (90th percentile). Quebec measures from registration to physician (rolling average). These numbers can't be directly compared—but most apps present them side-by-side anyway.",
-    "p2": "<strong>Wait Time Canada is different.</strong> Instead of pretending the data is comparable, we audit it. We tag every measurement with its methodology and warn users when direct comparison is statistically invalid. This is what I call a \"Health Systems Observatory\"—a tool that exposes the black box of healthcare reporting.",
-    "p3": "This project demonstrates my approach to medicine: rigorous methodology, transparent limitations, and a commitment to helping patients make informed decisions—even when that means telling them what we <em>don't</em> know.",
+    "p1": "As a pre-medical student, I noticed something troubling: Canadian provinces report emergency room wait times using <strong>completely different methodologies</strong>. Ontario measures from triage to physician (90th percentile). Quebec measures from registration to physician (rolling average). These numbers can't be directly compared — but most apps present them side-by-side anyway.",
+    "p2": "<strong>Wait Time Canada is different.</strong> Instead of pretending the data is comparable, we audit it. We tag every measurement with its methodology and warn users when direct comparison is statistically invalid. This is what I call a \"Health Systems Observatory\" — a tool that exposes the black box of healthcare reporting.",
+    "p3": "This project demonstrates my approach to medicine: rigorous methodology, transparent limitations, and a commitment to helping patients make informed decisions — even when that means telling them what we <em>don't</em> know.",
     "aria": {
       "expand": "Expand about section",
       "collapse": "Collapse about section",
@@ -312,6 +354,173 @@
     "title": "Wait Time Canada | Real-Time ER Wait Times & Methodology Audit",
     "description": "A clinically defensible Health Systems Observatory tracking emergency department wait times across Canada. Compare methodologies, view real-time data, and access health system analytics.",
     "keywords": "ER wait times, Canada emergency rooms, health methodology, hospital wait times, Quebec ER, Ontario ER, Alberta ER, BC ER"
+  },
+  "StatusPage": {
+    "backToMap": "Back to live map",
+    "title": "System Status",
+    "subtitle": "Operational health of all provincial scrapers. Uptime is measured as actual vs. expected data collections (96 per hospital per day at 15-minute intervals).",
+    "overallHealth": "Overall Health",
+    "systemUptime24h": "System Uptime (24h)",
+    "activeProvinces": "Active Provinces",
+    "hospitalsTracked": "Hospitals Tracked",
+    "provincialScrapers": "Provincial Scrapers",
+    "driftEvents": "Methodology Drift Events (Last 30 Days)",
+    "driftEventsDesc": "Detected when a province-wide mean shifts by more than 20% week-over-week across at least 5 hospitals. May indicate a silent change in measurement methodology.",
+    "noDriftEvents": "No drift events detected in the last 30 days.",
+    "dataFreshness": "Data freshness:",
+    "statusGeneratedAt": "Status generated at {time}.",
+    "uptimeCalc": "Uptime calculation:",
+    "uptimeCalcDesc": "Scrapers run every 15 minutes (96 expected collections per hospital per day). Uptime = actual / expected, capped at 100%.",
+    "detailedQuality": "For detailed data quality metrics, visit the",
+    "dataQualityDashboard": "Data Quality dashboard",
+    "uptime": {
+      "24h": "24h uptime",
+      "7d": "7d uptime",
+      "30d": "30d uptime"
+    },
+    "scraper": {
+      "hospitals": "{count} hospitals",
+      "active": "active",
+      "label": "Scraper"
+    },
+    "status": {
+      "healthy": "Healthy",
+      "degraded": "Degraded",
+      "critical": "Critical",
+      "unknown": "Unknown"
+    },
+    "loading": "Loading system status...",
+    "error": "Failed to load system status."
+  },
+  "FAQPage": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Understand how we track wait times and what the data means for you.",
+    "items": {
+      "q1": {
+        "question": "Are these wait times official?",
+        "answer": "We collect data directly from official provincial health sources (e.g., Ontario Health, Health Quebec). However, we are an independent observatory, not a government agency. Always rely on professional medical advice. If you have a medical emergency, call 911 immediately."
+      },
+      "q2": {
+        "question": "Why do wait times change so quickly?",
+        "answer": "ER wait times are dynamic and depend on the number of patients arriving, the severity of their conditions (triage scores), and available staff. A sudden influx of critical cases can increase wait times for everyone else instantly."
+      },
+      "q3": {
+        "question": "What does 'Triage to Doctor' mean?",
+        "answer": "This metric measures the time from when a nurse first assesses you (triage) to when you see a physician. This is different from 'Registration to Doctor' or 'Total Time in ER'. Different provinces use different metrics, which is why we clearly label them."
+      },
+      "q4": {
+        "question": "How often is data updated?",
+        "answer": "Most data sources are updated every 15-30 minutes. We fetch the latest data continuously. Check the 'Last updated' timestamp on each hospital card to be sure."
+      },
+      "q5": {
+        "question": "Why does my local hospital show 'No Data'?",
+        "answer": "Not all hospitals report real-time wait times publicly. We can only display data that is officially published by the health authority. We are constantly working to add more sources."
+      },
+      "q6": {
+        "question": "Can I compare hospitals across provinces?",
+        "answer": "Only if they use the same measurement methodology. Ontario reports P90 (90th percentile) triage-to-physician time, while Quebec reports rolling average registration-to-provider time. Our platform flags when direct comparison is statistically invalid and shows a methodology divergence warning."
+      },
+      "q7": {
+        "question": "What do the methodology badges on hospital cards mean?",
+        "answer": "Each hospital card shows how that province measures wait times — including the metric family (e.g., Time to Provider), start/end events (e.g., Triage to Physician), and statistic type (e.g., P90). These tags help you understand exactly what each number represents."
+      },
+      "q8": {
+        "question": "How do you ensure data quality?",
+        "answer": "We use automated anomaly detection (z-score and IQR methods), heartbeat monitoring for scraper health, and SHA-256 payload hashing to verify data integrity. Our Data Quality dashboard displays every gap, outlier, and quality metric transparently."
+      },
+      "q9": {
+        "question": "Is this project open source?",
+        "answer": "Yes. The entire codebase — scrapers, API, frontend, and methodology documentation — is available on GitHub under the MIT license. We encourage contributions, audits, and feedback from researchers and developers."
+      }
+    },
+    "cta": {
+      "title": "Still have questions?",
+      "subtitle": "Learn more about how we standardize data across different provinces.",
+      "button": "View Methodology"
+    }
+  },
+  "DataQualityPage": {
+    "backToMap": "Back to live map",
+    "title": "Data Quality & Provenance",
+    "subtitle": "Transparent metrics about our data collection reliability. Every measurement is tracked, gaps are detected, and statistical outliers are flagged — because research-grade data requires research-grade auditing.",
+    "systemHealth": "System Health",
+    "uptime24h": "24h Uptime",
+    "measurements24h": "Measurements (24h)",
+    "hospitalsReporting": "Hospitals Reporting",
+    "qualityDrift": "7-Day Quality Drift",
+    "qualityDriftDesc": "Changes in collection performance and reporting coverage compared to a 7-day baseline.",
+    "recentAnomalies": "Recent Anomalies",
+    "recentAnomaliesDesc": "Measurements flagged as statistical outliers. These are still included in the dataset — the flag is metadata for transparency, not a filter.",
+    "qualityTrend": "Quality Trend",
+    "qualityTrendDesc": "Longitudinal coverage patterns mapped from active operations snapshots.",
+    "delta7d": "7-Day Delta",
+    "coverage": "Coverage",
+    "hospitals": "Hospitals",
+    "successRate30d": "30-Day Success Rate",
+    "noHistoricalData": "No historical snapshot data yet for {sourceName}.",
+    "aboutMetrics": "About Data Quality Metrics",
+    "metrics": {
+      "successRate": "Success Rate:",
+      "successRateDesc": "Scrapers run every 15 minutes (96 expected per day per hospital). Success rate measures actual vs expected data collection.",
+      "anomalyDetection": "Anomaly Detection:",
+      "anomalyDetectionDesc": "Uses z-score (3 standard deviations) and IQR methods against a 7-day rolling baseline. Requires 20+ historical data points before flagging.",
+      "whyTransparency": "Why Transparency Matters:",
+      "whyTransparencyDesc": "Clinical researchers need to know data reliability before drawing conclusions. We expose every gap, outlier, and quality metric because that is what research-grade infrastructure demands."
+    },
+    "loading": "Loading data quality metrics...",
+    "error": "Failed to load data quality metrics"
+  },
+  "AnalyticsPage": {
+    "backToMap": "Back to live map",
+    "title": "Analytics Dashboard",
+    "subtitle": "Province-level wait-time trends, regional intelligence, and peer hospital rankings for operational and research interpretation.",
+    "province": "Province",
+    "provinces": {
+      "ON": "Ontario",
+      "QC": "Quebec",
+      "AB": "Alberta",
+      "BC": "British Columbia"
+    },
+    "regionalOverview": "Regional Overview",
+    "regionSetupNeeded": "Regional analytics setup needed",
+    "occupancy": {
+      "title": "Occupancy Signals",
+      "subtitle": "Patients waiting and patients in treatment metrics are surfaced only when source fields are available and explicitly reported.",
+      "loading": "Loading occupancy status...",
+      "loadError": "Occupancy status could not be loaded at this time.",
+      "notAvailable": "Occupancy metrics not available yet",
+      "noReportingData": "No reporting data available.",
+      "avgWaiting": "Avg Patients Waiting (24h)",
+      "avgTreatment": "Avg Patients In Treatment (24h)",
+      "hospitalsReporting": "Hospitals reporting: {count}",
+      "observations": "Observations: {count}",
+      "latestObservation": "Latest occupancy observation: {time}",
+      "na": "n/a"
+    },
+    "occupancyTrend": "Historical Occupancy Trend",
+    "rankings": {
+      "title": "Hospital Rankings",
+      "subtitle": "Seven-day peer ranking by average wait time within {province}",
+      "regionFilterActive": "Region filter active",
+      "methodologyDivergence": "Methodology Divergence",
+      "viewMatrix": "View comparability matrix",
+      "loading": "Loading benchmark rankings...",
+      "empty": "No benchmark rows available.",
+      "columns": {
+        "hospital": "Hospital",
+        "city": "City",
+        "mean": "7d Mean",
+        "percentile": "Percentile",
+        "quartile": "Quartile",
+        "trend": "Trend"
+      },
+      "min": "min"
+    },
+    "trend": {
+      "improving": "Improving",
+      "stable": "Stable",
+      "worsening": "Worsening"
+    }
   },
   "TrendChart": {
     "title": "Wait Time Trends",

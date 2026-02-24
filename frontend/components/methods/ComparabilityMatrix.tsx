@@ -42,11 +42,11 @@ function areComparable(a: Source, b: Source): ComparabilityLevel {
 function getComparabilityColor(level: ComparabilityLevel): string {
   switch (level) {
     case "comparable":
-      return "bg-emerald-100 text-emerald-700 border-emerald-200";
+      return "bg-success/10 text-success border-success/30";
     case "partial":
-      return "bg-amber-100 text-amber-700 border-amber-200";
+      return "bg-warning/10 text-warning border-warning/30";
     case "not-comparable":
-      return "bg-red-100 text-red-700 border-red-200";
+      return "bg-danger/10 text-danger border-danger/30";
   }
 }
 
@@ -150,7 +150,7 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
 
   if (sources.length === 0) {
     return (
-      <div className="text-center py-8 text-slate-500">
+      <div className="text-center py-8 text-muted-foreground">
         {t('noData')}
       </div>
     );
@@ -164,11 +164,11 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
           <table className="min-w-full border-collapse">
             <thead>
               <tr>
-                <th className="p-3 border border-slate-200 bg-slate-50"></th>
+                <th className="p-3 border border-border bg-muted/50"></th>
                 {sources.map((source) => (
                   <th
                     key={source.id}
-                    className="p-3 border border-slate-200 bg-slate-50 text-sm font-semibold text-slate-700"
+                    className="p-3 border border-border bg-muted/50 text-sm font-semibold text-foreground"
                   >
                     {source.province}
                   </th>
@@ -178,7 +178,7 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
             <tbody>
               {sources.map((rowSource) => (
                 <tr key={rowSource.id}>
-                  <th className="p-3 border border-slate-200 bg-slate-50 text-left text-sm font-semibold text-slate-700">
+                  <th className="p-3 border border-border bg-muted/50 text-left text-sm font-semibold text-foreground">
                     {rowSource.province}
                   </th>
                   {sources.map((colSource) => {
@@ -191,10 +191,10 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
                       <td
                         key={colSource.id}
                         className={`
-                          p-3 border border-slate-200 text-center cursor-pointer
+                          p-3 border border-border text-center cursor-pointer
                           transition-all duration-200
                           ${getComparabilityColor(level)}
-                          ${isSelected ? "ring-2 ring-blue-500 ring-inset" : ""}
+                          ${isSelected ? "ring-2 ring-primary ring-inset" : ""}
                           hover:opacity-80
                         `}
                         onClick={() => handleCellClick(rowSource, colSource)}
@@ -217,31 +217,31 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
       <div className="flex flex-wrap items-center justify-between gap-6">
         <div className="flex flex-wrap items-center gap-6 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-emerald-100 text-emerald-700 border-emerald-200 font-semibold">
+            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-success/10 text-success border-success/30 font-semibold">
               ✓
             </div>
-            <span className="text-slate-700">{t('legend.comparable')}</span>
+            <span className="text-muted-foreground">{t('legend.comparable')}</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-amber-100 text-amber-700 border-amber-200 font-semibold">
+            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-warning/10 text-warning border-warning/30 font-semibold">
               ⚠
             </div>
-            <span className="text-slate-700">
+            <span className="text-muted-foreground">
               {t('legend.partial')}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-red-100 text-red-700 border-red-200 font-semibold">
+            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-danger/10 text-danger border-danger/30 font-semibold">
               ✗
             </div>
-            <span className="text-slate-700">{t('legend.notComparable')}</span>
+            <span className="text-muted-foreground">{t('legend.notComparable')}</span>
           </div>
         </div>
 
         {/* Export Button */}
         <button
           onClick={() => exportMatrixToCSV(sources, (key: string) => t(`levels.${key}`))}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm font-medium"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-colors flex items-center gap-2 text-sm font-medium"
           title="Export matrix as CSV"
         >
           <svg
@@ -263,8 +263,8 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
 
       {/* Selected cell details */}
       {selectedCell && selectedCell.row.id !== selectedCell.col.id && (
-        <div className="mt-6 p-6 rounded-xl border-2 border-blue-200 bg-blue-50">
-          <h4 className="font-semibold text-blue-900 mb-3">
+        <div className="mt-6 p-6 rounded-xl border-2 border-primary/30 bg-primary/5">
+          <h4 className="font-semibold text-foreground mb-3">
             {t('comparing', {p1: selectedCell.row.province, p2: selectedCell.col.province})}
           </h4>
           <div className="space-y-2 text-sm">
@@ -289,7 +289,7 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
               value2={selectedCell.col.default_statistic_type}
             />
           </div>
-          <p className="mt-4 text-sm text-blue-800">
+          <p className="mt-4 text-sm text-muted-foreground">
             {areComparable(selectedCell.row, selectedCell.col) ===
               "comparable" && (
               <>
@@ -327,17 +327,17 @@ function ComparisonRow({
   const matches = value1 === value2;
 
   return (
-    <div className="flex items-center justify-between py-2 border-b border-blue-200 last:border-0">
-      <span className="font-medium text-blue-900">{label}:</span>
+    <div className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
+      <span className="font-medium text-foreground">{label}:</span>
       <div className="flex items-center gap-2">
         <code
-          className={`px-2 py-1 rounded text-xs ${matches ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-700"}`}
+          className={`px-2 py-1 rounded text-xs ${matches ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}
         >
           {value1}
         </code>
-        <span className="text-blue-400">{matches ? "=" : "≠"}</span>
+        <span className="text-muted-foreground">{matches ? "=" : "≠"}</span>
         <code
-          className={`px-2 py-1 rounded text-xs ${matches ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-700"}`}
+          className={`px-2 py-1 rounded text-xs ${matches ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}
         >
           {value2}
         </code>

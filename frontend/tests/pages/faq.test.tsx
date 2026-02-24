@@ -7,12 +7,15 @@ vi.mock("@/components/Header", () => ({
   Header: () => <header data-testid="mock-header">Header</header>,
 }));
 
-// Mock JSON-LD output to avoid error with script tag in JSDOM?
-// No, JSDOM handles script tags fine mostly.
+// Mock Footer
+vi.mock("@/components/Footer", () => ({
+  Footer: () => <footer data-testid="mock-footer">Footer</footer>,
+}));
 
 describe("FAQPage", () => {
-  it("renders page title and description", () => {
-    render(<FAQPage />);
+  it("renders page title and description", async () => {
+    const Page = await FAQPage();
+    render(Page);
     expect(screen.getByText("Frequently Asked Questions")).toBeInTheDocument();
     expect(
       screen.getByText(/Understand how we track wait times/),
@@ -20,8 +23,9 @@ describe("FAQPage", () => {
     expect(screen.getByTestId("mock-header")).toBeInTheDocument();
   });
 
-  it("renders faq items", () => {
-    render(<FAQPage />);
+  it("renders faq items", async () => {
+    const Page = await FAQPage();
+    render(Page);
     expect(
       screen.getByText("Are these wait times official?"),
     ).toBeInTheDocument();
@@ -30,8 +34,9 @@ describe("FAQPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders methodology link", () => {
-    render(<FAQPage />);
+  it("renders methodology link", async () => {
+    const Page = await FAQPage();
+    render(Page);
     const link = screen.getByText("View Methodology");
     expect(link).toHaveAttribute("href", "/methods");
   });
