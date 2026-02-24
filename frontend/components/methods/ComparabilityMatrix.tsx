@@ -42,11 +42,11 @@ function areComparable(a: Source, b: Source): ComparabilityLevel {
 function getComparabilityColor(level: ComparabilityLevel): string {
   switch (level) {
     case "comparable":
-      return "bg-success/10 text-success border-success/30";
+      return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800";
     case "partial":
-      return "bg-warning/10 text-warning border-warning/30";
+      return "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800";
     case "not-comparable":
-      return "bg-danger/10 text-danger border-danger/30";
+      return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800";
   }
 }
 
@@ -164,11 +164,11 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
           <table className="min-w-full border-collapse">
             <thead>
               <tr>
-                <th className="p-3 border border-border bg-muted/50"></th>
+                <th className="p-3 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800"></th>
                 {sources.map((source) => (
                   <th
                     key={source.id}
-                    className="p-3 border border-border bg-muted/50 text-sm font-semibold text-foreground"
+                    className="p-3 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-200"
                   >
                     {source.province}
                   </th>
@@ -178,7 +178,7 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
             <tbody>
               {sources.map((rowSource) => (
                 <tr key={rowSource.id}>
-                  <th className="p-3 border border-border bg-muted/50 text-left text-sm font-semibold text-foreground">
+                  <th className="p-3 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-left text-sm font-semibold text-slate-700 dark:text-slate-200">
                     {rowSource.province}
                   </th>
                   {sources.map((colSource) => {
@@ -191,7 +191,7 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
                       <td
                         key={colSource.id}
                         className={`
-                          p-3 border border-border text-center cursor-pointer
+                          p-3 border border-slate-200 dark:border-slate-700 text-center cursor-pointer
                           transition-all duration-200
                           ${getComparabilityColor(level)}
                           ${isSelected ? "ring-2 ring-primary ring-inset" : ""}
@@ -217,13 +217,13 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
       <div className="flex flex-wrap items-center justify-between gap-6">
         <div className="flex flex-wrap items-center gap-6 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-success/10 text-success border-success/30 font-semibold">
+            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 font-semibold">
               ✓
             </div>
-            <span className="text-muted-foreground">{t('legend.comparable')}</span>
+            <span className="text-slate-700 dark:text-slate-300">{t('legend.comparable')}</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-warning/10 text-warning border-warning/30 font-semibold">
+            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 font-semibold">
               ⚠
             </div>
             <span className="text-muted-foreground">
@@ -231,17 +231,17 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-danger/10 text-danger border-danger/30 font-semibold">
+            <div className="w-8 h-8 flex items-center justify-center rounded border-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800 font-semibold">
               ✗
             </div>
-            <span className="text-muted-foreground">{t('legend.notComparable')}</span>
+            <span className="text-slate-700 dark:text-slate-300">{t('legend.notComparable')}</span>
           </div>
         </div>
 
         {/* Export Button */}
         <button
           onClick={() => exportMatrixToCSV(sources, (key: string) => t(`levels.${key}`))}
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-colors flex items-center gap-2 text-sm font-medium"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm font-medium"
           title="Export matrix as CSV"
         >
           <svg
@@ -263,8 +263,8 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
 
       {/* Selected cell details */}
       {selectedCell && selectedCell.row.id !== selectedCell.col.id && (
-        <div className="mt-6 p-6 rounded-xl border-2 border-primary/30 bg-primary/5">
-          <h4 className="font-semibold text-foreground mb-3">
+        <div className="mt-6 p-6 rounded-xl border-2 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30">
+          <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-3">
             {t('comparing', {p1: selectedCell.row.province, p2: selectedCell.col.province})}
           </h4>
           <div className="space-y-2 text-sm">
@@ -289,7 +289,7 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
               value2={selectedCell.col.default_statistic_type}
             />
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">
+          <p className="mt-4 text-sm text-blue-800 dark:text-blue-200">
             {areComparable(selectedCell.row, selectedCell.col) ===
               "comparable" && (
               <>
@@ -327,17 +327,17 @@ function ComparisonRow({
   const matches = value1 === value2;
 
   return (
-    <div className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
-      <span className="font-medium text-foreground">{label}:</span>
+    <div className="flex items-center justify-between py-2 border-b border-blue-200 dark:border-blue-800 last:border-0">
+      <span className="font-medium text-blue-900 dark:text-blue-100">{label}:</span>
       <div className="flex items-center gap-2">
         <code
-          className={`px-2 py-1 rounded text-xs ${matches ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}
+          className={`px-2 py-1 rounded text-xs ${matches ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300" : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"}`}
         >
           {value1}
         </code>
-        <span className="text-muted-foreground">{matches ? "=" : "≠"}</span>
+        <span className="text-blue-400 dark:text-blue-500">{matches ? "=" : "≠"}</span>
         <code
-          className={`px-2 py-1 rounded text-xs ${matches ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}
+          className={`px-2 py-1 rounded text-xs ${matches ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300" : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"}`}
         >
           {value2}
         </code>

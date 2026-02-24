@@ -68,9 +68,9 @@ export default async function MethodsPage() {
   const t = await getTranslations('MethodsPage');
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-50 dark:bg-background">
       {/* Header */}
-      <header className="bg-card border-b border-border">
+      <header className="bg-white dark:bg-card border-b border-slate-200 dark:border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
@@ -110,14 +110,14 @@ export default async function MethodsPage() {
           {/* Section 1: Comparability Matrix */}
           <section>
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-3">
+              <h2 className="text-3xl font-bold text-foreground mb-3">
                 {t('sections.comparabilityMatrix.title')}
               </h2>
               <p className="text-muted-foreground leading-relaxed max-w-3xl">
                 {t('sections.comparabilityMatrix.description')}
               </p>
             </div>
-            <div className="bg-card rounded-xl shadow-sm border border-border p-8">
+            <div className="bg-white dark:bg-card rounded-xl shadow-sm border border-slate-200 dark:border-border p-8">
               <ComparabilityMatrix sources={sources} />
             </div>
           </section>
@@ -125,7 +125,7 @@ export default async function MethodsPage() {
           {/* Section 2: Province Methodology Cards */}
           <section>
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-3">
+              <h2 className="text-3xl font-bold text-foreground mb-3">
                 {t('sections.provincialMethodologies.title')}
               </h2>
               <p className="text-muted-foreground leading-relaxed max-w-3xl">
@@ -142,28 +142,28 @@ export default async function MethodsPage() {
           {/* Section 3: Methodology Timeline */}
           <section>
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-3">
+              <h2 className="text-3xl font-bold text-foreground mb-3">
                 {t('sections.methodologyTimeline.title')}
               </h2>
               <p className="text-muted-foreground leading-relaxed max-w-3xl">
                 {t('sections.methodologyTimeline.description')}
               </p>
             </div>
-            <div className="bg-card rounded-xl shadow-sm border border-border p-8">
+            <div className="bg-white dark:bg-card rounded-xl shadow-sm border border-slate-200 dark:border-border p-8">
               <MethodologyTimeline sources={sources} />
             </div>
           </section>
 
           {/* Section 4: Ontology Explainer */}
           <section>
-            <div className="bg-card rounded-xl shadow-sm border border-border p-8">
+            <div className="bg-white dark:bg-card rounded-xl shadow-sm border border-slate-200 dark:border-border p-8">
               <OntologyExplainer />
             </div>
           </section>
 
           {/* Section 5: FAQ */}
           <section>
-            <div className="bg-card rounded-xl shadow-sm border border-border p-8">
+            <div className="bg-white dark:bg-card rounded-xl shadow-sm border border-slate-200 dark:border-border p-8">
               <FAQ />
             </div>
           </section>
@@ -171,7 +171,7 @@ export default async function MethodsPage() {
           {/* Section 6: Data for Researchers */}
           <section>
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-3">
+              <h2 className="text-3xl font-bold text-foreground mb-3">
                 {t('sections.dataForResearchers.title')}
               </h2>
               <p className="text-muted-foreground leading-relaxed max-w-3xl">
@@ -183,16 +183,16 @@ export default async function MethodsPage() {
 
           {/* Footer CTA */}
           <section className="text-center py-12">
-            <div className="inline-block p-8 rounded-2xl bg-primary text-primary-foreground shadow-xl">
+            <div className="inline-block p-8 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xl">
               <h3 className="text-2xl font-bold mb-3">
                 {t('cta.title')}
               </h3>
-              <p className="text-primary-foreground/80 mb-6 max-w-md">
+              <p className="text-blue-100 mb-6 max-w-md">
                 {t('cta.description')}
               </p>
               <a
                 href="/"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-background text-primary font-semibold hover:bg-muted transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors"
               >
                 {t('cta.button')}
                 <svg

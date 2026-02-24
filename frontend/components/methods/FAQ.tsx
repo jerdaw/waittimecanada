@@ -21,10 +21,10 @@ export function FAQ() {
   return (
     <div className="space-y-4">
       <div className="text-center mb-8">
-        <h3 className="text-2xl font-bold text-foreground mb-2">
+        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
           {t('title')}
         </h3>
-        <p className="text-muted-foreground">
+        <p className="text-slate-600 dark:text-slate-400">
           {t('subtitle')}
         </p>
       </div>
@@ -36,17 +36,17 @@ export function FAQ() {
           return (
             <div
               key={index}
-              className="border border-border rounded-lg overflow-hidden bg-card hover:border-primary/40 transition-colors"
+              className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-600 transition-colors"
             >
               <button
                 onClick={() => setExpandedIndex(isExpanded ? null : index)}
-                className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-muted/50 transition-colors"
+                className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
               >
-                <span className="font-medium text-foreground pr-4">
+                <span className="font-medium text-slate-900 dark:text-white pr-4">
                   {faq.question}
                 </span>
                 <svg
-                  className={`w-5 h-5 text-muted-foreground flex-shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+                  className={`w-5 h-5 text-slate-400 dark:text-slate-500 flex-shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -61,7 +61,7 @@ export function FAQ() {
               </button>
 
               {isExpanded && (
-                <div className="px-6 pb-4 text-muted-foreground leading-relaxed border-t border-border pt-4 bg-muted/30">
+                <div className="px-6 pb-4 text-slate-700 dark:text-slate-300 leading-relaxed border-t border-slate-200 dark:border-slate-700 pt-4 bg-slate-50 dark:bg-slate-800/50">
                   {faq.answer}
                 </div>
               )}
@@ -71,18 +71,18 @@ export function FAQ() {
       </div>
 
       {/* Contact CTA */}
-      <div className="mt-8 p-6 rounded-xl bg-primary/5 border border-primary/20">
-        <h4 className="font-semibold text-foreground mb-2">
+      <div className="mt-8 p-6 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+        <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
           {t('cta.title')}
         </h4>
-        <p className="text-muted-foreground text-sm mb-4">
+        <p className="text-blue-800 dark:text-blue-200 text-sm mb-4">
           {t('cta.description')}
         </p>
         <a
           href="https://github.com/jerdaw/waittimecanada/issues"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary-hover transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
         >
           {t('cta.button')}
           <svg

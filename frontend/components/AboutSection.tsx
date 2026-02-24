@@ -5,11 +5,11 @@ import { ChevronDown, ChevronUp, Github, Linkedin, Mail } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export function AboutSection() {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const t = useTranslations('AboutSection');
 
   return (
-    <section className="bg-card border-b border-border/50 py-12 px-4">
+    <section className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <button
           onClick={() => setExpanded(!expanded)}
@@ -20,10 +20,10 @@ export function AboutSection() {
           }
         >
           <div>
-            <span className="text-sm font-medium text-primary uppercase tracking-wide">
+            <span className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide">
               {t('badge')}
             </span>
-            <h2 className="text-2xl font-bold text-foreground mt-1">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
               {t('title')}
             </h2>
           </div>
@@ -35,21 +35,21 @@ export function AboutSection() {
         </button>
 
         {expanded && (
-          <div className="mt-6 space-y-4 text-muted-foreground animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="mt-6 space-y-4 text-slate-600 dark:text-slate-300 animate-in fade-in slide-in-from-top-4 duration-300">
             <p>{t.rich('p1', { strong: (chunks) => <strong className="text-foreground">{chunks}</strong> })}</p>
             <p>{t.rich('p2', { strong: (chunks) => <strong className="text-foreground">{chunks}</strong> })}</p>
             <p>{t.rich('p3', { em: (chunks) => <em>{chunks}</em> })}</p>
 
-            <div className="flex items-center gap-6 pt-4 border-t border-border/50">
+            <div className="flex items-center gap-6 pt-4 border-t border-slate-200 dark:border-slate-700">
               <div className="flex items-center gap-3">
                 <div
-                  className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg"
+                  className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg"
                   aria-label={t('aria.avatar')}
                 >
                   JD
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground">
+                  <p className="font-semibold text-slate-900 dark:text-white">
                     {t('author.name')}
                   </p>
                   <p className="text-sm text-muted-foreground">{t('author.role')}</p>

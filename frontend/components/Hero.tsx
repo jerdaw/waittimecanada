@@ -109,7 +109,7 @@ export function Hero({
       </div>
 
       <div className="container max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20 relative">
-        <div className="flex-1 text-center lg:text-left space-y-6">
+        <div className="flex-1 text-center lg:text-left space-y-8">
           {/* Badge pill */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold animate-in fade-in slide-in-from-bottom-4 duration-700 border border-primary/20">
             <span className="relative flex h-2 w-2" aria-hidden="true">
