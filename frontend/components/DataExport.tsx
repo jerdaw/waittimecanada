@@ -61,7 +61,7 @@ export function DataExport() {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
       <div className="flex items-center gap-2 mb-4">
-        <FileSpreadsheet className="w-5 h-5 text-blue-600" />
+        <FileSpreadsheet className="w-5 h-5 text-blue-600 dark:text-blue-400" />
         <h3 className="text-lg font-bold text-slate-900 dark:text-white">
           Download Data
         </h3>
@@ -77,7 +77,7 @@ export function DataExport() {
         <div>
           <label
             htmlFor="province-select"
-            className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+            className="block text-sm font-medium text-foreground mb-1"
           >
             Province
           </label>
@@ -97,7 +97,7 @@ export function DataExport() {
         <div>
           <label
             htmlFor="daterange-select"
-            className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+            className="block text-sm font-medium text-foreground mb-1"
           >
             Date Range
           </label>
@@ -122,7 +122,7 @@ export function DataExport() {
       <div className="mb-4">
         <label
           htmlFor="granularity-select"
-          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+          className="block text-sm font-medium text-foreground mb-1"
         >
           Data Granularity
         </label>
@@ -138,7 +138,7 @@ export function DataExport() {
             </option>
           ))}
         </select>
-        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+        <p className="mt-1 text-xs text-muted-foreground">
           {isAggregated
             ? "Aggregated data includes mean, median, P90, min, max, and sample count per period."
             : "Raw data is available for the last 30 days. For longer ranges, use aggregated data."}
@@ -158,7 +158,7 @@ export function DataExport() {
 
       {/* Format Toggle */}
       <div className="flex items-center gap-4 mb-6">
-        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+        <span className="text-sm font-medium text-foreground">
           Format:
         </span>
         <div className="flex gap-2">
@@ -166,8 +166,8 @@ export function DataExport() {
             onClick={() => setFormat("csv")}
             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
               format === "csv"
-                ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600"
+                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600"
             }`}
           >
             <FileSpreadsheet className="w-4 h-4" />
@@ -177,8 +177,8 @@ export function DataExport() {
             onClick={() => setFormat("json")}
             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
               format === "json"
-                ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600"
+                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600"
             }`}
           >
             <Code className="w-4 h-4" />
@@ -199,18 +199,18 @@ export function DataExport() {
 
       {/* Citation Info */}
       <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
-	        <div className="flex items-start gap-2">
-	          <Info className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
-	          <div className="text-xs text-slate-500 dark:text-slate-400">
-	            <p className="font-medium mb-1">Suggested Citation:</p>
-	            <p className="italic">
-	              Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set].
-	              https://wait-time.ca
-	            </p>
-	            <p className="mt-2">License: CC-BY-4.0 (Attribution Required)</p>
-	          </div>
-	        </div>
-	      </div>
+        <div className="flex items-start gap-2">
+          <Info className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+          <div className="text-xs text-muted-foreground">
+            <p className="font-medium mb-1">Suggested Citation:</p>
+            <p className="italic">
+              Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set].
+              https://wait-time.ca
+            </p>
+            <p className="mt-2">License: CC-BY-4.0 (Attribution Required)</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
