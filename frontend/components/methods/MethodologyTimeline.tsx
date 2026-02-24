@@ -83,7 +83,7 @@ export function MethodologyTimeline({
 
   if (error) {
     return (
-      <div className="text-center py-8 text-red-600">
+      <div className="text-center py-8 text-danger">
         {t('error', {message: error})}
       </div>
     );
@@ -96,7 +96,7 @@ export function MethodologyTimeline({
         <div className="flex items-center gap-3">
           <label
             htmlFor="source-filter"
-            className="text-sm font-medium text-slate-700"
+            className="text-sm font-medium text-slate-700 dark:text-slate-300"
           >
             {t('filter')}
           </label>
@@ -104,7 +104,7 @@ export function MethodologyTimeline({
             id="source-filter"
             value={selectedSource}
             onChange={(e) => setSelectedSource(e.target.value)}
-            className="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="all">{t('allProvinces')}</option>
             {sources.map((source) => (
@@ -118,9 +118,9 @@ export function MethodologyTimeline({
 
       {/* Timeline */}
       {events.length === 0 ? (
-        <div className="text-center py-12 text-slate-500">
+        <div className="text-center py-12 text-muted-foreground">
           <svg
-            className="w-12 h-12 mx-auto mb-3 text-slate-300"
+            className="w-12 h-12 mx-auto mb-3 text-muted-foreground/40"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -140,34 +140,34 @@ export function MethodologyTimeline({
       ) : (
         <div className="relative">
           {/* Timeline line */}
-          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-slate-200"></div>
+          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-border"></div>
 
           {/* Events */}
           <div className="space-y-8">
             {events.map((event, index) => (
               <div key={event.id} className="relative pl-20">
                 {/* Timeline dot */}
-                <div className="absolute left-6 top-2 w-4 h-4 rounded-full bg-blue-600 border-4 border-white shadow"></div>
+                <div className="absolute left-6 top-2 w-4 h-4 rounded-full bg-blue-600 border-4 border-white dark:border-slate-900 shadow"></div>
 
                 {/* Event card */}
-                <div className="bg-white rounded-lg border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6 shadow-sm hover:shadow-md transition-shadow">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h4 className="font-semibold text-slate-900 text-lg">
+                      <h4 className="font-semibold text-slate-900 dark:text-white text-lg">
                         {getSourceName(event.source_id)}
                       </h4>
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-muted-foreground">
                         {t('detected', {date: formatDate(event.detected_at)})}
                       </p>
                     </div>
                     <div
                       className={`px-3 py-1 rounded-full text-sm font-medium ${
                         Math.abs(event.shift_percent) >= 20
-                          ? "bg-red-100 text-red-700"
+                          ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300"
                           : Math.abs(event.shift_percent) >= 10
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-blue-100 text-blue-700"
+                            ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300"
+                            : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
                       }`}
                     >
                       {event.shift_percent > 0 ? "+" : ""}
@@ -176,30 +176,30 @@ export function MethodologyTimeline({
                   </div>
 
                   {/* Explanation */}
-                  <p className="text-slate-700 mb-4">{event.explanation}</p>
+                  <p className="text-slate-700 dark:text-slate-300 mb-4">{event.explanation}</p>
 
                   {/* Details */}
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
                     <div>
-                      <p className="text-xs text-slate-500 mb-1">
+                      <p className="text-xs text-muted-foreground mb-1">
                         {t('previousPeriod')}
                       </p>
-                      <p className="text-sm font-medium text-slate-900">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white">
                         {event.previous_period.mean.toFixed(0)} min
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-muted-foreground">
                         {formatDate(event.previous_period.start)} -{" "}
                         {formatDate(event.previous_period.end)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500 mb-1">
+                      <p className="text-xs text-muted-foreground mb-1">
                         {t('currentPeriod')}
                       </p>
-                      <p className="text-sm font-medium text-slate-900">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white">
                         {event.current_period.mean.toFixed(0)} min
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-muted-foreground">
                         {formatDate(event.current_period.start)} -{" "}
                         {formatDate(event.current_period.end)}
                       </p>
@@ -207,7 +207,7 @@ export function MethodologyTimeline({
                   </div>
 
                   {/* Metadata */}
-                  <div className="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-500">
+                  <div className="mt-4 pt-4 border-t border-border/50 text-xs text-muted-foreground">
                     {event.hospitals_analyzed !== 1 ? t('analyzedPlural', {count: event.hospitals_analyzed}) : t('analyzed', {count: event.hospitals_analyzed})}
                   </div>
                 </div>

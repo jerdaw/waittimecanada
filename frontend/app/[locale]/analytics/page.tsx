@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { SystemTrendChart } from "@/components/SystemTrendChart";
 import { RegionDashboard } from "@/components/RegionDashboard";
+import { useTranslations } from "next-intl";
 
 type TrendDirection = "improving" | "stable" | "worsening";
 
@@ -74,14 +76,16 @@ interface OccupancySnapshot {
     patients_in_treatment: number | null;
   };
   latest_observation?: string | null;
+  occupancy_percentage?: {
+    hospitals_reporting: number;
+    average: number | null;
+    min: number | null;
+    max: number | null;
+    note: string;
+  };
 }
 
-const PROVINCE_OPTIONS = [
-  { code: "ON", label: "Ontario" },
-  { code: "QC", label: "Quebec" },
-  { code: "AB", label: "Alberta" },
-  { code: "BC", label: "British Columbia" },
-];
+const PROVINCE_CODES = ["ON", "QC", "AB", "BC"] as const;
 
 function quartileLabel(quartile: number): string {
   if (quartile === 1) return "Q1";
@@ -100,13 +104,8 @@ function formatOrdinal(value: number): string {
   return `${value}th`;
 }
 
-function trendLabel(trend: TrendDirection): string {
-  if (trend === "improving") return "Improving";
-  if (trend === "worsening") return "Worsening";
-  return "Stable";
-}
-
 export default function AnalyticsPage() {
+  const t = useTranslations('AnalyticsPage');
   const [province, setProvince] = useState("ON");
   const [regions, setRegions] = useState<RegionRow[]>([]);
   const [provinceRegionMean, setProvinceRegionMean] = useState<number | null>(
@@ -297,7 +296,7 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-muted/20">
+    <main className="min-h-screen bg-muted/20 flex flex-col">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetSchema) }}
@@ -305,32 +304,30 @@ export default function AnalyticsPage() {
 
       <Header />
 
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1">
         <section className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
             <Link href="/" className="text-sm text-primary hover:underline">
-              Back to live map
+              {t('backToMap')}
             </Link>
             <h1 className="text-3xl font-bold text-foreground mt-2">
-              Analytics Dashboard
+              {t('title')}
             </h1>
             <p className="text-sm text-muted-foreground mt-1 max-w-3xl">
-              System-level wait-time trends, Ontario-style regional
-              intelligence, and peer hospital ranking outputs for operational
-              and research interpretation.
+              {t('subtitle')}
             </p>
           </div>
 
           <label className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-            Province
+            {t('province')}
             <select
               className="rounded-md border border-border bg-background px-2.5 py-1.5 text-foreground"
               value={province}
               onChange={(event) => setProvince(event.target.value)}
             >
-              {PROVINCE_OPTIONS.map((option) => (
-                <option key={option.code} value={option.code}>
-                  {option.label}
+              {PROVINCE_CODES.map((code) => (
+                <option key={code} value={code}>
+                  {t(`provinces.${code}`)}
                 </option>
               ))}
             </select>
@@ -340,12 +337,12 @@ export default function AnalyticsPage() {
         <SystemTrendChart province={province} />
 
         <section>
-          <h2 className="text-lg font-semibold text-foreground mb-3">
-            Regional Overview
+          <h2 className="text-xl font-semibold text-foreground mb-3">
+            {t('regionalOverview')}
           </h2>
           {regionSetupMessage && (
-            <div className="mb-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-              <p className="font-medium">Regional analytics setup needed</p>
+            <div className="mb-3 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 p-3 text-sm text-amber-900 dark:text-amber-200">
+              <p className="font-medium">{t('regionSetupNeeded')}</p>
               <p className="mt-1">{regionSetupMessage}</p>
               {regionSetupSteps.length > 0 && (
                 <div className="mt-2 space-y-1 font-mono text-xs">
@@ -368,26 +365,25 @@ export default function AnalyticsPage() {
           />
         </section>
 
-        <section className="rounded-xl border border-border/50 bg-card p-4">
-          <h2 className="text-lg font-semibold text-foreground">
-            Occupancy Signals
+        <section className="rounded-xl border border-border/50 bg-card p-5">
+          <h2 className="text-xl font-semibold text-foreground">
+            {t('occupancy.title')}
           </h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Patients waiting and patients in treatment metrics are surfaced only
-            when source fields are available and explicitly reported.
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t('occupancy.subtitle')}
           </p>
 
           {loadingOccupancy ? (
             <p className="mt-3 text-sm text-muted-foreground">
-              Loading occupancy status...
+              {t('occupancy.loading')}
             </p>
           ) : !occupancy ? (
             <p className="mt-3 text-sm text-muted-foreground">
-              Occupancy status could not be loaded at this time.
+              {t('occupancy.loadError')}
             </p>
           ) : occupancy.status === "not_available_yet" ? (
-            <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-              <p className="font-medium">Occupancy metrics not available yet</p>
+            <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 p-3 text-sm text-amber-900 dark:text-amber-200">
+              <p className="font-medium">{t('occupancy.notAvailable')}</p>
               <p className="mt-1">{occupancy.message}</p>
               {Array.isArray(occupancy.setup_steps) &&
                 occupancy.setup_steps.length > 0 && (
@@ -403,39 +399,38 @@ export default function AnalyticsPage() {
               {occupancy.message}
             </div>
           ) : (
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-lg border border-border/60 bg-background p-3">
-                <p className="text-xs text-muted-foreground">
-                  Avg Patients Waiting (24h)
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-xl border border-border/50 bg-background p-5">
+                <p className="text-sm text-muted-foreground">
+                  {t('occupancy.avgWaiting')}
                 </p>
-                <p className="mt-1 text-2xl font-semibold text-foreground tabular-nums">
+                <p className="mt-2 text-4xl font-bold text-foreground tabular-nums">
                   {occupancy.averages?.patients_waiting === null ||
                   occupancy.averages?.patients_waiting === undefined
-                    ? "n/a"
+                    ? t('occupancy.na')
                     : Math.round(occupancy.averages.patients_waiting)}
                 </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Hospitals reporting: {occupancy.hospitals_reporting ?? 0}
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {t('occupancy.hospitalsReporting', { count: occupancy.hospitals_reporting ?? 0 })}
                 </p>
               </div>
-              <div className="rounded-lg border border-border/60 bg-background p-3">
-                <p className="text-xs text-muted-foreground">
-                  Avg Patients In Treatment (24h)
+              <div className="rounded-xl border border-border/50 bg-background p-5">
+                <p className="text-sm text-muted-foreground">
+                  {t('occupancy.avgTreatment')}
                 </p>
-                <p className="mt-1 text-2xl font-semibold text-foreground tabular-nums">
+                <p className="mt-2 text-4xl font-bold text-foreground tabular-nums">
                   {occupancy.averages?.patients_in_treatment === null ||
                   occupancy.averages?.patients_in_treatment === undefined
-                    ? "n/a"
+                    ? t('occupancy.na')
                     : Math.round(occupancy.averages.patients_in_treatment)}
                 </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Observations: {occupancy.observations_24h ?? 0}
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {t('occupancy.observations', { count: occupancy.observations_24h ?? 0 })}
                 </p>
               </div>
               {occupancy.latest_observation && (
                 <p className="text-xs text-muted-foreground sm:col-span-2">
-                  Latest occupancy observation:{" "}
-                  {new Date(occupancy.latest_observation).toLocaleString()}
+                  {t('occupancy.latestObservation', { time: new Date(occupancy.latest_observation).toLocaleString() })}
                 </p>
               )}
             </div>
@@ -445,8 +440,8 @@ export default function AnalyticsPage() {
         {occupancy?.status === "available" && occupancy?.occupancy_percentage && (
           <details className="rounded-xl border border-border/50 bg-card group overflow-hidden">
             <summary className="p-4 font-semibold text-foreground cursor-pointer list-none flex justify-between items-center hover:bg-muted/30 transition-colors">
-              Historical Occupancy Trend
-              <span className="text-muted-foreground group-open:rotate-180 transition-transform">▼</span>
+              {t('occupancyTrend')}
+              <span className="text-muted-foreground group-open:rotate-180 transition-transform">&#x25BC;</span>
             </summary>
             <div className="border-t border-border/50">
               <SystemTrendChart
@@ -458,30 +453,30 @@ export default function AnalyticsPage() {
           </details>
         )}
 
-        <section className="rounded-xl border border-border/50 bg-card p-4">
+        <section className="rounded-xl border border-border/50 bg-card p-5">
           <div className="flex items-center justify-between gap-2 mb-4">
             <div>
-              <h2 className="text-lg font-semibold text-foreground">
-                Hospital Rankings
+              <h2 className="text-xl font-semibold text-foreground">
+                {t('rankings.title')}
               </h2>
-              <p className="text-xs text-muted-foreground">
-                Seven-day peer ranking by average wait time within {province}
+              <p className="text-sm text-muted-foreground mt-1">
+                {t('rankings.subtitle', { province })}
               </p>
             </div>
             {selectedRegionId && (
-              <span className="text-xs text-primary">Region filter active</span>
+              <span className="text-xs text-primary">{t('rankings.regionFilterActive')}</span>
             )}
           </div>
 
           {!loadingBenchmarks && methodologySummary && !methodologySummary.is_homogeneous && (
-            <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+            <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 p-3 text-sm text-amber-900 dark:text-amber-200">
               <p className="font-semibold flex items-center gap-2">
-                <span aria-hidden="true">⚠️</span> Methodology Divergence
+                <span aria-hidden="true">&#x26A0;&#xFE0F;</span> {t('rankings.methodologyDivergence')}
               </p>
               <p className="mt-1">{methodologySummary.divergence_note}</p>
               <div className="mt-2 text-xs">
-                <Link href="/methods" className="font-medium underline hover:text-amber-700">
-                  View comparability matrix &rarr;
+                <Link href="/methods" className="font-medium underline hover:text-amber-700 dark:hover:text-amber-300">
+                  {t('rankings.viewMatrix')} &rarr;
                 </Link>
               </div>
             </div>
@@ -489,32 +484,32 @@ export default function AnalyticsPage() {
 
           {loadingBenchmarks ? (
             <div className="text-sm text-muted-foreground">
-              Loading benchmark rankings...
+              {t('rankings.loading')}
             </div>
           ) : filteredBenchmarks.length === 0 ? (
             <div className="text-sm text-muted-foreground">
-              No benchmark rows available.
+              {t('rankings.empty')}
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto -mx-5">
               <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left border-b border-border/60 text-muted-foreground">
-                    <th className="py-2 pr-2 font-medium">Hospital</th>
-                    <th className="py-2 pr-2 font-medium">City</th>
-                    <th className="py-2 pr-2 font-medium">7d Mean</th>
-                    <th className="py-2 pr-2 font-medium">Percentile</th>
-                    <th className="py-2 pr-2 font-medium">Quartile</th>
-                    <th className="py-2 pr-2 font-medium">Trend</th>
+                <thead className="sticky top-0 z-10 bg-card">
+                  <tr className="text-left border-b-2 border-border/60 text-muted-foreground">
+                    <th className="py-2.5 px-5 font-medium">{t('rankings.columns.hospital')}</th>
+                    <th className="py-2.5 pr-3 font-medium">{t('rankings.columns.city')}</th>
+                    <th className="py-2.5 pr-3 font-medium">{t('rankings.columns.mean')}</th>
+                    <th className="py-2.5 pr-3 font-medium">{t('rankings.columns.percentile')}</th>
+                    <th className="py-2.5 pr-3 font-medium">{t('rankings.columns.quartile')}</th>
+                    <th className="py-2.5 pr-5 font-medium">{t('rankings.columns.trend')}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredBenchmarks.map((row) => (
+                  {filteredBenchmarks.map((row, idx) => (
                     <tr
                       key={row.hospital_id}
-                      className="border-b border-border/40"
+                      className={`border-b border-border/30 transition-colors hover:bg-muted/30 ${idx % 2 === 1 ? 'bg-muted/10' : ''}`}
                     >
-                      <td className="py-2 pr-2 font-medium text-foreground">
+                      <td className="py-2.5 px-5 font-medium text-foreground">
                         <div>{row.hospital_name}</div>
                         <div className="mt-0.5">
                           <span className="inline-flex items-center rounded-sm bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
@@ -522,21 +517,20 @@ export default function AnalyticsPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="py-2 pr-2 text-muted-foreground">
+                      <td className="py-2.5 pr-3 text-muted-foreground">
                         {row.city}
                       </td>
-                      <td className="py-2 pr-2 tabular-nums">
-                        {Math.round(row.period_mean)} min
+                      <td className="py-2.5 pr-3 tabular-nums">
+                        {Math.round(row.period_mean)} {t('rankings.min')}
                       </td>
-                      <td className="py-2 pr-2 tabular-nums">
+                      <td className="py-2.5 pr-3 tabular-nums">
                         {formatOrdinal(row.percentile)}
                       </td>
-                      <td className="py-2 pr-2">
+                      <td className="py-2.5 pr-3">
                         {quartileLabel(row.quartile)}
                       </td>
-                      <td className="py-2 pr-2">
-                        {trendLabel(row.trend)} (
-                        {Math.abs(row.trend_change_percent).toFixed(1)}%)
+                      <td className="py-2.5 pr-5">
+                        {t(`trend.${row.trend}`)} ({Math.abs(row.trend_change_percent).toFixed(1)}%)
                       </td>
                     </tr>
                   ))}
@@ -546,6 +540,8 @@ export default function AnalyticsPage() {
           )}
         </section>
       </div>
+
+      <Footer />
     </main>
   );
 }

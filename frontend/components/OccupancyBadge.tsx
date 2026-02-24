@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 
 interface OccupancyBadgeProps {
-  percentage: number;
+  percentage: number | null;
   size?: "sm" | "md";
   className?: string;
 }
@@ -21,6 +21,8 @@ export function OccupancyBadge({
   size = "sm",
   className,
 }: OccupancyBadgeProps) {
+  if (percentage === null) return null;
+
   // Determine color based on occupancy level
   const getOccupancyColor = (pct: number) => {
     if (pct < 90) return "success"; // Below capacity

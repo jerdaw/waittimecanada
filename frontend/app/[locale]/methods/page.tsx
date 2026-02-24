@@ -68,15 +68,15 @@ export default async function MethodsPage() {
   const t = await getTranslations('MethodsPage');
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-background">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200">
+      <header className="bg-white dark:bg-card border-b border-slate-200 dark:border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
               <a
                 href="/"
-                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium mb-2"
+                className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium mb-2"
               >
                 <svg
                   className="w-4 h-4"
@@ -93,10 +93,10 @@ export default async function MethodsPage() {
                 </svg>
                 {t('header.backToMap')}
               </a>
-              <h1 className="text-4xl font-bold text-slate-900 mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 {t('header.title')}
               </h1>
-              <p className="text-lg text-slate-600 max-w-3xl">
+              <p className="text-lg text-muted-foreground max-w-3xl">
                 {t('header.description')}
               </p>
             </div>
@@ -105,19 +105,19 @@ export default async function MethodsPage() {
       </header>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="space-y-16">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div className="space-y-12 md:space-y-16">
           {/* Section 1: Comparability Matrix */}
           <section>
             <div className="mb-8">
-              <h2 className="text-3xl font-bold text-slate-900 mb-3">
+              <h2 className="text-3xl font-bold text-foreground mb-3">
                 {t('sections.comparabilityMatrix.title')}
               </h2>
-              <p className="text-slate-600 leading-relaxed max-w-3xl">
+              <p className="text-muted-foreground leading-relaxed max-w-3xl">
                 {t('sections.comparabilityMatrix.description')}
               </p>
             </div>
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+            <div className="bg-white dark:bg-card rounded-xl shadow-sm border border-slate-200 dark:border-border p-8">
               <ComparabilityMatrix sources={sources} />
             </div>
           </section>
@@ -125,10 +125,10 @@ export default async function MethodsPage() {
           {/* Section 2: Province Methodology Cards */}
           <section>
             <div className="mb-8">
-              <h2 className="text-3xl font-bold text-slate-900 mb-3">
+              <h2 className="text-3xl font-bold text-foreground mb-3">
                 {t('sections.provincialMethodologies.title')}
               </h2>
-              <p className="text-slate-600 leading-relaxed max-w-3xl">
+              <p className="text-muted-foreground leading-relaxed max-w-3xl">
                 {t('sections.provincialMethodologies.description')}
               </p>
             </div>
@@ -142,28 +142,28 @@ export default async function MethodsPage() {
           {/* Section 3: Methodology Timeline */}
           <section>
             <div className="mb-8">
-              <h2 className="text-3xl font-bold text-slate-900 mb-3">
+              <h2 className="text-3xl font-bold text-foreground mb-3">
                 {t('sections.methodologyTimeline.title')}
               </h2>
-              <p className="text-slate-600 leading-relaxed max-w-3xl">
+              <p className="text-muted-foreground leading-relaxed max-w-3xl">
                 {t('sections.methodologyTimeline.description')}
               </p>
             </div>
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+            <div className="bg-white dark:bg-card rounded-xl shadow-sm border border-slate-200 dark:border-border p-8">
               <MethodologyTimeline sources={sources} />
             </div>
           </section>
 
           {/* Section 4: Ontology Explainer */}
           <section>
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+            <div className="bg-white dark:bg-card rounded-xl shadow-sm border border-slate-200 dark:border-border p-8">
               <OntologyExplainer />
             </div>
           </section>
 
           {/* Section 5: FAQ */}
           <section>
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+            <div className="bg-white dark:bg-card rounded-xl shadow-sm border border-slate-200 dark:border-border p-8">
               <FAQ />
             </div>
           </section>
@@ -171,10 +171,10 @@ export default async function MethodsPage() {
           {/* Section 6: Data for Researchers */}
           <section>
             <div className="mb-8">
-              <h2 className="text-3xl font-bold text-slate-900 mb-3">
+              <h2 className="text-3xl font-bold text-foreground mb-3">
                 {t('sections.dataForResearchers.title')}
               </h2>
-              <p className="text-slate-600 leading-relaxed max-w-3xl">
+              <p className="text-muted-foreground leading-relaxed max-w-3xl">
                 {t('sections.dataForResearchers.description')}
               </p>
             </div>
@@ -215,11 +215,10 @@ export default async function MethodsPage() {
       </main>
 
       {/* Page Footer */}
-      <footer className="border-t border-slate-200 bg-white mt-16">
+      <footer className="border-t border-border bg-card mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between text-sm text-slate-500">
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
             <span>{t('footer.tagline')}</span>
-            <span>{t('footer.lastUpdated')}: {new Date().toLocaleDateString()}</span>
           </div>
         </div>
       </footer>

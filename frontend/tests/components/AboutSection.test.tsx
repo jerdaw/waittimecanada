@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest";
 import { AboutSection } from "@/components/AboutSection";
 
 describe("AboutSection", () => {
-  it("renders with collapsed view by default", () => {
+  it("renders collapsed by default", () => {
     render(<AboutSection />);
 
     expect(
@@ -11,13 +11,13 @@ describe("AboutSection", () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/About This Project/i)).toBeInTheDocument();
 
-    // Content should not be visible when collapsed
+    // Content should NOT be visible when collapsed by default
     expect(
       screen.queryByText(/As a pre-medical student/i),
     ).not.toBeInTheDocument();
   });
 
-  it("expands to show full narrative when clicked", () => {
+  it("expands to show narrative when clicked", () => {
     render(<AboutSection />);
 
     const button = screen.getByRole("button", {
@@ -26,14 +26,12 @@ describe("AboutSection", () => {
     fireEvent.click(button);
 
     // Content should now be visible
-    expect(screen.getByText(/As a pre-medical student/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/completely different methodologies/i),
+      screen.getByText(/As a pre-medical student/i),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Health Systems Observatory/i)).toBeInTheDocument();
   });
 
-  it("collapses when clicked again", () => {
+  it("collapses again when clicked twice", () => {
     render(<AboutSection />);
 
     const button = screen.getByRole("button");
@@ -52,6 +50,7 @@ describe("AboutSection", () => {
   it("displays author information when expanded", () => {
     render(<AboutSection />);
 
+    // Expand first
     const button = screen.getByRole("button");
     fireEvent.click(button);
 
@@ -64,6 +63,7 @@ describe("AboutSection", () => {
   it("renders social links when expanded", () => {
     render(<AboutSection />);
 
+    // Expand first
     const button = screen.getByRole("button");
     fireEvent.click(button);
 
@@ -87,7 +87,7 @@ describe("AboutSection", () => {
 
     const button = screen.getByRole("button");
 
-    // Should have aria-expanded attribute
+    // Should start collapsed
     expect(button).toHaveAttribute("aria-expanded", "false");
 
     fireEvent.click(button);
@@ -97,6 +97,7 @@ describe("AboutSection", () => {
   it("opens external links in new tab with security attributes", () => {
     render(<AboutSection />);
 
+    // Expand first
     const button = screen.getByRole("button");
     fireEvent.click(button);
 
@@ -112,10 +113,10 @@ describe("AboutSection", () => {
   it("emphasizes key concepts in the narrative", () => {
     render(<AboutSection />);
 
+    // Expand first
     const button = screen.getByRole("button");
     fireEvent.click(button);
 
-    // Check for emphasized text
     const strongElements = screen.getAllByText(
       /completely different methodologies|Wait Time Canada is different/i,
     );

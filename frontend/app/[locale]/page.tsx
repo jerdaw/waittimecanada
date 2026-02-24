@@ -14,7 +14,7 @@ import { calculateDistance } from "@/utils/distance";
 import { Hero } from "@/components/Hero";
 import { AboutSection } from "@/components/AboutSection";
 import { Testimonial } from "@/components/Testimonial";
-import { SystemStatus } from "@/components/SystemStatus";
+import { Footer } from "@/components/Footer";
 import { AccessInsightsSummary } from "@/components/insights/AccessInsightsSummary";
 import {
   RegionDashboard,
@@ -165,11 +165,11 @@ export default function Home() {
             }
           }
         } else {
-          setError(data.message || "Failed to load data");
+          setError(data.message || t('error.loadFailed'));
         }
       } catch (err) {
         console.error("Fetch error:", err);
-        setError("Failed to load hospitals. Please try again later.");
+        setError(t('error.fetchFailed'));
       } finally {
         setLoading(false);
       }
@@ -318,14 +318,22 @@ export default function Home() {
                 onExplore={handleExplore}
                 userLocation={userLocation}
                 loading={loading}
+                selectedProvince={selectedProvince}
+                onProvinceChange={setSelectedProvince}
+                onSelectHospital={setSelectedHospitalId}
               />
+              {featuredTestimonial && (
+                <div className="px-6 pb-6 max-w-md mx-auto lg:mx-0 lg:ml-6">
+                  <Testimonial testimonial={featuredTestimonial} />
+                </div>
+              )}
             </div>
           )}
 
           {/* Access Insights Section - Only show when Hero is dismissed */}
           {!showHero && !loading && hospitals.length > 0 && (
             <div className={clsx(
-              "flex-shrink-0 px-4 sm:px-6 lg:px-8 pt-6",
+              "flex-shrink-0 px-4 sm:px-6 lg:px-8 pt-6 animate-in fade-in duration-500",
               viewMode === "map" && "hidden lg:block"
             )}>
               <div className="max-w-screen-2xl mx-auto">
@@ -349,6 +357,13 @@ export default function Home() {
                   />
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Mobile hint: in split mode on mobile, the list is hidden — prompt users to switch */}
+          {!showHero && viewMode === "split" && (
+            <div className="lg:hidden flex-shrink-0 px-4 pb-2">
+              <p className="text-xs text-center text-muted-foreground" dangerouslySetInnerHTML={{ __html: t.raw('mobileHint') }} />
             </div>
           )}
 
@@ -429,25 +444,16 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Footer with System Status */}
+      {/* About Section - only shown after hero dismiss */}
       {!showHero && (
-        <footer className="border-t border-border/50 bg-card/30 backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-sm text-muted-foreground">
-                <span>Wait Time Canada</span>
-                <span className="mx-2">•</span>
-                <a
-                  href="/methods"
-                  className="hover:text-foreground transition-colors"
-                >
-                  {t('footer.methodology')}
-                </a>
-              </div>
-              <SystemStatus />
-            </div>
-          </div>
-        </footer>
+        <div className="flex-shrink-0 animate-in fade-in duration-700">
+          <AboutSection />
+        </div>
+      )}
+
+      {/* Footer */}
+      {!showHero && (
+        <Footer />
       )}
     </main>
   );

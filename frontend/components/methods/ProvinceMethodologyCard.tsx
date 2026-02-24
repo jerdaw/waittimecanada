@@ -21,29 +21,24 @@ const provinceColors: Record<
   { bg: string; border: string; accent: string }
 > = {
   Ontario: {
-    bg: "bg-blue-50",
-    border: "border-blue-200",
-    accent: "text-blue-700",
+    bg: "bg-blue-50 dark:bg-blue-950/30",
+    border: "border-blue-200 dark:border-blue-800",
+    accent: "text-blue-700 dark:text-blue-300",
   },
   Quebec: {
-    bg: "bg-indigo-50",
-    border: "border-indigo-200",
-    accent: "text-indigo-700",
+    bg: "bg-indigo-50 dark:bg-indigo-950/30",
+    border: "border-indigo-200 dark:border-indigo-800",
+    accent: "text-indigo-700 dark:text-indigo-300",
   },
   Alberta: {
-    bg: "bg-red-50",
-    border: "border-red-200",
-    accent: "text-red-700",
-  },
-  Manitoba: {
-    bg: "bg-green-50",
-    border: "border-green-200",
-    accent: "text-green-700",
+    bg: "bg-red-50 dark:bg-red-950/30",
+    border: "border-red-200 dark:border-red-800",
+    accent: "text-red-700 dark:text-red-300",
   },
   "British Columbia": {
-    bg: "bg-purple-50",
-    border: "border-purple-200",
-    accent: "text-purple-700",
+    bg: "bg-purple-50 dark:bg-purple-950/30",
+    border: "border-purple-200 dark:border-purple-800",
+    accent: "text-purple-700 dark:text-purple-300",
   },
 };
 
@@ -52,24 +47,21 @@ export function ProvinceMethodologyCard({
 }: ProvinceMethodologyCardProps) {
   const t = useTranslations('Methods.ProvinceMethodologyCard');
   const colors = provinceColors[source.province] || {
-    bg: "bg-slate-50",
-    border: "border-slate-200",
-    accent: "text-slate-700",
+    bg: "bg-muted/30",
+    border: "border-border",
+    accent: "text-primary",
   };
 
   return (
     <div
-      className={`
-        rounded-xl border-2 ${colors.border} ${colors.bg}
-        p-6 transition-all duration-200 hover:shadow-lg
-      `}
+      className={`rounded-xl border-2 ${colors.border} ${colors.bg} p-6 transition-all duration-200 hover:shadow-lg`}
     >
       {/* Header */}
-      <div className="mb-4 pb-4 border-b-2 border-slate-200">
+      <div className="mb-4 pb-4 border-b-2 border-slate-200 dark:border-slate-700">
         <h3 className={`text-xl font-bold ${colors.accent} mb-1`}>
           {source.province}
         </h3>
-        <p className="text-sm text-slate-600">{source.name}</p>
+        <p className="text-sm text-muted-foreground">{source.name}</p>
       </div>
 
       {/* Methodology details */}
@@ -97,16 +89,13 @@ export function ProvinceMethodologyCard({
       </div>
 
       {/* Footer */}
-      <div className="mt-6 pt-4 border-t-2 border-slate-200">
+      <div className="mt-6 pt-4 border-t-2 border-slate-200 dark:border-slate-700">
         {source.methodology_url ? (
           <a
             href={source.methodology_url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`
-              inline-flex items-center gap-2 text-sm font-medium
-              ${colors.accent} hover:underline
-            `}
+            className={`inline-flex items-center gap-2 text-sm font-medium ${colors.accent} hover:underline`}
           >
             {t('viewOfficial')}
             <svg
@@ -124,7 +113,7 @@ export function ProvinceMethodologyCard({
             </svg>
           </a>
         ) : (
-          <span className="text-sm text-slate-500">
+          <span className="text-sm text-muted-foreground">
             {t('notAvailable')}
           </span>
         )}
@@ -145,15 +134,15 @@ function MethodologyField({
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
           {label}
         </span>
-        <code className="px-2 py-1 rounded bg-white text-xs font-mono text-slate-700 border border-slate-200">
+        <code className="px-2 py-1 rounded bg-white dark:bg-slate-800 text-xs font-mono text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
           {value}
         </code>
       </div>
       {description && (
-        <p className="text-sm text-slate-600 leading-relaxed">{description}</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
       )}
     </div>
   );
