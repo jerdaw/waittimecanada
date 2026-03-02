@@ -46,7 +46,7 @@ jobs:
 
       - name: Notify on failure
         if: failure()
-        uses: dawidd6/action-send-mail@v9
+        uses: dawidd6/action-send-mail@v11
         with:
           server_address: smtp.gmail.com
           server_port: 465
