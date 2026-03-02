@@ -1,10 +1,10 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-02-23)
+## Current Status (Updated 2026-02-25)
 
 **Progress:** M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | CI/Tooling Maintenance Complete (2026-02-23) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived
 
-**Strategic Direction:** **CI tooling maintenance complete (2026-02-23).** Resolved all mypy and pytest CI failures from the scraper-ci workflow. Upgraded ruff (v0.14.14), mypy (v1.19.0), react-map-gl (v8), playwright (1.58.2), and date-fns (v4). All 359 frontend and 454+ backend tests passing. Pre-commit hooks fully aligned across hook env, venv, and CI.
+**Strategic Direction:** **Admissions strengthening phase active (2026-02-25).** Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). Focus shifts to real-world engagement, external validation, and public-facing artifacts. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for the full phased plan.
 
 **Deployment Note (2026-02-23):** Frontend public hosting is currently unavailable because the Netlify project is paused (cost control / credit exhaustion). The `wait-time.ca` domain cutover is staged in-repo but should be treated as **on hold** until the project is unpaused (target: **March 9, 2026**).
 
@@ -51,7 +51,9 @@
 
 ## Next Steps
 
-CI tooling maintenance complete (2026-02-23). Netlify unpause target is **March 9, 2026** — plan to reactivate production hosting and run production smoke verification at that time. Beyond that: M34 (multi-province equity layer) when StatsCan CT data is available; M35 (Nova Scotia scraper) when bandwidth allows.
+**Admissions strengthening plan active (2026-02-25).** Phase A (pre-deployment) items are in progress now. Netlify unpause target is **March 9, 2026** — Phase B (launch week) begins then. Phase C (scholarly artifacts + external validation) targets weeks 2–4 post-launch. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
+
+Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT data is available; M35 (Nova Scotia scraper) when bandwidth allows. Both are Phase D (deferred) in the admissions plan.
 
 ## Roadmap Operating Model
 
@@ -74,53 +76,63 @@ CI tooling maintenance complete (2026-02-23). Netlify unpause target is **March 
 - Temporary cost-control mode is active: `scraper-cron` at `*/30` and heartbeat `--max-age 90`.
 - Post-unpause target (review on **March 9, 2026**): Reactivate deploys and move to `scraper-cron: */20`.
 
-### Focus Shift (2026-02-15)
-Per recent direction, the roadmap has been refocused on **Core Functionality, Features, and Code**. Peripheral items (portfolio artifacts, academic integrations, advanced documentation, and non-critical expansions) have been moved to "Deferred / On Hold".
+### Focus Shift (2026-02-25)
+Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The gap is in **real-world engagement, external validation, and public-facing artifacts**. See the [Admissions Strengthening Plan](implementation/admissions-strengthening-plan.md) for the full phased strategy including analytical rationale (original plan, devil's advocate, steelman, and final synthesis).
 
 ## Active Roadmap (Now / Deferred / Later)
 
-### Now (0-2 weeks) — CORE ENGINEERING & VERIFICATION
-(Production Deployment Blocked until March 9, 2026)
+### Completed Engineering (Reference)
 
-**PRIORITY 0: Active Reliability Fixes (Local)**
-- [x] **P0 / Ops: Quebec parser zero-value guard** — MSSS occupancy occasionally returns `0`, which currently fails `Measurement.value > 0` validation and classifies as `parser_breakage/parse`; update parser handling to treat zero-value occupancy as explicit non-reporting/suppressed signal rather than hard failure, with regression tests.
+- [x] **P0 / Ops: Quebec parser zero-value guard** — Zero-value occupancy as suppressed signal rather than hard failure
+- [x] **P1 / Performance: Cache & polling audit** — Verified cache headers/TTLs, enforced `no-store` for user-specific/export routes
+- [x] **P1 / Ops: CI quota conservation (temporary)** — Minimized free-tier GitHub Actions burn
+- [x] **P1 / Ops: CI/tooling maintenance (2026-02-23)** — Resolved all mypy/pytest CI failures; upgraded ruff, mypy, react-map-gl v8, playwright, date-fns
+- [x] **P1 / Ops: Harden Netlify release gate** — M32 Complete
+- [x] **P1 / Divergence Briefs in analytics + export** — M32 Complete
+- [x] **P2 / Historical occupancy trends** — M33 Complete
 
-**PRIORITY 1: Engineering Reliability (Local)**
-- [x] **P1 / Performance: Cache & polling audit** — Verify cache headers/TTLs for shared read-heavy routes; enforce `no-store` for user-specific and export endpoints; keep SystemStatus polling at 5m and tab-visible only (4-8h)
-- [x] **P1 / Ops: CI quota conservation (temporary)** — Minimize free-tier GitHub Actions burn until reset (favor local preflight + targeted workflow triggers, defer non-critical heavy jobs such as Playwright to essential runs only).
-- [x] **P1 / Ops: CI/tooling maintenance (2026-02-23)** — Resolved all mypy/pytest CI failures; upgraded ruff, mypy, react-map-gl v8, playwright, date-fns; aligned pre-commit hook env with venv and CI; pruned stale remote-tracking branch.
+### Phase A: Now (Before March 9) — Pre-Deployment Credibility
+[Full details: admissions-strengthening-plan.md §Phase A](implementation/admissions-strengthening-plan.md#phase-a-immediate-before-march-9--no-live-url-required)
 
-### Deferred / On Hold (Non-Core / Too Reaching)
+- [ ] **P1 / A1: Named author bio in README** — 3–5 sentence personal motivation statement; replace “See repository owner” (30 min)
+- [ ] **P1 / A2: Limitations section in README** — Specific, technical limitations demonstrating intellectual maturity (1 h)
+- [ ] **P1 / A3: Fix placeholder Zenodo DOI** — Register real deposit; update CITATION.cff and README badge (90 min)
+- [ ] **P1 / A4: Stakeholder interview outreach** — Send 10–15 outreach messages to ER professionals using existing templates (2–3 h outreach; interviews on their schedule)
+- [ ] **P1 / A5: Private reflection document** — ABS/interview prep; motivation, decisions, surprises, ethical tensions (2 h; not committed to repo)
+- [ ] **P1 / A6: Ottawa–Gatineau case study** — 2-page methodology divergence case study; verify hospitals in DB first (2–3 h)
+- [ ] **P1 / A7: Quantified metrics & methodology findings** — Query DB for honest metrics; methodology-characterization findings only, no cross-province performance claims (3 h)
 
-**Deployment / Domain Cutover (On Hold):**
-- [ ] **P1 / Ops: Unpause Netlify + verify `wait-time.ca` cutover** — Confirm TLS/cert, redirects, `NEXT_PUBLIC_BASE_URL`, and re-enable `production-smoke` (target **March 9, 2026**)
-- [x] **P1 / Ops: Harden Netlify release gate** — Assert `netlify-ignore.sh` blocks non-release commits and add a minimal CI check to prevent accidental credit burn (M32 Complete)
+### Phase B: Launch Week (March 9–16) — Go Live
+[Full details: admissions-strengthening-plan.md §Phase B](implementation/admissions-strengthening-plan.md#phase-b-launch-week-march-916--url-goes-live)
 
-**Advanced Documentation (Deferred):**
-- [ ] **P2 / Add contributor onboarding guide** (#40) — Paperwork
+- [ ] **P0 / B1: Restore production hosting** — Unpause Netlify; verify TLS, redirects, production smoke; create `[release]` commit (2–3 h)
+- [ ] **P1 / B2: Privacy-safe usage analytics** — Add Plausible Analytics; update /privacy page; do not publicize numbers (2 h)
+- [ ] **P1 / B3: Publish LinkedIn launch post** — Replace placeholder URL; publish; max 30 min (30 min)
+- [ ] **P1 / B4: Video walkthrough** — Script 3–4 min; record with decent audio; upload unlisted YouTube (3 h)
+- [ ] **P2 / B5: GitHub topics & discoverability** — Add topic tags; check 1–2 open data registries (30 min)
 
-**Advanced Testing & Monitoring (Deferred):**
-- [ ] **P2 / Add Lighthouse CI** (#14) — Optimization metrics
-- [ ] **P2 / Add uptime/status history page** (#37) — Public transparency page
+### Phase C: Weeks 2–4 Post-Launch — Scholarly Artifacts & External Validation
+[Full details: admissions-strengthening-plan.md §Phase C](implementation/admissions-strengthening-plan.md#phase-c-weeks-24-scholarly-artifacts--external-validation)
 
-**Project Management (Deferred):**
-- [ ] **P2 / Add GitHub Project board** (#47) — Process overhead
+- [ ] **P1 / C1: Technical report** — 2–4 page “Methodological Heterogeneity in Canadian ED Wait-Time Reporting”; gate publication on external read-through (1–2 d)
+- [ ] **P1 / C2: Targeted researcher outreach** — 3 specific researchers at ICES/INSPQ/university labs; share technical report (3 h + response time)
+- [ ] **P1 / C3: Equity layer interpretive summary** — Section in technical report; limitations ARE the finding (merged with C1)
+- [ ] **P2 / C4: Operational transparency report** — One monthly report from DB tables; honest about cost-control mode (2 h)
+- [ ] **P2 / C5: Incident post-mortem** — Quebec zero-value parser incident; write for interview preparation (1–2 h)
+- [ ] **P2 / C6: Named reviewer acknowledgement** — If A4 or C2 produces a willing reviewer, add Acknowledgements to README (30 min; conditional)
 
-### Next (2-6 weeks) — Core Engineering & Reliability
+### Phase D: Deferred (Weeks 5–12) — If Time Permits
+[Full details: admissions-strengthening-plan.md §Phase D](implementation/admissions-strengthening-plan.md#phase-d-if-time-permits-weeks-512)
 
-**Priority 1: System Reliability & Correctness**
-- [x] **P1 / Divergence Briefs in analytics + export** — When ontology mismatches, generate a structured “divergence brief” (why non-comparable) and surface it in UI + export metadata (M32 Complete - CSV and analytics coverage complete)
-
-### Later (6+ weeks) — Strategic Enhancements
-
-**Future Feature Development:**
-- [x] **P2 / Historical occupancy trends** — Daily/weekly patterns for Quebec stretcher occupancy (M33 Complete)
-- [ ] **P2 / Enhanced equity layer (multi-province rollout)** — Apply Ontario template to QC/AB/BC (M34 — blocked on StatsCan CT data manual download)
-- [ ] **P2 / Additional provinces** — Nova Scotia scraper with methodology documentation (M35 — pre-research done)
+- [ ] **P2 / D1: Comparability matrix upgrade** — Explicit per-pair field-by-field verdicts on /methods (conditional on current state)
+- [ ] **P2 / D2: Quebec equity layer extension (M34)** — Apply Ontario template to QC with full rigor (blocked on StatsCan CT data)
+- [ ] **P2 / D3: Per-hospital data freshness indicators** — `last_updated` timestamp on hospital cards and export CSV
+- [ ] **P2 / D4: Nova Scotia scraper (M35)** — Only if NS methodology is confirmed novel (pre-research done)
+- [ ] **P2 / D5: Grant/competition application** — Opportunistic only; do not actively search
 - [ ] **P2 / Occupancy-based recommendations** — Smart hospital suggestions based on current occupancy
-- [ ] **P2 / Portfolio launch** — Complete stakeholder interview and publish launch communications when public hosting is re-enabled
 - [ ] **P2 / Monitoring dashboard** — Prometheus/Grafana integration for operational visibility
 - [ ] **P2 / Advanced analytics** — Predictive wait time modeling based on historical patterns
+- [ ] **P2 / Add GitHub Project board** (#47) — Process overhead
 
 ---
 
@@ -128,13 +140,13 @@ Per recent direction, the roadmap has been refocused on **Core Functionality, Fe
 
 Each feature maps to CanMEDS competencies for medical school admissions:
 
-| Competency | Features |
-|------------|----------|
-| **Scholar** | Metric ontology, comparability matrix, citation export, aggregation pipeline, anomaly detection, methodology change detection, property-based testing, data dictionary, OpenAPI documentation, methodology comparison assets, Zenodo DOI |
-| **Professional** | Clinical defensibility, divergence warnings, data quality transparency, peer benchmarking, SECURITY.md, LICENSE, CODE_OF_CONDUCT, privacy policy, terms of use, error boundaries, security headers, uptime monitoring |
-| **Health Advocate** | Access Burden Estimator, equity layer, temporal access patterns, accessibility testing (WCAG), French language support, mobile responsiveness |
-| **Leader** | Multi-province scaling, systems architecture, regional dashboards, data quality monitoring, GitHub Project board, contributor onboarding, release management, operational documentation |
-| **Collaborator** | Province-aware telehealth routing, stakeholder interviews, issue/PR templates, CODE_OF_CONDUCT, CONTRIBUTING guidelines |
+| Competency | Delivered | Admissions Plan (New) |
+|------------|----------|----------------------|
+| **Scholar** | Metric ontology, comparability matrix, citation export, aggregation pipeline, anomaly detection, methodology change detection, property-based testing, data dictionary, OpenAPI docs, Zenodo DOI | Technical report (C1), Ottawa–Gatineau case study (A6), quantified findings (A7), equity interpretive summary (C3), limitations section (A2) |
+| **Professional** | Clinical defensibility, divergence warnings, data quality transparency, peer benchmarking, SECURITY.md, LICENSE, CODE_OF_CONDUCT, privacy policy, terms of use, error boundaries, security headers, uptime monitoring | Operational transparency report (C4), incident post-mortem (C5), named author bio (A1), reflection document (A5) |
+| **Health Advocate** | Access Burden Estimator, equity layer (ON), temporal access patterns, accessibility testing (WCAG), French language support, mobile responsiveness | Stakeholder interview with ER professionals (A4), equity layer interpretation (C3) |
+| **Leader** | Multi-province scaling, systems architecture, regional dashboards, data quality monitoring, release management, operational documentation | Live production URL (B1), video walkthrough (B4), LinkedIn launch (B3), usage analytics (B2) |
+| **Collaborator** | Province-aware telehealth routing, issue/PR templates, CODE_OF_CONDUCT, CONTRIBUTING guidelines | Stakeholder interview (A4), researcher outreach (C2), named reviewer acknowledgement (C6) |
 
 ---
 
@@ -208,27 +220,29 @@ All 50 roadmap items are categorized by their primary OMSAS/CanMEDS impact:
 
 ---
 
-## Top 10 Highest-Impact Items for Admissions (Quick Wins)
+## Top 10 Highest-Impact Items for Admissions
 
-Ranked by **admissions credibility per hour of effort**:
+Ranked by **defensible admissions value per hour of effort** (updated 2026-02-25 after three-pass analysis):
 
-1. **#42: Zenodo DOI** — Instant research-grade artifact (1-2h)
-2. **#41: CITATION.cff** — GitHub cite button (30min)
-3. **#2: LICENSE** — Legal clarity (30min)
-4. **#1: SECURITY.md** — Professional governance (1-2h)
-5. **#18: README badges** — Visual credibility signals (1h)
-6. **#23: Architecture diagram** — System clarity (1-2h)
-7. **#31: Data freshness badge** — Proof of live system (4-6h)
-8. **#3: CODE_OF_CONDUCT** — Community readiness (30min)
-9. **#4: CHANGELOG.md** — Release discipline (4-6h)
-10. **#48: mkdocs site** — Professional docs (4-6h)
+1. **A1: Named author bio** — Establishes ownership; eliminates active credibility gap (30 min)
+2. **A4: Stakeholder interview** — Unlocks Collaborator competency; transforms project category (2–3 h + scheduling)
+3. **A6: Ottawa–Gatineau case study** — Most narratively compelling specific story; interview-ready (2–3 h)
+4. **A3: Fix placeholder Zenodo DOI** — Eliminates fake-DOI credibility risk; third-party attestation (90 min)
+5. **A2: Limitations section** — Differentiated intellectual humility signal; rare among student projects (1 h)
+6. **B4: Video walkthrough** — Only format where committee hears your voice and command of material (3 h)
+7. **C1: Technical report** — Anchor Scholar artifact; no other pre-med applicant will have this (1–2 d)
+8. **B1: Restore production hosting** — Changes cognitive category from "repo" to "product" (2–3 h)
+9. **A7: Quantified metrics** — Specificity is more credible than vagueness (3 h)
+10. **B3: LinkedIn launch post** — Public timestamp; asymmetric upside for 30 min of effort (30 min)
+
+Previous top-10 items (#42 Zenodo, #41 CITATION.cff, #2 LICENSE, etc.) are all ✅ Complete — infrastructure is done. The remaining gap is real-world engagement and public-facing artifacts.
 
 ---
 
 ## Implementation Plans
 
 Active milestone plans in `docs/planning/implementation/`:
-- none currently open.
+- [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) — Phased plan (A/B/C/D) for real-world credibility, external validation, and public-facing artifacts. Includes full analytical rationale from three-pass review (original → devil's advocate → steelman → synthesis).
 
 Archived (delivered):
 - `docs/planning/archive/maintenance-2026-02-23.md` — CI/tooling maintenance (2026-02-23)
@@ -416,25 +430,15 @@ Archived (delivered):
 
 ---
 
-**Total Progress: 36/50 completed (0 on hold)** | **Estimated Total Effort:** ~150-200 hours (3-4 weeks full-time equivalent)
+**Infrastructure Progress: 36/50 original items completed.** All governance, testing, documentation, and CI/CD infrastructure is in place.
 
-**Recommended Execution Order (Week-by-Week):**
+**Current Execution Plan:** [Admissions Strengthening Plan](implementation/admissions-strengthening-plan.md) — 4-phase approach (A/B/C/D) totaling ~5–6 days of focused work over 6 weeks.
 
-**Week 1 (Quick Wins - 20h):**
-Items #2, #3, #1, #41, #42, #18, #23, #11, #12, #30 → LICENSE, CODE_OF_CONDUCT, SECURITY.md, CITATION.cff, Zenodo DOI, badges, architecture diagram, pre-commit hooks, Dependabot, commitlint
+| Phase | Timeline | Items | Effort |
+|-------|----------|-------|--------|
+| **A: Pre-Deployment** | Now → March 9 | A1–A7 (author bio, limitations, Zenodo DOI, stakeholder outreach, reflection doc, case study, metrics) | ~12–15 h |
+| **B: Launch Week** | March 9–16 | B1–B5 (restore hosting, analytics, LinkedIn, video, discoverability) | ~8–9 h |
+| **C: Scholarly Artifacts** | Weeks 2–4 post-launch | C1–C6 (technical report, researcher outreach, equity interpretation, ops report, post-mortem, reviewer) | ~2–3 d |
+| **D: If Time Permits** | Weeks 5–12 | D1–D5 (comparability matrix, QC equity, freshness indicators, NS scraper, grant/competition) | Variable |
 
-**Week 2 (Frontend & Docs - 20h):**
-Items #5, #8, #26, #15, #19, #16, #28, #4, #20, #46, #47 → Error boundaries, Privacy/Terms pages, robots/sitemap, loading states, CSP, CORS, CHANGELOG, migration docs, issue templates, project board
-
-**Week 3 (Quality & Testing - 25h):**
-Items #6, #13, #14, #21, #22, #29, #38, #39, #44, #34, #35 → Accessibility testing, backend coverage, Lighthouse CI, Zod validation, API integration tests, health check, DB indexes, E2E pipeline, mobile testing, TS/mypy strict
-
-**Week 4 (Documentation & Advanced - 25h):**
-Items #10, #24, #36, #40, #48, #50, #25, #9, #27, #31, #37, #43, #45 → OpenAPI docs, scraper docs, methodology table, onboarding, mkdocs site, data dictionary, structured logging, rate limiting, screenshots, freshness badge, status page, drift monitoring, interview examples
-
-**Week 5-8 (Strategic - variable):**
-Item #7 (French i18n) → Full bilingual support with next-intl, methodology warnings, emergency disclaimers, UI translations
-
----
-
-**Next Action:** Review and approve this roadmap, then begin execution with Week 1 quick wins for immediate admissions credibility boost.
+**Next Action:** Begin Phase A immediately — A1 (author bio) and A4 (stakeholder outreach) are the highest-ROI tasks and have zero dependencies.
