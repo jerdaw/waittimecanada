@@ -41,4 +41,4 @@ jobs:
       - name: Run production smoke checks
         env:
           PRODUCTION_BASE_URL: ${{ steps.resolve-url.outputs.base_url }}
-        run: ./scripts/production-smoke.sh
+        run: bash ./scripts/production-smoke.sh
