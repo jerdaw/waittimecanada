@@ -67,8 +67,8 @@ export function HospitalList({
   onRegionChange,
   regionsLoading = false,
 }: HospitalListProps) {
-  const t = useTranslations('HospitalList');
-  const tCard = useTranslations('HospitalCard');
+  const t = useTranslations("HospitalList");
+  const tCard = useTranslations("HospitalCard");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -139,13 +139,13 @@ export function HospitalList({
                   )}
                 />
               </span>
-              {t('liveOnly')}
+              {t("liveOnly")}
             </button>
           )}
 
           {/* Results count */}
           <span className="text-xs text-muted-foreground ml-auto pr-1">
-            {t('results', {count: displayedHospitals.length})}
+            {t("results", { count: displayedHospitals.length })}
           </span>
         </div>
 
@@ -156,9 +156,9 @@ export function HospitalList({
           ) && (
             <div className="mt-2 px-3 py-2 bg-primary/5 border border-primary/10 rounded-lg text-xs text-muted-foreground">
               <span className="font-medium text-foreground">
-                {t('qcOccupancy.label')}
+                {t("qcOccupancy.label")}
               </span>{" "}
-              {t('qcOccupancy.text')}
+              {t("qcOccupancy.text")}
             </div>
           )}
       </div>
@@ -180,13 +180,13 @@ export function HospitalList({
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
-            <p className="text-sm font-medium">{t('empty.title')}</p>
+            <p className="text-sm font-medium">{t("empty.title")}</p>
             {searchQuery && (
               <button
                 onClick={() => onSearchChange?.("")}
                 className="mt-2 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors"
               >
-                {t('empty.clearSearch')}
+                {t("empty.clearSearch")}
               </button>
             )}
           </div>
@@ -251,7 +251,7 @@ export function HospitalList({
                         {showLiveBadge && (
                           <span className="shrink-0 flex items-center gap-0.5 text-[9px] font-bold text-emerald-700 bg-success/10 px-1 py-0.5 rounded">
                             <span className="w-1 h-1 rounded-full bg-success animate-pulse" />
-                            {tCard('live')}
+                            {tCard("live")}
                           </span>
                         )}
                       </div>
@@ -273,7 +273,7 @@ export function HospitalList({
                             {formatWaitTime(hospital.current_wait_time)}
                           </span>
                           <span className="text-xs text-muted-foreground ml-0.5">
-                            {tCard('min')}
+                            {tCard("min")}
                           </span>
                         </div>
                         {hospital.occupancy_percentage !== undefined && (

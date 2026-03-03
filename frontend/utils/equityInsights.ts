@@ -26,7 +26,10 @@ export interface EquityLinkageSummary {
   uncertainty: {
     method: "bootstrap_percentile";
     iterations: number;
-    near_low_income_avg_wait_ci95: { lower: number | null; upper: number | null };
+    near_low_income_avg_wait_ci95: {
+      lower: number | null;
+      upper: number | null;
+    };
     wait_gap_minutes_ci95: { lower: number | null; upper: number | null };
   };
 }
@@ -36,7 +39,10 @@ function average(values: number[]): number | null {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
-function percentile(sortedValues: number[], percentileValue: number): number | null {
+function percentile(
+  sortedValues: number[],
+  percentileValue: number,
+): number | null {
   if (!sortedValues.length) return null;
   if (sortedValues.length === 1) return sortedValues[0];
   const index = (sortedValues.length - 1) * percentileValue;
@@ -100,7 +106,9 @@ function bootstrapGapCi95(
       nearSample.push(nearValues[Math.floor(rng() * nearValues.length)]);
     }
     for (let j = 0; j < provinceValues.length; j += 1) {
-      provinceSample.push(provinceValues[Math.floor(rng() * provinceValues.length)]);
+      provinceSample.push(
+        provinceValues[Math.floor(rng() * provinceValues.length)],
+      );
     }
     const nearMean = average(nearSample);
     const provinceMean = average(provinceSample);

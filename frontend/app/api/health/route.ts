@@ -75,8 +75,12 @@ export async function GET(req: NextRequest) {
         pool_status: {
           max: sqlInternal.options?.max || 10,
           idle: typeof sqlInternal.idle === "number" ? sqlInternal.idle : null,
-          active: typeof sqlInternal.active === "number" ? sqlInternal.active : null,
-          waiting: typeof sqlInternal.waiting === "number" ? sqlInternal.waiting : null,
+          active:
+            typeof sqlInternal.active === "number" ? sqlInternal.active : null,
+          waiting:
+            typeof sqlInternal.waiting === "number"
+              ? sqlInternal.waiting
+              : null,
         },
       };
     } catch (dbError) {
@@ -152,7 +156,8 @@ export async function GET(req: NextRequest) {
           last_error_stage: row.last_error_stage ?? null,
           consecutive_failures: consecutiveFailures,
           last_run_duration_ms:
-            row.last_run_duration_ms !== null && row.last_run_duration_ms !== undefined
+            row.last_run_duration_ms !== null &&
+            row.last_run_duration_ms !== undefined
               ? Number(row.last_run_duration_ms)
               : null,
         };
@@ -170,8 +175,8 @@ export async function GET(req: NextRequest) {
     healthResponse.healthy = dbHealthy && sourcesHealthy;
 
     // Find the most recent update across all sources
-    const lastUpdate = healthResponse.sources!
-      .filter((s) => s.last_run)
+    const lastUpdate = healthResponse
+      .sources!.filter((s) => s.last_run)
       .sort(
         (a, b) =>
           new Date(b.last_run!).getTime() - new Date(a.last_run!).getTime(),

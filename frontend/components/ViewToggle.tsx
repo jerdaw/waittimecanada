@@ -10,7 +10,7 @@ interface ViewToggleProps {
 }
 
 export function ViewToggle({ mode, onChange, className }: ViewToggleProps) {
-  const t = useTranslations('ViewToggle');
+  const t = useTranslations("ViewToggle");
 
   return (
     <div
@@ -42,7 +42,7 @@ export function ViewToggle({ mode, onChange, className }: ViewToggleProps) {
             d="M4 6h16M4 10h16M4 14h16M4 18h16"
           />
         </svg>
-        <span className="hidden sm:inline">{t('list')}</span>
+        <span className="hidden sm:inline">{t("list")}</span>
       </button>
       <button
         onClick={() => onChange("map")}
@@ -67,7 +67,7 @@ export function ViewToggle({ mode, onChange, className }: ViewToggleProps) {
             d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
           />
         </svg>
-        <span className="hidden sm:inline">{t('map')}</span>
+        <span className="hidden sm:inline">{t("map")}</span>
       </button>
       <button
         onClick={() => onChange("split")}
@@ -77,9 +77,9 @@ export function ViewToggle({ mode, onChange, className }: ViewToggleProps) {
           mode === "split"
             ? "bg-background text-foreground shadow-sm"
             : "text-muted-foreground hover:text-foreground hover:bg-background/50",
-          )}
+        )}
       >
-        {t('split')}
+        {t("split")}
       </button>
     </div>
   );

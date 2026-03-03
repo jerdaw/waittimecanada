@@ -30,7 +30,9 @@ describe("QualityDriftPanel", () => {
 
     // Should wait for fetch to resolve
     await waitFor(() => {
-      expect(screen.getByText("Coverage improved by 5.0% vs. 7 days ago.")).toBeDefined();
+      expect(
+        screen.getByText("Coverage improved by 5.0% vs. 7 days ago."),
+      ).toBeDefined();
     });
 
     expect(screen.getByText("+5.0%")).toBeDefined();

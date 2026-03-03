@@ -4,29 +4,27 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 
 export function FAQ() {
-  const t = useTranslations('Methods.FAQ');
+  const t = useTranslations("Methods.FAQ");
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   const faqs = [
-    { question: t('items.q1.question'), answer: t('items.q1.answer') },
-    { question: t('items.q2.question'), answer: t('items.q2.answer') },
-    { question: t('items.q3.question'), answer: t('items.q3.answer') },
-    { question: t('items.q4.question'), answer: t('items.q4.answer') },
-    { question: t('items.q5.question'), answer: t('items.q5.answer') },
-    { question: t('items.q6.question'), answer: t('items.q6.answer') },
-    { question: t('items.q7.question'), answer: t('items.q7.answer') },
-    { question: t('items.q8.question'), answer: t('items.q8.answer') },
+    { question: t("items.q1.question"), answer: t("items.q1.answer") },
+    { question: t("items.q2.question"), answer: t("items.q2.answer") },
+    { question: t("items.q3.question"), answer: t("items.q3.answer") },
+    { question: t("items.q4.question"), answer: t("items.q4.answer") },
+    { question: t("items.q5.question"), answer: t("items.q5.answer") },
+    { question: t("items.q6.question"), answer: t("items.q6.answer") },
+    { question: t("items.q7.question"), answer: t("items.q7.answer") },
+    { question: t("items.q8.question"), answer: t("items.q8.answer") },
   ];
 
   return (
     <div className="space-y-4">
       <div className="text-center mb-8">
         <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-          {t('title')}
+          {t("title")}
         </h3>
-        <p className="text-slate-600 dark:text-slate-400">
-          {t('subtitle')}
-        </p>
+        <p className="text-slate-600 dark:text-slate-400">{t("subtitle")}</p>
       </div>
 
       <div className="space-y-3">
@@ -73,10 +71,10 @@ export function FAQ() {
       {/* Contact CTA */}
       <div className="mt-8 p-6 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
         <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-          {t('cta.title')}
+          {t("cta.title")}
         </h4>
         <p className="text-blue-800 dark:text-blue-200 text-sm mb-4">
-          {t('cta.description')}
+          {t("cta.description")}
         </p>
         <a
           href="https://github.com/jerdaw/waittimecanada/issues"
@@ -84,7 +82,7 @@ export function FAQ() {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
         >
-          {t('cta.button')}
+          {t("cta.button")}
           <svg
             className="w-4 h-4"
             fill="none"

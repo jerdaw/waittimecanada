@@ -1,4 +1,4 @@
-const createNextIntlPlugin = require('next-intl/plugin');
+const createNextIntlPlugin = require("next-intl/plugin");
 
 const withNextIntl = createNextIntlPlugin();
 
@@ -48,7 +48,8 @@ const nextConfig = {
           // Permissions policy (formerly Feature-Policy)
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=(self), interest-cohort=()",
+            value:
+              "camera=(), microphone=(), geolocation=(self), interest-cohort=()",
           },
           // Content Security Policy
           // Using report-only mode initially to avoid breaking changes

@@ -195,8 +195,11 @@ export async function GET(request: NextRequest) {
     // Zod ensures period is valid, but parsePeriod returns the config object with days
 
     if (!periodConfig) {
-       // Should not happen given Zod schema
-       return NextResponse.json({ success: false, error: "Invalid period config" }, { status: 500 });
+      // Should not happen given Zod schema
+      return NextResponse.json(
+        { success: false, error: "Invalid period config" },
+        { status: 500 },
+      );
     }
 
     const normalizedProvince = province.toUpperCase();

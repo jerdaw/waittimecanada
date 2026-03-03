@@ -170,7 +170,9 @@ describe("SystemTrendChart", () => {
         }),
     });
 
-    render(<SystemTrendChart province="QC" metricFamily="STRETCHER_OCCUPANCY" />);
+    render(
+      <SystemTrendChart province="QC" metricFamily="STRETCHER_OCCUPANCY" />,
+    );
 
     // Wait for data to load (mock returns success)
     await waitFor(() => {

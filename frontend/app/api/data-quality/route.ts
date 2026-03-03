@@ -36,7 +36,13 @@ export async function GET(request: Request) {
       );
     }
 
-    const { view, hospital_id: hospitalId, source_id: sourceId, days, compare_days: compareDays } = validation.data;
+    const {
+      view,
+      hospital_id: hospitalId,
+      source_id: sourceId,
+      days,
+      compare_days: compareDays,
+    } = validation.data;
 
     if (view === "trend" && sourceId) {
       return await getSourceTrend(sql, sourceId, days);
@@ -267,7 +273,7 @@ async function getSourceDiff(
       MAX(longest_gap_minutes) AS worst_gap_minutes
     FROM data_quality_snapshots
     WHERE source_id = ${sourceId}
-      AND snapshot_date >= CURRENT_DATE - ${(compareDays + 1) + " days"}::INTERVAL
+      AND snapshot_date >= CURRENT_DATE - ${compareDays + 1 + " days"}::INTERVAL
     GROUP BY snapshot_date
     ORDER BY snapshot_date DESC
   `;
@@ -285,7 +291,9 @@ async function getSourceDiff(
   const current = trend[0];
   const baseline = trend[trend.length - 1];
 
-  if (current.snapshot_date.toISOString() === baseline.snapshot_date.toISOString()) {
+  if (
+    current.snapshot_date.toISOString() === baseline.snapshot_date.toISOString()
+  ) {
     return NextResponse.json(
       {
         has_baseline: false,
@@ -306,7 +314,9 @@ async function getSourceDiff(
   const currGap =
     current.worst_gap_minutes !== null ? Number(current.worst_gap_minutes) : 0;
   const baseGap =
-    baseline.worst_gap_minutes !== null ? Number(baseline.worst_gap_minutes) : 0;
+    baseline.worst_gap_minutes !== null
+      ? Number(baseline.worst_gap_minutes)
+      : 0;
   const worstGapDelta = currGap - baseGap;
 
   const rateChangePct = successRateDelta * 100;

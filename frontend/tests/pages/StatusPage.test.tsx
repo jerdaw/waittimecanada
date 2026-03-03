@@ -47,7 +47,9 @@ describe("StatusPage", () => {
   });
 
   it("shows loading spinner initially", () => {
-    global.fetch = vi.fn(() => new Promise(() => {})) as unknown as typeof fetch;
+    global.fetch = vi.fn(
+      () => new Promise(() => {}),
+    ) as unknown as typeof fetch;
     render(<StatusPage />);
     expect(document.querySelector(".animate-spin")).toBeTruthy();
   });
@@ -99,11 +101,18 @@ describe("StatusPage", () => {
     });
   });
 
-
   it("renders source cards for each province", async () => {
     const sources = [
-      makeSource({ source_id: "ca-on-oh", source_name: "Ontario Health", province: "ON" }),
-      makeSource({ source_id: "ca-qc-msss", source_name: "Quebec MSSS", province: "QC" }),
+      makeSource({
+        source_id: "ca-on-oh",
+        source_name: "Ontario Health",
+        province: "ON",
+      }),
+      makeSource({
+        source_id: "ca-qc-msss",
+        source_name: "Quebec MSSS",
+        province: "QC",
+      }),
     ];
     global.fetch = vi.fn().mockResolvedValueOnce({
       json: () => Promise.resolve(makeStatus({ sources })),
@@ -126,9 +135,7 @@ describe("StatusPage", () => {
     render(<StatusPage />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/No drift events detected/i),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/No drift events detected/i)).toBeInTheDocument();
     });
   });
 
@@ -142,7 +149,8 @@ describe("StatusPage", () => {
         current_mean: 130,
         shift_percent: 30.0,
         hospitals_analyzed: 6,
-        explanation: "Province-wide mean increased by 30.0% across 6 hospitals.",
+        explanation:
+          "Province-wide mean increased by 30.0% across 6 hospitals.",
         detected_at: "2026-02-18T08:00:00Z",
       },
     ];
@@ -161,14 +169,18 @@ describe("StatusPage", () => {
   });
 
   it("shows error message on fetch failure", async () => {
-    global.fetch = vi.fn().mockRejectedValueOnce(
-      new Error("Network error"),
-    ) as unknown as typeof fetch;
+    global.fetch = vi
+      .fn()
+      .mockRejectedValueOnce(
+        new Error("Network error"),
+      ) as unknown as typeof fetch;
 
     render(<StatusPage />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Failed to load system status/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Failed to load system status/i),
+      ).toBeInTheDocument();
     });
   });
 

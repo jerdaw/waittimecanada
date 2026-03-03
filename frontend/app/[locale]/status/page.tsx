@@ -40,10 +40,18 @@ interface SystemStatus {
   generated_at: string;
 }
 
-function StatusBadge({ status, t }: { status: string; t: ReturnType<typeof useTranslations> }) {
+function StatusBadge({
+  status,
+  t,
+}: {
+  status: string;
+  t: ReturnType<typeof useTranslations>;
+}) {
   const styles: Record<string, string> = {
-    healthy: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300",
-    degraded: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300",
+    healthy:
+      "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300",
+    degraded:
+      "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300",
     critical: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300",
     unknown: "bg-gray-100 dark:bg-gray-800 text-gray-500",
   };
@@ -54,7 +62,7 @@ function StatusBadge({ status, t }: { status: string; t: ReturnType<typeof useTr
     unknown: <HelpCircle className="w-3 h-3" aria-hidden="true" />,
   };
   const key = status as "healthy" | "degraded" | "critical" | "unknown";
-  const label = t(`status.${key in styles ? key : 'unknown'}`);
+  const label = t(`status.${key in styles ? key : "unknown"}`);
   return (
     <span
       className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${styles[status] ?? styles.unknown}`}
@@ -68,11 +76,7 @@ function StatusBadge({ status, t }: { status: string; t: ReturnType<typeof useTr
 function UptimeBar({ value }: { value: number }) {
   const pct = Math.round(value * 100);
   const color =
-    pct >= 95
-      ? "bg-green-500"
-      : pct >= 80
-        ? "bg-amber-400"
-        : "bg-red-500";
+    pct >= 95 ? "bg-green-500" : pct >= 80 ? "bg-amber-400" : "bg-red-500";
   return (
     <div className="flex items-center gap-2">
       <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
@@ -103,7 +107,13 @@ function HeartbeatAge({ minutes }: { minutes: number | null }) {
   );
 }
 
-function SourceCard({ source, t }: { source: SourceStatus; t: ReturnType<typeof useTranslations> }) {
+function SourceCard({
+  source,
+  t,
+}: {
+  source: SourceStatus;
+  t: ReturnType<typeof useTranslations>;
+}) {
   const scraperOk = source.scraper_status === "healthy";
   const overallStatus =
     source.uptime_24h >= 0.95
@@ -129,24 +139,29 @@ function SourceCard({ source, t }: { source: SourceStatus; t: ReturnType<typeof 
 
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs text-muted-foreground mb-0.5">
-          <span>{t('uptime.24h')}</span>
+          <span>{t("uptime.24h")}</span>
         </div>
         <UptimeBar value={source.uptime_24h} />
         <div className="flex justify-between text-xs text-muted-foreground mb-0.5">
-          <span>{t('uptime.7d')}</span>
+          <span>{t("uptime.7d")}</span>
         </div>
         <UptimeBar value={source.uptime_7d} />
         <div className="flex justify-between text-xs text-muted-foreground mb-0.5">
-          <span>{t('uptime.30d')}</span>
+          <span>{t("uptime.30d")}</span>
         </div>
         <UptimeBar value={source.uptime_30d} />
       </div>
 
       <div className="flex items-center justify-between text-xs border-t border-border/40 pt-2">
         <span className="text-muted-foreground">
-          {t('scraper.hospitals', { count: source.total_hospitals })} · {t('scraper.label')}{" "}
-          <span className={scraperOk ? "text-green-600 dark:text-green-400" : "text-red-500"}>
-            {scraperOk ? t('scraper.active') : source.scraper_status}
+          {t("scraper.hospitals", { count: source.total_hospitals })} ·{" "}
+          {t("scraper.label")}{" "}
+          <span
+            className={
+              scraperOk ? "text-green-600 dark:text-green-400" : "text-red-500"
+            }
+          >
+            {scraperOk ? t("scraper.active") : source.scraper_status}
           </span>
         </span>
         <HeartbeatAge minutes={source.last_heartbeat_age_minutes} />
@@ -158,7 +173,7 @@ function SourceCard({ source, t }: { source: SourceStatus; t: ReturnType<typeof 
 const REFRESH_INTERVAL = 60_000; // 60 seconds
 
 export default function StatusPage() {
-  const t = useTranslations('StatusPage');
+  const t = useTranslations("StatusPage");
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -172,10 +187,10 @@ export default function StatusPage() {
         setError(null);
       })
       .catch(() => {
-        setError(t('error'));
+        setError(t("error"));
         setLoading(false);
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -192,13 +207,13 @@ export default function StatusPage() {
         {/* Page header */}
         <section>
           <Link href="/" className="text-sm text-primary hover:underline">
-            {t('backToMap')}
+            {t("backToMap")}
           </Link>
           <h1 className="text-3xl font-bold text-foreground mt-2">
-            {t('title')}
+            {t("title")}
           </h1>
           <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            {t('subtitle')}
+            {t("subtitle")}
           </p>
         </section>
 
@@ -216,7 +231,7 @@ export default function StatusPage() {
               data-testid="overall-status"
             >
               <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-xl font-semibold">{t('overallHealth')}</h2>
+                <h2 className="text-xl font-semibold">{t("overallHealth")}</h2>
                 <StatusBadge status={status.overall_status} t={t} />
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -225,7 +240,7 @@ export default function StatusPage() {
                     {Math.round(status.system_uptime_24h * 100)}%
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {t('systemUptime24h')}
+                    {t("systemUptime24h")}
                   </div>
                 </div>
                 <div className="text-center">
@@ -233,7 +248,7 @@ export default function StatusPage() {
                     {status.sources.length}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {t('activeProvinces')}
+                    {t("activeProvinces")}
                   </div>
                 </div>
                 <div className="text-center">
@@ -244,7 +259,7 @@ export default function StatusPage() {
                     )}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {t('hospitalsTracked')}
+                    {t("hospitalsTracked")}
                   </div>
                 </div>
               </div>
@@ -253,7 +268,7 @@ export default function StatusPage() {
             {/* Per-province cards */}
             <section>
               <h2 className="text-xl font-semibold mb-4">
-                {t('provincialScrapers')}
+                {t("provincialScrapers")}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {status.sources.map((source) => (
@@ -264,16 +279,17 @@ export default function StatusPage() {
 
             {/* Methodology drift events */}
             <section>
-              <h2 className="text-xl font-semibold mb-2">
-                {t('driftEvents')}
-              </h2>
+              <h2 className="text-xl font-semibold mb-2">{t("driftEvents")}</h2>
               <p className="text-sm text-muted-foreground mb-4">
-                {t('driftEventsDesc')}
+                {t("driftEventsDesc")}
               </p>
               {status.drift_events.length === 0 ? (
                 <div className="rounded-xl border border-border/50 bg-card p-6 text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" aria-hidden="true" />
-                  {t('noDriftEvents')}
+                  <CheckCircle
+                    className="w-4 h-4 text-green-500"
+                    aria-hidden="true"
+                  />
+                  {t("noDriftEvents")}
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -308,20 +324,24 @@ export default function StatusPage() {
             {/* Footer note */}
             <section className="rounded-xl border border-border/50 bg-card p-5 text-sm text-muted-foreground space-y-2">
               <p>
-                <strong className="text-foreground">{t('dataFreshness')}</strong>{" "}
-                {t('statusGeneratedAt', { time: new Date(status.generated_at).toLocaleString() })}
+                <strong className="text-foreground">
+                  {t("dataFreshness")}
+                </strong>{" "}
+                {t("statusGeneratedAt", {
+                  time: new Date(status.generated_at).toLocaleString(),
+                })}
               </p>
               <p>
-                <strong className="text-foreground">{t('uptimeCalc')}</strong>{" "}
-                {t('uptimeCalcDesc')}
+                <strong className="text-foreground">{t("uptimeCalc")}</strong>{" "}
+                {t("uptimeCalcDesc")}
               </p>
               <p>
-                {t('detailedQuality')}{" "}
+                {t("detailedQuality")}{" "}
                 <Link
                   href="/data-quality"
                   className="text-primary hover:underline"
                 >
-                  {t('dataQualityDashboard')}
+                  {t("dataQualityDashboard")}
                 </Link>
                 .
               </p>

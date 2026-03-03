@@ -1036,7 +1036,9 @@ export default function Map({
         mapStyle="mapbox://styles/mapbox/light-v11"
         mapboxAccessToken={MAPBOX_TOKEN}
         interactiveLayerIds={["hospitals-layer", "equity-fill"]}
-        onClick={(e: unknown) => handleMapClick(e as unknown as MapInteractionEvent)}
+        onClick={(e: unknown) =>
+          handleMapClick(e as unknown as MapInteractionEvent)
+        }
         onMouseMove={(e: unknown) =>
           handleMapMouseMove(e as unknown as MapInteractionEvent)
         }

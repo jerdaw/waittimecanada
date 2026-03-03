@@ -179,29 +179,29 @@ export async function GET(request: Request) {
       totalObservations > 0 ? "available" : "no_reporting_data";
 
     interface OccupancyResponse {
-        province: string;
-        available: boolean;
-        status: OccupancyStatus;
-        generated_at: string;
-        message: string;
-        fields: OccupancyFieldsAvailability;
-        observations_24h: number;
-        occupancy_percentage?: {
-            hospitals_reporting: number;
-            average: number | null;
-            min: number | null;
-            max: number | null;
-            latest_observation: string | null;
-            note: string;
+      province: string;
+      available: boolean;
+      status: OccupancyStatus;
+      generated_at: string;
+      message: string;
+      fields: OccupancyFieldsAvailability;
+      observations_24h: number;
+      occupancy_percentage?: {
+        hospitals_reporting: number;
+        average: number | null;
+        min: number | null;
+        max: number | null;
+        latest_observation: string | null;
+        note: string;
+      };
+      raw_counts?: {
+        hospitals_reporting: number;
+        averages: {
+          patients_waiting: number | null;
+          patients_in_treatment: number | null;
         };
-        raw_counts?: {
-            hospitals_reporting: number;
-            averages: {
-                patients_waiting: number | null;
-                patients_in_treatment: number | null;
-            };
-            latest_observation: string | null;
-        };
+        latest_observation: string | null;
+      };
     }
 
     // Build response data

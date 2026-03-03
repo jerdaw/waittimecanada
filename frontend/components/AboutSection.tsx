@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 
 export function AboutSection() {
   const [expanded, setExpanded] = useState(false);
-  const t = useTranslations('AboutSection');
+  const t = useTranslations("AboutSection");
 
   return (
     <section className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 py-12 px-4">
@@ -15,16 +15,14 @@ export function AboutSection() {
           onClick={() => setExpanded(!expanded)}
           className="w-full flex items-center justify-between text-left hover:opacity-80 transition-opacity"
           aria-expanded={expanded}
-          aria-label={
-            expanded ? t('aria.collapse') : t('aria.expand')
-          }
+          aria-label={expanded ? t("aria.collapse") : t("aria.expand")}
         >
           <div>
             <span className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide">
-              {t('badge')}
+              {t("badge")}
             </span>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
-              {t('title')}
+              {t("title")}
             </h2>
           </div>
           {expanded ? (
@@ -36,30 +34,44 @@ export function AboutSection() {
 
         {expanded && (
           <div className="mt-6 space-y-4 text-slate-600 dark:text-slate-300 animate-in fade-in slide-in-from-top-4 duration-300">
-            <p>{t.rich('p1', { strong: (chunks) => <strong className="text-foreground">{chunks}</strong> })}</p>
-            <p>{t.rich('p2', { strong: (chunks) => <strong className="text-foreground">{chunks}</strong> })}</p>
-            <p>{t.rich('p3', { em: (chunks) => <em>{chunks}</em> })}</p>
+            <p>
+              {t.rich("p1", {
+                strong: (chunks) => (
+                  <strong className="text-foreground">{chunks}</strong>
+                ),
+              })}
+            </p>
+            <p>
+              {t.rich("p2", {
+                strong: (chunks) => (
+                  <strong className="text-foreground">{chunks}</strong>
+                ),
+              })}
+            </p>
+            <p>{t.rich("p3", { em: (chunks) => <em>{chunks}</em> })}</p>
 
             <div className="flex items-center gap-6 pt-4 border-t border-slate-200 dark:border-slate-700">
               <div className="flex items-center gap-3">
                 <div
                   className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg"
-                  aria-label={t('aria.avatar')}
+                  aria-label={t("aria.avatar")}
                 >
                   JD
                 </div>
                 <div>
                   <p className="font-semibold text-slate-900 dark:text-white">
-                    {t('author.name')}
+                    {t("author.name")}
                   </p>
-                  <p className="text-sm text-muted-foreground">{t('author.role')}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t("author.role")}
+                  </p>
                 </div>
               </div>
               <div className="flex gap-3">
                 <a
                   href="https://github.com/jerdaw/waittimecanada"
                   className="text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={t('aria.github')}
+                  aria-label={t("aria.github")}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -68,7 +80,7 @@ export function AboutSection() {
                 <a
                   href="https://linkedin.com/in/jeremyjdawson"
                   className="text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={t('aria.linkedin')}
+                  aria-label={t("aria.linkedin")}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -77,7 +89,7 @@ export function AboutSection() {
                 <a
                   href="mailto:jeremyjdawson@gmail.com"
                   className="text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={t('aria.email')}
+                  aria-label={t("aria.email")}
                 >
                   <Mail className="w-5 h-5" />
                 </a>

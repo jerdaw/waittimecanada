@@ -65,7 +65,7 @@ async function getSources(): Promise<Source[]> {
 
 export default async function MethodsPage() {
   const sources = await getSources();
-  const t = await getTranslations('MethodsPage');
+  const t = await getTranslations("MethodsPage");
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-background">
@@ -91,13 +91,13 @@ export default async function MethodsPage() {
                     d="M10 19l-7-7m0 0l7-7m-7 7h18"
                   />
                 </svg>
-                {t('header.backToMap')}
+                {t("header.backToMap")}
               </a>
               <h1 className="text-3xl font-bold text-foreground mb-2">
-                {t('header.title')}
+                {t("header.title")}
               </h1>
               <p className="text-lg text-muted-foreground max-w-3xl">
-                {t('header.description')}
+                {t("header.description")}
               </p>
             </div>
           </div>
@@ -111,10 +111,10 @@ export default async function MethodsPage() {
           <section>
             <div className="mb-8">
               <h2 className="text-3xl font-bold text-foreground mb-3">
-                {t('sections.comparabilityMatrix.title')}
+                {t("sections.comparabilityMatrix.title")}
               </h2>
               <p className="text-muted-foreground leading-relaxed max-w-3xl">
-                {t('sections.comparabilityMatrix.description')}
+                {t("sections.comparabilityMatrix.description")}
               </p>
             </div>
             <div className="bg-white dark:bg-card rounded-xl shadow-sm border border-slate-200 dark:border-border p-8">
@@ -126,10 +126,10 @@ export default async function MethodsPage() {
           <section>
             <div className="mb-8">
               <h2 className="text-3xl font-bold text-foreground mb-3">
-                {t('sections.provincialMethodologies.title')}
+                {t("sections.provincialMethodologies.title")}
               </h2>
               <p className="text-muted-foreground leading-relaxed max-w-3xl">
-                {t('sections.provincialMethodologies.description')}
+                {t("sections.provincialMethodologies.description")}
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -143,10 +143,10 @@ export default async function MethodsPage() {
           <section>
             <div className="mb-8">
               <h2 className="text-3xl font-bold text-foreground mb-3">
-                {t('sections.methodologyTimeline.title')}
+                {t("sections.methodologyTimeline.title")}
               </h2>
               <p className="text-muted-foreground leading-relaxed max-w-3xl">
-                {t('sections.methodologyTimeline.description')}
+                {t("sections.methodologyTimeline.description")}
               </p>
             </div>
             <div className="bg-white dark:bg-card rounded-xl shadow-sm border border-slate-200 dark:border-border p-8">
@@ -172,10 +172,10 @@ export default async function MethodsPage() {
           <section>
             <div className="mb-8">
               <h2 className="text-3xl font-bold text-foreground mb-3">
-                {t('sections.dataForResearchers.title')}
+                {t("sections.dataForResearchers.title")}
               </h2>
               <p className="text-muted-foreground leading-relaxed max-w-3xl">
-                {t('sections.dataForResearchers.description')}
+                {t("sections.dataForResearchers.description")}
               </p>
             </div>
             <DataExport />
@@ -184,17 +184,15 @@ export default async function MethodsPage() {
           {/* Footer CTA */}
           <section className="text-center py-12">
             <div className="inline-block p-8 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xl">
-              <h3 className="text-2xl font-bold mb-3">
-                {t('cta.title')}
-              </h3>
+              <h3 className="text-2xl font-bold mb-3">{t("cta.title")}</h3>
               <p className="text-blue-100 mb-6 max-w-md">
-                {t('cta.description')}
+                {t("cta.description")}
               </p>
               <a
                 href="/"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors"
               >
-                {t('cta.button')}
+                {t("cta.button")}
                 <svg
                   className="w-5 h-5"
                   fill="none"
@@ -218,7 +216,7 @@ export default async function MethodsPage() {
       <footer className="border-t border-border bg-card mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>{t('footer.tagline')}</span>
+            <span>{t("footer.tagline")}</span>
           </div>
         </div>
       </footer>

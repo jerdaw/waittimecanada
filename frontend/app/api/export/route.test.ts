@@ -50,15 +50,29 @@ describe("GET /api/export", () => {
     expect(res.status).toBe(200);
     expect(json.metadata.methodology_homogeneity).toBeDefined();
     expect(json.metadata.methodology_homogeneity.is_homogeneous).toBe(true);
-    expect(json.metadata.methodology_homogeneity.distinct_methodology_groups).toBe(1);
+    expect(
+      json.metadata.methodology_homogeneity.distinct_methodology_groups,
+    ).toBe(1);
     expect(json.metadata.methodology_homogeneity.groups).toHaveLength(1);
-    expect(json.metadata.methodology_homogeneity.groups[0].record_count).toBe(1);
+    expect(json.metadata.methodology_homogeneity.groups[0].record_count).toBe(
+      1,
+    );
   });
 
   it("marks is_homogeneous=true when all records share same methodology", async () => {
     const mockResults = [
-      { metric_family: "A", start_event: "B", end_event: "C", statistic_type: "D" },
-      { metric_family: "A", start_event: "B", end_event: "C", statistic_type: "D" },
+      {
+        metric_family: "A",
+        start_event: "B",
+        end_event: "C",
+        statistic_type: "D",
+      },
+      {
+        metric_family: "A",
+        start_event: "B",
+        end_event: "C",
+        statistic_type: "D",
+      },
     ];
     mockSql.mockResolvedValue(mockResults);
 
@@ -67,14 +81,28 @@ describe("GET /api/export", () => {
     const json = await res.json();
 
     expect(json.metadata.methodology_homogeneity.is_homogeneous).toBe(true);
-    expect(json.metadata.methodology_homogeneity.distinct_methodology_groups).toBe(1);
-    expect(json.metadata.methodology_homogeneity.groups[0].record_count).toBe(2);
+    expect(
+      json.metadata.methodology_homogeneity.distinct_methodology_groups,
+    ).toBe(1);
+    expect(json.metadata.methodology_homogeneity.groups[0].record_count).toBe(
+      2,
+    );
   });
 
   it("marks is_homogeneous=false and lists groups when mixed methodology", async () => {
     const mockResults = [
-      { metric_family: "A", start_event: "B", end_event: "C", statistic_type: "D" },
-      { metric_family: "X", start_event: "Y", end_event: "Z", statistic_type: "W" },
+      {
+        metric_family: "A",
+        start_event: "B",
+        end_event: "C",
+        statistic_type: "D",
+      },
+      {
+        metric_family: "X",
+        start_event: "Y",
+        end_event: "Z",
+        statistic_type: "W",
+      },
     ];
     mockSql.mockResolvedValue(mockResults);
 
@@ -83,14 +111,23 @@ describe("GET /api/export", () => {
     const json = await res.json();
 
     expect(json.metadata.methodology_homogeneity.is_homogeneous).toBe(false);
-    expect(json.metadata.methodology_homogeneity.distinct_methodology_groups).toBe(2);
+    expect(
+      json.metadata.methodology_homogeneity.distinct_methodology_groups,
+    ).toBe(2);
     expect(json.metadata.methodology_homogeneity.groups).toHaveLength(2);
-    expect(json.metadata.methodology_homogeneity.divergence_note).toContain("scientifically invalid");
+    expect(json.metadata.methodology_homogeneity.divergence_note).toContain(
+      "scientifically invalid",
+    );
   });
 
   it("does not include methodology_homogeneity in CSV response", async () => {
     const mockResults = [
-      { metric_family: "A", start_event: "B", end_event: "C", statistic_type: "D" },
+      {
+        metric_family: "A",
+        start_event: "B",
+        end_event: "C",
+        statistic_type: "D",
+      },
     ];
     mockSql.mockResolvedValue(mockResults);
 
@@ -106,8 +143,18 @@ describe("GET /api/export", () => {
 
   it("adds diverange warning comment to raw CSV when methodology is mixed", async () => {
     const mockResults = [
-      { metric_family: "A", start_event: "B", end_event: "C", statistic_type: "D" },
-      { metric_family: "X", start_event: "Y", end_event: "Z", statistic_type: "W" },
+      {
+        metric_family: "A",
+        start_event: "B",
+        end_event: "C",
+        statistic_type: "D",
+      },
+      {
+        metric_family: "X",
+        start_event: "Y",
+        end_event: "Z",
+        statistic_type: "W",
+      },
     ];
     mockSql.mockResolvedValue(mockResults);
 
@@ -124,12 +171,26 @@ describe("GET /api/export", () => {
 
   it("adds diverange warning comment to aggregated CSV when methodology is mixed", async () => {
     const mockResults = [
-      { metric_family: "A", start_event: "B", end_event: "C", statistic_type: "D", period_start: "2026-01-01" },
-      { metric_family: "X", start_event: "Y", end_event: "Z", statistic_type: "W", period_start: "2026-01-02" },
+      {
+        metric_family: "A",
+        start_event: "B",
+        end_event: "C",
+        statistic_type: "D",
+        period_start: "2026-01-01",
+      },
+      {
+        metric_family: "X",
+        start_event: "Y",
+        end_event: "Z",
+        statistic_type: "W",
+        period_start: "2026-01-02",
+      },
     ];
     mockSql.mockResolvedValue(mockResults);
 
-    const req = createRequest("/api/export?format=csv&granularity=daily&include_methodology=true");
+    const req = createRequest(
+      "/api/export?format=csv&granularity=daily&include_methodology=true",
+    );
     const res = await GET(req);
     const text = await res.text();
 

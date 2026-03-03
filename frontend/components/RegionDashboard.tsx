@@ -76,7 +76,7 @@ export function RegionDashboard({
   selectedRegionId,
   onSelectRegion,
 }: RegionDashboardProps) {
-  const t = useTranslations('RegionDashboard');
+  const t = useTranslations("RegionDashboard");
 
   if (!loading && regions.length === 0) {
     return null;
@@ -84,35 +84,35 @@ export function RegionDashboard({
 
   const getTrendLabel = (trend: RegionTrend, change: number) => {
     const pct = `${Math.abs(change).toFixed(1)}%`;
-    if (trend === "improving") return t('trend.improving', {percent: pct});
-    if (trend === "worsening") return t('trend.worsening', {percent: pct});
-    return t('trend.stable');
-  }
+    if (trend === "improving") return t("trend.improving", { percent: pct });
+    if (trend === "worsening") return t("trend.worsening", { percent: pct });
+    return t("trend.stable");
+  };
 
   return (
     <section className="rounded-xl border border-border/50 bg-card p-4">
       <div className="flex items-start justify-between gap-3 mb-4">
         <div>
           <h3 className="text-sm font-semibold text-foreground">
-            {t('title')}
+            {t("title")}
           </h3>
           <p className="text-xs text-muted-foreground">
-            {t('subtitle', {province: provinceLabel(province), period})}
+            {t("subtitle", { province: provinceLabel(province), period })}
           </p>
         </div>
         <button
           onClick={() => onSelectRegion(null)}
           className="text-xs text-primary hover:underline"
           type="button"
-          aria-label={t('clearFilter')}
+          aria-label={t("clearFilter")}
         >
-          {t('clearFilter')}
+          {t("clearFilter")}
         </button>
       </div>
 
       {provinceMean !== null && (
         <p className="text-xs text-muted-foreground mb-3">
-          {t('provinceMean')}{" "}
+          {t("provinceMean")}{" "}
           <span className="font-semibold">{Math.round(provinceMean)} min</span>
         </p>
       )}
@@ -126,20 +126,17 @@ export function RegionDashboard({
               : "text-muted-foreground",
           )}
         >
-          {t('mappingCoverage')}{" "}
+          {t("mappingCoverage")}{" "}
           <span className="font-semibold">
             {mappingCoverage.mapped_hospitals}/{mappingCoverage.total_hospitals}
           </span>{" "}
           ({mappingCoverage.coverage_percent.toFixed(1)}%)
-          {mappingCoverage.coverage_percent < 60 &&
-            t('incompleteMetrics')}
+          {mappingCoverage.coverage_percent < 60 && t("incompleteMetrics")}
         </p>
       )}
 
       {loading ? (
-        <div className="text-sm text-muted-foreground">
-          {t('loading')}
-        </div>
+        <div className="text-sm text-muted-foreground">{t("loading")}</div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {regions.map((region) => {
@@ -178,25 +175,29 @@ export function RegionDashboard({
 
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
-                    <p className="text-muted-foreground">{t('metrics.mean')}</p>
+                    <p className="text-muted-foreground">{t("metrics.mean")}</p>
                     <p className="font-semibold text-foreground">
                       {formatWait(region.period_mean)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">{t('metrics.median')}</p>
+                    <p className="text-muted-foreground">
+                      {t("metrics.median")}
+                    </p>
                     <p className="font-semibold text-foreground">
                       {formatWait(region.period_median)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">{t('metrics.best')}</p>
+                    <p className="text-muted-foreground">{t("metrics.best")}</p>
                     <p className="font-semibold text-emerald-700">
                       {formatWait(region.best_wait)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">{t('metrics.worst')}</p>
+                    <p className="text-muted-foreground">
+                      {t("metrics.worst")}
+                    </p>
                     <p className="font-semibold text-red-700">
                       {formatWait(region.worst_wait)}
                     </p>
@@ -204,7 +205,7 @@ export function RegionDashboard({
                 </div>
 
                 <p className="text-[11px] text-muted-foreground mt-2">
-                  {t('reporting')} {region.reporting_count}/
+                  {t("reporting")} {region.reporting_count}/
                   {region.hospital_count}
                 </p>
               </button>

@@ -32,52 +32,54 @@ describe("System Trends API", () => {
   });
 
   it("returns trend points and summary for valid request", async () => {
-    mockSql.mockResolvedValueOnce([
-      {
-         metric_family: "TOTAL_LOS",
-         start_event: "TRIAGE",
-         end_event: "DISCHARGE",
-         statistic_type: "P90",
-         hospital_count: 2,
-      },
-    ]).mockResolvedValueOnce([
-      {
-        hospital_id: "h1",
-        period_start: "2025-11-01T00:00:00.000Z",
-        period_end: "2025-11-30T23:59:59.000Z",
-        mean_value: 100,
-        min_value: 70,
-        max_value: 160,
-        sample_count: 200,
-      },
-      {
-        hospital_id: "h2",
-        period_start: "2025-11-01T00:00:00.000Z",
-        period_end: "2025-11-30T23:59:59.000Z",
-        mean_value: 130,
-        min_value: 90,
-        max_value: 220,
-        sample_count: 100,
-      },
-      {
-        hospital_id: "h1",
-        period_start: "2025-12-01T00:00:00.000Z",
-        period_end: "2025-12-31T23:59:59.000Z",
-        mean_value: 140,
-        min_value: 80,
-        max_value: 240,
-        sample_count: 220,
-      },
-      {
-        hospital_id: "h2",
-        period_start: "2025-12-01T00:00:00.000Z",
-        period_end: "2025-12-31T23:59:59.000Z",
-        mean_value: 160,
-        min_value: 100,
-        max_value: 260,
-        sample_count: 120,
-      },
-    ]);
+    mockSql
+      .mockResolvedValueOnce([
+        {
+          metric_family: "TOTAL_LOS",
+          start_event: "TRIAGE",
+          end_event: "DISCHARGE",
+          statistic_type: "P90",
+          hospital_count: 2,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          hospital_id: "h1",
+          period_start: "2025-11-01T00:00:00.000Z",
+          period_end: "2025-11-30T23:59:59.000Z",
+          mean_value: 100,
+          min_value: 70,
+          max_value: 160,
+          sample_count: 200,
+        },
+        {
+          hospital_id: "h2",
+          period_start: "2025-11-01T00:00:00.000Z",
+          period_end: "2025-11-30T23:59:59.000Z",
+          mean_value: 130,
+          min_value: 90,
+          max_value: 220,
+          sample_count: 100,
+        },
+        {
+          hospital_id: "h1",
+          period_start: "2025-12-01T00:00:00.000Z",
+          period_end: "2025-12-31T23:59:59.000Z",
+          mean_value: 140,
+          min_value: 80,
+          max_value: 240,
+          sample_count: 220,
+        },
+        {
+          hospital_id: "h2",
+          period_start: "2025-12-01T00:00:00.000Z",
+          period_end: "2025-12-31T23:59:59.000Z",
+          mean_value: 160,
+          min_value: 100,
+          max_value: 260,
+          sample_count: 120,
+        },
+      ]);
 
     const request = new Request(
       "http://localhost/api/analytics/trends?province=ON&period=monthly&lookback=6m",
@@ -120,52 +122,55 @@ describe("System Trends API", () => {
   });
 
   it("falls back to daily rollups when requested period has no rows", async () => {
-    mockSql.mockResolvedValueOnce([
-       {
-         metric_family: "TOTAL_LOS",
-         start_event: "TRIAGE",
-         end_event: "DISCHARGE",
-         statistic_type: "P90",
-         hospital_count: 2,
-       }
-    ]).mockResolvedValueOnce([]).mockResolvedValueOnce([
-      {
-        hospital_id: "h1",
-        period_start: "2025-12-01T00:00:00.000Z",
-        period_end: "2025-12-02T00:00:00.000Z",
-        mean_value: 100,
-        min_value: 70,
-        max_value: 160,
-        sample_count: 100,
-      },
-      {
-        hospital_id: "h1",
-        period_start: "2025-12-02T00:00:00.000Z",
-        period_end: "2025-12-03T00:00:00.000Z",
-        mean_value: 120,
-        min_value: 90,
-        max_value: 180,
-        sample_count: 100,
-      },
-      {
-        hospital_id: "h2",
-        period_start: "2025-12-01T00:00:00.000Z",
-        period_end: "2025-12-02T00:00:00.000Z",
-        mean_value: 140,
-        min_value: 100,
-        max_value: 220,
-        sample_count: 100,
-      },
-      {
-        hospital_id: "h2",
-        period_start: "2025-12-02T00:00:00.000Z",
-        period_end: "2025-12-03T00:00:00.000Z",
-        mean_value: 160,
-        min_value: 110,
-        max_value: 240,
-        sample_count: 100,
-      },
-    ]);
+    mockSql
+      .mockResolvedValueOnce([
+        {
+          metric_family: "TOTAL_LOS",
+          start_event: "TRIAGE",
+          end_event: "DISCHARGE",
+          statistic_type: "P90",
+          hospital_count: 2,
+        },
+      ])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          hospital_id: "h1",
+          period_start: "2025-12-01T00:00:00.000Z",
+          period_end: "2025-12-02T00:00:00.000Z",
+          mean_value: 100,
+          min_value: 70,
+          max_value: 160,
+          sample_count: 100,
+        },
+        {
+          hospital_id: "h1",
+          period_start: "2025-12-02T00:00:00.000Z",
+          period_end: "2025-12-03T00:00:00.000Z",
+          mean_value: 120,
+          min_value: 90,
+          max_value: 180,
+          sample_count: 100,
+        },
+        {
+          hospital_id: "h2",
+          period_start: "2025-12-01T00:00:00.000Z",
+          period_end: "2025-12-02T00:00:00.000Z",
+          mean_value: 140,
+          min_value: 100,
+          max_value: 220,
+          sample_count: 100,
+        },
+        {
+          hospital_id: "h2",
+          period_start: "2025-12-02T00:00:00.000Z",
+          period_end: "2025-12-03T00:00:00.000Z",
+          mean_value: 160,
+          min_value: 110,
+          max_value: 240,
+          sample_count: 100,
+        },
+      ]);
 
     const request = new Request(
       "http://localhost/api/analytics/trends?province=ON&period=monthly&lookback=6m",

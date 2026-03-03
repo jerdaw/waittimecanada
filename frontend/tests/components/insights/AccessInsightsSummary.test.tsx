@@ -252,7 +252,9 @@ describe("AccessInsightsSummary", () => {
       expect(
         screen.getByText(/descriptive\/associational only/i),
       ).toBeInTheDocument();
-      expect(screen.getByText(/Income reference year: 2021/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Income reference year: 2021/i),
+      ).toBeInTheDocument();
     });
   });
 });

@@ -93,7 +93,12 @@ export async function GET(request: Request) {
       );
     }
 
-    const { hospital_id: hospitalId, type: patternType, lookback_days, lookback_months } = validation.data;
+    const {
+      hospital_id: hospitalId,
+      type: patternType,
+      lookback_days,
+      lookback_months,
+    } = validation.data;
     // patternType is already typed as PatternType by Zod enum
 
     const hospitalRows = await sql`

@@ -55,7 +55,14 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const { province, start_date: startDate, end_date: endDate, format, include_methodology: includeMethodology, granularity } = validation.data;
+  const {
+    province,
+    start_date: startDate,
+    end_date: endDate,
+    format,
+    include_methodology: includeMethodology,
+    granularity,
+  } = validation.data;
 
   try {
     const sql = getDb();
@@ -145,7 +152,9 @@ export async function GET(request: NextRequest) {
 
       const csvRows = [];
       if (!homogeneity.is_homogeneous) {
-        csvRows.push(`# METHODOLOGY DIVERGENCE WARNING: ${homogeneity.divergence_note}`);
+        csvRows.push(
+          `# METHODOLOGY DIVERGENCE WARNING: ${homogeneity.divergence_note}`,
+        );
       }
       csvRows.push(aggHeaders.join(","));
 
@@ -177,7 +186,9 @@ export async function GET(request: NextRequest) {
           "X-Data-Type": "aggregated",
           "X-Granularity": granularity,
           "X-Methodology-Divergence": String(!homogeneity.is_homogeneous),
-          "X-Methodology-Groups": String(homogeneity.distinct_methodology_groups),
+          "X-Methodology-Groups": String(
+            homogeneity.distinct_methodology_groups,
+          ),
           ...NO_STORE_HEADERS,
         },
       });
@@ -262,7 +273,9 @@ export async function GET(request: NextRequest) {
 
     const csvRows = [];
     if (!homogeneity.is_homogeneous) {
-      csvRows.push(`# METHODOLOGY DIVERGENCE WARNING: ${homogeneity.divergence_note}`);
+      csvRows.push(
+        `# METHODOLOGY DIVERGENCE WARNING: ${homogeneity.divergence_note}`,
+      );
     }
     csvRows.push(headers.join(","));
 

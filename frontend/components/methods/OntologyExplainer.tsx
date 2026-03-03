@@ -4,100 +4,114 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 
 export function OntologyExplainer() {
-  const t = useTranslations('Methods.OntologyExplainer');
+  const t = useTranslations("Methods.OntologyExplainer");
   const [expandedDimension, setExpandedDimension] = useState<number | null>(0);
 
   const dimensions = [
     {
-      title: t('dimensions.metricFamily.title'),
-      subtitle: t('dimensions.metricFamily.subtitle'),
-      description: t('dimensions.metricFamily.description'),
+      title: t("dimensions.metricFamily.title"),
+      subtitle: t("dimensions.metricFamily.subtitle"),
+      description: t("dimensions.metricFamily.description"),
       examples: [
         {
           value: "TIME_TO_PROVIDER",
-          label: t('dimensions.metricFamily.examples.timeToProvider.label'),
-          explanation: t('dimensions.metricFamily.examples.timeToProvider.explanation'),
+          label: t("dimensions.metricFamily.examples.timeToProvider.label"),
+          explanation: t(
+            "dimensions.metricFamily.examples.timeToProvider.explanation",
+          ),
         },
         {
           value: "TOTAL_LOS",
-          label: t('dimensions.metricFamily.examples.totalLos.label'),
-          explanation: t('dimensions.metricFamily.examples.totalLos.explanation'),
+          label: t("dimensions.metricFamily.examples.totalLos.label"),
+          explanation: t(
+            "dimensions.metricFamily.examples.totalLos.explanation",
+          ),
         },
         {
           value: "STRETCHER_OCCUPANCY",
-          label: t('dimensions.metricFamily.examples.stretcherOccupancy.label'),
-          explanation: t('dimensions.metricFamily.examples.stretcherOccupancy.explanation'),
+          label: t("dimensions.metricFamily.examples.stretcherOccupancy.label"),
+          explanation: t(
+            "dimensions.metricFamily.examples.stretcherOccupancy.explanation",
+          ),
         },
       ],
     },
     {
-      title: t('dimensions.startEvent.title'),
-      subtitle: t('dimensions.startEvent.subtitle'),
-      description: t('dimensions.startEvent.description'),
+      title: t("dimensions.startEvent.title"),
+      subtitle: t("dimensions.startEvent.subtitle"),
+      description: t("dimensions.startEvent.description"),
       examples: [
         {
           value: "DOOR",
-          label: t('dimensions.startEvent.examples.door.label'),
-          explanation: t('dimensions.startEvent.examples.door.explanation'),
+          label: t("dimensions.startEvent.examples.door.label"),
+          explanation: t("dimensions.startEvent.examples.door.explanation"),
         },
         {
           value: "TRIAGE",
-          label: t('dimensions.startEvent.examples.triage.label'),
-          explanation: t('dimensions.startEvent.examples.triage.explanation'),
+          label: t("dimensions.startEvent.examples.triage.label"),
+          explanation: t("dimensions.startEvent.examples.triage.explanation"),
         },
         {
           value: "REGISTRATION",
-          label: t('dimensions.startEvent.examples.registration.label'),
-          explanation: t('dimensions.startEvent.examples.registration.explanation'),
+          label: t("dimensions.startEvent.examples.registration.label"),
+          explanation: t(
+            "dimensions.startEvent.examples.registration.explanation",
+          ),
         },
       ],
     },
     {
-      title: t('dimensions.endEvent.title'),
-      subtitle: t('dimensions.endEvent.subtitle'),
-      description: t('dimensions.endEvent.description'),
+      title: t("dimensions.endEvent.title"),
+      subtitle: t("dimensions.endEvent.subtitle"),
+      description: t("dimensions.endEvent.description"),
       examples: [
         {
           value: "PHYSICIAN",
-          label: t('dimensions.endEvent.examples.physician.label'),
-          explanation: t('dimensions.endEvent.examples.physician.explanation'),
+          label: t("dimensions.endEvent.examples.physician.label"),
+          explanation: t("dimensions.endEvent.examples.physician.explanation"),
         },
         {
           value: "PROVIDER",
-          label: t('dimensions.endEvent.examples.provider.label'),
-          explanation: t('dimensions.endEvent.examples.provider.explanation'),
+          label: t("dimensions.endEvent.examples.provider.label"),
+          explanation: t("dimensions.endEvent.examples.provider.explanation"),
         },
         {
           value: "DISCHARGE",
-          label: t('dimensions.endEvent.examples.discharge.label'),
-          explanation: t('dimensions.endEvent.examples.discharge.explanation'),
+          label: t("dimensions.endEvent.examples.discharge.label"),
+          explanation: t("dimensions.endEvent.examples.discharge.explanation"),
         },
       ],
     },
     {
-      title: t('dimensions.statisticType.title'),
-      subtitle: t('dimensions.statisticType.subtitle'),
-      description: t('dimensions.statisticType.description'),
+      title: t("dimensions.statisticType.title"),
+      subtitle: t("dimensions.statisticType.subtitle"),
+      description: t("dimensions.statisticType.description"),
       examples: [
         {
           value: "P90",
-          label: t('dimensions.statisticType.examples.p90.label'),
-          explanation: t('dimensions.statisticType.examples.p90.explanation'),
+          label: t("dimensions.statisticType.examples.p90.label"),
+          explanation: t("dimensions.statisticType.examples.p90.explanation"),
         },
         {
           value: "MEDIAN",
-          label: t('dimensions.statisticType.examples.median.label'),
-          explanation: t('dimensions.statisticType.examples.median.explanation'),
+          label: t("dimensions.statisticType.examples.median.label"),
+          explanation: t(
+            "dimensions.statisticType.examples.median.explanation",
+          ),
         },
         {
           value: "ROLLING_AVG",
-          label: t('dimensions.statisticType.examples.rollingAvg.label'),
-          explanation: t('dimensions.statisticType.examples.rollingAvg.explanation'),
+          label: t("dimensions.statisticType.examples.rollingAvg.label"),
+          explanation: t(
+            "dimensions.statisticType.examples.rollingAvg.explanation",
+          ),
         },
         {
           value: "POINT_ESTIMATE",
-          label: t('dimensions.statisticType.examples.pointEstimate.label'),
-          explanation: t('dimensions.statisticType.examples.pointEstimate.explanation'),
+          label: t("dimensions.statisticType.examples.pointEstimate.label"),
+          explanation: t(
+            "dimensions.statisticType.examples.pointEstimate.explanation",
+          ),
         },
       ],
     },
@@ -107,10 +121,10 @@ export function OntologyExplainer() {
     <div className="space-y-4">
       <div className="text-center mb-8">
         <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-          {t('title')}
+          {t("title")}
         </h3>
         <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-          {t('subtitle')}
+          {t("subtitle")}
         </p>
       </div>
 
@@ -135,7 +149,9 @@ export function OntologyExplainer() {
                   <h4 className="font-semibold text-slate-900 dark:text-white text-lg">
                     {dimension.title}
                   </h4>
-                  <p className="text-sm text-muted-foreground">{dimension.subtitle}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {dimension.subtitle}
+                  </p>
                 </div>
               </div>
               <svg
@@ -210,10 +226,10 @@ export function OntologyExplainer() {
           </div>
           <div>
             <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-              {t('summary.title')}
+              {t("summary.title")}
             </h4>
             <p className="text-blue-800 dark:text-blue-200 text-sm leading-relaxed">
-              {t('summary.description')}
+              {t("summary.description")}
             </p>
           </div>
         </div>

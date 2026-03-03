@@ -16,11 +16,7 @@ export default function robots(): MetadataRoute.Robots {
           "/privacy",
           "/terms",
         ],
-        disallow: [
-          "/api/",
-          "/_next/",
-          "/admin",
-        ],
+        disallow: ["/api/", "/_next/", "/admin"],
       },
       // Respect crawl rate limits (be polite to server resources)
       {

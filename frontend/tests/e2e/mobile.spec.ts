@@ -53,7 +53,7 @@ test.describe("Mobile Responsiveness", () => {
         contentType: "application/json",
         body: JSON.stringify({
           success: true,
-          data: []
+          data: [],
         }),
       });
     });
@@ -68,7 +68,10 @@ test.describe("Mobile Responsiveness", () => {
 
     // Mock mapbox equity layer to avoid errors if token missing
     await page.route("**/api/equity-layer**", async (route) => {
-        await route.fulfill({ status: 404, body: JSON.stringify({ success: false }) });
+      await route.fulfill({
+        status: 404,
+        body: JSON.stringify({ success: false }),
+      });
     });
 
     // Mock Mapbox API to prevent 401 errors and retries
@@ -85,7 +88,9 @@ test.describe("Mobile Responsiveness", () => {
 
   test("Homepage layout should be responsive", async ({ page }) => {
     // Verify logo and main text are visible without scrolling horizontally
-    await expect(page.getByRole("heading", { name: /Canada.*ER Wait Time/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /Canada.*ER Wait Time/i }),
+    ).toBeVisible();
 
     // Verify "Explore Hospitals" button is visible and click it to reveal search/app
     await page.getByRole("button", { name: /Explore Hospitals/i }).click();
@@ -105,7 +110,9 @@ test.describe("Mobile Responsiveness", () => {
 
   test("Map view interactions on mobile", async ({ page }) => {
     // Click explore to ensure map is fully interactive/visible in main view
-    const exploreButton = page.getByRole("button", { name: /Explore Hospitals/i });
+    const exploreButton = page.getByRole("button", {
+      name: /Explore Hospitals/i,
+    });
     await exploreButton.waitFor({ state: "visible", timeout: 10000 });
     await exploreButton.click({ force: true });
 
@@ -123,7 +130,10 @@ test.describe("Mobile Responsiveness", () => {
     console.log("Found markers with text:", markerTexts);
 
     // Target the specific hospital by its mock wait time (45)
-    const targetMarker = page.locator(".mapboxgl-marker").filter({ hasText: "45" }).first();
+    const targetMarker = page
+      .locator(".mapboxgl-marker")
+      .filter({ hasText: "45" })
+      .first();
     await targetMarker.click({ force: true });
 
     // Verify popup
@@ -140,7 +150,9 @@ test.describe("Mobile Responsiveness", () => {
 
   test("Hospital cards in list view", async ({ page }) => {
     // Click explore to enter app
-    const exploreButton = page.getByRole("button", { name: /Explore Hospitals/i });
+    const exploreButton = page.getByRole("button", {
+      name: /Explore Hospitals/i,
+    });
     await exploreButton.waitFor({ state: "visible", timeout: 10000 });
     await exploreButton.click({ force: true });
 
@@ -150,21 +162,30 @@ test.describe("Mobile Responsiveness", () => {
     await listViewButton.click({ force: true });
 
     // Verify list items
-    await expect(page.getByRole("heading", { name: "Toronto General Hospital" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Mount Sinai" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Toronto General Hospital" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Mount Sinai" }),
+    ).toBeVisible();
 
     // Verify Header stats
     await expect(page.getByText("2", { exact: true }).first()).toBeVisible();
   });
-  test.skip("Should show access burden estimator and quick actions when location available", async ({ page, context }) => {
+  test.skip("Should show access burden estimator and quick actions when location available", async ({
+    page,
+    context,
+  }) => {
     // Grant permissions and set geolocation to Toronto (slightly offset from hospital to ensure distance > 0)
-    await context.grantPermissions(['geolocation']);
+    await context.grantPermissions(["geolocation"]);
     await page.setGeolocation({ latitude: 43.6532, longitude: -79.3932 }); // ~800m away
 
     await page.goto("/");
 
     // Wait for location to be detected (Hero card shows "Nearest")
-    await expect(page.getByText("Nearest", { exact: false })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("Nearest", { exact: false })).toBeVisible({
+      timeout: 10000,
+    });
 
     // Enter app
     await page.getByRole("button", { name: /Explore Hospitals/i }).click();
@@ -174,15 +195,23 @@ test.describe("Mobile Responsiveness", () => {
 
     // Click on a hospital to expand it (Toronto General is close/same location in mock)
     // Wait for list to load
-    await expect(page.getByRole("heading", { name: "Toronto General Hospital" })).toBeVisible();
-    await page.getByRole("heading", { name: "Toronto General Hospital" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Toronto General Hospital" }),
+    ).toBeVisible();
+    await page
+      .getByRole("heading", { name: "Toronto General Hospital" })
+      .click();
 
     // Check for Quick Actions
     await expect(page.getByRole("link", { name: "Directions" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Call Health Info" })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Call Health Info" }),
+    ).toBeVisible();
 
     // Check for Access Burden Estimator (should be visible since we have location)
-    const estimatorButton = page.getByRole("button", { name: /Access Burden Estimate/i });
+    const estimatorButton = page.getByRole("button", {
+      name: /Access Burden Estimate/i,
+    });
     await expect(estimatorButton).toBeVisible();
 
     // Expand estimator

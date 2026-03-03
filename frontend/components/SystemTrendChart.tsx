@@ -190,7 +190,9 @@ export function SystemTrendChart({
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">
-            {metricFamily === "STRETCHER_OCCUPANCY" ? "Occupancy Trend" : "Wait Time Trend"}
+            {metricFamily === "STRETCHER_OCCUPANCY"
+              ? "Occupancy Trend"
+              : "Wait Time Trend"}
           </h2>
           <p className="text-xs text-muted-foreground">
             {metricFamily === "STRETCHER_OCCUPANCY"
@@ -250,7 +252,11 @@ export function SystemTrendChart({
             {Math.abs(trendSummary.change_percent).toFixed(1)}%
           </span>
           <span className="text-xs text-muted-foreground">
-            {provinceLabel(province)} {metricFamily === "STRETCHER_OCCUPANCY" ? "ER occupancy" : "ER waits"} over {lookback}
+            {provinceLabel(province)}{" "}
+            {metricFamily === "STRETCHER_OCCUPANCY"
+              ? "ER occupancy"
+              : "ER waits"}{" "}
+            over {lookback}
           </span>
         </div>
       )}

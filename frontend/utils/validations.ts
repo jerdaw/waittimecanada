@@ -37,7 +37,14 @@ export const PaginationSchema = z.object({
 
 // Specific Enums (Must be defined before use)
 export const BenchmarkPeriodSchema = z.enum(["24h", "7d", "30d"]);
-export const HospitalTrendPeriodSchema = z.enum(["24h", "7d", "30d", "90d", "6m", "1y"]);
+export const HospitalTrendPeriodSchema = z.enum([
+  "24h",
+  "7d",
+  "30d",
+  "90d",
+  "6m",
+  "1y",
+]);
 
 // Query schemas for specific routes
 export const TrendsQuerySchema = z.object({
@@ -63,7 +70,9 @@ export const OccupancyQuerySchema = z.object({
 
 export const PatternsQuerySchema = z.object({
   hospital_id: z.string(),
-  type: z.enum(["hour_of_day", "day_of_week", "monthly"]).default("hour_of_day"),
+  type: z
+    .enum(["hour_of_day", "day_of_week", "monthly"])
+    .default("hour_of_day"),
   lookback_days: z.coerce.number().int().positive().optional(),
   lookback_months: z.coerce.number().int().positive().optional(),
 });
@@ -108,6 +117,11 @@ export const ExportQuerySchema = z.object({
   start_date: z.string().datetime().optional(), // ISO string
   end_date: z.string().datetime().optional(),
   format: z.enum(["csv", "json"]).default("csv"),
-  include_methodology: z.enum(["true", "false"]).transform((val) => val !== "false").default("true"),
-  granularity: z.enum(["raw", "hourly", "daily", "weekly", "monthly"]).default("raw"),
+  include_methodology: z
+    .enum(["true", "false"])
+    .transform((val) => val !== "false")
+    .default("true"),
+  granularity: z
+    .enum(["raw", "hourly", "daily", "weekly", "monthly"])
+    .default("raw"),
 });

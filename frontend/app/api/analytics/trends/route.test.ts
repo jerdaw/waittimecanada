@@ -14,7 +14,9 @@ describe("API Route Integration: Trends", () => {
   });
 
   test("returns 200 for valid params", async () => {
-    const req = new NextRequest("http://localhost/api/analytics/trends?province=ON");
+    const req = new NextRequest(
+      "http://localhost/api/analytics/trends?province=ON",
+    );
     const res = await GET(req);
     expect(res.status).toBe(200);
   });
@@ -28,7 +30,9 @@ describe("API Route Integration: Trends", () => {
   });
 
   test("returns 400 for invalid period", async () => {
-    const req = new NextRequest("http://localhost/api/analytics/trends?province=ON&period=invalid");
+    const req = new NextRequest(
+      "http://localhost/api/analytics/trends?province=ON&period=invalid",
+    );
     const res = await GET(req);
     expect(res.status).toBe(400);
   });

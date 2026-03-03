@@ -27,7 +27,7 @@ import { isRecent } from "@/utils/date";
 import { useTranslations } from "next-intl";
 
 export default function Home() {
-  const t = useTranslations('HomePage');
+  const t = useTranslations("HomePage");
   const REGION_PERIOD = "7d";
   const featuredTestimonial = getFeaturedTestimonial();
 
@@ -165,11 +165,11 @@ export default function Home() {
             }
           }
         } else {
-          setError(data.message || t('error.loadFailed'));
+          setError(data.message || t("error.loadFailed"));
         }
       } catch (err) {
         console.error("Fetch error:", err);
-        setError(t('error.fetchFailed'));
+        setError(t("error.fetchFailed"));
       } finally {
         setLoading(false);
       }
@@ -305,75 +305,78 @@ export default function Home() {
         showStats={!showHero}
       />
 
-        <div
-          className={clsx(
-            "flex-1 w-full flex flex-col relative overflow-y-auto"
-          )}
-        >
-          {/* Hero Section */}
-          {showHero && (
-            <div className="flex-shrink-0 animate-in fade-in slide-in-from-top-10 duration-500">
-              <Hero
-                hospitals={hospitals}
-                onExplore={handleExplore}
-                userLocation={userLocation}
-                loading={loading}
-                selectedProvince={selectedProvince}
-                onProvinceChange={setSelectedProvince}
-                onSelectHospital={setSelectedHospitalId}
-              />
-              {featuredTestimonial && (
-                <div className="px-6 pb-6 max-w-md mx-auto lg:mx-0 lg:ml-6">
-                  <Testimonial testimonial={featuredTestimonial} />
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Access Insights Section - Only show when Hero is dismissed */}
-          {!showHero && !loading && hospitals.length > 0 && (
-            <div className={clsx(
-              "flex-shrink-0 px-4 sm:px-6 lg:px-8 pt-6 animate-in fade-in duration-500",
-              viewMode === "map" && "hidden lg:block"
-            )}>
-              <div className="max-w-screen-2xl mx-auto">
-                <h2 className="text-lg font-semibold mb-4 text-foreground">
-                  {t('accessInsights')}
-                </h2>
-                <AccessInsightsSummary
-                  hospitals={hospitals}
-                  userLocation={userLocation}
-                  province={selectedProvince}
-                />
-                <div className="mt-4">
-                  <RegionDashboard
-                    province={selectedProvince}
-                    period={REGION_PERIOD}
-                    regions={regionRows}
-                    provinceMean={provinceRegionMean}
-                    loading={regionsLoading}
-                    selectedRegionId={selectedRegionId}
-                    onSelectRegion={setSelectedRegionId}
-                  />
-                </div>
+      <div
+        className={clsx("flex-1 w-full flex flex-col relative overflow-y-auto")}
+      >
+        {/* Hero Section */}
+        {showHero && (
+          <div className="flex-shrink-0 animate-in fade-in slide-in-from-top-10 duration-500">
+            <Hero
+              hospitals={hospitals}
+              onExplore={handleExplore}
+              userLocation={userLocation}
+              loading={loading}
+              selectedProvince={selectedProvince}
+              onProvinceChange={setSelectedProvince}
+              onSelectHospital={setSelectedHospitalId}
+            />
+            {featuredTestimonial && (
+              <div className="px-6 pb-6 max-w-md mx-auto lg:mx-0 lg:ml-6">
+                <Testimonial testimonial={featuredTestimonial} />
               </div>
-            </div>
-          )}
+            )}
+          </div>
+        )}
 
-          {/* Mobile hint: in split mode on mobile, the list is hidden — prompt users to switch */}
-          {!showHero && viewMode === "split" && (
-            <div className="lg:hidden flex-shrink-0 px-4 pb-2">
-              <p className="text-xs text-center text-muted-foreground" dangerouslySetInnerHTML={{ __html: t.raw('mobileHint') }} />
-            </div>
-          )}
-
-          {/* Main Split View Content - Responsive with max-width */}
+        {/* Access Insights Section - Only show when Hero is dismissed */}
+        {!showHero && !loading && hospitals.length > 0 && (
           <div
             className={clsx(
-              "flex-1 p-4 sm:p-6 lg:p-8",
-              showHero ? "h-[45vh] min-h-[45vh]" : "h-full min-h-[650px]",
+              "flex-shrink-0 px-4 sm:px-6 lg:px-8 pt-6 animate-in fade-in duration-500",
+              viewMode === "map" && "hidden lg:block",
             )}
           >
+            <div className="max-w-screen-2xl mx-auto">
+              <h2 className="text-lg font-semibold mb-4 text-foreground">
+                {t("accessInsights")}
+              </h2>
+              <AccessInsightsSummary
+                hospitals={hospitals}
+                userLocation={userLocation}
+                province={selectedProvince}
+              />
+              <div className="mt-4">
+                <RegionDashboard
+                  province={selectedProvince}
+                  period={REGION_PERIOD}
+                  regions={regionRows}
+                  provinceMean={provinceRegionMean}
+                  loading={regionsLoading}
+                  selectedRegionId={selectedRegionId}
+                  onSelectRegion={setSelectedRegionId}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Mobile hint: in split mode on mobile, the list is hidden — prompt users to switch */}
+        {!showHero && viewMode === "split" && (
+          <div className="lg:hidden flex-shrink-0 px-4 pb-2">
+            <p
+              className="text-xs text-center text-muted-foreground"
+              dangerouslySetInnerHTML={{ __html: t.raw("mobileHint") }}
+            />
+          </div>
+        )}
+
+        {/* Main Split View Content - Responsive with max-width */}
+        <div
+          className={clsx(
+            "flex-1 p-4 sm:p-6 lg:p-8",
+            showHero ? "h-[45vh] min-h-[45vh]" : "h-full min-h-[650px]",
+          )}
+        >
           <div className="h-full max-w-screen-2xl mx-auto">
             {/* Desktop: Side by side | Mobile: Show one view at a time */}
             <div className="h-full flex gap-4 sm:gap-6 lg:gap-8">
@@ -382,8 +385,8 @@ export default function Home() {
                 <div
                   className={`${
                     viewMode === "split"
-                    ? "hidden lg:block lg:w-[35%]" // Hidden on mobile, 35% on desktop
-                    : "w-full"
+                      ? "hidden lg:block lg:w-[35%]" // Hidden on mobile, 35% on desktop
+                      : "w-full"
                   } h-full`}
                 >
                   <div className="h-full bg-card rounded-xl border border-border/50 shadow-sm overflow-hidden">
@@ -420,8 +423,8 @@ export default function Home() {
                 <div
                   className={`${
                     viewMode === "split"
-                    ? "w-full lg:w-[65%]" // Full on mobile, 65% on desktop
-                    : "w-full"
+                      ? "w-full lg:w-[65%]" // Full on mobile, 65% on desktop
+                      : "w-full"
                   } h-full`}
                 >
                   <div className="h-full bg-card rounded-xl border border-border/50 shadow-sm overflow-hidden">
@@ -452,9 +455,7 @@ export default function Home() {
       )}
 
       {/* Footer */}
-      {!showHero && (
-        <Footer />
-      )}
+      {!showHero && <Footer />}
     </main>
   );
 }

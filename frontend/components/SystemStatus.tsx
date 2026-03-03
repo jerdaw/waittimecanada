@@ -17,7 +17,7 @@ interface HealthData {
 const HEALTH_CHECK_INTERVAL_MS = 5 * 60 * 1000;
 
 export function SystemStatus() {
-  const t = useTranslations('SystemStatus');
+  const t = useTranslations("SystemStatus");
   const [health, setHealth] = useState<HealthData>({
     status: "loading",
     lastUpdate: null,
@@ -89,18 +89,18 @@ export function SystemStatus() {
   }, []);
 
   const statusConfig = {
-    loading: { icon: Activity, color: "text-slate-400", label: t('checking') },
+    loading: { icon: Activity, color: "text-slate-400", label: t("checking") },
     healthy: {
       icon: CheckCircle,
       color: "text-green-500",
-      label: t('healthy'),
+      label: t("healthy"),
     },
     degraded: {
       icon: AlertTriangle,
       color: "text-amber-500",
-      label: t('degraded'),
+      label: t("degraded"),
     },
-    down: { icon: XCircle, color: "text-red-500", label: t('down') },
+    down: { icon: XCircle, color: "text-red-500", label: t("down") },
   };
 
   const { icon: Icon, color, label } = statusConfig[health.status];
@@ -111,7 +111,7 @@ export function SystemStatus() {
       <span className="text-slate-500 dark:text-slate-400">{label}</span>
       {health.ageMinutes < 999 && (
         <span className="text-slate-400 text-xs">
-          {t('updatedAgo', {minutes: health.ageMinutes})}
+          {t("updatedAgo", { minutes: health.ageMinutes })}
         </span>
       )}
     </div>

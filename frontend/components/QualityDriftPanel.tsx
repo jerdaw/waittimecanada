@@ -32,7 +32,9 @@ export function QualityDriftPanel({ sources }: QualityDriftPanelProps) {
 
     // Fetch diff for each source
     sources.forEach((source) => {
-      fetch(`/api/data-quality?view=diff&source_id=${source.source_id}&compare_days=7`)
+      fetch(
+        `/api/data-quality?view=diff&source_id=${source.source_id}&compare_days=7`,
+      )
         .then((r) => {
           if (!r.ok) throw new Error("Failed");
           return r.json();

@@ -26,9 +26,7 @@ describe("AboutSection", () => {
     fireEvent.click(button);
 
     // Content should now be visible
-    expect(
-      screen.getByText(/As a pre-medical student/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/As a pre-medical student/i)).toBeInTheDocument();
   });
 
   it("collapses again when clicked twice", () => {

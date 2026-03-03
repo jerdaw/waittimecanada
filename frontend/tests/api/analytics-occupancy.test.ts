@@ -83,7 +83,9 @@ describe("Occupancy Analytics API", () => {
     expect(json.data.occupancy_percentage.average).toBe(115.5);
     expect(json.data.occupancy_percentage.min).toBe(85.0);
     expect(json.data.occupancy_percentage.max).toBe(150.0);
-    expect(json.data.occupancy_percentage.note).toContain("Stretcher occupancy");
+    expect(json.data.occupancy_percentage.note).toContain(
+      "Stretcher occupancy",
+    );
   });
 
   it("returns raw count metrics when available", async () => {

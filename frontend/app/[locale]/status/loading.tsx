@@ -46,7 +46,10 @@ export default function StatusLoading() {
                 </div>
                 <div className="space-y-2">
                   {[1, 2, 3].map((j) => (
-                    <div key={j} className="h-1.5 bg-muted rounded-full animate-pulse" />
+                    <div
+                      key={j}
+                      className="h-1.5 bg-muted rounded-full animate-pulse"
+                    />
                   ))}
                 </div>
               </div>

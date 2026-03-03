@@ -23,26 +23,26 @@ describe("API Route Integration: Compare", () => {
 
     // We can mock the return value to be a list containing the hospital object.
     const mockHosp1 = {
-        id: "hosp1",
-        name: "H1",
-        province: "ON",
-        metric_family: "A",
-        last_updated: "2023-01-01T00:00:00Z", // Required for Date parsing
-        start_event: "arrival",
-        end_event: "admission",
-        statistic_type: "mean",
-        wait_time: 120
+      id: "hosp1",
+      name: "H1",
+      province: "ON",
+      metric_family: "A",
+      last_updated: "2023-01-01T00:00:00Z", // Required for Date parsing
+      start_event: "arrival",
+      end_event: "admission",
+      statistic_type: "mean",
+      wait_time: 120,
     };
     const mockHosp2 = {
-        id: "hosp2",
-        name: "H2",
-        province: "ON",
-        metric_family: "A",
-        last_updated: "2023-01-01T00:00:00Z",
-        start_event: "arrival",
-        end_event: "admission",
-        statistic_type: "mean",
-        wait_time: 130
+      id: "hosp2",
+      name: "H2",
+      province: "ON",
+      metric_family: "A",
+      last_updated: "2023-01-01T00:00:00Z",
+      start_event: "arrival",
+      end_event: "admission",
+      statistic_type: "mean",
+      wait_time: 130,
     };
 
     mockSql

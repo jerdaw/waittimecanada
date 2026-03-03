@@ -79,8 +79,12 @@ describe("computeEquityLinkageSummary", () => {
       result.sensitivity_analysis.some((item) => item.threshold_km === 30),
     ).toBe(true);
     expect(result.uncertainty.method).toBe("bootstrap_percentile");
-    expect(result.uncertainty.near_low_income_avg_wait_ci95.lower).not.toBeNull();
-    expect(result.uncertainty.near_low_income_avg_wait_ci95.upper).not.toBeNull();
+    expect(
+      result.uncertainty.near_low_income_avg_wait_ci95.lower,
+    ).not.toBeNull();
+    expect(
+      result.uncertainty.near_low_income_avg_wait_ci95.upper,
+    ).not.toBeNull();
     expect(result.uncertainty.wait_gap_minutes_ci95.lower).not.toBeNull();
     expect(result.uncertainty.wait_gap_minutes_ci95.upper).not.toBeNull();
   });

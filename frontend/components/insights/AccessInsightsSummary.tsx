@@ -82,7 +82,7 @@ export function AccessInsightsSummary({
   userLocation,
   province,
 }: AccessInsightsSummaryProps) {
-  const t = useTranslations('AccessInsights');
+  const t = useTranslations("AccessInsights");
   const [equitySummary, setEquitySummary] =
     useState<EquitySummarySnapshot | null>(null);
   const [equityLoading, setEquityLoading] = useState(true);
@@ -174,7 +174,7 @@ export function AccessInsightsSummary({
           <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
             <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
             <p className="text-xs text-amber-800 dark:text-amber-200">
-              {t('disclaimer')}
+              {t("disclaimer")}
             </p>
           </div>
 
@@ -183,21 +183,23 @@ export function AccessInsightsSummary({
               {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <StatCard
-                  title={t('stats.erWithin30km')}
+                  title={t("stats.erWithin30km")}
                   value={within30km.length}
-                  subtitle={t('stats.totalHospitals', {total: hospitals.length})}
+                  subtitle={t("stats.totalHospitals", {
+                    total: hospitals.length,
+                  })}
                   icon={<MapPin className="w-5 h-5" />}
                 />
 
                 <StatCard
-                  title={t('stats.avgCost')}
+                  title={t("stats.avgCost")}
                   value={`$${Math.round(avgAccessCost)}`}
-                  subtitle={t('stats.costDesc')}
+                  subtitle={t("stats.costDesc")}
                   icon={<DollarSign className="w-5 h-5" />}
                 />
 
                 <StatCard
-                  title={t('stats.nearestEr')}
+                  title={t("stats.nearestEr")}
                   value={`${nearest.distance.toFixed(1)}km`}
                   subtitle={nearest.name}
                   icon={<Navigation className="w-5 h-5" />}
@@ -208,7 +210,10 @@ export function AccessInsightsSummary({
               {within30km.length === 0 && within50km.length > 0 && (
                 <div className="p-3 bg-muted/50 border border-border rounded-lg">
                   <p className="text-xs text-muted-foreground">
-                    {t('noErNearby', {distance: nearest.distance.toFixed(1), city: nearest.city})}
+                    {t("noErNearby", {
+                      distance: nearest.distance.toFixed(1),
+                      city: nearest.city,
+                    })}
                   </p>
                 </div>
               )}
@@ -217,11 +222,13 @@ export function AccessInsightsSummary({
               {within30km.length > 0 && (
                 <div className="p-3 bg-muted/50 border border-border rounded-lg">
                   <p className="text-xs text-muted-foreground">
-                    {t('costRange', {
+                    {t("costRange", {
                       min: Math.round(nearest.accessCost),
-                      max: Math.round(within30km[within30km.length - 1].accessCost),
+                      max: Math.round(
+                        within30km[within30km.length - 1].accessCost,
+                      ),
                       price: (GAS_PRICES[province] || 1.55).toFixed(2),
-                      province: province
+                      province: province,
                     })}
                   </p>
                 </div>
@@ -231,7 +238,7 @@ export function AccessInsightsSummary({
             <div className="p-6 text-center bg-card border border-border rounded-lg">
               <MapPin className="w-8 h-8 mx-auto mb-2 text-muted-foreground opacity-50" />
               <p className="text-sm font-medium text-muted-foreground">
-                {t('noHospitals')}
+                {t("noHospitals")}
               </p>
             </div>
           )}
@@ -240,37 +247,35 @@ export function AccessInsightsSummary({
         <div className="p-6 text-center bg-card border border-border rounded-lg">
           <MapPin className="w-8 h-8 mx-auto mb-2 text-muted-foreground opacity-50" />
           <p className="text-sm font-medium text-muted-foreground">
-            {t('enableLocation.title')}
+            {t("enableLocation.title")}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            {t('enableLocation.subtitle')}
+            {t("enableLocation.subtitle")}
           </p>
         </div>
       )}
 
       <div className="rounded-lg border border-border bg-card p-4">
         <h3 className="text-sm font-semibold text-foreground">
-          {t('equity.title')}
+          {t("equity.title")}
         </h3>
         <p className="mt-1 text-xs text-muted-foreground">
-          {t('equity.description')}
+          {t("equity.description")}
         </p>
 
         {equityLoading ? (
           <p className="mt-3 text-sm text-muted-foreground">
-            {t('equity.loading')}
+            {t("equity.loading")}
           </p>
         ) : equityError ? (
           <p className="mt-3 text-sm text-muted-foreground">{equityError}</p>
         ) : !equitySummary ? (
           <p className="mt-3 text-sm text-muted-foreground">
-            {t('equity.unavailable')}
+            {t("equity.unavailable")}
           </p>
         ) : equitySummary.status === "not_available_yet" ? (
           <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-            <p className="font-medium">
-              {t('equity.notReady')}
-            </p>
+            <p className="font-medium">{t("equity.notReady")}</p>
             <p className="mt-1">{equitySummary.message}</p>
             {Array.isArray(equitySummary.setup_steps) &&
               equitySummary.setup_steps.length > 0 && (
@@ -289,19 +294,23 @@ export function AccessInsightsSummary({
           <div className="mt-3 space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <StatCard
-                title={t('equity.lowIncomeTracts')}
+                title={t("equity.lowIncomeTracts")}
                 value={equitySummary.low_income_tracts ?? 0}
-                subtitle={t('equity.tractsCount', {total: equitySummary.total_tracts ?? 0})}
+                subtitle={t("equity.tractsCount", {
+                  total: equitySummary.total_tracts ?? 0,
+                })}
                 icon={<MapPin className="w-5 h-5" />}
               />
               <StatCard
-                title={t('equity.hospitalsNear')}
+                title={t("equity.hospitalsNear")}
                 value={equitySummary.hospitals_near_low_income ?? 0}
-                subtitle={t('equity.withinKm', {distance: equitySummary.threshold_km ?? 30})}
+                subtitle={t("equity.withinKm", {
+                  distance: equitySummary.threshold_km ?? 30,
+                })}
                 icon={<Navigation className="w-5 h-5" />}
               />
               <StatCard
-                title={t('equity.waitGap')}
+                title={t("equity.waitGap")}
                 value={
                   equitySummary.wait_gap_minutes === null ||
                   equitySummary.wait_gap_minutes === undefined
@@ -310,20 +319,22 @@ export function AccessInsightsSummary({
                         equitySummary.wait_gap_minutes,
                       )} min`
                 }
-                subtitle={t('equity.reportingCount', {count: equitySummary.reporting_hospitals ?? 0})}
+                subtitle={t("equity.reportingCount", {
+                  count: equitySummary.reporting_hospitals ?? 0,
+                })}
                 icon={<AlertTriangle className="w-5 h-5" />}
               />
             </div>
 
             <p className="text-xs text-muted-foreground">
-              {t('equity.nearTractMean')}{" "}
+              {t("equity.nearTractMean")}{" "}
               <strong>
                 {equitySummary.near_low_income_avg_wait === null ||
                 equitySummary.near_low_income_avg_wait === undefined
                   ? "n/a"
                   : `${Math.round(equitySummary.near_low_income_avg_wait)} min`}
               </strong>{" "}
-              • {t('equity.provinceMean')}{" "}
+              • {t("equity.provinceMean")}{" "}
               <strong>
                 {equitySummary.province_avg_wait === null ||
                 equitySummary.province_avg_wait === undefined
@@ -356,7 +367,7 @@ export function AccessInsightsSummary({
 
             {equitySummary.is_placeholder && (
               <p className="text-xs text-amber-700">
-                {t('equity.placeholder')}
+                {t("equity.placeholder")}
               </p>
             )}
           </div>

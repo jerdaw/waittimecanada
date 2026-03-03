@@ -390,9 +390,9 @@ export async function GET(request: NextRequest) {
 
     if (!lookbackConfig) {
       // Should not happen if Zod schema is correct
-       return NextResponse.json(
+      return NextResponse.json(
         { success: false, error: "Invalid lookback configuration" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -405,14 +405,19 @@ export async function GET(request: NextRequest) {
     const lookbackStartIso = lookbackStart.toISOString();
 
     const [methodologyContext, aggregateRowsResult] = await Promise.all([
-      queryMethodologyContext(sql, normalizedProvince, lookbackStartIso, metric_family),
+      queryMethodologyContext(
+        sql,
+        normalizedProvince,
+        lookbackStartIso,
+        metric_family,
+      ),
       queryAggregateRows(
         sql,
         normalizedProvince,
         period,
         lookbackStartIso,
         metric_family,
-      )
+      ),
     ]);
 
     let aggregateRows = aggregateRowsResult;

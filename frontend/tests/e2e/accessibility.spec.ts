@@ -57,7 +57,10 @@ test.describe("Accessibility Audits", () => {
 
     // Mock mapbox equity layer
     await page.route("**/api/equity-layer**", async (route) => {
-      await route.fulfill({ status: 404, body: JSON.stringify({ success: false }) });
+      await route.fulfill({
+        status: 404,
+        body: JSON.stringify({ success: false }),
+      });
     });
 
     // Mock Mapbox API
@@ -77,13 +80,16 @@ test.describe("Accessibility Audits", () => {
 
     // Wait for key content to load
     await expect(
-      page.getByRole("heading", { name: /Canada.*ER Wait Time/i })
+      page.getByRole("heading", { name: /Canada.*ER Wait Time/i }),
     ).toBeVisible();
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
 
     if (accessibilityScanResults.violations.length > 0) {
-      console.log("Violations found:", JSON.stringify(accessibilityScanResults.violations, null, 2));
+      console.log(
+        "Violations found:",
+        JSON.stringify(accessibilityScanResults.violations, null, 2),
+      );
     }
     expect(accessibilityScanResults.violations).toEqual([]);
   });
@@ -101,27 +107,35 @@ test.describe("Accessibility Audits", () => {
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
 
     if (accessibilityScanResults.violations.length > 0) {
-      console.log("Violations found:", JSON.stringify(accessibilityScanResults.violations, null, 2));
+      console.log(
+        "Violations found:",
+        JSON.stringify(accessibilityScanResults.violations, null, 2),
+      );
     }
     expect(accessibilityScanResults.violations).toEqual([]);
   });
 
-  test("Should verify map view accessibility (basic controls)", async ({ page }) => {
+  test("Should verify map view accessibility (basic controls)", async ({
+    page,
+  }) => {
     await page.goto("/");
     await page.getByRole("button", { name: /Explore Hospitals/i }).click();
     await page.getByRole("button", { name: "Map view" }).click();
 
     // Wait for map container
-    await page.waitForSelector('.mapboxgl-map');
+    await page.waitForSelector(".mapboxgl-map");
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       // Mapbox GL JS creates some canvas structures that often flag false positives for non-interactive elements
       // We exclude the map canvas itself but check controls
-      .exclude('.mapboxgl-canvas-container')
+      .exclude(".mapboxgl-canvas-container")
       .analyze();
 
     if (accessibilityScanResults.violations.length > 0) {
-      console.log("Violations found:", JSON.stringify(accessibilityScanResults.violations, null, 2));
+      console.log(
+        "Violations found:",
+        JSON.stringify(accessibilityScanResults.violations, null, 2),
+      );
     }
     expect(accessibilityScanResults.violations).toEqual([]);
   });

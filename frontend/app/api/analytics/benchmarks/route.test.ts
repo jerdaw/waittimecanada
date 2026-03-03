@@ -14,7 +14,9 @@ describe("API Route Integration: Benchmarks", () => {
   });
 
   test("returns 200 for valid params", async () => {
-    const req = new NextRequest("http://localhost/api/analytics/benchmarks?province=ON");
+    const req = new NextRequest(
+      "http://localhost/api/analytics/benchmarks?province=ON",
+    );
     const res = await GET(req);
     expect(res.status).toBe(200);
   });
@@ -26,7 +28,9 @@ describe("API Route Integration: Benchmarks", () => {
   });
 
   test("returns 400 for invalid period", async () => {
-    const req = new NextRequest("http://localhost/api/analytics/benchmarks?province=ON&period=invalid");
+    const req = new NextRequest(
+      "http://localhost/api/analytics/benchmarks?province=ON&period=invalid",
+    );
     const res = await GET(req);
     expect(res.status).toBe(400);
   });
@@ -56,10 +60,12 @@ describe("API Route Integration: Benchmarks", () => {
         start_event: "TRIAGE",
         end_event: "PHYSICIAN",
         statistic_type: "P90",
-      }
+      },
     ]);
 
-    const req = new NextRequest("http://localhost/api/analytics/benchmarks?province=ON");
+    const req = new NextRequest(
+      "http://localhost/api/analytics/benchmarks?province=ON",
+    );
     const res = await GET(req);
     const json = await res.json();
 
@@ -95,16 +101,20 @@ describe("API Route Integration: Benchmarks", () => {
         start_event: "Y",
         end_event: "Z",
         statistic_type: "W",
-      }
+      },
     ]);
 
-    const req = new NextRequest("http://localhost/api/analytics/benchmarks?province=ON");
+    const req = new NextRequest(
+      "http://localhost/api/analytics/benchmarks?province=ON",
+    );
     const res = await GET(req);
     const json = await res.json();
 
     expect(res.status).toBe(200);
     expect(json.data.methodology_summary.is_homogeneous).toBe(false);
     expect(json.data.methodology_summary.distinct_groups).toBe(2);
-    expect(json.data.methodology_summary.divergence_note).toContain("scientifically invalid");
+    expect(json.data.methodology_summary.divergence_note).toContain(
+      "scientifically invalid",
+    );
   });
 });

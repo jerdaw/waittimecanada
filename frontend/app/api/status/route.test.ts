@@ -134,7 +134,9 @@ describe("/api/status", () => {
   });
 
   it("should handle database errors gracefully", async () => {
-    const mockSql = vi.fn().mockRejectedValue(new Error("Database disconnected"));
+    const mockSql = vi
+      .fn()
+      .mockRejectedValue(new Error("Database disconnected"));
     (getDb as Mock).mockReturnValue(mockSql);
 
     const res = await GET();

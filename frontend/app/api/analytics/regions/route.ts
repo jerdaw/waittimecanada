@@ -134,7 +134,10 @@ export async function GET(request: Request) {
     const periodConfig = parsePeriod(period);
 
     if (!periodConfig) {
-       return NextResponse.json({ success: false, error: "Invalid period config" }, { status: 500 });
+      return NextResponse.json(
+        { success: false, error: "Invalid period config" },
+        { status: 500 },
+      );
     }
 
     const normalizedProvince = province.toUpperCase();

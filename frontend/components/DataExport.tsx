@@ -158,9 +158,7 @@ export function DataExport() {
 
       {/* Format Toggle */}
       <div className="flex items-center gap-4 mb-6">
-        <span className="text-sm font-medium text-foreground">
-          Format:
-        </span>
+        <span className="text-sm font-medium text-foreground">Format:</span>
         <div className="flex gap-2">
           <button
             onClick={() => setFormat("csv")}

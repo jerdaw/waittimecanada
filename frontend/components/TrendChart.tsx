@@ -11,7 +11,10 @@ import {
   ComposedChart,
 } from "recharts";
 import { clsx } from "clsx";
-import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
+import type {
+  NameType,
+  ValueType,
+} from "recharts/types/component/DefaultTooltipContent";
 import { useTranslations } from "next-intl";
 
 type Period = "24h" | "7d" | "30d" | "90d" | "6m" | "1y";
@@ -34,7 +37,7 @@ interface TrendChartProps {
 }
 
 export function TrendChart({ hospitalId }: TrendChartProps) {
-  const t = useTranslations('TrendChart');
+  const t = useTranslations("TrendChart");
   const [period, setPeriod] = useState<Period>("24h");
   const [data, setData] = useState<TrendData | null>(null);
 
@@ -58,7 +61,7 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
       .catch((err) => {
         if (mounted) {
           console.error(err);
-          setError(t('error'));
+          setError(t("error"));
           setLoading(false);
         }
       });
@@ -85,11 +88,14 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
     return date.toLocaleDateString([], { month: "short", day: "numeric" });
   };
 
-  const formatTooltip = (value: ValueType | undefined, name: NameType | undefined) => {
+  const formatTooltip = (
+    value: ValueType | undefined,
+    name: NameType | undefined,
+  ) => {
     if (name === "waitTime")
-      return [`${value} min`, isAggregated ? t('mean') : t('waitTime')];
-    if (name === "minWaitTime") return [`${value} min`, t('min')];
-    if (name === "maxWaitTime") return [`${value} min`, t('max')];
+      return [`${value} min`, isAggregated ? t("mean") : t("waitTime")];
+    if (name === "minWaitTime") return [`${value} min`, t("min")];
+    if (name === "maxWaitTime") return [`${value} min`, t("max")];
     return [`${value}`, name ?? ""];
   };
 
@@ -103,10 +109,10 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
     <div className="bg-card rounded-lg p-4 border border-border/50 shadow-sm mt-4">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-sm">{t('title')}</h3>
+          <h3 className="font-semibold text-sm">{t("title")}</h3>
           {isAggregated && (
             <span className="text-[10px] px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded font-medium">
-              {t('aggregated')}
+              {t("aggregated")}
             </span>
           )}
         </div>
@@ -139,7 +145,7 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
           </div>
         ) : !data?.dataPoints?.length ? (
           <div className="h-full w-full flex items-center justify-center text-sm text-muted-foreground">
-            {t('noData')}
+            {t("noData")}
           </div>
         ) : hasMinMax ? (
           /* Aggregate view: mean line with min/max shaded area */

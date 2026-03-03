@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { RegionDashboard } from "@/components/RegionDashboard";
 
 // Mock next-intl explicitly here
-vi.mock('next-intl', () => ({
+vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
@@ -109,8 +109,6 @@ describe("RegionDashboard", () => {
     );
 
     // "Loading regional analytics..." -> "loading"
-    expect(
-      screen.getByText("loading"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("loading")).toBeInTheDocument();
   });
 });

@@ -8,14 +8,14 @@ afterEach(() => {
   cleanup();
 });
 
-import messages from '../messages/en.json';
+import messages from "../messages/en.json";
 
 const getNestedValue = (obj: any, path: string) => {
-  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+  return path.split(".").reduce((acc, part) => acc && acc[part], obj);
 };
 
 // Mock next-intl
-vi.mock('next-intl', () => ({
+vi.mock("next-intl", () => ({
   useTranslations: (namespace?: string) => {
     const t = (key: string, params?: Record<string, any>) => {
       const fullPath = namespace ? `${namespace}.${key}` : key;
@@ -23,9 +23,9 @@ vi.mock('next-intl', () => ({
 
       if (!value) return key;
 
-      if (params && typeof value === 'string') {
+      if (params && typeof value === "string") {
         Object.entries(params).forEach(([k, v]) => {
-          if (typeof v !== 'function') {
+          if (typeof v !== "function") {
             value = (value as string).replace(`{${k}}`, String(v));
           }
         });
@@ -44,12 +44,12 @@ vi.mock('next-intl', () => ({
 
     return t;
   },
-  useLocale: () => 'en',
-  useTimeZone: () => 'America/Toronto',
+  useLocale: () => "en",
+  useTimeZone: () => "America/Toronto",
 }));
 
 // Mock next-intl/server (for server components like FAQPage)
-vi.mock('next-intl/server', () => ({
+vi.mock("next-intl/server", () => ({
   getTranslations: async (namespace?: string) => {
     const t = (key: string, params?: Record<string, any>) => {
       const fullPath = namespace ? `${namespace}.${key}` : key;
@@ -57,9 +57,9 @@ vi.mock('next-intl/server', () => ({
 
       if (!value) return key;
 
-      if (params && typeof value === 'string') {
+      if (params && typeof value === "string") {
         Object.entries(params).forEach(([k, v]) => {
-          if (typeof v !== 'function') {
+          if (typeof v !== "function") {
             value = (value as string).replace(`{${k}}`, String(v));
           }
         });

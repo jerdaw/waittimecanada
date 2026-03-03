@@ -9,7 +9,11 @@ export function HeroStats({ hospitalCount }: HeroStatsProps) {
 
   const stats = [
     { label: t("stats.provinces") },
-    { label: t("stats.hospitals", { count: hospitalCount > 0 ? hospitalCount : "..." }) },
+    {
+      label: t("stats.hospitals", {
+        count: hospitalCount > 0 ? hospitalCount : "...",
+      }),
+    },
     { label: t("stats.cadence") },
   ];
 

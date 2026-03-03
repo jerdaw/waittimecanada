@@ -9,9 +9,9 @@ import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { StructuredData } from "./structured-data";
 
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, getTranslations } from 'next-intl/server';
-import { notFound } from 'next/navigation';
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, getTranslations } from "next-intl/server";
+import { notFound } from "next/navigation";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,16 +19,22 @@ const inter = Inter({
   display: "swap",
 });
 
-const locales = ['en', 'fr'];
+const locales = ["en", "fr"];
 
-export async function generateMetadata({params: {locale}}: {params: {locale: string}}): Promise<Metadata> {
-  const t = await getTranslations({locale, namespace: 'Metadata'});
+export async function generateMetadata({
+  params: { locale },
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: "Metadata" });
 
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? "https://wait-time.ca"),
-    title: t('title'),
-    description: t('description'),
-    keywords: t('keywords'),
+    metadataBase: new URL(
+      process.env.NEXT_PUBLIC_BASE_URL ?? "https://wait-time.ca",
+    ),
+    title: t("title"),
+    description: t("description"),
+    keywords: t("keywords"),
     authors: [{ name: "Wait Time Canada Team" }],
     viewport: "width=device-width, initial-scale=1, maximum-scale=1",
     icons: {
@@ -48,10 +54,10 @@ export async function generateMetadata({params: {locale}}: {params: {locale: str
 
 export default async function RootLayout({
   children,
-  params: {locale}
+  params: { locale },
 }: {
   children: React.ReactNode;
-  params: {locale: string};
+  params: { locale: string };
 }) {
   // Validate that the incoming `locale` parameter is valid
   if (!locales.includes(locale as any)) notFound();

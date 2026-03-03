@@ -23,8 +23,8 @@ export function Header({
   liveCount,
   showStats = false,
 }: HeaderProps) {
-  const t = useTranslations('Header');
-  const tCommon = useTranslations('Common');
+  const t = useTranslations("Header");
+  const tCommon = useTranslations("Common");
 
   return (
     <header className="sticky top-0 z-30 w-full border-b border-border/40 bg-background/70 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm transition-all">
@@ -56,15 +56,17 @@ export function Header({
           <div className="hidden sm:block">
             {showStats ? (
               <h1 className="font-bold text-base tracking-tight">
-                {tCommon('title')}
+                {tCommon("title")}
               </h1>
             ) : (
               <span className="font-bold text-base tracking-tight">
-                {tCommon('title')}
+                {tCommon("title")}
               </span>
             )}
           </div>
-          <span className="font-bold text-base sm:hidden">{t('mobileLogo')}</span>
+          <span className="font-bold text-base sm:hidden">
+            {t("mobileLogo")}
+          </span>
         </Link>
 
         {/* Central Search Bar - Only shown when showStats is true */}
@@ -87,7 +89,7 @@ export function Header({
               </svg>
               <input
                 type="text"
-                placeholder={t('searchExample')}
+                placeholder={t("searchExample")}
                 className="w-full pl-9 pr-8 py-2 rounded-lg border border-border bg-muted/30 focus:bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 outline-none text-sm"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
@@ -124,30 +126,33 @@ export function Header({
               <div className="w-px h-5 bg-border hidden sm:block" />
             </>
           )}
-          <nav className="hidden md:flex items-center gap-1 text-sm font-medium" aria-label="Main">
+          <nav
+            className="hidden md:flex items-center gap-1 text-sm font-medium"
+            aria-label="Main"
+          >
             <Link
               href="/data-quality"
               className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >
-              {tCommon('nav.dataQuality')}
+              {tCommon("nav.dataQuality")}
             </Link>
             <Link
               href="/methods"
               className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >
-              {tCommon('nav.methodology')}
+              {tCommon("nav.methodology")}
             </Link>
             <Link
               href="/analytics"
               className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >
-              {tCommon('nav.analytics')}
+              {tCommon("nav.analytics")}
             </Link>
             <Link
               href="/faq"
               className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >
-              {tCommon('nav.faq')}
+              {tCommon("nav.faq")}
             </Link>
           </nav>
           <ThemeToggle />
@@ -161,7 +166,9 @@ export function Header({
             {/* Stats */}
             <div className="flex items-center gap-4 text-xs sm:text-sm">
               <div className="flex items-center gap-1.5">
-                <span className="text-muted-foreground">{t('stats.hospitals')}</span>
+                <span className="text-muted-foreground">
+                  {t("stats.hospitals")}
+                </span>
                 <span className="font-semibold tabular-nums">
                   {hospitalCount ?? "--"}
                 </span>
@@ -171,7 +178,7 @@ export function Header({
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
                 </span>
-                <span className="text-muted-foreground">{t('stats.live')}</span>
+                <span className="text-muted-foreground">{t("stats.live")}</span>
                 <span className="font-semibold text-success tabular-nums">
                   {liveCount ?? "--"}
                 </span>
@@ -198,7 +205,7 @@ export function Header({
                   </svg>
                   <input
                     type="text"
-                    placeholder={t('searchMobile')}
+                    placeholder={t("searchMobile")}
                     className="w-full pl-8 pr-2 py-1.5 rounded-md border border-border bg-background text-xs"
                     value={searchQuery}
                     onChange={(e) => onSearchChange(e.target.value)}

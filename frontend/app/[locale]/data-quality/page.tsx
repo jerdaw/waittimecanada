@@ -1,7 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Area, ComposedChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  ComposedChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { DataQualityCard } from "@/components/DataQualityCard";
 import { AnomalyFeed } from "@/components/AnomalyFeed";
 import { QualityDriftPanel } from "@/components/QualityDriftPanel";
@@ -40,7 +48,15 @@ function getStatusBadge(status: string) {
   return styles[status] ?? styles.critical;
 }
 
-function QualityTrendSection({ sourceId, sourceName, t }: { sourceId: string; sourceName: string; t: ReturnType<typeof useTranslations> }) {
+function QualityTrendSection({
+  sourceId,
+  sourceName,
+  t,
+}: {
+  sourceId: string;
+  sourceName: string;
+  t: ReturnType<typeof useTranslations>;
+}) {
   const [trend, setTrend] = useState<any>(null);
   const [diff, setDiff] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -50,8 +66,12 @@ function QualityTrendSection({ sourceId, sourceName, t }: { sourceId: string; so
     setLoading(true);
 
     Promise.all([
-      fetch(`/api/data-quality?view=trend&source_id=${sourceId}&days=30`).then((r) => r.json()),
-      fetch(`/api/data-quality?view=diff&source_id=${sourceId}&compare_days=7`).then((r) => r.json())
+      fetch(`/api/data-quality?view=trend&source_id=${sourceId}&days=30`).then(
+        (r) => r.json(),
+      ),
+      fetch(
+        `/api/data-quality?view=diff&source_id=${sourceId}&compare_days=7`,
+      ).then((r) => r.json()),
     ])
       .then(([trendData, diffData]) => {
         if (!mounted) return;
@@ -75,7 +95,7 @@ function QualityTrendSection({ sourceId, sourceName, t }: { sourceId: string; so
   if (!trend || trend.length === 0) {
     return (
       <div className="text-sm text-muted-foreground p-4 text-center border rounded-lg bg-card">
-        {t('noHistoricalData', { sourceName })}
+        {t("noHistoricalData", { sourceName })}
       </div>
     );
   }
@@ -94,12 +114,14 @@ function QualityTrendSection({ sourceId, sourceName, t }: { sourceId: string; so
       {diff?.has_baseline && (
         <div className="rounded-lg border border-border/50 bg-card p-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
           <div>
-            <h4 className="font-medium text-sm">{t('delta7d')}</h4>
+            <h4 className="font-medium text-sm">{t("delta7d")}</h4>
             <p className="text-sm text-muted-foreground mt-1">{diff.summary}</p>
           </div>
           <div className="flex gap-6">
             <div className="text-center">
-              <div className="text-xs text-muted-foreground">{t('coverage')}</div>
+              <div className="text-xs text-muted-foreground">
+                {t("coverage")}
+              </div>
               <div
                 className={`font-semibold ${
                   diff.deltas.success_rate_delta > 0.02
@@ -114,7 +136,9 @@ function QualityTrendSection({ sourceId, sourceName, t }: { sourceId: string; so
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-muted-foreground">{t('hospitals')}</div>
+              <div className="text-xs text-muted-foreground">
+                {t("hospitals")}
+              </div>
               <div className="font-semibold text-foreground">
                 {diff.deltas.hospitals_reporting_delta > 0 ? "+" : ""}
                 {diff.deltas.hospitals_reporting_delta}
@@ -125,15 +149,39 @@ function QualityTrendSection({ sourceId, sourceName, t }: { sourceId: string; so
       )}
 
       <div className="h-[240px] w-full rounded-lg border border-border/50 bg-card p-4">
-        <h4 className="text-sm font-medium mb-4">{t('successRate30d')}</h4>
+        <h4 className="text-sm font-medium mb-4">{t("successRate30d")}</h4>
         <ResponsiveContainer width="100%" height="80%">
-          <ComposedChart data={chartData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-            <XAxis dataKey="label" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} domain={[0, 100]} />
+          <ComposedChart
+            data={chartData}
+            margin={{ top: 5, right: 0, left: -20, bottom: 0 }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke="var(--border)"
+            />
+            <XAxis
+              dataKey="label"
+              tick={{ fontSize: 10 }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis
+              tick={{ fontSize: 10 }}
+              axisLine={false}
+              tickLine={false}
+              domain={[0, 100]}
+            />
             <Tooltip
-              formatter={(value: number | undefined) => [`${(value ?? 0).toFixed(1)}%`, "Success Rate"]}
-              contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)", borderRadius: "0.5rem" }}
+              formatter={(value: number | undefined) => [
+                `${(value ?? 0).toFixed(1)}%`,
+                "Success Rate",
+              ]}
+              contentStyle={{
+                backgroundColor: "var(--card)",
+                border: "1px solid var(--border)",
+                borderRadius: "0.5rem",
+              }}
               labelStyle={{ color: "var(--foreground)" }}
             />
             <Area
@@ -153,7 +201,7 @@ function QualityTrendSection({ sourceId, sourceName, t }: { sourceId: string; so
 }
 
 export default function DataQualityPage() {
-  const t = useTranslations('DataQualityPage');
+  const t = useTranslations("DataQualityPage");
   const [quality, setQuality] = useState<SystemQuality | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -170,10 +218,10 @@ export default function DataQualityPage() {
         setLoading(false);
       })
       .catch(() => {
-        setError(t('error'));
+        setError(t("error"));
         setLoading(false);
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -184,11 +232,13 @@ export default function DataQualityPage() {
         {/* Page Header */}
         <div className="mb-8">
           <Link href="/" className="text-sm text-primary hover:underline">
-            {t('backToMap')}
+            {t("backToMap")}
           </Link>
-          <h1 className="text-3xl font-bold text-foreground mt-2">{t('title')}</h1>
+          <h1 className="text-3xl font-bold text-foreground mt-2">
+            {t("title")}
+          </h1>
           <p className="text-muted-foreground text-sm max-w-3xl mt-1">
-            {t('subtitle')}
+            {t("subtitle")}
           </p>
         </div>
 
@@ -203,7 +253,7 @@ export default function DataQualityPage() {
             {/* System Health Summary */}
             <section>
               <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-xl font-semibold">{t('systemHealth')}</h2>
+                <h2 className="text-xl font-semibold">{t("systemHealth")}</h2>
                 <span
                   className={`text-xs px-2 py-0.5 rounded-full font-medium ${getStatusBadge(quality.overall_status)}`}
                 >
@@ -218,7 +268,7 @@ export default function DataQualityPage() {
                     {(quality.system_uptime_24h * 100).toFixed(1)}%
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    {t('uptime24h')}
+                    {t("uptime24h")}
                   </div>
                 </div>
                 <div className="rounded-xl border border-border/50 bg-card p-4 text-center shadow-sm">
@@ -226,7 +276,7 @@ export default function DataQualityPage() {
                     {quality.total_measurements_24h.toLocaleString()}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    {t('measurements24h')}
+                    {t("measurements24h")}
                   </div>
                 </div>
                 <div className="rounded-xl border border-border/50 bg-card p-4 text-center shadow-sm">
@@ -234,7 +284,7 @@ export default function DataQualityPage() {
                     {quality.total_hospitals_reporting}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    {t('hospitalsReporting')}
+                    {t("hospitalsReporting")}
                   </div>
                 </div>
               </div>
@@ -249,27 +299,33 @@ export default function DataQualityPage() {
 
             {/* 7-Day Quality Drift */}
             <section>
-              <h2 className="text-xl font-semibold mb-2">{t('qualityDrift')}</h2>
+              <h2 className="text-xl font-semibold mb-2">
+                {t("qualityDrift")}
+              </h2>
               <p className="text-sm text-muted-foreground mb-4">
-                {t('qualityDriftDesc')}
+                {t("qualityDriftDesc")}
               </p>
               <QualityDriftPanel sources={quality.sources} />
             </section>
 
             {/* Recent Anomalies */}
             <section>
-              <h2 className="text-xl font-semibold mb-2">{t('recentAnomalies')}</h2>
+              <h2 className="text-xl font-semibold mb-2">
+                {t("recentAnomalies")}
+              </h2>
               <p className="text-sm text-muted-foreground mb-4">
-                {t('recentAnomaliesDesc')}
+                {t("recentAnomaliesDesc")}
               </p>
               <AnomalyFeed />
             </section>
 
             {/* Quality Trend */}
             <section>
-              <h2 className="text-xl font-semibold mb-2">{t('qualityTrend')}</h2>
+              <h2 className="text-xl font-semibold mb-2">
+                {t("qualityTrend")}
+              </h2>
               <p className="text-sm text-muted-foreground mb-4">
-                {t('qualityTrendDesc')}
+                {t("qualityTrendDesc")}
               </p>
               <div className="mb-4">
                 <select
@@ -288,8 +344,9 @@ export default function DataQualityPage() {
                 <QualityTrendSection
                   sourceId={selectedSourceId}
                   sourceName={
-                    quality.sources.find((s) => s.source_id === selectedSourceId)
-                      ?.source_name || selectedSourceId
+                    quality.sources.find(
+                      (s) => s.source_id === selectedSourceId,
+                    )?.source_name || selectedSourceId
                   }
                   t={t}
                 />
@@ -299,20 +356,32 @@ export default function DataQualityPage() {
             {/* Methodology Notes — card layout */}
             <section className="rounded-xl border border-border/50 bg-card p-6 shadow-sm">
               <h2 className="text-xl font-semibold mb-4">
-                {t('aboutMetrics')}
+                {t("aboutMetrics")}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="rounded-lg border border-border/40 p-4">
-                  <p className="font-medium text-foreground text-sm mb-1">{t('metrics.successRate')}</p>
-                  <p className="text-sm text-muted-foreground">{t('metrics.successRateDesc')}</p>
+                  <p className="font-medium text-foreground text-sm mb-1">
+                    {t("metrics.successRate")}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {t("metrics.successRateDesc")}
+                  </p>
                 </div>
                 <div className="rounded-lg border border-border/40 p-4">
-                  <p className="font-medium text-foreground text-sm mb-1">{t('metrics.anomalyDetection')}</p>
-                  <p className="text-sm text-muted-foreground">{t('metrics.anomalyDetectionDesc')}</p>
+                  <p className="font-medium text-foreground text-sm mb-1">
+                    {t("metrics.anomalyDetection")}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {t("metrics.anomalyDetectionDesc")}
+                  </p>
                 </div>
                 <div className="rounded-lg border border-border/40 p-4">
-                  <p className="font-medium text-foreground text-sm mb-1">{t('metrics.whyTransparency')}</p>
-                  <p className="text-sm text-muted-foreground">{t('metrics.whyTransparencyDesc')}</p>
+                  <p className="font-medium text-foreground text-sm mb-1">
+                    {t("metrics.whyTransparency")}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {t("metrics.whyTransparencyDesc")}
+                  </p>
                 </div>
               </div>
             </section>

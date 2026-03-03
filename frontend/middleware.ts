@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import createMiddleware from 'next-intl/middleware';
+import createMiddleware from "next-intl/middleware";
 
 const i18nMiddleware = createMiddleware({
   // A list of all locales that are supported
-  locales: ['en', 'fr'],
+  locales: ["en", "fr"],
 
   // Used when no locale matches
-  defaultLocale: 'en'
+  defaultLocale: "en",
 });
 
 export function middleware(request: NextRequest) {
   const start = performance.now();
 
   // Canonical host redirect (domain rebrand)
-  const canonicalBaseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://wait-time.ca";
+  const canonicalBaseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL ?? "https://wait-time.ca";
   const canonical = new URL(canonicalBaseUrl);
   const canonicalHostname = canonical.hostname.toLowerCase();
   const canonicalProtocol = canonical.protocol;
@@ -35,7 +36,10 @@ export function middleware(request: NextRequest) {
   }
 
   // Handle CORS preflight requests for API routes
-  if (request.method === "OPTIONS" && request.nextUrl.pathname.startsWith("/api/")) {
+  if (
+    request.method === "OPTIONS" &&
+    request.nextUrl.pathname.startsWith("/api/")
+  ) {
     return new NextResponse(null, {
       status: 204,
       headers: {
@@ -91,6 +95,6 @@ export const config = {
      * But i18nMiddleware only wants to match pages.
      * The logic above handles API separately, so it's fine.
      */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };

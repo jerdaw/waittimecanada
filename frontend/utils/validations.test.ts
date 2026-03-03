@@ -93,7 +93,8 @@ describe("Validation Schemas", () => {
   describe("GeolocationQuerySchema", () => {
     it("validates coordinates", () => {
       expect(
-        GeolocationQuerySchema.safeParse({ latitude: 45, longitude: -75 }).success,
+        GeolocationQuerySchema.safeParse({ latitude: 45, longitude: -75 })
+          .success,
       ).toBe(true);
     });
 
@@ -110,7 +111,8 @@ describe("Validation Schemas", () => {
 
     it("rejects out of bounds coordinates", () => {
       expect(
-        GeolocationQuerySchema.safeParse({ latitude: 91, longitude: 0 }).success,
+        GeolocationQuerySchema.safeParse({ latitude: 91, longitude: 0 })
+          .success,
       ).toBe(false);
     });
   });
@@ -127,23 +129,34 @@ describe("Validation Schemas", () => {
 
   describe("BenchmarkQuerySchema", () => {
     it("validates valid periods", () => {
-      expect(BenchmarkQuerySchema.safeParse({ province: "ON", period: "7d" }).success).toBe(true);
+      expect(
+        BenchmarkQuerySchema.safeParse({ province: "ON", period: "7d" })
+          .success,
+      ).toBe(true);
     });
 
     it("rejects invalid periods", () => {
-      expect(BenchmarkQuerySchema.safeParse({ province: "ON", period: "1y" }).success).toBe(false);
+      expect(
+        BenchmarkQuerySchema.safeParse({ province: "ON", period: "1y" })
+          .success,
+      ).toBe(false);
     });
   });
 
   describe("PatternsQuerySchema", () => {
     it("accepts valid types", () => {
-      expect(PatternsQuerySchema.safeParse({ hospital_id: "1", type: "day_of_week" }).success).toBe(true);
+      expect(
+        PatternsQuerySchema.safeParse({ hospital_id: "1", type: "day_of_week" })
+          .success,
+      ).toBe(true);
     });
   });
 
   describe("ExportQuerySchema", () => {
     it("transforms boolean strings", () => {
-      const result = ExportQuerySchema.safeParse({ include_methodology: "false" });
+      const result = ExportQuerySchema.safeParse({
+        include_methodology: "false",
+      });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.include_methodology).toBe(false);
@@ -151,8 +164,13 @@ describe("Validation Schemas", () => {
     });
 
     it("validates dates", () => {
-      expect(ExportQuerySchema.safeParse({ start_date: "invalid" }).success).toBe(false);
-      expect(ExportQuerySchema.safeParse({ start_date: "2023-01-01T00:00:00Z" }).success).toBe(true);
+      expect(
+        ExportQuerySchema.safeParse({ start_date: "invalid" }).success,
+      ).toBe(false);
+      expect(
+        ExportQuerySchema.safeParse({ start_date: "2023-01-01T00:00:00Z" })
+          .success,
+      ).toBe(true);
     });
   });
 });

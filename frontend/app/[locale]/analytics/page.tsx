@@ -105,7 +105,7 @@ function formatOrdinal(value: number): string {
 }
 
 export default function AnalyticsPage() {
-  const t = useTranslations('AnalyticsPage');
+  const t = useTranslations("AnalyticsPage");
   const [province, setProvince] = useState("ON");
   const [regions, setRegions] = useState<RegionRow[]>([]);
   const [provinceRegionMean, setProvinceRegionMean] = useState<number | null>(
@@ -121,7 +121,8 @@ export default function AnalyticsPage() {
   const [selectedRegionId, setSelectedRegionId] = useState<string | null>(null);
   const [loadingRegions, setLoadingRegions] = useState(true);
   const [loadingBenchmarks, setLoadingBenchmarks] = useState(true);
-  const [methodologySummary, setMethodologySummary] = useState<MethodologySummary | null>(null);
+  const [methodologySummary, setMethodologySummary] =
+    useState<MethodologySummary | null>(null);
   const [loadingOccupancy, setLoadingOccupancy] = useState(true);
   const [occupancy, setOccupancy] = useState<OccupancySnapshot | null>(null);
 
@@ -308,18 +309,18 @@ export default function AnalyticsPage() {
         <section className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
             <Link href="/" className="text-sm text-primary hover:underline">
-              {t('backToMap')}
+              {t("backToMap")}
             </Link>
             <h1 className="text-3xl font-bold text-foreground mt-2">
-              {t('title')}
+              {t("title")}
             </h1>
             <p className="text-sm text-muted-foreground mt-1 max-w-3xl">
-              {t('subtitle')}
+              {t("subtitle")}
             </p>
           </div>
 
           <label className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-            {t('province')}
+            {t("province")}
             <select
               className="rounded-md border border-border bg-background px-2.5 py-1.5 text-foreground"
               value={province}
@@ -338,11 +339,11 @@ export default function AnalyticsPage() {
 
         <section>
           <h2 className="text-xl font-semibold text-foreground mb-3">
-            {t('regionalOverview')}
+            {t("regionalOverview")}
           </h2>
           {regionSetupMessage && (
             <div className="mb-3 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 p-3 text-sm text-amber-900 dark:text-amber-200">
-              <p className="font-medium">{t('regionSetupNeeded')}</p>
+              <p className="font-medium">{t("regionSetupNeeded")}</p>
               <p className="mt-1">{regionSetupMessage}</p>
               {regionSetupSteps.length > 0 && (
                 <div className="mt-2 space-y-1 font-mono text-xs">
@@ -367,23 +368,23 @@ export default function AnalyticsPage() {
 
         <section className="rounded-xl border border-border/50 bg-card p-5">
           <h2 className="text-xl font-semibold text-foreground">
-            {t('occupancy.title')}
+            {t("occupancy.title")}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {t('occupancy.subtitle')}
+            {t("occupancy.subtitle")}
           </p>
 
           {loadingOccupancy ? (
             <p className="mt-3 text-sm text-muted-foreground">
-              {t('occupancy.loading')}
+              {t("occupancy.loading")}
             </p>
           ) : !occupancy ? (
             <p className="mt-3 text-sm text-muted-foreground">
-              {t('occupancy.loadError')}
+              {t("occupancy.loadError")}
             </p>
           ) : occupancy.status === "not_available_yet" ? (
             <div className="mt-3 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 p-3 text-sm text-amber-900 dark:text-amber-200">
-              <p className="font-medium">{t('occupancy.notAvailable')}</p>
+              <p className="font-medium">{t("occupancy.notAvailable")}</p>
               <p className="mt-1">{occupancy.message}</p>
               {Array.isArray(occupancy.setup_steps) &&
                 occupancy.setup_steps.length > 0 && (
@@ -402,118 +403,150 @@ export default function AnalyticsPage() {
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="rounded-xl border border-border/50 bg-background p-5">
                 <p className="text-sm text-muted-foreground">
-                  {t('occupancy.avgWaiting')}
+                  {t("occupancy.avgWaiting")}
                 </p>
                 <p className="mt-2 text-4xl font-bold text-foreground tabular-nums">
                   {occupancy.averages?.patients_waiting === null ||
                   occupancy.averages?.patients_waiting === undefined
-                    ? t('occupancy.na')
+                    ? t("occupancy.na")
                     : Math.round(occupancy.averages.patients_waiting)}
                 </p>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  {t('occupancy.hospitalsReporting', { count: occupancy.hospitals_reporting ?? 0 })}
+                  {t("occupancy.hospitalsReporting", {
+                    count: occupancy.hospitals_reporting ?? 0,
+                  })}
                 </p>
               </div>
               <div className="rounded-xl border border-border/50 bg-background p-5">
                 <p className="text-sm text-muted-foreground">
-                  {t('occupancy.avgTreatment')}
+                  {t("occupancy.avgTreatment")}
                 </p>
                 <p className="mt-2 text-4xl font-bold text-foreground tabular-nums">
                   {occupancy.averages?.patients_in_treatment === null ||
                   occupancy.averages?.patients_in_treatment === undefined
-                    ? t('occupancy.na')
+                    ? t("occupancy.na")
                     : Math.round(occupancy.averages.patients_in_treatment)}
                 </p>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  {t('occupancy.observations', { count: occupancy.observations_24h ?? 0 })}
+                  {t("occupancy.observations", {
+                    count: occupancy.observations_24h ?? 0,
+                  })}
                 </p>
               </div>
               {occupancy.latest_observation && (
                 <p className="text-xs text-muted-foreground sm:col-span-2">
-                  {t('occupancy.latestObservation', { time: new Date(occupancy.latest_observation).toLocaleString() })}
+                  {t("occupancy.latestObservation", {
+                    time: new Date(
+                      occupancy.latest_observation,
+                    ).toLocaleString(),
+                  })}
                 </p>
               )}
             </div>
           )}
         </section>
 
-        {occupancy?.status === "available" && occupancy?.occupancy_percentage && (
-          <details className="rounded-xl border border-border/50 bg-card group overflow-hidden">
-            <summary className="p-4 font-semibold text-foreground cursor-pointer list-none flex justify-between items-center hover:bg-muted/30 transition-colors">
-              {t('occupancyTrend')}
-              <span className="text-muted-foreground group-open:rotate-180 transition-transform">&#x25BC;</span>
-            </summary>
-            <div className="border-t border-border/50">
-              <SystemTrendChart
-                province={province}
-                metricFamily="STRETCHER_OCCUPANCY"
-                className="p-4 bg-transparent"
-              />
-            </div>
-          </details>
-        )}
+        {occupancy?.status === "available" &&
+          occupancy?.occupancy_percentage && (
+            <details className="rounded-xl border border-border/50 bg-card group overflow-hidden">
+              <summary className="p-4 font-semibold text-foreground cursor-pointer list-none flex justify-between items-center hover:bg-muted/30 transition-colors">
+                {t("occupancyTrend")}
+                <span className="text-muted-foreground group-open:rotate-180 transition-transform">
+                  &#x25BC;
+                </span>
+              </summary>
+              <div className="border-t border-border/50">
+                <SystemTrendChart
+                  province={province}
+                  metricFamily="STRETCHER_OCCUPANCY"
+                  className="p-4 bg-transparent"
+                />
+              </div>
+            </details>
+          )}
 
         <section className="rounded-xl border border-border/50 bg-card p-5">
           <div className="flex items-center justify-between gap-2 mb-4">
             <div>
               <h2 className="text-xl font-semibold text-foreground">
-                {t('rankings.title')}
+                {t("rankings.title")}
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
-                {t('rankings.subtitle', { province })}
+                {t("rankings.subtitle", { province })}
               </p>
             </div>
             {selectedRegionId && (
-              <span className="text-xs text-primary">{t('rankings.regionFilterActive')}</span>
+              <span className="text-xs text-primary">
+                {t("rankings.regionFilterActive")}
+              </span>
             )}
           </div>
 
-          {!loadingBenchmarks && methodologySummary && !methodologySummary.is_homogeneous && (
-            <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 p-3 text-sm text-amber-900 dark:text-amber-200">
-              <p className="font-semibold flex items-center gap-2">
-                <span aria-hidden="true">&#x26A0;&#xFE0F;</span> {t('rankings.methodologyDivergence')}
-              </p>
-              <p className="mt-1">{methodologySummary.divergence_note}</p>
-              <div className="mt-2 text-xs">
-                <Link href="/methods" className="font-medium underline hover:text-amber-700 dark:hover:text-amber-300">
-                  {t('rankings.viewMatrix')} &rarr;
-                </Link>
+          {!loadingBenchmarks &&
+            methodologySummary &&
+            !methodologySummary.is_homogeneous && (
+              <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 p-3 text-sm text-amber-900 dark:text-amber-200">
+                <p className="font-semibold flex items-center gap-2">
+                  <span aria-hidden="true">&#x26A0;&#xFE0F;</span>{" "}
+                  {t("rankings.methodologyDivergence")}
+                </p>
+                <p className="mt-1">{methodologySummary.divergence_note}</p>
+                <div className="mt-2 text-xs">
+                  <Link
+                    href="/methods"
+                    className="font-medium underline hover:text-amber-700 dark:hover:text-amber-300"
+                  >
+                    {t("rankings.viewMatrix")} &rarr;
+                  </Link>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {loadingBenchmarks ? (
             <div className="text-sm text-muted-foreground">
-              {t('rankings.loading')}
+              {t("rankings.loading")}
             </div>
           ) : filteredBenchmarks.length === 0 ? (
             <div className="text-sm text-muted-foreground">
-              {t('rankings.empty')}
+              {t("rankings.empty")}
             </div>
           ) : (
             <div className="overflow-x-auto -mx-5">
               <table className="w-full text-sm">
                 <thead className="sticky top-0 z-10 bg-card">
                   <tr className="text-left border-b-2 border-border/60 text-muted-foreground">
-                    <th className="py-2.5 px-5 font-medium">{t('rankings.columns.hospital')}</th>
-                    <th className="py-2.5 pr-3 font-medium">{t('rankings.columns.city')}</th>
-                    <th className="py-2.5 pr-3 font-medium">{t('rankings.columns.mean')}</th>
-                    <th className="py-2.5 pr-3 font-medium">{t('rankings.columns.percentile')}</th>
-                    <th className="py-2.5 pr-3 font-medium">{t('rankings.columns.quartile')}</th>
-                    <th className="py-2.5 pr-5 font-medium">{t('rankings.columns.trend')}</th>
+                    <th className="py-2.5 px-5 font-medium">
+                      {t("rankings.columns.hospital")}
+                    </th>
+                    <th className="py-2.5 pr-3 font-medium">
+                      {t("rankings.columns.city")}
+                    </th>
+                    <th className="py-2.5 pr-3 font-medium">
+                      {t("rankings.columns.mean")}
+                    </th>
+                    <th className="py-2.5 pr-3 font-medium">
+                      {t("rankings.columns.percentile")}
+                    </th>
+                    <th className="py-2.5 pr-3 font-medium">
+                      {t("rankings.columns.quartile")}
+                    </th>
+                    <th className="py-2.5 pr-5 font-medium">
+                      {t("rankings.columns.trend")}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredBenchmarks.map((row, idx) => (
                     <tr
                       key={row.hospital_id}
-                      className={`border-b border-border/30 transition-colors hover:bg-muted/30 ${idx % 2 === 1 ? 'bg-muted/10' : ''}`}
+                      className={`border-b border-border/30 transition-colors hover:bg-muted/30 ${idx % 2 === 1 ? "bg-muted/10" : ""}`}
                     >
                       <td className="py-2.5 px-5 font-medium text-foreground">
                         <div>{row.hospital_name}</div>
                         <div className="mt-0.5">
                           <span className="inline-flex items-center rounded-sm bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-                            {row.statistic_type} / {row.start_event}&rarr;{row.end_event}
+                            {row.statistic_type} / {row.start_event}&rarr;
+                            {row.end_event}
                           </span>
                         </div>
                       </td>
@@ -521,7 +554,7 @@ export default function AnalyticsPage() {
                         {row.city}
                       </td>
                       <td className="py-2.5 pr-3 tabular-nums">
-                        {Math.round(row.period_mean)} {t('rankings.min')}
+                        {Math.round(row.period_mean)} {t("rankings.min")}
                       </td>
                       <td className="py-2.5 pr-3 tabular-nums">
                         {formatOrdinal(row.percentile)}
@@ -530,7 +563,8 @@ export default function AnalyticsPage() {
                         {quartileLabel(row.quartile)}
                       </td>
                       <td className="py-2.5 pr-5">
-                        {t(`trend.${row.trend}`)} ({Math.abs(row.trend_change_percent).toFixed(1)}%)
+                        {t(`trend.${row.trend}`)} (
+                        {Math.abs(row.trend_change_percent).toFixed(1)}%)
                       </td>
                     </tr>
                   ))}

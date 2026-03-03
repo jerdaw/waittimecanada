@@ -27,7 +27,7 @@ describe("API Route Integration: Hospitals", () => {
 
     // Mock successful DB response through unsafe()
     mockSql.unsafe.mockResolvedValueOnce([
-        { id: 1, name: "Hospital A", province: "ON" }
+      { id: 1, name: "Hospital A", province: "ON" },
     ]);
 
     const res = await GET(req);

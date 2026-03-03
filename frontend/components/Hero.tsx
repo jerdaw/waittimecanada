@@ -31,7 +31,7 @@ export function Hero({
   onProvinceChange,
   onSelectHospital,
 }: HeroProps) {
-  const t = useTranslations('Hero');
+  const t = useTranslations("Hero");
 
   // Find the featured hospital based on location
   const featuredHospital = (() => {
@@ -116,19 +116,20 @@ export function Hero({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
             </span>
-            {t('badge')}
+            {t("badge")}
           </div>
 
           {/* Stats bar */}
           <HeroStats hospitalCount={hospitals.length} />
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground animate-in fade-in slide-in-from-bottom-5 duration-700 delay-100">
-            {t('title')} <span className="text-primary">{t('subtitle')}</span> <br />
-            {t('subtitle2')}
+            {t("title")} <span className="text-primary">{t("subtitle")}</span>{" "}
+            <br />
+            {t("subtitle2")}
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200 leading-relaxed">
-            {t('description', {count: hospitals.length || "..."})}
+            {t("description", { count: hospitals.length || "..." })}
           </p>
 
           {/* Province quick-pick */}
@@ -155,11 +156,11 @@ export function Hero({
           <div className="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start animate-in fade-in slide-in-from-bottom-7 duration-700 delay-300 pt-2">
             <button
               onClick={onExplore}
-              aria-label={t('cta.explore')}
+              aria-label={t("cta.explore")}
               className="group px-8 py-3.5 bg-primary text-primary-foreground rounded-full font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:bg-primary-hover hover:scale-[1.02] transition-all duration-200 active:scale-[0.98]"
             >
               <span className="flex items-center gap-2">
-                {t('cta.explore')}
+                {t("cta.explore")}
                 <svg
                   className="w-5 h-5 group-hover:translate-x-0.5 transition-transform"
                   fill="none"
@@ -180,7 +181,7 @@ export function Hero({
               href="/methods"
               className="text-muted-foreground hover:text-foreground font-medium flex items-center gap-1.5 transition-colors"
             >
-              {t('cta.methodologies')}
+              {t("cta.methodologies")}
               <svg
                 className="w-4 h-4"
                 fill="none"
@@ -218,7 +219,11 @@ export function Hero({
                 onExplore();
               }
             }}
-            aria-label={featuredHospital ? `${t('card.explore')}: ${featuredHospital.hospital.name}` : undefined}
+            aria-label={
+              featuredHospital
+                ? `${t("card.explore")}: ${featuredHospital.hospital.name}`
+                : undefined
+            }
           >
             {/* Enhanced card glow effect for floating appearance */}
             <div className="absolute -inset-2 bg-gradient-to-r from-primary/25 via-accent/20 to-primary/25 rounded-3xl blur-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-500" />
@@ -231,17 +236,20 @@ export function Hero({
                 <div className="flex justify-between items-center mb-6">
                   <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                     {featuredHospital?.type === "nearest"
-                      ? t('card.nearest')
+                      ? t("card.nearest")
                       : featuredHospital?.type === "shortest"
-                        ? t('card.shortest')
-                        : t('card.featured')}
+                        ? t("card.shortest")
+                        : t("card.featured")}
                   </span>
                   <span className="flex items-center gap-1.5 text-success bg-success/10 px-2.5 py-1 rounded-full text-xs font-bold ring-1 ring-inset ring-success/20">
-                    <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
+                    <span
+                      className="relative flex h-1.5 w-1.5"
+                      aria-hidden="true"
+                    >
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
                       <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success" />
                     </span>
-                    {t('card.live')}
+                    {t("card.live")}
                   </span>
                 </div>
 
@@ -271,19 +279,28 @@ export function Hero({
                         )}
                       </span>
                       <span className="text-xl font-medium text-muted-foreground">
-                        {t('card.min')}
+                        {t("card.min")}
                       </span>
                     </div>
 
                     <div className="pt-4 border-t border-border/50">
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <span className="flex items-center gap-1.5">
-                          <span className="w-1 h-1 rounded-full bg-success" aria-hidden="true" />
-                          {t(`card.statisticType.${featuredHospital.hospital.statistic_type ?? 'P90'}`)}
+                          <span
+                            className="w-1 h-1 rounded-full bg-success"
+                            aria-hidden="true"
+                          />
+                          {t(
+                            `card.statisticType.${featuredHospital.hospital.statistic_type ?? "P90"}`,
+                          )}
                         </span>
                         {featuredHospital.hospital.metric_family && (
                           <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium border border-primary/15">
-                            {t('card.methodology')}: {featuredHospital.hospital.metric_family.replace(/_/g, ' ')}
+                            {t("card.methodology")}:{" "}
+                            {featuredHospital.hospital.metric_family.replace(
+                              /_/g,
+                              " ",
+                            )}
                           </span>
                         )}
                       </div>
@@ -291,8 +308,11 @@ export function Hero({
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-40 space-y-3 text-muted-foreground">
-                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" aria-hidden="true" />
-                    <span className="text-sm">{t('card.loading')}</span>
+                    <div
+                      className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"
+                      aria-hidden="true"
+                    />
+                    <span className="text-sm">{t("card.loading")}</span>
                   </div>
                 )}
               </div>

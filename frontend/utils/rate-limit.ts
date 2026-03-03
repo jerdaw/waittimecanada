@@ -19,7 +19,10 @@ const tokenCache = new LRUCache<string, number>({
  * @param limit Max requests per interval (default 60)
  * @returns NextResponse (429) if limited, null otherwise
  */
-export async function checkRateLimit(req: NextRequest, limit: number = 60): Promise<NextResponse | null> {
+export async function checkRateLimit(
+  req: NextRequest,
+  limit: number = 60,
+): Promise<NextResponse | null> {
   const ip = req.ip || req.headers.get("x-forwarded-for") || "127.0.0.1";
   const token = ip.toString();
 

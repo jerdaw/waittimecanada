@@ -6,9 +6,9 @@ export interface Logger {
 }
 
 // Check for Edge Runtime (which doesn't support pino fully)
-const isEdgeRuntime = process.env.NEXT_RUNTIME === 'edge';
+const isEdgeRuntime = process.env.NEXT_RUNTIME === "edge";
 // Check for Browser environment
-const isBrowser = typeof window !== 'undefined';
+const isBrowser = typeof window !== "undefined";
 
 /**
  * Console-based logger for Edge/Browser environments where Pino might fail.
@@ -77,7 +77,10 @@ if (!isEdgeRuntime && !isBrowser) {
       // But usually just JSON in production
     });
   } catch (e) {
-    console.warn("Failed to initialize pino, falling back to console logger", e);
+    console.warn(
+      "Failed to initialize pino, falling back to console logger",
+      e,
+    );
   }
 }
 
@@ -96,9 +99,9 @@ export const logger: Logger = {
     if (pinoLogger) {
       let errorObj: any = { err: error };
       if (error instanceof Error) {
-         // reconstruct to avoid TS issues with spread
-         const { message, stack, ...rest } = error as any;
-         errorObj = { err: { message, stack, ...rest } };
+        // reconstruct to avoid TS issues with spread
+        const { message, stack, ...rest } = error as any;
+        errorObj = { err: { message, stack, ...rest } };
       }
       // Cast to any to avoid TS gripes about message property conflict
       pinoLogger.error({ ...errorObj, ...(meta || {}) } as any, message);

@@ -22,11 +22,14 @@ describe("API Route Integration: Health", () => {
 
     // 2. Mock Sources Query (Success)
     mockSqlFn.mockResolvedValueOnce([
-        {
-            source_id: "s1", source_name: "Source 1",
-            last_run: new Date().toISOString(), status: "success",
-            measurements_count: 100, age_minutes: 5
-        }
+      {
+        source_id: "s1",
+        source_name: "Source 1",
+        last_run: new Date().toISOString(),
+        status: "success",
+        measurements_count: 100,
+        age_minutes: 5,
+      },
     ]);
 
     const res = await GET(new NextRequest("http://localhost"));

@@ -14,7 +14,10 @@ describe("Rate Limiting", () => {
   it("should allow requests under the limit", async () => {
     const req = new NextRequest("http://localhost");
     // Mock IP
-    Object.defineProperty(req, "ip", { value: "127.0.0.1", configurable: true });
+    Object.defineProperty(req, "ip", {
+      value: "127.0.0.1",
+      configurable: true,
+    });
 
     const limit = 5;
     for (let i = 0; i < limit; i++) {
@@ -25,11 +28,14 @@ describe("Rate Limiting", () => {
 
   it("should block requests over the limit", async () => {
     const req = new NextRequest("http://localhost");
-    Object.defineProperty(req, "ip", { value: "127.0.0.2", configurable: true });
+    Object.defineProperty(req, "ip", {
+      value: "127.0.0.2",
+      configurable: true,
+    });
 
     const limit = 5;
     for (let i = 0; i < limit; i++) {
-        await checkRateLimit(req, limit);
+      await checkRateLimit(req, limit);
     }
 
     const res = await checkRateLimit(req, limit);
@@ -44,7 +50,10 @@ describe("Rate Limiting", () => {
   it("should reset limit after window via LRU TTL", async () => {
     // Note: lru-cache TTL is driven by time.
     const req = new NextRequest("http://localhost");
-    Object.defineProperty(req, "ip", { value: "127.0.0.3", configurable: true });
+    Object.defineProperty(req, "ip", {
+      value: "127.0.0.3",
+      configurable: true,
+    });
 
     // Exhaust limit
     await checkRateLimit(req, 1);

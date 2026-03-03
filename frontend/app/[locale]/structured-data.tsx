@@ -2,7 +2,7 @@ import Script from "next/script";
 import { useTranslations } from "next-intl";
 
 export function StructuredData() {
-  const t = useTranslations('StructuredData');
+  const t = useTranslations("StructuredData");
 
   const faqSchema = {
     "@context": "https://schema.org",
@@ -10,26 +10,26 @@ export function StructuredData() {
     mainEntity: [
       {
         "@type": "Question",
-        name: t('faq.q1'),
+        name: t("faq.q1"),
         acceptedAnswer: {
           "@type": "Answer",
-          text: t('faq.a1'),
+          text: t("faq.a1"),
         },
       },
       {
         "@type": "Question",
-        name: t('faq.q2'),
+        name: t("faq.q2"),
         acceptedAnswer: {
           "@type": "Answer",
-          text: t('faq.a2'),
+          text: t("faq.a2"),
         },
       },
       {
         "@type": "Question",
-        name: t('faq.q3'),
+        name: t("faq.q3"),
         acceptedAnswer: {
           "@type": "Answer",
-          text: t('faq.a3'),
+          text: t("faq.a3"),
         },
       },
     ],
@@ -39,7 +39,7 @@ export function StructuredData() {
     "@context": "https://schema.org",
     "@type": "MedicalWebPage",
     name: "Wait Time Canada",
-    description: t('medicalPage.desc'),
+    description: t("medicalPage.desc"),
     audience: {
       "@type": "Patient",
       audienceType: "public",
@@ -66,18 +66,18 @@ export function StructuredData() {
     step: [
       {
         "@type": "HowToStep",
-        name: t('howTo.step1.name'),
-        text: t('howTo.step1.text'),
+        name: t("howTo.step1.name"),
+        text: t("howTo.step1.text"),
       },
       {
         "@type": "HowToStep",
-        name: t('howTo.step2.name'),
-        text: t('howTo.step2.text'),
+        name: t("howTo.step2.name"),
+        text: t("howTo.step2.text"),
       },
       {
         "@type": "HowToStep",
-        name: t('howTo.step3.name'),
-        text: t('howTo.step3.text'),
+        name: t("howTo.step3.name"),
+        text: t("howTo.step3.text"),
       },
     ],
   };

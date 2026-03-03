@@ -22,7 +22,9 @@ export function ProvinceCoverage() {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/60 border border-border/50 text-xs"
           >
             <span className="font-bold text-primary">{code}</span>
-            <span className="text-muted-foreground">{t(`provinces.${key}`)}</span>
+            <span className="text-muted-foreground">
+              {t(`provinces.${key}`)}
+            </span>
           </div>
         ))}
       </div>

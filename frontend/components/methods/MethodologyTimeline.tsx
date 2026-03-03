@@ -29,7 +29,7 @@ interface MethodologyTimelineProps {
 export function MethodologyTimeline({
   sources = [],
 }: MethodologyTimelineProps) {
-  const t = useTranslations('Methods.MethodologyTimeline');
+  const t = useTranslations("Methods.MethodologyTimeline");
   const [events, setEvents] = useState<MethodologyEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -84,7 +84,7 @@ export function MethodologyTimeline({
   if (error) {
     return (
       <div className="text-center py-8 text-danger">
-        {t('error', {message: error})}
+        {t("error", { message: error })}
       </div>
     );
   }
@@ -98,7 +98,7 @@ export function MethodologyTimeline({
             htmlFor="source-filter"
             className="text-sm font-medium text-slate-700 dark:text-slate-300"
           >
-            {t('filter')}
+            {t("filter")}
           </label>
           <select
             id="source-filter"
@@ -106,7 +106,7 @@ export function MethodologyTimeline({
             onChange={(e) => setSelectedSource(e.target.value)}
             className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="all">{t('allProvinces')}</option>
+            <option value="all">{t("allProvinces")}</option>
             {sources.map((source) => (
               <option key={source.id} value={source.id}>
                 {source.province}
@@ -132,10 +132,8 @@ export function MethodologyTimeline({
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <p className="font-medium">{t('noEvents.title')}</p>
-          <p className="text-sm mt-1">
-            {t('noEvents.description')}
-          </p>
+          <p className="font-medium">{t("noEvents.title")}</p>
+          <p className="text-sm mt-1">{t("noEvents.description")}</p>
         </div>
       ) : (
         <div className="relative">
@@ -158,7 +156,7 @@ export function MethodologyTimeline({
                         {getSourceName(event.source_id)}
                       </h4>
                       <p className="text-sm text-muted-foreground">
-                        {t('detected', {date: formatDate(event.detected_at)})}
+                        {t("detected", { date: formatDate(event.detected_at) })}
                       </p>
                     </div>
                     <div
@@ -176,13 +174,15 @@ export function MethodologyTimeline({
                   </div>
 
                   {/* Explanation */}
-                  <p className="text-slate-700 dark:text-slate-300 mb-4">{event.explanation}</p>
+                  <p className="text-slate-700 dark:text-slate-300 mb-4">
+                    {event.explanation}
+                  </p>
 
                   {/* Details */}
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">
-                        {t('previousPeriod')}
+                        {t("previousPeriod")}
                       </p>
                       <p className="text-sm font-medium text-slate-900 dark:text-white">
                         {event.previous_period.mean.toFixed(0)} min
@@ -194,7 +194,7 @@ export function MethodologyTimeline({
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">
-                        {t('currentPeriod')}
+                        {t("currentPeriod")}
                       </p>
                       <p className="text-sm font-medium text-slate-900 dark:text-white">
                         {event.current_period.mean.toFixed(0)} min
@@ -208,7 +208,9 @@ export function MethodologyTimeline({
 
                   {/* Metadata */}
                   <div className="mt-4 pt-4 border-t border-border/50 text-xs text-muted-foreground">
-                    {event.hospitals_analyzed !== 1 ? t('analyzedPlural', {count: event.hospitals_analyzed}) : t('analyzed', {count: event.hospitals_analyzed})}
+                    {event.hospitals_analyzed !== 1
+                      ? t("analyzedPlural", { count: event.hospitals_analyzed })
+                      : t("analyzed", { count: event.hospitals_analyzed })}
                   </div>
                 </div>
               </div>

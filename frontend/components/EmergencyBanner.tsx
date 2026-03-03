@@ -2,10 +2,13 @@ import React from "react";
 import { useTranslations } from "next-intl";
 
 export function EmergencyBanner() {
-  const t = useTranslations('Common.emergency');
+  const t = useTranslations("Common.emergency");
 
   return (
-    <div className="sticky top-0 z-50 bg-red-600 text-white px-4 py-2 text-center text-sm md:text-base font-medium shadow-md animate-in fade-in slide-in-from-top-2" role="alert">
+    <div
+      className="sticky top-0 z-50 bg-red-600 text-white px-4 py-2 text-center text-sm md:text-base font-medium shadow-md animate-in fade-in slide-in-from-top-2"
+      role="alert"
+    >
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
         <span className="flex items-center gap-2">
           <svg
@@ -21,17 +24,17 @@ export function EmergencyBanner() {
               clipRule="evenodd"
             />
           </svg>
-          {t('label')}
+          {t("label")}
         </span>
         <span>
-          {t('call')}{" "}
+          {t("call")}{" "}
           <a
             href="tel:911"
             className="underline font-bold hover:text-red-100 transition-colors"
           >
-            {t('number')}
+            {t("number")}
           </a>{" "}
-          {t('text')}
+          {t("text")}
         </span>
       </div>
     </div>

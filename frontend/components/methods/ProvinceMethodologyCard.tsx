@@ -45,7 +45,7 @@ const provinceColors: Record<
 export function ProvinceMethodologyCard({
   source,
 }: ProvinceMethodologyCardProps) {
-  const t = useTranslations('Methods.ProvinceMethodologyCard');
+  const t = useTranslations("Methods.ProvinceMethodologyCard");
   const colors = provinceColors[source.province] || {
     bg: "bg-muted/30",
     border: "border-border",
@@ -97,7 +97,7 @@ export function ProvinceMethodologyCard({
             rel="noopener noreferrer"
             className={`inline-flex items-center gap-2 text-sm font-medium ${colors.accent} hover:underline`}
           >
-            {t('viewOfficial')}
+            {t("viewOfficial")}
             <svg
               className="w-4 h-4"
               fill="none"
@@ -114,7 +114,7 @@ export function ProvinceMethodologyCard({
           </a>
         ) : (
           <span className="text-sm text-muted-foreground">
-            {t('notAvailable')}
+            {t("notAvailable")}
           </span>
         )}
       </div>
@@ -142,7 +142,9 @@ function MethodologyField({
         </code>
       </div>
       {description && (
-        <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {description}
+        </p>
       )}
     </div>
   );
