@@ -20,9 +20,9 @@ declare -a PATHS=(
 )
 
 declare -a EXPECTED_TEXT=(
-  "Wait Time Canada"
+  "WaitTime Canada - ER Wait Time Observatory"
   "Understanding Wait Time Metrics"
-  "Data Quality & Provenance"
+  "Data Quality &amp; Provenance"
   "Analytics Dashboard"
 )
 
