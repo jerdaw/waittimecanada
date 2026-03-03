@@ -94,6 +94,53 @@ def test_run_scraper_success(mock_geocoder, mock_db, mock_scrapers):
     mock_db_instance.update_heartbeat.assert_not_called()
 
 
+@patch("waittime.cli.scraper.SCRAPERS")
+@patch("waittime.cli.scraper.DatabaseService")
+@patch("waittime.cli.scraper.GeocodingService")
+def test_run_scraper_manages_shared_connection_context(mock_geocoder, mock_db, mock_scrapers):
+    """Verify shared connection context is entered and exited around scraper execution."""
+    mock_scraper_class = MagicMock()
+    mock_source_factory = MagicMock()
+    mock_source = MagicMock(name="Test Source", province="ON")
+    mock_source_factory.return_value = mock_source
+
+    mock_scrapers.__contains__.return_value = True
+    mock_scrapers.__getitem__.return_value = (mock_scraper_class, mock_source_factory)
+
+    measurements = [MagicMock(hospital_id="ca-on-h1", value=10)]
+    mock_scraper_instance = mock_scraper_class.return_value.__enter__.return_value
+
+    def run_side_effect(*args, **kwargs):
+        before_save = kwargs.get("before_save")
+        if kwargs.get("save_to_db") and before_save:
+            before_save(measurements)
+        return measurements
+
+    mock_scraper_instance.run.side_effect = run_side_effect
+
+    connection_context = MagicMock()
+    connection_context.__enter__.return_value = MagicMock()
+
+    base_db_instance = MagicMock()
+    base_db_instance.get_connection.return_value = connection_context
+
+    scraper_db_instance = MagicMock()
+    scraper_db_instance.get_hospital.return_value = None
+
+    mock_db.side_effect = [base_db_instance, scraper_db_instance]
+
+    mock_geocoder_instance = mock_geocoder.return_value
+    mock_geocoder_instance.geocode_hospital.return_value = MagicMock(
+        city="Ottawa", latitude=45.0, longitude=-75.0, confidence=1.0
+    )
+
+    count = run_scraper("ontario-health", dry_run=False)
+
+    assert count == 1
+    connection_context.__enter__.assert_called_once()
+    connection_context.__exit__.assert_called_once_with(None, None, None)
+
+
 def test_main_list_scrapers():
     """Verify that --list exits normally."""
     with patch("sys.argv", ["scraper.py", "--list"]):

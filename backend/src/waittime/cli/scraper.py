@@ -190,6 +190,7 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
 
     logger.info(f"Starting scraper for {source.name} ({source_id})")
 
+    connection_context = None
     try:
         if dry_run:
             scraper_db = None
@@ -197,7 +198,8 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
         else:
             # Use a single connection for the entire scraper run to save network transfer
             base_db = DatabaseService()
-            conn = base_db.get_connection().__enter__()
+            connection_context = base_db.get_connection()
+            conn = connection_context.__enter__()
             scraper_db = DatabaseService(conn=conn)
             geocoder = GeocodingService()
 
@@ -220,10 +222,6 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
                 before_save=before_save,
             )
 
-        if not dry_run and scraper_db and scraper_db._provided_conn:
-            # Manually close because we bypassed the 'with' context for the shared connection
-            scraper_db._provided_conn.close()
-
         logger.info(f"Collected {len(measurements)} measurements")
 
         if dry_run:
@@ -240,6 +238,9 @@ def run_scraper(source_id: str, dry_run: bool = False) -> int:
     except Exception as e:
         logger.exception(f"Scraper failed for {source_id}: {e}")
         return 0
+    finally:
+        if connection_context is not None:
+            connection_context.__exit__(None, None, None)
 
 
 def main() -> NoReturn:
