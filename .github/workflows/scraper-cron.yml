@@ -1,9 +1,11 @@
 name: Scraper Cron Job
 
-# PAUSED (2026-02-22): Scheduled runs disabled due to exhausted GitHub Actions quota.
-# Keep manual dispatch available for one-off runs if needed.
-# Post-unpause target (>= 2026-03-09): restore schedule and move to */20 cadence.
+# Active temporary cost-control cadence (as of 2026-03-03):
+# every 4 hours with heartbeat stale threshold 250 minutes.
+# Review target date: 2026-03-09 (restore */20 cadence + tighter threshold).
 on:
+  schedule:
+    - cron: "0 */4 * * *"
   workflow_dispatch: # Allow manual trigger
 
 env:
@@ -55,7 +57,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.check_heartbeat --max-age 90 --dry-run --verbose || true
+          python -m waittime.cli.check_heartbeat --max-age 250 --dry-run --verbose || true
 
       - name: Generate Freshness Badge
         if: always()
@@ -82,4 +84,4 @@ jobs:
           PUSHOVER_USER_KEY: ${{ secrets.PUSHOVER_USER_KEY }}
           PUSHOVER_API_TOKEN: ${{ secrets.PUSHOVER_API_TOKEN }}
         run: |
-          python -m waittime.cli.check_heartbeat --max-age 90 --max-consecutive-failures 1 || true
+          python -m waittime.cli.check_heartbeat --max-age 250 --max-consecutive-failures 1 || true

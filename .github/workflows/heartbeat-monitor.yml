@@ -1,8 +1,11 @@
 name: Heartbeat Monitor (Dead Man's Switch)
 
-# PAUSED (2026-02-22): Scheduled runs disabled due to exhausted GitHub Actions quota.
-# Keep manual dispatch available for one-off checks if needed.
+# Active temporary cost-control cadence (as of 2026-03-03):
+# monitor every 30 minutes with stale threshold 250 minutes.
+# Review target date: 2026-03-09 (restore tighter threshold with higher scraper cadence).
 on:
+  schedule:
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 
 concurrency:
@@ -35,5 +38,5 @@ jobs:
         run: |
           cd backend
           # Temporary cost-control throttle companion setting.
-          # Review target date: 2026-03-09 (revert to --max-age 60 with */15 scraper cadence).
+          # Review target date: 2026-03-09 (revert to --max-age 90 with */20 scraper cadence).
           python -m waittime.cli.check_heartbeat --max-age 250 --max-consecutive-failures 1

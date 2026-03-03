@@ -59,7 +59,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 4. `scraper-cron.yml` - Scheduled Scraper Execution
 
-**Trigger:** currently manual dispatch only (scheduled cron temporarily paused due to GitHub Actions quota exhaustion).
+**Trigger:** cron `0 */4 * * *` (every 4 hours) + manual dispatch.
 
 **Purpose:** Run all provincial scrapers against production DB and emit classified operational alerts.
 
@@ -70,7 +70,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 5. `heartbeat-monitor.yml` - Dead Man's Switch
 
-**Trigger:** currently manual dispatch only (scheduled cron temporarily paused due to GitHub Actions quota exhaustion).
+**Trigger:** cron `*/30 * * * *` (every 30 minutes) + manual dispatch.
 
 **Purpose:** Ensure scraper heartbeat freshness remains within threshold and report consecutive/classified failures.
 

@@ -1,4 +1,4 @@
-# Deployment Blockers (Updated 2026-02-16)
+# Deployment Blockers (Updated 2026-03-03)
 
 ## Critical Blockers
 
@@ -9,5 +9,5 @@
 - **Workaround:** Local verification (`npm run build && npm start`).
 
 ## Resolved Blockers
-- **Mapbox Cost:** Mitigated by `scraper-cron` throttling (*/30).
-- **Neon Transfer:** Mitigated by strict `heartbeat --max-age 90` limits.
+- **Mapbox Cost:** Mitigated by `scraper-cron` throttling (`0 */4 * * *` temporary cadence).
+- **Neon Transfer:** Mitigated by strict `heartbeat --max-age 250` limits.

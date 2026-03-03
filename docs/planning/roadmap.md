@@ -69,11 +69,11 @@ Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT d
 - Operational impact confirmed (alerts, workflows, secrets, deployment posture).
 - Item status reflected in this roadmap and no duplicate open tasks remain.
 
-### Release and Cost Policy (Updated 2026-02-19)
+### Release and Cost Policy (Updated 2026-03-03)
 - **Netlify Deploys:** Paused due to credit exhaustion. Public hosting remains unavailable until the project is unpaused (target: **March 9, 2026**).
 - **Public Hosting:** Offline until unpause.
 - Scraper reliability workflows (`scraper-cron`, heartbeat monitor, readiness checks) remain active on GitHub Actions.
-- Temporary cost-control mode is active: `scraper-cron` at `*/30` and heartbeat `--max-age 90`.
+- Temporary cost-control mode is active: `scraper-cron` at `0 */4 * * *` and heartbeat `--max-age 250`.
 - Post-unpause target (review on **March 9, 2026**): Reactivate deploys and move to `scraper-cron: */20`.
 
 ### Focus Shift (2026-02-25)

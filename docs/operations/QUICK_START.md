@@ -62,12 +62,12 @@ python -m waittime.cli.check_heartbeat --source quebec-msss
 
 ### Dry Run (No Alerts)
 ```bash
-python -m waittime.cli.check_heartbeat --max-age 90 --dry-run
+python -m waittime.cli.check_heartbeat --max-age 250 --dry-run
 ```
 
 ### Detailed Operational View (Last Known Good + Last Error)
 ```bash
-python -m waittime.cli.check_heartbeat --max-age 90 --dry-run --verbose
+python -m waittime.cli.check_heartbeat --max-age 250 --dry-run --verbose
 ```
 
 ---

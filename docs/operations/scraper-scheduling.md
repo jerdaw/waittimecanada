@@ -1,6 +1,6 @@
 # Scraper Scheduling & Operations
 
-**Last Updated:** 2026-02-19
+**Last Updated:** 2026-03-03
 **Status:** ✅ All 4 provincial scrapers operational
 
 > Temporary cost-control mode (updated February 21, 2026): scraper cadence is `every 4 hours` with heartbeat stale threshold `250` minutes. Review on or before **March 9, 2026** and revert to normal cadence when Neon transfer usage stabilizes.
@@ -57,22 +57,22 @@ Available via GitHub Actions UI (`workflow_dispatch`)
 
 **Purpose:** Dead Man's Switch - verify scrapers are running
 **Schedule:** `*/30 * * * *` (every 30 minutes)
-**Max Heartbeat Age:** 90 minutes
+**Max Heartbeat Age:** 250 minutes
 
 **Execution:**
 ```bash
-python -m waittime.cli.check_heartbeat --max-age 90
+python -m waittime.cli.check_heartbeat --max-age 250
 ```
 
 **Features:**
 - ✅ Dynamically discovers all sources from database
 - ✅ Checks `scraper_status` table for last run timestamp
-- ✅ Alerts via Pushover if heartbeat > 90 minutes old
+- ✅ Alerts via Pushover if heartbeat > 250 minutes old
 - ✅ Alerts include failure classification (`category/stage`) for error states
 - ✅ Alerts if no heartbeat ever recorded for a source
 
 **Alert Conditions:**
-- ⚠️ Heartbeat older than 90 minutes
+- ⚠️ Heartbeat older than 250 minutes
 - 🚨 No heartbeat found for source
 
 ---
@@ -158,12 +158,12 @@ python -m waittime.cli.scraper --list
 
 ### Check Heartbeat Health
 ```bash
-python -m waittime.cli.check_heartbeat --max-age 90
+python -m waittime.cli.check_heartbeat --max-age 250
 ```
 
 ### Check Detailed Operational Status (last-known-good + last-error)
 ```bash
-python -m waittime.cli.check_heartbeat --max-age 90 --dry-run --verbose
+python -m waittime.cli.check_heartbeat --max-age 250 --dry-run --verbose
 ```
 
 ### Dry Run (No Database Writes)
@@ -190,7 +190,7 @@ python -m waittime.cli.scraper --all --dry-run
 
 2. **Stale Heartbeat** (heartbeat-monitor.yml)
    - Title: ⚠️ Scraper Stale
-   - Trigger: No heartbeat in last 90 minutes
+   - Trigger: No heartbeat in last 250 minutes
    - Priority: 1 (High)
 
 **Manual Alert Test:**

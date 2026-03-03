@@ -41,7 +41,7 @@ declare -a recommended_workflows=(
 
 # Age thresholds allow for normal GitHub Actions schedule jitter.
 declare -a required_runs=(
-  "scraper-cron.yml:75"
+  "scraper-cron.yml:300"
   "heartbeat-monitor.yml:90"
 )
 
