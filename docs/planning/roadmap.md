@@ -2,11 +2,11 @@
 
 ## Current Status (Updated 2026-03-12)
 
-**Progress:** M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | CI/Tooling Maintenance Complete (2026-02-23) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived
+**Progress:** Production Domain Launch Complete (2026-03-12) | M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | CI/Tooling Maintenance Complete (2026-02-23) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived
 
 **Strategic Direction:** **Admissions strengthening phase active (2026-03-12).** Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). Focus remains on real-world engagement, external validation, and public-facing artifacts. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for the full phased plan.
 
-**Deployment Note (2026-03-12):** Frontend hosting is live on Netlify, but the custom domain launch is **not complete**. `wait-time.ca` is serving content while HTTPS hostname validation still presents the Netlify certificate rather than a certificate valid for `wait-time.ca`; treat production launch as incomplete until TLS and redirect checks pass cleanly.
+**Deployment Note (2026-03-12):** Frontend hosting is live on Netlify, `https://wait-time.ca` presents a valid Let's Encrypt certificate, `https://www.wait-time.ca` redirects to the canonical host, and production smoke passes against the canonical domain.
 
 ---
 
@@ -51,7 +51,7 @@
 
 ## Next Steps
 
-**Admissions strengthening plan active (2026-03-12).** Immediate work is launch cleanup plus credibility cleanup that can be finished locally. The highest-priority blocker is still **B1: restore production hosting end-to-end** by fixing custom-domain TLS/redirect validation. Phase C (scholarly artifacts + external validation) should start only after launch verification is genuinely complete. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
+**Admissions strengthening plan active (2026-03-12).** Production launch verification is complete. Immediate work now shifts to credibility artifacts and post-launch follow-through: A1 (personal author bio), A3 (real Zenodo DOI), A4 (stakeholder outreach), A6/A7 (case study + quantified findings), and B2-B4 (analytics, launch post, walkthrough). See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
 
 Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT data is available; M35 (Nova Scotia scraper) when bandwidth allows. Both are Phase D (deferred) in the admissions plan.
 
@@ -71,7 +71,7 @@ Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT d
 
 ### Release and Cost Policy (Updated 2026-03-12)
 - **Netlify Deploys:** Active again.
-- **Public Hosting:** Netlify deployment is live, but the custom domain launch remains incomplete until `wait-time.ca` passes HTTPS certificate and redirect verification.
+- **Public Hosting:** `https://wait-time.ca` is live and has passed HTTPS, redirect, and production smoke verification.
 - Scraper reliability workflows (`scraper-cron`, heartbeat monitor, readiness checks) remain active on GitHub Actions.
 - Temporary cost-control mode is active: `scraper-cron` at `0 */4 * * *` and heartbeat `--max-age 250`.
 - Post-launch target: once cost posture is acceptable and production verification is stable, review returning `scraper-cron` to `*/20`.
@@ -87,6 +87,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [x] **P1 / Performance: Cache & polling audit** — Verified cache headers/TTLs, enforced `no-store` for user-specific/export routes
 - [x] **P1 / Ops: CI quota conservation (temporary)** — Minimized free-tier GitHub Actions burn
 - [x] **P1 / Ops: CI/tooling maintenance (2026-02-23)** — Resolved all mypy/pytest CI failures; upgraded ruff, mypy, react-map-gl v8, playwright, date-fns
+- [x] **P0 / Ops: Production domain launch verification** — `wait-time.ca` HTTPS valid, `www.wait-time.ca` redirect verified, release deploy published, production smoke passing
 - [x] **P1 / Ops: Harden Netlify release gate** — M32 Complete
 - [x] **P1 / Divergence Briefs in analytics + export** — M32 Complete
 - [x] **P2 / Historical occupancy trends** — M33 Complete
@@ -95,7 +96,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 [Full details: admissions-strengthening-plan.md §Phase A](implementation/admissions-strengthening-plan.md#phase-a-immediate-before-march-9--no-live-url-required)
 
 - [ ] **P1 / A1: Named author bio in README** — Expand the maintainer blurb into a 3–5 sentence personal motivation statement (30 min)
-- [ ] **P1 / A2: Limitations section in README** — Specific, technical limitations demonstrating intellectual maturity (1 h)
+- [x] **P1 / A2: Limitations section in README** — Specific, technical limitations demonstrating intellectual maturity (delivered in README + application summary)
 - [ ] **P1 / A3: Fix placeholder Zenodo DOI** — Register real deposit; update CITATION.cff and README badge (90 min)
 - [ ] **P1 / A4: Stakeholder interview outreach** — Send 10–15 outreach messages to ER professionals using existing templates (2–3 h outreach; interviews on their schedule)
 - [ ] **P1 / A5: Private reflection document** — ABS/interview prep; motivation, decisions, surprises, ethical tensions (2 h; not committed to repo)
@@ -103,11 +104,10 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P1 / A7: Quantified metrics & methodology findings** — Query DB for honest metrics; methodology-characterization findings only, no cross-province performance claims (3 h)
 
 ### Phase B: Active Launch Cleanup
-[Full details: admissions-strengthening-plan.md §Phase B](implementation/admissions-strengthening-plan.md#phase-b-launch-week-march-916--url-goes-live)
+[Full details: admissions-strengthening-plan.md §Phase B](implementation/admissions-strengthening-plan.md#phase-b-launch-follow-through-post-verification)
 
-- [ ] **P0 / B1: Restore production hosting** — Unpause Netlify; verify TLS, redirects, production smoke; create `[release]` commit (2–3 h)
 - [ ] **P1 / B2: Privacy-safe usage analytics** — Add Plausible Analytics; update /privacy page; do not publicize numbers (2 h)
-- [ ] **P1 / B3: Publish LinkedIn launch post** — Replace placeholder URL; publish; max 30 min (30 min)
+- [ ] **P1 / B3: Publish LinkedIn launch post** — Publish the finalized post using `https://wait-time.ca`; max 30 min (30 min)
 - [ ] **P1 / B4: Video walkthrough** — Script 3–4 min; record with decent audio; upload unlisted YouTube (3 h)
 - [ ] **P2 / B5: GitHub topics & discoverability** — Add topic tags; check 1–2 open data registries (30 min)
 
@@ -222,20 +222,20 @@ All 50 roadmap items are categorized by their primary OMSAS/CanMEDS impact:
 
 ## Top 10 Highest-Impact Items for Admissions
 
-Ranked by **defensible admissions value per hour of effort** (updated 2026-02-25 after three-pass analysis):
+Ranked by **defensible admissions value per hour of effort** (updated 2026-03-12 after production launch verification):
 
 1. **A1: Named author bio** — Establishes ownership; eliminates active credibility gap (30 min)
 2. **A4: Stakeholder interview** — Unlocks Collaborator competency; transforms project category (2–3 h + scheduling)
 3. **A6: Ottawa–Gatineau case study** — Most narratively compelling specific story; interview-ready (2–3 h)
 4. **A3: Fix placeholder Zenodo DOI** — Eliminates fake-DOI credibility risk; third-party attestation (90 min)
-5. **A2: Limitations section** — Differentiated intellectual humility signal; rare among student projects (1 h)
+5. **B3: LinkedIn launch post** — Public timestamp; asymmetric upside for 30 min of effort (30 min)
 6. **B4: Video walkthrough** — Only format where committee hears your voice and command of material (3 h)
 7. **C1: Technical report** — Anchor Scholar artifact; no other pre-med applicant will have this (1–2 d)
-8. **B1: Restore production hosting** — Changes cognitive category from "repo" to "product" (2–3 h)
-9. **A7: Quantified metrics** — Specificity is more credible than vagueness (3 h)
-10. **B3: LinkedIn launch post** — Public timestamp; asymmetric upside for 30 min of effort (30 min)
+8. **A7: Quantified metrics** — Specificity is more credible than vagueness (3 h)
+9. **B2: Privacy-safe usage analytics** — Starts the clock on real usage evidence (2 h)
+10. **C4: Operational transparency report** — Demonstrates disciplined stewardship, not just shipping (2 h)
 
-Previous top-10 items (#42 Zenodo, #41 CITATION.cff, #2 LICENSE, etc.) are all ✅ Complete — infrastructure is done. The remaining gap is real-world engagement and public-facing artifacts.
+Completed from the prior ranking: **A2 (limitations)** and **B1 (production hosting)** are now done. The remaining gap is real-world engagement and public-facing artifacts.
 
 ---
 
@@ -341,7 +341,7 @@ Archived (delivered):
 | Neon PostgreSQL | Database hosting | Free (512 MB) |
 | Mapbox | Map tiles | Free (50k loads/month) |
 | Nominatim (OSM) | Geocoding | Free (1 req/sec) |
-| Netlify | Frontend hosting (release-gated; intentionally offline) | Free (300 credits/month) |
+| Netlify | Frontend hosting (release-gated production deploys) | Free (300 credits/month) |
 | GitHub Actions | CI/CD + scrapers | Free (2000 min/month) |
 
 ---
@@ -436,9 +436,9 @@ Archived (delivered):
 
 | Phase | Timeline | Items | Effort |
 |-------|----------|-------|--------|
-| **A: Pre-Deployment** | Now → March 9 | A1–A7 (author bio, limitations, Zenodo DOI, stakeholder outreach, reflection doc, case study, metrics) | ~12–15 h |
-| **B: Launch Week** | March 9–16 | B1–B5 (restore hosting, analytics, LinkedIn, video, discoverability) | ~8–9 h |
+| **A: Credibility Cleanup** | Active | A1–A7 (author bio, limitations, Zenodo DOI, stakeholder outreach, reflection doc, case study, metrics) | ~12–15 h |
+| **B: Launch Follow-Through** | Active | B2–B5 (analytics, LinkedIn, video, discoverability) | ~5–6 h remaining |
 | **C: Scholarly Artifacts** | Weeks 2–4 post-launch | C1–C6 (technical report, researcher outreach, equity interpretation, ops report, post-mortem, reviewer) | ~2–3 d |
 | **D: If Time Permits** | Weeks 5–12 | D1–D5 (comparability matrix, QC equity, freshness indicators, NS scraper, grant/competition) | Variable |
 
-**Next Action:** Begin Phase A immediately — A1 (author bio) and A4 (stakeholder outreach) are the highest-ROI tasks and have zero dependencies.
+**Next Action:** Start A1 (personal author bio) and A4 (stakeholder outreach), then finish B3 (publish the launch post) now that the canonical URL is live.

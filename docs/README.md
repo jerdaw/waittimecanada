@@ -21,7 +21,7 @@ This directory is the documentation control plane for Wait Time Canada.
 
 - Planning hub: `docs/planning/README.md`
 - Roadmap lifecycle process: `docs/planning/roadmap-process.md`
-- Active milestone plans: `docs/planning/implementation/`
+- Active milestone plans: `docs/planning/implementation/` (`admissions-strengthening-plan.md`)
 - Archived plans: `docs/planning/archive/`
 
 ## Historical Snapshots

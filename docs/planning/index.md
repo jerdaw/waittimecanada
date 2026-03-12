@@ -13,7 +13,7 @@ This section contains the project planning control plane.
 
 ## Active Implementation Plans
 
-- None currently open (latest delivered: `docs/planning/archive/milestone-30-scraper-visibility-reliability.md`)
+- `docs/planning/implementation/admissions-strengthening-plan.md`
 
 ## Maintenance Logs
 

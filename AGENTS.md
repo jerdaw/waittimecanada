@@ -40,7 +40,7 @@ This file provides guidance to automated developer tools when working with code 
 
 This is the **Wait Time Canada** project - a "Health Systems Observatory" designed to audit and standardize Canadian emergency room wait time data across provinces. This is **NOT a simple wait time app**, but rather a clinically defensible auditing platform that exposes methodological inconsistencies in healthcare reporting.
 
-**Current Status:** Milestone 33 (Historical Occupancy Trends) Complete. **Four-province breadth achieved** (ON, QC, AB, BC). All scrapers active, 380+ hospitals visible, methodology documentation complete for all provinces. Occupancy trend aggregation pipeline operational.
+**Current Status:** Milestone 33 (Historical Occupancy Trends) Complete. **Four-province breadth achieved** (ON, QC, AB, BC). All scrapers active, 380+ hospitals visible, methodology documentation complete for all provinces, occupancy trend aggregation pipeline operational, and the production domain `wait-time.ca` is live on Netlify.
 
 **Current Architecture:**
 - **Database**: Neon PostgreSQL 17 (9 tables: sources, hospitals, measurements, scraper_status, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions)
@@ -67,7 +67,7 @@ This is the **Wait Time Canada** project - a "Health Systems Observatory" design
 - **Database:** Neon PostgreSQL 17 with strict schema constraints
 - **Frontend:** Next.js 14 App Router + TypeScript + Mapbox GL JS
 - **Testing:** pytest (backend), Vitest (frontend), Playwright (E2E in CI)
-- **Hosting:** Netlify (frontend, release-gated and currently offline for cost control) + GitHub Actions (scrapers)
+- **Hosting:** Netlify (frontend, release-gated production deploys) + GitHub Actions (scrapers)
 
 ### The Metric Ontology System
 
@@ -208,7 +208,7 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 - A Netlify production build is allowed only when commit message contains `[release]` or `[deploy]`.
 - Non-production branches are skipped by default.
 - This guardrail prevents new accidental credit burn; it does **not** unsuspend already suspended Netlify projects before billing reset on March 2, 2026.
-- `production-smoke.yml` may be intentionally disabled while frontend hosting is offline; `scripts/verify-production-ops.sh` treats this as a warning, not a hard failure.
+- `production-smoke.yml` remains manual-dispatch to conserve GitHub Actions minutes on the free tier; use explicit release commits and manual smoke checks rather than high-frequency automated production probes.
 
 ## Runtime Usage Guardrails
 

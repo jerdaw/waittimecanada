@@ -14,10 +14,10 @@
 
 **Maturity:** Engineering is highly mature — 33 milestones complete, 777+ tests, full CI/CD, OpenAPI spec, MkDocs deployment, French i18n, Ontario equity layer with 2021 StatsCan census tracts, divergence briefs, historical occupancy trends, structured failure taxonomy.
 
-**Evidence of use:** Essentially zero. No completed stakeholder interviews (templates exist, zero filled), no testimonials (array is empty), no user analytics, no external citations, and no GitHub community signals. The placeholder Zenodo DOI has been removed from README, but no real DOI has been registered yet. The app is deployed at `https://earnest-pavlova-73674e.netlify.app`, while the canonical domain `https://wait-time.ca` still fails clean HTTPS validation because it presents the default Netlify certificate rather than a certificate for `wait-time.ca`.
+**Evidence of use:** Still minimal. There are no completed stakeholder interviews yet, no published testimonials, no user analytics, no external citations, and no GitHub community signals. The placeholder Zenodo DOI has been removed from README, but no real DOI has been registered yet. The important launch gate is now cleared: `https://wait-time.ca` is live with valid HTTPS and verified redirects, so Phase B can focus on public-facing follow-through rather than infrastructure rescue.
 
 **Biggest gaps:**
-1. No working canonical URL — the Netlify deploy exists, but the intended `wait-time.ca` launch is still undermined by custom-domain TLS issues.
+1. No meaningful public engagement yet — the canonical URL is live, but launch artifacts and stakeholder interaction still lag the engineering maturity.
 2. No real-world human engagement — zero completed stakeholder conversations.
 3. No published academic or semi-academic output.
 4. Placeholder DOI undermines the "citable software" claim.
@@ -118,16 +118,16 @@ If the raw numbers are unimpressive (cost-control mode has been active), lead wi
 
 **Artifact:** "By the Numbers" section in README; specific figures for ABS entries.
 
-**Phase A total: ~12–15 hours. Remaining items are still valuable while the custom-domain launch is being cleaned up.**
+**Phase A total: ~12–15 hours. Remaining items are still valuable even after launch because they improve interpretability and ownership.**
 
 ---
 
-## Phase B: Launch Cleanup (After URL Verification)
+## Phase B: Launch Follow-Through (Post-Verification)
 
 ### B1: Restore Production Hosting
 **Priority:** 0 (gate) | **Effort:** 2–3 h | **CanMEDS:** Leader
 
-Finish custom-domain TLS + redirect validation, rerun production smoke against `https://wait-time.ca`, and replace temporary/fallback demo links once the canonical URL is trustworthy. This changes the cognitive category of the project from "repo" to "product."
+Delivered on **2026-03-12**: custom-domain TLS + redirect validation completed, production smoke passes against `https://wait-time.ca`, and the canonical URL is now trustworthy.
 
 **Artifact:** Clean HTTPS + redirect behavior at `https://wait-time.ca`; passing production smoke test against the canonical URL.
 
@@ -141,7 +141,7 @@ Add Plausible Analytics to Next.js layout. Update `/privacy` page. Do not public
 ### B3: Publish LinkedIn Launch Post
 **Priority:** 3 | **Effort:** 30 min | **CanMEDS:** Communicator, Leader
 
-Replace placeholder URL. Publish. Spend no more than 30 minutes total. The value is a public timestamp of work and asymmetric upside if it reaches health informatics professionals.
+The canonical URL is now live. Publish using `https://wait-time.ca`. Spend no more than 30 minutes total. The value is a public timestamp of work and asymmetric upside if it reaches health informatics professionals.
 
 **Artifact:** Public, timestamped LinkedIn post.
 
@@ -161,7 +161,7 @@ Add repository topic tags (`health-systems`, `emergency-medicine`, `wait-times`,
 
 **Artifact:** GitHub topic tags; potentially external directory listing.
 
-**Phase B total: ~8–9 hours in launch week.**
+**Phase B total: ~5–6 hours remaining post-launch (B1 delivered).**
 
 ---
 
@@ -262,7 +262,7 @@ Add `last_updated` timestamp and age indicator to hospital cards and export CSV.
 
 If Phases A–C execute on schedule, by mid-April 2026 the portfolio includes:
 
-- A live, professional URL at `wait-time.ca` with real-time data
+- A live, professional URL at `wait-time.ca` with current published data
 - A named author with personal motivation statement
 - A real Zenodo DOI resolving to a real record
 - An honest limitations section demonstrating intellectual maturity

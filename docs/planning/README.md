@@ -10,7 +10,7 @@ This directory is the planning control plane for Wait Time Canada.
 
 ## Active Milestone Plans
 
-- None currently open.
+- `docs/planning/implementation/admissions-strengthening-plan.md`
 
 ## Archived Milestone Plans
 
@@ -42,4 +42,4 @@ These documents are retained for context and may not match current implementatio
 3. Archive implementation plans once a milestone is delivered and no longer actively edited.
 4. Keep completed milestone details in archived files; keep roadmap focused on active next steps.
 
-Last Updated: 2026-02-19
+Last Updated: 2026-03-12

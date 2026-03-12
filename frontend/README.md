@@ -84,7 +84,7 @@ This repo is configured to avoid accidental Netlify credit burn:
 - `frontend/netlify.toml` uses `frontend/scripts/netlify-ignore.sh` as the build ignore rule.
 - Non-production branches are skipped by default.
 - Production branch builds require explicit release intent via commit message containing `[release]` or `[deploy]`.
-- This prevents new accidental usage; it does not unsuspend a currently suspended Netlify site before the billing cycle reset date (March 2, 2026).
+- This prevents new accidental usage while keeping production deploys explicit and low-frequency on the free tier.
 
 Example release commit:
 

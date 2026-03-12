@@ -1,10 +1,10 @@
 # Production Deployment Plan - Milestone 3
 
-**Status:** Partially Complete - Netlify Deploy Live, Custom Domain Launch Incomplete
+**Status:** Delivered - Production Domain Live (Retained as Historical Reference)
 **Date:** March 12, 2026
 **Platform:** Netlify (release-gated; active)
 
-> Update (March 12, 2026): Netlify deploys are active again and the application is serving successfully from `https://earnest-pavlova-73674e.netlify.app`. The remaining production blocker is the canonical custom domain: `https://wait-time.ca` still presents the default Netlify certificate (`*.netlify.app`) rather than a certificate valid for `wait-time.ca`.
+> Update (March 12, 2026): Netlify deploys are active again, the application is serving successfully from the Netlify site, `https://wait-time.ca` is live with a valid Let's Encrypt certificate, `https://www.wait-time.ca` redirects to the canonical host, and production smoke passes against the canonical domain.
 >
 > Runtime usage controls implemented:
 > - `/api/health` polling reduced to every 5 minutes and only while tab is visible.
@@ -22,9 +22,9 @@
 - ✅ **CI/CD:** GitHub Actions for scrapers, cleanup, and monitoring
 
 ### What Needs Deployment
-1. **Custom domain validation** (`wait-time.ca` / `www.wait-time.ca`)
-2. **Production smoke against canonical URL** after TLS is fixed
-3. **Launch-material cleanup** to replace temporary demo links with the canonical URL
+1. **No blocking deployment tasks remain**
+2. **Ongoing release discipline** via explicit `[release]` commits
+3. **Launch-material follow-through** (LinkedIn post, screenshots, walkthrough)
 
 ---
 
@@ -120,7 +120,7 @@
    - Environment variables: `NEXT_PUBLIC_MAPBOX_TOKEN`, `DATABASE_URL`
 
 2. **Scrapers on GitHub Actions** (already configured)
-   - Runs every 15 minutes
+   - Runs every 4 hours in current cost-control mode
    - Connects to Neon PostgreSQL
    - No additional hosting cost
 
@@ -289,7 +289,7 @@ Instructions will depend on platform chosen (see platform-specific guides below)
 After deployment, monitor for 24-48 hours:
 
 1. **GitHub Actions**
-   - Check scraper-cron runs every 15 minutes
+   - Check scraper-cron runs every 4 hours
    - Verify heartbeat-monitor passes hourly
    - Watch for failure notifications
 

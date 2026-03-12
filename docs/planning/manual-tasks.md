@@ -79,44 +79,32 @@ This document tracks all tasks requiring significant human intervention, browser
 
 ---
 
-## 🔴 BLOCKED: Production Deployment
+## ✅ COMPLETED: Production Deployment
 
 **Why:** Get live URL for portfolio/applications
 **Milestone:** M9 Phase 1 - Portfolio Launch
 **Estimated Time:** 45-60 minutes
 **Priority:** CRITICAL (needed for applications)
 
-### Frontend Deployment (Render):
-1. **Create Render Account:**
-   - Go to https://render.com
-   - Sign up / Sign in with GitHub
-
-2. **Deploy Frontend:**
-   - New → Static Site
-   - Connect repository: `jerdaw/waittimecanada`
-   - Build command: `cd frontend && npm install && npm run build`
-   - Publish directory: `frontend/out` or `frontend/.next`
-
-3. **Configure Environment Variables:**
-   - `DATABASE_URL` = (Neon connection string)
-   - `NEXT_PUBLIC_MAPBOX_TOKEN` = (Mapbox token)
-
-4. **Custom Domain (optional):**
-   - Add custom domain if desired
-   - Configure DNS
+### Production Outcome:
+- **Platform:** Netlify
+- **Canonical URL:** `https://wait-time.ca`
+- **Redirects:** `https://www.wait-time.ca` → `https://wait-time.ca/`
+- **Latest verified production release:** `main@f5da07c`
 
 ### GitHub Actions (Already Configured):
 ✅ Scraper cron already set up in `.github/workflows/scraper-cron.yml`
 ✅ Heartbeat monitor already set up
 ✅ Production smoke workflow set up in `.github/workflows/production-smoke.yml`
 ✅ Production readiness workflow set up in `.github/workflows/production-readiness.yml`
-⚠️  Need to verify DATABASE_URL secret is set in GitHub
-⚠️  Need to set `PRODUCTION_BASE_URL` secret and run smoke workflow once
+✅ `DATABASE_URL` secret is configured
+✅ `PRODUCTION_BASE_URL` is configured
+✅ Canonical-domain smoke checks have passed
 
 **Document Live URL:**
 ```
-Production URL: _______________________
-Deployment Date: _______________________
+Production URL: https://wait-time.ca
+Deployment Date: 2026-03-12
 ```
 
 ### Production Smoke Verification:
@@ -234,7 +222,7 @@ Thanks,
 
 ### Steps:
 1. [x] Finalize publish-ready copy in `docs/linkedin-launch-post.md`
-2. [x] Replace placeholder with the temporary Netlify demo URL; swap back to `https://wait-time.ca` once custom-domain TLS is fixed
+2. [x] Set live demo URL to `https://wait-time.ca`
 3. [ ] Add 2-3 screenshots
 4. [ ] Publish
 

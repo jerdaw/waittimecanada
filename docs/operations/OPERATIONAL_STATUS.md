@@ -1,9 +1,9 @@
 # Operational Status Report
 
 **Date:** 2026-03-12
-**Status:** ✅ Scrapers Operational | ⚠️ Custom Domain Launch Incomplete
+**Status:** ✅ Scrapers Operational | ✅ Production Domain Live
 
-**Addendum (2026-03-12):** The Netlify deployment is live and passes smoke checks via `https://earnest-pavlova-73674e.netlify.app`, but the canonical domain `https://wait-time.ca` still presents the default Netlify certificate (`*.netlify.app`) rather than a certificate valid for `wait-time.ca`. Treat the custom-domain launch as incomplete until HTTPS and redirect validation pass.
+**Addendum (2026-03-12):** The Netlify deployment is live, `https://wait-time.ca` now presents a valid Let's Encrypt certificate, `https://www.wait-time.ca` redirects to the canonical host, and production smoke checks pass against the canonical domain.
 
 ---
 
@@ -41,12 +41,13 @@ Wait Time Canada's scraper infrastructure is **fully operational** with all 4 pr
 - **Dead Man's Switch:** `check_heartbeat` CLI monitors all sources
 - **Dynamic Discovery:** Sources auto-detected from database
 
-### Frontend Hosting: ⚠️ PARTIALLY OPERATIONAL
+### Frontend Hosting: ✅ OPERATIONAL
 
 - **Verified Deploy URL:** `https://earnest-pavlova-73674e.netlify.app`
 - **Canonical Domain:** `https://wait-time.ca`
-- **Current Risk:** custom-domain HTTPS validation still serves the default Netlify certificate
-- **Operational Meaning:** the application is live, but the canonical production URL should not be treated as cleanly launched until TLS and redirect checks pass
+- **HTTPS:** Valid Let's Encrypt certificate provisioned for `wait-time.ca`
+- **Redirects:** `https://www.wait-time.ca` redirects to `https://wait-time.ca/`
+- **Operational Meaning:** the canonical production URL is live and has passed smoke verification
 
 ---
 
