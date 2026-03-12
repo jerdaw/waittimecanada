@@ -14,10 +14,10 @@
 
 **Maturity:** Engineering is highly mature — 33 milestones complete, 777+ tests, full CI/CD, OpenAPI spec, MkDocs deployment, French i18n, Ontario equity layer with 2021 StatsCan census tracts, divergence briefs, historical occupancy trends, structured failure taxonomy.
 
-**Evidence of use:** Essentially zero. No completed stakeholder interviews (templates exist, zero filled), no testimonials (array is empty), no user analytics, no external citations, no GitHub community signals. The Zenodo DOI is a placeholder (`zenodo.123456`). The LinkedIn launch post has `[INSERT_PRODUCTION_URL]` still in it. The frontend is offline (Netlify paused until March 9, 2026).
+**Evidence of use:** Essentially zero. No completed stakeholder interviews (templates exist, zero filled), no testimonials (array is empty), no user analytics, no external citations, and no GitHub community signals. The placeholder Zenodo DOI has been removed from README, but no real DOI has been registered yet. The app is deployed at `https://earnest-pavlova-73674e.netlify.app`, while the canonical domain `https://wait-time.ca` still fails clean HTTPS validation because it presents the default Netlify certificate rather than a certificate for `wait-time.ca`.
 
 **Biggest gaps:**
-1. No live URL — nothing is verifiable by a committee member who clicks.
+1. No working canonical URL — the Netlify deploy exists, but the intended `wait-time.ca` launch is still undermined by custom-domain TLS issues.
 2. No real-world human engagement — zero completed stakeholder conversations.
 3. No published academic or semi-academic output.
 4. Placeholder DOI undermines the "citable software" claim.
@@ -42,7 +42,7 @@
 ### A1: Named Author Bio in README
 **Priority:** 1 (tied with A4) | **Effort:** 30 min | **CanMEDS:** Professional, Communicator
 
-Write a named author section in README with 3–5 sentences of personal motivation. Don't make it sound like an OMSAS essay — write as a developer-researcher who happens to be going into medicine. The current "See repository owner" state is actively suspicious in a world where AI-generated portfolios are common.
+Expand the named maintainer section in README into a 3–5 sentence personal motivation statement. Don't make it sound like an OMSAS essay — write as a developer-researcher who happens to be going into medicine. The current maintainer blurb is now factual, but it still lacks the personal motivation that would make the work feel owned rather than merely maintained.
 
 **Artifact:** Named, personally motivated `## Author` section in README.
 
@@ -50,7 +50,7 @@ Write a named author section in README with 3–5 sentences of personal motivati
 **Priority:** 1 | **Effort:** 1 h | **CanMEDS:** Scholar, Professional
 
 Add specific, technical limitations to README. Keep limitations honest and specific rather than vague:
-- Scraper data may lag by up to 90 minutes in cost-control mode.
+- Scraper data may lag by up to 4 hours in the current cost-control mode.
 - Equity layer uses 2021 census income data, not current.
 - Methodology labels are inferred from provincial documentation and may not match internal hospital reporting practices.
 - Platform cannot account for unreported overcrowding events.
@@ -62,7 +62,7 @@ Most student projects overclaim. Honest limitations are a differentiated signal 
 ### A3: Fix Placeholder Zenodo DOI
 **Priority:** 2 | **Effort:** 90 min | **CanMEDS:** Scholar
 
-The README currently displays `DOI: 10.5281/zenodo.123456`, which is a placeholder resolving to nothing. This is worse than having no DOI because it looks like fabrication. Register a real Zenodo deposit, update `CITATION.cff`, and update the README badge.
+The placeholder DOI has been removed from README, which is safer than displaying a fabricated citation signal. The remaining task is to register a real Zenodo deposit, update `CITATION.cff`, and restore the README badge only once the DOI is real.
 
 A real Zenodo record is third-party-attested, timestamped evidence of the project's existence and authorship — not just a badge.
 
@@ -118,18 +118,18 @@ If the raw numbers are unimpressive (cost-control mode has been active), lead wi
 
 **Artifact:** "By the Numbers" section in README; specific figures for ABS entries.
 
-**Phase A total: ~12–15 hours. All completable before March 9.**
+**Phase A total: ~12–15 hours. Remaining items are still valuable while the custom-domain launch is being cleaned up.**
 
 ---
 
-## Phase B: Launch Week (March 9–16 — URL Goes Live)
+## Phase B: Launch Cleanup (After URL Verification)
 
 ### B1: Restore Production Hosting
 **Priority:** 0 (gate) | **Effort:** 2–3 h | **CanMEDS:** Leader
 
-Unpause Netlify. Verify TLS, redirects, production smoke. Create `[release]` commit. Replace `[INSERT_PRODUCTION_URL]` in all docs. This changes the cognitive category of the project from "repo" to "product."
+Finish custom-domain TLS + redirect validation, rerun production smoke against `https://wait-time.ca`, and replace temporary/fallback demo links once the canonical URL is trustworthy. This changes the cognitive category of the project from "repo" to "product."
 
-**Artifact:** Live URL at `wait-time.ca`; passing production smoke test.
+**Artifact:** Clean HTTPS + redirect behavior at `https://wait-time.ca`; passing production smoke test against the canonical URL.
 
 ### B2: Privacy-Safe Usage Analytics
 **Priority:** 3 | **Effort:** 2 h | **CanMEDS:** Professional, Privacy

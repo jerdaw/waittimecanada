@@ -10,7 +10,6 @@
 [![Node.js 20+](https://img.shields.io/badge/node.js-20+-green.svg)](https://nodejs.org/)
 [![Tests](https://img.shields.io/badge/tests-660%2B%20passing-success.svg)](https://github.com/jerdaw/waittimecanada)
 [![Coverage](https://img.shields.io/badge/coverage-77%25-yellowgreen.svg)](https://github.com/jerdaw/waittimecanada)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.123456.svg)](https://zenodo.org/doi/10.5281/zenodo.123456)
 [![Documentation](https://img.shields.io/badge/docs-deployed-blue.svg)](https://jerdaw.github.io/waittimecanada/)
 [![Data Freshness](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fjerdaw%2Fwaittimecanada%2Fbadges%2Ffreshness.json&query=%24.message&label=Last%20Scrape&color=%24.color)](https://github.com/jerdaw/waittimecanada/actions/workflows/scraper-cron.yml)
 
@@ -23,8 +22,8 @@
 ### Current Coverage
 
 - **4 Provinces:** Quebec, Ontario, Alberta, British Columbia
-- **380+ Hospitals:** Real-time monitoring across all regions
-- **15-Minute Updates:** Automated data collection via GitHub Actions
+- **380+ Hospitals:** Near-real-time monitoring across all regions
+- **4-Hour Updates:** Automated data collection via GitHub Actions in current cost-control mode
 - **First-in-Canada:** Real-time ED stretcher occupancy visualization (Quebec)
 
 ### Why This Matters
@@ -36,6 +35,15 @@ Provincial health authorities report ER wait times using **fundamentally differe
 - Different patient populations (all vs mid-acuity)
 
 **Direct comparison without methodology awareness is clinically misleading.** This observatory makes those differences transparent.
+
+---
+
+## Limitations
+
+- Scraper freshness currently reflects a 4-hour GitHub Actions cadence in cost-control mode rather than continuous ingestion.
+- Provincial methodology labels are inferred from public documentation and can lag unannounced reporting changes by source organizations.
+- Reported wait times and occupancy values are limited to what provinces publish; the platform cannot surface unreported overcrowding or internal flow constraints.
+- The equity layer is currently implemented for Ontario only and should not be generalized to other provinces without province-specific source and tract validation.
 
 ---
 
@@ -98,8 +106,8 @@ graph TD
     end
 
     subgraph "GitHub Actions"
-        CRON[15-Minute Cron<br/>Scrapers]
-        HB[30-Minute Heartbeat<br/>Monitor]
+        CRON[4-Hour Cron<br/>Scrapers]
+        HB[250-Minute Threshold<br/>Heartbeat Monitor]
     end
 
     subgraph "Database (Neon PostgreSQL)"
@@ -193,7 +201,7 @@ graph TD
 - `hospital_regions` - Hospital-to-region mappings
 
 ### Automation
-- **GitHub Actions:** Scrapers run every 15 minutes, heartbeat checks every 30 minutes
+- **GitHub Actions:** Scrapers run every 4 hours in current cost-control mode, heartbeat checks every 30 minutes
 - **Playwright Browsers:** Automated for Ontario/Alberta JavaScript-rendered pages
 - **Failure Alerting:** Pushover notifications for scraper/heartbeat failures
 - **Cost:** ~$240/month GitHub Actions (optimizable to ~$120/month)
@@ -410,7 +418,7 @@ waittimecanada/
 ## 🎯 Operational Workflows
 
 ### Production Automation
-- **Scraper Cron:** Runs every 15 minutes via GitHub Actions
+- **Scraper Cron:** Runs every 4 hours via GitHub Actions in current cost-control mode
 - **Heartbeat Monitor:** Checks scraper health every 30 minutes
 - **Failure Alerts:** Pushover notifications for stale data or errors
 - **Database Cleanup:** Automated retention policy (30-day measurement rolloff)
@@ -542,7 +550,7 @@ All data sourced from publicly available provincial health authority websites.
 
 ## 🎓 Author
 
-**Portfolio Project for Medical School Applications**
+Wait Time Canada is maintained by **Jeremy Dawson** as a health informatics portfolio and methodology-audit project focused on transparent interpretation of Canadian emergency department reporting.
 
 This project demonstrates:
 - Full-stack software development
@@ -551,7 +559,7 @@ This project demonstrates:
 - Clinical defensibility in health informatics
 - Systems-level thinking and architecture
 
-**Contact:** See repository owner
+**Contact:** Use the repository issue tracker or the repository owner's GitHub profile for project inquiries.
 
 ---
 

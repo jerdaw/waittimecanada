@@ -1,9 +1,9 @@
 # Operational Status Report
 
-**Date:** 2026-02-11
-**Status:** ✅ Scrapers Operational | ⚠️ Public Frontend Hosting Paused
+**Date:** 2026-03-12
+**Status:** ✅ Scrapers Operational | ⚠️ Custom Domain Launch Incomplete
 
-**Addendum (2026-02-19):** The Netlify frontend project is currently paused (cost control / credit exhaustion), so the public site is unavailable and domain cutover to `wait-time.ca` should be treated as **on hold** until the project is unpaused (target: **March 9, 2026**).
+**Addendum (2026-03-12):** The Netlify deployment is live and passes smoke checks via `https://earnest-pavlova-73674e.netlify.app`, but the canonical domain `https://wait-time.ca` still presents the default Netlify certificate (`*.netlify.app`) rather than a certificate valid for `wait-time.ca`. Treat the custom-domain launch as incomplete until HTTPS and redirect validation pass.
 
 ---
 
@@ -40,6 +40,13 @@ Wait Time Canada's scraper infrastructure is **fully operational** with all 4 pr
 - **Failure Alerts:** Pushover configured
 - **Dead Man's Switch:** `check_heartbeat` CLI monitors all sources
 - **Dynamic Discovery:** Sources auto-detected from database
+
+### Frontend Hosting: ⚠️ PARTIALLY OPERATIONAL
+
+- **Verified Deploy URL:** `https://earnest-pavlova-73674e.netlify.app`
+- **Canonical Domain:** `https://wait-time.ca`
+- **Current Risk:** custom-domain HTTPS validation still serves the default Netlify certificate
+- **Operational Meaning:** the application is live, but the canonical production URL should not be treated as cleanly launched until TLS and redirect checks pass
 
 ---
 

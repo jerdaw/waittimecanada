@@ -35,7 +35,7 @@
     }
   },
   "Hero": {
-    "badge": "Données Urgences Canada en temps réel",
+    "badge": "Données canadiennes sur les temps d'attente aux urgences",
     "title": "Canada",
     "subtitle": "Observatoire des",
     "subtitle2": "Temps d'Attente",
@@ -329,11 +329,11 @@
       "a1": "Nous agrégeons les données des autorités sanitaires provinciales. Pour l'Ontario, nous rapportons les temps d'attente au 90e centile (P90) du triage à l'évaluation par un médecin.",
       "q2": "Pourquoi ne puis-je pas comparer directement les temps d'attente de l'Ontario et du Québec ?",
       "a2": "L'Ontario rapporte les temps P90 (90e centile) du triage au médecin, tandis que le Québec rapporte la moyenne mobile de l'inscription au médecin. Ces méthodologies différentes rendent la comparaison directe statistiquement invalide.",
-      "q3": "Ces données sont-elles en temps réel ?",
-      "a3": "Oui, nous collectons les données des sources provinciales officielles toutes les 15 minutes. Vérifiez l'horodatage « Mis à jour » sur chaque carte d'hôpital pour la fraîcheur spécifique des données."
+      "q3": "À quel point ces données sont-elles à jour ?",
+      "a3": "Nous collectons les données des sources provinciales officielles selon un horaire automatisé. Dans le mode actuel de contrôle des coûts, la cadence interprovinciale est de 4 heures; chaque province peut toutefois publier ses propres mises à jour à un rythme différent."
     },
     "medicalPage": {
-      "desc": "Temps d'attente aux urgences en temps réel et audit méthodologique pour les hôpitaux canadiens."
+      "desc": "Temps d'attente aux urgences publiés et audit méthodologique pour les hôpitaux canadiens."
     },
     "howTo": {
       "step1": {
@@ -351,14 +351,14 @@
     }
   },
   "Metadata": {
-    "title": "Wait Time Canada | Temps d'attente aux Urgences en Temps Réel & Audit Méthodologique",
-    "description": "Un Observatoire des Systèmes de Santé cliniquement défendable suivant les temps d'attente aux urgences à travers le Canada. Comparez les méthodologies, visualisez les données en temps réel et accédez aux analyses du système de santé.",
+    "title": "Wait Time Canada | Temps d'attente aux urgences et audit méthodologique",
+    "description": "Un Observatoire des Systèmes de Santé cliniquement défendable suivant les temps d'attente aux urgences à travers le Canada. Comparez les méthodologies, consultez les dernières données publiées et accédez aux analyses du système de santé.",
     "keywords": "temps d'attente urgences, salles d'urgence Canada, méthodologie santé, temps d'attente hôpital, urgences Québec, urgences Ontario, urgences Alberta, urgences C-B"
   },
   "StatusPage": {
     "backToMap": "Back to live map",
     "title": "System Status",
-    "subtitle": "Operational health of all provincial scrapers. Uptime is measured as actual vs. expected data collections (96 per hospital per day at 15-minute intervals).",
+    "subtitle": "Santé opérationnelle de tous les scrapers provinciaux. Le taux de disponibilité compare les collectes réelles aux collectes attendues selon la cadence actuelle de 4 heures.",
     "overallHealth": "Overall Health",
     "systemUptime24h": "System Uptime (24h)",
     "activeProvinces": "Active Provinces",
@@ -370,7 +370,7 @@
     "dataFreshness": "Data freshness:",
     "statusGeneratedAt": "Status generated at {time}.",
     "uptimeCalc": "Uptime calculation:",
-    "uptimeCalcDesc": "Scrapers run every 15 minutes (96 expected collections per hospital per day). Uptime = actual / expected, capped at 100%.",
+    "uptimeCalcDesc": "Les scrapers s'exécutent actuellement toutes les 4 heures (6 collectes attendues par hôpital et par jour). Disponibilité = réel / attendu, plafonné à 100 %.",
     "detailedQuality": "For detailed data quality metrics, visit the",
     "dataQualityDashboard": "Data Quality dashboard",
     "uptime": {
@@ -461,7 +461,7 @@
     "aboutMetrics": "About Data Quality Metrics",
     "metrics": {
       "successRate": "Success Rate:",
-      "successRateDesc": "Scrapers run every 15 minutes (96 expected per day per hospital). Success rate measures actual vs expected data collection.",
+      "successRateDesc": "Les scrapers s'exécutent actuellement toutes les 4 heures (6 collectes attendues par hôpital et par jour). Le taux de succès mesure les collectes réelles par rapport aux collectes attendues.",
       "anomalyDetection": "Anomaly Detection:",
       "anomalyDetectionDesc": "Uses z-score (3 standard deviations) and IQR methods against a 7-day rolling baseline. Requires 20+ historical data points before flagging.",
       "whyTransparency": "Why Transparency Matters:",
@@ -648,7 +648,7 @@
         },
         "q4": {
           "question": "À quelle fréquence ces données sont-elles mises à jour ?",
-          "answer": "La fréquence de mise à jour varie selon la province. Les sources de l'Ontario mettent à jour toutes les 15 minutes, le Québec toutes les heures. Nos scrapers s'exécutent automatiquement via GitHub Actions à des intervalles de 15 minutes. Vous pouvez voir l'horodatage de la dernière mise à jour dans le coin supérieur gauche de la carte."
+          "answer": "La fréquence de mise à jour varie selon la province et les organismes sources ne publient pas tous au même rythme. Dans le mode actuel de contrôle des coûts, notre workflow interprovincial s'exécute toutes les 4 heures via GitHub Actions, même si certaines sources provinciales peuvent se rafraîchir plus souvent en amont."
         },
         "q5": {
           "question": "D'où viennent ces données ?",

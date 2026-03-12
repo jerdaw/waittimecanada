@@ -234,7 +234,7 @@ Thanks,
 
 ### Steps:
 1. [x] Finalize publish-ready copy in `docs/linkedin-launch-post.md`
-2. [ ] Replace `[INSERT_PRODUCTION_URL]` once deployed
+2. [x] Replace placeholder with the temporary Netlify demo URL; swap back to `https://wait-time.ca` once custom-domain TLS is fixed
 3. [ ] Add 2-3 screenshots
 4. [ ] Publish
 

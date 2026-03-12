@@ -1,10 +1,10 @@
 # Production Deployment Plan - Milestone 3
 
-**Status:** On Hold - Frontend Intentionally Offline (Cost Control)
-**Date:** February 3, 2026
-**Platform:** Netlify (release-gated; currently offline)
+**Status:** Partially Complete - Netlify Deploy Live, Custom Domain Launch Incomplete
+**Date:** March 12, 2026
+**Platform:** Netlify (release-gated; active)
 
-> Update (February 8, 2026): Netlify Free credit usage exceeded plan allowance and projects were suspended. In this repo, Netlify deploys are guarded by `frontend/scripts/netlify-ignore.sh` and only proceed for explicit `[release]`/`[deploy]` commits. The frontend is intentionally kept offline for now to avoid unnecessary credit usage.
+> Update (March 12, 2026): Netlify deploys are active again and the application is serving successfully from `https://earnest-pavlova-73674e.netlify.app`. The remaining production blocker is the canonical custom domain: `https://wait-time.ca` still presents the default Netlify certificate (`*.netlify.app`) rather than a certificate valid for `wait-time.ca`.
 >
 > Runtime usage controls implemented:
 > - `/api/health` polling reduced to every 5 minutes and only while tab is visible.
@@ -16,15 +16,15 @@
 ## Current State
 
 ### What's Already Built
-- ✅ **Backend scrapers:** Python with GitHub Actions cron (15-min schedule configured)
-- ✅ **Frontend:** Next.js 14 with SSR, ready to deploy
+- ✅ **Backend scrapers:** Python with GitHub Actions cron (4-hour cost-control schedule active)
+- ✅ **Frontend:** Next.js 14 with SSR, deployed on Netlify
 - ✅ **Database:** Neon PostgreSQL (already in production)
 - ✅ **CI/CD:** GitHub Actions for scrapers, cleanup, and monitoring
 
 ### What Needs Deployment
-1. **Frontend application** (Next.js)
-2. **GitHub Secrets** (DATABASE_URL for scrapers)
-3. **Monitoring alerts** (optional email notifications)
+1. **Custom domain validation** (`wait-time.ca` / `www.wait-time.ca`)
+2. **Production smoke against canonical URL** after TLS is fixed
+3. **Launch-material cleanup** to replace temporary demo links with the canonical URL
 
 ---
 

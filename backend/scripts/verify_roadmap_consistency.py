@@ -162,12 +162,19 @@ def check_roadmap_items_formatting(roadmap_path: Path) -> tuple[bool, str]:
     """Verify roadmap items use consistent checkbox formatting."""
     content = roadmap_path.read_text()
 
-    # Find roadmap sections (Now/Next/Later) - extract the full section content
-    section_pattern = r"### (Now|Next|Later) \([^)]+\)(.*?)(?=###|\Z)"
-    sections = re.findall(section_pattern, content, re.DOTALL)
+    active_roadmap_match = re.search(
+        r"## Active Roadmap.*?\n(.*?)(?=\n## |\Z)",
+        content,
+        re.DOTALL,
+    )
+    if not active_roadmap_match:
+        return False, "Could not find Active Roadmap section"
 
+    active_roadmap = active_roadmap_match.group(1)
+    section_pattern = r"### ([^\n]+)\n(.*?)(?=### |\Z)"
+    sections = re.findall(section_pattern, active_roadmap, re.DOTALL)
     if not sections:
-        return False, "Could not find Now/Next/Later roadmap sections"
+        return False, "Could not find roadmap subsections under Active Roadmap"
 
     issues = []
     for section_name, section_content in sections:

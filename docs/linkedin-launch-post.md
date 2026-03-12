@@ -22,7 +22,7 @@ Core stack:
 This project reflects how I approach health informatics: methodological rigor, transparent limitations, and patient-facing clarity.
 
 GitHub: https://github.com/jerdaw/waittimecanada
-Live demo: [INSERT_PRODUCTION_URL]
+Live demo (temporary Netlify URL while `wait-time.ca` TLS is fixed): https://earnest-pavlova-73674e.netlify.app
 
 #HealthcareInnovation #CanadianHealthcare #HealthInformatics #DataTransparency #EmergencyMedicine #MedEd
 
@@ -30,7 +30,7 @@ Live demo: [INSERT_PRODUCTION_URL]
 
 ## Publish Checklist
 
-- Replace `[INSERT_PRODUCTION_URL]` with the live URL.
+- Replace the temporary Netlify URL with `https://wait-time.ca` once custom-domain TLS and redirects pass.
 - Attach 2-3 screenshots from `docs/screenshot-guide.md`.
 - Add alt text for each image.
 - Post from your personal account and pin it for portfolio visibility.
@@ -46,4 +46,4 @@ Instead of normalizing incompatible metrics, it tags each measurement with ontol
 That means clearer interpretation, better data stewardship, and fewer misleading comparisons.
 
 GitHub: https://github.com/jerdaw/waittimecanada
-Live demo: [INSERT_PRODUCTION_URL]
+Live demo (temporary): https://earnest-pavlova-73674e.netlify.app

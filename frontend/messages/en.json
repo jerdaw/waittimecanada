@@ -35,7 +35,7 @@
     }
   },
   "Hero": {
-    "badge": "Real-Time Canadian ER Data",
+    "badge": "Canadian ER Wait Time Data",
     "title": "Canada",
     "subtitle": "ER Wait Time",
     "subtitle2": "Observatory",
@@ -329,11 +329,11 @@
       "a1": "We aggregate data from provincial health authorities. For Ontario, we report P90 (90th percentile) wait times from triage to physician assessment.",
       "q2": "Why can't I compare Ontario and Quebec wait times directly?",
       "a2": "Ontario reports P90 (90th percentile) triage-to-physician times, while Quebec reports rolling average registration-to-physician times. These different methodologies mean direct comparison is statistically invalid.",
-      "q3": "Is this data real-time?",
-      "a3": "Yes, we scrape official provincial data sources every 15 minutes. Check the 'Updated' timestamp on each hospital card for specific data freshness."
+      "q3": "How current is this data?",
+      "a3": "We collect from official provincial sources on an automated schedule. In the current cost-control mode, the cross-province scrape cadence is every 4 hours; individual provinces may publish source updates on different intervals."
     },
     "medicalPage": {
-      "desc": "Real-time emergency room wait times and methodology auditing for Canadian hospitals."
+      "desc": "Published emergency room wait times and methodology auditing for Canadian hospitals."
     },
     "howTo": {
       "step1": {
@@ -351,14 +351,14 @@
     }
   },
   "Metadata": {
-    "title": "Wait Time Canada | Real-Time ER Wait Times & Methodology Audit",
-    "description": "A clinically defensible Health Systems Observatory tracking emergency department wait times across Canada. Compare methodologies, view real-time data, and access health system analytics.",
+    "title": "Wait Time Canada | ER Wait Times & Methodology Audit",
+    "description": "A clinically defensible Health Systems Observatory tracking emergency department wait times across Canada. Compare methodologies, view the latest published data, and access health system analytics.",
     "keywords": "ER wait times, Canada emergency rooms, health methodology, hospital wait times, Quebec ER, Ontario ER, Alberta ER, BC ER"
   },
   "StatusPage": {
     "backToMap": "Back to live map",
     "title": "System Status",
-    "subtitle": "Operational health of all provincial scrapers. Uptime is measured as actual vs. expected data collections (96 per hospital per day at 15-minute intervals).",
+    "subtitle": "Operational health of all provincial scrapers. Uptime is measured as actual vs. expected collections under the current 4-hour cost-control cadence.",
     "overallHealth": "Overall Health",
     "systemUptime24h": "System Uptime (24h)",
     "activeProvinces": "Active Provinces",
@@ -370,7 +370,7 @@
     "dataFreshness": "Data freshness:",
     "statusGeneratedAt": "Status generated at {time}.",
     "uptimeCalc": "Uptime calculation:",
-    "uptimeCalcDesc": "Scrapers run every 15 minutes (96 expected collections per hospital per day). Uptime = actual / expected, capped at 100%.",
+    "uptimeCalcDesc": "Scrapers currently run every 4 hours (6 expected collections per hospital per day). Uptime = actual / expected, capped at 100%.",
     "detailedQuality": "For detailed data quality metrics, visit the",
     "dataQualityDashboard": "Data Quality dashboard",
     "uptime": {
@@ -461,7 +461,7 @@
     "aboutMetrics": "About Data Quality Metrics",
     "metrics": {
       "successRate": "Success Rate:",
-      "successRateDesc": "Scrapers run every 15 minutes (96 expected per day per hospital). Success rate measures actual vs expected data collection.",
+      "successRateDesc": "Scrapers currently run every 4 hours (6 expected per day per hospital). Success rate measures actual vs expected data collection.",
       "anomalyDetection": "Anomaly Detection:",
       "anomalyDetectionDesc": "Uses z-score (3 standard deviations) and IQR methods against a 7-day rolling baseline. Requires 20+ historical data points before flagging.",
       "whyTransparency": "Why Transparency Matters:",
@@ -648,7 +648,7 @@
         },
         "q4": {
           "question": "How often is this data updated?",
-          "answer": "Update frequency varies by province. Ontario sources update every 15 minutes, Quebec updates hourly. Our scrapers run automatically via GitHub Actions on 15-minute intervals. You can see the last update timestamp in the top-left corner of the map."
+          "answer": "Update frequency varies by province, and source organizations do not all publish on the same cadence. In the current cost-control mode, our cross-province scraper workflow runs every 4 hours via GitHub Actions, while some provincial sources may refresh more frequently upstream."
         },
         "q5": {
           "question": "Where does this data come from?",

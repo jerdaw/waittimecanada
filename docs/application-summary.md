@@ -25,6 +25,15 @@ The key design choice is to audit and expose heterogeneity rather than normalize
 
 ---
 
+## Limitations
+
+- Current scraper freshness reflects a 4-hour GitHub Actions cadence in cost-control mode rather than continuous ingestion.
+- Methodology labels are inferred from public provincial documentation and can lag unannounced source-side reporting changes.
+- The platform can only surface what provinces publish; it cannot detect unreported overcrowding or internal flow constraints.
+- Equity analysis is currently implemented for Ontario only and should not be generalized to other provinces without province-specific validation.
+
+---
+
 ## CanMEDS Mapping Summary
 
 - `Scholar`: methodology ontology design, comparability reasoning, and transparent assumptions
@@ -34,4 +43,4 @@ The key design choice is to audit and expose heterogeneity rather than normalize
 
 ---
 
-Last Updated: 2026-02-08
+Last Updated: 2026-03-12

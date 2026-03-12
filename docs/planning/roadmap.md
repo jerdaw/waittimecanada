@@ -1,12 +1,12 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-02-25)
+## Current Status (Updated 2026-03-12)
 
 **Progress:** M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | CI/Tooling Maintenance Complete (2026-02-23) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived
 
-**Strategic Direction:** **Admissions strengthening phase active (2026-02-25).** Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). Focus shifts to real-world engagement, external validation, and public-facing artifacts. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for the full phased plan.
+**Strategic Direction:** **Admissions strengthening phase active (2026-03-12).** Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). Focus remains on real-world engagement, external validation, and public-facing artifacts. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for the full phased plan.
 
-**Deployment Note (2026-02-23):** Frontend public hosting is currently unavailable because the Netlify project is paused (cost control / credit exhaustion). The `wait-time.ca` domain cutover is staged in-repo but should be treated as **on hold** until the project is unpaused (target: **March 9, 2026**).
+**Deployment Note (2026-03-12):** Frontend hosting is live on Netlify, but the custom domain launch is **not complete**. `wait-time.ca` is serving content while HTTPS hostname validation still presents the Netlify certificate rather than a certificate valid for `wait-time.ca`; treat production launch as incomplete until TLS and redirect checks pass cleanly.
 
 ---
 
@@ -51,7 +51,7 @@
 
 ## Next Steps
 
-**Admissions strengthening plan active (2026-02-25).** Phase A (pre-deployment) items are in progress now. Netlify unpause target is **March 9, 2026** — Phase B (launch week) begins then. Phase C (scholarly artifacts + external validation) targets weeks 2–4 post-launch. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
+**Admissions strengthening plan active (2026-03-12).** Immediate work is launch cleanup plus credibility cleanup that can be finished locally. The highest-priority blocker is still **B1: restore production hosting end-to-end** by fixing custom-domain TLS/redirect validation. Phase C (scholarly artifacts + external validation) should start only after launch verification is genuinely complete. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
 
 Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT data is available; M35 (Nova Scotia scraper) when bandwidth allows. Both are Phase D (deferred) in the admissions plan.
 
@@ -69,17 +69,17 @@ Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT d
 - Operational impact confirmed (alerts, workflows, secrets, deployment posture).
 - Item status reflected in this roadmap and no duplicate open tasks remain.
 
-### Release and Cost Policy (Updated 2026-03-03)
-- **Netlify Deploys:** Paused due to credit exhaustion. Public hosting remains unavailable until the project is unpaused (target: **March 9, 2026**).
-- **Public Hosting:** Offline until unpause.
+### Release and Cost Policy (Updated 2026-03-12)
+- **Netlify Deploys:** Active again.
+- **Public Hosting:** Netlify deployment is live, but the custom domain launch remains incomplete until `wait-time.ca` passes HTTPS certificate and redirect verification.
 - Scraper reliability workflows (`scraper-cron`, heartbeat monitor, readiness checks) remain active on GitHub Actions.
 - Temporary cost-control mode is active: `scraper-cron` at `0 */4 * * *` and heartbeat `--max-age 250`.
-- Post-unpause target (review on **March 9, 2026**): Reactivate deploys and move to `scraper-cron: */20`.
+- Post-launch target: once cost posture is acceptable and production verification is stable, review returning `scraper-cron` to `*/20`.
 
 ### Focus Shift (2026-02-25)
 Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The gap is in **real-world engagement, external validation, and public-facing artifacts**. See the [Admissions Strengthening Plan](implementation/admissions-strengthening-plan.md) for the full phased strategy including analytical rationale (original plan, devil's advocate, steelman, and final synthesis).
 
-## Active Roadmap (Now / Deferred / Later)
+## Active Roadmap (Phase-Based)
 
 ### Completed Engineering (Reference)
 
@@ -91,10 +91,10 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [x] **P1 / Divergence Briefs in analytics + export** — M32 Complete
 - [x] **P2 / Historical occupancy trends** — M33 Complete
 
-### Phase A: Now (Before March 9) — Pre-Deployment Credibility
+### Phase A: Immediate Credibility Cleanup
 [Full details: admissions-strengthening-plan.md §Phase A](implementation/admissions-strengthening-plan.md#phase-a-immediate-before-march-9--no-live-url-required)
 
-- [ ] **P1 / A1: Named author bio in README** — 3–5 sentence personal motivation statement; replace “See repository owner” (30 min)
+- [ ] **P1 / A1: Named author bio in README** — Expand the maintainer blurb into a 3–5 sentence personal motivation statement (30 min)
 - [ ] **P1 / A2: Limitations section in README** — Specific, technical limitations demonstrating intellectual maturity (1 h)
 - [ ] **P1 / A3: Fix placeholder Zenodo DOI** — Register real deposit; update CITATION.cff and README badge (90 min)
 - [ ] **P1 / A4: Stakeholder interview outreach** — Send 10–15 outreach messages to ER professionals using existing templates (2–3 h outreach; interviews on their schedule)
@@ -102,7 +102,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P1 / A6: Ottawa–Gatineau case study** — 2-page methodology divergence case study; verify hospitals in DB first (2–3 h)
 - [ ] **P1 / A7: Quantified metrics & methodology findings** — Query DB for honest metrics; methodology-characterization findings only, no cross-province performance claims (3 h)
 
-### Phase B: Launch Week (March 9–16) — Go Live
+### Phase B: Active Launch Cleanup
 [Full details: admissions-strengthening-plan.md §Phase B](implementation/admissions-strengthening-plan.md#phase-b-launch-week-march-916--url-goes-live)
 
 - [ ] **P0 / B1: Restore production hosting** — Unpause Netlify; verify TLS, redirects, production smoke; create `[release]` commit (2–3 h)
@@ -111,7 +111,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P1 / B4: Video walkthrough** — Script 3–4 min; record with decent audio; upload unlisted YouTube (3 h)
 - [ ] **P2 / B5: GitHub topics & discoverability** — Add topic tags; check 1–2 open data registries (30 min)
 
-### Phase C: Weeks 2–4 Post-Launch — Scholarly Artifacts & External Validation
+### Phase C: After Verified Launch — Scholarly Artifacts & External Validation
 [Full details: admissions-strengthening-plan.md §Phase C](implementation/admissions-strengthening-plan.md#phase-c-weeks-24-scholarly-artifacts--external-validation)
 
 - [ ] **P1 / C1: Technical report** — 2–4 page “Methodological Heterogeneity in Canadian ED Wait-Time Reporting”; gate publication on external read-through (1–2 d)
@@ -121,7 +121,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P2 / C5: Incident post-mortem** — Quebec zero-value parser incident; write for interview preparation (1–2 h)
 - [ ] **P2 / C6: Named reviewer acknowledgement** — If A4 or C2 produces a willing reviewer, add Acknowledgements to README (30 min; conditional)
 
-### Phase D: Deferred (Weeks 5–12) — If Time Permits
+### Phase D: Deferred — If Time Permits
 [Full details: admissions-strengthening-plan.md §Phase D](implementation/admissions-strengthening-plan.md#phase-d-if-time-permits-weeks-512)
 
 - [ ] **P2 / D1: Comparability matrix upgrade** — Explicit per-pair field-by-field verdicts on /methods (conditional on current state)
