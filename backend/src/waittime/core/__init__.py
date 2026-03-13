@@ -14,6 +14,7 @@ from waittime.core.models import (
     Hospital,
     Measurement,
     MeasurementAggregate,
+    ScraperAlertState,
     ScraperStatus,
     Source,
     are_comparable,
@@ -32,6 +33,7 @@ __all__ = [
     "MeasurementAggregate",
     "Hospital",
     "Source",
+    "ScraperAlertState",
     "ScraperStatus",
     # Functions
     "are_comparable",

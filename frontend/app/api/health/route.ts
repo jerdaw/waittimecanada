@@ -43,7 +43,7 @@ export interface HealthResponse {
 }
 
 const STALE_THRESHOLD_MINUTES = Number(
-  process.env.HEARTBEAT_STALE_THRESHOLD_MINUTES ?? "90",
+  process.env.HEARTBEAT_STALE_THRESHOLD_MINUTES ?? "120",
 );
 
 export async function GET(req: NextRequest) {

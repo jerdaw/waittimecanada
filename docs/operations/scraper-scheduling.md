@@ -72,6 +72,7 @@ python -m waittime.cli.check_heartbeat --max-age 120
 - ✅ Alerts via Pushover if heartbeat > 120 minutes old
 - ✅ Alerts include failure classification (`category/stage`) for error states
 - ✅ Alerts if no heartbeat ever recorded for a source
+- ✅ Sends alerts only on incident state changes, with a single recovery notice when healthy again
 
 **Alert Conditions:**
 - ⚠️ Heartbeat older than 120 minutes
@@ -137,6 +138,18 @@ ORDER BY last_run DESC;
 **Updated by:** Each scraper run (success or failure)
 **Monitored by:** `heartbeat-monitor.yml` workflow
 
+### Scraper Alert State Table
+Incident deduplication state is tracked separately in `scraper_alert_state`:
+
+```sql
+SELECT source_id, active_incident_kind, opened_at, last_resolved_at
+FROM scraper_alert_state
+ORDER BY source_id;
+```
+
+**Updated by:** `check_heartbeat` when incident state changes
+**Purpose:** Suppress duplicate stale/error notifications until the incident actually changes or resolves
+
 ---
 
 ## CLI Commands
@@ -194,6 +207,16 @@ python -m waittime.cli.scraper --all --dry-run
    - Title: ⚠️ Scraper Stale
    - Trigger: No heartbeat in last 120 minutes
    - Priority: 1 (High)
+
+3. **Recovery** (heartbeat-monitor.yml)
+   - Title: ✅ Scraper Recovered: `<source-id>`
+   - Trigger: Source returns to healthy after an active stale/error incident
+   - Priority: 0 (Normal)
+
+**Deduplication behavior:**
+- One incident alert when a source first becomes `stale` or `error`
+- No repeated alerts while the same incident fingerprint remains active
+- One recovery alert when the source returns to healthy
 
 **Manual Alert Test:**
 ```bash

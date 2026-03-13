@@ -61,6 +61,19 @@ Heartbeat monitor for scraper health.
 | `consecutive_failures` | INTEGER | Number of consecutive failed runs since last success. |
 | `last_run_duration_ms` | INTEGER | Last run duration in milliseconds. |
 
+### `scraper_alert_state`
+Persistent alert deduplication state for heartbeat incidents.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `source_id` | TEXT (PK/FK) | Link to `sources.id`. |
+| `active_incident_kind` | TEXT | Current active incident kind: `stale` or `error`. |
+| `active_incident_fingerprint` | TEXT | Stable fingerprint for the active incident. |
+| `opened_at` | TIMESTAMPTZ | When the current active incident began. |
+| `last_notified_at` | TIMESTAMPTZ | When the active incident last generated a notification attempt. |
+| `last_resolved_at` | TIMESTAMPTZ | When the most recent incident for this source was resolved. |
+| `updated_at` | TIMESTAMPTZ | Row update timestamp. |
+
 ## Analytics & Aggregation
 
 ### `measurement_aggregates`

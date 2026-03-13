@@ -105,6 +105,25 @@ class AlertService:
             url=self.config.reference_url,
         )
 
+    def alert_scraper_resolved(
+        self,
+        source_id: str,
+        incident_kind: str,
+        duration: str | None = None,
+        run_url: str | None = None,
+    ) -> bool:
+        """Alert that a scraper incident has recovered."""
+        message = f"Recovered from {incident_kind} incident."
+        if duration:
+            message = f"{message} Duration: {duration}."
+        message = f"{message} Scraper heartbeat is healthy again."
+        return self.send_alert(
+            title=f"✅ Scraper Recovered: {source_id}",
+            message=message,
+            priority=0,
+            url=run_url or self.config.reference_url,
+        )
+
     def alert_scraper_error(
         self,
         source_id: str,

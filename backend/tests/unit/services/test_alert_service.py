@@ -87,3 +87,14 @@ class TestAlertService:
             assert "unknown/unknown" in message
             assert "Error:" in message
             assert mock_send.call_args[1]["url"] == "https://example.com/alerts"
+
+    def test_alert_scraper_resolved(self):
+        service = AlertService(AlertConfig("k", "t", reference_url="https://example.com/alerts"))
+        with patch.object(service, "send_alert", return_value=True) as mock_send:
+            result = service.alert_scraper_resolved("source_1", "stale", duration="2h 5m")
+            assert result is True
+            mock_send.assert_called_once()
+            assert "Scraper Recovered: source_1" in mock_send.call_args[1]["title"]
+            assert "Recovered from stale incident" in mock_send.call_args[1]["message"]
+            assert "2h 5m" in mock_send.call_args[1]["message"]
+            assert mock_send.call_args[1]["url"] == "https://example.com/alerts"

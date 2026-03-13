@@ -339,20 +339,42 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 
 ---
 
+### M31: Alert State Deduplication (017)
+
+#### 017_add_scraper_alert_state.sql
+**Purpose:** Persist scraper incident state so heartbeat alerting only notifies on transitions
+**Created:** 2026-03-13
+**Milestone:** M31 (Alert Noise Reduction & Incident State Tracking)
+
+**Table Added:**
+- `scraper_alert_state`
+
+**Columns Added:**
+- `active_incident_kind`
+- `active_incident_fingerprint`
+- `opened_at`
+- `last_notified_at`
+- `last_resolved_at`
+
+**Indexes Added:**
+- `idx_scraper_alert_state_active_incident`
+
+---
+
 ## Creating New Migrations
 
 ### Step 1: Determine Next Number
 
 ```bash
 ls backend/migrations/*.sql | tail -1
-# Output: backend/migrations/013_add_scraper_observability_columns.sql
-# Next: 014
+# Output: backend/migrations/017_add_scraper_alert_state.sql
+# Next: 018
 ```
 
 ### Step 2: Create Migration File
 
 ```bash
-touch backend/migrations/014_your_descriptive_name.sql
+touch backend/migrations/018_your_descriptive_name.sql
 ```
 
 ### Step 3: Write Migration

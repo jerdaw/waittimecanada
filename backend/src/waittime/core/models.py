@@ -213,6 +213,18 @@ class ScraperStatus(BaseModel):
     last_run_duration_ms: int | None = Field(default=None, ge=0)
 
 
+class ScraperAlertState(BaseModel):
+    """Persistent alert state for scraper incident deduplication."""
+
+    source_id: str
+    active_incident_kind: str | None = Field(default=None, pattern="^(stale|error)$")
+    active_incident_fingerprint: str | None = None
+    opened_at: datetime | None = None
+    last_notified_at: datetime | None = None
+    last_resolved_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
 def are_comparable(a: Measurement, b: Measurement) -> bool:
     """Determine if two measurements can be directly compared.
 

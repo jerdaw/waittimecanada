@@ -14,6 +14,7 @@ from waittime.core.models import (
     Hospital,
     Measurement,
     MeasurementAggregate,
+    ScraperAlertState,
     Source,
 )
 from waittime.services.database import DatabaseService
@@ -256,6 +257,58 @@ class TestDatabaseService:
         count = db_service.insert_measurements([])
         assert count == 0
         mock_connect.assert_not_called()
+
+    @patch("psycopg2.connect")
+    def test_open_scraper_alert_incident(self, mock_connect, db_service):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_cursor.fetchone.return_value = {
+            "source_id": "ontario-health",
+            "active_incident_kind": "error",
+            "active_incident_fingerprint": "error:ontario-health:fetch:abc123",
+            "opened_at": datetime.now(UTC),
+            "last_notified_at": datetime.now(UTC),
+            "last_resolved_at": None,
+            "updated_at": datetime.now(UTC),
+        }
+
+        result = db_service.open_scraper_alert_incident(
+            "ontario-health",
+            "error",
+            "error:ontario-health:fetch:abc123",
+        )
+
+        assert isinstance(result, ScraperAlertState)
+        assert result.source_id == "ontario-health"
+        assert result.active_incident_kind == "error"
+        assert "INSERT INTO scraper_alert_state" in mock_cursor.execute.call_args[0][0]
+
+    @patch("psycopg2.connect")
+    def test_resolve_scraper_alert_incident(self, mock_connect, db_service):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_cursor.fetchone.return_value = {
+            "source_id": "ontario-health",
+            "active_incident_kind": None,
+            "active_incident_fingerprint": None,
+            "opened_at": None,
+            "last_notified_at": None,
+            "last_resolved_at": datetime.now(UTC),
+            "updated_at": datetime.now(UTC),
+        }
+
+        result = db_service.resolve_scraper_alert_incident("ontario-health")
+
+        assert isinstance(result, ScraperAlertState)
+        assert result.source_id == "ontario-health"
+        assert result.active_incident_kind is None
+        assert "INSERT INTO scraper_alert_state" in mock_cursor.execute.call_args[0][0]
 
     @patch("psycopg2.connect")
     def test_cleanup_old_measurements(self, mock_connect, db_service):
