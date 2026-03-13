@@ -2,8 +2,8 @@
 -- Create table for permanent statistical summaries of wait time data.
 -- Depends on: 002_create_tables.sql (hospitals, sources)
 --
--- These aggregates survive the 30-day raw measurement retention window,
--- enabling longitudinal research and long-range trend analysis.
+-- These aggregates keep longitudinal research and long-range trend analysis
+-- efficient even when raw measurements are retained indefinitely.
 -- Ontology tags are denormalized: if a source changes methodology,
 -- historical aggregates preserve what the methodology was at that time.
 

@@ -191,7 +191,7 @@ DELETE FROM sources WHERE id IN ('quebec-msss', 'ontario-health', 'alberta-ahs',
 **Table Created:** `measurement_aggregates`
 - Granularity: `hourly`, `daily`, `weekly`, `monthly`
 - Metrics: count, min, max, mean, median, p50, p75, p90, p95, p99
-- Purpose: Retain aggregates after raw measurements deleted (30-day retention)
+- Purpose: Retain aggregates for efficient long-range analytics while raw measurements are also preserved
 - Indexes: Composite index on (hospital_id, granularity, window_start) for efficient querying
 
 **Rollback:**
@@ -613,7 +613,7 @@ hospitals (380+ rows)
   ├── province, city, latitude, longitude
   └── is_verified, is_visible
 
-measurements (100,000+ rows, 30-day retention)
+measurements (100,000+ rows, full retained history)
   ├── id (BIGSERIAL, PK)
   ├── hospital_id → hospitals(id)
   ├── metric_family, start_event, end_event, statistic_type, patient_scope

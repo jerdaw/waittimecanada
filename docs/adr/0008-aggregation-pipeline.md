@@ -6,13 +6,19 @@ Status: Accepted
 
 Deciders: Jeremy Dawson
 
+> Update (2026-03-13): the aggregate architecture in this ADR remains active,
+> but the original assumption of automatic 30-day raw-data deletion is no
+> longer the default operating policy. Raw measurements are now preserved by
+> default, and aggregates remain the efficient long-range analytics layer.
+
 ## Context and Problem Statement
 
-Raw measurements have a 30-day retention window to manage storage costs on Neon's free tier. How do we enable longitudinal analysis (90-day, 6-month, 1-year trends) when the raw data is deleted after 30 days?
+How do we enable longitudinal analysis (90-day, 6-month, 1-year trends)
+without forcing every analytics query to scan the full raw measurement table?
 
 ## Decision Drivers
 
-* 30-day raw data retention policy (storage constraint)
+* Need efficient long-range analytics even when raw measurements are preserved
 * Need for long-range trend analysis (Scholar narrative)
 * Research-grade data export requires extended date ranges
 * Must preserve ontology metadata for comparability analysis
@@ -25,7 +31,10 @@ Raw measurements have a 30-day retention window to manage storage costs on Neon'
 
 ## Decision Outcome
 
-Chosen option: "Two-tier architecture", because it balances storage constraints with analytical depth. Raw measurements provide operational freshness (last 30 days), while permanent aggregates enable longitudinal research.
+Chosen option: "Two-tier architecture", because it balances analytical depth
+with query efficiency. Raw measurements remain available for high-granularity
+analysis, while permanent aggregates enable longitudinal research and cheaper
+read paths.
 
 ### Positive Consequences
 
@@ -38,7 +47,7 @@ Chosen option: "Two-tier architecture", because it balances storage constraints 
 
 * Aggregates lose individual measurement granularity
 * Two-step query pattern (check aggregates first, fall back to raw)
-* Requires scheduled aggregation step before cleanup
+* Requires scheduled aggregation maintenance even when no purge is planned
 
 ## Implementation Details
 

@@ -1,20 +1,20 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-03-12)
+## Current Status (Updated 2026-03-13)
 
 **Progress:** Production Domain Launch Complete (2026-03-12) | M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | CI/Tooling Maintenance Complete (2026-02-23) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived
 
-**Strategic Direction:** **Admissions strengthening phase remains active (2026-03-12), with a parallel full direct-VPS migration track started on 2026-03-13.** Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). Focus remains on real-world engagement, external validation, public-facing artifacts, and replacing Netlify plus GitHub Actions hosting with the shared VPS pattern used by other projects. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for the admissions plan, `docs/operations/direct-vps-frontend.md` for the frontend path, and `docs/operations/direct-vps-backend.md` for the backend worker path.
+**Strategic Direction:** **Admissions strengthening phase remains active (2026-03-13), with the frontend now live on the shared VPS and the backend scheduler path still live on GitHub Actions.** Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). Focus remains on real-world engagement, external validation, public-facing artifacts, and keeping the new VPS frontend path stable while deferring backend cutover until the Ontario source is reachable from the chosen runtime. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for the admissions plan, `docs/operations/direct-vps-frontend.md` for the frontend path, and `docs/operations/direct-vps-backend.md` for the backend worker path.
 
-**Deployment Note (2026-03-12):** Frontend hosting is live on Netlify, `https://wait-time.ca` presents a valid Let's Encrypt certificate, `https://www.wait-time.ca` redirects to the canonical host, and production smoke passes against the canonical domain.
+**Deployment Note (2026-03-13):** Frontend hosting is now live on the shared VPS, `https://wait-time.ca` presents a valid Let's Encrypt certificate from Caddy, `https://www.wait-time.ca` redirects to the canonical host, and production smoke passes against the canonical domain.
 
-**Migration Note (2026-03-13):** The next runtime objective is to move the full production stack onto the shared VPS:
+**Migration Note (2026-03-13):** The backend scheduler/runtime cutover was attempted on the shared VPS, but the Ontario source timed out repeatedly from this host:
 
-- frontend via host Caddy + a loopback-bound Docker container
-- backend scrapers/heartbeat/quality jobs via a Python release plus systemd timers
+- frontend via host Caddy + a loopback-bound Docker container is now live
+- backend scrapers/heartbeat/quality jobs remain on GitHub Actions
 - Neon remains the managed production database in this wave
 
-Netlify and GitHub Actions remain the live hosting/scheduler paths until VPS verification passes.
+Netlify should now be treated as rollback-only for the frontend, and GitHub Actions remains the live backend scheduler path until an Ontario-compatible worker runtime is proven.
 
 ---
 
@@ -61,7 +61,7 @@ Netlify and GitHub Actions remain the live hosting/scheduler paths until VPS ver
 
 **Admissions strengthening plan active (2026-03-12).** Production launch verification is complete. Immediate work now shifts to credibility artifacts and post-launch follow-through: A1 (personal author bio), A3 (real Zenodo DOI), A4 (stakeholder outreach), A6/A7 (case study + quantified findings), and B2-B4 (analytics, launch post, walkthrough). See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
 
-**Parallel ops track (2026-03-13):** prepare and execute the full Wait Time Canada move to the shared VPS. Immediate tasks are frontend Docker packaging, backend timer packaging, env contract finalization, release/deploy script validation, host Caddy cutover prep, and post-cutover verification for both surfaces.
+**Parallel ops track (2026-03-13):** keep the VPS frontend stable, document the frontend cutover outcome clearly, and treat backend migration as deferred pending an Ontario reachability investigation for the VPS path.
 
 Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT data is available; M35 (Nova Scotia scraper) when bandwidth allows. Both are Phase D (deferred) in the admissions plan.
 
@@ -79,12 +79,12 @@ Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT d
 - Operational impact confirmed (alerts, workflows, secrets, deployment posture).
 - Item status reflected in this roadmap and no duplicate open tasks remain.
 
-### Release and Cost Policy (Updated 2026-03-12)
-- **Netlify Deploys:** Active again and still live until frontend VPS cutover completes.
+### Release and Cost Policy (Updated 2026-03-13)
+- **Frontend Hosting:** Live on the shared VPS through host Caddy and a loopback Docker container.
 - **Public Hosting:** `https://wait-time.ca` is live and has passed HTTPS, redirect, and production smoke verification.
-- **Backend Scheduling:** still live on GitHub Actions until VPS timers are installed and proven.
+- **Backend Scheduling:** still live on GitHub Actions because the Ontario source timed out from the shared VPS during backend cutover testing.
 - Temporary cost-control mode is active on the current GitHub Actions backend path: `scraper-cron` at `0 */4 * * *` and heartbeat `--max-age 250`.
-- After VPS backend cutover, retire the GitHub Actions scheduler path instead of restoring the old `*/20` cadence there.
+- If backend migration is revisited later, solve Ontario reachability first instead of re-running the same VPS timer cutover sequence blindly.
 
 ### Focus Shift (2026-02-25)
 Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The gap is in **real-world engagement, external validation, and public-facing artifacts**. See the [Admissions Strengthening Plan](implementation/admissions-strengthening-plan.md) for the full phased strategy including analytical rationale (original plan, devil's advocate, steelman, and final synthesis).
@@ -102,13 +102,13 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [x] **P1 / Divergence Briefs in analytics + export** — M32 Complete
 - [x] **P2 / Historical occupancy trends** — M33 Complete
 
-### Active Ops Track: Direct VPS Full-Service Migration
+### Active Ops Track: VPS Frontend Live / Backend Follow-Up
 
 - [x] **P1 / Add frontend VPS runtime packaging** — Frontend Dockerfile, standalone Next.js output, `.dockerignore`, and deploy/release helpers
 - [x] **P1 / Add backend VPS runtime packaging** — Backend deploy/release helpers, systemd templates, and verification script
-- [ ] **P1 / Finalize VPS env contracts** — Confirm `/etc/projects-merge/env/waittime-frontend.env` and `/etc/projects-merge/env/waittime-backend.env`
-- [ ] **P1 / Host cutover preparation** — Add Caddy route, release roots, loopback bind target, backend timers, and Playwright runtime deps on the shared VPS
-- [ ] **P1 / Cutover verification** — Frontend private/public health, production smoke, backend timer health, and rollback proof
+- [x] **P1 / Finalize VPS env contracts** — `/etc/projects-merge/env/waittime-frontend.env` and `/etc/projects-merge/env/waittime-backend.env` created on the shared VPS
+- [x] **P1 / Host cutover preparation** — Caddy route, release roots, loopback bind target, backend timers, and Playwright runtime deps were staged on the shared VPS
+- [ ] **P1 / Backend-compatible cutover verification** — Frontend private/public health and production smoke passed; backend verification exposed Ontario upstream timeouts from this VPS, so backend cutover is deferred until a compatible runtime path is proven
 
 ### Phase A: Immediate Credibility Cleanup
 [Full details: admissions-strengthening-plan.md §Phase A](implementation/admissions-strengthening-plan.md#phase-a-immediate-before-march-9--no-live-url-required)

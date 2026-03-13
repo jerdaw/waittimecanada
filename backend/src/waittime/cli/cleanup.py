@@ -1,12 +1,16 @@
-"""CLI command for running database cleanup tasks.
+"""CLI command for backend data maintenance tasks.
 
-This script implements the 30-day retention policy from the strategic plan.
-Run this via cron job or GitHub Actions to prevent database bloat.
+The default behavior is non-destructive:
+1. report raw-measurement age statistics
+2. refresh recent aggregates so long-range analytics stay current
+
+Raw measurement deletion is now opt-in and requires an explicit purge flag.
 
 Usage:
-    python -m waittime.cli.cleanup --dry-run  # Preview what would be deleted
-    python -m waittime.cli.cleanup            # Actually delete old measurements
-    python -m waittime.cli.cleanup --retention-days 60  # Custom retention period
+    python -m waittime.cli.cleanup --dry-run
+    python -m waittime.cli.cleanup
+    python -m waittime.cli.cleanup --with-stats
+    python -m waittime.cli.cleanup --purge-old-measurements --retention-days 60
 """
 
 import argparse
@@ -25,18 +29,25 @@ logger = logging.getLogger(__name__)
 
 
 def main() -> int:
-    """Run database cleanup."""
-    parser = argparse.ArgumentParser(description="Clean up old measurements from the database")
+    """Run backend data maintenance."""
+    parser = argparse.ArgumentParser(
+        description="Aggregate recent measurements and optionally purge old raw rows"
+    )
     parser.add_argument(
         "--retention-days",
         type=int,
         default=30,
-        help="Number of days to retain measurements (default: 30)",
+        help="Number of days to retain measurements when purge is explicitly enabled (default: 30)",
+    )
+    parser.add_argument(
+        "--purge-old-measurements",
+        action="store_true",
+        help="Actually delete raw measurements older than --retention-days",
     )
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Preview what would be deleted without actually deleting",
+        help="Preview maintenance and any requested purge without mutating data",
     )
     parser.add_argument(
         "--verbose",
@@ -44,23 +55,40 @@ def main() -> int:
         action="store_true",
         help="Show detailed statistics",
     )
+    parser.add_argument(
+        "--with-stats",
+        action="store_true",
+        help="Collect full-table age statistics during maintenance output",
+    )
 
     args = parser.parse_args()
 
     try:
         db = DatabaseService()
+        stats_requested = args.dry_run or args.verbose or args.with_stats
+        stats_before = None
 
-        # Get statistics before cleanup
-        logger.info("Fetching current database statistics...")
-        stats_before = db.get_measurement_age_stats()
-
-        logger.info("Database Statistics:")
-        logger.info(f"  Total measurements: {stats_before['total_measurements']}")
-        logger.info(f"  Oldest measurement: {stats_before['oldest_measurement_age_days']} days old")
-        logger.info(f"  Newest measurement: {stats_before['newest_measurement_age_days']} days old")
-        logger.info(
-            f"  Measurements older than 30 days: {stats_before['measurements_older_than_30_days']}"
-        )
+        if stats_requested:
+            logger.info("Fetching current database statistics...")
+            stats_before = db.get_measurement_age_stats(older_than_days=args.retention_days)
+            logger.info("Database Statistics:")
+            logger.info(f"  Total measurements: {stats_before['total_measurements']}")
+            logger.info(
+                f"  Oldest measurement: {stats_before['oldest_measurement_age_days']} days old"
+            )
+            logger.info(
+                f"  Newest measurement: {stats_before['newest_measurement_age_days']} days old"
+            )
+            logger.info(
+                "  Measurements older than %s days: %s",
+                stats_before["older_than_days_threshold"],
+                stats_before["measurements_older_than_threshold"],
+            )
+        else:
+            logger.info(
+                "Skipping full-table age statistics. Use --with-stats, --verbose, "
+                "or --dry-run to collect them."
+            )
 
         # Calculate what would be deleted
         if args.retention_days != 30:
@@ -68,14 +96,24 @@ def main() -> int:
 
         if args.dry_run:
             logger.info("\n🔍 DRY RUN MODE - No data will be deleted")
-            logger.info(
-                f"Would delete approximately {stats_before['measurements_older_than_30_days']} "
-                f"measurements older than {args.retention_days} days"
-            )
+            if args.purge_old_measurements:
+                if stats_before is not None:
+                    logger.info(
+                        "Would delete approximately %s measurements older than %s days",
+                        stats_before["measurements_older_than_threshold"],
+                        args.retention_days,
+                    )
+                else:
+                    logger.info(
+                        "Purge requested, but no stats were collected; rerun with --with-stats "
+                        "for an estimate before deletion."
+                    )
+            else:
+                logger.info("Raw measurements will be preserved; no purge requested.")
             return 0
 
-        # Aggregate before cleanup to ensure no data is lost
-        logger.info("\nAggregating measurements before cleanup...")
+        # Refresh recent aggregates during each maintenance run.
+        logger.info("\nRefreshing recent aggregates...")
         agg_service = AggregationService(db)
 
         # Reduced lookback range (3 days) to save Neon network transfer.
@@ -88,18 +126,24 @@ def main() -> int:
         )
         agg_total = sum(agg_counts.values())
         if agg_total > 0:
-            logger.info(f"  Created {agg_total} new aggregates before cleanup")
+            logger.info(f"  Created {agg_total} new aggregates during maintenance")
 
-        # Actually perform cleanup
-        logger.info(f"\nDeleting measurements older than {args.retention_days} days...")
-        deleted_count = db.cleanup_old_measurements(retention_days=args.retention_days)
+        deleted_count = 0
+        if args.purge_old_measurements:
+            logger.info(f"\nDeleting measurements older than {args.retention_days} days...")
+            deleted_count = db.cleanup_old_measurements(retention_days=args.retention_days)
+        else:
+            logger.info(
+                "\nSkipping raw measurement deletion. "
+                "Indefinite raw-data retention is the current default policy."
+            )
 
-        logger.info("\n✅ Cleanup complete!")
+        logger.info("\n✅ Maintenance complete!")
         logger.info(f"  Deleted: {deleted_count} measurements")
 
         # Get statistics after cleanup
-        if args.verbose:
-            stats_after = db.get_measurement_age_stats()
+        if args.verbose or args.with_stats:
+            stats_after = db.get_measurement_age_stats(older_than_days=args.retention_days)
             logger.info("\nAfter cleanup:")
             logger.info(f"  Total measurements: {stats_after['total_measurements']}")
             logger.info(

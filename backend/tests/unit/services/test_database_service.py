@@ -144,15 +144,59 @@ class TestDatabaseService:
         result = db_service.insert_measurement(measurement)
         assert result["value"] == 45
         assert "INSERT INTO measurements" in mock_cursor.execute.call_args[0][0]
+        assert "ON CONFLICT" in mock_cursor.execute.call_args[0][0]
 
     @patch("psycopg2.connect")
-    @patch("psycopg2.extras.execute_batch")
-    def test_insert_measurements_batch(self, mock_execute_batch, mock_connect, db_service):
+    def test_insert_measurement_returns_existing_row_when_duplicate(self, mock_connect, db_service):
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
         mock_connect.return_value = mock_conn
         mock_conn.cursor.return_value = mock_cursor
         mock_cursor.__enter__.return_value = mock_cursor
+
+        existing_row = {
+            "id": 99,
+            "hospital_id": "hosp1",
+            "timestamp_utc": datetime.now(UTC),
+            "value": 45,
+            "metric_family": "TIME_TO_PROVIDER",
+            "start_event": "TRIAGE",
+            "end_event": "PHYSICIAN",
+            "statistic_type": "MEAN",
+            "patient_scope": "ALL",
+            "source_id": "src1",
+            "raw_payload_hash": "a" * 64,
+            "parser_version": "1.0",
+        }
+        mock_cursor.fetchone.side_effect = [None, existing_row]
+
+        measurement = Measurement(
+            hospital_id="hosp1",
+            timestamp_utc=existing_row["timestamp_utc"],
+            value=45,
+            metric_family=MetricFamily.TIME_TO_PROVIDER,
+            start_event=StartEvent.TRIAGE,
+            end_event=EndEvent.PHYSICIAN,
+            statistic_type=StatisticType.MEAN,
+            patient_scope=PatientScope.ALL,
+            source_id="src1",
+            raw_payload_hash="a" * 64,
+            parser_version="1.0",
+        )
+
+        result = db_service.insert_measurement(measurement)
+        assert result["id"] == 99
+        assert mock_cursor.execute.call_count == 2
+
+    @patch("psycopg2.connect")
+    @patch("psycopg2.extras.execute_values")
+    def test_insert_measurements_batch(self, mock_execute_values, mock_connect, db_service):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_execute_values.return_value = [(1,)]
 
         measurements = [
             Measurement(
@@ -172,7 +216,39 @@ class TestDatabaseService:
 
         count = db_service.insert_measurements(measurements)
         assert count == 1
-        mock_execute_batch.assert_called_once()
+        mock_execute_values.assert_called_once()
+
+    @patch("psycopg2.connect")
+    @patch("psycopg2.extras.execute_values")
+    def test_insert_measurements_batch_dedupes_exact_duplicates(
+        self, mock_execute_values, mock_connect, db_service
+    ):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_execute_values.return_value = [(1,)]
+
+        timestamp = datetime.now(UTC)
+        measurement = Measurement(
+            hospital_id="hosp1",
+            timestamp_utc=timestamp,
+            value=45,
+            metric_family=MetricFamily.TIME_TO_PROVIDER,
+            start_event=StartEvent.TRIAGE,
+            end_event=EndEvent.PHYSICIAN,
+            statistic_type=StatisticType.MEAN,
+            patient_scope=PatientScope.ALL,
+            source_id="src1",
+            raw_payload_hash="a" * 64,
+            parser_version="1.0",
+        )
+
+        count = db_service.insert_measurements([measurement, measurement])
+        assert count == 1
+        insert_rows = mock_execute_values.call_args[0][2]
+        assert len(insert_rows) == 1
 
     @patch("psycopg2.connect")
     def test_insert_measurements_empty(self, mock_connect, db_service):
@@ -238,6 +314,58 @@ class TestDatabaseService:
         mock_connect.return_value = mock_conn
         mock_conn.cursor.return_value = mock_cursor
         mock_cursor.__enter__.return_value = mock_cursor
+        mock_cursor.fetchone.return_value = {
+            "oldest_age_days": None,
+            "newest_age_days": None,
+            "total_measurements": 0,
+            "measurements_older_than_threshold": 0,
+        }
+
+        stats = db_service.get_measurement_age_stats()
+        assert stats["total_measurements"] == 0
+        assert stats["older_than_days_threshold"] == 30
+        assert stats["measurements_older_than_threshold"] == 0
+
+    @patch("psycopg2.connect")
+    def test_get_relation_storage_stats(self, mock_connect, db_service):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_cursor.fetchone.return_value = {
+            "relation_name": "measurements",
+            "estimated_row_count": 1234,
+            "table_bytes": 4096,
+            "index_bytes": 2048,
+            "total_bytes": 6144,
+        }
+
+        stats = db_service.get_relation_storage_stats()
+        assert stats["relation_name"] == "measurements"
+        assert stats["estimated_row_count"] == 1234
+        assert stats["table_bytes"] == 4096
+
+    @patch("psycopg2.connect")
+    def test_get_relation_storage_stats_with_exact_count(self, mock_connect, db_service):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_cursor.fetchone.side_effect = [
+            {
+                "relation_name": "measurements",
+                "estimated_row_count": 1234,
+                "table_bytes": 4096,
+                "index_bytes": 2048,
+                "total_bytes": 6144,
+            },
+            {"exact_row_count": 1200},
+        ]
+
+        stats = db_service.get_relation_storage_stats(exact_count=True)
+        assert stats["exact_row_count"] == 1200
 
     @patch("psycopg2.connect")
     def test_insert_hospital(self, mock_connect, db_service):

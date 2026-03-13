@@ -78,6 +78,7 @@ API routes (selected):
 - Map layer equity geometry is scaffolded placeholder data until StatsCan integration is completed.
 - The direct-VPS frontend packaging path is `frontend/Dockerfile`; service-local deploy and rollback steps live in `docs/operations/direct-vps-frontend.md`.
 - The backend worker/timer migration path is documented separately in `docs/operations/direct-vps-backend.md`.
+- The production frontend now runs on the shared VPS at `https://wait-time.ca`.
 
 ## Netlify Deploy Guard
 
@@ -86,7 +87,7 @@ This repo is configured to avoid accidental Netlify credit burn:
 - `frontend/netlify.toml` uses `frontend/scripts/netlify-ignore.sh` as the build ignore rule.
 - Non-production branches are skipped by default.
 - Production branch builds require explicit release intent via commit message containing `[release]` or `[deploy]`.
-- This prevents new accidental usage while keeping production deploys explicit and low-frequency on the free tier.
+- This prevents new accidental usage while keeping the old Netlify path available as rollback-only infrastructure.
 
 Example release commit:
 

@@ -17,6 +17,7 @@ from typing import Any
 import psycopg2
 import psycopg2.extras
 from dotenv import load_dotenv
+from psycopg2 import sql
 
 from waittime.core import Hospital, Measurement, MeasurementAggregate, ScraperStatus, Source
 
@@ -34,6 +35,11 @@ class DatabaseService:
 
     Uses direct psycopg2 connections for maximum compatibility.
     """
+
+    MEASUREMENT_CONFLICT_COLUMNS = (
+        "hospital_id, timestamp_utc, metric_family, start_event, end_event, "
+        "statistic_type, patient_scope, source_id, value, raw_payload_hash"
+    )
 
     def __init__(self, database_url: str | None = None, conn: Any = None) -> None:
         """Initialize database connection.
@@ -261,8 +267,27 @@ class DatabaseService:
     # Measurements
     # ─────────────────────────────────────────────────────────────────
 
+    @staticmethod
+    def _measurement_conflict_key(measurement: Measurement) -> tuple[Any, ...]:
+        """Return the exact-observation identity tuple used for idempotent inserts."""
+        return (
+            measurement.hospital_id,
+            measurement.timestamp_utc,
+            measurement.metric_family.value,
+            measurement.start_event.value,
+            measurement.end_event.value,
+            measurement.statistic_type.value,
+            measurement.patient_scope.value,
+            measurement.source_id,
+            measurement.value,
+            measurement.raw_payload_hash,
+        )
+
     def insert_measurement(self, measurement: Measurement) -> dict[str, Any]:
-        """Insert a new measurement."""
+        """Insert a new measurement.
+
+        Exact duplicate observations are ignored and the existing row is returned.
+        """
         with self.get_connection() as conn:
             with self.get_cursor(conn) as cur:
                 cur.execute(
@@ -274,6 +299,9 @@ class DatabaseService:
                         source_id, raw_payload_hash, raw_payload_snippet, parser_version,
                         is_anomaly, anomaly_reason
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (hospital_id, timestamp_utc, metric_family, start_event, end_event,
+                                 statistic_type, patient_scope, source_id, value, raw_payload_hash)
+                    DO NOTHING
                     RETURNING *
                     """,
                     (
@@ -297,14 +325,46 @@ class DatabaseService:
                     ),
                 )
                 row = cur.fetchone()
-                if row is None:
-                    raise ValueError("Failed to insert measurement")
-                return dict(row)
+                if row is not None:
+                    return dict(row)
+
+                cur.execute(
+                    """
+                    SELECT * FROM measurements
+                    WHERE hospital_id = %s
+                      AND timestamp_utc = %s
+                      AND metric_family = %s
+                      AND start_event = %s
+                      AND end_event = %s
+                      AND statistic_type = %s
+                      AND patient_scope = %s
+                      AND source_id = %s
+                      AND value = %s
+                      AND raw_payload_hash = %s
+                    ORDER BY id
+                    LIMIT 1
+                    """,
+                    self._measurement_conflict_key(measurement),
+                )
+                existing_row = cur.fetchone()
+                if existing_row is None:
+                    raise ValueError("Failed to insert or retrieve measurement")
+                return dict(existing_row)
 
     def insert_measurements(self, measurements: list[Measurement]) -> int:
-        """Insert multiple measurements in batch."""
+        """Insert multiple measurements in batch.
+
+        Returns the number of newly inserted rows; exact duplicates are skipped.
+        """
         if not measurements:
             return 0
+
+        unique_measurements = list(
+            {
+                self._measurement_conflict_key(measurement): measurement
+                for measurement in measurements
+            }.values()
+        )
 
         with self.get_connection() as conn:
             with self.get_cursor(conn) as cur:
@@ -328,10 +388,10 @@ class DatabaseService:
                         m.is_anomaly,
                         m.anomaly_reason,
                     )
-                    for m in measurements
+                    for m in unique_measurements
                 ]
 
-                psycopg2.extras.execute_batch(
+                inserted = psycopg2.extras.execute_values(
                     cur,
                     """
                     INSERT INTO measurements (
@@ -340,11 +400,17 @@ class DatabaseService:
                         patients_waiting, patients_in_treatment, total_treatment_spaces,
                         source_id, raw_payload_hash, raw_payload_snippet, parser_version,
                         is_anomaly, anomaly_reason
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ) VALUES %s
+                    ON CONFLICT (hospital_id, timestamp_utc, metric_family, start_event, end_event,
+                                 statistic_type, patient_scope, source_id, value, raw_payload_hash)
+                    DO NOTHING
+                    RETURNING 1
                     """,
                     data,
+                    template="(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    fetch=True,
                 )
-                return len(measurements)
+                return len(inserted)
 
     def get_latest_measurement(self, hospital_id: str) -> Measurement | None:
         """Get the most recent measurement for a hospital."""
@@ -367,12 +433,13 @@ class DatabaseService:
     def cleanup_old_measurements(self, retention_days: int = 30) -> int:
         """Delete measurements older than retention period.
 
-        IMPORTANT: This implements the storage safety policy from strategic plan.
-        We only keep raw measurements for retention_days, then delete them to prevent
-        database bloat. Aggregated analytics should be computed before deletion.
+        IMPORTANT: this is now an explicit purge path, not the default retention
+        policy. Callers should use it only when an operator deliberately intends
+        to delete historical raw data. Aggregated analytics should be computed
+        before deletion.
 
         Args:
-            retention_days: Number of days to retain raw measurements (default: 30)
+            retention_days: Number of days to retain raw measurements before an explicit purge
 
         Returns:
             Number of measurements deleted
@@ -397,12 +464,11 @@ class DatabaseService:
                 )
                 return deleted_count
 
-    def get_measurement_age_stats(self) -> dict[str, Any]:
+    def get_measurement_age_stats(self, older_than_days: int = 30) -> dict[str, Any]:
         """Get statistics about measurement ages for monitoring retention policy.
 
         Returns:
-            Dict with oldest_measurement_age_days, newest_measurement_age_days,
-            total_measurements, and measurements_older_than_30_days
+            Dict with oldest/newest age, total rows, and count older than a caller-selected threshold.
         """
         with self.get_connection() as conn:
             with self.get_cursor(conn) as cur:
@@ -413,10 +479,11 @@ class DatabaseService:
                         EXTRACT(EPOCH FROM (NOW() - MAX(timestamp_utc))) / 86400 as newest_age_days,
                         COUNT(*) as total_measurements,
                         COUNT(*) FILTER (
-                            WHERE timestamp_utc < NOW() - INTERVAL '30 days'
-                        ) as measurements_older_than_30_days
+                            WHERE timestamp_utc < NOW() - (%s * INTERVAL '1 day')
+                        ) as measurements_older_than_threshold
                     FROM measurements
-                    """
+                    """,
+                    (older_than_days,),
                 )
                 row = cur.fetchone()
 
@@ -425,7 +492,8 @@ class DatabaseService:
                         "oldest_measurement_age_days": None,
                         "newest_measurement_age_days": None,
                         "total_measurements": 0,
-                        "measurements_older_than_30_days": 0,
+                        "older_than_days_threshold": older_than_days,
+                        "measurements_older_than_threshold": 0,
                     }
 
                 return {
@@ -436,7 +504,59 @@ class DatabaseService:
                     if row["newest_age_days"]
                     else None,
                     "total_measurements": row["total_measurements"],
-                    "measurements_older_than_30_days": row["measurements_older_than_30_days"],
+                    "older_than_days_threshold": older_than_days,
+                    "measurements_older_than_threshold": row["measurements_older_than_threshold"],
+                }
+
+    def get_relation_storage_stats(
+        self, relation_name: str = "measurements", exact_count: bool = False
+    ) -> dict[str, Any]:
+        """Get size and row-count metadata for a table or partitioned relation."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT
+                        c.relname AS relation_name,
+                        COALESCE(s.n_live_tup, c.reltuples)::bigint AS estimated_row_count,
+                        pg_table_size(c.oid) AS table_bytes,
+                        pg_indexes_size(c.oid) AS index_bytes,
+                        pg_total_relation_size(c.oid) AS total_bytes
+                    FROM pg_class c
+                    LEFT JOIN pg_stat_user_tables s ON s.relid = c.oid
+                    WHERE c.relname = %s
+                      AND c.relkind IN ('r', 'p')
+                    ORDER BY c.relnamespace = 'public'::regnamespace DESC, c.oid
+                    LIMIT 1
+                    """,
+                    (relation_name,),
+                )
+                row = cur.fetchone()
+
+                if row is None:
+                    raise ValueError(f"Relation not found: {relation_name}")
+
+                exact_row_count = None
+                if exact_count:
+                    cur.execute(
+                        sql.SQL("SELECT COUNT(*) AS exact_row_count FROM {}").format(
+                            sql.Identifier(relation_name)
+                        )
+                    )
+                    count_row = cur.fetchone()
+                    exact_row_count = int(count_row["exact_row_count"]) if count_row else 0
+
+                table_bytes = int(row["table_bytes"])
+                index_bytes = int(row["index_bytes"])
+                total_bytes = int(row["total_bytes"])
+
+                return {
+                    "relation_name": row["relation_name"],
+                    "estimated_row_count": int(row["estimated_row_count"] or 0),
+                    "exact_row_count": exact_row_count,
+                    "table_bytes": table_bytes,
+                    "index_bytes": index_bytes,
+                    "total_bytes": total_bytes,
                 }
 
     # ─────────────────────────────────────────────────────────────────

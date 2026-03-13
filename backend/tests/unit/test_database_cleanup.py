@@ -119,7 +119,7 @@ class TestGetMeasurementAgeStats:
             "oldest_age_days": 45.5,
             "newest_age_days": 0.5,
             "total_measurements": 150,
-            "measurements_older_than_30_days": 20,
+            "measurements_older_than_threshold": 20,
         }
         mock_cursor = setup_cursor_mock(return_value=mock_row)
         mock_conn = setup_connection_mock(mock_cursor)
@@ -135,7 +135,8 @@ class TestGetMeasurementAgeStats:
         assert stats["total_measurements"] == 150
         assert stats["oldest_measurement_age_days"] == 45.5
         assert stats["newest_measurement_age_days"] == 0.5
-        assert stats["measurements_older_than_30_days"] == 20
+        assert stats["older_than_days_threshold"] == 30
+        assert stats["measurements_older_than_threshold"] == 20
 
     def test_returns_none_when_no_measurements(self, mock_db_with_cleanup, monkeypatch):
         """Should return None values when no measurements in database."""
@@ -143,7 +144,7 @@ class TestGetMeasurementAgeStats:
             "oldest_age_days": None,
             "newest_age_days": None,
             "total_measurements": 0,
-            "measurements_older_than_30_days": 0,
+            "measurements_older_than_threshold": 0,
         }
         mock_cursor = setup_cursor_mock(return_value=mock_row)
         mock_conn = setup_connection_mock(mock_cursor)
@@ -159,7 +160,8 @@ class TestGetMeasurementAgeStats:
         assert stats["total_measurements"] == 0
         assert stats["oldest_measurement_age_days"] is None
         assert stats["newest_measurement_age_days"] is None
-        assert stats["measurements_older_than_30_days"] == 0
+        assert stats["older_than_days_threshold"] == 30
+        assert stats["measurements_older_than_threshold"] == 0
 
     def test_rounds_age_to_one_decimal(self, mock_db_with_cleanup, monkeypatch):
         """Should round age values to 1 decimal place."""
@@ -167,7 +169,7 @@ class TestGetMeasurementAgeStats:
             "oldest_age_days": 45.6789,
             "newest_age_days": 0.1234,
             "total_measurements": 100,
-            "measurements_older_than_30_days": 10,
+            "measurements_older_than_threshold": 10,
         }
         mock_cursor = setup_cursor_mock(return_value=mock_row)
         mock_conn = setup_connection_mock(mock_cursor)
@@ -210,7 +212,7 @@ class TestCleanupIntegration:
             "oldest_age_days": 60.0,
             "newest_age_days": 1.0,
             "total_measurements": 200,
-            "measurements_older_than_30_days": 50,
+            "measurements_older_than_threshold": 50,
         }
 
         # Stats after cleanup
@@ -218,7 +220,7 @@ class TestCleanupIntegration:
             "oldest_age_days": 29.0,
             "newest_age_days": 1.0,
             "total_measurements": 150,
-            "measurements_older_than_30_days": 0,
+            "measurements_older_than_threshold": 0,
         }
 
         call_count = {"value": 0}
@@ -256,7 +258,7 @@ class TestCleanupIntegration:
         stats2 = mock_db_with_cleanup.get_measurement_age_stats()
 
         # Verify workflow results
-        assert stats1["measurements_older_than_30_days"] == 50
+        assert stats1["measurements_older_than_threshold"] == 50
         assert deleted == 50
-        assert stats2["measurements_older_than_30_days"] == 0
+        assert stats2["measurements_older_than_threshold"] == 0
         assert stats2["total_measurements"] == 150

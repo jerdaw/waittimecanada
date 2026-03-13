@@ -1,17 +1,20 @@
 # Operational Status Report
 
 **Date:** 2026-03-13
-**Status:** ✅ Scrapers Operational | ✅ Production Domain Live
+**Status:** ✅ Frontend Live On VPS | ✅ GitHub Actions Backend Operational | ⚠️ VPS Backend Deferred
 
-**Addendum (2026-03-12):** The Netlify deployment is live, `https://wait-time.ca` now presents a valid Let's Encrypt certificate, `https://www.wait-time.ca` redirects to the canonical host, and production smoke checks pass against the canonical domain.
+**Frontend addendum (2026-03-13):** `https://wait-time.ca` is now live on the shared VPS behind host Caddy, `https://www.wait-time.ca` redirects to the canonical host through Caddy, and production smoke checks pass against the canonical domain.
 
-**Migration addendum (2026-03-13):** GitHub Actions remains the live backend scheduler path today, but the active migration target is now a shared-VPS backend runtime documented in `docs/operations/direct-vps-backend.md`.
+**Backend addendum (2026-03-13):** GitHub Actions remains the live backend scheduler path. A same-host VPS backend attempt was paused after confirming that the Ontario source times out from this VPS.
 
 ---
 
 ## Executive Summary
 
-Wait Time Canada's scraper infrastructure is **fully operational** with all 4 provincial scrapers running on automated schedules via GitHub Actions. This report verifies the operational status and documents the production configuration.
+Wait Time Canada's public frontend is now served from the shared VPS, while the
+authoritative backend scheduler path remains GitHub Actions. This report
+documents that split production configuration and the current Ontario blocker on
+the VPS backend path.
 
 ---
 
@@ -45,11 +48,19 @@ Wait Time Canada's scraper infrastructure is **fully operational** with all 4 pr
 
 ### Frontend Hosting: ✅ OPERATIONAL
 
-- **Verified Deploy URL:** `https://earnest-pavlova-73674e.netlify.app`
+- **Public Runtime:** Shared VPS behind host Caddy
 - **Canonical Domain:** `https://wait-time.ca`
-- **HTTPS:** Valid Let's Encrypt certificate provisioned for `wait-time.ca`
+- **Private Upstream:** `http://127.0.0.1:3400`
+- **HTTPS:** Let's Encrypt certificate served by Caddy on the VPS
 - **Redirects:** `https://www.wait-time.ca` redirects to `https://wait-time.ca/`
-- **Operational Meaning:** the canonical production URL is live and has passed smoke verification
+- **Operational Meaning:** the canonical production URL is live on the VPS and has passed smoke verification
+
+### VPS Backend Attempt: ⚠️ DEFERRED
+
+- **Mechanical deploy:** succeeded
+- **Systemd install:** succeeded
+- **Blocker:** Ontario upstream timed out repeatedly from this VPS
+- **Operational Meaning:** GitHub Actions remains the live backend scheduler path
 
 ---
 

@@ -1,5 +1,5 @@
 [Unit]
-Description=Run Wait Time Canada backend cleanup weekly
+Description=Run Wait Time Canada backend database maintenance weekly
 
 [Timer]
 OnCalendar=Sun *-*-* 02:15:00 UTC

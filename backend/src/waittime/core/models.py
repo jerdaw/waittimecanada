@@ -134,8 +134,8 @@ class Source(BaseModel):
 class MeasurementAggregate(BaseModel):
     """Aggregated statistics for a hospital over a time period.
 
-    Permanent summaries that survive the 30-day raw measurement retention
-    window. Enables longitudinal research and long-range trend analysis.
+    Permanent summaries that keep longitudinal research and long-range trend
+    analysis efficient even when raw measurements are preserved indefinitely.
 
     Ontology tags are denormalized intentionally: if a source changes
     methodology, historical aggregates preserve what the methodology

@@ -20,7 +20,8 @@ import { HospitalTrendQuerySchema } from "@/utils/validations";
 //   dataSource: "raw" | "aggregated"
 // }
 
-// Periods that can be served from raw measurements (within 30-day retention)
+// Short interactive windows served directly from raw measurements for fidelity
+// and responsiveness. Longer ranges use pre-computed aggregates.
 const RAW_PERIODS = ["24h", "7d", "30d"];
 
 export async function GET(

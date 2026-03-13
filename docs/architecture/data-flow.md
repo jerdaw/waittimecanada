@@ -30,11 +30,11 @@ graph TD
 
 ## 2. Aggregation Pipeline (Transformation)
 
-Raw measurements are ephemeral (30-day retention). The aggregation pipeline transforms them into permanent statistical records.
+Raw measurements are retained for historical analysis. The aggregation pipeline also transforms them into permanent statistical records for efficient long-range analytics.
 
 ```mermaid
 graph TD
-    DB[(PostgreSQL<br/>measurements)] -->|Select| Batch[Raw Data Batch<br/>(30-day window)]
+    DB[(PostgreSQL<br/>measurements)] -->|Select| Batch[Raw Data Batch<br/>(full retained history)]
 
     subgraph Aggregation Service
         Batch -->|Group By| Group[Hospital + Methodology]

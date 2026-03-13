@@ -1,10 +1,10 @@
 # Direct VPS Frontend Deployment
 
-**Status:** Active migration target, not yet the live production host
+**Status:** Live production frontend path
 **Last Updated:** 2026-03-13
 
-This document defines the app-local deployment path for moving the Wait Time
-Canada frontend from Netlify to the shared VPS.
+This document defines the app-local deployment path for the Wait Time Canada
+frontend now running on the shared VPS.
 
 Shared-VPS ownership note:
 
@@ -21,10 +21,10 @@ Shared-VPS ownership note:
 
 As of 2026-03-13:
 
-1. `https://wait-time.ca` is still live on Netlify.
-2. The direct-VPS runtime described here is the approved next deployment path,
-   but it is not live until the cutover is completed and `platform-ops`
-   inventory is updated.
+1. `https://wait-time.ca` is live on the shared VPS through host Caddy.
+2. `https://www.wait-time.ca` redirects to the apex host through the same VPS route.
+3. `platform-ops` inventory now records `waittime-frontend` as a live Docker web service.
+4. Netlify should be treated as rollback-only for the frontend path.
 
 ## Target Runtime Shape
 
@@ -120,8 +120,8 @@ PRODUCTION_BASE_URL=https://wait-time.ca ./scripts/production-smoke.sh
 Expected outcome:
 
 1. private and public health return HTTP `200`
-2. `healthy` is `true`
-3. page smoke checks pass for `/`, `/methods`, `/data-quality`, and `/analytics`
+2. page smoke checks pass for `/`, `/methods`, `/data-quality`, and `/analytics`
+3. `/api/health` reflects the current backend freshness state in the database, so `healthy` may be `false` even when the frontend cutover itself is correct
 
 Suggested Caddy shape after cutover:
 
@@ -145,7 +145,8 @@ Rollback is release-based:
 3. rerun `./scripts/deploy-vps-frontend.sh /etc/projects-merge/env/waittime-frontend.env`
 4. repeat the health and smoke verification
 
-## Cutover Rule
+## Current Production Rule
 
-Do not update `platform-ops/inventory/services.yaml` until the VPS container is
-actually serving production traffic and the public checks pass.
+Treat this as the live production path. If a rollback is required, document the
+reason and flip shared status surfaces in `platform-ops` back to rollback mode
+instead of treating Netlify as silently active.

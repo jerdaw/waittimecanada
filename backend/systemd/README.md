@@ -23,7 +23,7 @@ Installed timers:
 Optional timer:
 
 1. `waittime-backend-database-cleanup.timer`
-   - weekly retention cleanup
+   - weekly non-destructive aggregate maintenance
 
 Use the installer:
 
@@ -36,3 +36,8 @@ To also enable the cleanup timer:
 ```bash
 sudo ./scripts/install-vps-backend-systemd.sh --enable --enable-cleanup
 ```
+
+Current note:
+
+1. the cleanup CLI now preserves raw measurements by default
+2. enabling this timer does not delete historical raw rows unless the service command is deliberately changed to include an explicit purge flag

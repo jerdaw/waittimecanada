@@ -1,6 +1,6 @@
 # Direct VPS Backend Deployment
 
-**Status:** Active migration target, not yet the live production scheduler path
+**Status:** Deferred migration target; not the live production scheduler path
 **Last Updated:** 2026-03-13
 
 This document defines the app-local deployment path for moving the Wait Time
@@ -22,7 +22,8 @@ As of 2026-03-13:
 1. production scraper scheduling still runs on GitHub Actions
 2. heartbeat monitoring still runs on GitHub Actions
 3. the managed Neon database remains the production data plane
-4. the direct-VPS backend path described here is the next deployment target, but it is not live until the VPS timers are installed, enabled, and verified
+4. the direct-VPS backend path described here was staged and verified mechanically, but it is not live because the Ontario source timed out repeatedly from the shared VPS during cutover testing
+5. the `waittime-backend-*` timers on the VPS should remain disabled unless a later investigation resolves the Ontario reachability problem
 
 ## Target Runtime Shape
 
@@ -41,6 +42,22 @@ The VPS target is a Python worker release with systemd timers:
    - `waittime-backend-database-cleanup.timer`
 
 The database remains managed in Neon for this wave.
+
+## Current Blocker
+
+The attempted VPS backend cutover was paused after repeated failures reaching
+`https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments`
+from the shared VPS:
+
+1. Playwright navigation timed out from this host
+2. plain `httpx` fetches timed out from this host
+3. plain `curl` from the VPS also timed out
+
+Operational meaning:
+
+1. this is not currently treated as a packaging or deploy-script problem
+2. GitHub Actions remains the live scheduler path because it can still reach the Ontario source
+3. do not re-enable the VPS timers until an Ontario-compatible runtime path is proven
 
 ## Required Env Contract
 
@@ -134,6 +151,11 @@ The systemd installer:
 4. enables scraper, heartbeat, and quality snapshot timers
 5. optionally enables the cleanup timer with `--enable-cleanup`
 
+Cleanup note:
+
+1. the cleanup CLI now preserves raw measurements by default and only deletes old rows when an explicit purge flag is supplied
+2. the optional timer is therefore non-destructive unless an operator deliberately changes the service command
+
 ## Stage And Release From A Workstation
 
 ```bash
@@ -164,6 +186,12 @@ Expected outcome:
 3. recent scraper runs write fresh `scraper_status` rows
 4. alerting is configured if `PUSHOVER_*` vars are present
 
+Current reality:
+
+1. frontend verification passed, but backend verification failed on Ontario reachability from the VPS
+2. the timers were therefore disabled again
+3. this runbook remains useful for a future retry, but it is not the live production scheduler path today
+
 ## Rollback
 
 Rollback is release-based:
@@ -188,3 +216,6 @@ Do not disable the GitHub Actions backend schedulers until:
 1. the VPS scraper timer has completed successfully at least once
 2. the heartbeat timer verifies fresh rows on the VPS path
 3. rollback to GitHub Actions remains straightforward
+
+As of 2026-03-13, keep GitHub Actions live and treat the VPS backend path as
+deferred.

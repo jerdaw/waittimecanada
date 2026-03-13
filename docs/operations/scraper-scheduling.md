@@ -5,7 +5,7 @@
 
 > Temporary cost-control mode (updated February 21, 2026): scraper cadence is `every 4 hours` with heartbeat stale threshold `250` minutes. Review on or before **March 9, 2026** and revert to normal cadence when Neon transfer usage stabilizes.
 >
-> Migration note (March 13, 2026): this document describes the current live GitHub Actions scheduler path. The active replacement target is the VPS worker path documented in `docs/operations/direct-vps-backend.md`.
+> Migration note (March 13, 2026): this document still describes the current live GitHub Actions scheduler path. A same-host VPS worker attempt was paused after the Ontario source timed out from that host; see `docs/operations/direct-vps-backend.md`.
 
 ---
 

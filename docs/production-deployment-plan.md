@@ -1,19 +1,20 @@
 # Production Deployment Plan - Historical Netlify Baseline
 
-**Status:** Historical reference; Netlify remains current live hosting until VPS cutover
+**Status:** Historical reference; Netlify is no longer the live frontend host
 **Date:** March 12, 2026
-**Platform:** Netlify (release-gated; active)
+**Platform:** Netlify (historical production baseline; rollback-only)
 
-> Update (March 12, 2026): Netlify deploys are active again, the application is serving successfully from the Netlify site, `https://wait-time.ca` is live with a valid Let's Encrypt certificate, `https://www.wait-time.ca` redirects to the canonical host, and production smoke passes against the canonical domain.
+> Update (March 12, 2026): Netlify deploys were restored and the application served successfully from the Netlify site, `https://wait-time.ca` was live with a valid Let's Encrypt certificate, `https://www.wait-time.ca` redirected to the canonical host, and production smoke passed against the canonical domain.
 >
 > Runtime usage controls implemented:
 > - `/api/health` polling reduced to every 5 minutes and only while tab is visible.
 > - Read-heavy API routes now send short CDN cache headers (typically 2-10 minutes).
 > - Admin, geolocation, and export routes are `Cache-Control: no-store`.
 >
-> Direct-VPS note (March 13, 2026): the active migration target for future
-> hosting is documented in `docs/operations/direct-vps-frontend.md`. Do not
-> treat this file as the source of truth for the VPS path.
+> Direct-VPS note (March 13, 2026): the frontend is now live on the shared VPS
+> and the active runtime path is documented in
+> `docs/operations/direct-vps-frontend.md`. Treat this file as historical
+> Netlify baseline context only.
 
 ---
 
@@ -21,9 +22,9 @@
 
 ### What's Already Built
 - ✅ **Backend scrapers:** Python with GitHub Actions cron (4-hour cost-control schedule active)
-- ✅ **Frontend:** Next.js 14 with SSR, deployed on Netlify
+- ✅ **Frontend:** Next.js 14 with SSR, now deployed on the shared VPS
 - ✅ **Database:** Neon PostgreSQL (already in production)
-- ✅ **CI/CD:** GitHub Actions for scrapers, cleanup, and monitoring
+- ✅ **CI/CD:** GitHub Actions for scrapers, maintenance, and monitoring
 
 ### What Needs Deployment
 1. **No blocking deployment tasks remain**
@@ -283,7 +284,7 @@ Instructions will depend on platform chosen (see platform-specific guides below)
 | Scraper fails silently | Medium | High | Heartbeat monitor (already configured) |
 | Database connection limit hit | Low | Medium | Neon free tier: 100 connections, should be sufficient |
 | API rate limits exceeded | Low | Low | No external APIs except Mapbox (generous free tier) |
-| Storage exceeds free tier | Low | Medium | 30-day retention policy (already implemented) |
+| Storage exceeds free tier | Low | Medium | Raw history is preserved by default; monitor growth and archive later if needed |
 | Bad data published | Medium | High | Verification queue (already implemented) |
 
 ---
@@ -305,7 +306,7 @@ After deployment, monitor for 24-48 hours:
 3. **Database**
    - Monitor connection count in Neon dashboard
    - Verify measurements are being inserted
-   - Check cleanup job runs daily
+   - Check maintenance / aggregate refresh runs as intended
 
 ---
 

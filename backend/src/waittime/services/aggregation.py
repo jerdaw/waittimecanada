@@ -1,9 +1,9 @@
 """Service for computing and storing measurement aggregates.
 
 Computes hourly, daily, weekly, and monthly summary statistics from raw
-measurements and persists them as permanent aggregates. These aggregates
-survive the 30-day raw measurement retention window, enabling longitudinal
-research and long-range trend analysis.
+measurements and persists them as permanent aggregates. The aggregates keep
+long-range analytics efficient even when raw measurements are retained
+indefinitely for historical analysis.
 """
 
 import logging

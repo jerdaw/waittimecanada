@@ -79,11 +79,11 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ---
 
-### 6. `database-cleanup.yml` - Measurement Retention Cleanup
+### 6. `database-cleanup.yml` - Database Maintenance
 
 **Trigger:** currently manual dispatch only (scheduled cron temporarily paused due to GitHub Actions quota exhaustion).
 
-**Purpose:** Enforce retention policy for old measurement rows.
+**Purpose:** Refresh recent aggregates and provide an operator-run maintenance entry point. Raw measurement deletion is no longer the default behavior, and the workflow also reports `measurements` storage growth.
 
 **Optimization controls:**
 - Serialized concurrency group.
@@ -127,11 +127,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 **Trigger:** push to `main` for `database/migrations/**` + manual dispatch.
 
-**Purpose:** Apply database migrations through Supabase tooling.
-
-Note: the current production database is Neon PostgreSQL. Treat this workflow as
-legacy/optional unless your environment is explicitly configured for Supabase CLI.
-Default local migration path remains `python backend/run_migrations.py`.
+**Purpose:** Apply database migrations to the live Neon PostgreSQL database using `backend/run_migrations.py`.
 
 **Optimization controls:**
 - Serialized concurrency per ref.
@@ -151,9 +147,6 @@ Default local migration path remains `python backend/run_migrations.py`.
 - `PRODUCTION_BASE_URL` (required for scheduled smoke checks and optional readiness smoke)
 
 ### Database migration workflow
-- `SUPABASE_ACCESS_TOKEN`
-- `SUPABASE_PROJECT_ID`
-- `SUPABASE_URL`
 - `ALERT_EMAIL_USER`
 - `ALERT_EMAIL_PASSWORD`
 - `ALERT_EMAIL_TO`

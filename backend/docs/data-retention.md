@@ -2,54 +2,62 @@
 
 ## Overview
 
-Wait Time Canada implements a **30-day retention policy** for raw measurement data to ensure storage safety and prevent database bloat. This is a core architectural requirement from the strategic plan.
+Wait Time Canada now preserves raw measurement rows for long-term historical
+analysis by default. The maintenance tooling still refreshes aggregates and
+reports data-age statistics, but raw measurement deletion is no longer the
+standard path.
 
-## Why 30 Days?
+## Current Policy
 
-1. **Storage Safety**: We hash (not store) raw HTML payloads to avoid storing full web pages
-2. **Database Performance**: Keeping unbounded historical data degrades query performance
-3. **Privacy**: Minimizing data retention reduces privacy risk
-4. **Cost Control**: Prevents runaway storage costs on cloud database (Neon)
+1. Raw `measurements` rows are retained indefinitely unless an operator explicitly runs a purge.
+2. `measurement_aggregates` remain permanent and continue to power long-range analytics efficiently.
+3. We still hash payloads instead of storing full HTML bodies.
+4. Exact duplicate observations are now rejected at insert time.
+5. Storage growth should now be monitored instead of controlled through automatic deletion.
 
-## What Gets Deleted?
+## What Gets Preserved?
 
-After 30 days, the following are **automatically deleted**:
+The default maintenance path **does NOT delete**:
 - Individual measurement records from the `measurements` table
 - Associated `raw_payload_hash` and `raw_payload_snippet` fields
-
-## What Is Preserved?
-
-The cleanup process **does NOT delete**:
 - Hospital metadata (name, location, verification status)
 - Source configurations
 - Scraper heartbeat/health status
-- Any aggregated analytics you compute beforehand
+- Aggregated analytics
+- Daily quality snapshots
+- Methodology change events
 
-## Automated Cleanup
+## Automated Maintenance
 
-### GitHub Actions (Recommended)
+### GitHub Actions
 
-The cleanup runs automatically via GitHub Actions:
-- **Schedule**: Daily at 2 AM UTC
+The maintenance workflow is currently manual-dispatch only:
 - **Workflow**: `.github/workflows/database-cleanup.yml`
-- **Manual Trigger**: Can be triggered manually from Actions tab
+- **Default behavior**: refresh aggregates without forcing a full-table age scan
+- **Purge behavior**: only if the CLI is run with an explicit purge flag
 
-### Manual Cleanup
+### Manual Maintenance
 
-You can also run cleanup manually:
+You can also run maintenance manually:
 
 ```bash
-# Preview what would be deleted
+# Preview current maintenance / optional purge behavior
 python -m waittime.cli.cleanup --dry-run
 
-# Actually delete old measurements (30 days)
+# Refresh aggregates without deleting raw rows
 python -m waittime.cli.cleanup
 
-# Use custom retention period (e.g., 60 days)
-python -m waittime.cli.cleanup --retention-days 60
+# Refresh aggregates and also collect age statistics
+python -m waittime.cli.cleanup --with-stats
+
+# Explicitly purge old raw measurements (only if you really mean to)
+python -m waittime.cli.cleanup --purge-old-measurements --retention-days 60
 
 # Verbose output with statistics
 python -m waittime.cli.cleanup --verbose
+
+# Inspect measurements table growth
+python -m waittime.cli.storage_stats --relation measurements
 ```
 
 ## Monitoring
@@ -64,7 +72,10 @@ stats = db.get_measurement_age_stats()
 
 print(f"Total measurements: {stats['total_measurements']}")
 print(f"Oldest measurement: {stats['oldest_measurement_age_days']} days")
-print(f"Measurements needing cleanup: {stats['measurements_older_than_30_days']}")
+print(
+    f"Measurements older than {stats['older_than_days_threshold']} days: "
+    f"{stats['measurements_older_than_threshold']}"
+)
 ```
 
 ### Example Output
@@ -76,33 +87,46 @@ Newest measurement: 0.2 days old
 Measurements older than 30 days: 1,847
 ```
 
-## Implementation Details
+### Check Storage Growth
 
-### Database Method
-
-```python
-# In DatabaseService
-deleted_count = db.cleanup_old_measurements(retention_days=30)
-# Returns: number of measurements deleted
+```bash
+python -m waittime.cli.storage_stats --relation measurements
+python -m waittime.cli.storage_stats --relation measurements --exact-count --json
 ```
 
-### SQL Query
+## Implementation Details
+
+### Default Maintenance Flow
+
+```python
+# In cleanup CLI
+# 1. optionally collect full-table age stats (--dry-run/--verbose/--with-stats)
+# 2. refresh recent hourly/daily aggregates
+# 3. skip deletion unless --purge-old-measurements is provided
+```
+
+### Insert-Time Efficiency Guards
+
+- Exact duplicate raw observations are skipped via a database uniqueness guard.
+- A BRIN index on `measurements.timestamp_utc` keeps long-range append-heavy scans efficient.
+
+### Optional Purge Query
 
 ```sql
 DELETE FROM measurements
-WHERE timestamp_utc < NOW() - INTERVAL '30 days'
+WHERE timestamp_utc < NOW() - INTERVAL '60 days'
 ```
 
 ## Best Practices
 
-1. **Compute Aggregates First**: If you need historical trends, compute them **before** the 30-day mark
-2. **Monitor Regularly**: Use `get_measurement_age_stats()` to monitor data age
-3. **Alert on Failures**: The GitHub Action should notify you if cleanup fails
-4. **Test Retention Period**: Use `--dry-run` before changing retention period
+1. **Keep raw history unless you have a clear reason to purge it**.
+2. **Monitor storage regularly**: use database size checks and measurement age stats.
+3. **Keep aggregate maintenance running** so analytics stay efficient even with full raw retention.
+4. **Use `--dry-run` before any purge**.
 
 ## Analytics & Reporting
 
-If you need long-term analytics, create aggregated views:
+Long-term analytics should continue to prefer aggregate tables:
 
 ```sql
 -- Example: Daily average wait times (keep forever)
@@ -116,15 +140,15 @@ FROM measurements
 GROUP BY DATE(timestamp_utc), hospital_id;
 ```
 
-Then run this aggregation **before** the 30-day cleanup.
+The aggregate pipeline reduces read cost for analytics, but it is no longer a prerequisite for preserving raw history.
 
 ## Troubleshooting
 
-### "Cleanup deleted 0 measurements"
+### "Deleted 0 measurements"
 
-This means all measurements are newer than the retention period. This is normal if:
-- The database was recently created
-- Scrapers haven't been running for 30 days yet
+This is expected if:
+- you did not pass `--purge-old-measurements`
+- all measurements are newer than the requested purge threshold
 
 ### "Database connection failed"
 
@@ -137,15 +161,15 @@ echo $DATABASE_URL
 
 ### Manual Recovery
 
-If cleanup accidentally deletes data you needed:
+If a purge accidentally deletes data you needed:
 
 1. **Restore from database backup** (Neon provides point-in-time recovery)
 2. **Re-run scrapers** to collect fresh data
-3. Historical data is gone, but new data will accumulate
+3. Future raw history will continue accumulating once the purge path is no longer used
 
 ## Configuration
 
-The retention period is configurable:
+The optional purge period is configurable:
 
 ```python
 # In code
@@ -154,30 +178,27 @@ db.cleanup_old_measurements(retention_days=60)
 
 ```bash
 # Via CLI
-python -m waittime.cli.cleanup --retention-days 60
+python -m waittime.cli.cleanup --purge-old-measurements --retention-days 60
 ```
 
 ```yaml
-# In GitHub Actions
-env:
-  RETENTION_DAYS: 60
+# In GitHub Actions or systemd, add an explicit purge flag only if you intend to delete raw history
 ```
 
-**Default**: 30 days (recommended)
+**Default policy**: preserve raw measurements indefinitely
 
 ## Security Considerations
 
 - Cleanup requires `DATABASE_URL` with write permissions
 - The GitHub Action uses repository secrets for database access
-- Always test with `--dry-run` in production first
-- Consider running cleanup during low-traffic hours (2 AM UTC)
+- Always test any purge command with `--dry-run` in production first
+- Treat purging raw history as an operator decision, not a routine task
 
 ## Future Enhancements
 
 Potential improvements for v2:
 
-- [ ] Selective retention (keep high-priority hospital data longer)
-- [ ] Automated aggregate computation before cleanup
-- [ ] Slack/email notifications on cleanup completion
-- [ ] Retention policy per province (different data retention laws)
-- [ ] Archive to cheaper cold storage instead of delete
+- [ ] Storage growth dashboards / alerts
+- [ ] Archive-to-cold-storage path if Neon cost becomes material
+- [ ] Slack/email notifications on maintenance completion
+- [ ] Purge safety rails requiring a second explicit confirmation flag

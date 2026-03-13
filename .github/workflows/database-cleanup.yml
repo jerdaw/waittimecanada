@@ -1,7 +1,8 @@
-name: Database Cleanup
+name: Database Maintenance
 
 # PAUSED (2026-02-22): Scheduled runs disabled due to exhausted GitHub Actions quota.
-# Keep manual dispatch available if a retention cleanup is needed before quota reset.
+# Keep manual dispatch available for non-destructive aggregate maintenance or
+# explicit operator-approved purge work.
 on:
   workflow_dispatch:  # Allow manual triggering
 
@@ -28,22 +29,30 @@ jobs:
         run: |
           pip install -e .
 
-      - name: Run database cleanup
+      - name: Run database maintenance
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.cleanup --verbose
+          python -m waittime.cli.cleanup
 
-      - name: Report cleanup results
+      - name: Report measurement storage footprint
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python -m waittime.cli.storage_stats --relation measurements
+
+      - name: Report maintenance results
         if: success()
         run: |
-          echo "✅ Database cleanup completed successfully"
-          echo "Old measurements (>30 days) have been purged"
-          echo "This maintains our storage safety policy"
+          echo "✅ Database maintenance completed successfully"
+          echo "Recent aggregates were refreshed"
+          echo "Raw measurements were preserved unless an explicit purge flag was supplied"
+          echo "Measurement table storage stats were reported"
 
       - name: Notify on failure
         if: failure()
         run: |
-          echo "❌ Database cleanup failed!"
+          echo "❌ Database maintenance failed!"
           echo "Manual investigation required"

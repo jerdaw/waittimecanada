@@ -212,7 +212,7 @@ CREATE TABLE measurements (
 | --------------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
 | **Misinterpretation** | High     | **Mitigation:** The "Methodology Divergence Warning." Never show a raw comparison table without footnotes. |
 | **Silent Failure**    | High     | **Mitigation:** "Heartbeat Monitor" on frontend + "Dead Man's Switch" email alert.                         |
-| **Storage Limits**    | Med      | **Mitigation:** Store Payload *Hash* only. Retention Policy deletes raw rows > 30 days.                    |
+| **Storage Limits**    | Med      | **Mitigation:** Store Payload *Hash* only. Preserve raw history by default, monitor growth, and add archival controls if needed. |
 | **Triage Liability**  | Critical | **Mitigation:** REMOVED Symptom Router. Replaced with Province-Aware Telehealth Directory.                 |
 
 ---

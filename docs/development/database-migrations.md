@@ -161,7 +161,7 @@ The `database-migrate.yml` workflow can be triggered manually to apply migration
 |---|---|---|
 | `sources` | 4 | Provincial data source metadata |
 | `hospitals` | 380+ | Facility metadata with geo-coordinates |
-| `measurements` | 100k+ (30d retention) | Wait time audit log with ontology tags |
+| `measurements` | 100k+ (indefinite raw retention) | Wait time audit log with ontology tags |
 | `measurement_aggregates` | permanent | Statistical summaries (hourly → monthly) |
 | `scraper_status` | 4 | Heartbeat monitoring per source |
 | `data_quality_snapshots` | daily | Scraper reliability metrics |

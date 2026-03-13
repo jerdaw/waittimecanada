@@ -155,12 +155,20 @@ class QuebecScraper(BaseScraper):
                         raise
 
                 try:
-                    self.db.insert_measurements(measurements)
+                    inserted_count = self.db.insert_measurements(measurements)
                 except Exception as error:
                     self._record_failure(error, "persist", start_time)
                     failure_recorded = True
                     raise
-                logger.info(f"Saved {len(measurements)} measurements to database")
+                duplicate_count = len(measurements) - inserted_count
+                if duplicate_count > 0:
+                    logger.info(
+                        "Persisted %s measurements to database (%s exact duplicates skipped)",
+                        inserted_count,
+                        duplicate_count,
+                    )
+                else:
+                    logger.info("Persisted %s measurements to database", inserted_count)
 
             run_duration_ms = self._elapsed_ms(start_time)
             if self._heartbeat is not None:

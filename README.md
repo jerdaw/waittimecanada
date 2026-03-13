@@ -41,7 +41,7 @@ Provincial health authorities report ER wait times using **fundamentally differe
 ## Limitations
 
 - Scraper freshness currently reflects a 4-hour GitHub Actions cadence in cost-control mode rather than continuous ingestion.
-- A direct-VPS migration is now in progress for both the frontend and backend scheduler path; Netlify and GitHub Actions remain live until VPS cutover verification passes.
+- The frontend is now live on the shared VPS at `https://wait-time.ca`; the backend scheduler path remains on GitHub Actions because the Ontario source is not reachable from this VPS.
 - Provincial methodology labels are inferred from public documentation and can lag unannounced reporting changes by source organizations.
 - Reported wait times and occupancy values are limited to what provinces publish; the platform cannot surface unreported overcrowding or internal flow constraints.
 - The equity layer is currently implemented for Ontario only and should not be generalized to other provinces without province-specific source and tract validation.
@@ -180,7 +180,7 @@ graph TD
   - DatabaseService, AggregationService, DataQualityService
   - AnomalyDetectionService, MethodologyChangeDetector
   - GeocodingService (Nominatim), HeartbeatService
-- **CLI Tools:** Scraper runner, database cleanup, seeding, aggregation, region mapping
+- **CLI Tools:** Scraper runner, database maintenance, storage stats, seeding, aggregation, region mapping
 
 ### Frontend
 - **Framework:** Next.js 14 App Router + TypeScript
@@ -335,7 +335,8 @@ python -m waittime.cli.scraper --dry-run --all    # Test without DB writes
 # Maintenance
 python -m waittime.cli.check_heartbeat            # Verify scraper health
 python -m waittime.cli.aggregate --backfill       # Regenerate aggregates
-python -m waittime.cli.cleanup --dry-run          # Preview cleanup
+python -m waittime.cli.cleanup --dry-run          # Preview maintenance / optional purge
+python -m waittime.cli.storage_stats              # Inspect measurements table growth
 
 # Testing
 pytest tests/unit                                  # Unit tests only
@@ -422,7 +423,7 @@ waittimecanada/
 - **Scraper Cron:** Runs every 4 hours via GitHub Actions in current cost-control mode
 - **Heartbeat Monitor:** Checks scraper health every 30 minutes
 - **Failure Alerts:** Pushover notifications for stale data or errors
-- **Database Cleanup:** Automated retention policy (30-day measurement rolloff)
+- **Database Maintenance:** Aggregates refreshed without deleting raw measurements by default
 
 ### CI/CD Pipelines
 - **Frontend CI:** Type checking, linting, unit tests
@@ -431,8 +432,8 @@ waittimecanada/
 - **Docs CI:** Documentation quality checks
 
 ### Deployment Configuration
-- **Frontend:** Netlify today; direct-VPS migration active
-- **Backend:** GitHub Actions runners today; direct-VPS migration active
+- **Frontend:** Shared VPS via host Caddy + loopback Docker container
+- **Backend:** GitHub Actions runners remain live; VPS backend cutover is deferred on Ontario reachability from this host
 - **Database:** Neon PostgreSQL (free tier: 512 MB)
 - **Secrets Management:** GitHub Secrets for `DATABASE_URL`, `PUSHOVER_*`, `MAPBOX_TOKEN`
 
