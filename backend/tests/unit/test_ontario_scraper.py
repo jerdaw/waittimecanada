@@ -1,9 +1,16 @@
 """Unit tests for Ontario scraper."""
 
+from unittest.mock import MagicMock, patch
+
 import pytest
 
 from waittime.core import EndEvent, MetricFamily, PatientScope, StartEvent, StatisticType
-from waittime.scrapers.ontario import OntarioScraper, create_ontario_source
+from waittime.scrapers.ontario import (
+    ONTARIO_GOTO_TIMEOUT_MS,
+    ONTARIO_TABLE_SELECTOR_TIMEOUT_MS,
+    OntarioScraper,
+    create_ontario_source,
+)
 
 
 @pytest.mark.unit
@@ -140,6 +147,32 @@ class TestOntarioScraper:
         """Handle empty HTML gracefully."""
         measurements = scraper.parse("<html><body></body></html>")
         assert measurements == []
+
+    def test_fetch_waits_for_domcontentloaded_and_table(self, scraper):
+        """Ontario fetch should avoid waiting for the full load event."""
+        mock_page = MagicMock()
+        mock_page.content.return_value = "<table></table>"
+        mock_browser = MagicMock()
+        mock_browser.new_page.return_value = mock_page
+        mock_playwright = MagicMock()
+        mock_playwright.chromium.launch.return_value = mock_browser
+
+        with patch("waittime.scrapers.ontario.sync_playwright") as mock_sync_playwright:
+            mock_sync_playwright.return_value.__enter__.return_value = mock_playwright
+
+            html = scraper.fetch("https://example.com/ontario")
+
+        assert html == "<table></table>"
+        mock_page.goto.assert_called_once_with(
+            "https://example.com/ontario",
+            timeout=ONTARIO_GOTO_TIMEOUT_MS,
+            wait_until="domcontentloaded",
+        )
+        mock_page.wait_for_selector.assert_called_once_with(
+            "table",
+            timeout=ONTARIO_TABLE_SELECTOR_TIMEOUT_MS,
+        )
+        mock_browser.close.assert_called_once()
 
     def test_parse_no_valid_wait_times(self, scraper):
         """Handle HTML with hospitals but no valid wait times."""

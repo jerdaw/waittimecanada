@@ -40,6 +40,9 @@ from waittime.scrapers.observability import (
 
 logger = logging.getLogger(__name__)
 
+ONTARIO_GOTO_TIMEOUT_MS = 90_000
+ONTARIO_TABLE_SELECTOR_TIMEOUT_MS = 45_000
+
 
 class OntarioScraper(BaseScraper):
     """Scraper for Ontario HQOntario emergency wait times.
@@ -106,12 +109,21 @@ class OntarioScraper(BaseScraper):
                 browser = p.chromium.launch(headless=True)
                 page = browser.new_page()
 
-                # Navigate to page
-                page.goto(target_url, timeout=PLAYWRIGHT_PAGE_TIMEOUT_MS)
+                # HQOntario can stall on third-party assets; wait for the DOM
+                # rather than the full page load event, then wait explicitly
+                # for the data table we actually need.
+                page.goto(
+                    target_url,
+                    timeout=max(PLAYWRIGHT_PAGE_TIMEOUT_MS, ONTARIO_GOTO_TIMEOUT_MS),
+                    wait_until="domcontentloaded",
+                )
 
                 # Wait for data table to load
                 # HQOntario uses dynamic loading, so we need to wait
-                page.wait_for_selector("table", timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS)
+                page.wait_for_selector(
+                    "table",
+                    timeout=max(PLAYWRIGHT_SELECTOR_TIMEOUT_MS, ONTARIO_TABLE_SELECTOR_TIMEOUT_MS),
+                )
 
                 # Give extra time for all rows to render
                 page.wait_for_timeout(PLAYWRIGHT_RENDER_WAIT_MS)
