@@ -102,3 +102,5 @@ Migrations live in `backend/migrations/`.
 - `docs/architecture/api.md`
 - `docs/planning/roadmap.md`
 - `docs/adr/0002-metric-ontology.md`
+- `docs/operations/direct-vps-backend.md`
+- `backend/systemd/README.md`

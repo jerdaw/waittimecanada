@@ -4,9 +4,17 @@
 
 **Progress:** Production Domain Launch Complete (2026-03-12) | M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | CI/Tooling Maintenance Complete (2026-02-23) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived
 
-**Strategic Direction:** **Admissions strengthening phase active (2026-03-12).** Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). Focus remains on real-world engagement, external validation, and public-facing artifacts. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for the full phased plan.
+**Strategic Direction:** **Admissions strengthening phase remains active (2026-03-12), with a parallel full direct-VPS migration track started on 2026-03-13.** Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). Focus remains on real-world engagement, external validation, public-facing artifacts, and replacing Netlify plus GitHub Actions hosting with the shared VPS pattern used by other projects. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for the admissions plan, `docs/operations/direct-vps-frontend.md` for the frontend path, and `docs/operations/direct-vps-backend.md` for the backend worker path.
 
 **Deployment Note (2026-03-12):** Frontend hosting is live on Netlify, `https://wait-time.ca` presents a valid Let's Encrypt certificate, `https://www.wait-time.ca` redirects to the canonical host, and production smoke passes against the canonical domain.
+
+**Migration Note (2026-03-13):** The next runtime objective is to move the full production stack onto the shared VPS:
+
+- frontend via host Caddy + a loopback-bound Docker container
+- backend scrapers/heartbeat/quality jobs via a Python release plus systemd timers
+- Neon remains the managed production database in this wave
+
+Netlify and GitHub Actions remain the live hosting/scheduler paths until VPS verification passes.
 
 ---
 
@@ -53,6 +61,8 @@
 
 **Admissions strengthening plan active (2026-03-12).** Production launch verification is complete. Immediate work now shifts to credibility artifacts and post-launch follow-through: A1 (personal author bio), A3 (real Zenodo DOI), A4 (stakeholder outreach), A6/A7 (case study + quantified findings), and B2-B4 (analytics, launch post, walkthrough). See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
 
+**Parallel ops track (2026-03-13):** prepare and execute the full Wait Time Canada move to the shared VPS. Immediate tasks are frontend Docker packaging, backend timer packaging, env contract finalization, release/deploy script validation, host Caddy cutover prep, and post-cutover verification for both surfaces.
+
 Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT data is available; M35 (Nova Scotia scraper) when bandwidth allows. Both are Phase D (deferred) in the admissions plan.
 
 ## Roadmap Operating Model
@@ -70,11 +80,11 @@ Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT d
 - Item status reflected in this roadmap and no duplicate open tasks remain.
 
 ### Release and Cost Policy (Updated 2026-03-12)
-- **Netlify Deploys:** Active again.
+- **Netlify Deploys:** Active again and still live until frontend VPS cutover completes.
 - **Public Hosting:** `https://wait-time.ca` is live and has passed HTTPS, redirect, and production smoke verification.
-- Scraper reliability workflows (`scraper-cron`, heartbeat monitor, readiness checks) remain active on GitHub Actions.
-- Temporary cost-control mode is active: `scraper-cron` at `0 */4 * * *` and heartbeat `--max-age 250`.
-- Post-launch target: once cost posture is acceptable and production verification is stable, review returning `scraper-cron` to `*/20`.
+- **Backend Scheduling:** still live on GitHub Actions until VPS timers are installed and proven.
+- Temporary cost-control mode is active on the current GitHub Actions backend path: `scraper-cron` at `0 */4 * * *` and heartbeat `--max-age 250`.
+- After VPS backend cutover, retire the GitHub Actions scheduler path instead of restoring the old `*/20` cadence there.
 
 ### Focus Shift (2026-02-25)
 Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The gap is in **real-world engagement, external validation, and public-facing artifacts**. See the [Admissions Strengthening Plan](implementation/admissions-strengthening-plan.md) for the full phased strategy including analytical rationale (original plan, devil's advocate, steelman, and final synthesis).
@@ -91,6 +101,14 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [x] **P1 / Ops: Harden Netlify release gate** — M32 Complete
 - [x] **P1 / Divergence Briefs in analytics + export** — M32 Complete
 - [x] **P2 / Historical occupancy trends** — M33 Complete
+
+### Active Ops Track: Direct VPS Full-Service Migration
+
+- [x] **P1 / Add frontend VPS runtime packaging** — Frontend Dockerfile, standalone Next.js output, `.dockerignore`, and deploy/release helpers
+- [x] **P1 / Add backend VPS runtime packaging** — Backend deploy/release helpers, systemd templates, and verification script
+- [ ] **P1 / Finalize VPS env contracts** — Confirm `/etc/projects-merge/env/waittime-frontend.env` and `/etc/projects-merge/env/waittime-backend.env`
+- [ ] **P1 / Host cutover preparation** — Add Caddy route, release roots, loopback bind target, backend timers, and Playwright runtime deps on the shared VPS
+- [ ] **P1 / Cutover verification** — Frontend private/public health, production smoke, backend timer health, and rollback proof
 
 ### Phase A: Immediate Credibility Cleanup
 [Full details: admissions-strengthening-plan.md §Phase A](implementation/admissions-strengthening-plan.md#phase-a-immediate-before-march-9--no-live-url-required)

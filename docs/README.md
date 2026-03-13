@@ -13,6 +13,8 @@ This directory is the documentation control plane for Wait Time Canada.
 - API contracts: `docs/API.md`
 - Architecture overview: `docs/architecture/index.md`
 - ADRs: `docs/adr/`
+- Direct-VPS backend deploy path: `docs/operations/direct-vps-backend.md`
+- Direct-VPS frontend deploy path: `docs/operations/direct-vps-frontend.md`
 - Development setup: `docs/development/setup.md`
 - Testing standards: `docs/development/testing-guidelines.md`
 - Documentation standards: `docs/development/documentation-guidelines.md`

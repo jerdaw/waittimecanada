@@ -1,0 +1,17 @@
+[Unit]
+Description=Wait Time Canada backend heartbeat monitor
+Wants=network-online.target
+After=network-online.target
+ConditionPathExists=/etc/projects-merge/env/waittime-backend.env
+ConditionPathExists=/srv/apps/waittime-backend/current/backend/.venv/bin/python
+
+[Service]
+Type=oneshot
+User=__WAITTIME_USER__
+Group=__WAITTIME_GROUP__
+WorkingDirectory=/srv/apps/waittime-backend/current/backend
+EnvironmentFile=/etc/projects-merge/env/waittime-backend.env
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=6
+ExecStart=/srv/apps/waittime-backend/current/backend/.venv/bin/python -m waittime.cli.check_heartbeat --max-age 250 --max-consecutive-failures 1

@@ -1,0 +1,19 @@
+[Unit]
+Description=Wait Time Canada backend scraper run
+Wants=network-online.target
+After=network-online.target
+ConditionPathExists=/etc/projects-merge/env/waittime-backend.env
+ConditionPathExists=/srv/apps/waittime-backend/current/backend/.venv/bin/python
+
+[Service]
+Type=oneshot
+User=__WAITTIME_USER__
+Group=__WAITTIME_GROUP__
+WorkingDirectory=/srv/apps/waittime-backend/current/backend
+EnvironmentFile=/etc/projects-merge/env/waittime-backend.env
+Environment=PLAYWRIGHT_BROWSERS_PATH=/srv/apps/waittime-backend/shared/playwright-browsers
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=6
+TimeoutStartSec=30m
+ExecStart=/srv/apps/waittime-backend/current/backend/.venv/bin/python -m waittime.cli.scraper --all

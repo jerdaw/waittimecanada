@@ -17,7 +17,7 @@ jobs:
       - name: Run daily quality snapshot
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python -m waittime.cli.snapshot
+        run: python -m waittime.cli.snapshot_quality
       - name: Run drift check
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}

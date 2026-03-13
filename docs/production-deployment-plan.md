@@ -1,6 +1,6 @@
-# Production Deployment Plan - Milestone 3
+# Production Deployment Plan - Historical Netlify Baseline
 
-**Status:** Delivered - Production Domain Live (Retained as Historical Reference)
+**Status:** Historical reference; Netlify remains current live hosting until VPS cutover
 **Date:** March 12, 2026
 **Platform:** Netlify (release-gated; active)
 
@@ -10,6 +10,10 @@
 > - `/api/health` polling reduced to every 5 minutes and only while tab is visible.
 > - Read-heavy API routes now send short CDN cache headers (typically 2-10 minutes).
 > - Admin, geolocation, and export routes are `Cache-Control: no-store`.
+>
+> Direct-VPS note (March 13, 2026): the active migration target for future
+> hosting is documented in `docs/operations/direct-vps-frontend.md`. Do not
+> treat this file as the source of truth for the VPS path.
 
 ---
 

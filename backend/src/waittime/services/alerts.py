@@ -16,6 +16,7 @@ class AlertConfig:
     pushover_user_key: str
     pushover_api_token: str
     enabled: bool = True
+    reference_url: str = "https://github.com/jerdaw/waittimecanada/actions"
 
 
 class AlertService:
@@ -34,6 +35,10 @@ class AlertService:
             pushover_user_key=os.environ.get("PUSHOVER_USER_KEY", ""),
             pushover_api_token=os.environ.get("PUSHOVER_API_TOKEN", ""),
             enabled=bool(os.environ.get("ALERTS_ENABLED", "true").lower() == "true"),
+            reference_url=os.environ.get(
+                "ALERTS_REFERENCE_URL",
+                "https://github.com/jerdaw/waittimecanada/actions",
+            ),
         )
 
     def send_alert(
@@ -95,9 +100,9 @@ class AlertService:
         """
         return self.send_alert(
             title=f"⚠️ Scraper Stale: {source_id}",
-            message=f"No heartbeat for {age_minutes} minutes. Check GitHub Actions.",
+            message=f"No heartbeat for {age_minutes} minutes. Check the Wait Time Canada scraper runtime.",
             priority=1,  # High priority
-            url="https://github.com/jerdaw/waittimecanada/actions",
+            url=self.config.reference_url,
         )
 
     def alert_scraper_error(
@@ -126,5 +131,5 @@ class AlertService:
             title=f"🚨 Scraper Error: {source_id}",
             message=f"Classification: {classification} | Error: {error[:200]}",
             priority=1,  # High priority
-            url=run_url or "https://github.com/jerdaw/waittimecanada/actions",
+            url=run_url or self.config.reference_url,
         )

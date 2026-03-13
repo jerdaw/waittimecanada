@@ -1,9 +1,11 @@
 # Scraper Scheduling & Operations
 
-**Last Updated:** 2026-03-03
+**Last Updated:** 2026-03-13
 **Status:** ✅ All 4 provincial scrapers operational
 
 > Temporary cost-control mode (updated February 21, 2026): scraper cadence is `every 4 hours` with heartbeat stale threshold `250` minutes. Review on or before **March 9, 2026** and revert to normal cadence when Neon transfer usage stabilizes.
+>
+> Migration note (March 13, 2026): this document describes the current live GitHub Actions scheduler path. The active replacement target is the VPS worker path documented in `docs/operations/direct-vps-backend.md`.
 
 ---
 

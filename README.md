@@ -23,7 +23,7 @@
 
 - **4 Provinces:** Quebec, Ontario, Alberta, British Columbia
 - **380+ Hospitals:** Near-real-time monitoring across all regions
-- **4-Hour Updates:** Automated data collection via GitHub Actions in current cost-control mode
+- **4-Hour Updates:** Automated data collection currently via GitHub Actions in cost-control mode
 - **First-in-Canada:** Real-time ED stretcher occupancy visualization (Quebec)
 
 ### Why This Matters
@@ -41,6 +41,7 @@ Provincial health authorities report ER wait times using **fundamentally differe
 ## Limitations
 
 - Scraper freshness currently reflects a 4-hour GitHub Actions cadence in cost-control mode rather than continuous ingestion.
+- A direct-VPS migration is now in progress for both the frontend and backend scheduler path; Netlify and GitHub Actions remain live until VPS cutover verification passes.
 - Provincial methodology labels are inferred from public documentation and can lag unannounced reporting changes by source organizations.
 - Reported wait times and occupancy values are limited to what provinces publish; the platform cannot surface unreported overcrowding or internal flow constraints.
 - The equity layer is currently implemented for Ontario only and should not be generalized to other provinces without province-specific source and tract validation.
@@ -105,7 +106,7 @@ graph TD
         BC[BC PHSA<br/>JSON/__NEXT_DATA__]
     end
 
-    subgraph "GitHub Actions"
+    subgraph "Current Scheduler (GitHub Actions)"
         CRON[4-Hour Cron<br/>Scrapers]
         HB[250-Minute Threshold<br/>Heartbeat Monitor]
     end
@@ -430,8 +431,8 @@ waittimecanada/
 - **Docs CI:** Documentation quality checks
 
 ### Deployment Configuration
-- **Frontend:** Netlify (release-gated; project paused for cost control; expected resume **March 9, 2026**)
-- **Backend:** GitHub Actions runners
+- **Frontend:** Netlify today; direct-VPS migration active
+- **Backend:** GitHub Actions runners today; direct-VPS migration active
 - **Database:** Neon PostgreSQL (free tier: 512 MB)
 - **Secrets Management:** GitHub Secrets for `DATABASE_URL`, `PUSHOVER_*`, `MAPBOX_TOKEN`
 

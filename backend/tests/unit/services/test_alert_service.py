@@ -16,11 +16,13 @@ class TestAlertService:
     def test_init_defaults(self, monkeypatch):
         monkeypatch.setenv("PUSHOVER_USER_KEY", "u_key")
         monkeypatch.setenv("PUSHOVER_API_TOKEN", "api_token")
+        monkeypatch.setenv("ALERTS_REFERENCE_URL", "https://example.com/ops")
 
         service = AlertService()
         assert service.config.pushover_user_key == "u_key"
         assert service.config.pushover_api_token == "api_token"
         assert service.config.enabled is True
+        assert service.config.reference_url == "https://example.com/ops"
 
     def test_send_alert_disabled(self):
         config = AlertConfig(pushover_user_key="k", pushover_api_token="t", enabled=False)
@@ -66,16 +68,17 @@ class TestAlertService:
         assert result is False
 
     def test_alert_scraper_stale(self):
-        service = AlertService(AlertConfig("k", "t"))
+        service = AlertService(AlertConfig("k", "t", reference_url="https://example.com/alerts"))
         with patch.object(service, "send_alert", return_value=True) as mock_send:
             result = service.alert_scraper_stale("source_1", 120)
             assert result is True
             mock_send.assert_called_once()
             assert "Scraper Stale: source_1" in mock_send.call_args[1]["title"]
             assert "120 minutes" in mock_send.call_args[1]["message"]
+            assert mock_send.call_args[1]["url"] == "https://example.com/alerts"
 
     def test_alert_scraper_error_truncation(self):
-        service = AlertService(AlertConfig("k", "t"))
+        service = AlertService(AlertConfig("k", "t", reference_url="https://example.com/alerts"))
         long_error = "x" * 300
         with patch.object(service, "send_alert", return_value=True) as mock_send:
             service.alert_scraper_error("source_1", long_error)
@@ -83,3 +86,4 @@ class TestAlertService:
             assert len(message) < 250  # Should be truncated
             assert "unknown/unknown" in message
             assert "Error:" in message
+            assert mock_send.call_args[1]["url"] == "https://example.com/alerts"

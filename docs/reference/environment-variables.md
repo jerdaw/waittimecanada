@@ -21,6 +21,12 @@ Optional:
 - `SENTRY_DSN`: error tracking (optional)
 - `ENVIRONMENT`: `development` or `production`
 - `LOG_LEVEL`: logging level
+- `HEARTBEAT_STALE_THRESHOLD_MINUTES`: backend heartbeat/health threshold override
+- `ALERTS_ENABLED`: set to `false` to suppress Pushover sends
+- `PUSHOVER_USER_KEY`: Pushover user key for scraper alerts
+- `PUSHOVER_API_TOKEN`: Pushover API token for scraper alerts
+- `ALERTS_REFERENCE_URL`: optional alert deep link override; defaults to the current GitHub Actions view unless you point it at the VPS runbook or another operator URL
+- `PLAYWRIGHT_BROWSERS_PATH`: shared Chromium cache path for VPS timers
 
 ## Frontend
 
@@ -32,3 +38,10 @@ Required:
 Recommended:
 
 - `NEXT_PUBLIC_BASE_URL`: canonical base URL for sitemap/robots/metadata (for example, `https://wait-time.ca`)
+- `HEARTBEAT_STALE_THRESHOLD_MINUTES`: health endpoint stale threshold override for production/VPS runtime checks
+
+Deployment notes:
+
+- `NEXT_PUBLIC_MAPBOX_TOKEN` must be present at image build time for the direct-VPS frontend container.
+- `NEXT_PUBLIC_BASE_URL` should be set explicitly in production so metadata, robots, and sitemap output stay canonical after cutover.
+- The direct-VPS backend worker path expects its own env file at `/etc/projects-merge/env/waittime-backend.env`.

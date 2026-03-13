@@ -19,7 +19,9 @@ dependencies = [
 
 [project.scripts]
 scraper = "waittime.cli.scraper:main"
-database_cleanup = "waittime.cli.database_cleanup:main"
+check_heartbeat = "waittime.cli.check_heartbeat:main"
+aggregate = "waittime.cli.aggregate:main"
+database_cleanup = "waittime.cli.cleanup:main"
 export_json = "waittime.cli.export_json:main"
 populate_seed_data = "waittime.cli.populate_seed_data:main"
 snapshot_quality = "waittime.cli.snapshot_quality:main"

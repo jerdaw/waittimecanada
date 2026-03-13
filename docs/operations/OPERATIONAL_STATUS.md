@@ -1,9 +1,11 @@
 # Operational Status Report
 
-**Date:** 2026-03-12
+**Date:** 2026-03-13
 **Status:** ✅ Scrapers Operational | ✅ Production Domain Live
 
 **Addendum (2026-03-12):** The Netlify deployment is live, `https://wait-time.ca` now presents a valid Let's Encrypt certificate, `https://www.wait-time.ca` redirects to the canonical host, and production smoke checks pass against the canonical domain.
+
+**Migration addendum (2026-03-13):** GitHub Actions remains the live backend scheduler path today, but the active migration target is now a shared-VPS backend runtime documented in `docs/operations/direct-vps-backend.md`.
 
 ---
 

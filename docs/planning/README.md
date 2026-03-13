@@ -7,6 +7,8 @@ This directory is the planning control plane for Wait Time Canada.
 - Roadmap: `docs/planning/roadmap.md`
 - Process: `docs/planning/roadmap-process.md`
 - Manual intervention queue: `docs/planning/manual-tasks.md`
+- Active backend migration path: `docs/operations/direct-vps-backend.md`
+- Active deployment migration path: `docs/operations/direct-vps-frontend.md`
 
 ## Active Milestone Plans
 
