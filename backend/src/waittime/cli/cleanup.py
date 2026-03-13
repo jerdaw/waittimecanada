@@ -112,17 +112,19 @@ def main() -> int:
                 logger.info("Raw measurements will be preserved; no purge requested.")
             return 0
 
-        # Refresh recent aggregates during each maintenance run.
-        logger.info("\nRefreshing recent aggregates...")
+        # Refresh recent daily aggregates during each maintenance run.
+        # Hourly backfill is more expensive over GitHub Actions + Neon and should
+        # be handled via explicit aggregation runs when needed.
+        logger.info("\nRefreshing recent daily aggregates...")
         agg_service = AggregationService(db)
 
-        # Reduced lookback range (3 days) to save Neon network transfer.
-        # Since cleanup runs daily, a 3-day buffer is sufficient.
+        # Keep the maintenance window short to limit Neon round-trips while still
+        # covering the current day and a small retry buffer.
         three_days_ago = datetime.now(UTC) - timedelta(days=3)
         agg_counts = agg_service.backfill(
             start_date=three_days_ago,
             end_date=None,
-            period_types=["hourly", "daily"],
+            period_types=["daily"],
         )
         agg_total = sum(agg_counts.values())
         if agg_total > 0:

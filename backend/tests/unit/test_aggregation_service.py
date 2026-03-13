@@ -381,7 +381,7 @@ class TestBackfill:
             _make_measurement_row(value=200.0),
             _make_measurement_row(value=300.0),
         ]
-        mock_db.insert_aggregate.return_value = True
+        mock_db.insert_aggregates.return_value = 1
 
         counts = service.backfill(
             hospital_id="ca-on-test",
@@ -393,6 +393,7 @@ class TestBackfill:
         assert counts["daily"] == 1
         # Should NOT have called get_all_hospital_ids
         mock_db.get_all_hospital_ids.assert_not_called()
+        mock_db.insert_aggregates.assert_called_once()
 
     def test_backfill_all_hospitals(self, service, mock_db) -> None:
         """Should process all visible hospitals when hospital_id is None."""
@@ -404,7 +405,7 @@ class TestBackfill:
         mock_db.get_measurements_in_range.return_value = [
             _make_measurement_row(value=150.0),
         ]
-        mock_db.insert_aggregate.return_value = True
+        mock_db.insert_aggregates.return_value = 1
 
         counts = service.backfill(
             start_date=start,
@@ -427,7 +428,7 @@ class TestBackfill:
         mock_db.get_measurements_in_range.return_value = [
             _make_measurement_row(value=100.0),
         ]
-        mock_db.insert_aggregate.return_value = True
+        mock_db.insert_aggregates.return_value = 1
 
         counts = service.backfill(
             hospital_id="ca-on-test",
@@ -458,7 +459,7 @@ class TestBackfill:
         )
 
         assert counts["daily"] == 1
-        mock_db.insert_aggregate.assert_not_called()
+        mock_db.insert_aggregates.assert_not_called()
 
     def test_backfill_skips_empty_periods(self, service, mock_db) -> None:
         """Should not count periods with no measurements."""
@@ -476,7 +477,7 @@ class TestBackfill:
         )
 
         assert counts["daily"] == 0
-        mock_db.insert_aggregate.assert_not_called()
+        mock_db.insert_aggregates.assert_not_called()
 
     def test_backfill_defaults_to_all_period_types(self, service, mock_db) -> None:
         """Should compute all four period types when none specified."""

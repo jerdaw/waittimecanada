@@ -13,6 +13,7 @@ from waittime.core.enums import (
 from waittime.core.models import (
     Hospital,
     Measurement,
+    MeasurementAggregate,
     Source,
 )
 from waittime.services.database import DatabaseService
@@ -366,6 +367,59 @@ class TestDatabaseService:
 
         stats = db_service.get_relation_storage_stats(exact_count=True)
         assert stats["exact_row_count"] == 1200
+
+    @patch("psycopg2.connect")
+    @patch("psycopg2.extras.execute_values")
+    def test_insert_aggregates_batch(self, mock_execute_values, mock_connect, db_service):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_execute_values.return_value = [(1,), (1,)]
+
+        aggregates = [
+            MeasurementAggregate(
+                hospital_id="hosp1",
+                source_id="src1",
+                period_type="daily",
+                period_start=datetime(2026, 2, 1, tzinfo=UTC),
+                period_end=datetime(2026, 2, 2, tzinfo=UTC),
+                mean_value=100,
+                median_value=100,
+                p90_value=100,
+                min_value=90,
+                max_value=110,
+                std_dev=5,
+                sample_count=3,
+                metric_family="TIME_TO_PROVIDER",
+                start_event="TRIAGE",
+                end_event="PHYSICIAN",
+                statistic_type="MEAN",
+            ),
+            MeasurementAggregate(
+                hospital_id="hosp2",
+                source_id="src1",
+                period_type="daily",
+                period_start=datetime(2026, 2, 1, tzinfo=UTC),
+                period_end=datetime(2026, 2, 2, tzinfo=UTC),
+                mean_value=120,
+                median_value=120,
+                p90_value=120,
+                min_value=100,
+                max_value=140,
+                std_dev=10,
+                sample_count=4,
+                metric_family="TIME_TO_PROVIDER",
+                start_event="TRIAGE",
+                end_event="PHYSICIAN",
+                statistic_type="MEAN",
+            ),
+        ]
+
+        inserted = db_service.insert_aggregates(aggregates)
+        assert inserted == 2
+        mock_execute_values.assert_called_once()
 
     @patch("psycopg2.connect")
     def test_insert_hospital(self, mock_connect, db_service):

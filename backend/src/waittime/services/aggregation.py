@@ -160,6 +160,10 @@ class AggregationService:
         """
         return self.db.insert_aggregate(aggregate)
 
+    def save_aggregates(self, aggregates: list[MeasurementAggregate]) -> int:
+        """Save multiple aggregates to the database in one batch."""
+        return self.db.insert_aggregates(aggregates)
+
     def backfill(
         self,
         hospital_id: str | None = None,
@@ -224,6 +228,7 @@ class AggregationService:
 
         periods = self._generate_periods(period_type, start_date, end_date)
         computed = 0
+        pending_aggregates: list[MeasurementAggregate] = []
 
         for period_start, period_end in periods:
             if period_start in existing:
@@ -233,11 +238,12 @@ class AggregationService:
             if not aggs:
                 continue
 
-            if not dry_run:
-                for agg in aggs:
-                    self.save_aggregate(agg)
-
             computed += len(aggs)
+            if not dry_run:
+                pending_aggregates.extend(aggs)
+
+        if not dry_run and pending_aggregates:
+            return self.save_aggregates(pending_aggregates)
 
         return computed
 

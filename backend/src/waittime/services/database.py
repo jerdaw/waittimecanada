@@ -734,6 +734,57 @@ class DatabaseService:
                 )
                 return cur.rowcount > 0
 
+    def insert_aggregates(self, aggregates: list[MeasurementAggregate]) -> int:
+        """Insert multiple aggregates in one batch.
+
+        Returns the number of newly inserted rows.
+        """
+        if not aggregates:
+            return 0
+
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                rows = [
+                    (
+                        aggregate.hospital_id,
+                        aggregate.source_id,
+                        aggregate.period_type,
+                        aggregate.period_start,
+                        aggregate.period_end,
+                        aggregate.mean_value,
+                        aggregate.median_value,
+                        aggregate.p90_value,
+                        aggregate.min_value,
+                        aggregate.max_value,
+                        aggregate.std_dev,
+                        aggregate.sample_count,
+                        aggregate.metric_family,
+                        aggregate.start_event,
+                        aggregate.end_event,
+                        aggregate.statistic_type,
+                    )
+                    for aggregate in aggregates
+                ]
+
+                inserted = psycopg2.extras.execute_values(
+                    cur,
+                    """
+                    INSERT INTO measurement_aggregates (
+                        hospital_id, source_id,
+                        period_type, period_start, period_end,
+                        mean_value, median_value, p90_value,
+                        min_value, max_value, std_dev, sample_count,
+                        metric_family, start_event, end_event, statistic_type
+                    ) VALUES %s
+                    ON CONFLICT (hospital_id, period_type, period_start, metric_family) DO NOTHING
+                    RETURNING 1
+                    """,
+                    rows,
+                    template="(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    fetch=True,
+                )
+                return len(inserted)
+
     def get_aggregates(
         self,
         hospital_id: str,
