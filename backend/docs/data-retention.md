@@ -3,9 +3,9 @@
 ## Overview
 
 Wait Time Canada now preserves raw measurement rows for long-term historical
-analysis by default. The maintenance tooling still refreshes aggregates and
-reports data-age statistics, but raw measurement deletion is no longer the
-standard path.
+analysis by default. Routine maintenance is intentionally lightweight: it can
+report age or storage statistics, but it no longer performs broad aggregate
+recomputation or raw measurement deletion by default.
 
 ## Current Policy
 
@@ -33,7 +33,7 @@ The default maintenance path **does NOT delete**:
 
 The maintenance workflow is currently manual-dispatch only:
 - **Workflow**: `.github/workflows/database-cleanup.yml`
-- **Default behavior**: refresh aggregates without forcing a full-table age scan
+- **Default behavior**: lightweight maintenance only (no broad aggregate refresh, no full-table age scan)
 - **Purge behavior**: only if the CLI is run with an explicit purge flag
 
 ### Manual Maintenance
@@ -44,10 +44,10 @@ You can also run maintenance manually:
 # Preview current maintenance / optional purge behavior
 python -m waittime.cli.cleanup --dry-run
 
-# Refresh aggregates without deleting raw rows
+# Run lightweight maintenance without deleting raw rows
 python -m waittime.cli.cleanup
 
-# Refresh aggregates and also collect age statistics
+# Collect age statistics too
 python -m waittime.cli.cleanup --with-stats
 
 # Explicitly purge old raw measurements (only if you really mean to)
@@ -101,7 +101,7 @@ python -m waittime.cli.storage_stats --relation measurements --exact-count --jso
 ```python
 # In cleanup CLI
 # 1. optionally collect full-table age stats (--dry-run/--verbose/--with-stats)
-# 2. refresh recent hourly/daily aggregates
+# 2. optionally report storage / age statistics
 # 3. skip deletion unless --purge-old-measurements is provided
 ```
 
@@ -121,7 +121,7 @@ WHERE timestamp_utc < NOW() - INTERVAL '60 days'
 
 1. **Keep raw history unless you have a clear reason to purge it**.
 2. **Monitor storage regularly**: use database size checks and measurement age stats.
-3. **Keep aggregate maintenance running** so analytics stay efficient even with full raw retention.
+3. **Keep storage monitoring running** so growth stays visible even with full raw retention.
 4. **Use `--dry-run` before any purge**.
 
 ## Analytics & Reporting
@@ -140,7 +140,7 @@ FROM measurements
 GROUP BY DATE(timestamp_utc), hospital_id;
 ```
 
-The aggregate pipeline reduces read cost for analytics, but it is no longer a prerequisite for preserving raw history.
+The aggregate pipeline reduces read cost for analytics, but it is no longer part of routine maintenance and it is not a prerequisite for preserving raw history.
 
 ## Troubleshooting
 

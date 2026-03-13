@@ -26,6 +26,7 @@ Add or update an ADR when changing:
 - `docs/adr/0017-domain-rebrand-wait-time-ca.md`
 - `docs/adr/0018-scraper-observability-and-reliability-hardening.md`
 - `docs/adr/0019-occupancy-trend-aggregation.md`
+- `docs/adr/0020-raw-retention-and-stateful-alerting.md`
 
 ## Template
 

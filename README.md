@@ -175,7 +175,7 @@ graph TD
 - **Language:** Python 3.12+
 - **Testing:** pytest with 375+ tests, 77% code coverage
 - **Scrapers:** 4 provincial scrapers (BeautifulSoup, Playwright, JSON extraction)
-- **Database:** Neon PostgreSQL 17 with 9 tables, strict ontology constraints
+- **Database:** Neon PostgreSQL 17 with 10 tables, strict ontology constraints
 - **Services:**
   - DatabaseService, AggregationService, DataQualityService
   - AnomalyDetectionService, MethodologyChangeDetector
@@ -190,11 +190,12 @@ graph TD
 - **API Routes:** 15+ endpoints for hospitals, comparisons, analytics, data quality
 - **Pages:** Home (map + list), /data-quality, /analytics, /methods, /about
 
-### Database Schema (9 Tables)
+### Database Schema (10 Tables)
 - `sources` - Provincial data source metadata
 - `hospitals` - Facility metadata with verification workflow
 - `measurements` - Audit log with ontology tags (payload hashing, not full HTML)
 - `scraper_status` - Heartbeat monitoring
+- `scraper_alert_state` - Stateful alert incident tracking and recovery suppression
 - `measurement_aggregates` - Permanent statistical summaries (hourly/daily/weekly/monthly)
 - `data_quality_snapshots` - Daily scraper reliability metrics
 - `methodology_change_events` - Detected methodology shifts
@@ -205,7 +206,7 @@ graph TD
 - **GitHub Actions:** Scrapers run hourly, heartbeat checks every 30 minutes
 - **Playwright Browsers:** Automated for Ontario/Alberta JavaScript-rendered pages
 - **Failure Alerting:** Pushover notifications for scraper/heartbeat failures
-- **Cost:** ~$240/month GitHub Actions (optimizable to ~$120/month)
+- **Operational Posture:** Hourly scraper cadence + 30-minute heartbeat checks on GitHub Actions with state-change alerting and a 120-minute stale threshold
 
 ---
 

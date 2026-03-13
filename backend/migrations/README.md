@@ -18,7 +18,7 @@ python run_migrations.py
 
 **Output:**
 ```
-Found 13 migration files:
+Found 17 migration files:
 
 Running: 001_create_enums.sql
   ✓ Success
@@ -45,7 +45,7 @@ Migrations use `DO $$ ... EXCEPTION WHEN duplicate_object THEN NULL; END $$;` bl
 NNN_descriptive_name.sql
 ```
 
-- `NNN`: Zero-padded sequential number (001, 002, ..., 013)
+- `NNN`: Zero-padded sequential number (001, 002, ..., 017)
 - `descriptive_name`: Action and target (e.g., `create_enums`, `add_occupancy_columns`)
 - **Always use `.sql` extension** (`.sql.skip` files are intentionally excluded)
 
@@ -59,7 +59,7 @@ Migrations run in **lexicographic order** (alphabetical). The numeric prefix ens
 
 **Behavior:**
 - Reads all `*.sql` files from `backend/migrations/`
-- Sorts alphabetically (001 → 013)
+- Sorts alphabetically (001 → 017)
 - Executes each in a transaction
 - Stops on first error (unless safe duplicate)
 - Safe duplicate errors (already exists): ⚠ Warning, continues
@@ -336,6 +336,22 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 - `idx_scraper_status_last_success_run`
 - `idx_scraper_status_last_error_run`
 - `idx_scraper_status_consecutive_failures`
+
+---
+
+### M31: Raw Retention Efficiency Guards (016)
+
+#### 016_add_measurement_retention_efficiency_guards.sql
+**Purpose:** Support indefinite raw retention safely and efficiently
+**Created:** 2026-03-13
+**Milestone:** M31 (Raw Retention Hardening)
+
+**Changes:**
+- Removes exact historical duplicate raw observations before constraints are added
+- Adds an exact-observation uniqueness guard on `measurements`
+- Adds a BRIN index on `measurements.timestamp_utc`
+
+**Rationale:** Preserve full raw history while preventing exact duplicate growth and keeping append-heavy time scans efficient.
 
 ---
 
@@ -620,7 +636,7 @@ GRANT CREATE ON SCHEMA public TO your_user;
 
 ## Schema Visualization
 
-### Current Schema (9 tables)
+### Current Schema (10 tables)
 
 ```
 sources (4 rows)
@@ -780,7 +796,7 @@ For migration questions or issues:
 
 ---
 
-**Last Updated:** 2026-02-19
-**Total Migrations:** 12
+**Last Updated:** 2026-03-13
+**Total Migrations:** 17
 **Database Provider:** Neon PostgreSQL 17
-**Schema Version:** 013 (Scraper Observability Metadata)
+**Schema Version:** 017 (Scraper Alert State)

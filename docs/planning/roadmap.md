@@ -46,7 +46,7 @@ Netlify should now be treated as rollback-only for the frontend, and GitHub Acti
 | **M22: Portfolio Documentation** | OpenAPI spec, MkDocs deployment, freshness badges, and roadmap reconciliation for admissions credibility |
 | **M25: Reliability & Verification Phase 2** | Backend coverage increased to 80%, API integration tests (hospitals, health, export, geolocation), hardened E2E pipeline, connection pool monitoring |
 | **M23: Quality & Standardization** | Stricter backend typing (mypy strict), frontend type safety audit, accessibility testing (axe-core), mobile responsiveness tests, API rate limiting & validation |
-| **M26: Strategic Documentation & Robustness** | Data Dictionary (9 tables), Data Flow Architecture, Property-based testing for comparability (Hypothesis), CONTRIBUTING guide updates |
+| **M26: Strategic Documentation & Robustness** | Data Dictionary (10 tables), Data Flow Architecture, Property-based testing for comparability (Hypothesis), CONTRIBUTING guide updates |
 | **M27: Operational Observability & Resilience** | Drift monitor script (`monitor_drift.py`) with 7 unit tests, public `/status` page with per-province uptime bars + drift event log, Lighthouse CI workflow, database migration guide |
 | **M28: Ontario Real-Data Equity Layer** | Replaced scaffold linkage with real StatsCan CT overlays for ON; added acquisition provenance, processing manifest, ON-only rollout contract, and map/API integration |
 | **M29: Equity Academic Rigor Hardening (ON)** | ON-scoped quintiles, suppression provenance, sensitivity + uncertainty outputs, non-causal/temporal messaging, reproducibility hardening (`equity` extras/docs), optimized layer output + API loader preference |
@@ -83,7 +83,8 @@ Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT d
 - **Frontend Hosting:** Live on the shared VPS through host Caddy and a loopback Docker container.
 - **Public Hosting:** `https://wait-time.ca` is live and has passed HTTPS, redirect, and production smoke verification.
 - **Backend Scheduling:** still live on GitHub Actions because the Ontario source timed out from the shared VPS during backend cutover testing.
-- Temporary cost-control mode is active on the current GitHub Actions backend path: `scraper-cron` at `0 */4 * * *` and heartbeat `--max-age 250`.
+- Current production cadence is `hourly` on GitHub Actions with heartbeat checks every 30 minutes and a `120` minute stale threshold.
+- Alerting is now state-change driven: one incident alert when a source becomes unhealthy, one recovery alert when it clears.
 - If backend migration is revisited later, solve Ontario reachability first instead of re-running the same VPS timer cutover sequence blindly.
 
 ### Focus Shift (2026-02-25)
@@ -96,6 +97,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [x] **P0 / Ops: Quebec parser zero-value guard** — Zero-value occupancy as suppressed signal rather than hard failure
 - [x] **P1 / Performance: Cache & polling audit** — Verified cache headers/TTLs, enforced `no-store` for user-specific/export routes
 - [x] **P1 / Ops: CI quota conservation (temporary)** — Minimized free-tier GitHub Actions burn
+- [x] **P1 / Ops: Raw retention + alerting stabilization** — Raw measurements preserved by default, duplicate suppression added, maintenance made lightweight, and heartbeat alerts made state-change driven with a 120-minute threshold
 - [x] **P1 / Ops: CI/tooling maintenance (2026-02-23)** — Resolved all mypy/pytest CI failures; upgraded ruff, mypy, react-map-gl v8, playwright, date-fns
 - [x] **P0 / Ops: Production domain launch verification** — `wait-time.ca` HTTPS valid, `www.wait-time.ca` redirect verified, release deploy published, production smoke passing
 - [x] **P1 / Ops: Harden Netlify release gate** — M32 Complete
@@ -313,7 +315,7 @@ Archived (delivered):
 
 ## Architecture
 
-### Database Schema (9 tables)
+### Database Schema (10 tables)
 
 | Table | Purpose |
 |-------|---------|
@@ -321,6 +323,7 @@ Archived (delivered):
 | `hospitals` | Facility metadata with verification workflow |
 | `measurements` | Audit log of scraped wait times with ontology tags |
 | `scraper_status` | Heartbeat monitoring |
+| `scraper_alert_state` | Active stale/error incident state for alert deduplication |
 | `measurement_aggregates` | Permanent statistical summaries (M13) |
 | `data_quality_snapshots` | Daily scraper reliability metrics (M14) |
 | `methodology_change_events` | Detected methodology shifts (M14) |
@@ -333,6 +336,7 @@ Archived (delivered):
 |-----|----------|
 | [0002](../adr/0002-metric-ontology.md) | Strict metric ontology for comparability |
 | [0003](../adr/0003-manual-geocoding-overrides.md) | Manual geocoding overrides |
+| [0020](../adr/0020-raw-retention-and-stateful-alerting.md) | Preserve raw history by default and use state-change alerting + lightweight maintenance |
 | [0004](../adr/0004-landing-page-ux-optimization.md) | Landing page UX optimization |
 | [0005](../adr/0005-access-burden-estimator.md) | Access Burden Estimator design |
 | [0006](../adr/0006-dead-mans-switch-monitoring.md) | Dead Man's Switch monitoring |

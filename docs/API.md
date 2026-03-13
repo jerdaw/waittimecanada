@@ -78,6 +78,10 @@ Top-level fields:
 - `stale_threshold_minutes: number`
 - `sources: SourceHealth[]`
 
+Operational note:
+
+- The live stale threshold is currently `120` minutes, supplied by environment/config but exposed directly in the response so operators and clients can stay aligned.
+
 Per-source diagnostics (`SourceHealth`) include:
 
 - Existing: `source_id`, `source_name`, `last_run`, `status`, `error_message`, `measurements_count`, `age_minutes`
@@ -141,6 +145,11 @@ Layer loading behavior is optimized-first with canonical fallback:
 
 1. `ontario-equity-layer.optimized.geojson` (preferred when present)
 2. `ontario-equity-layer.geojson` (fallback)
+
+## Analytics freshness notes
+
+- `GET /api/analytics/patterns?type=hour_of_day` derives its hourly view from bounded raw measurements rather than precomputed hourly aggregates.
+- `GET /api/export?granularity=hourly` is intended for bounded recent windows only and returns an error for oversized hourly requests.
 
 ## Example Requests
 

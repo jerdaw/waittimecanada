@@ -37,7 +37,7 @@
 
 ---
 
-## Phase A: Immediate (Before March 9 — No Live URL Required)
+## Phase A: Immediate Credibility Cleanup
 
 ### A1: Named Author Bio in README
 **Priority:** 1 (tied with A4) | **Effort:** 30 min | **CanMEDS:** Professional, Communicator
@@ -50,7 +50,7 @@ Expand the named maintainer section in README into a 3–5 sentence personal mot
 **Priority:** 1 | **Effort:** 1 h | **CanMEDS:** Scholar, Professional
 
 Add specific, technical limitations to README. Keep limitations honest and specific rather than vague:
-- Scraper data may lag by up to 4 hours in the current cost-control mode.
+- Scraper data now reflects an hourly GitHub Actions cadence rather than continuous ingestion.
 - Equity layer uses 2021 census income data, not current.
 - Methodology labels are inferred from provincial documentation and may not match internal hospital reporting practices.
 - Platform cannot account for unreported overcrowding events.
@@ -114,7 +114,7 @@ Safe examples:
 - "100% of cross-province hospital pairs have ontology mismatches on ≥2 dimensions."
 - "Quebec hospitals report stretcher occupancy >110% in X% of measurements."
 
-If the raw numbers are unimpressive (cost-control mode has been active), lead with operational metrics (uptime, measurement count, anomaly detection events) rather than impact metrics.
+If the raw numbers are still early or modest, lead with operational metrics (uptime, measurement count, anomaly detection events) rather than impact metrics.
 
 **Artifact:** "By the Numbers" section in README; specific figures for ABS entries.
 
@@ -203,7 +203,7 @@ A structured analysis of what you *cannot* conclude from this data is a stronger
 ### C4: Operational Transparency Report
 **Priority:** 7 | **Effort:** 2 h | **CanMEDS:** Professional, Leader
 
-Generate one monthly report from `data_quality_snapshots` and `scraper_status` tables. Be honest about cost-control mode. Store in `docs/operations/reports/`. The value is behavioral — demonstrating the practice of systematic operational review, not the specific numbers.
+Generate one monthly report from `data_quality_snapshots` and `scraper_status` tables. Be honest about the current hourly GitHub Actions runtime and any alert/recovery incidents. Store in `docs/operations/reports/`. The value is behavioral — demonstrating the practice of systematic operational review, not the specific numbers.
 
 **Artifact:** `docs/operations/reports/YYYY-MM-operational-report.md`.
 

@@ -29,13 +29,13 @@ Create a migration whenever you need to:
 
 ```bash
 ls backend/migrations/*.sql | tail -1
-# e.g. backend/migrations/013_add_scraper_observability_columns.sql → next is 014
+# e.g. backend/migrations/017_add_scraper_alert_state.sql → next is 018
 ```
 
 ### 2. Create the migration file
 
 ```bash
-touch backend/migrations/014_your_descriptive_name.sql
+touch backend/migrations/018_your_descriptive_name.sql
 ```
 
 ### 3. Write the migration
@@ -43,7 +43,7 @@ touch backend/migrations/014_your_descriptive_name.sql
 Use idempotent SQL so migrations are safe to re-run:
 
 ```sql
--- 014_your_descriptive_name.sql
+-- 018_your_descriptive_name.sql
 -- Purpose: Brief description
 -- Depends on: 012_optimize_indexes.sql
 
@@ -123,7 +123,7 @@ Migrations do not auto-rollback. Each migration file includes rollback SQL in co
 
 **Steps:**
 
-1. Identify the migration to undo (e.g., `014_your_descriptive_name.sql`).
+1. Identify the migration to undo (e.g., `018_your_descriptive_name.sql`).
 2. Extract the rollback SQL from the file's comments.
 3. Execute it manually:
    ```bash
@@ -132,8 +132,8 @@ Migrations do not auto-rollback. Each migration file includes rollback SQL in co
    ```
 4. Rename the migration file to `.sql.skip` to prevent re-application:
    ```bash
-   mv backend/migrations/014_your_descriptive_name.sql \
-      backend/migrations/014_your_descriptive_name.sql.skip
+   mv backend/migrations/018_your_descriptive_name.sql \
+      backend/migrations/018_your_descriptive_name.sql.skip
    ```
 
 > [!CAUTION]
@@ -164,6 +164,7 @@ The `database-migrate.yml` workflow can be triggered manually to apply migration
 | `measurements` | 100k+ (indefinite raw retention) | Wait time audit log with ontology tags |
 | `measurement_aggregates` | permanent | Statistical summaries (hourly → monthly) |
 | `scraper_status` | 4 | Heartbeat monitoring per source |
+| `scraper_alert_state` | 4 | Current alert/incident state per source |
 | `data_quality_snapshots` | daily | Scraper reliability metrics |
 | `methodology_change_events` | historical | Drift detection audit log |
 | `regions` | 15 | Health region metadata |

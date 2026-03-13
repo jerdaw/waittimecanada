@@ -86,7 +86,7 @@ python -m waittime.cli.check_heartbeat --max-age 120
 - **Methodology:** REGISTRATION → PHYSICIAN (ROLLING_AVG)
 - **Technology:** BeautifulSoup (HTML parsing)
 - **Coverage:** 110+ hospitals
-- **Update Frequency:** 30 min daytime / 60 min overnight (temporary throttle)
+- **Update Frequency:** Hourly
 - **Special Features:** ✅ Stretcher occupancy data (M17/M18)
 - **Data Quality:** 86% test coverage
 
@@ -94,21 +94,21 @@ python -m waittime.cli.check_heartbeat --max-age 120
 - **Methodology:** TRIAGE → PHYSICIAN (P90)
 - **Technology:** Playwright (JavaScript rendering required)
 - **Coverage:** 160+ hospitals
-- **Update Frequency:** 30 min daytime / 60 min overnight (temporary throttle)
+- **Update Frequency:** Hourly
 - **Browser:** Chromium (installed in GitHub Actions)
 
 ### Alberta (AHS)
 - **Methodology:** TRIAGE → PHYSICIAN (P90)
 - **Technology:** Playwright (JavaScript rendering required)
 - **Coverage:** 50+ hospitals
-- **Update Frequency:** 30 min daytime / 60 min overnight (temporary throttle)
+- **Update Frequency:** Hourly
 - **Browser:** Chromium (installed in GitHub Actions)
 
 ### British Columbia (PHSA)
 - **Methodology:** TRIAGE → PHYSICIAN (P90)
 - **Technology:** BeautifulSoup + JSON extraction (`__NEXT_DATA__`)
 - **Coverage:** 60+ hospitals
-- **Update Frequency:** 30 min daytime / 60 min overnight (temporary throttle)
+- **Update Frequency:** Hourly
 - **URL:** `https://edwaittimes.ca/legacy`
 
 ---

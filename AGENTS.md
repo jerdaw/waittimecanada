@@ -43,7 +43,7 @@ This is the **Wait Time Canada** project - a "Health Systems Observatory" design
 **Current Status:** Milestone 33 (Historical Occupancy Trends) Complete. **Four-province breadth achieved** (ON, QC, AB, BC). All scrapers active, 380+ hospitals visible, methodology documentation complete for all provinces, occupancy trend aggregation pipeline operational, the production domain `wait-time.ca` is live on the VPS via Caddy, and raw measurements are preserved by default for long-term analysis.
 
 **Current Architecture:**
-- **Database**: Neon PostgreSQL 17 (9 tables: sources, hospitals, measurements, scraper_status, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions)
+- **Database**: Neon PostgreSQL 17 (10 tables: sources, hospitals, measurements, scraper_status, scraper_alert_state, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions)
 - **Backend**: Python 3.12+ with psycopg2, pytest
   - **Tests**: 454+ passing (unit + integration)
   - Scrapers: Quebec (BeautifulSoup), Ontario (HTTP client), Alberta (Playwright), BC (JSON/__NEXT_DATA__)
@@ -63,7 +63,7 @@ This is the **Wait Time Canada** project - a "Health Systems Observatory" design
 
 ### Technology Stack
 
-- **Backend:** Python 3.12+ scrapers via GitHub Actions (cost-control mode: every 4 hours; post-unpause target: */20)
+- **Backend:** Python 3.12+ scrapers via GitHub Actions (hourly scraper cadence, heartbeat checks every 30 minutes, state-change alerting)
 - **Database:** Neon PostgreSQL 17 with strict schema constraints
 - **Frontend:** Next.js 14 App Router + TypeScript + Mapbox GL JS
 - **Testing:** pytest (backend), Vitest (frontend), Playwright (E2E in CI)
@@ -130,7 +130,7 @@ Retention policy: Preserve raw measurement rows by default; only purge old rows 
 
 ### 2. Silent Failure Detection
 
-**Heartbeat Monitor:** Every scraper run must write a status row with timestamp. Frontend displays "Last Audit: X mins ago". If heartbeat is >60 minutes old, GitHub Action triggers alert.
+**Heartbeat Monitor:** Every scraper run must write a status row with timestamp. Frontend displays "Last Audit: X mins ago". If heartbeat is >120 minutes old, GitHub Actions treats the source as stale and the heartbeat check emits a single incident alert until the state changes or recovers.
 
 Implementation pattern:
 ```python
@@ -207,7 +207,7 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 - `frontend/netlify.toml` uses `frontend/scripts/netlify-ignore.sh`.
 - A Netlify production build is allowed only when commit message contains `[release]` or `[deploy]`.
 - Non-production branches are skipped by default.
-- This guardrail prevents new accidental credit burn; it does **not** unsuspend already suspended Netlify projects before billing reset on March 2, 2026.
+- This guardrail keeps the old Netlify path available as rollback-only infrastructure without making it the active frontend runtime again.
 - `production-smoke.yml` remains manual-dispatch to conserve GitHub Actions minutes on the free tier; use explicit release commits and manual smoke checks rather than high-frequency automated production probes.
 
 ## Runtime Usage Guardrails

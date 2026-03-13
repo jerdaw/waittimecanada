@@ -14,4 +14,4 @@ EnvironmentFile=/etc/projects-merge/env/waittime-backend.env
 Nice=10
 IOSchedulingClass=best-effort
 IOSchedulingPriority=6
-ExecStart=/srv/apps/waittime-backend/current/backend/.venv/bin/python -m waittime.cli.check_heartbeat --max-age 250 --max-consecutive-failures 1
+ExecStart=/srv/apps/waittime-backend/current/backend/.venv/bin/python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1

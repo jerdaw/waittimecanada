@@ -55,4 +55,4 @@ sudo systemd-run --wait --pipe \
   --property="EnvironmentFile=${env_file}" \
   --property="WorkingDirectory=${app_root}/current/backend" \
   --setenv="PLAYWRIGHT_BROWSERS_PATH=${playwright_dir}" \
-  "${venv_python}" -m waittime.cli.check_heartbeat --max-age 250 --dry-run --verbose
+  "${venv_python}" -m waittime.cli.check_heartbeat --max-age 120 --dry-run --verbose

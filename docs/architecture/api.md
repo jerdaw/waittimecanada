@@ -105,6 +105,11 @@ Route compatibility rules:
 3. Route computes derived summaries where needed (e.g., percentiles, trends, linkage).
 4. UI renders with explicit states (loading/success/setup-needed/error).
 
+Analytics implementation note:
+
+- `hour_of_day` patterns and bounded hourly exports derive from raw `measurements` for fidelity.
+- Daily/weekly/monthly analytics continue to prefer `measurement_aggregates`.
+
 ## Related References
 
 - Public endpoint contract details: `docs/API.md`

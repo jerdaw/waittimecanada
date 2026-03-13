@@ -258,7 +258,7 @@ start docs/assets/methodology-comparison.html  # Windows
 
 For questions about these assets:
 - **Methodology Details**: See `backend/docs/methodologies/README.md`
-- **Comparability Logic**: See `CLAUDE.md` or `frontend/utils/comparability.ts`
+- **Comparability Logic**: See `AGENTS.md` or `frontend/utils/comparability.ts`
 - **Generator Script**: See `backend/scripts/generate_methodology_comparison.py`
 - **Issues**: Open GitHub issue with `[methodology]` tag
 

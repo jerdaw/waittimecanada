@@ -4,7 +4,7 @@
 
 - Engine: PostgreSQL (Neon)
 - Migration source: `backend/migrations/`
-- Core strategy: strict ontology metadata + verifiable provenance + aggregate summaries
+- Core strategy: strict ontology metadata + verifiable provenance + indefinite raw retention + aggregate summaries as an optimization layer
 
 ## Schema Components
 
@@ -27,6 +27,7 @@ From `002_create_tables.sql`:
 - `hospitals`: facility metadata with verification/visibility gates
 - `measurements`: raw wait measurements + ontology tags + payload hash/snippet
 - `scraper_status`: heartbeat and scraper execution status
+- `scraper_alert_state`: current per-source incident state for stale/error deduplication and recovery tracking
 
 ## Analytics and quality extensions
 
@@ -47,12 +48,25 @@ From `002_create_tables.sql`:
 
 These fields support deterministic triage in `check_heartbeat --verbose`, workflow alerts, and `/api/health`.
 
+## Alert state tracking
+
+`scraper_alert_state` stores at most one active operational incident per source:
+
+- `active_incident_kind` (`stale` or `error`)
+- `active_incident_fingerprint`
+- `opened_at`
+- `last_notified_at`
+- `last_resolved_at`
+
+This lets the heartbeat monitor send one incident alert when a source becomes unhealthy and one recovery notice when it returns to healthy, instead of repeating the same alert every run.
+
 ## Data Model Rules
 
 - Do not normalize incompatible methodologies into a single synthetic metric.
 - Use ontology tags to drive comparability logic.
 - Keep verification gate: new hospitals are not auto-published.
 - Store payload hash/snippet, not full source HTML.
+- Preserve raw measurements by default; explicit purges are opt-in only.
 
 ## Migration and Bootstrap
 
@@ -68,7 +82,8 @@ python -m waittime.cli.bootstrap_analytics --days 180
 ## Query Patterns
 
 - Map and list views pull latest measurement per hospital.
-- Trends and benchmarks prefer aggregate tables (`measurement_aggregates`).
+- Trends and benchmarks prefer aggregate tables (`measurement_aggregates`) for daily/weekly/monthly views.
+- Intra-day patterns and bounded hourly exports derive from raw `measurements` for fidelity.
 - Data quality and anomalies rely on quality snapshot + anomaly flags.
 - Region analytics depend on `regions` + `hospital_regions` mapping coverage.
 
