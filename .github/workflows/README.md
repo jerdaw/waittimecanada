@@ -131,6 +131,8 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 **Optimization controls:**
 - Serialized concurrency per ref.
+- Installs the editable backend package before running migrations so `waittime` imports resolve correctly in CI.
+- Failure email is best-effort and runs only when alert secrets are configured.
 
 ## Secrets Matrix
 
