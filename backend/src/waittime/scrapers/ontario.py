@@ -16,9 +16,6 @@ import re
 from typing import Any
 
 from bs4 import BeautifulSoup
-from playwright.sync_api import TimeoutError as PlaywrightTimeout
-from playwright.sync_api import sync_playwright
-from tenacity import retry, stop_after_attempt
 
 from waittime.core import (
     EndEvent,
@@ -30,18 +27,8 @@ from waittime.core import (
     StatisticType,
 )
 from waittime.scrapers.base import BaseScraper
-from waittime.scrapers.observability import (
-    HTTP_FETCH_ATTEMPTS,
-    PLAYWRIGHT_PAGE_TIMEOUT_MS,
-    PLAYWRIGHT_RENDER_WAIT_MS,
-    PLAYWRIGHT_SELECTOR_TIMEOUT_MS,
-    fetch_retry_wait,
-)
 
 logger = logging.getLogger(__name__)
-
-ONTARIO_GOTO_TIMEOUT_MS = 90_000
-ONTARIO_TABLE_SELECTOR_TIMEOUT_MS = 45_000
 
 
 class OntarioScraper(BaseScraper):
@@ -82,65 +69,16 @@ class OntarioScraper(BaseScraper):
         "William Osler Health System": "ca-on-william-osler",
     }
 
-    @retry(
-        stop=stop_after_attempt(HTTP_FETCH_ATTEMPTS),
-        wait=fetch_retry_wait(),
-    )
     def fetch(self, url: str | None = None) -> str:
-        """Fetch HTML using Playwright to handle JavaScript rendering.
-
-        Overrides base class fetch() to use headless browser instead of httpx.
+        """Fetch HTML directly over HTTP.
 
         Args:
             url: Optional override URL, defaults to source.url
 
         Returns:
-            Rendered HTML after JavaScript execution
-
-        Raises:
-            PlaywrightTimeout: If page doesn't load within timeout
-            Exception: If browser fails to launch
+            HTML content for the Ontario page
         """
-        target_url = url or self.source.url
-        logger.info(f"Fetching {target_url} with Playwright")
-
-        try:
-            with sync_playwright() as p:
-                browser = p.chromium.launch(headless=True)
-                page = browser.new_page()
-
-                # HQOntario can stall on third-party assets; wait for the DOM
-                # rather than the full page load event, then wait explicitly
-                # for the data table we actually need.
-                page.goto(
-                    target_url,
-                    timeout=max(PLAYWRIGHT_PAGE_TIMEOUT_MS, ONTARIO_GOTO_TIMEOUT_MS),
-                    wait_until="domcontentloaded",
-                )
-
-                # Wait for data table to load
-                # HQOntario uses dynamic loading, so we need to wait
-                page.wait_for_selector(
-                    "table",
-                    timeout=max(PLAYWRIGHT_SELECTOR_TIMEOUT_MS, ONTARIO_TABLE_SELECTOR_TIMEOUT_MS),
-                )
-
-                # Give extra time for all rows to render
-                page.wait_for_timeout(PLAYWRIGHT_RENDER_WAIT_MS)
-
-                # Get rendered HTML
-                html: str = page.content()
-
-                browser.close()
-
-                return html
-
-        except PlaywrightTimeout as e:
-            logger.error(f"Timeout waiting for page to load: {e}")
-            raise
-        except Exception as e:
-            logger.error(f"Playwright fetch failed: {e}")
-            raise
+        return super().fetch(url)
 
     def parse(self, html: str) -> list[Measurement]:
         """Parse HQOntario HTML into measurements.
