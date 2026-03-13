@@ -422,6 +422,79 @@ class TestDatabaseService:
         mock_execute_values.assert_called_once()
 
     @patch("psycopg2.connect")
+    @patch("psycopg2.extras.execute_values")
+    def test_upsert_aggregates_batch(self, mock_execute_values, mock_connect, db_service):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_execute_values.return_value = [(1,), (1,)]
+
+        aggregates = [
+            MeasurementAggregate(
+                hospital_id="hosp1",
+                source_id="src1",
+                period_type="daily",
+                period_start=datetime(2026, 2, 1, tzinfo=UTC),
+                period_end=datetime(2026, 2, 2, tzinfo=UTC),
+                mean_value=100,
+                median_value=100,
+                p90_value=100,
+                min_value=90,
+                max_value=110,
+                std_dev=5,
+                sample_count=3,
+                metric_family="TIME_TO_PROVIDER",
+                start_event="TRIAGE",
+                end_event="PHYSICIAN",
+                statistic_type="MEAN",
+            ),
+            MeasurementAggregate(
+                hospital_id="hosp1",
+                source_id="src1",
+                period_type="weekly",
+                period_start=datetime(2026, 2, 1, tzinfo=UTC),
+                period_end=datetime(2026, 2, 8, tzinfo=UTC),
+                mean_value=120,
+                median_value=120,
+                p90_value=120,
+                min_value=100,
+                max_value=140,
+                std_dev=10,
+                sample_count=4,
+                metric_family="TIME_TO_PROVIDER",
+                start_event="TRIAGE",
+                end_event="PHYSICIAN",
+                statistic_type="MEAN",
+            ),
+        ]
+
+        refreshed = db_service.upsert_aggregates(aggregates)
+        assert refreshed == 2
+        mock_execute_values.assert_called_once()
+        assert "DO UPDATE SET" in mock_execute_values.call_args[0][1]
+
+    @patch("psycopg2.connect")
+    def test_get_hospital_ids_with_measurements_since(self, mock_connect, db_service):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [
+            {"hospital_id": "ca-on-a"},
+            {"hospital_id": "ca-on-b"},
+        ]
+
+        hospital_ids = db_service.get_hospital_ids_with_measurements_since(
+            datetime(2026, 2, 1, tzinfo=UTC)
+        )
+
+        assert hospital_ids == ["ca-on-a", "ca-on-b"]
+        assert "SELECT DISTINCT m.hospital_id" in mock_cursor.execute.call_args[0][0]
+
+    @patch("psycopg2.connect")
     def test_insert_hospital(self, mock_connect, db_service):
         mock_conn = MagicMock()
         mock_cursor = MagicMock()

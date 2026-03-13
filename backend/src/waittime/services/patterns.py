@@ -29,7 +29,7 @@ class TemporalPatternService:
         self.db = db
 
     def hour_of_day_pattern(self, hospital_id: str, lookback_days: int = 30) -> dict[str, Any]:
-        """Compute average wait time by hour of day using hourly aggregates."""
+        """Compute average wait time by hour of day from bounded raw measurements."""
         if lookback_days <= 0:
             raise ValueError("lookback_days must be > 0")
 
@@ -40,23 +40,17 @@ class TemporalPatternService:
         end = datetime.now(UTC)
         start = end - timedelta(days=lookback_days)
 
-        aggregates = self.db.get_aggregates(
-            hospital_id=hospital_id,
-            period_type="hourly",
-            start=start,
-            end=end,
-        )
-
-        buckets: dict[int, list[MeasurementAggregate]] = defaultdict(list)
-        for aggregate in aggregates:
-            buckets[aggregate.period_start.hour].append(aggregate)
+        measurements = self.db.get_measurements_in_range(hospital_id, start, end)
+        buckets: dict[int, list[float]] = defaultdict(list)
+        for measurement in measurements:
+            buckets[measurement["timestamp_utc"].hour].append(float(measurement["value"]))
 
         patterns: list[dict[str, Any]] = []
         for hour in range(24):
             patterns.append(
                 {
                     "hour": hour,
-                    **self._bucket_stats(buckets.get(hour, [])),
+                    **self._value_bucket_stats(buckets.get(hour, [])),
                 }
             )
 
@@ -277,6 +271,17 @@ class TemporalPatternService:
             "mean": round(statistics.mean(means), 1),
             "median": round(statistics.mean(medians), 1) if medians else None,
             "sample_count": sum(int(aggregate.sample_count) for aggregate in aggregates),
+        }
+
+    @staticmethod
+    def _value_bucket_stats(values: list[float]) -> dict[str, Any]:
+        if not values:
+            return {"mean": None, "median": None, "sample_count": 0}
+
+        return {
+            "mean": round(statistics.mean(values), 1),
+            "median": round(statistics.median(values), 1),
+            "sample_count": len(values),
         }
 
     @staticmethod

@@ -59,7 +59,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 4. `scraper-cron.yml` - Scheduled Scraper Execution
 
-**Trigger:** cron `0 */4 * * *` (every 4 hours) + manual dispatch.
+**Trigger:** cron `0 * * * *` (hourly) + manual dispatch.
 
 **Purpose:** Run all provincial scrapers against production DB and emit classified operational alerts.
 
@@ -83,7 +83,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 **Trigger:** currently manual dispatch only (scheduled cron temporarily paused due to GitHub Actions quota exhaustion).
 
-**Purpose:** Refresh recent aggregates and provide an operator-run maintenance entry point. Raw measurement deletion is no longer the default behavior, and the workflow also reports `measurements` storage growth.
+**Purpose:** Provide an operator-run lightweight maintenance entry point. Raw measurement deletion is no longer the default behavior, and the workflow reports `measurements` storage growth without recomputing aggregates.
 
 **Optimization controls:**
 - Serialized concurrency group.

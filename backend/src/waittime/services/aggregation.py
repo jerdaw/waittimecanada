@@ -164,6 +164,10 @@ class AggregationService:
         """Save multiple aggregates to the database in one batch."""
         return self.db.insert_aggregates(aggregates)
 
+    def refresh_aggregates(self, aggregates: list[MeasurementAggregate]) -> int:
+        """Insert or refresh current-period aggregates in one batch."""
+        return self.db.upsert_aggregates(aggregates)
+
     def backfill(
         self,
         hospital_id: str | None = None,
@@ -307,3 +311,87 @@ class AggregationService:
         far_past = datetime(2020, 1, 1, tzinfo=UTC)
         results = self.db.get_aggregates(hospital_id, period_type, far_past, now)
         return results[-1] if results else None
+
+    def refresh_recent_periods(
+        self,
+        hospital_id: str | None = None,
+        since: datetime | None = None,
+        period_types: list[str] | None = None,
+        dry_run: bool = False,
+    ) -> dict[str, int]:
+        """Refresh current aggregate buckets touched by recent measurements.
+
+        This is intended for the post-scrape path: only hospitals with new
+        measurements since ``since`` are considered, and only current
+        daily/weekly/monthly buckets are recomputed.
+        """
+        if since is None:
+            since = datetime.now(UTC) - timedelta(hours=2)
+        if period_types is None:
+            period_types = ["daily", "weekly", "monthly"]
+
+        hospital_ids = (
+            [hospital_id]
+            if hospital_id
+            else self.db.get_hospital_ids_with_measurements_since(since, visible_only=True)
+        )
+        counts: dict[str, int] = dict.fromkeys(period_types, 0)
+        now = datetime.now(UTC)
+
+        for h_id in hospital_ids:
+            timestamps = self.db.get_measurement_timestamps(h_id, since, now)
+            if not timestamps:
+                continue
+
+            for period_type in period_types:
+                period_starts = {
+                    self._period_start_for_timestamp(period_type, timestamp)
+                    for timestamp in timestamps
+                }
+                pending_aggregates: list[MeasurementAggregate] = []
+                for period_start in sorted(period_starts):
+                    period_end = self._period_end_for_start(period_type, period_start)
+                    pending_aggregates.extend(
+                        self.aggregate_period(h_id, period_type, period_start, period_end)
+                    )
+
+                if not pending_aggregates:
+                    continue
+
+                counts[period_type] += (
+                    len(pending_aggregates)
+                    if dry_run
+                    else self.refresh_aggregates(pending_aggregates)
+                )
+
+        logger.info(
+            "Recent aggregate refresh complete: %s (dry_run=%s, since=%s)",
+            counts,
+            dry_run,
+            since.isoformat(),
+        )
+        return counts
+
+    @staticmethod
+    def _period_start_for_timestamp(period_type: str, timestamp: datetime) -> datetime:
+        """Normalize a measurement timestamp to the start of its enclosing period."""
+        if period_type == "daily":
+            return timestamp.replace(hour=0, minute=0, second=0, microsecond=0)
+        if period_type == "weekly":
+            start = timestamp.replace(hour=0, minute=0, second=0, microsecond=0)
+            return start - timedelta(days=start.weekday())
+        if period_type == "monthly":
+            return timestamp.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        raise ValueError(f"Unsupported incremental period type: {period_type}")
+
+    @staticmethod
+    def _period_end_for_start(period_type: str, period_start: datetime) -> datetime:
+        """Return the exclusive end timestamp for a normalized period start."""
+        if period_type == "daily":
+            return period_start + timedelta(days=1)
+        if period_type == "weekly":
+            return period_start + timedelta(weeks=1)
+        if period_type == "monthly":
+            days_in_month = monthrange(period_start.year, period_start.month)[1]
+            return period_start + timedelta(days=days_in_month)
+        raise ValueError(f"Unsupported incremental period type: {period_type}")

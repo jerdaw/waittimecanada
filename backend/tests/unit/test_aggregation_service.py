@@ -544,3 +544,44 @@ class TestQueryAggregates:
         result = service.get_latest_aggregate("ca-on-test")
 
         assert result is None
+
+
+@pytest.mark.unit
+class TestRefreshRecentPeriods:
+    """Tests for targeted post-scrape aggregate refresh."""
+
+    def test_refresh_recent_periods_uses_recent_hospitals(self, service, mock_db) -> None:
+        recent_timestamp = datetime(2026, 2, 6, 23, 45, tzinfo=UTC)
+        mock_db.get_hospital_ids_with_measurements_since.return_value = ["ca-on-test"]
+        mock_db.get_measurement_timestamps.return_value = [recent_timestamp]
+        mock_db.get_measurements_in_range.return_value = [
+            _make_measurement_row(value=100.0, timestamp_utc=recent_timestamp),
+            _make_measurement_row(value=150.0, timestamp_utc=recent_timestamp),
+        ]
+        mock_db.upsert_aggregates.return_value = 1
+
+        counts = service.refresh_recent_periods(
+            since=datetime(2026, 2, 6, 22, 0, tzinfo=UTC),
+            period_types=["daily", "weekly", "monthly"],
+        )
+
+        assert counts == {"daily": 1, "weekly": 1, "monthly": 1}
+        mock_db.get_hospital_ids_with_measurements_since.assert_called_once()
+        assert mock_db.upsert_aggregates.call_count == 3
+
+    def test_refresh_recent_periods_dry_run_skips_upsert(self, service, mock_db) -> None:
+        recent_timestamp = datetime(2026, 2, 6, 10, 0, tzinfo=UTC)
+        mock_db.get_hospital_ids_with_measurements_since.return_value = ["ca-on-test"]
+        mock_db.get_measurement_timestamps.return_value = [recent_timestamp]
+        mock_db.get_measurements_in_range.return_value = [
+            _make_measurement_row(value=120.0, timestamp_utc=recent_timestamp),
+        ]
+
+        counts = service.refresh_recent_periods(
+            since=datetime(2026, 2, 6, 9, 0, tzinfo=UTC),
+            period_types=["daily"],
+            dry_run=True,
+        )
+
+        assert counts == {"daily": 1}
+        mock_db.upsert_aggregates.assert_not_called()

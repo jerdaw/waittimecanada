@@ -4,7 +4,7 @@ This document visualizes the end-to-end journey of data within the Wait Time Can
 
 ## 1. Scraper Pipeline (Ingestion)
 
-The ingestion process currently runs every 4 hours via GitHub Actions in cost-control mode. It prioritizes **Storage Safety** (hashing payloads) and **Ontology Enforcement** (tagging measurements).
+The ingestion process currently runs hourly via GitHub Actions. It prioritizes **Storage Safety** (hashing payloads) and **Ontology Enforcement** (tagging measurements).
 
 ```mermaid
 graph TD

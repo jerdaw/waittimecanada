@@ -21,7 +21,7 @@
 ## Current State
 
 ### What's Already Built
-- ✅ **Backend scrapers:** Python with GitHub Actions cron (4-hour cost-control schedule active)
+- ✅ **Backend scrapers:** Python with GitHub Actions cron (hourly schedule active)
 - ✅ **Frontend:** Next.js 14 with SSR, now deployed on the shared VPS
 - ✅ **Database:** Neon PostgreSQL (already in production)
 - ✅ **CI/CD:** GitHub Actions for scrapers, maintenance, and monitoring
@@ -125,7 +125,7 @@
    - Environment variables: `NEXT_PUBLIC_MAPBOX_TOKEN`, `DATABASE_URL`
 
 2. **Scrapers on GitHub Actions** (already configured)
-   - Runs every 4 hours in current cost-control mode
+   - Runs hourly on the live GitHub Actions path
    - Connects to Neon PostgreSQL
    - No additional hosting cost
 
@@ -294,7 +294,7 @@ Instructions will depend on platform chosen (see platform-specific guides below)
 After deployment, monitor for 24-48 hours:
 
 1. **GitHub Actions**
-   - Check scraper-cron runs every 4 hours
+   - Check scraper-cron runs hourly
    - Verify heartbeat-monitor passes hourly
    - Watch for failure notifications
 

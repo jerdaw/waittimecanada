@@ -60,9 +60,9 @@ class TestTemporalPatternService:
 
     def test_hour_of_day_24_entries(self, service: TemporalPatternService, mock_db: Mock) -> None:
         """Hour-of-day output should always contain 24 buckets."""
-        mock_db.get_aggregates.return_value = [
-            _aggregate("hourly", datetime(2026, 2, 5, 2, tzinfo=UTC), 90.0, 10),
-            _aggregate("hourly", datetime(2026, 2, 5, 14, tzinfo=UTC), 180.0, 12),
+        mock_db.get_measurements_in_range.return_value = [
+            {"value": 90.0, "timestamp_utc": datetime(2026, 2, 5, 2, tzinfo=UTC)},
+            {"value": 180.0, "timestamp_utc": datetime(2026, 2, 5, 14, tzinfo=UTC)},
         ]
 
         result = service.hour_of_day_pattern("ca-on-test")
@@ -77,9 +77,9 @@ class TestTemporalPatternService:
         self, service: TemporalPatternService, mock_db: Mock
     ) -> None:
         """Service should identify peak and quietest hours correctly."""
-        mock_db.get_aggregates.return_value = [
-            _aggregate("hourly", datetime(2026, 2, 5, 4, tzinfo=UTC), 70.0, 9),
-            _aggregate("hourly", datetime(2026, 2, 5, 15, tzinfo=UTC), 175.0, 15),
+        mock_db.get_measurements_in_range.return_value = [
+            {"value": 70.0, "timestamp_utc": datetime(2026, 2, 5, 4, tzinfo=UTC)},
+            {"value": 175.0, "timestamp_utc": datetime(2026, 2, 5, 15, tzinfo=UTC)},
         ]
 
         result = service.hour_of_day_pattern("ca-on-test")
@@ -133,6 +133,7 @@ class TestTemporalPatternService:
 
     def test_insufficient_data(self, service: TemporalPatternService, mock_db: Mock) -> None:
         """Should gracefully return empty insights when there is insufficient data."""
+        mock_db.get_measurements_in_range.return_value = []
         mock_db.get_aggregates.return_value = []
 
         hour_result = service.hour_of_day_pattern("ca-on-test")

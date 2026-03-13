@@ -23,7 +23,7 @@
 
 - **4 Provinces:** Quebec, Ontario, Alberta, British Columbia
 - **380+ Hospitals:** Near-real-time monitoring across all regions
-- **4-Hour Updates:** Automated data collection currently via GitHub Actions in cost-control mode
+- **Hourly Updates:** Automated data collection currently via GitHub Actions
 - **First-in-Canada:** Real-time ED stretcher occupancy visualization (Quebec)
 
 ### Why This Matters
@@ -40,7 +40,7 @@ Provincial health authorities report ER wait times using **fundamentally differe
 
 ## Limitations
 
-- Scraper freshness currently reflects a 4-hour GitHub Actions cadence in cost-control mode rather than continuous ingestion.
+- Scraper freshness currently reflects an hourly GitHub Actions cadence rather than continuous ingestion.
 - The frontend is now live on the shared VPS at `https://wait-time.ca`; the backend scheduler path remains on GitHub Actions because the Ontario source is not reachable from this VPS.
 - Provincial methodology labels are inferred from public documentation and can lag unannounced reporting changes by source organizations.
 - Reported wait times and occupancy values are limited to what provinces publish; the platform cannot surface unreported overcrowding or internal flow constraints.
@@ -107,8 +107,8 @@ graph TD
     end
 
     subgraph "Current Scheduler (GitHub Actions)"
-        CRON[4-Hour Cron<br/>Scrapers]
-        HB[250-Minute Threshold<br/>Heartbeat Monitor]
+        CRON[Hourly Cron<br/>Scrapers]
+        HB[120-Minute Threshold<br/>Heartbeat Monitor]
     end
 
     subgraph "Database (Neon PostgreSQL)"
@@ -202,7 +202,7 @@ graph TD
 - `hospital_regions` - Hospital-to-region mappings
 
 ### Automation
-- **GitHub Actions:** Scrapers run every 4 hours in current cost-control mode, heartbeat checks every 30 minutes
+- **GitHub Actions:** Scrapers run hourly, heartbeat checks every 30 minutes
 - **Playwright Browsers:** Automated for Ontario/Alberta JavaScript-rendered pages
 - **Failure Alerting:** Pushover notifications for scraper/heartbeat failures
 - **Cost:** ~$240/month GitHub Actions (optimizable to ~$120/month)
@@ -420,10 +420,10 @@ waittimecanada/
 ## 🎯 Operational Workflows
 
 ### Production Automation
-- **Scraper Cron:** Runs every 4 hours via GitHub Actions in current cost-control mode
+- **Scraper Cron:** Runs hourly via GitHub Actions
 - **Heartbeat Monitor:** Checks scraper health every 30 minutes
 - **Failure Alerts:** Pushover notifications for stale data or errors
-- **Database Maintenance:** Aggregates refreshed without deleting raw measurements by default
+- **Database Maintenance:** Lightweight reporting by default; aggregate refresh is handled post-scrape
 
 ### CI/CD Pipelines
 - **Frontend CI:** Type checking, linting, unit tests
@@ -495,8 +495,8 @@ waittimecanada/
 - **Total:** 777 tests across full stack
 
 ### Data Freshness
-- **Update Frequency:** Every 30 minutes (12:00–04:00 UTC) + hourly overnight (04:00–12:00 UTC) — temporary cost-control throttle
-- **Heartbeat Threshold:** 90 minutes (alerts if exceeded) — temporary companion setting
+- **Update Frequency:** Hourly via GitHub Actions
+- **Heartbeat Threshold:** 120 minutes (alerts if exceeded)
 - **Current Status:** All 4 scrapers operational ✅
 
 ---

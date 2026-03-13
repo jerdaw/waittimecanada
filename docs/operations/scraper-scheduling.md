@@ -3,7 +3,7 @@
 **Last Updated:** 2026-03-13
 **Status:** ✅ All 4 provincial scrapers operational
 
-> Temporary cost-control mode (updated February 21, 2026): scraper cadence is `every 4 hours` with heartbeat stale threshold `250` minutes. Review on or before **March 9, 2026** and revert to normal cadence when Neon transfer usage stabilizes.
+> Live scheduler status (updated March 13, 2026): scraper cadence is `hourly` on GitHub Actions with heartbeat stale threshold `120` minutes. The VPS backend path remains deferred because Ontario times out from that host.
 >
 > Migration note (March 13, 2026): this document still describes the current live GitHub Actions scheduler path. A same-host VPS worker attempt was paused after the Ontario source timed out from that host; see `docs/operations/direct-vps-backend.md`.
 
@@ -19,10 +19,10 @@ Wait Time Canada operates 4 provincial emergency department wait time scrapers r
 
 | Province | Source ID | Status | Schedule | Last Verified |
 |----------|-----------|--------|----------|---------------|
-| **Quebec** | `quebec-msss` | ✅ Active | Every 4 hours | 2026-02-21 |
-| **Ontario** | `ontario-health` | ✅ Active | Every 4 hours | 2026-02-21 |
-| **Alberta** | `alberta-ahs` | ✅ Active | Every 4 hours | 2026-02-21 |
-| **British Columbia** | `bc-phsa` | ✅ Active | Every 4 hours | 2026-02-21 |
+| **Quebec** | `quebec-msss` | ✅ Active | Hourly | 2026-03-13 |
+| **Ontario** | `ontario-health` | ✅ Active | Hourly | 2026-03-13 |
+| **Alberta** | `alberta-ahs` | ✅ Active | Hourly | 2026-03-13 |
+| **British Columbia** | `bc-phsa` | ✅ Active | Hourly | 2026-03-13 |
 
 **Total Coverage:** 380+ hospitals across 4 provinces
 
@@ -33,7 +33,7 @@ Wait Time Canada operates 4 provincial emergency department wait time scrapers r
 ### 1. Scraper Cron (`scraper-cron.yml`)
 
 **Purpose:** Run all scrapers on schedule
-**Schedule:** `0 */4 * * *` (Every 4 hours)
+**Schedule:** `0 * * * *` (Hourly)
 **Runtime:** ~8-12 minutes (all 4 scrapers)
 **Timeout:** 20 minutes
 
@@ -59,22 +59,22 @@ Available via GitHub Actions UI (`workflow_dispatch`)
 
 **Purpose:** Dead Man's Switch - verify scrapers are running
 **Schedule:** `*/30 * * * *` (every 30 minutes)
-**Max Heartbeat Age:** 250 minutes
+**Max Heartbeat Age:** 120 minutes
 
 **Execution:**
 ```bash
-python -m waittime.cli.check_heartbeat --max-age 250
+python -m waittime.cli.check_heartbeat --max-age 120
 ```
 
 **Features:**
 - ✅ Dynamically discovers all sources from database
 - ✅ Checks `scraper_status` table for last run timestamp
-- ✅ Alerts via Pushover if heartbeat > 250 minutes old
+- ✅ Alerts via Pushover if heartbeat > 120 minutes old
 - ✅ Alerts include failure classification (`category/stage`) for error states
 - ✅ Alerts if no heartbeat ever recorded for a source
 
 **Alert Conditions:**
-- ⚠️ Heartbeat older than 250 minutes
+- ⚠️ Heartbeat older than 120 minutes
 - 🚨 No heartbeat found for source
 
 ---
@@ -160,12 +160,12 @@ python -m waittime.cli.scraper --list
 
 ### Check Heartbeat Health
 ```bash
-python -m waittime.cli.check_heartbeat --max-age 250
+python -m waittime.cli.check_heartbeat --max-age 120
 ```
 
 ### Check Detailed Operational Status (last-known-good + last-error)
 ```bash
-python -m waittime.cli.check_heartbeat --max-age 250 --dry-run --verbose
+python -m waittime.cli.check_heartbeat --max-age 120 --dry-run --verbose
 ```
 
 ### Dry Run (No Database Writes)
@@ -192,7 +192,7 @@ python -m waittime.cli.scraper --all --dry-run
 
 2. **Stale Heartbeat** (heartbeat-monitor.yml)
    - Title: ⚠️ Scraper Stale
-   - Trigger: No heartbeat in last 250 minutes
+   - Trigger: No heartbeat in last 120 minutes
    - Priority: 1 (High)
 
 **Manual Alert Test:**
@@ -319,12 +319,12 @@ When adding a new scraper:
 
 | Metric | Target | Current |
 |--------|--------|---------|
-| Scraper Run Frequency | Every 4 hours | ✅ Configured |
+| Scraper Run Frequency | Hourly | ✅ Configured |
 | Max Scraper Runtime | < 15 min | ✅ ~8-12 min |
 | Heartbeat Check Frequency | Every 30 min | ✅ Configured |
-| Max Heartbeat Age | < 250 min | ✅ Monitored |
+| Max Heartbeat Age | < 120 min | ✅ Monitored |
 | Scraper Success Rate | > 95% | ✅ Tolerant design |
-| Data Freshness | < 250 min | ✅ Temporary throttle cadence |
+| Data Freshness | < 120 min | ✅ Hourly scheduler path |
 
 ---
 
@@ -359,9 +359,9 @@ If Neon sends a public transfer warning (for example 80% usage), apply this runb
    GROUP BY source_id
    ORDER BY source_id;
    ```
-2. Temporarily reduce scrape cadence to 4 hours if needed:
-   - `scraper-cron.yml`: `*/15` -> `0 */4 * * *`
-   - `heartbeat-monitor.yml`: `--max-age 60` -> `--max-age 250`
+2. If cost pressure returns, adjust cadence and threshold together:
+   - `scraper-cron.yml`: `0 * * * *` -> slower cadence
+   - `heartbeat-monitor.yml`: increase `--max-age` to preserve sane alerting
 3. Confirm connection reuse is active in `DatabaseService` (constructor accepts `conn`).
 4. Keep read-heavy API routes cached at 5-10 minute shared TTL, and `no-store` only for user-specific/export routes.
 

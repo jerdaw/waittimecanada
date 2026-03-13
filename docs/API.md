@@ -45,6 +45,7 @@ Base URL:
 ## Export
 
 - `GET /api/export?format=csv|json&granularity=raw|hourly|daily|weekly|monthly`
+  - `granularity=hourly` is derived from raw measurements and limited to 30-day windows
 
 Additional optional export params:
 

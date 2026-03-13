@@ -1,5 +1,6 @@
 """Unit tests for the aggregate CLI tool."""
 
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 import pytest
@@ -68,20 +69,43 @@ class TestAggregateCLIIncremental:
     @patch("waittime.cli.aggregate.AggregationService")
     @patch("waittime.cli.aggregate.DatabaseService")
     def test_incremental_uses_48h_window(self, mock_db_cls, mock_agg_cls, mock_backfill_counts):
-        """--incremental should use a 48-hour lookback window."""
+        """--incremental should refresh recent current-period aggregates."""
         mock_service = mock_agg_cls.return_value
-        mock_service.backfill.return_value = mock_backfill_counts
+        mock_service.refresh_recent_periods.return_value = {
+            "daily": 2,
+            "weekly": 1,
+            "monthly": 1,
+        }
 
         with patch("sys.argv", ["aggregate.py", "--incremental"]):
             exit_code = main()
 
         assert exit_code == 0
-        call_kwargs = mock_service.backfill.call_args.kwargs
-        start_date = call_kwargs["start_date"]
-        end_date = call_kwargs["end_date"]
-        delta = end_date - start_date
-        # Should be approximately 48 hours (allow small timing variance)
-        assert 47.9 < delta.total_seconds() / 3600 < 48.1
+        call_kwargs = mock_service.refresh_recent_periods.call_args.kwargs
+        assert call_kwargs["period_types"] == ["daily", "weekly", "monthly"]
+        delta = datetime.now(UTC) - call_kwargs["since"]
+        assert 1.9 < delta.total_seconds() / 3600 < 2.1
+
+    @patch("waittime.cli.aggregate.AggregationService")
+    @patch("waittime.cli.aggregate.DatabaseService")
+    def test_incremental_specific_period(self, mock_db_cls, mock_agg_cls):
+        """--incremental --period daily should narrow the refresh scope."""
+        mock_service = mock_agg_cls.return_value
+        mock_service.refresh_recent_periods.return_value = {"daily": 2}
+
+        with patch("sys.argv", ["aggregate.py", "--incremental", "--period", "daily"]):
+            exit_code = main()
+
+        assert exit_code == 0
+        call_kwargs = mock_service.refresh_recent_periods.call_args.kwargs
+        assert call_kwargs["period_types"] == ["daily"]
+
+    def test_incremental_rejects_hourly_period(self):
+        """Routine incremental refresh should not maintain hourly aggregates."""
+        with patch("sys.argv", ["aggregate.py", "--incremental", "--period", "hourly"]):
+            with pytest.raises(SystemExit) as exc_info:
+                main()
+            assert exc_info.value.code == 2
 
 
 @pytest.mark.unit

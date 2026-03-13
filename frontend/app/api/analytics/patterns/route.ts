@@ -136,15 +136,14 @@ export async function GET(request: Request) {
 
       const rows = await sql`
         SELECT
-          EXTRACT(HOUR FROM period_start)::int AS hour,
-          AVG(mean_value)::float AS mean,
-          AVG(median_value)::float AS median,
-          SUM(sample_count)::int AS sample_count
-        FROM measurement_aggregates
-        WHERE hospital_id = ${hospitalId}
-          AND period_type = 'hourly'
-          AND period_start >= ${start.toISOString()}::timestamptz
-        GROUP BY EXTRACT(HOUR FROM period_start)
+          EXTRACT(HOUR FROM m.timestamp_utc)::int AS hour,
+          AVG(m.value)::float AS mean,
+          PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY m.value)::float AS median,
+          COUNT(*)::int AS sample_count
+        FROM measurements m
+        WHERE m.hospital_id = ${hospitalId}
+          AND m.timestamp_utc >= ${start.toISOString()}::timestamptz
+        GROUP BY EXTRACT(HOUR FROM m.timestamp_utc)
         ORDER BY hour
       `;
 

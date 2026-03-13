@@ -48,7 +48,7 @@ Required:
 Recommended:
 
 1. `NEXT_PUBLIC_BASE_URL=https://wait-time.ca`
-2. `HEARTBEAT_STALE_THRESHOLD_MINUTES=250` while cost-control heartbeat policy remains in effect
+2. `HEARTBEAT_STALE_THRESHOLD_MINUTES=120` to match the hourly GitHub Actions backend cadence
 
 Deployment note:
 

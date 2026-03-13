@@ -33,7 +33,7 @@ the VPS backend path.
 
 ### Scheduling: ✅ OPERATIONAL
 
-- **Scraper Cron:** Runs every 4 hours (`0 */4 * * *`)
+- **Scraper Cron:** Runs hourly (`0 * * * *`)
 - **Heartbeat Monitor:** Checks every 30 minutes (`*/30 * * * *`)
 - **Execution:** `python -m waittime.cli.scraper --all`
 - **Runtime:** ~8-12 minutes per cycle
@@ -41,7 +41,7 @@ the VPS backend path.
 
 ### Monitoring: ✅ OPERATIONAL
 
-- **Heartbeat Checks:** Active (250-minute threshold)
+- **Heartbeat Checks:** Active (120-minute threshold)
 - **Failure Alerts:** Pushover configured
 - **Dead Man's Switch:** `check_heartbeat` CLI monitors all sources
 - **Dynamic Discovery:** Sources auto-detected from database
@@ -70,7 +70,7 @@ the VPS backend path.
 
 **scraper-cron.yml:**
 - ✅ YAML syntax valid
-- ✅ Runs every 4 hours
+- ✅ Runs hourly
 - ✅ Installs Playwright browsers
 - ✅ Runs all 4 scrapers with `--all` flag
 - ✅ Failure alerting configured
@@ -80,7 +80,7 @@ the VPS backend path.
 - ✅ YAML syntax valid
 - ✅ Runs every 30 minutes
 - ✅ Checks all sources dynamically
-- ✅ 250-minute heartbeat threshold
+- ✅ 120-minute heartbeat threshold
 - ✅ Pushover alerts configured
 
 ### 2. Scraper CLI ✅
@@ -210,11 +210,11 @@ concurrency:
 
 | Metric | Target | Status |
 |--------|--------|--------|
-| Scraper Frequency | Every 4 hours | ✅ Configured |
+| Scraper Frequency | Hourly | ✅ Configured |
 | Scraper Runtime | < 15 min | ✅ ~10 min avg |
 | Heartbeat Frequency | Every 30 min | ✅ Configured |
-| Max Heartbeat Age | < 250 min | ✅ Monitored |
-| Data Freshness | < 250 min | ✅ temporary throttle cadence |
+| Max Heartbeat Age | < 120 min | ✅ Monitored |
+| Data Freshness | < 120 min | ✅ hourly scheduler path |
 
 ### Cost Estimate
 

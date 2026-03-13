@@ -1,7 +1,6 @@
 name: Database Maintenance
 
-# PAUSED (2026-02-22): Scheduled runs disabled due to exhausted GitHub Actions quota.
-# Keep manual dispatch available for non-destructive aggregate maintenance or
+# Keep manual dispatch available for lightweight storage reporting and
 # explicit operator-approved purge work.
 on:
   workflow_dispatch:  # Allow manual triggering
@@ -48,7 +47,7 @@ jobs:
         if: success()
         run: |
           echo "✅ Database maintenance completed successfully"
-          echo "Recent aggregates were refreshed"
+          echo "No aggregate recomputation was performed"
           echo "Raw measurements were preserved unless an explicit purge flag was supplied"
           echo "Measurement table storage stats were reported"
 

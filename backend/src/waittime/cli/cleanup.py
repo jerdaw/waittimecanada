@@ -2,7 +2,7 @@
 
 The default behavior is non-destructive:
 1. report raw-measurement age statistics
-2. refresh recent aggregates so long-range analytics stay current
+2. report lightweight maintenance status
 
 Raw measurement deletion is now opt-in and requires an explicit purge flag.
 
@@ -16,9 +16,7 @@ Usage:
 import argparse
 import logging
 import sys
-from datetime import UTC, datetime, timedelta
 
-from waittime.services.aggregation import AggregationService
 from waittime.services.database import DatabaseService
 
 logging.basicConfig(
@@ -31,7 +29,7 @@ logger = logging.getLogger(__name__)
 def main() -> int:
     """Run backend data maintenance."""
     parser = argparse.ArgumentParser(
-        description="Aggregate recent measurements and optionally purge old raw rows"
+        description="Run lightweight maintenance and optionally purge old raw rows"
     )
     parser.add_argument(
         "--retention-days",
@@ -112,23 +110,10 @@ def main() -> int:
                 logger.info("Raw measurements will be preserved; no purge requested.")
             return 0
 
-        # Refresh recent daily aggregates during each maintenance run.
-        # Hourly backfill is more expensive over GitHub Actions + Neon and should
-        # be handled via explicit aggregation runs when needed.
-        logger.info("\nRefreshing recent daily aggregates...")
-        agg_service = AggregationService(db)
-
-        # Keep the maintenance window short to limit Neon round-trips while still
-        # covering the current day and a small retry buffer.
-        three_days_ago = datetime.now(UTC) - timedelta(days=3)
-        agg_counts = agg_service.backfill(
-            start_date=three_days_ago,
-            end_date=None,
-            period_types=["daily"],
+        logger.info(
+            "\nSkipping aggregate refresh in maintenance. "
+            "Current buckets are refreshed by the post-scrape aggregation path."
         )
-        agg_total = sum(agg_counts.values())
-        if agg_total > 0:
-            logger.info(f"  Created {agg_total} new aggregates during maintenance")
 
         deleted_count = 0
         if args.purge_old_measurements:

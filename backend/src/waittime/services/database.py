@@ -859,6 +859,98 @@ class DatabaseService:
                     cur.execute("SELECT id FROM hospitals ORDER BY id")
                 return [row["id"] for row in cur.fetchall()]
 
+    def get_hospital_ids_with_measurements_since(
+        self, since: datetime, visible_only: bool = True
+    ) -> list[str]:
+        """Return hospital IDs that have raw measurements at or after ``since``."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                if visible_only:
+                    cur.execute(
+                        """
+                        SELECT DISTINCT m.hospital_id
+                        FROM measurements m
+                        JOIN hospitals h ON h.id = m.hospital_id
+                        WHERE m.timestamp_utc >= %s
+                          AND h.is_verified = true
+                          AND h.is_visible = true
+                        ORDER BY m.hospital_id
+                        """,
+                        (since,),
+                    )
+                else:
+                    cur.execute(
+                        """
+                        SELECT DISTINCT hospital_id
+                        FROM measurements
+                        WHERE timestamp_utc >= %s
+                        ORDER BY hospital_id
+                        """,
+                        (since,),
+                    )
+                return [row["hospital_id"] for row in cur.fetchall()]
+
+    def upsert_aggregates(self, aggregates: list[MeasurementAggregate]) -> int:
+        """Insert or refresh multiple aggregates in one batch."""
+        if not aggregates:
+            return 0
+
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                rows = [
+                    (
+                        aggregate.hospital_id,
+                        aggregate.source_id,
+                        aggregate.period_type,
+                        aggregate.period_start,
+                        aggregate.period_end,
+                        aggregate.mean_value,
+                        aggregate.median_value,
+                        aggregate.p90_value,
+                        aggregate.min_value,
+                        aggregate.max_value,
+                        aggregate.std_dev,
+                        aggregate.sample_count,
+                        aggregate.metric_family,
+                        aggregate.start_event,
+                        aggregate.end_event,
+                        aggregate.statistic_type,
+                    )
+                    for aggregate in aggregates
+                ]
+
+                refreshed = psycopg2.extras.execute_values(
+                    cur,
+                    """
+                    INSERT INTO measurement_aggregates (
+                        hospital_id, source_id,
+                        period_type, period_start, period_end,
+                        mean_value, median_value, p90_value,
+                        min_value, max_value, std_dev, sample_count,
+                        metric_family, start_event, end_event, statistic_type
+                    ) VALUES %s
+                    ON CONFLICT (hospital_id, period_type, period_start, metric_family)
+                    DO UPDATE SET
+                        source_id = EXCLUDED.source_id,
+                        period_end = EXCLUDED.period_end,
+                        mean_value = EXCLUDED.mean_value,
+                        median_value = EXCLUDED.median_value,
+                        p90_value = EXCLUDED.p90_value,
+                        min_value = EXCLUDED.min_value,
+                        max_value = EXCLUDED.max_value,
+                        std_dev = EXCLUDED.std_dev,
+                        sample_count = EXCLUDED.sample_count,
+                        start_event = EXCLUDED.start_event,
+                        end_event = EXCLUDED.end_event,
+                        statistic_type = EXCLUDED.statistic_type
+                    RETURNING 1
+                    """,
+                    rows,
+                    template="(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    fetch=True,
+                )
+                return len(refreshed)
+
     def _row_to_aggregate(self, row: dict[str, Any]) -> MeasurementAggregate:
         """Convert database row to MeasurementAggregate model."""
         return MeasurementAggregate(

@@ -25,6 +25,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 VALID_PERIOD_TYPES = ["hourly", "daily", "weekly", "monthly"]
+INCREMENTAL_PERIOD_TYPES = ["daily", "weekly", "monthly"]
 
 
 def main() -> int:
@@ -38,7 +39,7 @@ def main() -> int:
     parser.add_argument(
         "--incremental",
         action="store_true",
-        help="Only compute aggregates for the last 48 hours (intended for cron)",
+        help="Refresh current daily/weekly/monthly buckets for hospitals with recent data",
     )
     parser.add_argument(
         "--hospital",
@@ -79,18 +80,23 @@ def main() -> int:
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
 
+    if args.incremental and args.period and args.period not in INCREMENTAL_PERIOD_TYPES:
+        parser.error("--incremental only supports daily, weekly, or monthly periods")
+
     try:
         db = DatabaseService()
         service = AggregationService(db)
-
-        now = datetime.now(UTC)
-        period_types = [args.period] if args.period else None
+        period_types: list[str] | None
 
         if args.incremental:
-            start_date = now - timedelta(hours=48)
-            mode_label = "Incremental (last 48 hours)"
+            now = datetime.now(UTC)
+            since = now - timedelta(hours=2)
+            period_types = [args.period] if args.period else INCREMENTAL_PERIOD_TYPES
+            mode_label = "Incremental refresh (recent daily/weekly/monthly buckets)"
         else:
+            now = datetime.now(UTC)
             start_date = now - timedelta(days=args.days)
+            period_types = [args.period] if args.period else None
             mode_label = f"Backfill (last {args.days} days)"
 
         logger.info(f"Aggregation mode: {mode_label}")
@@ -105,13 +111,21 @@ def main() -> int:
         if args.dry_run:
             logger.info("DRY RUN - no data will be saved")
 
-        counts = service.backfill(
-            hospital_id=args.hospital,
-            start_date=start_date,
-            end_date=now,
-            period_types=period_types,
-            dry_run=args.dry_run,
-        )
+        if args.incremental:
+            counts = service.refresh_recent_periods(
+                hospital_id=args.hospital,
+                since=since,
+                period_types=period_types,
+                dry_run=args.dry_run,
+            )
+        else:
+            counts = service.backfill(
+                hospital_id=args.hospital,
+                start_date=start_date,
+                end_date=now,
+                period_types=period_types,
+                dry_run=args.dry_run,
+            )
 
         total = sum(counts.values())
         logger.info(
