@@ -10,6 +10,9 @@ on:
 
 env:
   PYTHON_VERSION: '3.12'
+  ALERT_EMAIL_USER: ${{ secrets.ALERT_EMAIL_USER }}
+  ALERT_EMAIL_PASSWORD: ${{ secrets.ALERT_EMAIL_PASSWORD }}
+  ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
 
 concurrency:
   group: database-migrate-${{ github.ref }}
@@ -43,15 +46,15 @@ jobs:
           python run_migrations.py
 
       - name: Notify on failure
-        if: failure() && secrets.ALERT_EMAIL_TO != '' && secrets.ALERT_EMAIL_USER != '' && secrets.ALERT_EMAIL_PASSWORD != ''
+        if: failure() && env.ALERT_EMAIL_TO != '' && env.ALERT_EMAIL_USER != '' && env.ALERT_EMAIL_PASSWORD != ''
         uses: dawidd6/action-send-mail@v11
         with:
           server_address: smtp.gmail.com
           server_port: 465
-          username: ${{ secrets.ALERT_EMAIL_USER }}
-          password: ${{ secrets.ALERT_EMAIL_PASSWORD }}
+          username: ${{ env.ALERT_EMAIL_USER }}
+          password: ${{ env.ALERT_EMAIL_PASSWORD }}
           subject: '[Wait Time Canada] Database Migration Failed'
-          to: ${{ secrets.ALERT_EMAIL_TO }}
+          to: ${{ env.ALERT_EMAIL_TO }}
           from: Wait Time Canada Monitoring
           body: |
             Database migration failed at ${{ github.run_id }}.
