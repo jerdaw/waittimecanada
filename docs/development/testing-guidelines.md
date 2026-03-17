@@ -55,7 +55,7 @@ cd frontend
 npm run test:e2e
 ```
 
-Default rule: do not run E2E locally unless investigating a specific browser-flow bug.
+Default rule: do not run E2E locally unless investigating a specific browser-flow bug. Use GitHub Actions manual dispatch for routine browser verification until the Playwright stabilization item is closed.
 
 ## Coverage and Quality Expectations
 
@@ -96,7 +96,7 @@ npm run test:unit
 - Treat local runs as fast preflight to reduce CI churn.
 - If local and CI disagree, prioritize reproducing and fixing CI conditions.
 - Frontend and backend coverage upload from separate path-scoped workflows; a coverage-config-only change should still trigger the relevant CI path.
-- Playwright is path-gated to user-facing frontend diffs; API-only frontend changes should rely on lint, type-check, unit tests, and build unless the change explicitly affects browser flows.
+- Playwright is currently manual-dispatch in GitHub Actions while the suite is being stabilized; default merge readiness relies on lint, type-check, unit tests, and build.
 
 ## Free-Tier CI Conservation (Temporary)
 

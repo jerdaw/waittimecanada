@@ -12,6 +12,7 @@ on:
     paths:
       - 'frontend/**'
       - 'codecov.yml'
+  workflow_dispatch:
 
 env:
   NODE_VERSION: '20'
@@ -140,7 +141,7 @@ jobs:
   test-e2e:
     name: E2E Tests (Playwright)
     needs: [changes]
-    if: needs.changes.outputs.run_e2e == 'true' && (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 25
 

@@ -32,13 +32,13 @@ This directory contains operational and CI workflows for Wait Time Canada.
 - `lint` (ESLint + Prettier check)
 - `type-check` (TypeScript)
 - `test-unit` (Vitest + coverage)
-- `test-e2e` (Playwright Chromium only, diff-gated)
+- `test-e2e` (Playwright Chromium only, manual dispatch while the suite is being stabilized)
 - `build` (Next.js production build, diff-gated)
 
 **Optimization controls:**
 - Branch-level concurrency cancellation.
 - Changed-path gating for heavy E2E/build steps.
-- Playwright E2E now runs only for user-facing route/component/style/test diffs, not API-only frontend changes.
+- Playwright E2E is currently manual-dispatch only while the suite is being stabilized; routine push/PR CI relies on lint, type-check, unit tests, and build.
 - Explicit failures (no permissive "skip on error" fallbacks).
 - Unit-test coverage uploads to Codecov with the `frontend` flag.
 
@@ -158,6 +158,6 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ## Operational Notes
 
-- Playwright E2E is CI-only for normal development flow.
+- Playwright E2E is GitHub-CI-only and manual-dispatch while stabilization work is outstanding.
 - `frontend-ci.yml` keeps strict quality gates while avoiding heavy jobs when changes do not affect user-facing frontend runtime behavior.
 - `production-readiness.yml` and `production-smoke.yml` are the operational preflight/postflight checks for live deployment confidence.
