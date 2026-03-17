@@ -96,6 +96,7 @@ npm run test:unit
 - Treat local runs as fast preflight to reduce CI churn.
 - If local and CI disagree, prioritize reproducing and fixing CI conditions.
 - Frontend and backend coverage upload from separate path-scoped workflows; a coverage-config-only change should still trigger the relevant CI path.
+- Playwright is path-gated to user-facing frontend diffs; API-only frontend changes should rely on lint, type-check, unit tests, and build unless the change explicitly affects browser flows.
 
 ## Free-Tier CI Conservation (Temporary)
 

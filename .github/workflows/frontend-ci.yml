@@ -36,7 +36,8 @@ jobs:
         with:
           filters: |
             e2e:
-              - 'frontend/app/**'
+              - 'frontend/app/[locale]/**'
+              - 'frontend/app/globals.css'
               - 'frontend/components/**'
               - 'frontend/utils/**'
               - 'frontend/content/**'

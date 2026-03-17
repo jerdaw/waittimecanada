@@ -100,6 +100,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [x] **P1 / Ops: Raw retention + alerting stabilization** — Raw measurements preserved by default, duplicate suppression added, maintenance made lightweight, and heartbeat alerts made state-change driven with a 120-minute threshold
 - [x] **P1 / Ops: CI/tooling maintenance (2026-02-23)** — Resolved all mypy/pytest CI failures; upgraded ruff, mypy, react-map-gl v8, playwright, date-fns
 - [x] **P1 / Ops: Codecov coverage rollout (2026-03-16)** — Added quiet Codecov configuration with split frontend/backend flags, carryforward support, and patch-focused PR status checks
+- [ ] **P1 / Ops: Stabilize Playwright UI regression suite** — Main-branch Playwright currently times out on map/list interactions and footer landmark a11y assertions; tighten selectors/fixtures and keep heavy E2E focused on user-facing diffs
 - [x] **P0 / Ops: Production domain launch verification** — `wait-time.ca` HTTPS valid, `www.wait-time.ca` redirect verified, release deploy published, production smoke passing
 - [x] **P1 / Ops: Harden Netlify release gate** — M32 Complete
 - [x] **P1 / Divergence Briefs in analytics + export** — M32 Complete

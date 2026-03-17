@@ -38,6 +38,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 **Optimization controls:**
 - Branch-level concurrency cancellation.
 - Changed-path gating for heavy E2E/build steps.
+- Playwright E2E now runs only for user-facing route/component/style/test diffs, not API-only frontend changes.
 - Explicit failures (no permissive "skip on error" fallbacks).
 - Unit-test coverage uploads to Codecov with the `frontend` flag.
 
@@ -158,5 +159,5 @@ This directory contains operational and CI workflows for Wait Time Canada.
 ## Operational Notes
 
 - Playwright E2E is CI-only for normal development flow.
-- `frontend-ci.yml` keeps strict quality gates while avoiding heavy jobs when changes do not affect runtime behavior.
+- `frontend-ci.yml` keeps strict quality gates while avoiding heavy jobs when changes do not affect user-facing frontend runtime behavior.
 - `production-readiness.yml` and `production-smoke.yml` are the operational preflight/postflight checks for live deployment confidence.
