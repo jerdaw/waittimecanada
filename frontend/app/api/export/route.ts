@@ -84,13 +84,17 @@ export async function GET(request: NextRequest) {
           {
             success: false,
             error: "Invalid hourly export window",
-            message: "Hourly exports require a valid start_date before end_date.",
+            message:
+              "Hourly exports require a valid start_date before end_date.",
           },
           { status: 400, headers: NO_STORE_HEADERS },
         );
       }
 
-      if (hourlyEnd.getTime() - hourlyStart.getTime() > MAX_HOURLY_EXPORT_WINDOW_MS) {
+      if (
+        hourlyEnd.getTime() - hourlyStart.getTime() >
+        MAX_HOURLY_EXPORT_WINDOW_MS
+      ) {
         return NextResponse.json(
           {
             success: false,
