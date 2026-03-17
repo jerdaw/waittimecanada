@@ -42,7 +42,7 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
   const [data, setData] = useState<TrendData | null>(null);
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -55,13 +55,13 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
           if (json.error) throw new Error(json.error);
           setData(json);
           setLoading(false);
-          setError(null);
+          setHasError(false);
         }
       })
       .catch((err) => {
         if (mounted) {
           console.error(err);
-          setError(t("error"));
+          setHasError(true);
           setLoading(false);
         }
       });
@@ -69,7 +69,7 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
     return () => {
       mounted = false;
     };
-  }, [hospitalId, period, t]);
+  }, [hospitalId, period]);
 
   const isAggregated = data?.dataSource === "aggregated";
   const hasMinMax = data?.dataPoints?.some(
@@ -139,9 +139,9 @@ export function TrendChart({ hospitalId }: TrendChartProps) {
           <div className="h-full w-full flex items-center justify-center">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
-        ) : error ? (
+        ) : hasError ? (
           <div className="h-full w-full flex items-center justify-center text-sm text-red-500">
-            {error}
+            {t("error")}
           </div>
         ) : !data?.dataPoints?.length ? (
           <div className="h-full w-full flex items-center justify-center text-sm text-muted-foreground">

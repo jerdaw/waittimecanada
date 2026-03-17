@@ -67,6 +67,8 @@ describe("TrendChart Component", () => {
     await waitFor(() => {
       expect(screen.getByText("Failed to load trends")).toBeInTheDocument();
     });
+
+    expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 
   it("renders all six period buttons", async () => {
