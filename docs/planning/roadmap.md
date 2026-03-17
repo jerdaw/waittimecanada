@@ -114,7 +114,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P1 / Backend-compatible cutover verification** — Frontend private/public health and production smoke passed; backend verification exposed Ontario upstream timeouts from this VPS, so backend cutover is deferred until a compatible runtime path is proven
 
 ### Phase A: Immediate Credibility Cleanup
-[Full details: admissions-strengthening-plan.md §Phase A](implementation/admissions-strengthening-plan.md#phase-a-immediate-before-march-9--no-live-url-required)
+[Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
 
 - [ ] **P1 / A1: Named author bio in README** — Expand the maintainer blurb into a 3–5 sentence personal motivation statement (30 min)
 - [x] **P1 / A2: Limitations section in README** — Specific, technical limitations demonstrating intellectual maturity (delivered in README + application summary)
@@ -125,7 +125,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P1 / A7: Quantified metrics & methodology findings** — Query DB for honest metrics; methodology-characterization findings only, no cross-province performance claims (3 h)
 
 ### Phase B: Active Launch Cleanup
-[Full details: admissions-strengthening-plan.md §Phase B](implementation/admissions-strengthening-plan.md#phase-b-launch-follow-through-post-verification)
+[Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
 
 - [ ] **P1 / B2: Privacy-safe usage analytics** — Add Plausible Analytics; update /privacy page; do not publicize numbers (2 h)
 - [ ] **P1 / B3: Publish LinkedIn launch post** — Publish the finalized post using `https://wait-time.ca`; max 30 min (30 min)
@@ -133,7 +133,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P2 / B5: GitHub topics & discoverability** — Add topic tags; check 1–2 open data registries (30 min)
 
 ### Phase C: After Verified Launch — Scholarly Artifacts & External Validation
-[Full details: admissions-strengthening-plan.md §Phase C](implementation/admissions-strengthening-plan.md#phase-c-weeks-24-scholarly-artifacts--external-validation)
+[Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
 
 - [ ] **P1 / C1: Technical report** — 2–4 page “Methodological Heterogeneity in Canadian ED Wait-Time Reporting”; gate publication on external read-through (1–2 d)
 - [ ] **P1 / C2: Targeted researcher outreach** — 3 specific researchers at ICES/INSPQ/university labs; share technical report (3 h + response time)
@@ -143,7 +143,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P2 / C6: Named reviewer acknowledgement** — If A4 or C2 produces a willing reviewer, add Acknowledgements to README (30 min; conditional)
 
 ### Phase D: Deferred — If Time Permits
-[Full details: admissions-strengthening-plan.md §Phase D](implementation/admissions-strengthening-plan.md#phase-d-if-time-permits-weeks-512)
+[Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
 
 - [ ] **P2 / D1: Comparability matrix upgrade** — Explicit per-pair field-by-field verdicts on /methods (conditional on current state)
 - [ ] **P2 / D2: Quebec equity layer extension (M34)** — Apply Ontario template to QC with full rigor (blocked on StatsCan CT data)
