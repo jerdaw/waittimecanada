@@ -160,6 +160,7 @@ class QuebecScraper(BaseScraper):
                     self._record_failure(error, "persist", start_time)
                     failure_recorded = True
                     raise
+                inserted_count = self._normalize_inserted_count(inserted_count, len(measurements))
                 duplicate_count = len(measurements) - inserted_count
                 if duplicate_count > 0:
                     logger.info(

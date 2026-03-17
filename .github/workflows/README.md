@@ -23,7 +23,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 2. `frontend-ci.yml` - Frontend CI
 
-**Trigger:** push/PR affecting `frontend/**`.
+**Trigger:** push/PR affecting `frontend/**` or `codecov.yml`.
 
 **Purpose:** Keep frontend quality gates strict while reducing redundant runtime.
 
@@ -39,12 +39,13 @@ This directory contains operational and CI workflows for Wait Time Canada.
 - Branch-level concurrency cancellation.
 - Changed-path gating for heavy E2E/build steps.
 - Explicit failures (no permissive "skip on error" fallbacks).
+- Unit-test coverage uploads to Codecov with the `frontend` flag.
 
 ---
 
 ### 3. `scraper-ci.yml` - Backend/Scraper CI
 
-**Trigger:** push/PR affecting `backend/**`.
+**Trigger:** push/PR affecting `backend/**` or `codecov.yml`.
 
 **Jobs:**
 - `lint` (ruff)
@@ -54,6 +55,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 **Optimization controls:**
 - Branch-level concurrency cancellation.
+- Coverage uploads to Codecov with the `scrapers` flag.
 
 ---
 

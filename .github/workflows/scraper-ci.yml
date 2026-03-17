@@ -6,10 +6,12 @@ on:
     paths:
       - 'backend/**'
       - '.github/workflows/scraper-ci.yml'
+      - 'codecov.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'backend/**'
+      - 'codecov.yml'
 
 env:
   PYTHON_VERSION: '3.12'

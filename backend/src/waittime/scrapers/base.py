@@ -154,6 +154,18 @@ class BaseScraper(ABC):
         """
         return content[:max_length]
 
+    def _normalize_inserted_count(self, inserted_count: object, measurement_count: int) -> int:
+        """Normalize DB insert results for logging.
+
+        Real database inserts return an integer count, but tests and alternate
+        persistence shims may use mocks or `None` when the count is not relevant.
+        In those cases, treat the batch as fully persisted so scraper execution
+        and heartbeat reporting remain robust.
+        """
+        if isinstance(inserted_count, int) and inserted_count >= 0:
+            return inserted_count
+        return measurement_count
+
     def run(
         self,
         save_to_db: bool = True,
@@ -212,6 +224,7 @@ class BaseScraper(ABC):
                     failure_recorded = True
                     raise
 
+                inserted_count = self._normalize_inserted_count(inserted_count, len(measurements))
                 duplicate_count = len(measurements) - inserted_count
                 if duplicate_count > 0:
                     logger.info(

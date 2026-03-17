@@ -8,8 +8,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![Node.js 20+](https://img.shields.io/badge/node.js-20+-green.svg)](https://nodejs.org/)
-[![Tests](https://img.shields.io/badge/tests-660%2B%20passing-success.svg)](https://github.com/jerdaw/waittimecanada)
-[![Coverage](https://img.shields.io/badge/coverage-77%25-yellowgreen.svg)](https://github.com/jerdaw/waittimecanada)
+[![Tests](https://img.shields.io/badge/tests-821%2B%20passing-success.svg)](https://github.com/jerdaw/waittimecanada)
+[![Coverage](https://img.shields.io/badge/coverage-CodeCov-blue.svg)](https://app.codecov.io/gh/jerdaw/waittimecanada)
 [![Documentation](https://img.shields.io/badge/docs-deployed-blue.svg)](https://jerdaw.github.io/waittimecanada/)
 [![Data Freshness](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fjerdaw%2Fwaittimecanada%2Fbadges%2Ffreshness.json&query=%24.message&label=Last%20Scrape&color=%24.color)](https://github.com/jerdaw/waittimecanada/actions/workflows/scraper-cron.yml)
 
@@ -472,7 +472,7 @@ waittimecanada/
 
 ---
 
-## 📊 Current Status (as of 2026-02-19)
+## 📊 Current Status (as of 2026-03-16)
 
 ### Milestones Completed
 - ✅ M1-M4: Database foundation, Ontario/Quebec scrapers, methodology warnings, PWA setup
@@ -488,12 +488,14 @@ waittimecanada/
 - ✅ M18: Occupancy frontend UI (visual indicators on hospital cards)
 - ✅ M28: Ontario real-data equity layer (StatsCan tract integration)
 - ✅ M29: Ontario equity academic rigor hardening (uncertainty + interpretation limits)
+- ✅ M30-M33: Reliability hardening, divergence briefs, deployment readiness, and historical occupancy trends
 - ✅ Operations: Production verification and comprehensive documentation
+- ✅ Operations: Codecov PR coverage reporting with split frontend/backend uploads
 
 ### Test Coverage
-- **Backend:** 435 tests passing, 80% code coverage
-- **Frontend:** 342 tests passing
-- **Total:** 777 tests across full stack
+- **Backend:** 460 tests passing locally, ~80% line coverage
+- **Frontend:** 361 tests passing locally
+- **Total:** 821 tests across the locally verified stack
 
 ### Data Freshness
 - **Update Frequency:** Hourly via GitHub Actions
@@ -506,12 +508,9 @@ waittimecanada/
 
 ### Planned Enhancements
 - [ ] Additional provinces (Nova Scotia, New Brunswick)
-- [ ] Historical occupancy trends (daily/weekly patterns)
-- [ ] Enhanced equity layer with census tract income overlays
-- [ ] Scraper reliability hardening (retry/backoff, clearer failure visibility)
-- [ ] Divergence briefs across analytics and exports (non-comparability explanations)
-- [ ] Data quality snapshot diffs + drift monitoring (coverage drops, anomalies over time)
-- [ ] Cache header + polling audit (tight TTLs, `no-store` where required, low-frequency health checks)
+- [ ] Multi-province equity layer beyond Ontario
+- [ ] Public-facing admissions artifacts (named author bio, real Zenodo DOI, case study, quantified findings)
+- [ ] Privacy-safe usage analytics and launch follow-through artifacts
 - [ ] Prometheus/Grafana monitoring dashboard
 - [ ] Smart scheduling (reduce frequency during overnight hours)
 - [ ] Occupancy-based hospital recommendations

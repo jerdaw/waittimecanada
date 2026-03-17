@@ -6,10 +6,12 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
+      - 'codecov.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'frontend/**'
+      - 'codecov.yml'
 
 env:
   NODE_VERSION: '20'
@@ -30,7 +32,7 @@ jobs:
 
       - name: Detect changed paths
         id: filter
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@v4
         with:
           filters: |
             e2e:

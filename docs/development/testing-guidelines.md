@@ -63,6 +63,8 @@ Default rule: do not run E2E locally unless investigating a specific browser-flo
 - New API routes/services should include happy-path and error-path tests.
 - Comparability, divergence warnings, and data-quality logic must remain explicitly tested.
 - If a change is hard to test directly, document rationale in PR notes.
+- PR coverage reporting is handled in Codecov with split `frontend` and `scrapers` uploads plus a patch-focused status check.
+- Avoid brittle whole-repo coverage gates in local commands when the baseline is intentionally being raised over time.
 
 ## Naming and Organization
 
@@ -93,6 +95,7 @@ npm run test:unit
 - CI is the source of truth for merge readiness.
 - Treat local runs as fast preflight to reduce CI churn.
 - If local and CI disagree, prioritize reproducing and fixing CI conditions.
+- Frontend and backend coverage upload from separate path-scoped workflows; a coverage-config-only change should still trigger the relevant CI path.
 
 ## Free-Tier CI Conservation (Temporary)
 
