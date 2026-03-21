@@ -113,7 +113,7 @@ waittime-canada/
 │   │   ├── scrapers/            # Provincial scrapers
 │   │   │   ├── base.py          # BaseScraper abstract class
 │   │   │   ├── quebec.py        # Quebec MSSS scraper
-│   │   │   └── ontario.py       # Ontario Health scraper (Playwright)
+│   │   │   └── ontario.py       # Ontario Health scraper (HTTP + HTML tables)
 │   │   ├── services/            # Business logic
 │   │   │   ├── database.py      # DatabaseService (CRUD operations)
 │   │   │   ├── comparison.py    # ComparisonService (divergence detection)

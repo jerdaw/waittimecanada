@@ -1,11 +1,13 @@
 # Operational Status Report
 
-**Date:** 2026-03-13
+**Date:** 2026-03-21
 **Status:** ✅ Frontend Live On VPS | ✅ GitHub Actions Backend Operational | ⚠️ VPS Backend Deferred
 
 **Frontend addendum (2026-03-13):** `https://wait-time.ca` is now live on the shared VPS behind host Caddy, `https://www.wait-time.ca` redirects to the canonical host through Caddy, and production smoke checks pass against the canonical domain.
 
 **Backend addendum (2026-03-13):** GitHub Actions remains the live backend scheduler path. A same-host VPS backend attempt was paused after confirming that the Ontario source times out from this VPS.
+
+**Backend reliability addendum (2026-03-21):** the live GitHub Actions Ontario scraper path now retries a read timeout once with an extended HTTP read timeout. A post-deploy production run completed successfully at `2026-03-21T10:31:36Z`, preserving GitHub Actions as the healthy live backend path while the VPS backend remains deferred.
 
 ---
 
@@ -24,12 +26,12 @@ the VPS backend path.
 
 | Component | Status | Details |
 |-----------|--------|---------|
-| **Quebec Scraper** | ✅ Active | MSSS portal, BeautifulSoup, 110+ hospitals |
-| **Ontario Scraper** | ✅ Active | Health Ontario, Playwright, 160+ hospitals |
-| **Alberta Scraper** | ✅ Active | AHS portal, Playwright, 50+ hospitals |
-| **BC Scraper** | ✅ Active | PHSA portal, JSON extraction, 60+ hospitals |
+| **Quebec Scraper** | ✅ Active | MSSS portal, BeautifulSoup, 120+ hospitals |
+| **Ontario Scraper** | ✅ Active | Health Ontario, direct HTTP + HTML table parsing, 220+ hospitals |
+| **Alberta Scraper** | ✅ Active | AHS portal, Playwright, 26 hospitals |
+| **BC Scraper** | ✅ Active | PHSA portal, JSON extraction, 25 hospitals |
 
-**Total Coverage:** 380+ hospitals across 4 provinces
+**Total Coverage:** 390+ hospitals across 4 provinces
 
 ### Scheduling: ✅ OPERATIONAL
 

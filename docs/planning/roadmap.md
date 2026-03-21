@@ -1,10 +1,10 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-03-16)
+## Current Status (Updated 2026-03-21)
 
-**Progress:** Production Domain Launch Complete (2026-03-12) | M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Codecov Coverage Rollout Complete (2026-03-16) | CI/Tooling Maintenance Complete (2026-02-23) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived
+**Progress:** Production Domain Launch Complete (2026-03-12) | M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Ontario Timeout Hardening Verified In Production (2026-03-21) | Codecov Coverage Rollout Complete (2026-03-16) | CI/Tooling Maintenance Complete (2026-02-23) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived
 
-**Strategic Direction:** **Admissions strengthening phase remains active (2026-03-16), with the frontend now live on the shared VPS and the backend scheduler path still live on GitHub Actions.** Engineering foundation is mature (33 milestones, 821+ passing tests locally, 4 provinces). Focus remains on real-world engagement, external validation, public-facing artifacts, and keeping the new VPS frontend path stable while deferring backend cutover until the Ontario source is reachable from the chosen runtime. Coverage reporting now flows through quiet Codecov PR checks instead of chatty bot comments. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for the admissions plan, `docs/operations/direct-vps-frontend.md` for the frontend path, and `docs/operations/direct-vps-backend.md` for the backend worker path.
+**Strategic Direction:** **Admissions strengthening phase remains active (2026-03-21), with the frontend now live on the shared VPS and the backend scheduler path still live on GitHub Actions.** Engineering foundation is mature (33 milestones, 821+ passing tests locally, 4 provinces). Focus remains on real-world engagement, external validation, public-facing artifacts, and keeping the new VPS frontend path stable while deferring backend cutover until the Ontario source is reachable from the chosen runtime. The GitHub Actions Ontario fetch path now has scraper-specific read-timeout hardening, reducing transient upstream failures without changing the VPS backend blocker. Coverage reporting now flows through quiet Codecov PR checks instead of chatty bot comments. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for the admissions plan, `docs/operations/direct-vps-frontend.md` for the frontend path, and `docs/operations/direct-vps-backend.md` for the backend worker path.
 
 **Deployment Note (2026-03-13):** Frontend hosting is now live on the shared VPS, `https://wait-time.ca` presents a valid Let's Encrypt certificate from Caddy, `https://www.wait-time.ca` redirects to the canonical host, and production smoke passes against the canonical domain.
 
@@ -23,7 +23,7 @@ Netlify should now be treated as rollback-only for the frontend, and GitHub Acti
 | Milestone | Summary |
 |-----------|---------|
 | **M1: Database Foundation** | Neon PostgreSQL schema, ontology enums, Quebec scraper, heartbeat monitoring |
-| **M2: Ontario End-to-End** | Ontario Playwright scraper, Nominatim geocoding, Mapbox frontend, 160 hospitals |
+| **M2: Ontario End-to-End** | Ontario HTTP/HTML scraper, Nominatim geocoding, Mapbox frontend, 160 hospitals |
 | **M3: Methodology Warnings** | DivergenceWarning component, /methods comparability matrix, hospital detail modal |
 | **M4: Polish & Launch** | 911 banner, dark mode, split view, trend charts, hero section, PWA setup |
 | **M7: UX Polish & SEO** | Schema.org structured data, skeleton loading, search/filter, geolocation, live indicators |
@@ -100,7 +100,9 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [x] **P1 / Ops: Raw retention + alerting stabilization** — Raw measurements preserved by default, duplicate suppression added, maintenance made lightweight, and heartbeat alerts made state-change driven with a 120-minute threshold
 - [x] **P1 / Ops: CI/tooling maintenance (2026-02-23)** — Resolved all mypy/pytest CI failures; upgraded ruff, mypy, react-map-gl v8, playwright, date-fns
 - [x] **P1 / Ops: Codecov coverage rollout (2026-03-16)** — Added quiet Codecov configuration with split frontend/backend flags, carryforward support, and patch-focused PR status checks
+- [x] **P1 / Ops: Ontario timeout hardening (2026-03-21)** — Added Ontario-specific HTTP read-timeout fallback and verified a healthy post-deploy production scrape on GitHub Actions
 - [ ] **P1 / Ops: Stabilize Playwright UI regression suite** — Main-branch Playwright currently times out on map/list interactions and footer landmark a11y assertions; tighten selectors/fixtures and keep heavy E2E focused on user-facing diffs
+- [ ] **P2 / Ops: Batch frontend dependency refresh** — Dependabot PRs #32, #34, #35, and #36 were closed as stale after their merge refs failed `npm ci` on lockfile drift (`@swc/helpers` mismatch); revisit in one deliberate lockfile refresh instead of drip-merging broken PRs
 - [x] **P0 / Ops: Production domain launch verification** — `wait-time.ca` HTTPS valid, `www.wait-time.ca` redirect verified, release deploy published, production smoke passing
 - [x] **P1 / Ops: Harden Netlify release gate** — M32 Complete
 - [x] **P1 / Divergence Briefs in analytics + export** — M32 Complete
@@ -268,6 +270,7 @@ Active milestone plans in `docs/planning/implementation/`:
 
 Archived (delivered):
 - `docs/planning/archive/maintenance-2026-02-23.md` — CI/tooling maintenance (2026-02-23)
+- `docs/planning/archive/maintenance-2026-03-21.md` — Ontario timeout hardening + repository maintenance sweep (2026-03-21)
 - `docs/planning/archive/maintenance-2026-02-19.md` — Domain rebrand staging, M30 closeout (2026-02-19)
 - `docs/planning/archive/milestone-32-deployment-readiness.md` — Deployment Readiness & CSV Divergence (M32)
 - `docs/planning/archive/milestone-33-historical-occupancy-trends.md` — M33-M35 planning doc (M33 delivered)
@@ -310,7 +313,7 @@ Archived (delivered):
 ### Resolved Risks
 
 - Geocoding accuracy (resolved: Nominatim + city centroids)
-- JavaScript rendering (resolved: Playwright for Ontario)
+- Ontario upstream slowness on GitHub Actions (resolved: extended HTTP read-timeout fallback for Ontario fetches)
 - Hospital verification (resolved: verification gate in place)
 
 ---

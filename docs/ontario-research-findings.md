@@ -4,6 +4,8 @@
 **Phase:** 0 - Research & Discovery
 **Researcher:** Implementation of M2 Plan v1.0.0
 
+> Implementation note (2026-03-21): the production Ontario scraper no longer uses Playwright. The current runtime fetches the HQOntario page directly over HTTP and parses the embedded HTML tables because the needed table content is available server-side.
+
 ---
 
 ## Data Source Options
@@ -20,13 +22,12 @@
 - ✅ Clear methodology documentation
 
 **Cons:**
-- ⚠️ Dynamically loaded via JavaScript (requires headless browser)
+- ⚠️ Upstream response latency can be intermittent
 - ⚠️ Paginated/filtered interface
 - ⚠️ Average wait times (not real-time)
 
 **Technical Requirements:**
-- Selenium or Playwright for JavaScript rendering
-- Wait for table to load
+- Direct HTTP fetch of the HQOntario page
 - Parse HTML table structure
 
 **Data Structure:**
@@ -71,11 +72,10 @@
 4. **Methodology clear** - Well-documented for ontology tagging
 
 **Implementation Strategy:**
-1. Use Playwright (already in dependencies from plan)
-2. Navigate to HQOntario URL
-3. Wait for table to render
-4. Extract hospital rows
-5. Parse wait times (convert hours → minutes)
+1. Fetch the HQOntario page directly over HTTP
+2. Parse the hospital comparison table
+3. Extract hospital rows
+4. Parse wait times (convert hours → minutes)
 
 **Sample Hospitals (from HQOntario):**
 - The Ottawa Hospital - Civic Campus
@@ -146,26 +146,22 @@ Based on HQOntario methodology page:
 
 ## Technical Decision: Scraping Approach
 
-### Chosen: Playwright with Python
+### Chosen: Direct HTTP fetch with HTML parsing
 
-**Why Playwright over Selenium:**
-- Modern, faster, more reliable
-- Better async support
-- Easier to install (no driver management)
-- Already have playwright-python in dependencies
+**Why direct HTTP over a browser runtime:**
+- Simpler operationally
+- Lower runtime overhead
+- No browser dependency for the Ontario scraper path
+- Works because the needed comparison table is present in the fetched HTML
 
 **Implementation Pattern:**
 ```python
-from playwright.sync_api import sync_playwright
-
-with sync_playwright() as p:
-    browser = p.chromium.launch(headless=True)
-    page = browser.new_page()
-    page.goto("https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments")
-    page.wait_for_selector("table")  # Wait for data to load
-    html = page.content()
-    # Parse with BeautifulSoup
-    browser.close()
+response = client.get(
+    "https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments"
+)
+response.raise_for_status()
+html = response.text
+# Parse with BeautifulSoup
 ```
 
 ---
@@ -175,7 +171,7 @@ with sync_playwright() as p:
 | Risk | Probability | Impact | Mitigation |
 |------|-------------|--------|------------|
 | HQOntario changes HTML structure | Medium | High | Version parser, add structure detection |
-| Playwright install issues | Low | Medium | Use fallback scraping method |
+| Upstream read timeouts | Medium | Medium | Retry with an extended HTTP read timeout before surfacing failure |
 | Data not updated regularly | Low | Low | Check timestamps, alert if stale |
 | Hospital names don't match mapping | High | Low | Fuzzy matching (already have from Quebec) |
 
@@ -194,9 +190,9 @@ with sync_playwright() as p:
 
 ## Next Steps (Phase 1)
 
-1. Install Playwright: `pip install playwright && playwright install chromium`
-2. Create `ontario.py` scraper
-3. Implement HQOntario parsing with Playwright
+1. Create `ontario.py` scraper
+2. Implement HQOntario HTML table parsing over HTTP
+3. Add hospital ID normalization
 4. Test with dry-run mode
 
-**Estimated Time:** 6-8 hours (per plan)
+Historical note: these Phase 1 steps are preserved for discovery context; the scraper is now implemented and live.

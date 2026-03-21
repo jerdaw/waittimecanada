@@ -1,11 +1,13 @@
 # Scraper Scheduling & Operations
 
-**Last Updated:** 2026-03-13
+**Last Updated:** 2026-03-21
 **Status:** ✅ All 4 provincial scrapers operational
 
 > Live scheduler status (updated March 13, 2026): scraper cadence is `hourly` on GitHub Actions with heartbeat stale threshold `120` minutes. The VPS backend path remains deferred because Ontario times out from that host.
 >
 > Migration note (March 13, 2026): this document still describes the current live GitHub Actions scheduler path. A same-host VPS worker attempt was paused after the Ontario source timed out from that host; see `docs/operations/direct-vps-backend.md`.
+>
+> Reliability addendum (March 21, 2026): the live GitHub Actions Ontario scraper path now retries a read timeout once with an extended HTTP read timeout before surfacing a fetch failure. This hardened repeated `upstream_unavailable/fetch` incidents without changing the VPS backend deferment.
 
 ---
 
@@ -24,7 +26,7 @@ Wait Time Canada operates 4 provincial emergency department wait time scrapers r
 | **Alberta** | `alberta-ahs` | ✅ Active | Hourly | 2026-03-13 |
 | **British Columbia** | `bc-phsa` | ✅ Active | Hourly | 2026-03-13 |
 
-**Total Coverage:** 380+ hospitals across 4 provinces
+**Total Coverage:** 390+ hospitals across 4 provinces
 
 ---
 
@@ -44,7 +46,7 @@ python -m waittime.cli.scraper --all
 
 **Features:**
 - ✅ Runs all registered scrapers automatically
-- ✅ Playwright browsers installed for Ontario/Alberta
+- ✅ Playwright browsers installed for Alberta runtime requirements
 - ✅ Failure alerting via Pushover
 - ✅ Tolerates individual scraper failures (succeeds if ANY data collected)
 - ✅ Database connection via `DATABASE_URL` secret
@@ -85,29 +87,29 @@ python -m waittime.cli.check_heartbeat --max-age 120
 ### Quebec (MSSS)
 - **Methodology:** REGISTRATION → PHYSICIAN (ROLLING_AVG)
 - **Technology:** BeautifulSoup (HTML parsing)
-- **Coverage:** 110+ hospitals
+- **Coverage:** 120+ hospitals
 - **Update Frequency:** Hourly
 - **Special Features:** ✅ Stretcher occupancy data (M17/M18)
 - **Data Quality:** 86% test coverage
 
 ### Ontario (Health Ontario)
-- **Methodology:** TRIAGE → PHYSICIAN (P90)
-- **Technology:** Playwright (JavaScript rendering required)
-- **Coverage:** 160+ hospitals
+- **Methodology:** TRIAGE → PHYSICIAN (MEAN)
+- **Technology:** Direct HTTP fetch + HTML table parsing
+- **Coverage:** 220+ hospitals
 - **Update Frequency:** Hourly
-- **Browser:** Chromium (installed in GitHub Actions)
+- **Reliability Hardening:** read timeouts retry once with an extended HTTP read timeout before failing
 
 ### Alberta (AHS)
 - **Methodology:** TRIAGE → PHYSICIAN (P90)
 - **Technology:** Playwright (JavaScript rendering required)
-- **Coverage:** 50+ hospitals
+- **Coverage:** 26 hospitals
 - **Update Frequency:** Hourly
 - **Browser:** Chromium (installed in GitHub Actions)
 
 ### British Columbia (PHSA)
 - **Methodology:** TRIAGE → PHYSICIAN (P90)
 - **Technology:** BeautifulSoup + JSON extraction (`__NEXT_DATA__`)
-- **Coverage:** 60+ hospitals
+- **Coverage:** 25 hospitals
 - **Update Frequency:** Hourly
 - **URL:** `https://edwaittimes.ca/legacy`
 
@@ -275,7 +277,8 @@ ORDER BY source_id;
 
 2. **Common Issues:**
    - **Database Connection:** Verify `DATABASE_URL` secret is set
-   - **Playwright Timeout:** Ontario/Alberta scrapers may timeout if page loads slowly
+   - **Playwright Timeout:** Alberta may timeout if the page renders slowly
+   - **HTTP Read Timeout:** Ontario may still fail if the upstream remains slow even after the extended fallback timeout
    - **HTML Structure Changed:** Provincial websites may update their HTML
 
 3. **Test Locally:**

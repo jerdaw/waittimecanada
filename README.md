@@ -101,7 +101,7 @@ Provincial health authorities report ER wait times using **fundamentally differe
 graph TD
     subgraph "Provincial Sources"
         QC[Quebec MSSS<br/>BeautifulSoup]
-        ON[Ontario Health<br/>Playwright]
+        ON[Ontario Health<br/>HTTP + HTML tables]
         AB[Alberta AHS<br/>Playwright]
         BC[BC PHSA<br/>JSON/__NEXT_DATA__]
     end
@@ -174,7 +174,7 @@ graph TD
 ### Backend
 - **Language:** Python 3.12+
 - **Testing:** pytest with 375+ tests, 77% code coverage
-- **Scrapers:** 4 provincial scrapers (BeautifulSoup, Playwright, JSON extraction)
+- **Scrapers:** 4 provincial scrapers (BeautifulSoup, HTTP/HTML parsing, Playwright, JSON extraction)
 - **Database:** Neon PostgreSQL 17 with 10 tables, strict ontology constraints
 - **Services:**
   - DatabaseService, AggregationService, DataQualityService
@@ -204,7 +204,7 @@ graph TD
 
 ### Automation
 - **GitHub Actions:** Scrapers run hourly, heartbeat checks every 30 minutes
-- **Playwright Browsers:** Automated for Ontario/Alberta JavaScript-rendered pages
+- **Playwright Browsers:** Automated for Alberta and browser-based verification flows
 - **Failure Alerting:** Pushover notifications for scraper/heartbeat failures
 - **Operational Posture:** Hourly scraper cadence + 30-minute heartbeat checks on GitHub Actions with state-change alerting and a 120-minute stale threshold
 
@@ -282,7 +282,7 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install --upgrade pip
 pip install -e '.[dev]'  # Note: use quotes in zsh
 
-# Install Playwright browsers (for Ontario/Alberta scrapers)
+# Install Playwright browsers (required for Alberta scraper)
 playwright install chromium
 
 # Apply database migrations

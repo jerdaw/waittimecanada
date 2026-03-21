@@ -44,8 +44,7 @@ logger = logging.getLogger(__name__)
 class OntarioScraper(BaseScraper):
     """Scraper for Ontario HQOntario emergency wait times.
 
-    Uses Playwright to handle JavaScript-rendered content.
-    HQOntario displays data in HTML tables that load dynamically.
+    Fetches the HQOntario page directly over HTTP and parses the embedded HTML tables.
     """
 
     # Hospital ID mapping: HQOntario name → standardized ID
@@ -129,7 +128,7 @@ class OntarioScraper(BaseScraper):
         """Parse HQOntario HTML into measurements.
 
         Args:
-            html: Rendered HTML from HQOntario (after JavaScript execution)
+            html: HTML fetched from HQOntario over HTTP
 
         Returns:
             List of Measurement objects tagged with Ontario methodology
