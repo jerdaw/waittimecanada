@@ -1,6 +1,10 @@
 """Unit tests for Ontario scraper."""
 
+from unittest.mock import Mock, patch
+
+import httpx
 import pytest
+from tenacity import RetryError
 
 from waittime.core import EndEvent, MetricFamily, PatientScope, StartEvent, StatisticType
 from waittime.scrapers.ontario import OntarioScraper, create_ontario_source
@@ -33,6 +37,37 @@ class TestOntarioScraper:
         assert scraper._extract_wait_time_hours("N/A") is None
         assert scraper._extract_wait_time_hours("Unknown") is None
         assert scraper._extract_wait_time_hours("") is None
+
+    def test_fetch_retries_with_extended_timeout_after_read_timeout(self, scraper):
+        """Ontario fetch should retry once with a longer read timeout before failing."""
+        mock_response = Mock()
+        mock_response.text = "<html>Ontario</html>"
+
+        captured_timeouts: list[httpx.Timeout] = []
+
+        def side_effect(url, timeout):
+            captured_timeouts.append(timeout)
+            if len(captured_timeouts) == 1:
+                raise httpx.ReadTimeout("The read operation timed out")
+            return mock_response
+
+        with patch.object(scraper.client, "get", side_effect=side_effect):
+            result = scraper.fetch()
+
+        assert result == "<html>Ontario</html>"
+        assert len(captured_timeouts) == 2
+        assert captured_timeouts[0].read == 30.0
+        assert captured_timeouts[1].read == 90.0
+
+    def test_fetch_raises_after_retries_when_timeout_persists(self, scraper):
+        """Ontario fetch should still fail after tenacity retries if both attempts time out."""
+        with patch.object(
+            scraper.client,
+            "get",
+            side_effect=httpx.ReadTimeout("The read operation timed out"),
+        ):
+            with pytest.raises(RetryError):
+                scraper.fetch()
 
     def test_normalize_hospital_id_exact_match(self, scraper):
         """Normalize hospital name to ID (exact match)."""

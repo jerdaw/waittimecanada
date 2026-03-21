@@ -15,7 +15,9 @@ import logging
 import re
 from typing import Any
 
+import httpx
 from bs4 import BeautifulSoup
+from tenacity import retry, stop_after_attempt
 
 from waittime.core import (
     EndEvent,
@@ -27,6 +29,14 @@ from waittime.core import (
     StatisticType,
 )
 from waittime.scrapers.base import BaseScraper
+from waittime.scrapers.observability import (
+    DEFAULT_HTTP_CONNECT_TIMEOUT_SECONDS,
+    DEFAULT_HTTP_POOL_TIMEOUT_SECONDS,
+    DEFAULT_HTTP_READ_TIMEOUT_SECONDS,
+    DEFAULT_HTTP_WRITE_TIMEOUT_SECONDS,
+    HTTP_FETCH_ATTEMPTS,
+    fetch_retry_wait,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -69,8 +79,14 @@ class OntarioScraper(BaseScraper):
         "William Osler Health System": "ca-on-william-osler",
     }
 
+    FALLBACK_HTTP_READ_TIMEOUT_SECONDS = 90.0
+
+    @retry(
+        stop=stop_after_attempt(HTTP_FETCH_ATTEMPTS),
+        wait=fetch_retry_wait(),
+    )
     def fetch(self, url: str | None = None) -> str:
-        """Fetch HTML directly over HTTP.
+        """Fetch Ontario HTML with a timeout fallback for slow upstream responses.
 
         Args:
             url: Optional override URL, defaults to source.url
@@ -78,7 +94,36 @@ class OntarioScraper(BaseScraper):
         Returns:
             HTML content for the Ontario page
         """
-        return super().fetch(url)
+        target_url = url or self.source.url
+        logger.info(f"Fetching {target_url}")
+
+        try:
+            return self._fetch_with_read_timeout(
+                target_url, read_timeout_seconds=DEFAULT_HTTP_READ_TIMEOUT_SECONDS
+            )
+        except httpx.ReadTimeout:
+            logger.warning(
+                "Ontario fetch timed out after %.0fs; retrying with %.0fs read timeout",
+                DEFAULT_HTTP_READ_TIMEOUT_SECONDS,
+                self.FALLBACK_HTTP_READ_TIMEOUT_SECONDS,
+            )
+            return self._fetch_with_read_timeout(
+                target_url, read_timeout_seconds=self.FALLBACK_HTTP_READ_TIMEOUT_SECONDS
+            )
+
+    def _fetch_with_read_timeout(self, target_url: str, read_timeout_seconds: float) -> str:
+        """Fetch Ontario HTML with an explicit per-request read timeout."""
+        response = self.client.get(
+            target_url,
+            timeout=httpx.Timeout(
+                connect=DEFAULT_HTTP_CONNECT_TIMEOUT_SECONDS,
+                read=read_timeout_seconds,
+                write=DEFAULT_HTTP_WRITE_TIMEOUT_SECONDS,
+                pool=DEFAULT_HTTP_POOL_TIMEOUT_SECONDS,
+            ),
+        )
+        response.raise_for_status()
+        return response.text
 
     def parse(self, html: str) -> list[Measurement]:
         """Parse HQOntario HTML into measurements.
