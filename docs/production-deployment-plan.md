@@ -306,7 +306,7 @@ After deployment, monitor for 24-48 hours:
 3. **Database**
    - Monitor connection count in Neon dashboard
    - Verify measurements are being inserted
-   - Check maintenance / aggregate refresh runs as intended
+   - Check retention cleanup / storage reporting runs as intended
 
 ---
 

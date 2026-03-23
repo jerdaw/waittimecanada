@@ -424,7 +424,7 @@ waittimecanada/
 - **Scraper Cron:** Runs hourly via GitHub Actions
 - **Heartbeat Monitor:** Checks scraper health every 30 minutes
 - **Failure Alerts:** Pushover notifications for stale data or errors
-- **Database Cleanup:** Recent aggregates refreshed, then raw measurements older than 30 days are purged
+- **Database Cleanup:** Manual cleanup keeps a 30-day raw-measurement window; the GitHub Actions maintenance path uses bounded batched deletes and reports storage growth
 
 ### CI/CD Pipelines
 - **Frontend CI:** Type checking, linting, unit tests

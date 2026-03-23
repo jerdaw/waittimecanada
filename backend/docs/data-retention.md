@@ -3,8 +3,10 @@
 ## Overview
 
 Wait Time Canada implements a **30-day retention policy** for raw measurement
-data. Routine cleanup refreshes recent aggregates first, then deletes
-measurements older than the retention window to keep Neon storage bounded.
+data. The default cleanup CLI can refresh recent aggregates before deleting old
+rows, but the production GitHub Actions maintenance path now skips aggregate
+refresh and performs bounded batched deletes so storage safety does not turn
+into CI drag.
 
 ## Current Policy
 
@@ -36,7 +38,7 @@ Cleanup does **NOT** delete:
 
 The cleanup workflow is currently manual-dispatch only:
 - **Workflow**: `.github/workflows/database-cleanup.yml`
-- **Default behavior**: refresh recent daily aggregates, then purge rows older than 30 days
+- **Workflow behavior**: skip aggregate refresh, delete old rows in bounded batches, then report storage footprint
 - **Stats behavior**: use `--verbose` or `--with-stats` to print age metrics too
 
 ### Manual Cleanup
@@ -52,6 +54,9 @@ python -m waittime.cli.cleanup
 
 # Collect age statistics too
 python -m waittime.cli.cleanup --with-stats
+
+# Match the bounded production cleanup path
+python -m waittime.cli.cleanup --verbose --skip-aggregate-refresh --delete-batch-size 5000 --max-delete-batches 20
 
 # Use a custom retention window
 python -m waittime.cli.cleanup --retention-days 60
@@ -104,8 +109,8 @@ python -m waittime.cli.storage_stats --relation measurements --exact-count --jso
 ```python
 # In cleanup CLI
 # 1. optionally collect full-table age stats (--dry-run/--verbose/--with-stats)
-# 2. refresh recent daily aggregates
-# 3. delete rows older than retention_days
+# 2. optionally refresh recent daily aggregates
+# 3. delete rows older than retention_days in bounded batches
 ```
 
 ### Insert-Time Efficiency Guards
@@ -116,15 +121,22 @@ python -m waittime.cli.storage_stats --relation measurements --exact-count --jso
 ### Cleanup Query
 
 ```sql
-DELETE FROM measurements
-WHERE timestamp_utc < NOW() - INTERVAL '60 days'
+WITH rows_to_delete AS (
+    SELECT id
+    FROM measurements
+    WHERE timestamp_utc < NOW() - INTERVAL '60 days'
+    LIMIT 5000
+)
+DELETE FROM measurements m
+USING rows_to_delete d
+WHERE m.id = d.id;
 ```
 
 ## Best Practices
 
 1. **Keep cleanup running regularly** so storage stays within the Neon tier.
 2. **Monitor storage regularly**: use database size checks and measurement age stats.
-3. **Keep aggregate maintenance coupled to cleanup** so long-range analytics remain available after raw rows roll off.
+3. **Use explicit aggregation runs when needed** instead of forcing broad backfills into every storage-maintenance run.
 4. **Use `--dry-run` before changing the retention window**.
 
 ## Analytics & Reporting
@@ -143,7 +155,7 @@ FROM measurements
 GROUP BY DATE(timestamp_utc), hospital_id;
 ```
 
-The aggregate pipeline reduces read cost for analytics and is refreshed before old raw rows are purged.
+The aggregate pipeline reduces read cost for analytics, but the production cleanup workflow intentionally skips routine aggregate refresh to keep maintenance bounded.
 
 ## Troubleshooting
 

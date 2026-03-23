@@ -66,7 +66,7 @@ This lets the heartbeat monitor send one incident alert when a source becomes un
 - Use ontology tags to drive comparability logic.
 - Keep verification gate: new hospitals are not auto-published.
 - Store payload hash/snippet, not full source HTML.
-- Delete raw measurements older than 30 days after recent aggregates are refreshed.
+- Delete raw measurements older than 30 days via bounded cleanup runs; trigger aggregate refresh separately when needed.
 
 ## Migration and Bootstrap
 

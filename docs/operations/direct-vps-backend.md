@@ -153,8 +153,8 @@ The systemd installer:
 
 Cleanup note:
 
-1. the cleanup CLI refreshes recent aggregates and deletes raw measurements older than 30 days by default
-2. the optional timer therefore restores the repository's storage-safety policy when enabled
+1. the shipped cleanup timer skips aggregate refresh and deletes raw measurements older than 30 days in bounded batches
+2. the optional timer therefore restores the repository's storage-safety policy without turning maintenance into a long-running catch-all job
 
 ## Stage And Release From A Workstation
 

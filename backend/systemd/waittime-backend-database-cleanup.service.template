@@ -15,4 +15,4 @@ Nice=10
 IOSchedulingClass=best-effort
 IOSchedulingPriority=6
 TimeoutStartSec=30m
-ExecStart=/srv/apps/waittime-backend/current/backend/.venv/bin/python -m waittime.cli.cleanup
+ExecStart=/srv/apps/waittime-backend/current/backend/.venv/bin/python -m waittime.cli.cleanup --verbose --skip-aggregate-refresh --delete-batch-size 5000 --max-delete-batches 20

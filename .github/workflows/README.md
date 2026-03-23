@@ -86,7 +86,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 **Trigger:** currently manual dispatch only (scheduled cron temporarily paused due to GitHub Actions quota exhaustion).
 
-**Purpose:** Provide an operator-run retention cleanup entry point. The workflow refreshes recent aggregates, deletes raw measurements older than 30 days, and reports `measurements` storage growth.
+**Purpose:** Provide an operator-run retention cleanup entry point. The workflow skips aggregate refresh, deletes raw measurements older than 30 days in bounded batches, and reports `measurements` storage growth.
 
 **Optimization controls:**
 - Serialized concurrency group.

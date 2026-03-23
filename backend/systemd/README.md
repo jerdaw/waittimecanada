@@ -23,7 +23,7 @@ Installed timers:
 Optional timer:
 
 1. `waittime-backend-database-cleanup.timer`
-   - weekly cleanup with recent aggregate refresh and 30-day retention enforcement
+   - weekly cleanup with bounded batched deletion and 30-day retention enforcement
 
 Use the installer:
 
@@ -39,5 +39,5 @@ sudo ./scripts/install-vps-backend-systemd.sh --enable --enable-cleanup
 
 Current note:
 
-1. the cleanup CLI refreshes recent aggregates and deletes raw measurements older than 30 days by default
+1. the shipped timer template skips aggregate refresh and uses bounded delete batches to keep the maintenance window predictable
 2. enabling this timer restores the repository's storage-safety policy

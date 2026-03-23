@@ -2,11 +2,13 @@
 
 Date: 2026-03-13
 
-Status: Accepted
+Status: Superseded
 
 Deciders: Jeremy Dawson
 
 Technical Story: `docs/planning/roadmap.md` ops maintenance follow-up after the VPS frontend cutover, alert storm cleanup, and historical-data retention hardening
+
+Superseded on 2026-03-23 by `docs/adr/0021-bounded-retention-cleanup-operations.md`.
 
 ## Context and Problem Statement
 
