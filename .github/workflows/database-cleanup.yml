@@ -1,7 +1,8 @@
 name: Database Cleanup
 
-# Keep manual dispatch available for lightweight storage reporting and
-# an operator-run retention cleanup while scheduled jobs remain paused.
+# Keep manual dispatch available for an operator-run retention cleanup while
+# scheduled jobs remain paused. The delete path is intentionally batched so a
+# single maintenance run stays bounded and observable.
 on:
   workflow_dispatch:  # Allow manual triggering
 
@@ -34,7 +35,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.cleanup --verbose
+          python -m waittime.cli.cleanup --verbose --skip-aggregate-refresh --delete-batch-size 5000 --max-delete-batches 20
 
       - name: Report measurement storage footprint
         working-directory: backend
@@ -47,8 +48,8 @@ jobs:
         if: success()
         run: |
           echo "✅ Database cleanup completed successfully"
-          echo "Recent aggregates were refreshed"
-          echo "Old measurements (>30 days) have been purged"
+          echo "Aggregate refresh was skipped to keep the maintenance window bounded"
+          echo "Old measurements (>30 days) were deleted in bounded batches"
           echo "Measurement table storage stats were reported"
 
       - name: Notify on failure

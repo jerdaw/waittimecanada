@@ -40,7 +40,11 @@ def test_cleanup_execution_default_retention(mock_db, mock_aggregation, mock_db_
         exit_code = main()
         assert exit_code == 0
         mock_db_instance.get_measurement_age_stats.assert_not_called()
-        mock_db_instance.cleanup_old_measurements.assert_called_once_with(retention_days=30)
+        mock_db_instance.cleanup_old_measurements.assert_called_once_with(
+            retention_days=30,
+            batch_size=5000,
+            max_batches=None,
+        )
 
 
 @patch("waittime.cli.cleanup.AggregationService")
@@ -55,7 +59,11 @@ def test_cleanup_execution_with_custom_retention(mock_db, mock_aggregation, mock
         exit_code = main()
         assert exit_code == 0
         mock_db_instance.get_measurement_age_stats.assert_not_called()
-        mock_db_instance.cleanup_old_measurements.assert_called_once_with(retention_days=60)
+        mock_db_instance.cleanup_old_measurements.assert_called_once_with(
+            retention_days=60,
+            batch_size=5000,
+            max_batches=None,
+        )
 
 
 @patch("waittime.cli.cleanup.AggregationService")
@@ -87,7 +95,50 @@ def test_cleanup_with_stats_collects_measurement_age_stats(
         exit_code = main()
         assert exit_code == 0
         mock_db_instance.get_measurement_age_stats.assert_called()
-        mock_db_instance.cleanup_old_measurements.assert_called_once_with(retention_days=30)
+        mock_db_instance.cleanup_old_measurements.assert_called_once_with(
+            retention_days=30,
+            batch_size=5000,
+            max_batches=None,
+        )
+
+
+@patch("waittime.cli.cleanup.AggregationService")
+@patch("waittime.cli.cleanup.DatabaseService")
+def test_cleanup_with_batch_controls(mock_db, mock_aggregation, mock_db_stats):
+    """Verify that cleanup forwards batch-control flags to the database service."""
+    mock_db_instance = mock_db.return_value
+    mock_db_instance.cleanup_old_measurements.return_value = 200
+    mock_aggregation.return_value.backfill.return_value = {"daily": 1}
+
+    with patch(
+        "sys.argv",
+        ["cleanup.py", "--delete-batch-size", "2500", "--max-delete-batches", "4"],
+    ):
+        exit_code = main()
+        assert exit_code == 0
+        mock_db_instance.cleanup_old_measurements.assert_called_once_with(
+            retention_days=30,
+            batch_size=2500,
+            max_batches=4,
+        )
+
+
+@patch("waittime.cli.cleanup.AggregationService")
+@patch("waittime.cli.cleanup.DatabaseService")
+def test_cleanup_can_skip_aggregate_refresh(mock_db, mock_aggregation, mock_db_stats):
+    """Verify that skip flag bypasses aggregate backfill."""
+    mock_db_instance = mock_db.return_value
+    mock_db_instance.cleanup_old_measurements.return_value = 200
+
+    with patch("sys.argv", ["cleanup.py", "--skip-aggregate-refresh"]):
+        exit_code = main()
+        assert exit_code == 0
+        mock_aggregation.return_value.backfill.assert_not_called()
+        mock_db_instance.cleanup_old_measurements.assert_called_once_with(
+            retention_days=30,
+            batch_size=5000,
+            max_batches=None,
+        )
 
 
 @patch("waittime.cli.cleanup.AggregationService")

@@ -10,7 +10,7 @@ import logging
 import os
 from collections.abc import Generator
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -437,8 +437,13 @@ class DatabaseService:
                     return None
                 return self._row_to_measurement(dict(row))
 
-    def cleanup_old_measurements(self, retention_days: int = 30) -> int:
-        """Delete measurements older than retention period.
+    def cleanup_old_measurements(
+        self,
+        retention_days: int = 30,
+        batch_size: int = 5000,
+        max_batches: int | None = None,
+    ) -> int:
+        """Delete measurements older than retention period in bounded batches.
 
         IMPORTANT: this is now an explicit purge path, not the default retention
         policy. Callers should use it only when an operator deliberately intends
@@ -447,6 +452,8 @@ class DatabaseService:
 
         Args:
             retention_days: Number of days to retain raw measurements before an explicit purge
+            batch_size: Maximum number of rows to delete per transaction
+            max_batches: Optional cap on the number of delete batches to execute
 
         Returns:
             Number of measurements deleted
@@ -456,20 +463,63 @@ class DatabaseService:
             >>> deleted = db.cleanup_old_measurements(retention_days=30)
             >>> logger.info(f"Deleted {deleted} old measurements")
         """
-        with self.get_connection() as conn:
-            with self.get_cursor(conn) as cur:
-                cur.execute(
-                    """
-                    DELETE FROM measurements
-                    WHERE timestamp_utc < NOW() - INTERVAL '%s days'
-                    """,
-                    (retention_days,),
-                )
-                deleted_count = cur.rowcount or 0
-                logger.info(
-                    f"Cleaned up {deleted_count} measurements older than {retention_days} days"
-                )
-                return deleted_count
+        if batch_size <= 0:
+            raise ValueError("batch_size must be positive")
+        if max_batches is not None and max_batches <= 0:
+            raise ValueError("max_batches must be positive when provided")
+
+        cutoff = datetime.now(UTC) - timedelta(days=retention_days)
+        deleted_count = 0
+        batches_run = 0
+
+        while max_batches is None or batches_run < max_batches:
+            with self.get_connection() as conn:
+                with self.get_cursor(conn) as cur:
+                    cur.execute(
+                        """
+                        WITH rows_to_delete AS (
+                            SELECT id
+                            FROM measurements
+                            WHERE timestamp_utc < %s
+                            LIMIT %s
+                        )
+                        DELETE FROM measurements m
+                        USING rows_to_delete d
+                        WHERE m.id = d.id
+                        """,
+                        (cutoff, batch_size),
+                    )
+                    batch_deleted = cur.rowcount or 0
+
+            if batch_deleted == 0:
+                break
+
+            batches_run += 1
+            deleted_count += batch_deleted
+            logger.info(
+                "Cleanup batch %s deleted %s measurements older than %s days (%s total)",
+                batches_run,
+                batch_deleted,
+                retention_days,
+                deleted_count,
+            )
+
+            if batch_deleted < batch_size:
+                break
+
+        if max_batches is not None and batches_run >= max_batches:
+            logger.info(
+                "Cleanup stopped after reaching the configured batch cap (%s batches, %s rows)",
+                max_batches,
+                deleted_count,
+            )
+
+        logger.info(
+            "Cleaned up %s measurements older than %s days",
+            deleted_count,
+            retention_days,
+        )
+        return deleted_count
 
     def get_measurement_age_stats(self, older_than_days: int = 30) -> dict[str, Any]:
         """Get statistics about measurement ages for monitoring retention policy.

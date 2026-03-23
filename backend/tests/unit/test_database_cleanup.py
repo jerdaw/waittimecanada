@@ -41,41 +41,45 @@ class TestCleanupOldMeasurements:
         self, mock_db_with_cleanup, monkeypatch
     ):
         """Should delete measurements older than 30 days by default."""
-        mock_cursor = setup_cursor_mock(rowcount=42)
-        mock_conn = setup_connection_mock(mock_cursor)
+        cursors = [
+            setup_cursor_mock(rowcount=42),
+            setup_cursor_mock(rowcount=0),
+        ]
+        connections = [setup_connection_mock(cursor) for cursor in cursors]
 
         def mock_get_connection():
-            return mock_conn
+            return connections.pop(0)
 
         monkeypatch.setattr(mock_db_with_cleanup, "get_connection", mock_get_connection)
-        monkeypatch.setattr(mock_db_with_cleanup, "get_cursor", lambda conn: mock_cursor)
+        monkeypatch.setattr(mock_db_with_cleanup, "get_cursor", lambda conn: conn.cursor())
 
         deleted = mock_db_with_cleanup.cleanup_old_measurements()
 
         # Should use default 30 days
         assert deleted == 42
-        mock_cursor.execute.assert_called_once()
-        query = mock_cursor.execute.call_args[0][0]
+        query = cursors[0].execute.call_args[0][0]
         assert "DELETE FROM measurements" in query
-        assert "INTERVAL" in query
+        assert "LIMIT %s" in query
 
     def test_deletes_with_custom_retention_period(self, mock_db_with_cleanup, monkeypatch):
         """Should accept custom retention period."""
-        mock_cursor = setup_cursor_mock(rowcount=15)
-        mock_conn = setup_connection_mock(mock_cursor)
+        cursors = [
+            setup_cursor_mock(rowcount=15),
+            setup_cursor_mock(rowcount=0),
+        ]
+        connections = [setup_connection_mock(cursor) for cursor in cursors]
 
         def mock_get_connection():
-            return mock_conn
+            return connections.pop(0)
 
         monkeypatch.setattr(mock_db_with_cleanup, "get_connection", mock_get_connection)
-        monkeypatch.setattr(mock_db_with_cleanup, "get_cursor", lambda conn: mock_cursor)
+        monkeypatch.setattr(mock_db_with_cleanup, "get_cursor", lambda conn: conn.cursor())
 
         deleted = mock_db_with_cleanup.cleanup_old_measurements(retention_days=60)
 
         assert deleted == 15
-        # Check that 60 was passed as parameter
-        params = mock_cursor.execute.call_args[0][1]
-        assert params == (60,)
+        params = cursors[0].execute.call_args[0][1]
+        assert params[1] == 5000
 
     def test_returns_zero_when_no_old_measurements(self, mock_db_with_cleanup, monkeypatch):
         """Should return 0 when no measurements need deletion."""
@@ -92,22 +96,48 @@ class TestCleanupOldMeasurements:
 
         assert deleted == 0
 
-    def test_commits_deletion(self, mock_db_with_cleanup, monkeypatch):
-        """Should commit the transaction after deletion."""
-        mock_cursor = setup_cursor_mock(rowcount=10)
-        mock_conn = setup_connection_mock(mock_cursor)
+    def test_stops_after_reaching_max_batches(self, mock_db_with_cleanup, monkeypatch):
+        """Should stop deleting when max_batches is reached."""
+        cursors = [
+            setup_cursor_mock(rowcount=10),
+            setup_cursor_mock(rowcount=10),
+        ]
+        connections = [setup_connection_mock(cursor) for cursor in cursors]
 
         def mock_get_connection():
-            return mock_conn
+            return connections.pop(0)
 
         monkeypatch.setattr(mock_db_with_cleanup, "get_connection", mock_get_connection)
-        monkeypatch.setattr(mock_db_with_cleanup, "get_cursor", lambda conn: mock_cursor)
+        monkeypatch.setattr(mock_db_with_cleanup, "get_cursor", lambda conn: conn.cursor())
+
+        deleted = mock_db_with_cleanup.cleanup_old_measurements(
+            retention_days=30,
+            batch_size=10,
+            max_batches=2,
+        )
+
+        assert deleted == 20
+        assert len(connections) == 0
+
+    def test_commits_deletion(self, mock_db_with_cleanup, monkeypatch):
+        """Should commit the transaction after deletion."""
+        cursors = [
+            setup_cursor_mock(rowcount=10),
+            setup_cursor_mock(rowcount=0),
+        ]
+        connections = [setup_connection_mock(cursor) for cursor in cursors]
+
+        def mock_get_connection():
+            return connections.pop(0)
+
+        monkeypatch.setattr(mock_db_with_cleanup, "get_connection", mock_get_connection)
+        monkeypatch.setattr(mock_db_with_cleanup, "get_cursor", lambda conn: conn.cursor())
 
         mock_db_with_cleanup.cleanup_old_measurements()
 
         # The connection context manager should handle commit
         # Just verify execute was called
-        assert mock_cursor.execute.called
+        assert cursors[0].execute.called
 
 
 class TestGetMeasurementAgeStats:

@@ -39,6 +39,23 @@ def main() -> int:
         help="Number of days to retain measurements (default: 30)",
     )
     parser.add_argument(
+        "--delete-batch-size",
+        type=int,
+        default=5000,
+        help="Maximum number of rows to delete per cleanup transaction (default: 5000)",
+    )
+    parser.add_argument(
+        "--max-delete-batches",
+        type=int,
+        default=None,
+        help="Optional cap on delete batches for a single run",
+    )
+    parser.add_argument(
+        "--skip-aggregate-refresh",
+        action="store_true",
+        help="Skip the recent-aggregate backfill step before deletion",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Preview cleanup without mutating data",
@@ -87,6 +104,13 @@ def main() -> int:
         # Calculate what would be deleted
         if args.retention_days != 30:
             logger.info(f"\nUsing custom retention period: {args.retention_days} days")
+        if args.delete_batch_size != 5000:
+            logger.info("\nUsing custom delete batch size: %s rows", args.delete_batch_size)
+        if args.max_delete_batches is not None:
+            logger.info(
+                "\nDelete batches capped at %s for this run",
+                args.max_delete_batches,
+            )
 
         if args.dry_run:
             logger.info("\n🔍 DRY RUN MODE - No data will be deleted")
@@ -103,21 +127,31 @@ def main() -> int:
                 )
             return 0
 
-        logger.info("\nRefreshing recent daily aggregates before cleanup...")
-        agg_service = AggregationService(db)
+        if args.skip_aggregate_refresh:
+            logger.info(
+                "\nSkipping aggregate refresh before cleanup. "
+                "Use the aggregate CLI separately if you need a manual backfill."
+            )
+        else:
+            logger.info("\nRefreshing recent daily aggregates before cleanup...")
+            agg_service = AggregationService(db)
 
-        three_days_ago = datetime.now(UTC) - timedelta(days=3)
-        agg_counts = agg_service.backfill(
-            start_date=three_days_ago,
-            end_date=None,
-            period_types=["daily"],
-        )
-        agg_total = sum(agg_counts.values())
-        if agg_total > 0:
-            logger.info(f"  Created {agg_total} new aggregates during cleanup")
+            three_days_ago = datetime.now(UTC) - timedelta(days=3)
+            agg_counts = agg_service.backfill(
+                start_date=three_days_ago,
+                end_date=None,
+                period_types=["daily"],
+            )
+            agg_total = sum(agg_counts.values())
+            if agg_total > 0:
+                logger.info(f"  Created {agg_total} new aggregates during cleanup")
 
         logger.info(f"\nDeleting measurements older than {args.retention_days} days...")
-        deleted_count = db.cleanup_old_measurements(retention_days=args.retention_days)
+        deleted_count = db.cleanup_old_measurements(
+            retention_days=args.retention_days,
+            batch_size=args.delete_batch_size,
+            max_batches=args.max_delete_batches,
+        )
 
         logger.info("\n✅ Cleanup complete!")
         logger.info(f"  Deleted: {deleted_count} measurements")
@@ -131,6 +165,11 @@ def main() -> int:
                 f"  Oldest measurement: {stats_after['oldest_measurement_age_days']} days old"
             )
             logger.info(f"  Space saved: {deleted_count} rows")
+            logger.info(
+                "  Measurements still older than %s days: %s",
+                stats_after["older_than_days_threshold"],
+                stats_after["measurements_older_than_threshold"],
+            )
 
         return 0
 

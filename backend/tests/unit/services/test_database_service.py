@@ -323,7 +323,32 @@ class TestDatabaseService:
         deleted = db_service.cleanup_old_measurements(retention_days=30)
         assert deleted == 100
         assert "DELETE FROM measurements" in mock_cursor.execute.call_args[0][0]
-        assert mock_cursor.execute.call_args[0][1] == (30,)
+        assert mock_cursor.execute.call_args[0][1][1] == 5000
+
+    @patch("psycopg2.connect")
+    def test_cleanup_old_measurements_honors_batch_controls(self, mock_connect, db_service):
+        mock_conn1 = MagicMock()
+        mock_cursor1 = MagicMock()
+        mock_conn1.cursor.return_value = mock_cursor1
+        mock_cursor1.__enter__.return_value = mock_cursor1
+        mock_cursor1.rowcount = 50
+
+        mock_conn2 = MagicMock()
+        mock_cursor2 = MagicMock()
+        mock_conn2.cursor.return_value = mock_cursor2
+        mock_cursor2.__enter__.return_value = mock_cursor2
+        mock_cursor2.rowcount = 0
+
+        mock_connect.side_effect = [mock_conn1, mock_conn2]
+
+        deleted = db_service.cleanup_old_measurements(
+            retention_days=45,
+            batch_size=2500,
+            max_batches=2,
+        )
+
+        assert deleted == 50
+        assert mock_cursor1.execute.call_args[0][1][1] == 2500
 
     @patch("psycopg2.connect")
     def test_get_measurement_baseline_stats(self, mock_connect, db_service):
