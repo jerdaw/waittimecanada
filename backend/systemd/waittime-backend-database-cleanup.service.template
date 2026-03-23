@@ -1,5 +1,5 @@
 [Unit]
-Description=Wait Time Canada backend database maintenance
+Description=Wait Time Canada backend database cleanup
 Wants=network-online.target
 After=network-online.target
 ConditionPathExists=/etc/projects-merge/env/waittime-backend.env

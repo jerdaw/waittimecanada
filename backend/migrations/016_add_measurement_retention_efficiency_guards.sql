@@ -1,5 +1,5 @@
 -- 016_add_measurement_retention_efficiency_guards.sql
--- Support indefinite raw-measurement retention with safer idempotency and lower-cost
+-- Improve raw-measurement retention with safer idempotency and lower-cost
 -- time-range scans.
 --
 -- 1. Remove exact duplicate observations already present in measurements.

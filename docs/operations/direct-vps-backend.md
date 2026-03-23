@@ -153,8 +153,8 @@ The systemd installer:
 
 Cleanup note:
 
-1. the cleanup CLI now preserves raw measurements by default and only deletes old rows when an explicit purge flag is supplied
-2. the optional timer is therefore non-destructive unless an operator deliberately changes the service command
+1. the cleanup CLI refreshes recent aggregates and deletes raw measurements older than 30 days by default
+2. the optional timer therefore restores the repository's storage-safety policy when enabled
 
 ## Stage And Release From A Workstation
 

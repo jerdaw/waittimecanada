@@ -342,7 +342,7 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 ### M31: Raw Retention Efficiency Guards (016)
 
 #### 016_add_measurement_retention_efficiency_guards.sql
-**Purpose:** Support indefinite raw retention safely and efficiently
+**Purpose:** Improve raw-measurement retention efficiency and suppress exact duplicates
 **Created:** 2026-03-13
 **Milestone:** M31 (Raw Retention Hardening)
 
@@ -351,7 +351,7 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 - Adds an exact-observation uniqueness guard on `measurements`
 - Adds a BRIN index on `measurements.timestamp_utc`
 
-**Rationale:** Preserve full raw history while preventing exact duplicate growth and keeping append-heavy time scans efficient.
+**Rationale:** Prevent exact duplicate growth and keep append-heavy time scans efficient regardless of the cleanup window.
 
 ---
 

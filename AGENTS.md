@@ -40,7 +40,7 @@ This file provides guidance to automated developer tools when working with code 
 
 This is the **Wait Time Canada** project - a "Health Systems Observatory" designed to audit and standardize Canadian emergency room wait time data across provinces. This is **NOT a simple wait time app**, but rather a clinically defensible auditing platform that exposes methodological inconsistencies in healthcare reporting.
 
-**Current Status:** Milestone 33 (Historical Occupancy Trends) Complete. **Four-province breadth achieved** (ON, QC, AB, BC). All scrapers active, 380+ hospitals visible, methodology documentation complete for all provinces, occupancy trend aggregation pipeline operational, the production domain `wait-time.ca` is live on the VPS via Caddy, and raw measurements are preserved by default for long-term analysis.
+**Current Status:** Milestone 33 (Historical Occupancy Trends) Complete. **Four-province breadth achieved** (ON, QC, AB, BC). All scrapers active, 380+ hospitals visible, methodology documentation complete for all provinces, occupancy trend aggregation pipeline operational, the production domain `wait-time.ca` is live on the VPS via Caddy, and raw measurements follow a 30-day retention policy with permanent aggregates for long-term analysis.
 
 **Current Architecture:**
 - **Database**: Neon PostgreSQL 17 (10 tables: sources, hospitals, measurements, scraper_status, scraper_alert_state, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions)
@@ -48,7 +48,7 @@ This is the **Wait Time Canada** project - a "Health Systems Observatory" design
   - **Tests**: 454+ passing (unit + integration)
   - Scrapers: Quebec (BeautifulSoup), Ontario (HTTP client), Alberta (Playwright), BC (JSON/__NEXT_DATA__)
   - Services: DatabaseService, AggregationService, DataQualityService, AnomalyDetectionService, MethodologyChangeDetector, GeocodingService
-  - CLI tools: scraper runner, database maintenance / optional purge, seeding, aggregation, trusted hospital approval, region mapping
+  - CLI tools: scraper runner, database cleanup, storage stats, seeding, aggregation, trusted hospital approval, region mapping
 - **Frontend**: Next.js 14 + TypeScript + Mapbox GL JS
   - **Tests**: 359+ passing (Vitest + React Testing Library)
   - Map component with hospital markers and methodology display
@@ -126,7 +126,7 @@ payload_hash = hashlib.sha256(html.encode()).hexdigest()
 payload_snippet = html[:200]
 ```
 
-Retention policy: Preserve raw measurement rows by default; only purge old rows with an explicit operator-approved delete path (aggregates remain permanent).
+Retention policy: Delete raw measurement rows older than 30 days; keep permanent aggregates for long-term analysis.
 
 ### 2. Silent Failure Detection
 

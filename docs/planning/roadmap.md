@@ -97,7 +97,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [x] **P0 / Ops: Quebec parser zero-value guard** — Zero-value occupancy as suppressed signal rather than hard failure
 - [x] **P1 / Performance: Cache & polling audit** — Verified cache headers/TTLs, enforced `no-store` for user-specific/export routes
 - [x] **P1 / Ops: CI quota conservation (temporary)** — Minimized free-tier GitHub Actions burn
-- [x] **P1 / Ops: Raw retention + alerting stabilization** — Raw measurements preserved by default, duplicate suppression added, maintenance made lightweight, and heartbeat alerts made state-change driven with a 120-minute threshold
+- [x] **P1 / Ops: Raw retention + alerting stabilization** — Duplicate suppression added, 30-day retention enforcement restored, and heartbeat alerts made state-change driven with a 120-minute threshold
 - [x] **P1 / Ops: CI/tooling maintenance (2026-02-23)** — Resolved all mypy/pytest CI failures; upgraded ruff, mypy, react-map-gl v8, playwright, date-fns
 - [x] **P1 / Ops: Codecov coverage rollout (2026-03-16)** — Added quiet Codecov configuration with split frontend/backend flags, carryforward support, and patch-focused PR status checks
 - [x] **P1 / Ops: Ontario timeout hardening (2026-03-21)** — Added Ontario-specific HTTP read-timeout fallback and verified a healthy post-deploy production scrape on GitHub Actions

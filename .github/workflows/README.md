@@ -82,11 +82,11 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ---
 
-### 6. `database-cleanup.yml` - Database Maintenance
+### 6. `database-cleanup.yml` - Database Cleanup
 
 **Trigger:** currently manual dispatch only (scheduled cron temporarily paused due to GitHub Actions quota exhaustion).
 
-**Purpose:** Provide an operator-run lightweight maintenance entry point. Raw measurement deletion is no longer the default behavior, and the workflow reports `measurements` storage growth without recomputing aggregates.
+**Purpose:** Provide an operator-run retention cleanup entry point. The workflow refreshes recent aggregates, deletes raw measurements older than 30 days, and reports `measurements` storage growth.
 
 **Optimization controls:**
 - Serialized concurrency group.

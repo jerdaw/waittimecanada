@@ -1,7 +1,7 @@
-name: Database Maintenance
+name: Database Cleanup
 
 # Keep manual dispatch available for lightweight storage reporting and
-# explicit operator-approved purge work.
+# an operator-run retention cleanup while scheduled jobs remain paused.
 on:
   workflow_dispatch:  # Allow manual triggering
 
@@ -29,12 +29,12 @@ jobs:
         run: |
           pip install -e .
 
-      - name: Run database maintenance
+      - name: Run database cleanup
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.cleanup
+          python -m waittime.cli.cleanup --verbose
 
       - name: Report measurement storage footprint
         working-directory: backend
@@ -43,16 +43,16 @@ jobs:
         run: |
           python -m waittime.cli.storage_stats --relation measurements
 
-      - name: Report maintenance results
+      - name: Report cleanup results
         if: success()
         run: |
-          echo "✅ Database maintenance completed successfully"
-          echo "No aggregate recomputation was performed"
-          echo "Raw measurements were preserved unless an explicit purge flag was supplied"
+          echo "✅ Database cleanup completed successfully"
+          echo "Recent aggregates were refreshed"
+          echo "Old measurements (>30 days) have been purged"
           echo "Measurement table storage stats were reported"
 
       - name: Notify on failure
         if: failure()
         run: |
-          echo "❌ Database maintenance failed!"
+          echo "❌ Database cleanup failed!"
           echo "Manual investigation required"

@@ -180,7 +180,7 @@ graph TD
   - DatabaseService, AggregationService, DataQualityService
   - AnomalyDetectionService, MethodologyChangeDetector
   - GeocodingService (Nominatim), HeartbeatService
-- **CLI Tools:** Scraper runner, database maintenance, storage stats, seeding, aggregation, region mapping
+- **CLI Tools:** Scraper runner, database cleanup, storage stats, seeding, aggregation, region mapping
 
 ### Frontend
 - **Framework:** Next.js 14 App Router + TypeScript
@@ -336,7 +336,7 @@ python -m waittime.cli.scraper --dry-run --all    # Test without DB writes
 # Maintenance
 python -m waittime.cli.check_heartbeat            # Verify scraper health
 python -m waittime.cli.aggregate --backfill       # Regenerate aggregates
-python -m waittime.cli.cleanup --dry-run          # Preview maintenance / optional purge
+python -m waittime.cli.cleanup --dry-run          # Preview cleanup
 python -m waittime.cli.storage_stats              # Inspect measurements table growth
 
 # Testing
@@ -424,7 +424,7 @@ waittimecanada/
 - **Scraper Cron:** Runs hourly via GitHub Actions
 - **Heartbeat Monitor:** Checks scraper health every 30 minutes
 - **Failure Alerts:** Pushover notifications for stale data or errors
-- **Database Maintenance:** Lightweight reporting by default; aggregate refresh is handled post-scrape
+- **Database Cleanup:** Recent aggregates refreshed, then raw measurements older than 30 days are purged
 
 ### CI/CD Pipelines
 - **Frontend CI:** Type checking, linting, unit tests

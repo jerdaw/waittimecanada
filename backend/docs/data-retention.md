@@ -2,24 +2,27 @@
 
 ## Overview
 
-Wait Time Canada now preserves raw measurement rows for long-term historical
-analysis by default. Routine maintenance is intentionally lightweight: it can
-report age or storage statistics, but it no longer performs broad aggregate
-recomputation or raw measurement deletion by default.
+Wait Time Canada implements a **30-day retention policy** for raw measurement
+data. Routine cleanup refreshes recent aggregates first, then deletes
+measurements older than the retention window to keep Neon storage bounded.
 
 ## Current Policy
 
-1. Raw `measurements` rows are retained indefinitely unless an operator explicitly runs a purge.
+1. Raw `measurements` rows older than 30 days are deleted during cleanup.
 2. `measurement_aggregates` remain permanent and continue to power long-range analytics efficiently.
 3. We still hash payloads instead of storing full HTML bodies.
 4. Exact duplicate observations are now rejected at insert time.
-5. Storage growth should now be monitored instead of controlled through automatic deletion.
+5. Storage growth should still be monitored so retention failures are caught early.
+
+## What Gets Deleted?
+
+The default cleanup path deletes:
+- Individual measurement records from the `measurements` table
+- Associated `raw_payload_hash` and `raw_payload_snippet` fields
 
 ## What Gets Preserved?
 
-The default maintenance path **does NOT delete**:
-- Individual measurement records from the `measurements` table
-- Associated `raw_payload_hash` and `raw_payload_snippet` fields
+Cleanup does **NOT** delete:
 - Hospital metadata (name, location, verification status)
 - Source configurations
 - Scraper heartbeat/health status
@@ -27,31 +30,31 @@ The default maintenance path **does NOT delete**:
 - Daily quality snapshots
 - Methodology change events
 
-## Automated Maintenance
+## Automated Cleanup
 
 ### GitHub Actions
 
-The maintenance workflow is currently manual-dispatch only:
+The cleanup workflow is currently manual-dispatch only:
 - **Workflow**: `.github/workflows/database-cleanup.yml`
-- **Default behavior**: lightweight maintenance only (no broad aggregate refresh, no full-table age scan)
-- **Purge behavior**: only if the CLI is run with an explicit purge flag
+- **Default behavior**: refresh recent daily aggregates, then purge rows older than 30 days
+- **Stats behavior**: use `--verbose` or `--with-stats` to print age metrics too
 
-### Manual Maintenance
+### Manual Cleanup
 
-You can also run maintenance manually:
+You can also run cleanup manually:
 
 ```bash
-# Preview current maintenance / optional purge behavior
+# Preview cleanup
 python -m waittime.cli.cleanup --dry-run
 
-# Run lightweight maintenance without deleting raw rows
+# Refresh aggregates and delete measurements older than 30 days
 python -m waittime.cli.cleanup
 
 # Collect age statistics too
 python -m waittime.cli.cleanup --with-stats
 
-# Explicitly purge old raw measurements (only if you really mean to)
-python -m waittime.cli.cleanup --purge-old-measurements --retention-days 60
+# Use a custom retention window
+python -m waittime.cli.cleanup --retention-days 60
 
 # Verbose output with statistics
 python -m waittime.cli.cleanup --verbose
@@ -96,13 +99,13 @@ python -m waittime.cli.storage_stats --relation measurements --exact-count --jso
 
 ## Implementation Details
 
-### Default Maintenance Flow
+### Default Cleanup Flow
 
 ```python
 # In cleanup CLI
 # 1. optionally collect full-table age stats (--dry-run/--verbose/--with-stats)
-# 2. optionally report storage / age statistics
-# 3. skip deletion unless --purge-old-measurements is provided
+# 2. refresh recent daily aggregates
+# 3. delete rows older than retention_days
 ```
 
 ### Insert-Time Efficiency Guards
@@ -110,7 +113,7 @@ python -m waittime.cli.storage_stats --relation measurements --exact-count --jso
 - Exact duplicate raw observations are skipped via a database uniqueness guard.
 - A BRIN index on `measurements.timestamp_utc` keeps long-range append-heavy scans efficient.
 
-### Optional Purge Query
+### Cleanup Query
 
 ```sql
 DELETE FROM measurements
@@ -119,10 +122,10 @@ WHERE timestamp_utc < NOW() - INTERVAL '60 days'
 
 ## Best Practices
 
-1. **Keep raw history unless you have a clear reason to purge it**.
+1. **Keep cleanup running regularly** so storage stays within the Neon tier.
 2. **Monitor storage regularly**: use database size checks and measurement age stats.
-3. **Keep storage monitoring running** so growth stays visible even with full raw retention.
-4. **Use `--dry-run` before any purge**.
+3. **Keep aggregate maintenance coupled to cleanup** so long-range analytics remain available after raw rows roll off.
+4. **Use `--dry-run` before changing the retention window**.
 
 ## Analytics & Reporting
 
@@ -140,15 +143,13 @@ FROM measurements
 GROUP BY DATE(timestamp_utc), hospital_id;
 ```
 
-The aggregate pipeline reduces read cost for analytics, but it is no longer part of routine maintenance and it is not a prerequisite for preserving raw history.
+The aggregate pipeline reduces read cost for analytics and is refreshed before old raw rows are purged.
 
 ## Troubleshooting
 
 ### "Deleted 0 measurements"
 
-This is expected if:
-- you did not pass `--purge-old-measurements`
-- all measurements are newer than the requested purge threshold
+This is expected if all measurements are newer than the requested retention threshold.
 
 ### "Database connection failed"
 
@@ -161,15 +162,15 @@ echo $DATABASE_URL
 
 ### Manual Recovery
 
-If a purge accidentally deletes data you needed:
+If cleanup deletes data you needed:
 
 1. **Restore from database backup** (Neon provides point-in-time recovery)
 2. **Re-run scrapers** to collect fresh data
-3. Future raw history will continue accumulating once the purge path is no longer used
+3. Historical raw rows older than the retention window are not recoverable without backup restore
 
 ## Configuration
 
-The optional purge period is configurable:
+The retention period is configurable:
 
 ```python
 # In code
@@ -178,27 +179,27 @@ db.cleanup_old_measurements(retention_days=60)
 
 ```bash
 # Via CLI
-python -m waittime.cli.cleanup --purge-old-measurements --retention-days 60
+python -m waittime.cli.cleanup --retention-days 60
 ```
 
 ```yaml
-# In GitHub Actions or systemd, add an explicit purge flag only if you intend to delete raw history
+# In GitHub Actions or systemd, run the cleanup CLI on a schedule
 ```
 
-**Default policy**: preserve raw measurements indefinitely
+**Default policy**: retain raw measurements for 30 days
 
 ## Security Considerations
 
 - Cleanup requires `DATABASE_URL` with write permissions
 - The GitHub Action uses repository secrets for database access
-- Always test any purge command with `--dry-run` in production first
-- Treat purging raw history as an operator decision, not a routine task
+- Always test a new retention window with `--dry-run` in production first
+- Run cleanup during low-traffic windows when possible
 
 ## Future Enhancements
 
 Potential improvements for v2:
 
 - [ ] Storage growth dashboards / alerts
-- [ ] Archive-to-cold-storage path if Neon cost becomes material
-- [ ] Slack/email notifications on maintenance completion
-- [ ] Purge safety rails requiring a second explicit confirmation flag
+- [ ] Archive-to-cold-storage path if raw history ever needs to exceed 30 days
+- [ ] Slack/email notifications on cleanup completion
+- [ ] Province-specific retention policies if research needs change

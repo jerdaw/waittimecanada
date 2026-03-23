@@ -4,7 +4,7 @@
 
 - Engine: PostgreSQL (Neon)
 - Migration source: `backend/migrations/`
-- Core strategy: strict ontology metadata + verifiable provenance + indefinite raw retention + aggregate summaries as an optimization layer
+- Core strategy: strict ontology metadata + verifiable provenance + 30-day raw retention + permanent aggregate summaries
 
 ## Schema Components
 
@@ -66,7 +66,7 @@ This lets the heartbeat monitor send one incident alert when a source becomes un
 - Use ontology tags to drive comparability logic.
 - Keep verification gate: new hospitals are not auto-published.
 - Store payload hash/snippet, not full source HTML.
-- Preserve raw measurements by default; explicit purges are opt-in only.
+- Delete raw measurements older than 30 days after recent aggregates are refreshed.
 
 ## Migration and Bootstrap
 

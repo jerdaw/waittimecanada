@@ -284,7 +284,7 @@ Instructions will depend on platform chosen (see platform-specific guides below)
 | Scraper fails silently | Medium | High | Heartbeat monitor (already configured) |
 | Database connection limit hit | Low | Medium | Neon free tier: 100 connections, should be sufficient |
 | API rate limits exceeded | Low | Low | No external APIs except Mapbox (generous free tier) |
-| Storage exceeds free tier | Low | Medium | Raw history is preserved by default; monitor growth and archive later if needed |
+| Storage exceeds free tier | Low | Medium | Enforce 30-day raw retention, keep aggregates permanent, and monitor table growth |
 | Bad data published | Medium | High | Verification queue (already implemented) |
 
 ---
