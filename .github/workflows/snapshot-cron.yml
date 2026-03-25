@@ -1,8 +1,9 @@
 name: Snapshot Quality Cron
 
-# PAUSED (2026-02-22): Scheduled runs disabled due to exhausted GitHub Actions quota.
-# Keep manual dispatch available for testing or backfills.
 on:
+  schedule:
+    # Run daily at 01:00 UTC, after scrapers have had a chance to collect data
+    - cron: '0 1 * * *'
   workflow_dispatch:
     # Allows manual trigger for testing or backfills
 
