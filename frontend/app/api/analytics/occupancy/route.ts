@@ -133,7 +133,9 @@ export async function GET(request: Request) {
         const occupancyRow = occupancyRows[0] ?? null;
         const rawCountRow = rawCountRows[0] ?? null;
 
-        const occupancyObservations = Number(occupancyRow?.observations_24h ?? 0);
+        const occupancyObservations = Number(
+          occupancyRow?.observations_24h ?? 0,
+        );
         const rawCountObservations = Number(rawCountRow?.observations_24h ?? 0);
         const totalObservations = occupancyObservations + rawCountObservations;
 
@@ -194,8 +196,7 @@ export async function GET(request: Request) {
             latest_observation: occupancyRow?.latest_observation
               ? String(occupancyRow.latest_observation)
               : null,
-            note:
-              "Stretcher occupancy rate as percentage. >100% indicates overcrowding.",
+            note: "Stretcher occupancy rate as percentage. >100% indicates overcrowding.",
           };
         }
 
@@ -227,10 +228,9 @@ export async function GET(request: Request) {
       },
     );
 
-    return NextResponse.json(
-      payload,
-      { headers: publicCacheHeaders(300, 900) },
-    );
+    return NextResponse.json(payload, {
+      headers: publicCacheHeaders(300, 900),
+    });
   } catch (error) {
     console.error("Failed to compute occupancy analytics:", error);
     return NextResponse.json(

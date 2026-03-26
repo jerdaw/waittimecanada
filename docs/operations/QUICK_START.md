@@ -120,6 +120,12 @@ ORDER BY source_id;
 
 If counts are normal but transfer is still high, use the runbook in `docs/operations/scraper-scheduling.md` under "Neon Public Transfer Guardrails".
 
+Current production guardrails already applied on the frontend path:
+
+- `SystemStatus` polls `/api/health` every 5 minutes and only while visible.
+- Read-heavy anonymous API routes use short cache headers plus a short-lived in-process response cache on the shared VPS runtime.
+- If transfer pressure persists, verify the deployed frontend revision and health before changing scraper cadence.
+
 ---
 
 ## GitHub Actions

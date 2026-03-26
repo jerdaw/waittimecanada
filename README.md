@@ -45,6 +45,7 @@ Provincial health authorities report ER wait times using **fundamentally differe
 - Provincial methodology labels are inferred from public documentation and can lag unannounced reporting changes by source organizations.
 - Reported wait times and occupancy values are limited to what provinces publish; the platform cannot surface unreported overcrowding or internal flow constraints.
 - The equity layer is currently implemented for Ontario only and should not be generalized to other provinces without province-specific source and tract validation.
+- The direct-VPS frontend now uses short-lived in-process response caching for repeated anonymous reads; this reduces Neon public transfer without changing scraper cadence, raw retention, or aggregate storage policy.
 
 ---
 
@@ -207,6 +208,7 @@ graph TD
 - **Playwright Browsers:** Automated for Alberta and browser-based verification flows
 - **Failure Alerting:** Pushover notifications for scraper/heartbeat failures
 - **Operational Posture:** Hourly scraper cadence + 30-minute heartbeat checks on GitHub Actions with state-change alerting and a 120-minute stale threshold
+- **Frontend Transfer Guardrails:** `/api/health`, `/api/status`, `/api/hospitals`, `/api/hospitals/[slug]/trends`, and the main analytics routes use shared cache headers plus short-lived in-process server caching on the shared VPS runtime
 
 ---
 

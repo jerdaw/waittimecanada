@@ -221,7 +221,8 @@ export async function GET(request: Request) {
           sort_order: Number(row.sort_order),
           hospital_count: Number(row.hospital_count ?? 0),
           reporting_count: Number(row.reporting_count ?? 0),
-          period_mean: row.period_mean === null ? null : Number(row.period_mean),
+          period_mean:
+            row.period_mean === null ? null : Number(row.period_mean),
           period_median:
             row.period_median === null ? null : Number(row.period_median),
           best_wait: row.best_wait === null ? null : Number(row.best_wait),
@@ -238,7 +239,10 @@ export async function GET(request: Request) {
 
         const ranked = parsedRows
           .filter((row) => row.period_mean !== null)
-          .sort((left, right) => Number(left.period_mean) - Number(right.period_mean));
+          .sort(
+            (left, right) =>
+              Number(left.period_mean) - Number(right.period_mean),
+          );
 
         const rankIndex = new Map<
           string,
@@ -319,10 +323,9 @@ export async function GET(request: Request) {
       },
     );
 
-    return NextResponse.json(
-      payload,
-      { headers: publicCacheHeaders(300, 900) },
-    );
+    return NextResponse.json(payload, {
+      headers: publicCacheHeaders(300, 900),
+    });
   } catch (error) {
     if (isMissingRegionsSchemaError(error)) {
       return NextResponse.json(

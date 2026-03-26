@@ -100,6 +100,7 @@ git push origin main
 
 - `SystemStatus` polls `/api/health` every 5 minutes (not every minute) and only while the browser tab is visible.
 - Read-heavy API routes use shared cache headers from `frontend/utils/cache.ts`.
+- The direct-VPS runtime also applies short-lived in-process response caching via `frontend/utils/server-cache.ts` for repeated anonymous reads.
 - Typical cache windows:
   - `120s` for `/api/health`
   - `300s` for hospitals and analytics endpoints

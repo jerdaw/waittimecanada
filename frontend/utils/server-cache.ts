@@ -58,3 +58,8 @@ export async function getOrSetServerCache<T extends ServerCacheValue>(
   inflightRequests.set(key, promise as Promise<ServerCacheValue>);
   return promise;
 }
+
+export function resetServerCacheForTests() {
+  serverResponseCache.clear();
+  inflightRequests.clear();
+}

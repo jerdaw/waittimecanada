@@ -132,10 +132,9 @@ export async function GET(
       },
     );
 
-    return NextResponse.json(
-      payload,
-      { headers: publicCacheHeaders(600, 1800) },
-    );
+    return NextResponse.json(payload, {
+      headers: publicCacheHeaders(600, 1800),
+    });
   } catch (error) {
     console.error("Failed to fetch trends:", error);
     return NextResponse.json(

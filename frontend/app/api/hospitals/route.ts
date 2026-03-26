@@ -137,10 +137,9 @@ export async function GET(request: NextRequest) {
       },
     );
 
-    return NextResponse.json(
-      payload,
-      { headers: publicCacheHeaders(300, 900) },
-    );
+    return NextResponse.json(payload, {
+      headers: publicCacheHeaders(300, 900),
+    });
   } catch (error) {
     logger.error("Failed to fetch hospitals", error);
     return NextResponse.json(

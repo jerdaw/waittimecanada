@@ -1,10 +1,10 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-03-23)
+## Current Status (Updated 2026-03-26)
 
-**Progress:** Production Domain Launch Complete (2026-03-12) | M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Ontario Timeout Hardening Verified In Production (2026-03-21) | Bounded Cleanup Runtime Verified In Production (2026-03-23) | Codecov Coverage Rollout Complete (2026-03-16) | CI/Tooling Maintenance Complete (2026-02-23) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived
+**Progress:** Production Domain Launch Complete (2026-03-12) | M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Ontario Timeout Hardening Verified In Production (2026-03-21) | Bounded Cleanup Runtime Verified In Production (2026-03-23) | Frontend Neon Transfer Guardrails Deployed In Production (2026-03-26) | Codecov Coverage Rollout Complete (2026-03-16) | CI/Tooling Maintenance Complete (2026-02-23) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived
 
-**Strategic Direction:** **Admissions strengthening phase remains active (2026-03-23), with the frontend now live on the shared VPS and the backend scheduler path still live on GitHub Actions.** Engineering foundation is mature (33 milestones, 821+ passing tests locally, 4 provinces). Focus remains on real-world engagement, external validation, public-facing artifacts, and keeping the new VPS frontend path stable while deferring backend cutover until the Ontario source is reachable from the chosen runtime. The GitHub Actions Ontario fetch path now has scraper-specific read-timeout hardening, and the manual cleanup workflow now enforces 30-day retention without turning maintenance into a 5-minute aggregate backfill. Coverage reporting now flows through quiet Codecov PR checks instead of chatty bot comments. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for the admissions plan, `docs/operations/direct-vps-frontend.md` for the frontend path, and `docs/operations/direct-vps-backend.md` for the backend worker path.
+**Strategic Direction:** **Admissions strengthening phase remains active (2026-03-26), with the frontend live on the shared VPS and the backend scheduler path still live on GitHub Actions.** Engineering foundation is mature (33 milestones, 821+ passing tests locally, 4 provinces). Focus remains on real-world engagement, external validation, public-facing artifacts, and keeping the VPS frontend path operationally cheap while backend cutover stays deferred until the Ontario source is reachable from the chosen runtime. The GitHub Actions Ontario fetch path now has scraper-specific read-timeout hardening, the manual cleanup workflow enforces 30-day retention without turning maintenance into a 5-minute aggregate backfill, and the live VPS frontend now serves repeat anonymous reads from a short-lived in-process cache to reduce Neon public transfer without changing collection/storage policy. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for the admissions plan, `docs/operations/direct-vps-frontend.md` for the frontend path, and `docs/operations/direct-vps-backend.md` for the backend worker path.
 
 **Deployment Note (2026-03-13):** Frontend hosting is now live on the shared VPS, `https://wait-time.ca` presents a valid Let's Encrypt certificate from Caddy, `https://www.wait-time.ca` redirects to the canonical host, and production smoke passes against the canonical domain.
 
@@ -59,11 +59,11 @@ Netlify should now be treated as rollback-only for the frontend, and GitHub Acti
 
 ## Next Steps
 
-**Admissions strengthening plan active (2026-03-12).** Production launch verification is complete. Immediate work now shifts to credibility artifacts and post-launch follow-through: A1 (personal author bio), A3 (real Zenodo DOI), A4 (stakeholder outreach), A6/A7 (case study + quantified findings), and B2-B4 (analytics, launch post, walkthrough). See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
+**Admissions strengthening plan active (2026-03-26).** Production launch verification is complete. Immediate work now shifts to credibility artifacts and post-launch follow-through: A1 (personal author bio), A3 (real Zenodo DOI), A4 (stakeholder outreach), A6/A7 (case study + quantified findings), and B2-B4 (analytics, launch post, walkthrough). See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
 
-**Parallel ops track (2026-03-13):** keep the VPS frontend stable, document the frontend cutover outcome clearly, and treat backend migration as deferred pending an Ontario reachability investigation for the VPS path.
+**Parallel ops track (2026-03-26):** keep the VPS frontend stable, watch Neon transfer after the new read-cache guardrails, and treat backend migration as deferred pending an Ontario reachability investigation for the VPS path.
 
-Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT data is available; M35 (Nova Scotia scraper) when bandwidth allows. Both are Phase D (deferred) in the admissions plan.
+Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT data is available; M35 (Nova Scotia scraper) when bandwidth allows. Both are Phase D (deferred) in the admissions plan. If Neon transfer remains tight after the March 26 guardrail deploy, the next optimization target is a more compact latest-snapshot path for `GET /api/hospitals`.
 
 ## Roadmap Operating Model
 
@@ -95,7 +95,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 ### Completed Engineering (Reference)
 
 - [x] **P0 / Ops: Quebec parser zero-value guard** — Zero-value occupancy as suppressed signal rather than hard failure
-- [x] **P1 / Performance: Cache & polling audit** — Verified cache headers/TTLs, enforced `no-store` for user-specific/export routes
+- [x] **P1 / Performance: Frontend read-cache + polling guardrails (2026-03-26)** — Deployed short-lived in-process response caching for read-heavy VPS routes, kept shared cache headers/TTLs, and reduced status polling to a 5-minute visible-tab cadence
 - [x] **P1 / Ops: CI quota conservation (temporary)** — Minimized free-tier GitHub Actions burn
 - [x] **P1 / Ops: Raw retention + alerting stabilization** — Duplicate suppression added, 30-day retention enforcement restored, and heartbeat alerts made state-change driven with a 120-minute threshold
 - [x] **P1 / Ops: Bound database cleanup runtime (2026-03-23)** — Production cleanup deleted 207,059 rows older than 30 days, then the workflow/runtime was tightened to skip zero-yield aggregate refresh and finish in 22 seconds instead of 5m48s
@@ -104,7 +104,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [x] **P1 / Ops: Codecov coverage rollout (2026-03-16)** — Added quiet Codecov configuration with split frontend/backend flags, carryforward support, and patch-focused PR status checks
 - [x] **P1 / Ops: Ontario timeout hardening (2026-03-21)** — Added Ontario-specific HTTP read-timeout fallback and verified a healthy post-deploy production scrape on GitHub Actions
 - [ ] **P1 / Ops: Stabilize Playwright UI regression suite** — Main-branch Playwright currently times out on map/list interactions and footer landmark a11y assertions; tighten selectors/fixtures and keep heavy E2E focused on user-facing diffs
-- [ ] **P2 / Ops: Batch frontend dependency refresh** — Dependabot PRs #32, #34, #35, and #36 were closed as stale after their merge refs failed `npm ci` on lockfile drift (`@swc/helpers` mismatch); revisit in one deliberate lockfile refresh instead of drip-merging broken PRs
+- [ ] **P2 / Ops: Batch frontend dependency refresh** — Closed Dependabot PRs #38, #39, #40, #41, and #42 rather than drip-merging them; revisit frontend package updates in one deliberate lockfile refresh with a coherent lockfile/tooling plan
 - [x] **P0 / Ops: Production domain launch verification** — `wait-time.ca` HTTPS valid, `www.wait-time.ca` redirect verified, release deploy published, production smoke passing
 - [x] **P1 / Ops: Harden Netlify release gate** — M32 Complete
 - [x] **P1 / Divergence Briefs in analytics + export** — M32 Complete
@@ -343,7 +343,7 @@ Archived (delivered):
 |-----|----------|
 | [0002](../adr/0002-metric-ontology.md) | Strict metric ontology for comparability |
 | [0003](../adr/0003-manual-geocoding-overrides.md) | Manual geocoding overrides |
-| [0020](../adr/0020-raw-retention-and-stateful-alerting.md) | Preserve raw history by default and use state-change alerting + lightweight maintenance |
+| [0020](../adr/0020-raw-retention-and-stateful-alerting.md) | Historical alerting/retention decision later superseded by ADR-0021 |
 | [0004](../adr/0004-landing-page-ux-optimization.md) | Landing page UX optimization |
 | [0005](../adr/0005-access-burden-estimator.md) | Access Burden Estimator design |
 | [0006](../adr/0006-dead-mans-switch-monitoring.md) | Dead Man's Switch monitoring |
@@ -360,6 +360,8 @@ Archived (delivered):
 | [0017](../adr/0017-domain-rebrand-wait-time-ca.md) | Domain rebrand to wait-time.ca |
 | [0018](../adr/0018-scraper-observability-and-reliability-hardening.md) | Scraper observability & reliability hardening |
 | [0019](../adr/0019-occupancy-trend-aggregation.md) | Include STRETCHER_OCCUPANCY in aggregation pipeline |
+| [0021](../adr/0021-bounded-retention-cleanup-operations.md) | Keep 30-day raw retention cleanup bounded and separate from aggregate refresh |
+| [0022](../adr/0022-frontend-read-cache-for-neon-transfer-guardrails.md) | Use short-lived frontend response caching to reduce Neon public transfer |
 
 ---
 
@@ -367,10 +369,11 @@ Archived (delivered):
 
 | Service | Purpose | Tier |
 |---------|---------|------|
+| Shared VPS | Live frontend hosting via Caddy + Docker | Shared host allocation |
 | Neon PostgreSQL | Database hosting | Free (512 MB) |
 | Mapbox | Map tiles | Free (50k loads/month) |
 | Nominatim (OSM) | Geocoding | Free (1 req/sec) |
-| Netlify | Frontend hosting (release-gated production deploys) | Free (300 credits/month) |
+| Netlify | Rollback-only frontend hosting path | Free (300 credits/month) |
 | GitHub Actions | CI/CD + scrapers | Free (2000 min/month) |
 
 ---

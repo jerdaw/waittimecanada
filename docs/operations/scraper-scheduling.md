@@ -390,9 +390,11 @@ If Neon sends a public transfer warning (for example 80% usage), apply this runb
    - `heartbeat-monitor.yml`: increase `--max-age` to preserve sane alerting
 3. Confirm connection reuse is active in `DatabaseService` (constructor accepts `conn`).
 4. Keep read-heavy API routes cached at 5-10 minute shared TTL, and `no-store` only for user-specific/export routes.
+5. Confirm the live VPS frontend is on a release that includes `frontend/utils/server-cache.ts` guardrails before changing scraper cadence or database policy.
 
 Notes:
 - The scraper anomaly pipeline now computes baseline stats in SQL (count/mean/stddev/quartiles) to reduce transfer from Neon to scraper workers.
+- The shared VPS frontend now serves repeated anonymous reads for key public routes from a short-lived in-process cache before re-querying Neon.
 - Escalate to Launch plan only after guardrails are applied and usage trend is still above budget.
 
 ---

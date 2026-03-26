@@ -14,6 +14,7 @@ Base URL:
 - Most routes use JSON responses.
 - Many routes return `{ success, data }` for success and `{ success: false, error, message }` for errors.
 - Some older routes use payload-first contracts (kept for compatibility).
+- Shared anonymous read routes use short cache windows to reduce repeated Neon reads on the production VPS path.
 
 ## Endpoint Catalog
 
@@ -65,6 +66,19 @@ Additional optional export params:
 - `DELETE /api/admin/hospitals/[id]/verify`
 
 ## Key Contracts
+
+## Response caching and transfer guardrails
+
+These routes are intentionally cache-friendly on the public frontend path:
+
+- `GET /api/health` and `GET /api/status`: 2-minute shared cache window
+- `GET /api/hospitals`, `GET /api/analytics/benchmarks`, `GET /api/analytics/trends`, `GET /api/analytics/regions`, `GET /api/analytics/occupancy`: 5-minute shared cache window
+- `GET /api/hospitals/[slug]/trends`: 10-minute shared cache window
+
+Operational note:
+
+- On the shared VPS runtime, these same read-heavy routes also use short-lived in-process response caching to cut repeat public transfer from Neon without changing data collection or storage policy.
+- `GET /api/geolocation` and `GET /api/export` remain `Cache-Control: no-store`.
 
 ## Health endpoint operational contract (M30)
 

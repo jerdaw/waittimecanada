@@ -11,7 +11,7 @@ Wait Time Canada is a clinically defensible Health Systems Observatory for audit
 
 ## Deployment Status
 
-As of **2026-03-12**, the frontend is deployed on Netlify and the canonical production URL `https://wait-time.ca` is live with valid HTTPS and verified redirects from `https://www.wait-time.ca`. See `docs/planning/roadmap.md`.
+As of **2026-03-26**, the frontend is live on the shared VPS at `https://wait-time.ca`, `https://www.wait-time.ca` redirects to the canonical host, and the backend scheduler path remains on GitHub Actions. See `docs/operations/direct-vps-frontend.md` and `docs/planning/roadmap.md`.
 
 ## Safety
 

@@ -498,10 +498,9 @@ export async function GET(request: NextRequest) {
       },
     );
 
-    return NextResponse.json(
-      payload,
-      { headers: publicCacheHeaders(300, 900) },
-    );
+    return NextResponse.json(payload, {
+      headers: publicCacheHeaders(300, 900),
+    });
   } catch (error) {
     console.error("Failed to compute system trends:", error);
     return NextResponse.json(

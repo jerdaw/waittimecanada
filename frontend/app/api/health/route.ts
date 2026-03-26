@@ -176,7 +176,8 @@ export async function GET(req: NextRequest) {
 
         const dbHealthy = healthResponse.database?.status === "connected";
         const sourcesHealthy = healthResponse.sources!.every(
-          (source) => source.status === "healthy" || source.status === "unknown",
+          (source) =>
+            source.status === "healthy" || source.status === "unknown",
         );
 
         healthResponse.healthy = dbHealthy && sourcesHealthy;
@@ -197,10 +198,7 @@ export async function GET(req: NextRequest) {
       },
     );
 
-    return NextResponse.json(
-      payload,
-      { headers: NO_STORE_HEADERS },
-    );
+    return NextResponse.json(payload, { headers: NO_STORE_HEADERS });
   } catch (error) {
     logger.error("Failed to fetch health status", error);
     return NextResponse.json(

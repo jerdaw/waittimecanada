@@ -139,10 +139,9 @@ export async function GET() {
       },
     );
 
-    return NextResponse.json(
-      payload,
-      { headers: publicCacheHeaders(300, 900) },
-    );
+    return NextResponse.json(payload, {
+      headers: publicCacheHeaders(300, 900),
+    });
   } catch (error) {
     console.error("Failed to fetch system status:", error);
     return NextResponse.json(

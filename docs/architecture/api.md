@@ -10,6 +10,7 @@ Characteristics:
 - PostgreSQL queries executed server-side via `frontend/utils/db.ts`
 - JSON responses with explicit success/error contracts
 - Availability-state contracts where source data is incomplete (occupancy/equity)
+- Shared anonymous routes use short cache headers, and the direct-VPS runtime adds a short-lived in-process response cache for repeated reads
 
 ## Route Groups
 
@@ -101,9 +102,10 @@ Route compatibility rules:
 ## Data Flow
 
 1. Frontend component requests Next API route.
-2. Route validates parameters and queries Neon.
-3. Route computes derived summaries where needed (e.g., percentiles, trends, linkage).
-4. UI renders with explicit states (loading/success/setup-needed/error).
+2. Route validates parameters and first checks the short-lived server response cache when the route is marked cacheable on the direct-VPS runtime.
+3. Cache misses query Neon and compute derived summaries where needed (for example percentiles, trends, linkage).
+4. Responses are emitted with explicit cache headers that match the route's freshness contract.
+5. UI renders with explicit states (loading/success/setup-needed/error).
 
 Analytics implementation note:
 
