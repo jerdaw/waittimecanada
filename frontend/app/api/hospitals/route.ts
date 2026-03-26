@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/utils/db";
 import { publicCacheHeaders } from "@/utils/cache";
 import { logger } from "@/utils/logger";
+import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 
 export interface Hospital {
   id: string;
@@ -33,13 +34,14 @@ import { HospitalQuerySchema } from "@/utils/validations";
 
 import { checkRateLimit } from "@/utils/rate-limit";
 
+const HOSPITALS_CACHE_TTL_MS = 300_000;
+
 export async function GET(request: NextRequest) {
   // 1. Rate Limit
   const rateLimitResponse = await checkRateLimit(request);
   if (rateLimitResponse) return rateLimitResponse;
 
   try {
-    const sql = getDb();
     const { searchParams } = new URL(request.url);
     const rawParams = Object.fromEntries(searchParams.entries());
 
@@ -57,76 +59,86 @@ export async function GET(request: NextRequest) {
     }
 
     const { province } = validation.data;
+    const payload = await getOrSetServerCache(
+      buildServerCacheKey("api:hospitals", {
+        province: province ?? "all",
+      }),
+      HOSPITALS_CACHE_TTL_MS,
+      async () => {
+        const sql = getDb();
 
-    // Query hospitals with their most recent wait time and occupancy measurements
-    let query = `
-      SELECT
-        h.id,
-        h.name,
-        h.province,
-        h.city,
-        h.latitude,
-        h.longitude,
-        h.is_verified,
-        h.is_visible,
-        h.source_id,
-        s.telehealth_name,
-        s.telehealth_number,
-        m.value as current_wait_time,
-        m.timestamp_utc as last_updated,
-        m.metric_family,
-        m.start_event,
-        m.end_event,
-        m.statistic_type,
-        m.patient_scope,
-        occ.value as occupancy_percentage,
-        occ.timestamp_utc as occupancy_updated
-      FROM hospitals h
-      LEFT JOIN sources s ON s.id = h.source_id
-      LEFT JOIN LATERAL (
-        SELECT
-          value,
-          timestamp_utc,
-          metric_family,
-          start_event,
-          end_event,
-          statistic_type,
-          patient_scope
-        FROM measurements
-        WHERE hospital_id = h.id
-          AND metric_family = 'TIME_TO_PROVIDER'
-        ORDER BY timestamp_utc DESC
-        LIMIT 1
-      ) m ON true
-      LEFT JOIN LATERAL (
-        SELECT
-          value,
-          timestamp_utc
-        FROM measurements
-        WHERE hospital_id = h.id
-          AND metric_family = 'STRETCHER_OCCUPANCY'
-        ORDER BY timestamp_utc DESC
-        LIMIT 1
-      ) occ ON true
-      WHERE h.is_visible = true AND h.is_verified = true
-    `;
+        let query = `
+          SELECT
+            h.id,
+            h.name,
+            h.province,
+            h.city,
+            h.latitude,
+            h.longitude,
+            h.is_verified,
+            h.is_visible,
+            h.source_id,
+            s.telehealth_name,
+            s.telehealth_number,
+            m.value as current_wait_time,
+            m.timestamp_utc as last_updated,
+            m.metric_family,
+            m.start_event,
+            m.end_event,
+            m.statistic_type,
+            m.patient_scope,
+            occ.value as occupancy_percentage,
+            occ.timestamp_utc as occupancy_updated
+          FROM hospitals h
+          LEFT JOIN sources s ON s.id = h.source_id
+          LEFT JOIN LATERAL (
+            SELECT
+              value,
+              timestamp_utc,
+              metric_family,
+              start_event,
+              end_event,
+              statistic_type,
+              patient_scope
+            FROM measurements
+            WHERE hospital_id = h.id
+              AND metric_family = 'TIME_TO_PROVIDER'
+            ORDER BY timestamp_utc DESC
+            LIMIT 1
+          ) m ON true
+          LEFT JOIN LATERAL (
+            SELECT
+              value,
+              timestamp_utc
+            FROM measurements
+            WHERE hospital_id = h.id
+              AND metric_family = 'STRETCHER_OCCUPANCY'
+            ORDER BY timestamp_utc DESC
+            LIMIT 1
+          ) occ ON true
+          WHERE h.is_visible = true AND h.is_verified = true
+        `;
 
-    const params: string[] = [];
-    if (province) {
-      query += ` AND h.province = $1`;
-      params.push(province);
-    }
+        const params: string[] = [];
+        if (province) {
+          query += ` AND h.province = $1`;
+          params.push(province);
+        }
 
-    query += ` ORDER BY h.name`;
+        query += ` ORDER BY h.name`;
 
-    const hospitals = await sql.unsafe(query, params);
+        const hospitals = await sql.unsafe(query, params);
+
+        return {
+          success: true,
+          count: hospitals.length,
+          data: hospitals,
+        };
+      },
+    );
 
     return NextResponse.json(
-      {
-        success: true,
-        count: hospitals.length,
-        data: hospitals,
-      },
+      payload,
       { headers: publicCacheHeaders(300, 900) },
     );
   } catch (error) {

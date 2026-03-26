@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/utils/db";
 import { publicCacheHeaders } from "@/utils/cache";
+import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 
 type TrendDirection = "improving" | "stable" | "worsening";
 type PeriodType = "weekly" | "monthly";
@@ -313,6 +314,8 @@ import { TrendsQuerySchema } from "@/utils/validations";
 
 import { checkRateLimit } from "@/utils/rate-limit";
 
+const TRENDS_CACHE_TTL_MS = 300_000;
+
 async function queryMethodologyContext(
   sql: ReturnType<typeof getDb>,
   province: string,
@@ -363,7 +366,6 @@ export async function GET(request: NextRequest) {
   if (rateLimitResponse) return rateLimitResponse;
 
   try {
-    const sql = getDb();
     const { searchParams } = new URL(request.url);
     const rawParams = Object.fromEntries(searchParams.entries());
 
@@ -397,93 +399,107 @@ export async function GET(request: NextRequest) {
     }
 
     const normalizedProvince = province.toUpperCase();
-    const now = new Date();
-    const lookbackStart = new Date(
-      now.getTime() - lookbackConfig.months * 31 * 24 * 60 * 60 * 1000,
+    const payload = await getOrSetServerCache(
+      buildServerCacheKey("api:analytics:trends", {
+        province: normalizedProvince,
+        period,
+        lookback: lookbackConfig.label,
+        metric_family,
+      }),
+      TRENDS_CACHE_TTL_MS,
+      async () => {
+        const sql = getDb();
+        const now = new Date();
+        const lookbackStart = new Date(
+          now.getTime() - lookbackConfig.months * 31 * 24 * 60 * 60 * 1000,
+        );
+
+        const lookbackStartIso = lookbackStart.toISOString();
+
+        const [methodologyContext, aggregateRowsResult] = await Promise.all([
+          queryMethodologyContext(
+            sql,
+            normalizedProvince,
+            lookbackStartIso,
+            metric_family,
+          ),
+          queryAggregateRows(
+            sql,
+            normalizedProvince,
+            period,
+            lookbackStartIso,
+            metric_family,
+          ),
+        ]);
+
+        let aggregateRows = aggregateRowsResult;
+        let fallbackSource: "none" | "daily_rollup" = "none";
+
+        if (aggregateRows.length === 0) {
+          const dailyRows = await queryAggregateRows(
+            sql,
+            normalizedProvince,
+            "daily",
+            lookbackStartIso,
+            metric_family,
+          );
+          if (dailyRows.length > 0) {
+            aggregateRows = rollupDailyRows(dailyRows, period);
+            fallbackSource = "daily_rollup";
+          }
+        }
+
+        const dataPoints = buildTrendPoints(aggregateRows);
+
+        const startMean =
+          dataPoints.length > 0 ? dataPoints[0].province_mean : null;
+        const endMean =
+          dataPoints.length > 0
+            ? dataPoints[dataPoints.length - 1].province_mean
+            : null;
+
+        let changePercent = 0;
+        if (startMean !== null && endMean !== null && startMean > 0) {
+          changePercent = Number(
+            (((endMean - startMean) / startMean) * 100).toFixed(1),
+          );
+        }
+
+        const direction = classifyDirection(changePercent);
+
+        return {
+          success: true,
+          data: {
+            province: normalizedProvince,
+            period,
+            lookback: lookbackConfig.label,
+            generated_at: now.toISOString(),
+            data_source:
+              fallbackSource === "none" ? "precomputed" : "derived_from_daily",
+            fallback_used: fallbackSource !== "none",
+            methodology_context: methodologyContext,
+            data_points: dataPoints,
+            trend_summary: {
+              direction,
+              change_percent: changePercent,
+              start_mean: startMean,
+              end_mean: endMean,
+              narrative: narrative(
+                normalizedProvince,
+                direction,
+                changePercent,
+                startMean,
+                endMean,
+                lookbackConfig.label,
+              ),
+            },
+          },
+        };
+      },
     );
 
-    const lookbackStartIso = lookbackStart.toISOString();
-
-    const [methodologyContext, aggregateRowsResult] = await Promise.all([
-      queryMethodologyContext(
-        sql,
-        normalizedProvince,
-        lookbackStartIso,
-        metric_family,
-      ),
-      queryAggregateRows(
-        sql,
-        normalizedProvince,
-        period,
-        lookbackStartIso,
-        metric_family,
-      ),
-    ]);
-
-    let aggregateRows = aggregateRowsResult;
-    let fallbackSource: "none" | "daily_rollup" = "none";
-
-    if (aggregateRows.length === 0) {
-      const dailyRows = await queryAggregateRows(
-        sql,
-        normalizedProvince,
-        "daily",
-        lookbackStartIso,
-        metric_family,
-      );
-      if (dailyRows.length > 0) {
-        aggregateRows = rollupDailyRows(dailyRows, period);
-        fallbackSource = "daily_rollup";
-      }
-    }
-
-    const dataPoints = buildTrendPoints(aggregateRows);
-
-    const startMean =
-      dataPoints.length > 0 ? dataPoints[0].province_mean : null;
-    const endMean =
-      dataPoints.length > 0
-        ? dataPoints[dataPoints.length - 1].province_mean
-        : null;
-
-    let changePercent = 0;
-    if (startMean !== null && endMean !== null && startMean > 0) {
-      changePercent = Number(
-        (((endMean - startMean) / startMean) * 100).toFixed(1),
-      );
-    }
-
-    const direction = classifyDirection(changePercent);
-
     return NextResponse.json(
-      {
-        success: true,
-        data: {
-          province: normalizedProvince,
-          period,
-          lookback: lookbackConfig.label,
-          generated_at: now.toISOString(),
-          data_source:
-            fallbackSource === "none" ? "precomputed" : "derived_from_daily",
-          fallback_used: fallbackSource !== "none",
-          methodology_context: methodologyContext,
-          data_points: dataPoints,
-          trend_summary: {
-            direction,
-            change_percent: changePercent,
-            start_mean: startMean,
-            end_mean: endMean,
-            narrative: narrative(
-              normalizedProvince,
-              direction,
-              changePercent,
-              startMean,
-              endMean,
-              lookbackConfig.label,
-            ),
-          },
-        },
-      },
+      payload,
       { headers: publicCacheHeaders(300, 900) },
     );
   } catch (error) {

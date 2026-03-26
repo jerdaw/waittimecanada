@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/utils/db";
 import { publicCacheHeaders } from "@/utils/cache";
+import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 
 type BenchmarkTrend = "improving" | "stable" | "worsening";
 
@@ -167,13 +168,14 @@ import { BenchmarkQuerySchema } from "@/utils/validations";
 
 import { checkRateLimit } from "@/utils/rate-limit";
 
+const BENCHMARKS_CACHE_TTL_MS = 300_000;
+
 export async function GET(request: NextRequest) {
   // 1. Rate Limit
   const rateLimitResponse = await checkRateLimit(request);
   if (rateLimitResponse) return rateLimitResponse;
 
   try {
-    const sql = getDb();
     const { searchParams } = new URL(request.url);
     const rawParams = Object.fromEntries(searchParams.entries());
 
@@ -203,106 +205,126 @@ export async function GET(request: NextRequest) {
     }
 
     const normalizedProvince = province.toUpperCase();
+    const cachedBenchmarks = await getOrSetServerCache(
+      buildServerCacheKey("api:analytics:benchmarks", {
+        province: normalizedProvince,
+        period: periodConfig.label,
+      }),
+      BENCHMARKS_CACHE_TTL_MS,
+      async () => {
+        const sql = getDb();
+        const now = new Date();
+        const currentStart = new Date(
+          now.getTime() - periodConfig.days * 24 * 60 * 60 * 1000,
+        );
+        const previousStart = new Date(
+          currentStart.getTime() - periodConfig.days * 24 * 60 * 60 * 1000,
+        );
 
-    const now = new Date();
-    const currentStart = new Date(
-      now.getTime() - periodConfig.days * 24 * 60 * 60 * 1000,
+        const rows = await sql`
+          WITH current_period AS (
+            SELECT
+              hospital_id,
+              AVG(mean_value)::float AS period_mean
+            FROM measurement_aggregates
+            WHERE period_type = 'daily'
+              AND period_start >= ${currentStart.toISOString()}::timestamptz
+              AND period_start < ${now.toISOString()}::timestamptz
+            GROUP BY hospital_id
+          ),
+          previous_period AS (
+            SELECT
+              hospital_id,
+              AVG(mean_value)::float AS previous_period_mean
+            FROM measurement_aggregates
+            WHERE period_type = 'daily'
+              AND period_start >= ${previousStart.toISOString()}::timestamptz
+              AND period_start < ${currentStart.toISOString()}::timestamptz
+            GROUP BY hospital_id
+          )
+          SELECT
+            h.id AS hospital_id,
+            h.name AS hospital_name,
+            h.city,
+            lm.value AS current_wait,
+            lm.metric_family,
+            lm.start_event,
+            lm.end_event,
+            lm.statistic_type,
+            cp.period_mean,
+            pp.previous_period_mean
+          FROM hospitals h
+          LEFT JOIN LATERAL (
+            SELECT value, metric_family, start_event, end_event, statistic_type
+            FROM measurements
+            WHERE hospital_id = h.id
+            ORDER BY timestamp_utc DESC
+            LIMIT 1
+          ) lm ON true
+          LEFT JOIN current_period cp ON cp.hospital_id = h.id
+          LEFT JOIN previous_period pp ON pp.hospital_id = h.id
+          WHERE h.province = ${normalizedProvince}
+            AND h.is_visible = true
+            AND h.is_verified = true
+          ORDER BY h.id
+        `;
+
+        const rankedRows = rows
+          .filter((row) => row.period_mean !== null)
+          .map((row) => ({
+            hospital_id: String(row.hospital_id),
+            hospital_name: String(row.hospital_name),
+            city: String(row.city),
+            current_wait:
+              row.current_wait === null ? null : Number(row.current_wait),
+            period_mean: Number(row.period_mean),
+            previous_period_mean:
+              row.previous_period_mean === null
+                ? null
+                : Number(row.previous_period_mean),
+            metric_family: String(row.metric_family ?? "UNKNOWN"),
+            start_event: String(row.start_event ?? "UNKNOWN"),
+            end_event: String(row.end_event ?? "UNKNOWN"),
+            statistic_type: String(row.statistic_type ?? "UNKNOWN"),
+          }))
+          .sort((left, right) => left.period_mean - right.period_mean);
+
+        const hospitals: BenchmarkHospital[] = rankedRows.map((row, index) => {
+          const rank = index + 1;
+          const percentile = computePercentile(rank, rankedRows.length);
+
+          return {
+            hospital_id: row.hospital_id,
+            hospital_name: row.hospital_name,
+            city: row.city,
+            current_wait: row.current_wait,
+            period_mean: row.period_mean,
+            percentile,
+            quartile: computeQuartile(percentile),
+            trend: computeTrend(row.period_mean, row.previous_period_mean),
+            trend_change_percent: computeTrendChangePercent(
+              row.period_mean,
+              row.previous_period_mean,
+            ),
+            metric_family: row.metric_family,
+            start_event: row.start_event,
+            end_event: row.end_event,
+            statistic_type: row.statistic_type,
+          };
+        });
+
+        return {
+          generated_at: new Date().toISOString(),
+          hospital_count: hospitals.length,
+          province_stats: computeProvinceStats(
+            hospitals.map((hospital) => hospital.period_mean),
+          ),
+          hospitals,
+        };
+      },
     );
-    const previousStart = new Date(
-      currentStart.getTime() - periodConfig.days * 24 * 60 * 60 * 1000,
-    );
 
-    const rows = await sql`
-      WITH current_period AS (
-        SELECT
-          hospital_id,
-          AVG(mean_value)::float AS period_mean
-        FROM measurement_aggregates
-        WHERE period_type = 'daily'
-          AND period_start >= ${currentStart.toISOString()}::timestamptz
-          AND period_start < ${now.toISOString()}::timestamptz
-        GROUP BY hospital_id
-      ),
-      previous_period AS (
-        SELECT
-          hospital_id,
-          AVG(mean_value)::float AS previous_period_mean
-        FROM measurement_aggregates
-        WHERE period_type = 'daily'
-          AND period_start >= ${previousStart.toISOString()}::timestamptz
-          AND period_start < ${currentStart.toISOString()}::timestamptz
-        GROUP BY hospital_id
-      )
-      SELECT
-        h.id AS hospital_id,
-        h.name AS hospital_name,
-        h.city,
-        lm.value AS current_wait,
-        lm.metric_family,
-        lm.start_event,
-        lm.end_event,
-        lm.statistic_type,
-        cp.period_mean,
-        pp.previous_period_mean
-      FROM hospitals h
-      LEFT JOIN LATERAL (
-        SELECT value, metric_family, start_event, end_event, statistic_type
-        FROM measurements
-        WHERE hospital_id = h.id
-        ORDER BY timestamp_utc DESC
-        LIMIT 1
-      ) lm ON true
-      LEFT JOIN current_period cp ON cp.hospital_id = h.id
-      LEFT JOIN previous_period pp ON pp.hospital_id = h.id
-      WHERE h.province = ${normalizedProvince}
-        AND h.is_visible = true
-        AND h.is_verified = true
-      ORDER BY h.id
-    `;
-
-    const rankedRows = rows
-      .filter((row) => row.period_mean !== null)
-      .map((row) => ({
-        hospital_id: String(row.hospital_id),
-        hospital_name: String(row.hospital_name),
-        city: String(row.city),
-        current_wait:
-          row.current_wait === null ? null : Number(row.current_wait),
-        period_mean: Number(row.period_mean),
-        previous_period_mean:
-          row.previous_period_mean === null
-            ? null
-            : Number(row.previous_period_mean),
-        metric_family: String(row.metric_family ?? "UNKNOWN"),
-        start_event: String(row.start_event ?? "UNKNOWN"),
-        end_event: String(row.end_event ?? "UNKNOWN"),
-        statistic_type: String(row.statistic_type ?? "UNKNOWN"),
-      }))
-      .sort((a, b) => a.period_mean - b.period_mean);
-
-    const hospitals: BenchmarkHospital[] = rankedRows.map((row, index) => {
-      const rank = index + 1;
-      const percentile = computePercentile(rank, rankedRows.length);
-
-      return {
-        hospital_id: row.hospital_id,
-        hospital_name: row.hospital_name,
-        city: row.city,
-        current_wait: row.current_wait,
-        period_mean: row.period_mean,
-        percentile,
-        quartile: computeQuartile(percentile),
-        trend: computeTrend(row.period_mean, row.previous_period_mean),
-        trend_change_percent: computeTrendChangePercent(
-          row.period_mean,
-          row.previous_period_mean,
-        ),
-        metric_family: row.metric_family,
-        start_event: row.start_event,
-        end_event: row.end_event,
-        statistic_type: row.statistic_type,
-      };
-    });
+    const hospitals = cachedBenchmarks.hospitals;
 
     const selectedHospitals = hospitalId
       ? hospitals.filter((hospital) => hospital.hospital_id === hospitalId)
@@ -320,20 +342,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const provinceStats = computeProvinceStats(
-      hospitals.map((hospital) => hospital.period_mean),
-    );
-
     return NextResponse.json(
       {
         success: true,
         data: {
           province: normalizedProvince,
           period: periodConfig.label,
-          generated_at: new Date().toISOString(),
-          hospital_count: hospitals.length,
+          generated_at: cachedBenchmarks.generated_at,
+          hospital_count: cachedBenchmarks.hospital_count,
           methodology_summary: computeMethodologyHomogeneity(selectedHospitals),
-          province_stats: provinceStats,
+          province_stats: cachedBenchmarks.province_stats,
           hospitals: selectedHospitals,
         },
       },

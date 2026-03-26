@@ -170,7 +170,7 @@ function SourceCard({
   );
 }
 
-const REFRESH_INTERVAL = 60_000; // 60 seconds
+const REFRESH_INTERVAL = 5 * 60_000;
 
 export default function StatusPage() {
   const t = useTranslations("StatusPage");
@@ -195,8 +195,25 @@ export default function StatusPage() {
 
   useEffect(() => {
     fetchStatus();
-    const interval = setInterval(fetchStatus, REFRESH_INTERVAL);
-    return () => clearInterval(interval);
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchStatus();
+      }
+    };
+
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchStatus();
+      }
+    }, REFRESH_INTERVAL);
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, [fetchStatus]);
 
   return (
