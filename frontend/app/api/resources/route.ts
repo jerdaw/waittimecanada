@@ -137,7 +137,10 @@ export async function GET(request: NextRequest) {
             return (row.distance_km ?? Number.POSITIVE_INFINITY) <= radius;
           })
           .sort((left, right) => {
-            if (left.distance_km !== undefined && right.distance_km !== undefined) {
+            if (
+              left.distance_km !== undefined &&
+              right.distance_km !== undefined
+            ) {
               return left.distance_km - right.distance_km;
             }
             return left.name.localeCompare(right.name);
@@ -250,6 +253,6 @@ function mapResourceRecord(
     completeness_status:
       row.kind === "aed"
         ? "incomplete"
-        : row.completeness_status ?? undefined,
+        : (row.completeness_status ?? undefined),
   };
 }

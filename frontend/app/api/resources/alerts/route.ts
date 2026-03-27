@@ -179,7 +179,9 @@ async function enrichAlertsWithDPD(rows: AlertRow[]): Promise<{
           }
 
           rowUsedDPD = true;
-          const enrichedProduct = await lookupDrugProductByBrandName(product.brand_name);
+          const enrichedProduct = await lookupDrugProductByBrandName(
+            product.brand_name,
+          );
           if (!enrichedProduct?.din) {
             return product;
           }

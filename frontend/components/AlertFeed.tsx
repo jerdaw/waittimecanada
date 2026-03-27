@@ -60,7 +60,8 @@ export function AlertFeed({
             <span>{t("source", { source: alert.source_name })}</span>
             <span>
               {t("published", {
-                timestamp: formatTimestamp(alert.published_at) ?? alert.published_at,
+                timestamp:
+                  formatTimestamp(alert.published_at) ?? alert.published_at,
               })}
             </span>
             {alert.last_refreshed_at && (

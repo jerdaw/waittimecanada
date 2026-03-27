@@ -151,6 +151,9 @@ This directory contains operational and CI workflows for Wait Time Canada.
 **Optimization controls:**
 - Serialized concurrency group to avoid overlapping ingest runs.
 - Reuses the existing `DATABASE_URL` secret; no new secrets required.
+- MOHSERLO and Health Canada alerts remain hard-fail paths; the Overpass AED
+  fallback runs in its own best-effort step so transient AED mirror failures do
+  not block the rest of the batch.
 
 ## Secrets Matrix
 

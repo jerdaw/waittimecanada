@@ -58,7 +58,9 @@ describe("ResourceList", () => {
 
     expect(screen.getByText("Toronto General Hospital")).toBeInTheDocument();
     expect(
-      screen.getByText("Reference directory data. This is not a live operational status feed."),
+      screen.getByText(
+        "Reference directory data. This is not a live operational status feed.",
+      ),
     ).toBeInTheDocument();
     expect(screen.getByText("Source: MOHSERLO")).toBeInTheDocument();
   });

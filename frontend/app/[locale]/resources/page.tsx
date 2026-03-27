@@ -65,9 +65,9 @@ export default function ResourcesPage() {
   const [alertSourceStatus, setAlertSourceStatus] = useState<
     SourceStatusRecord[]
   >([]);
-  const [aqhiSourceStatus, setAQHISourceStatus] = useState<SourceStatusRecord[]>(
-    [],
-  );
+  const [aqhiSourceStatus, setAQHISourceStatus] = useState<
+    SourceStatusRecord[]
+  >([]);
 
   useEffect(() => {
     let mounted = true;
@@ -222,7 +222,9 @@ export default function ResourcesPage() {
           latitude: String(userLocation.latitude),
           longitude: String(userLocation.longitude),
         });
-        const response = await fetch(`/api/resources/aqhi?${params.toString()}`);
+        const response = await fetch(
+          `/api/resources/aqhi?${params.toString()}`,
+        );
         const payload = (await response.json()) as AQHIResponse;
 
         if (!mounted) return;
@@ -263,7 +265,12 @@ export default function ResourcesPage() {
       deduped.set(entry.source_id, entry);
     }
     return Array.from(deduped.values());
-  }, [facilitySourceStatus, aedSourceStatus, alertSourceStatus, aqhiSourceStatus]);
+  }, [
+    facilitySourceStatus,
+    aedSourceStatus,
+    alertSourceStatus,
+    aqhiSourceStatus,
+  ]);
 
   const requestLocation = () => {
     if (!("geolocation" in navigator)) {
@@ -382,7 +389,8 @@ export default function ResourcesPage() {
                         </h3>
                         <p className="mt-1 text-xs text-muted-foreground">
                           {t("sections.transparency.updated", {
-                            timestamp: source.last_refreshed_at ?? t("common.unknown"),
+                            timestamp:
+                              source.last_refreshed_at ?? t("common.unknown"),
                           })}
                         </p>
                       </div>

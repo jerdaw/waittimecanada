@@ -24,7 +24,9 @@ describe("API Route: Resource Alerts", () => {
   });
 
   test("returns 400 for invalid limit", async () => {
-    const req = new NextRequest("http://localhost/api/resources/alerts?limit=0");
+    const req = new NextRequest(
+      "http://localhost/api/resources/alerts?limit=0",
+    );
 
     const res = await GET(req);
 
@@ -48,7 +50,9 @@ describe("API Route: Resource Alerts", () => {
           source_name: "Health Canada Recalls",
           provenance_url: "https://recalls-rappels.canada.ca/example",
           last_refreshed_at: refreshedAt,
-          affected_products: [{ brand_name: "Example Product", din: "12345678" }],
+          affected_products: [
+            { brand_name: "Example Product", din: "12345678" },
+          ],
         },
       ])
       .mockResolvedValueOnce([

@@ -64,7 +64,9 @@ export async function GET(request: NextRequest) {
         return {
           success: true as const,
           data:
-            sourceStatus.freshness_state === "suppress" ? null : (aqhi as AQHIRecord | null),
+            sourceStatus.freshness_state === "suppress"
+              ? null
+              : (aqhi as AQHIRecord | null),
           meta: {
             latitude,
             longitude,
@@ -115,14 +117,17 @@ async function fetchNearestAQHI(
       latitude + radius,
     ].join(",");
 
-    const response = await fetch(`${AQHI_COLLECTION_URL}&bbox=${bbox}&limit=200`, {
-      headers: {
-        Accept: "application/geo+json",
+    const response = await fetch(
+      `${AQHI_COLLECTION_URL}&bbox=${bbox}&limit=200`,
+      {
+        headers: {
+          Accept: "application/geo+json",
+        },
+        next: {
+          revalidate: 900,
+        },
       },
-      next: {
-        revalidate: 900,
-      },
-    });
+    );
 
     if (!response.ok) {
       continue;
@@ -149,7 +154,11 @@ function selectBestAQHIFeature(
     .map((feature) => {
       const coordinates = feature.geometry?.coordinates;
       const properties = feature.properties;
-      if (!coordinates || !properties?.location_id || properties.aqhi === undefined) {
+      if (
+        !coordinates ||
+        !properties?.location_id ||
+        properties.aqhi === undefined
+      ) {
         return null;
       }
 
@@ -171,7 +180,10 @@ function selectBestAQHIFeature(
         aqhiValue: Number(properties.aqhi),
       };
     })
-    .filter((candidate): candidate is NonNullable<typeof candidate> => candidate !== null);
+    .filter(
+      (candidate): candidate is NonNullable<typeof candidate> =>
+        candidate !== null,
+    );
 
   if (candidates.length === 0) {
     return null;
@@ -182,7 +194,9 @@ function selectBestAQHIFeature(
   const nearestCandidates = candidates
     .filter((candidate) => candidate.locationId === nearestLocationId)
     .sort((left, right) => {
-      const leftDelta = Math.abs(new Date(left.forecastAt ?? left.issuedAt ?? 0).getTime() - now);
+      const leftDelta = Math.abs(
+        new Date(left.forecastAt ?? left.issuedAt ?? 0).getTime() - now,
+      );
       const rightDelta = Math.abs(
         new Date(right.forecastAt ?? right.issuedAt ?? 0).getTime() - now,
       );

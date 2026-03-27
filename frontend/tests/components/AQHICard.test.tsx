@@ -12,7 +12,8 @@ const aqhi: AQHIRecord = {
   valid_until: "2026-03-27T13:00:00.000Z",
   source_id: "aqhi-geomet",
   source_name: "AQHI GeoMet",
-  provenance_url: "https://api.weather.gc.ca/collections/aqhi-forecasts-realtime",
+  provenance_url:
+    "https://api.weather.gc.ca/collections/aqhi-forecasts-realtime",
   last_refreshed_at: "2026-03-27T12:00:00.000Z",
   freshness_state: "show",
   caveat_class: "official_forecast",

@@ -26,8 +26,12 @@ describe("AlertFeed", () => {
   it("renders alert cards with source metadata", () => {
     render(<AlertFeed alerts={alerts} />);
 
-    expect(screen.getByText("Example medical device recall")).toBeInTheDocument();
-    expect(screen.getByText("A sample recall used for testing.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Example medical device recall"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("A sample recall used for testing."),
+    ).toBeInTheDocument();
     expect(
       screen.getByText("Source: Health Canada Recalls and Safety Alerts"),
     ).toBeInTheDocument();

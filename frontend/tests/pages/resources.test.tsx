@@ -124,14 +124,18 @@ describe("ResourcesPage", () => {
     expect(screen.getByText("Crowdsourced")).toBeInTheDocument();
     expect(screen.getByText("Incomplete coverage")).toBeInTheDocument();
     expect(
-      screen.getByText("Reference directory data. This is not a live operational status feed."),
+      screen.getByText(
+        "Reference directory data. This is not a live operational status feed.",
+      ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
         "Crowdsourced AED data. Locations may be incomplete or outdated. In an emergency, call 911 immediately.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByText("No safety alerts available right now.")).toBeInTheDocument();
+    expect(
+      screen.getByText("No safety alerts available right now."),
+    ).toBeInTheDocument();
     expect(
       screen.getByText("Share your location to request an AQHI snapshot."),
     ).toBeInTheDocument();

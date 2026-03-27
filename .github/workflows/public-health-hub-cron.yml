@@ -34,13 +34,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .
 
-      - name: Ingest live public health resources
+      - name: Ingest live MOHSERLO resources
         working-directory: ./backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           python -m waittime.cli.seed_public_health_resources \
-            --fetch-mohserlo-live \
+            --fetch-mohserlo-live
+
+      - name: Ingest live OSM AED fallback
+        continue-on-error: true
+        working-directory: ./backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python -m waittime.cli.seed_public_health_resources \
             --fetch-osm-aed-live
 
       - name: Ingest live public health alerts

@@ -4,6 +4,7 @@ import csv
 import hashlib
 import io
 import json
+import logging
 import re
 import unicodedata
 from collections.abc import Iterable
@@ -17,6 +18,8 @@ import httpx
 from waittime.core import PublicDataSource, ResourceLocation
 from waittime.services.database import DatabaseService
 
+logger = logging.getLogger(__name__)
+
 PUBLIC_HEALTH_HUB_LAST_VERIFIED_AT = date(2026, 3, 27)
 HTTP_TIMEOUT_SECONDS = 30.0
 MOHSERLO_FEATURE_LAYER_URL = (
@@ -24,7 +27,11 @@ MOHSERLO_FEATURE_LAYER_URL = (
     "LIO_OPEN_DATA/LIO_Open09/MapServer/26/query"
 )
 MOHSERLO_PAGE_SIZE = 2000
-OSM_OVERPASS_API_URL = "https://overpass-api.de/api/interpreter"
+OSM_OVERPASS_API_URLS = (
+    "https://overpass-api.de/api/interpreter",
+    "https://lz4.overpass-api.de/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
+)
 ONTARIO_AED_OVERPASS_QUERY = """
 [out:json][timeout:90];
 area["ISO3166-2"="CA-ON"]->.searchArea;
@@ -218,14 +225,25 @@ class PublicHealthResourceService:
 
     def fetch_osm_aed_overpass_json(self) -> str:
         """Fetch the approved Ontario AED fallback query from Overpass."""
+        errors: list[str] = []
+
         with httpx.Client(timeout=HTTP_TIMEOUT_SECONDS, follow_redirects=True) as client:
-            response = client.get(
-                OSM_OVERPASS_API_URL,
-                params={"data": ONTARIO_AED_OVERPASS_QUERY},
-                headers={"Accept": "application/json"},
-            )
-            response.raise_for_status()
-            return response.text
+            for endpoint in OSM_OVERPASS_API_URLS:
+                try:
+                    response = client.get(
+                        endpoint,
+                        params={"data": ONTARIO_AED_OVERPASS_QUERY},
+                        headers={"Accept": "application/json"},
+                    )
+                    response.raise_for_status()
+                    return response.text
+                except httpx.HTTPError as exc:
+                    error_detail = f"{endpoint}: {exc}"
+                    errors.append(error_detail)
+                    logger.warning("OSM AED fetch failed for endpoint %s: %s", endpoint, exc)
+
+        error_summary = "; ".join(errors) if errors else "unknown error"
+        raise RuntimeError(f"All Overpass AED endpoints failed: {error_summary}")
 
 
 def load_text_file(file_path: Path) -> str:

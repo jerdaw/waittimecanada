@@ -89,10 +89,14 @@ export function ResourceList({
                   )}
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {[resource.city, resource.province].filter(Boolean).join(", ")}
+                  {[resource.city, resource.province]
+                    .filter(Boolean)
+                    .join(", ")}
                 </p>
                 {resource.address && (
-                  <p className="mt-2 text-sm text-foreground">{resource.address}</p>
+                  <p className="mt-2 text-sm text-foreground">
+                    {resource.address}
+                  </p>
                 )}
               </div>
 
@@ -124,12 +128,12 @@ export function ResourceList({
                     ? t("caveat.referenceDirectory")
                     : t("caveat.crowdsourcedIncomplete")}
                 </p>
-                <p>
-                  {t("sourceLabel", { source: resource.source_name })}
-                </p>
+                <p>{t("sourceLabel", { source: resource.source_name })}</p>
               </div>
               <div className="space-y-1">
-                {resource.phone && <p>{t("phoneLabel", { phone: resource.phone })}</p>}
+                {resource.phone && (
+                  <p>{t("phoneLabel", { phone: resource.phone })}</p>
+                )}
                 {resource.website_url && (
                   <a
                     href={resource.website_url}

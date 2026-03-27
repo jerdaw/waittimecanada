@@ -1,9 +1,13 @@
 from datetime import UTC, datetime
 from pathlib import Path
 
+import httpx
+
 from waittime.services.public_health_resources import (
     MOHSERLO_SOURCE,
     ODHF_SOURCE,
+    OSM_OVERPASS_API_URLS,
+    PublicHealthResourceService,
     normalize_mohserlo_csv,
     normalize_mohserlo_geojson,
     normalize_odhf_csv,
@@ -126,3 +130,48 @@ def test_normalize_osm_aed_overpass_json_uses_center_for_way_records() -> None:
     assert records[0].name == "Community Centre AED"
     assert records[0].latitude == 43.651
     assert records[0].longitude == -79.347
+
+
+def test_fetch_osm_aed_overpass_json_falls_back_to_secondary_endpoint(
+    monkeypatch,
+) -> None:
+    payload = '{"elements":[]}'
+    called_urls: list[str] = []
+
+    def fake_get(self, url, params=None, headers=None):  # type: ignore[no-untyped-def]
+        called_urls.append(url)
+        request = httpx.Request("GET", url, params=params, headers=headers)
+        if url == OSM_OVERPASS_API_URLS[0]:
+            return httpx.Response(504, request=request)
+        return httpx.Response(200, request=request, text=payload)
+
+    monkeypatch.setattr(httpx.Client, "get", fake_get)
+
+    service = PublicHealthResourceService(db=None)  # type: ignore[arg-type]
+
+    result = service.fetch_osm_aed_overpass_json()
+
+    assert result == payload
+    assert called_urls == [OSM_OVERPASS_API_URLS[0], OSM_OVERPASS_API_URLS[1]]
+
+
+def test_fetch_osm_aed_overpass_json_raises_after_all_endpoints_fail(
+    monkeypatch,
+) -> None:
+    def fake_get(self, url, params=None, headers=None):  # type: ignore[no-untyped-def]
+        request = httpx.Request("GET", url, params=params, headers=headers)
+        return httpx.Response(504, request=request)
+
+    monkeypatch.setattr(httpx.Client, "get", fake_get)
+
+    service = PublicHealthResourceService(db=None)  # type: ignore[arg-type]
+
+    try:
+        service.fetch_osm_aed_overpass_json()
+    except RuntimeError as exc:
+        message = str(exc)
+        assert "All Overpass AED endpoints failed" in message
+        for endpoint in OSM_OVERPASS_API_URLS:
+            assert endpoint in message
+    else:
+        raise AssertionError("Expected all-endpoint Overpass failure to raise")
