@@ -187,8 +187,9 @@
       "resources": {
         "title": "Resources",
         "nearbyTitle": "Nearby resources",
-        "description": "Reference directory data from approved public sources, with Ontario facilities prioritized first. Share your location to sort by distance.",
+        "description": "Reference directory data from approved public sources, with Ontario facilities prioritized first. Search by facility name or share your location to load results.",
         "nearbyDescription": "Reference directory data from approved public sources, filtered and sorted by distance from your location.",
+        "gated": "Search for a facility or share your location to load reference directory results.",
         "empty": "No facility records matched your current filters."
       },
       "transparency": {

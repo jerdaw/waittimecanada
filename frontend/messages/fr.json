@@ -187,8 +187,9 @@
       "resources": {
         "title": "Ressources",
         "nearbyTitle": "Ressources à proximité",
-        "description": "Données de répertoire de référence provenant de sources publiques approuvées, avec priorité aux établissements ontariens. Partagez votre position pour trier par distance.",
+        "description": "Données de répertoire de référence provenant de sources publiques approuvées, avec priorité aux établissements ontariens. Recherchez un établissement ou partagez votre position pour charger les résultats.",
         "nearbyDescription": "Données de répertoire de référence provenant de sources publiques approuvées, filtrées et triées selon la distance depuis votre position.",
+        "gated": "Recherchez un établissement ou partagez votre position pour charger les résultats du répertoire de référence.",
         "empty": "Aucun établissement ne correspond à vos filtres actuels."
       },
       "transparency": {

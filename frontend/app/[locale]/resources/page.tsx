@@ -81,11 +81,19 @@ export default function ResourcesPage() {
   const [aqhiSourceStatus, setAQHISourceStatus] = useState<
     SourceStatusRecord[]
   >([]);
+  const facilityDiscoveryReady = Boolean(userLocation || searchQuery.trim());
 
   useEffect(() => {
     let mounted = true;
 
     async function loadResources() {
+      if (!facilityDiscoveryReady) {
+        setResources([]);
+        setFacilitySourceStatus([]);
+        setResourcesLoading(false);
+        return;
+      }
+
       setResourcesLoading(true);
       try {
         const params = new URLSearchParams({
@@ -131,7 +139,7 @@ export default function ResourcesPage() {
     return () => {
       mounted = false;
     };
-  }, [province, searchQuery, userLocation]);
+  }, [facilityDiscoveryReady, province, searchQuery, userLocation]);
 
   useEffect(() => {
     let mounted = true;
@@ -408,7 +416,11 @@ export default function ResourcesPage() {
             <ResourceList
               resources={resources}
               loading={resourcesLoading}
-              emptyTitle={t("sections.resources.empty")}
+              emptyTitle={
+                facilityDiscoveryReady
+                  ? t("sections.resources.empty")
+                  : t("sections.resources.gated")
+              }
             />
           </section>
 
