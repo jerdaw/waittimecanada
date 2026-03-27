@@ -125,3 +125,37 @@ export const ExportQuerySchema = z.object({
     .enum(["raw", "hourly", "daily", "weekly", "monthly"])
     .default("raw"),
 });
+
+export const ResourceKindSchema = z.enum(["facility", "aed"]);
+
+export const ResourcesQuerySchema = z
+  .object({
+    kind: ResourceKindSchema,
+    q: z.string().trim().min(1).max(200).optional(),
+    province: OptionalProvinceSchema,
+    latitude: z.coerce.number().min(-90).max(90).optional(),
+    longitude: z.coerce.number().min(-180).max(180).optional(),
+    radius: z.coerce.number().positive().max(500).default(50),
+    limit: z.coerce.number().int().positive().max(50).default(20),
+  })
+  .superRefine((data, ctx) => {
+    const hasLatitude = data.latitude !== undefined;
+    const hasLongitude = data.longitude !== undefined;
+
+    if (hasLatitude !== hasLongitude) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "latitude and longitude must be provided together",
+        path: hasLatitude ? ["longitude"] : ["latitude"],
+      });
+    }
+  });
+
+export const ResourceAlertsQuerySchema = z.object({
+  limit: z.coerce.number().int().positive().max(50).default(20),
+});
+
+export const ResourceAQHIQuerySchema = z.object({
+  latitude: z.coerce.number().min(-90).max(90),
+  longitude: z.coerce.number().min(-180).max(180),
+});

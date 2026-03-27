@@ -11,7 +11,6 @@ import os
 from collections.abc import Generator
 from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from typing import Any
 
 import psycopg2
@@ -23,18 +22,34 @@ from waittime.core import (
     Hospital,
     Measurement,
     MeasurementAggregate,
+    PublicDataSource,
+    PublicHealthAlert,
+    ResourceLocation,
     ScraperAlertState,
     ScraperStatus,
     Source,
 )
 
-# Load environment variables from .env.local (preferred) or .env
-env_file = Path(__file__).parents[3] / ".env.local"
-if not env_file.exists():
-    env_file = Path(__file__).parents[3] / ".env"
-load_dotenv(env_file)
-
 logger = logging.getLogger(__name__)
+
+
+def _maybe_load_database_env() -> None:
+    """Load DATABASE_URL from local env files only when needed.
+
+    This avoids probing secret-bearing files during module import, which keeps
+    tests and agent tooling from touching `.env.local` / `.env` unless a runtime
+    path genuinely needs them.
+    """
+    if os.environ.get("DATABASE_URL"):
+        return
+
+    from pathlib import Path
+
+    env_file = Path(__file__).parents[3] / ".env.local"
+    if not env_file.exists():
+        env_file = Path(__file__).parents[3] / ".env"
+
+    load_dotenv(env_file)
 
 
 class DatabaseService:
@@ -55,6 +70,9 @@ class DatabaseService:
             database_url: PostgreSQL connection string (defaults to DATABASE_URL env var)
             conn: Optional existing connection to reuse
         """
+        if database_url is None and conn is None and not os.environ.get("DATABASE_URL"):
+            _maybe_load_database_env()
+
         self.database_url = database_url or os.environ.get("DATABASE_URL")
         self._provided_conn = conn
 
@@ -102,6 +120,299 @@ class DatabaseService:
             with self.get_cursor(conn) as cur:
                 cur.execute("SELECT * FROM sources")
                 return [self._row_to_source(dict(row)) for row in cur.fetchall()]
+
+    def get_public_data_source(self, source_id: str) -> PublicDataSource | None:
+        """Get a public-health-hub source metadata record by ID."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    "SELECT * FROM public_data_sources WHERE source_id = %s",
+                    (source_id,),
+                )
+                row = cur.fetchone()
+                if row is None:
+                    return None
+                return self._row_to_public_data_source(dict(row))
+
+    def list_public_data_sources(self, domain: str | None = None) -> list[PublicDataSource]:
+        """List public-health-hub sources with an optional domain filter."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                query = "SELECT * FROM public_data_sources"
+                params: list[Any] = []
+
+                if domain:
+                    query += " WHERE domain = %s"
+                    params.append(domain)
+
+                query += " ORDER BY domain, source_name"
+                cur.execute(query, params)
+                return [self._row_to_public_data_source(dict(row)) for row in cur.fetchall()]
+
+    def upsert_public_data_source(self, source: PublicDataSource) -> PublicDataSource:
+        """Insert or update a public-health-hub source metadata record."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO public_data_sources (
+                        source_id,
+                        domain,
+                        source_name,
+                        scope,
+                        jurisdiction_level,
+                        connector_type,
+                        access_route,
+                        license_reuse_status,
+                        attribution_requirement,
+                        update_cadence,
+                        freshness_sensitivity,
+                        operational_risk,
+                        recommended_usage_mode,
+                        provenance_url,
+                        last_verified_at,
+                        notes,
+                        fallback_source_id,
+                        public_methodology_note,
+                        last_refreshed_at
+                    ) VALUES (
+                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                    )
+                    ON CONFLICT (source_id) DO UPDATE SET
+                        domain = EXCLUDED.domain,
+                        source_name = EXCLUDED.source_name,
+                        scope = EXCLUDED.scope,
+                        jurisdiction_level = EXCLUDED.jurisdiction_level,
+                        connector_type = EXCLUDED.connector_type,
+                        access_route = EXCLUDED.access_route,
+                        license_reuse_status = EXCLUDED.license_reuse_status,
+                        attribution_requirement = EXCLUDED.attribution_requirement,
+                        update_cadence = EXCLUDED.update_cadence,
+                        freshness_sensitivity = EXCLUDED.freshness_sensitivity,
+                        operational_risk = EXCLUDED.operational_risk,
+                        recommended_usage_mode = EXCLUDED.recommended_usage_mode,
+                        provenance_url = EXCLUDED.provenance_url,
+                        last_verified_at = EXCLUDED.last_verified_at,
+                        notes = EXCLUDED.notes,
+                        fallback_source_id = EXCLUDED.fallback_source_id,
+                        public_methodology_note = EXCLUDED.public_methodology_note,
+                        last_refreshed_at = EXCLUDED.last_refreshed_at,
+                        updated_at = NOW()
+                    RETURNING *
+                    """,
+                    (
+                        source.source_id,
+                        source.domain,
+                        source.source_name,
+                        source.scope,
+                        source.jurisdiction_level,
+                        source.connector_type,
+                        source.access_route,
+                        source.license_reuse_status,
+                        source.attribution_requirement,
+                        source.update_cadence,
+                        source.freshness_sensitivity,
+                        source.operational_risk,
+                        source.recommended_usage_mode,
+                        source.provenance_url,
+                        source.last_verified_at,
+                        source.notes,
+                        source.fallback_source_id,
+                        source.public_methodology_note,
+                        source.last_refreshed_at,
+                    ),
+                )
+                row = cur.fetchone()
+                if row is None:
+                    raise ValueError(f"Failed to upsert public data source {source.source_id}")
+                return self._row_to_public_data_source(dict(row))
+
+    def mark_public_data_source_refreshed(
+        self,
+        source_id: str,
+        refreshed_at: datetime | None = None,
+    ) -> PublicDataSource:
+        """Update the last successful refresh timestamp for a public data source."""
+        effective_refreshed_at = refreshed_at or datetime.now(UTC)
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    UPDATE public_data_sources
+                    SET last_refreshed_at = %s,
+                        updated_at = NOW()
+                    WHERE source_id = %s
+                    RETURNING *
+                    """,
+                    (effective_refreshed_at, source_id),
+                )
+                row = cur.fetchone()
+                if row is None:
+                    raise ValueError(f"Public data source {source_id} not found")
+                return self._row_to_public_data_source(dict(row))
+
+    def list_resource_locations(
+        self,
+        kind: str | None = None,
+        source_id: str | None = None,
+    ) -> list[ResourceLocation]:
+        """List normalized resource locations with optional filters."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                query = "SELECT * FROM resource_locations WHERE 1 = 1"
+                params: list[Any] = []
+
+                if kind:
+                    query += " AND kind = %s"
+                    params.append(kind)
+
+                if source_id:
+                    query += " AND source_id = %s"
+                    params.append(source_id)
+
+                query += " ORDER BY name"
+                cur.execute(query, params)
+                return [self._row_to_resource_location(dict(row)) for row in cur.fetchall()]
+
+    def replace_resource_locations(
+        self,
+        source_id: str,
+        kind: str,
+        locations: list[ResourceLocation],
+    ) -> int:
+        """Replace resource rows for one source/kind pair with a fresh normalized batch."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    DELETE FROM resource_locations
+                    WHERE source_id = %s AND kind = %s
+                    """,
+                    (source_id, kind),
+                )
+
+                if not locations:
+                    return 0
+
+                insert_query = """
+                    INSERT INTO resource_locations (
+                        id,
+                        source_id,
+                        kind,
+                        source_record_id,
+                        name,
+                        province,
+                        city,
+                        latitude,
+                        longitude,
+                        address,
+                        postal_code,
+                        phone,
+                        website_url,
+                        reference_status,
+                        location_description,
+                        access_notes,
+                        crowdsourced,
+                        completeness_status,
+                        provenance_url,
+                        last_refreshed_at
+                    ) VALUES %s
+                """
+
+                rows = [
+                    (
+                        location.id,
+                        location.source_id,
+                        location.kind,
+                        location.source_record_id,
+                        location.name,
+                        location.province,
+                        location.city,
+                        location.latitude,
+                        location.longitude,
+                        location.address,
+                        location.postal_code,
+                        location.phone,
+                        location.website_url,
+                        location.reference_status,
+                        location.location_description,
+                        location.access_notes,
+                        location.crowdsourced,
+                        location.completeness_status,
+                        location.provenance_url,
+                        location.last_refreshed_at,
+                    )
+                    for location in locations
+                ]
+
+                psycopg2.extras.execute_values(cur, insert_query, rows)
+                return len(rows)
+
+    def list_public_health_alerts(self, source_id: str | None = None) -> list[PublicHealthAlert]:
+        """List normalized public health alerts with an optional source filter."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                query = "SELECT * FROM public_health_alerts"
+                params: list[Any] = []
+
+                if source_id:
+                    query += " WHERE source_id = %s"
+                    params.append(source_id)
+
+                query += " ORDER BY published_at DESC"
+                cur.execute(query, params)
+                return [self._row_to_public_health_alert(dict(row)) for row in cur.fetchall()]
+
+    def replace_public_health_alerts(
+        self,
+        source_id: str,
+        alerts: list[PublicHealthAlert],
+    ) -> int:
+        """Replace normalized alert rows for one source with a fresh batch."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    DELETE FROM public_health_alerts
+                    WHERE source_id = %s
+                    """,
+                    (source_id,),
+                )
+
+                if not alerts:
+                    return 0
+
+                insert_query = """
+                    INSERT INTO public_health_alerts (
+                        id,
+                        source_id,
+                        title,
+                        summary,
+                        alert_type,
+                        published_at,
+                        source_updated_at,
+                        affected_products,
+                        provenance_url,
+                        last_refreshed_at
+                    ) VALUES %s
+                """
+                rows = [
+                    (
+                        alert.id,
+                        alert.source_id,
+                        alert.title,
+                        alert.summary,
+                        alert.alert_type,
+                        alert.published_at,
+                        alert.source_updated_at,
+                        psycopg2.extras.Json(alert.affected_products),
+                        alert.provenance_url,
+                        alert.last_refreshed_at,
+                    )
+                    for alert in alerts
+                ]
+                psycopg2.extras.execute_values(cur, insert_query, rows)
+                return len(rows)
 
     def upsert_source(self, source: Source) -> Source:
         """Insert or update a source."""
@@ -1781,6 +2092,77 @@ class DatabaseService:
             default_start_event=StartEvent(row["default_start_event"]),
             default_end_event=EndEvent(row["default_end_event"]),
             default_statistic_type=StatisticType(row["default_statistic_type"]),
+        )
+
+    def _row_to_public_data_source(self, row: dict[str, Any]) -> PublicDataSource:
+        """Convert database row to PublicDataSource model."""
+        return PublicDataSource(
+            source_id=row["source_id"],
+            domain=row["domain"],
+            source_name=row["source_name"],
+            scope=row["scope"],
+            jurisdiction_level=row["jurisdiction_level"],
+            connector_type=row["connector_type"],
+            access_route=row["access_route"],
+            license_reuse_status=row["license_reuse_status"],
+            attribution_requirement=row["attribution_requirement"],
+            update_cadence=row["update_cadence"],
+            freshness_sensitivity=row["freshness_sensitivity"],
+            operational_risk=row["operational_risk"],
+            recommended_usage_mode=row["recommended_usage_mode"],
+            provenance_url=row["provenance_url"],
+            last_verified_at=row["last_verified_at"],
+            notes=row.get("notes"),
+            fallback_source_id=row.get("fallback_source_id"),
+            public_methodology_note=row.get("public_methodology_note"),
+            last_refreshed_at=row.get("last_refreshed_at"),
+            created_at=row.get("created_at"),
+            updated_at=row.get("updated_at"),
+        )
+
+    def _row_to_resource_location(self, row: dict[str, Any]) -> ResourceLocation:
+        """Convert database row to ResourceLocation model."""
+        return ResourceLocation(
+            id=row["id"],
+            source_id=row["source_id"],
+            kind=row["kind"],
+            source_record_id=row.get("source_record_id"),
+            name=row["name"],
+            province=row["province"],
+            city=row.get("city"),
+            latitude=row["latitude"],
+            longitude=row["longitude"],
+            address=row.get("address"),
+            postal_code=row.get("postal_code"),
+            phone=row.get("phone"),
+            website_url=row.get("website_url"),
+            reference_status=row.get("reference_status"),
+            location_description=row.get("location_description"),
+            access_notes=row.get("access_notes"),
+            crowdsourced=bool(row.get("crowdsourced")),
+            completeness_status=row.get("completeness_status"),
+            provenance_url=row["provenance_url"],
+            last_refreshed_at=row.get("last_refreshed_at"),
+            created_at=row.get("created_at"),
+            updated_at=row.get("updated_at"),
+        )
+
+    def _row_to_public_health_alert(self, row: dict[str, Any]) -> PublicHealthAlert:
+        """Convert database row to PublicHealthAlert model."""
+        affected_products = row.get("affected_products") or []
+        return PublicHealthAlert(
+            id=row["id"],
+            source_id=row["source_id"],
+            title=row["title"],
+            summary=row["summary"],
+            alert_type=row["alert_type"],
+            published_at=row["published_at"],
+            source_updated_at=row.get("source_updated_at"),
+            affected_products=affected_products,
+            provenance_url=row["provenance_url"],
+            last_refreshed_at=row.get("last_refreshed_at"),
+            created_at=row.get("created_at"),
+            updated_at=row.get("updated_at"),
         )
 
     def _row_to_scraper_alert_state(self, row: dict[str, Any]) -> ScraperAlertState:

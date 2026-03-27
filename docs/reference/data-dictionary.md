@@ -74,6 +74,57 @@ Persistent alert deduplication state for heartbeat incidents.
 | `last_resolved_at` | TIMESTAMPTZ | When the most recent incident for this source was resolved. |
 | `updated_at` | TIMESTAMPTZ | Row update timestamp. |
 
+## Public Health Hub Schema
+
+### `public_data_sources`
+Public-health-hub source catalog and sync metadata.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `source_id` | TEXT (PK) | Stable identifier for the public-health-hub source record. |
+| `domain` | TEXT | Source domain such as `provider_facility`, `aed`, or `safety_alert`. |
+| `source_name` | TEXT | Public display name used in provenance UI. |
+| `connector_type` | TEXT | Access posture such as `api`, `feed`, `open_data_portal`, or `crowdsourced_registry`. |
+| `license_reuse_status` | TEXT | Hard implementation gate: `approved`, `approved_with_conditions`, or `blocked`. |
+| `recommended_usage_mode` | TEXT | Whether the source is used via `live_ui`, `scheduled_ingest`, or a non-runtime mode. |
+| `provenance_url` | TEXT | Canonical upstream source URL shown in public provenance surfaces. |
+| `last_verified_at` | DATE | Last manual review date for source access/reuse posture. |
+| `last_refreshed_at` | TIMESTAMPTZ | Last successful in-product refresh timestamp for freshness rules. |
+
+### `resource_locations`
+Normalized location resources for the public-health-hub module.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | TEXT (PK) | Stable internal identifier for a facility or AED record. |
+| `source_id` | TEXT (FK) | Link to `public_data_sources.source_id`. |
+| `kind` | TEXT | `facility` or `aed`. |
+| `source_record_id` | TEXT | Optional upstream identifier for deduplication and re-ingest. |
+| `name` | TEXT | Public resource name. |
+| `province` | CHAR(2) | Two-letter province code. |
+| `latitude` / `longitude` | DOUBLE PRECISION | Map coordinates for distance and display. |
+| `reference_status` | TEXT | Directory posture, currently `directory_only` for facility baseline data. |
+| `crowdsourced` | BOOLEAN | Marks crowdsourced fallback records such as OSM-backed AEDs. |
+| `completeness_status` | TEXT | Current completeness caveat, such as `incomplete`. |
+| `provenance_url` | TEXT | Upstream provenance URL for the record. |
+| `last_refreshed_at` | TIMESTAMPTZ | Last successful resource refresh timestamp used for show/warn/suppress logic. |
+
+### `public_health_alerts`
+Normalized public recall and safety alert records.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | TEXT (PK) | Stable alert identifier. |
+| `source_id` | TEXT (FK) | Link to `public_data_sources.source_id`. |
+| `title` | TEXT | Public alert title. |
+| `summary` | TEXT | Short alert summary preserved from the official source. |
+| `alert_type` | TEXT | Feed-specific alert category. |
+| `published_at` | TIMESTAMPTZ | Official publication timestamp. |
+| `source_updated_at` | TIMESTAMPTZ | Upstream update timestamp when available. |
+| `affected_products` | JSONB | Structured affected-product list for optional enrichment/rendering. |
+| `provenance_url` | TEXT | Canonical alert URL. |
+| `last_refreshed_at` | TIMESTAMPTZ | Last successful ingest timestamp for freshness rules. |
+
 ## Analytics & Aggregation
 
 ### `measurement_aggregates`

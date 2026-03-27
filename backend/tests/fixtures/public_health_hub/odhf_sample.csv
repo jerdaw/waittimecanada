@@ -1,0 +1,3 @@
+facility_id,facility_name,province,city,latitude,longitude,address,postal_code,phone,website,facility_type
+CA-ON-001,Toronto Western Hospital,ON,Toronto,43.6536,-79.4051,399 Bathurst St,M5T2S8,416-603-2581,https://www.uhn.ca/OurHospitals/TWH,Hospital
+CA-QC-001,Montreal General Hospital,QC,Montreal,45.4945,-73.5806,1650 Cedar Ave,H3G1A4,514-934-1934,https://muhc.ca/montreal-general-hospital,Hospital

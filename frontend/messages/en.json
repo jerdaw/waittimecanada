@@ -132,6 +132,84 @@
     "patientsWaiting": "Patients Waiting",
     "methodology": "Methodology"
   },
+  "ResourceList": {
+    "emptyTitle": "No resources available right now.",
+    "distance": "{distance} km away",
+    "freshnessShow": "Current source metadata",
+    "freshnessWarn": "Stale source metadata",
+    "updatedAt": "Last refreshed {timestamp}",
+    "sourceLabel": "Source: {source}",
+    "phoneLabel": "Phone: {phone}",
+    "websiteLink": "Visit source website",
+    "labels": {
+      "crowdsourced": "Crowdsourced",
+      "incompleteCoverage": "Incomplete coverage"
+    },
+    "caveat": {
+      "referenceDirectory": "Reference directory data. This is not a live operational status feed.",
+      "crowdsourcedIncomplete": "Crowdsourced AED data. Locations may be incomplete or outdated. In an emergency, call 911 immediately."
+    }
+  },
+  "AlertFeed": {
+    "loading": "Loading safety alerts...",
+    "empty": "No safety alerts available right now.",
+    "source": "Source: {source}",
+    "published": "Published: {timestamp}",
+    "refreshed": "Last refreshed: {timestamp}"
+  },
+  "AQHICard": {
+    "locationPrompt": "Share your location to request an AQHI snapshot.",
+    "loading": "Loading AQHI...",
+    "empty": "AQHI is not available for this location right now.",
+    "issuedAt": "Issued: {timestamp}",
+    "caveat": "Official AQHI forecast from Environment and Climate Change Canada. Conditions may change."
+  },
+  "ResourcesPage": {
+    "eyebrow": "Ontario-first module",
+    "title": "Public Health Resources",
+    "description": "A facilities-first public resource hub built on approved public datasets. This layer is reference data with provenance and freshness, not live operational status.",
+    "common": {
+      "unknown": "unknown"
+    },
+    "filters": {
+      "province": "Province",
+      "search": "Search",
+      "searchPlaceholder": "Search hospitals, clinics, or services",
+      "useLocation": "Use my location"
+    },
+    "sections": {
+      "resources": {
+        "title": "Nearby resources",
+        "description": "Reference directory data from approved public sources, with Ontario facilities prioritized first.",
+        "empty": "No facility records matched your current filters."
+      },
+      "transparency": {
+        "title": "Source transparency",
+        "description": "Every source shown here keeps provenance and refresh metadata visible.",
+        "empty": "No source metadata available yet.",
+        "updated": "Last refreshed: {timestamp}",
+        "sourceLink": "View official source"
+      },
+      "aed": {
+        "title": "AED locations",
+        "description": "Crowdsourced AED records are shown with explicit provenance, incompleteness, and freshness labels.",
+        "empty": "No AED records matched your current filters."
+      },
+      "alerts": {
+        "title": "Safety alerts",
+        "description": "Official recall and safety alert data from Health Canada, with refresh metadata kept visible.",
+        "loading": "Loading safety alerts...",
+        "empty": "No safety alerts available right now."
+      },
+      "aqhi": {
+        "title": "Air quality health index",
+        "description": "Official AQHI snapshots from GeoMet, requested for your location through a cached server-side proxy.",
+        "locationPrompt": "Share your location to request an AQHI snapshot.",
+        "loading": "Loading AQHI...",
+        "empty": "AQHI is not available for this location right now."
+      }
+    }
+  },
   "ViewToggle": {
     "list": "List",
     "map": "Map",

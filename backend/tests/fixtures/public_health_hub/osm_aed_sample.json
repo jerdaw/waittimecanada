@@ -1,0 +1,34 @@
+{
+  "elements": [
+    {
+      "type": "node",
+      "id": 1001001,
+      "lat": 43.6532,
+      "lon": -79.3832,
+      "tags": {
+        "emergency": "defibrillator",
+        "name": "City Hall AED",
+        "addr:city": "Toronto",
+        "addr:housenumber": "100",
+        "addr:street": "Queen St W",
+        "addr:postcode": "M5H2N2",
+        "addr:province": "ON",
+        "access": "customers",
+        "indoor": "yes"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1001002,
+      "lat": 43.6426,
+      "lon": -79.3871,
+      "tags": {
+        "emergency": "defibrillator",
+        "defibrillator:location": "Union Station",
+        "addr:city": "Toronto",
+        "addr:street": "Front St W",
+        "addr:province": "ON"
+      }
+    }
+  ]
+}

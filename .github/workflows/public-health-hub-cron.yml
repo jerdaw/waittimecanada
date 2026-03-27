@@ -1,0 +1,51 @@
+name: Public Health Hub Ingest
+
+on:
+  schedule:
+    - cron: "15 */6 * * *"
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.12"
+
+concurrency:
+  group: public-health-hub-cron
+  cancel-in-progress: false
+
+jobs:
+  ingest-public-health-hub:
+    name: Ingest Public Health Hub Sources
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Ingest live public health resources
+        working-directory: ./backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python -m waittime.cli.seed_public_health_resources \
+            --fetch-mohserlo-live \
+            --fetch-osm-aed-live
+
+      - name: Ingest live public health alerts
+        working-directory: ./backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python -m waittime.cli.seed_public_health_alerts --fetch-live

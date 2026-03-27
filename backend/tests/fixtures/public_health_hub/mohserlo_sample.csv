@@ -1,0 +1,3 @@
+provider_id,service_provider_name,community_name,latitude,longitude,address1,postal_code,phone,website,service_type
+1001,Toronto General Hospital,Toronto,43.6582,-79.3891,200 Elizabeth St,M5G2C4,416-340-4800,https://www.uhn.ca/OurHospitals/TGH,Hospital
+1002,Mount Sinai Hospital,Toronto,43.6573,-79.3890,600 University Ave,M5G1X5,416-586-4800,https://www.mountsinai.on.ca,Hospital

@@ -137,6 +137,21 @@ This directory contains operational and CI workflows for Wait Time Canada.
 - Installs the editable backend package before running migrations so `waittime` imports resolve correctly in CI.
 - Failure email is best-effort and runs only when alert secrets are configured.
 
+---
+
+### 11. `public-health-hub-cron.yml` - Public Health Hub Ingest
+
+**Trigger:** cron `15 */6 * * *` (every 6 hours) + manual dispatch.
+
+**Purpose:** Refresh Batch A public-health-hub datasets from approved live upstreams:
+- MOHSERLO via the Ontario ArcGIS feature service
+- Ontario AED fallback via the approved Overpass query
+- Health Canada recalls via the approved RSS feed
+
+**Optimization controls:**
+- Serialized concurrency group to avoid overlapping ingest runs.
+- Reuses the existing `DATABASE_URL` secret; no new secrets required.
+
 ## Secrets Matrix
 
 ### Core production/runtime

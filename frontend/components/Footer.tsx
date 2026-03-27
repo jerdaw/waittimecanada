@@ -32,6 +32,12 @@ export function Footer() {
               aria-label={t("nav.resources")}
             >
               <Link
+                href="/resources"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                {t("nav.resources")}
+              </Link>
+              <Link
                 href="/methods"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >

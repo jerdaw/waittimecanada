@@ -149,6 +149,12 @@ export function Header({
               {tCommon("nav.analytics")}
             </Link>
             <Link
+              href="/resources"
+              className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+            >
+              {tCommon("nav.resources")}
+            </Link>
+            <Link
               href="/faq"
               className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
             >

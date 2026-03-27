@@ -1,0 +1,26 @@
+[
+  {
+    "id": "12345",
+    "title": "Example medical device recall",
+    "summary": "A sample recall used for fixture-backed tests.",
+    "alert_type": "medical_device",
+    "published_at": "2026-03-27T09:00:00Z",
+    "updated_at": "2026-03-27T10:15:00Z",
+    "provenance_url": "https://recalls-rappels.canada.ca/en/alert-recall/example",
+    "affected_products": [
+      {
+        "brand_name": "Example Device",
+        "din": "12345678"
+      }
+    ]
+  },
+  {
+    "id": "67890",
+    "title": "Example food recall",
+    "summary": "A second sample recall used for testing.",
+    "alert_type": "food",
+    "published_at": "2026-03-26T11:30:00Z",
+    "provenance_url": "https://recalls-rappels.canada.ca/en/alert-recall/example-food",
+    "brand_name": "Example Food"
+  }
+]

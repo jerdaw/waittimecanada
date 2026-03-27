@@ -132,6 +132,84 @@
     "patientsWaiting": "Patients en attente",
     "methodology": "Méthodologie"
   },
+  "ResourceList": {
+    "emptyTitle": "Aucune ressource disponible pour le moment.",
+    "distance": "À {distance} km",
+    "freshnessShow": "Métadonnées de source récentes",
+    "freshnessWarn": "Métadonnées de source possiblement périmées",
+    "updatedAt": "Dernière mise à jour {timestamp}",
+    "sourceLabel": "Source : {source}",
+    "phoneLabel": "Téléphone : {phone}",
+    "websiteLink": "Voir le site source",
+    "labels": {
+      "crowdsourced": "Collaboratif",
+      "incompleteCoverage": "Couverture incomplète"
+    },
+    "caveat": {
+      "referenceDirectory": "Données de répertoire de référence. Il ne s'agit pas d'un flux d'état opérationnel en direct.",
+      "crowdsourcedIncomplete": "Données DEA collaboratives. Les emplacements peuvent être incomplets ou périmés. En cas d'urgence, composez le 911 immédiatement."
+    }
+  },
+  "AlertFeed": {
+    "loading": "Chargement des alertes de sécurité...",
+    "empty": "Aucune alerte de sécurité disponible pour le moment.",
+    "source": "Source : {source}",
+    "published": "Publication : {timestamp}",
+    "refreshed": "Dernière mise à jour : {timestamp}"
+  },
+  "AQHICard": {
+    "locationPrompt": "Partagez votre position pour demander un instantané de la CAS.",
+    "loading": "Chargement de la CAS...",
+    "empty": "La CAS n'est pas disponible pour cette position pour le moment.",
+    "issuedAt": "Émis : {timestamp}",
+    "caveat": "Prévision officielle de la cote air santé d'Environnement et Changement climatique Canada. Les conditions peuvent changer."
+  },
+  "ResourcesPage": {
+    "eyebrow": "Module Ontario d'abord",
+    "title": "Ressources de santé publique",
+    "description": "Un hub de ressources publiques axé d'abord sur les établissements, construit à partir de jeux de données publics approuvés. Cette couche fournit des données de référence avec provenance et fraîcheur, et non un état opérationnel en direct.",
+    "common": {
+      "unknown": "inconnu"
+    },
+    "filters": {
+      "province": "Province",
+      "search": "Recherche",
+      "searchPlaceholder": "Rechercher hôpitaux, cliniques ou services",
+      "useLocation": "Utiliser ma position"
+    },
+    "sections": {
+      "resources": {
+        "title": "Ressources à proximité",
+        "description": "Données de répertoire de référence provenant de sources publiques approuvées, avec priorité aux établissements ontariens.",
+        "empty": "Aucun établissement ne correspond à vos filtres actuels."
+      },
+      "transparency": {
+        "title": "Transparence des sources",
+        "description": "Chaque source affichée ici conserve la provenance et les métadonnées de mise à jour visibles.",
+        "empty": "Aucune métadonnée de source disponible pour le moment.",
+        "updated": "Dernière mise à jour : {timestamp}",
+        "sourceLink": "Voir la source officielle"
+      },
+      "aed": {
+        "title": "Emplacements de DEA",
+        "description": "Les enregistrements DEA collaboratifs sont affichés avec des libellés explicites de provenance, d'incomplétude et de fraîcheur.",
+        "empty": "Aucun enregistrement DEA ne correspond à vos filtres actuels."
+      },
+      "alerts": {
+        "title": "Alertes de sécurité",
+        "description": "Données officielles de rappels et d'alertes de sécurité de Santé Canada, avec métadonnées de mise à jour visibles.",
+        "loading": "Chargement des alertes de sécurité...",
+        "empty": "Aucune alerte de sécurité disponible pour le moment."
+      },
+      "aqhi": {
+        "title": "Cote air santé",
+        "description": "Instantanés officiels de la CAS depuis GeoMet, demandés pour votre position via un proxy côté serveur mis en cache.",
+        "locationPrompt": "Partagez votre position pour demander un instantané de la CAS.",
+        "loading": "Chargement de la CAS...",
+        "empty": "La CAS n'est pas disponible pour cette position pour le moment."
+      }
+    }
+  },
   "ViewToggle": {
     "list": "Liste",
     "map": "Carte",

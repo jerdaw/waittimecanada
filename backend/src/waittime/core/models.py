@@ -4,8 +4,8 @@ These models enforce the metric ontology at the application layer,
 complementing the database-level constraints.
 """
 
-from datetime import UTC, datetime
-from typing import ClassVar, Self
+from datetime import UTC, date, datetime
+from typing import ClassVar, Literal, Self
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -129,6 +129,109 @@ class Source(BaseModel):
     default_start_event: StartEvent
     default_end_event: EndEvent
     default_statistic_type: StatisticType
+
+
+class PublicDataSource(BaseModel):
+    """Metadata contract and sync state for public-health-hub sources."""
+
+    source_id: str = Field(description="Stable internal source identifier")
+    domain: Literal[
+        "provider_facility",
+        "aed",
+        "safety_alert",
+        "health_product_reference",
+        "environmental_overlay",
+        "system_context",
+    ]
+    source_name: str = Field(min_length=1, max_length=255)
+    scope: Literal["canada", "ontario", "regional", "municipal", "institution"]
+    jurisdiction_level: Literal[
+        "federal",
+        "provincial",
+        "municipal",
+        "regional",
+        "institution",
+        "nonprofit_other",
+    ]
+    connector_type: Literal[
+        "api",
+        "feed",
+        "open_data_portal",
+        "file_download",
+        "dashboard_only",
+        "request_based",
+        "partner_only",
+        "crowdsourced_registry",
+    ]
+    access_route: str = Field(min_length=1)
+    license_reuse_status: Literal[
+        "approved",
+        "approved_with_conditions",
+        "blocked",
+    ]
+    attribution_requirement: str = Field(min_length=1)
+    update_cadence: str = Field(min_length=1)
+    freshness_sensitivity: Literal["low", "medium", "high"]
+    operational_risk: Literal["low", "medium", "high"]
+    recommended_usage_mode: Literal[
+        "live_ui",
+        "scheduled_ingest",
+        "analytics_only",
+        "research_only",
+        "do_not_use",
+    ]
+    provenance_url: str = Field(min_length=1)
+    last_verified_at: date
+    notes: str | None = None
+    fallback_source_id: str | None = None
+    public_methodology_note: str | None = None
+    last_refreshed_at: datetime | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class ResourceLocation(BaseModel):
+    """Normalized public-health resource location stored in the hub tables."""
+
+    id: str
+    source_id: str
+    kind: Literal["facility", "aed"]
+    source_record_id: str | None = None
+    name: str = Field(min_length=1, max_length=255)
+    province: str = Field(min_length=2, max_length=2)
+    city: str | None = None
+    latitude: float = Field(ge=-90, le=90)
+    longitude: float = Field(ge=-180, le=180)
+    address: str | None = None
+    postal_code: str | None = None
+    phone: str | None = None
+    website_url: str | None = None
+    reference_status: Literal["directory_only"] | None = None
+    location_description: str | None = None
+    access_notes: str | None = None
+    crowdsourced: bool = False
+    completeness_status: Literal["incomplete"] | None = None
+    provenance_url: str
+    last_refreshed_at: datetime | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class PublicHealthAlert(BaseModel):
+    """Normalized public health alert stored for the hub module."""
+
+    id: str
+    source_id: str
+    title: str = Field(min_length=1, max_length=500)
+    summary: str = Field(min_length=1)
+    alert_type: str = Field(min_length=1, max_length=100)
+    published_at: datetime
+    source_updated_at: datetime | None = None
+    affected_products: list[dict[str, str | None]] = Field(default_factory=list)
+    provenance_url: str
+    last_refreshed_at: datetime | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 
 class MeasurementAggregate(BaseModel):
