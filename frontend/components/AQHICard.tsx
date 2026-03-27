@@ -1,11 +1,15 @@
 import { useTranslations } from "next-intl";
 
-import type { AQHIRecord } from "@/utils/public-health-hub";
+import type {
+  AQHIRecord,
+  SourceStatusRecord,
+} from "@/utils/public-health-hub";
 
 interface AQHICardProps {
   aqhi: AQHIRecord | null;
   loading?: boolean;
   requiresLocation?: boolean;
+  sourceStatus?: SourceStatusRecord | null;
 }
 
 function formatTimestamp(value: string | null | undefined) {
@@ -23,6 +27,7 @@ export function AQHICard({
   aqhi,
   loading = false,
   requiresLocation = false,
+  sourceStatus = null,
 }: AQHICardProps) {
   const t = useTranslations("AQHICard");
 
@@ -37,7 +42,24 @@ export function AQHICard({
   }
 
   if (!aqhi) {
-    return <p className="text-sm text-muted-foreground">{t("empty")}</p>;
+    return (
+      <div className="space-y-2 text-sm text-muted-foreground">
+        <p>
+          {sourceStatus?.freshness_state === "suppress"
+            ? t("suppressed")
+            : t("empty")}
+        </p>
+        {sourceStatus?.last_refreshed_at && (
+          <p className="text-xs">
+            {t("refreshedAt", {
+              timestamp:
+                formatTimestamp(sourceStatus.last_refreshed_at) ??
+                sourceStatus.last_refreshed_at,
+            })}
+          </p>
+        )}
+      </div>
+    );
   }
 
   return (
@@ -54,6 +76,13 @@ export function AQHICard({
           timestamp: formatTimestamp(aqhi.issued_at) ?? aqhi.issued_at,
         })}
       </p>
+      {aqhi.valid_until && (
+        <p className="text-xs text-muted-foreground">
+          {t("validUntil", {
+            timestamp: formatTimestamp(aqhi.valid_until) ?? aqhi.valid_until,
+          })}
+        </p>
+      )}
       <p className="text-xs text-muted-foreground">{t("caveat")}</p>
     </div>
   );

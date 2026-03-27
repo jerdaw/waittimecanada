@@ -136,6 +136,8 @@ describe("ResourcesPage", () => {
     expect(
       screen.getByText("No safety alerts available right now."),
     ).toBeInTheDocument();
+    expect(screen.getAllByText("Current").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Last refreshed:/).length).toBeGreaterThan(0);
     expect(
       screen.getByText("Share your location to request an AQHI snapshot."),
     ).toBeInTheDocument();

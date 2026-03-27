@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { clsx } from "clsx";
 import { useTranslations } from "next-intl";
 
 import { AlertFeed } from "@/components/AlertFeed";
@@ -40,6 +41,17 @@ interface AQHIResponse {
   };
 }
 
+function formatTimestamp(value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  return new Date(value).toLocaleString("en-CA", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
 export default function ResourcesPage() {
   const t = useTranslations("ResourcesPage");
   const [province, setProvince] = useState("ON");
@@ -56,6 +68,7 @@ export default function ResourcesPage() {
     latitude: number;
     longitude: number;
   } | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const [facilitySourceStatus, setFacilitySourceStatus] = useState<
     SourceStatusRecord[]
   >([]);
@@ -274,15 +287,32 @@ export default function ResourcesPage() {
 
   const requestLocation = () => {
     if (!("geolocation" in navigator)) {
+      setLocationError(t("filters.locationUnsupported"));
       return;
     }
 
-    navigator.geolocation.getCurrentPosition((position) => {
-      setUserLocation({
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-      });
-    });
+    setLocationError(null);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      (error) => {
+        if (error.code === error.PERMISSION_DENIED) {
+          setLocationError(t("filters.locationDenied"));
+          return;
+        }
+
+        setLocationError(t("filters.locationError"));
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 10000,
+        maximumAge: 300000,
+      },
+    );
   };
 
   return (
@@ -334,13 +364,20 @@ export default function ResourcesPage() {
             </label>
 
             <div className="flex items-end">
-              <button
-                type="button"
-                onClick={requestLocation}
-                className="w-full rounded-xl border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/15 lg:w-auto"
-              >
-                {t("filters.useLocation")}
-              </button>
+              <div className="w-full lg:w-auto">
+                <button
+                  type="button"
+                  onClick={requestLocation}
+                  className="w-full rounded-xl border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/15 lg:w-auto"
+                >
+                  {t("filters.useLocation")}
+                </button>
+                {locationError && (
+                  <p className="mt-2 max-w-xs text-xs text-amber-700 dark:text-amber-300">
+                    {locationError}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </section>
@@ -390,12 +427,25 @@ export default function ResourcesPage() {
                         <p className="mt-1 text-xs text-muted-foreground">
                           {t("sections.transparency.updated", {
                             timestamp:
-                              source.last_refreshed_at ?? t("common.unknown"),
+                              formatTimestamp(source.last_refreshed_at) ??
+                              t("common.unknown"),
                           })}
                         </p>
                       </div>
-                      <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
-                        {source.freshness_state}
+                      <span
+                        className={clsx(
+                          "rounded-full px-2.5 py-1 text-[11px] font-medium",
+                          source.freshness_state === "show" &&
+                            "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200",
+                          source.freshness_state === "warn" &&
+                            "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200",
+                          source.freshness_state === "suppress" &&
+                            "bg-muted text-muted-foreground",
+                        )}
+                      >
+                        {t(
+                          `sections.transparency.freshness.${source.freshness_state}`,
+                        )}
                       </span>
                     </div>
                     <a
@@ -460,6 +510,7 @@ export default function ResourcesPage() {
                 aqhi={aqhi}
                 loading={aqhiLoading}
                 requiresLocation={!userLocation}
+                sourceStatus={aqhiSourceStatus[0] ?? null}
               />
             </div>
           </div>

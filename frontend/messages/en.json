@@ -161,7 +161,10 @@
     "locationPrompt": "Share your location to request an AQHI snapshot.",
     "loading": "Loading AQHI...",
     "empty": "AQHI is not available for this location right now.",
+    "suppressed": "This information is currently hidden because freshness or source requirements are not being met.",
     "issuedAt": "Issued: {timestamp}",
+    "validUntil": "Forecast valid until: {timestamp}",
+    "refreshedAt": "Last refreshed: {timestamp}",
     "caveat": "Official AQHI forecast from Environment and Climate Change Canada. Conditions may change."
   },
   "ResourcesPage": {
@@ -175,7 +178,10 @@
       "province": "Province",
       "search": "Search",
       "searchPlaceholder": "Search hospitals, clinics, or services",
-      "useLocation": "Use my location"
+      "useLocation": "Use my location",
+      "locationUnsupported": "Location access is not available in this browser.",
+      "locationDenied": "Location access was denied. You can still browse by province.",
+      "locationError": "We could not determine your location right now."
     },
     "sections": {
       "resources": {
@@ -188,6 +194,11 @@
         "description": "Every source shown here keeps provenance and refresh metadata visible.",
         "empty": "No source metadata available yet.",
         "updated": "Last refreshed: {timestamp}",
+        "freshness": {
+          "show": "Current",
+          "warn": "Stale",
+          "suppress": "Hidden"
+        },
         "sourceLink": "View official source"
       },
       "aed": {

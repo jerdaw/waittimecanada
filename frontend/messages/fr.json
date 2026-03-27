@@ -161,7 +161,10 @@
     "locationPrompt": "Partagez votre position pour demander un instantané de la CAS.",
     "loading": "Chargement de la CAS...",
     "empty": "La CAS n'est pas disponible pour cette position pour le moment.",
+    "suppressed": "Cette information est actuellement masquée parce que les exigences de fraîcheur ou de source ne sont pas respectées.",
     "issuedAt": "Émis : {timestamp}",
+    "validUntil": "Prévision valide jusqu'à : {timestamp}",
+    "refreshedAt": "Dernière mise à jour : {timestamp}",
     "caveat": "Prévision officielle de la cote air santé d'Environnement et Changement climatique Canada. Les conditions peuvent changer."
   },
   "ResourcesPage": {
@@ -175,7 +178,10 @@
       "province": "Province",
       "search": "Recherche",
       "searchPlaceholder": "Rechercher hôpitaux, cliniques ou services",
-      "useLocation": "Utiliser ma position"
+      "useLocation": "Utiliser ma position",
+      "locationUnsupported": "L'accès à la position n'est pas disponible dans ce navigateur.",
+      "locationDenied": "L'accès à la position a été refusé. Vous pouvez tout de même parcourir par province.",
+      "locationError": "Nous n'avons pas pu déterminer votre position pour le moment."
     },
     "sections": {
       "resources": {
@@ -188,6 +194,11 @@
         "description": "Chaque source affichée ici conserve la provenance et les métadonnées de mise à jour visibles.",
         "empty": "Aucune métadonnée de source disponible pour le moment.",
         "updated": "Dernière mise à jour : {timestamp}",
+        "freshness": {
+          "show": "Récent",
+          "warn": "Périmé",
+          "suppress": "Masqué"
+        },
         "sourceLink": "Voir la source officielle"
       },
       "aed": {
