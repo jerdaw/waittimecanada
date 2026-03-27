@@ -201,8 +201,9 @@ Another agent should be able to start Batch A implementation with only these doc
 
 1. `docs/planning/implementation/public-health-data-hub-batch-a-plan.md`
 2. `docs/planning/public-health-data-hub-agent-execution-readiness.md`
-3. `docs/planning/public-health-data-hub-metadata-contract.md`
-4. `docs/planning/public-health-data-hub-freshness-safety-rules.md`
-5. `docs/research/public-health-data-hub-batch-a-legal-review.md`
+3. `docs/planning/public-health-data-hub-execution-order.md`
+4. `docs/planning/public-health-data-hub-metadata-contract.md`
+5. `docs/planning/public-health-data-hub-freshness-safety-rules.md`
+6. `docs/research/public-health-data-hub-batch-a-legal-review.md`
 
 If one of those documents needs to change during implementation, the planning artifact should be updated first rather than silently diverging in code.

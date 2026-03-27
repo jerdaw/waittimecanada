@@ -23,6 +23,7 @@ This section contains the project planning control plane.
 - `docs/planning/public-health-data-hub-metadata-contract.md`
 - `docs/planning/public-health-data-hub-freshness-safety-rules.md`
 - `docs/planning/public-health-data-hub-agent-execution-readiness.md`
+- `docs/planning/public-health-data-hub-execution-order.md`
 
 ## Maintenance Logs
 
