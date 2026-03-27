@@ -185,8 +185,10 @@
     },
     "sections": {
       "resources": {
-        "title": "Ressources à proximité",
-        "description": "Données de répertoire de référence provenant de sources publiques approuvées, avec priorité aux établissements ontariens.",
+        "title": "Ressources",
+        "nearbyTitle": "Ressources à proximité",
+        "description": "Données de répertoire de référence provenant de sources publiques approuvées, avec priorité aux établissements ontariens. Partagez votre position pour trier par distance.",
+        "nearbyDescription": "Données de répertoire de référence provenant de sources publiques approuvées, filtrées et triées selon la distance depuis votre position.",
         "empty": "Aucun établissement ne correspond à vos filtres actuels."
       },
       "transparency": {
@@ -203,7 +205,9 @@
       },
       "aed": {
         "title": "Emplacements de DEA",
-        "description": "Les enregistrements DEA collaboratifs sont affichés avec des libellés explicites de provenance, d'incomplétude et de fraîcheur.",
+        "nearbyTitle": "Emplacements de DEA à proximité",
+        "description": "Les enregistrements DEA collaboratifs sont affichés avec des libellés explicites de provenance, d'incomplétude et de fraîcheur. Partagez votre position pour trier par distance.",
+        "nearbyDescription": "Enregistrements DEA collaboratifs près de votre position, avec des libellés explicites de provenance, d'incomplétude et de fraîcheur.",
         "empty": "Aucun enregistrement DEA ne correspond à vos filtres actuels."
       },
       "alerts": {

@@ -185,8 +185,10 @@
     },
     "sections": {
       "resources": {
-        "title": "Nearby resources",
-        "description": "Reference directory data from approved public sources, with Ontario facilities prioritized first.",
+        "title": "Resources",
+        "nearbyTitle": "Nearby resources",
+        "description": "Reference directory data from approved public sources, with Ontario facilities prioritized first. Share your location to sort by distance.",
+        "nearbyDescription": "Reference directory data from approved public sources, filtered and sorted by distance from your location.",
         "empty": "No facility records matched your current filters."
       },
       "transparency": {
@@ -203,7 +205,9 @@
       },
       "aed": {
         "title": "AED locations",
-        "description": "Crowdsourced AED records are shown with explicit provenance, incompleteness, and freshness labels.",
+        "nearbyTitle": "Nearby AED locations",
+        "description": "Crowdsourced AED records are shown with explicit provenance, incompleteness, and freshness labels. Share your location to sort by distance.",
+        "nearbyDescription": "Crowdsourced AED records near your location, shown with explicit provenance, incompleteness, and freshness labels.",
         "empty": "No AED records matched your current filters."
       },
       "alerts": {

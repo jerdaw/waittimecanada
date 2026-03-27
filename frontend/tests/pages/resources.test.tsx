@@ -112,7 +112,7 @@ describe("ResourcesPage", () => {
 
     expect(screen.getByTestId("mock-header")).toBeInTheDocument();
     expect(screen.getByText("Public Health Resources")).toBeInTheDocument();
-    expect(screen.getByText("Nearby resources")).toBeInTheDocument();
+    expect(screen.getByText("Resources")).toBeInTheDocument();
     expect(screen.getByText("Source transparency")).toBeInTheDocument();
 
     await waitFor(() => {

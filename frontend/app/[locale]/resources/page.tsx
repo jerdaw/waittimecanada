@@ -285,6 +285,19 @@ export default function ResourcesPage() {
     aqhiSourceStatus,
   ]);
 
+  const resourcesSectionTitle = userLocation
+    ? t("sections.resources.nearbyTitle")
+    : t("sections.resources.title");
+  const resourcesSectionDescription = userLocation
+    ? t("sections.resources.nearbyDescription")
+    : t("sections.resources.description");
+  const aedSectionTitle = userLocation
+    ? t("sections.aed.nearbyTitle")
+    : t("sections.aed.title");
+  const aedSectionDescription = userLocation
+    ? t("sections.aed.nearbyDescription")
+    : t("sections.aed.description");
+
   const requestLocation = () => {
     if (!("geolocation" in navigator)) {
       setLocationError(t("filters.locationUnsupported"));
@@ -386,10 +399,10 @@ export default function ResourcesPage() {
           <section className="space-y-4">
             <div>
               <h2 className="text-2xl font-semibold text-foreground">
-                {t("sections.resources.title")}
+                {resourcesSectionTitle}
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                {t("sections.resources.description")}
+                {resourcesSectionDescription}
               </p>
             </div>
             <ResourceList
@@ -466,10 +479,10 @@ export default function ResourcesPage() {
         <section className="grid gap-8 lg:grid-cols-2">
           <div className="rounded-3xl border border-border bg-card/80 p-6 shadow-sm">
             <h2 className="text-2xl font-semibold text-foreground">
-              {t("sections.aed.title")}
+              {aedSectionTitle}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              {t("sections.aed.description")}
+              {aedSectionDescription}
             </p>
             <div className="mt-4">
               <ResourceList
