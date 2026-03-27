@@ -10,9 +10,17 @@ This directory is the planning control plane for Wait Time Canada.
 - Active backend migration path: `docs/operations/direct-vps-backend.md`
 - Active deployment migration path: `docs/operations/direct-vps-frontend.md`
 
-## Active Milestone Plans
+## Active Planning Docs
 
 - `docs/planning/implementation/admissions-strengthening-plan.md`
+- `docs/planning/implementation/public-health-data-hub-batch-a-plan.md`
+- `docs/planning/post-launch-growth-strategy.md`
+- `docs/planning/public-health-data-hub-preplan.md`
+- `docs/planning/public-health-data-hub-decision-brief.md`
+- `docs/planning/public-health-data-hub-identity-memo.md`
+- `docs/planning/public-health-data-hub-batch-a-handoff.md`
+- `docs/planning/public-health-data-hub-metadata-contract.md`
+- `docs/planning/public-health-data-hub-freshness-safety-rules.md`
 
 ## Archived Milestone Plans
 
@@ -44,4 +52,4 @@ These documents are retained for context and may not match current implementatio
 3. Archive implementation plans once a milestone is delivered and no longer actively edited.
 4. Keep completed milestone details in archived files; keep roadmap focused on active next steps.
 
-Last Updated: 2026-03-12
+Last Updated: 2026-03-27

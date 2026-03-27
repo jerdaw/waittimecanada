@@ -11,9 +11,17 @@ This section contains the project planning control plane.
 
 - Human intervention tasks: `docs/planning/manual-tasks.md`
 
-## Active Implementation Plans
+## Active Planning Docs
 
 - `docs/planning/implementation/admissions-strengthening-plan.md`
+- `docs/planning/implementation/public-health-data-hub-batch-a-plan.md`
+- `docs/planning/post-launch-growth-strategy.md`
+- `docs/planning/public-health-data-hub-preplan.md`
+- `docs/planning/public-health-data-hub-decision-brief.md`
+- `docs/planning/public-health-data-hub-identity-memo.md`
+- `docs/planning/public-health-data-hub-batch-a-handoff.md`
+- `docs/planning/public-health-data-hub-metadata-contract.md`
+- `docs/planning/public-health-data-hub-freshness-safety-rules.md`
 
 ## Maintenance Logs
 

@@ -63,6 +63,8 @@ Netlify should now be treated as rollback-only for the frontend, and GitHub Acti
 
 **Parallel ops track (2026-03-26):** keep the VPS frontend stable, watch Neon transfer after the new read-cache guardrails, and treat backend migration as deferred pending an Ontario reachability investigation for the VPS path.
 
+**Exploratory strategy track (2026-03-27):** the Ontario-first public health data hub track now has an implementation-ready preflight bundle: decision brief, shortlist, scoring matrix, legal/reuse review, metadata contract, freshness rules, ADR-0023, and a Batch A implementation plan. The next step on that track is actual Batch A implementation if this direction is chosen.
+
 Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT data is available; M35 (Nova Scotia scraper) when bandwidth allows. Both are Phase D (deferred) in the admissions plan. If Neon transfer remains tight after the March 26 guardrail deploy, the next optimization target is a more compact latest-snapshot path for `GET /api/hospitals`.
 
 ## Roadmap Operating Model
