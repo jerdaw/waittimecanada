@@ -229,4 +229,104 @@ describe("API Route: Resources", () => {
       "1000005758 Ontario Inc.",
     ]);
   });
+
+  test("deduplicates default facility view for repeated campus records", async () => {
+    const refreshedAt = new Date().toISOString();
+    mockSql.unsafe
+      .mockResolvedValueOnce([
+        {
+          id: "facility-1",
+          kind: "facility",
+          name: "Alexandra Hospital",
+          province: "ON",
+          city: "Ingersoll",
+          latitude: 43.04,
+          longitude: -80.88,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "29 Noxon Street",
+          postal_code: "N5C1B8",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "Addiction Services",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+        {
+          id: "facility-2",
+          kind: "facility",
+          name: "Alexandra Hospital",
+          province: "ON",
+          city: "Ingersoll",
+          latitude: 43.04,
+          longitude: -80.88,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "29 Noxon Street",
+          postal_code: "N5C1B8",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "Licensed Hospital Lab Location",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+        {
+          id: "facility-3",
+          kind: "facility",
+          name: "Toronto General Hospital",
+          province: "ON",
+          city: "Toronto",
+          latitude: 43.6532,
+          longitude: -79.3832,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "200 Elizabeth St",
+          postal_code: "M5G 2C4",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "Hospital",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          domain: "provider_facility",
+          last_refreshed_at: refreshedAt,
+        },
+      ]);
+
+    const req = new NextRequest(
+      "http://localhost/api/resources?kind=facility&province=ON&limit=10",
+    );
+
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(
+      data.data.map((row: { name: string; city: string }) => `${row.name}|${row.city}`),
+    ).toEqual(
+      expect.arrayContaining([
+        "Toronto General Hospital|Toronto",
+        "Alexandra Hospital|Ingersoll",
+      ]),
+    );
+    expect(data.count).toBe(2);
+  });
 });

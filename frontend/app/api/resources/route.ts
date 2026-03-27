@@ -186,7 +186,17 @@ export async function GET(request: NextRequest) {
               }
             }
             return left.name.localeCompare(right.name);
-          })
+          });
+
+        const displayRows =
+          kind === "facility" &&
+          latitude === undefined &&
+          longitude === undefined &&
+          !q
+            ? dedupeDefaultFacilityRows(normalizedRows)
+            : normalizedRows;
+
+        const limitedRows = displayRows
           .slice(0, limit);
 
         const sourceStatusRows = (await sql.unsafe(
@@ -212,8 +222,8 @@ export async function GET(request: NextRequest) {
 
         return {
           success: true as const,
-          count: normalizedRows.length,
-          data: normalizedRows,
+          count: limitedRows.length,
+          data: limitedRows,
           meta: {
             kind,
             query: {
@@ -331,4 +341,38 @@ function matchesKeywordGroup(
   keywords: readonly string[],
 ): boolean {
   return keywords.some((keyword) => text.includes(keyword));
+}
+
+function dedupeDefaultFacilityRows(
+  resources: ResourceRecord[],
+): ResourceRecord[] {
+  const seen = new Set<string>();
+  const deduped: ResourceRecord[] = [];
+
+  for (const resource of resources) {
+    const key = buildFacilityDeduplicationKey(resource);
+    if (seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    deduped.push(resource);
+  }
+
+  return deduped;
+}
+
+function buildFacilityDeduplicationKey(resource: ResourceRecord): string {
+  return [
+    normalizeDeduplicationPart(resource.name),
+    normalizeDeduplicationPart(resource.address),
+    normalizeDeduplicationPart(resource.city),
+  ].join("|");
+}
+
+function normalizeDeduplicationPart(value: string | null | undefined): string {
+  return (value ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 }
