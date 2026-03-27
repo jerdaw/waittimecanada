@@ -56,6 +56,7 @@ export default function ResourcesPage() {
   const t = useTranslations("ResourcesPage");
   const [province, setProvince] = useState("ON");
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [resources, setResources] = useState<ResourceRecord[]>([]);
   const [resourcesLoading, setResourcesLoading] = useState(true);
   const [aedResources, setAEDResources] = useState<ResourceRecord[]>([]);
@@ -81,7 +82,19 @@ export default function ResourcesPage() {
   const [aqhiSourceStatus, setAQHISourceStatus] = useState<
     SourceStatusRecord[]
   >([]);
-  const facilityDiscoveryReady = Boolean(userLocation || searchQuery.trim());
+  const facilityDiscoveryReady = Boolean(
+    userLocation || debouncedSearchQuery.trim(),
+  );
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery.trim());
+    }, 250);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [searchQuery]);
 
   useEffect(() => {
     let mounted = true;
@@ -102,8 +115,8 @@ export default function ResourcesPage() {
           limit: "20",
         });
 
-        if (searchQuery.trim()) {
-          params.set("q", searchQuery.trim());
+        if (debouncedSearchQuery) {
+          params.set("q", debouncedSearchQuery);
         }
 
         if (userLocation) {
@@ -139,7 +152,7 @@ export default function ResourcesPage() {
     return () => {
       mounted = false;
     };
-  }, [facilityDiscoveryReady, province, searchQuery, userLocation]);
+  }, [debouncedSearchQuery, facilityDiscoveryReady, province, userLocation]);
 
   useEffect(() => {
     let mounted = true;
@@ -153,8 +166,8 @@ export default function ResourcesPage() {
           limit: "12",
         });
 
-        if (searchQuery.trim()) {
-          params.set("q", searchQuery.trim());
+        if (debouncedSearchQuery) {
+          params.set("q", debouncedSearchQuery);
         }
 
         if (userLocation) {
@@ -190,7 +203,7 @@ export default function ResourcesPage() {
     return () => {
       mounted = false;
     };
-  }, [province, searchQuery, userLocation]);
+  }, [debouncedSearchQuery, province, userLocation]);
 
   useEffect(() => {
     let mounted = true;
