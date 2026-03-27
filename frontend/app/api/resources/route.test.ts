@@ -329,4 +329,135 @@ describe("API Route: Resources", () => {
     );
     expect(data.count).toBe(2);
   });
+
+  test("uses query-aware ranking for facility search results", async () => {
+    const refreshedAt = new Date().toISOString();
+    mockSql.unsafe
+      .mockResolvedValueOnce([
+        {
+          id: "facility-1",
+          kind: "facility",
+          name: "Toronto Ultrasound Clinic",
+          province: "ON",
+          city: "Toronto",
+          latitude: 43.66,
+          longitude: -79.39,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "10 Bay Street",
+          postal_code: "M5J2R8",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "Diagnostic Imaging",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+        {
+          id: "facility-2",
+          kind: "facility",
+          name: "Toronto General Hospital",
+          province: "ON",
+          city: "Toronto",
+          latitude: 43.6532,
+          longitude: -79.3832,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "200 Elizabeth St",
+          postal_code: "M5G 2C4",
+          phone: "416-000-0000",
+          website_url: "https://example.com",
+          reference_status: "directory_only",
+          location_description: "Hospital",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          domain: "provider_facility",
+          last_refreshed_at: refreshedAt,
+        },
+      ]);
+
+    const req = new NextRequest(
+      "http://localhost/api/resources?kind=facility&province=ON&q=Toronto%20General&limit=10",
+    );
+
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.data.map((row: { name: string }) => row.name)).toEqual([
+      "Toronto General Hospital",
+      "Toronto Ultrasound Clinic",
+    ]);
+    expect(mockSql.unsafe).toHaveBeenNthCalledWith(
+      1,
+      expect.stringContaining("OR COALESCE(rl.city, '') ILIKE"),
+      ["facility", "ON", "%Toronto General%"],
+    );
+  });
+
+  test("matches facility search across city and address fields", async () => {
+    const refreshedAt = new Date().toISOString();
+    mockSql.unsafe
+      .mockResolvedValueOnce([
+        {
+          id: "facility-1",
+          kind: "facility",
+          name: "West End Health Centre",
+          province: "ON",
+          city: "Mississauga",
+          latitude: 43.59,
+          longitude: -79.64,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "1250 Southdown Road",
+          postal_code: "L5J2Z4",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "Community health centre",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          domain: "provider_facility",
+          last_refreshed_at: refreshedAt,
+        },
+      ]);
+
+    const req = new NextRequest(
+      "http://localhost/api/resources?kind=facility&province=ON&q=Southdown&limit=10",
+    );
+
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.count).toBe(1);
+    expect(data.data[0]).toMatchObject({
+      name: "West End Health Centre",
+      city: "Mississauga",
+      address: "1250 Southdown Road",
+    });
+  });
 });

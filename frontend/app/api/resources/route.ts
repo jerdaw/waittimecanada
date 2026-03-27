@@ -73,6 +73,7 @@ const DIAGNOSTIC_FACILITY_KEYWORDS = [
   "fluoroscopy",
   "nuclear medicine",
 ] as const;
+const QUERY_TOKEN_SEPARATOR = /[^a-z0-9]+/g;
 
 export async function GET(request: NextRequest) {
   const rateLimitResponse = await checkRateLimit(request);
@@ -153,7 +154,16 @@ export async function GET(request: NextRequest) {
 
         if (q) {
           params.push(`%${q}%`);
-          queryParts.push(`AND rl.name ILIKE $${params.length}`);
+          const likeParamIndex = params.length;
+          queryParts.push(`
+            AND (
+              rl.name ILIKE $${likeParamIndex}
+              OR COALESCE(rl.city, '') ILIKE $${likeParamIndex}
+              OR COALESCE(rl.address, '') ILIKE $${likeParamIndex}
+              OR COALESCE(rl.location_description, '') ILIKE $${likeParamIndex}
+              OR COALESCE(rl.access_notes, '') ILIKE $${likeParamIndex}
+            )
+          `);
         }
 
         queryParts.push("ORDER BY rl.name");
@@ -179,6 +189,14 @@ export async function GET(request: NextRequest) {
               return left.distance_km - right.distance_km;
             }
             if (kind === "facility") {
+              if (q) {
+                const facilityQueryRankDelta =
+                  getFacilityQuerySortRank(left, q) -
+                  getFacilityQuerySortRank(right, q);
+                if (facilityQueryRankDelta !== 0) {
+                  return facilityQueryRankDelta;
+                }
+              }
               const facilityRankDelta =
                 getFacilitySortRank(left) - getFacilitySortRank(right);
               if (facilityRankDelta !== 0) {
@@ -336,6 +354,81 @@ function getFacilitySortRank(resource: ResourceRecord): number {
   return rank;
 }
 
+function getFacilityQuerySortRank(
+  resource: ResourceRecord,
+  rawQuery: string,
+): number {
+  const query = normalizeSearchText(rawQuery);
+  const queryTokens = tokenizeSearchQuery(rawQuery);
+
+  if (!query || queryTokens.length === 0) {
+    return 50;
+  }
+
+  const name = normalizeSearchText(resource.name);
+  const city = normalizeSearchText(resource.city);
+  const address = normalizeSearchText(resource.address);
+  const locationDescription = normalizeSearchText(resource.location_description);
+  const accessNotes = normalizeSearchText(resource.access_notes);
+  const combined = [
+    name,
+    city,
+    address,
+    locationDescription,
+    accessNotes,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  if (name === query) {
+    return 0;
+  }
+
+  if (name.startsWith(query)) {
+    return 1;
+  }
+
+  if (queryTokens.every((token) => name.includes(token))) {
+    return 2;
+  }
+
+  if (city === query || address === query) {
+    return 3;
+  }
+
+  if (city.startsWith(query) || address.startsWith(query)) {
+    return 4;
+  }
+
+  if (
+    queryTokens.every((token) => city.includes(token)) ||
+    queryTokens.every((token) => address.includes(token))
+  ) {
+    return 5;
+  }
+
+  if (
+    queryTokens.every((token) => locationDescription.includes(token)) ||
+    queryTokens.every((token) => accessNotes.includes(token))
+  ) {
+    return 6;
+  }
+
+  if (queryTokens.every((token) => combined.includes(token))) {
+    return 7;
+  }
+
+  if (name.includes(query)) {
+    return 8;
+  }
+
+  if (combined.includes(query)) {
+    return 9;
+  }
+
+  return 10;
+}
+
 function matchesKeywordGroup(
   text: string,
   keywords: readonly string[],
@@ -375,4 +468,17 @@ function normalizeDeduplicationPart(value: string | null | undefined): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
+}
+
+function normalizeSearchText(value: string | null | undefined): string {
+  return (value ?? "")
+    .toLowerCase()
+    .replace(QUERY_TOKEN_SEPARATOR, " ")
+    .trim();
+}
+
+function tokenizeSearchQuery(value: string): string[] {
+  return normalizeSearchText(value)
+    .split(" ")
+    .filter(Boolean);
 }
