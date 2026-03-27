@@ -55,14 +55,14 @@ Do not redesign the homepage around this module in Batch A.
 
 ### 2. Data model and storage
 
-Add three new persistence concepts:
+Add three new persistence concepts using these exact table names:
 
-1. **Public data sources catalog**
+1. **`public_data_sources`**
    stores the metadata contract frozen in `public-health-data-hub-metadata-contract.md`
-2. **Resource locations**
+2. **`resource_locations`**
    stores normalized location-based resources for:
    `facility` and `aed`
-3. **Public health alerts**
+3. **`public_health_alerts`**
    stores normalized recall/safety alert items
 
 Do **not** add a persistent AQHI table in Batch A. AQHI should be proxied live through the Next.js API layer with server-side caching.
@@ -98,6 +98,79 @@ Add these public API routes under `frontend/app/api`:
 
 Batch A does **not** need a dedicated public `sources` API route. Provenance data can be embedded in route responses.
 
+The implementation should add these Zod schemas in `frontend/utils/validations.ts`:
+
+- `ResourceKindSchema`
+- `ResourcesQuerySchema`
+- `ResourceAlertsQuerySchema`
+- `ResourceAQHIQuerySchema`
+
+### 4.1 API response contracts
+
+The new API routes should use these response envelopes.
+
+`GET /api/resources`
+
+```ts
+{
+  success: true;
+  count: number;
+  data: ResourceRecord[];
+  meta: {
+    kind: "facility" | "aed";
+    query: {
+      q?: string;
+      province?: string;
+      latitude?: number;
+      longitude?: number;
+      radius?: number;
+      limit: number;
+    };
+    source_status: SourceStatusRecord[];
+  };
+}
+```
+
+`GET /api/resources/alerts`
+
+```ts
+{
+  success: true;
+  count: number;
+  data: AlertRecord[];
+  meta: {
+    limit: number;
+    source_status: SourceStatusRecord[];
+  };
+}
+```
+
+`GET /api/resources/aqhi`
+
+```ts
+{
+  success: true;
+  data: AQHIRecord | null;
+  meta: {
+    latitude: number;
+    longitude: number;
+    source_status: SourceStatusRecord[];
+  };
+}
+```
+
+Where `SourceStatusRecord` is:
+
+```ts
+{
+  source_id: string;
+  source_name: string;
+  provenance_url: string;
+  last_refreshed_at: string | null;
+  freshness_state: "show" | "warn" | "suppress";
+}
+```
+
 ### 5. Source metadata contract usage
 
 Batch A implementation must use the frozen metadata fields from:
@@ -105,6 +178,81 @@ Batch A implementation must use the frozen metadata fields from:
 - `docs/planning/public-health-data-hub-metadata-contract.md`
 
 No alternate naming is allowed in Batch A. If implementation pressure requires contract changes, the contract must be updated first.
+
+### 5.1 Normalized record contracts
+
+Batch A should use these normalized public response shapes.
+
+`ResourceRecord`
+
+```ts
+{
+  id: string;
+  kind: "facility" | "aed";
+  name: string;
+  province: string;
+  city: string | null;
+  latitude: number;
+  longitude: number;
+  distance_km?: number;
+  source_id: string;
+  source_name: string;
+  provenance_url: string;
+  last_refreshed_at: string | null;
+  freshness_state: "show" | "warn" | "suppress";
+  caveat_class: "reference_directory" | "crowdsourced_incomplete";
+  address?: string | null;
+  postal_code?: string | null;
+  phone?: string | null;
+  website_url?: string | null;
+  reference_status?: "directory_only";
+  location_description?: string | null;
+  access_notes?: string | null;
+  crowdsourced?: true;
+  completeness_status?: "incomplete";
+}
+```
+
+`AlertRecord`
+
+```ts
+{
+  id: string;
+  title: string;
+  summary: string;
+  alert_type: string;
+  published_at: string;
+  updated_at?: string | null;
+  source_id: string;
+  source_name: string;
+  provenance_url: string;
+  last_refreshed_at: string | null;
+  freshness_state: "show" | "warn" | "suppress";
+  caveat_class: "official_alert_feed";
+  affected_products?: Array<{
+    brand_name: string;
+    din?: string | null;
+  }>;
+}
+```
+
+`AQHIRecord`
+
+```ts
+{
+  location_name: string;
+  aqhi_value: number;
+  category: "low" | "moderate" | "high" | "very_high";
+  issued_at: string;
+  valid_until?: string | null;
+  source_id: string;
+  source_name: string;
+  provenance_url: string;
+  last_refreshed_at: string | null;
+  freshness_state: "show" | "warn" | "suppress";
+  caveat_class: "official_forecast";
+}
+```
 
 ### 6. Provider/facility baseline behavior
 
@@ -134,6 +282,8 @@ No alternate naming is allowed in Batch A. If implementation pressure requires c
 - Fetch AQHI through a server-side API proxy with caching.
 - AQHI is the only environmental overlay in Batch A.
 - If AQHI freshness exceeds the suppress threshold defined in the freshness rules, do not render a current AQHI card.
+- The AQHI proxy should use `frontend/utils/server-cache.ts` for response caching and `frontend/utils/cache.ts` for shared cache headers.
+- The AQHI route should not write to Postgres in Batch A.
 
 ### 10. Freshness and safety rules
 
@@ -156,6 +306,29 @@ This applies to:
 - Do not change existing analytics/methods/data-quality route structure.
 - Do not create a separate product shell or new locale root.
 
+### 12. Repo-grounded implementation conventions
+
+- New public API routes should follow the existing route structure under `frontend/app/api/.../route.ts`.
+- Route tests should be colocated at `frontend/app/api/.../route.test.ts` for the three new API routes.
+- Page and component tests should follow the existing `frontend/tests/pages` and `frontend/tests/components` patterns.
+- Query parsing must use Zod schemas from `frontend/utils/validations.ts`.
+- DB-backed API responses should use `publicCacheHeaders(300, 900)` unless a stricter rule is required.
+- AQHI proxy responses should use `publicCacheHeaders(900, 1800)` with a matching server-cache TTL.
+- Backend schema changes should use the next migration file: `backend/migrations/018_create_public_health_hub_tables.sql`.
+
+### 13. Fixture and mocking policy
+
+- Batch A tests must not rely on live upstream HTTP calls.
+- Use checked-in sanitized fixtures built from minimal approved-source payload fragments:
+  - MOHSERLO: small representative CSV/JSON rows
+  - ODHF: small representative file fragment
+  - OSM AED: minimal OSM/Overpass-style node payload
+  - recalls feeds: small official feed fragment
+  - DPD: small JSON response fixture
+  - AQHI: small GeoMet JSON response fixture
+- Do not store full HTML pages solely for test convenience.
+- Provenance URLs, freshness timestamps, and caveat classes must be present in fixtures because they drive UI behavior.
+
 ---
 
 ## Test Plan
@@ -168,12 +341,21 @@ This applies to:
   - OSM AED normalization
   - recalls feed normalization
 - source metadata contract tests to ensure required fields are present
+- target backend test files:
+  - `backend/tests/unit/test_public_health_source_catalog.py`
+  - `backend/tests/unit/test_resource_location_ingest.py`
+  - `backend/tests/unit/test_alert_feed_ingest.py`
+  - `backend/tests/integration/test_public_health_hub_database.py`
 
 ### API tests
 
 - validation tests for `/api/resources`, `/api/resources/alerts`, and `/api/resources/aqhi`
 - tests that resource responses include provenance and freshness metadata
 - tests that AQHI and DPD proxy failures degrade gracefully
+- target frontend route test files:
+  - `frontend/app/api/resources/route.test.ts`
+  - `frontend/app/api/resources/alerts/route.test.ts`
+  - `frontend/app/api/resources/aqhi/route.test.ts`
 
 ### UI tests
 
@@ -182,6 +364,11 @@ This applies to:
 - AED cards show crowdsourced/incomplete warning when OSM-backed
 - alerts list shows last refreshed time
 - AQHI card shows or suppresses correctly based on freshness state
+- target page/component test files:
+  - `frontend/tests/pages/resources.test.tsx`
+  - `frontend/tests/components/ResourceList.test.tsx`
+  - `frontend/tests/components/AlertFeed.test.tsx`
+  - `frontend/tests/components/AQHICard.test.tsx`
 
 ### Acceptance scenarios
 
@@ -196,6 +383,12 @@ This applies to:
 5. AED source sync is stale:
    AED results warn or suppress per rule, but facilities still render
 
+### Verification commands
+
+- `cd backend && pytest tests/unit/test_public_health_source_catalog.py tests/unit/test_resource_location_ingest.py tests/unit/test_alert_feed_ingest.py tests/integration/test_public_health_hub_database.py`
+- `cd frontend && npm run test:unit -- app/api/resources/route.test.ts app/api/resources/alerts/route.test.ts app/api/resources/aqhi/route.test.ts tests/pages/resources.test.tsx tests/components/ResourceList.test.tsx tests/components/AlertFeed.test.tsx tests/components/AQHICard.test.tsx`
+- `cd frontend && npm run type-check`
+
 ---
 
 ## Assumptions
@@ -206,3 +399,4 @@ This applies to:
 - the module remains inside Wait Time Canada for Batch A
 - AQHI is live-proxied rather than stored persistently in v1
 - Batch A uses only the approved source set from the legal review
+- final AED warning copy receives human sign-off before merge or release

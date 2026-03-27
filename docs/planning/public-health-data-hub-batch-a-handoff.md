@@ -114,6 +114,7 @@ These can remain in research or later batching.
 The resulting implementation-oriented milestone plan is:
 
 - `docs/planning/implementation/public-health-data-hub-batch-a-plan.md`
+- `docs/planning/public-health-data-hub-agent-execution-readiness.md` for delegation-safe execution boundaries
 
 That milestone plan includes:
 
