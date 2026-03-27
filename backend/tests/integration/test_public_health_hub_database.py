@@ -71,6 +71,24 @@ class TestPublicHealthHubDatabase:
         )
         assert refreshed.last_refreshed_at == refreshed_at
 
+    def test_upsert_public_data_source_preserves_existing_refresh_when_new_value_is_null(
+        self, public_health_hub_db: DatabaseService
+    ):
+        original_refreshed_at = datetime(2026, 3, 27, 12, 0, tzinfo=UTC)
+        public_health_hub_db.upsert_public_data_source(
+            _build_source(last_refreshed_at=original_refreshed_at)
+        )
+
+        updated = public_health_hub_db.upsert_public_data_source(
+            _build_source(
+                source_name="Updated MOHSERLO",
+                last_refreshed_at=None,
+            )
+        )
+
+        assert updated.source_name == "Updated MOHSERLO"
+        assert updated.last_refreshed_at == original_refreshed_at
+
     def test_public_health_hub_tables_accept_resource_and_alert_rows(
         self,
         public_health_hub_db: DatabaseService,

@@ -118,3 +118,24 @@ class TestPublicHealthSourceCatalogDatabaseService:
 
         assert result.last_refreshed_at == refreshed_at
         assert "UPDATE public_data_sources" in mock_cursor.execute.call_args[0][0]
+
+    @patch("psycopg2.connect")
+    def test_upsert_public_data_source_preserves_existing_refresh_when_null(
+        self, mock_connect, db_service
+    ):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_cursor.fetchone.return_value = make_public_data_source_row(
+            last_refreshed_at=datetime(2026, 3, 27, 12, 0, tzinfo=UTC)
+        )
+
+        source = make_public_data_source(last_refreshed_at=None)
+
+        db_service.upsert_public_data_source(source)
+
+        executed_sql = mock_cursor.execute.call_args[0][0]
+        assert "COALESCE(" in executed_sql
+        assert "public_data_sources.last_refreshed_at" in executed_sql

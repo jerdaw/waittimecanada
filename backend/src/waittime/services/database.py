@@ -196,7 +196,10 @@ class DatabaseService:
                         notes = EXCLUDED.notes,
                         fallback_source_id = EXCLUDED.fallback_source_id,
                         public_methodology_note = EXCLUDED.public_methodology_note,
-                        last_refreshed_at = EXCLUDED.last_refreshed_at,
+                        last_refreshed_at = COALESCE(
+                            EXCLUDED.last_refreshed_at,
+                            public_data_sources.last_refreshed_at
+                        ),
                         updated_at = NOW()
                     RETURNING *
                     """,
