@@ -38,6 +38,41 @@ type ResourceRow = {
 };
 
 const RESOURCES_CACHE_TTL_MS = 300_000;
+const EMERGENCY_FACILITY_KEYWORDS = [
+  "emergency",
+  "urgent care",
+  "urgent treatment",
+  "hospital",
+] as const;
+const COMMUNITY_FACILITY_KEYWORDS = [
+  "community health",
+  "health centre",
+  "health center",
+  "medical clinic",
+  "walk-in",
+  "walk in",
+  "family health",
+  "nurse practitioner",
+  "primary care",
+  "sexual health",
+  "mental health",
+  "public health",
+] as const;
+const PHARMACY_KEYWORDS = ["pharmacy", "drug store"] as const;
+const DIAGNOSTIC_FACILITY_KEYWORDS = [
+  "ultrasound",
+  "radiography",
+  "mammography",
+  "diagnostic",
+  "imaging",
+  "x-ray",
+  "xray",
+  "laboratory",
+  "lab",
+  "dxa",
+  "fluoroscopy",
+  "nuclear medicine",
+] as const;
 
 export async function GET(request: NextRequest) {
   const rateLimitResponse = await checkRateLimit(request);
@@ -142,6 +177,13 @@ export async function GET(request: NextRequest) {
               right.distance_km !== undefined
             ) {
               return left.distance_km - right.distance_km;
+            }
+            if (kind === "facility") {
+              const facilityRankDelta =
+                getFacilitySortRank(left) - getFacilitySortRank(right);
+              if (facilityRankDelta !== 0) {
+                return facilityRankDelta;
+              }
             }
             return left.name.localeCompare(right.name);
           })
@@ -255,4 +297,38 @@ function mapResourceRecord(
         ? "incomplete"
         : (row.completeness_status ?? undefined),
   };
+}
+
+function getFacilitySortRank(resource: ResourceRecord): number {
+  const text = [resource.name, resource.location_description]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  if (matchesKeywordGroup(text, EMERGENCY_FACILITY_KEYWORDS)) {
+    return 0;
+  }
+
+  if (matchesKeywordGroup(text, COMMUNITY_FACILITY_KEYWORDS)) {
+    return 1;
+  }
+
+  if (matchesKeywordGroup(text, PHARMACY_KEYWORDS)) {
+    return 2;
+  }
+
+  let rank = matchesKeywordGroup(text, DIAGNOSTIC_FACILITY_KEYWORDS) ? 4 : 3;
+
+  if (/^\d/.test(resource.name)) {
+    rank += 2;
+  }
+
+  return rank;
+}
+
+function matchesKeywordGroup(
+  text: string,
+  keywords: readonly string[],
+): boolean {
+  return keywords.some((keyword) => text.includes(keyword));
 }
