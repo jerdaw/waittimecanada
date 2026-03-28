@@ -164,6 +164,17 @@ This directory contains operational and CI workflows for Wait Time Canada.
   one degraded alert and one recovery alert instead of repeat duplicates. The
   best-effort AED fallback is intentionally excluded from paging.
 
+### 12. `deploy-docs.yml` - Documentation Publishing
+
+**Trigger:** push to `main` affecting docs surfaces + manual dispatch.
+
+**Purpose:** Publish the MkDocs site to the `gh-pages` branch.
+
+**Authorship rule:**
+- The workflow is configured to write docs-publish commits with the human repo
+  author identity rather than `github-actions[bot]`, so published branch
+  history remains aligned with the repository's human-authorship policy.
+
 ## Secrets Matrix
 
 ### Core production/runtime

@@ -61,3 +61,7 @@ These documents are retained for context and may not match current implementatio
 4. Keep completed milestone details in archived files; keep roadmap focused on active next steps.
 
 Last Updated: 2026-03-28
+
+## Latest Maintenance Log
+
+- `docs/planning/archive/maintenance-2026-03-28.md`

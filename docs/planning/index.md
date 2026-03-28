@@ -36,5 +36,6 @@ This section contains the project planning control plane.
 
 ## Maintenance Logs
 
+- `docs/planning/archive/maintenance-2026-03-28.md`
 - `docs/planning/archive/maintenance-2026-03-27.md`
 - `docs/planning/archive/maintenance-2026-03-26.md`
