@@ -460,4 +460,122 @@ describe("API Route: Resources", () => {
       address: "1250 Southdown Road",
     });
   });
+
+  test("compresses near-duplicate facility search results for the same campus", async () => {
+    const refreshedAt = new Date().toISOString();
+    mockSql.unsafe
+      .mockResolvedValueOnce([
+        {
+          id: "facility-1",
+          kind: "facility",
+          name: "Toronto General Hospital",
+          province: "ON",
+          city: "Toronto",
+          latitude: 43.65837,
+          longitude: -79.38719,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "200 Elizabeth Street",
+          postal_code: "M5G2C4",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "Licensed Hospital Lab Location",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+        {
+          id: "facility-2",
+          kind: "facility",
+          name: "Toronto General Hospital Phcy",
+          province: "ON",
+          city: "Toronto",
+          latitude: 43.65858,
+          longitude: -79.3893,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "585 University Avenue",
+          postal_code: "M5G2N2",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "Hospital Outpatient Dispensiary",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+        {
+          id: "facility-3",
+          kind: "facility",
+          name: "University Health Network - Toronto General",
+          province: "ON",
+          city: "Toronto",
+          latitude: 43.65957,
+          longitude: -79.38706,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "200 Elizabeth Street",
+          postal_code: "M5G2C4",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "Corporation",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+        {
+          id: "facility-4",
+          kind: "facility",
+          name: "Toronto General Medical Centre",
+          province: "ON",
+          city: "Ottawa",
+          latitude: 45.4215,
+          longitude: -75.6972,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "123 Main Street",
+          postal_code: "K1P1J1",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "Medical Clinic",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          domain: "provider_facility",
+          last_refreshed_at: refreshedAt,
+        },
+      ]);
+
+    const req = new NextRequest(
+      "http://localhost/api/resources?kind=facility&province=ON&q=Toronto%20General&limit=10",
+    );
+
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.data.map((row: { name: string }) => row.name)).toEqual([
+      "Toronto General Hospital",
+      "Toronto General Medical Centre",
+    ]);
+    expect(data.count).toBe(2);
+  });
 });

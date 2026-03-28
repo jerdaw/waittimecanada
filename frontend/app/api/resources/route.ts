@@ -212,7 +212,9 @@ export async function GET(request: NextRequest) {
           longitude === undefined &&
           !q
             ? dedupeDefaultFacilityRows(normalizedRows)
-            : normalizedRows;
+            : kind === "facility" && q
+              ? dedupeFacilitySearchRows(normalizedRows, q)
+              : normalizedRows;
 
         const limitedRows = displayRows
           .slice(0, limit);
@@ -455,11 +457,59 @@ function dedupeDefaultFacilityRows(
   return deduped;
 }
 
+function dedupeFacilitySearchRows(
+  resources: ResourceRecord[],
+  rawQuery: string,
+): ResourceRecord[] {
+  const queryTokens = tokenizeSearchQuery(rawQuery);
+
+  if (queryTokens.length < 2) {
+    return resources;
+  }
+
+  const seen = new Set<string>();
+  const deduped: ResourceRecord[] = [];
+
+  for (const resource of resources) {
+    const key = buildFacilitySearchDeduplicationKey(resource, queryTokens);
+    if (key && seen.has(key)) {
+      continue;
+    }
+
+    if (key) {
+      seen.add(key);
+    }
+
+    deduped.push(resource);
+  }
+
+  return deduped;
+}
+
 function buildFacilityDeduplicationKey(resource: ResourceRecord): string {
   return [
     normalizeDeduplicationPart(resource.name),
     normalizeDeduplicationPart(resource.address),
     normalizeDeduplicationPart(resource.city),
+  ].join("|");
+}
+
+function buildFacilitySearchDeduplicationKey(
+  resource: ResourceRecord,
+  queryTokens: string[],
+): string | null {
+  const normalizedName = normalizeSearchText(resource.name);
+
+  if (!queryTokens.every((token) => normalizedName.includes(token))) {
+    return null;
+  }
+
+  return [
+    resource.source_id,
+    normalizeDeduplicationPart(resource.city),
+    roundCoordinateForGrouping(resource.latitude),
+    roundCoordinateForGrouping(resource.longitude),
+    queryTokens.join(" "),
   ].join("|");
 }
 
@@ -481,4 +531,8 @@ function tokenizeSearchQuery(value: string): string[] {
   return normalizeSearchText(value)
     .split(" ")
     .filter(Boolean);
+}
+
+function roundCoordinateForGrouping(value: number): string {
+  return value.toFixed(2);
 }
