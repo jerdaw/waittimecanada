@@ -162,11 +162,13 @@ The canonical URL is now live. Publish using `https://wait-time.ca`. Spend no mo
 ### B4: Video Walkthrough
 **Priority:** 3 | **Effort:** 3 h | **CanMEDS:** Communicator
 
+**Status:** Intentionally skipped on 2026-03-28. Kept out of active scope because the time cost and presentation burden are not justified right now relative to other work, and a mediocre walkthrough would be worse than having none.
+
 Script a 3–4 minute walkthrough. Record with decent audio (headset mic is sufficient). Cover: landing page → select two incomparable hospitals → divergence warning → methods page → equity layer. Upload as unlisted YouTube or Loom link.
 
 This is the only format where a committee hears your voice and experiences your command of the material. Prioritize audio quality over video quality. A bad video is worse than none.
 
-**Artifact:** Unlisted video linked from README and application summary.
+**Artifact:** None for now. Revisit only if future application/interview needs make the payoff clearer.
 
 ### B5: GitHub Topics & Discoverability
 **Priority:** 8 | **Effort:** 30 min | **CanMEDS:** Leader
@@ -284,7 +286,7 @@ If Phases A–C execute on schedule, by mid-April 2026 the portfolio includes:
 - A concrete Ottawa–Gatineau case study ready for any interview
 - Quantified metrics grounded in actual database queries
 - A published LinkedIn post with a public timestamp
-- A 3–4 minute video walkthrough in your own voice
+- A consciously skipped video walkthrough, with effort redirected toward higher-value written/public artifacts
 - Usage analytics collecting baseline data
 - A 2–4 page technical report reviewed by at least one external reader
 - One monthly operational report

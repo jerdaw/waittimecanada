@@ -60,7 +60,7 @@ Netlify should now be treated as rollback-only for the frontend, and GitHub Acti
 
 ## Next Steps
 
-**Admissions strengthening plan active (2026-03-26).** Production launch verification is complete. Immediate work now shifts to credibility artifacts and post-launch follow-through: A6/A7 (case study + quantified findings) and B2-B4 (analytics, launch post, walkthrough). A1 (README mission/equity/stewardship section) is now delivered. A3 (Zenodo DOI) and A4 (stakeholder outreach) remain in scope but are held until explicit user go-ahead. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
+**Admissions strengthening plan active (2026-03-26).** Production launch verification is complete. Immediate work now shifts to credibility artifacts and post-launch follow-through: A6/A7 (case study + quantified findings) and B2/B5 (analytics + discoverability). A1 (README mission/equity/stewardship section) is now delivered. A3 (Zenodo DOI), A4 (stakeholder outreach), and B3 (LinkedIn launch) remain in scope but are held until explicit user go-ahead; B4 (video walkthrough) has been intentionally de-scoped. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
 
 **Parallel ops track (2026-03-26):** keep the VPS frontend stable, watch Neon transfer after the new read-cache guardrails, and treat backend migration as deferred pending an Ontario reachability investigation for the VPS path.
 
@@ -142,7 +142,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 
 - [ ] **P1 / B2: Privacy-safe usage analytics** — Add Plausible Analytics; update /privacy page; do not publicize numbers (2 h)
 - [ ] **P1 / B3: Publish LinkedIn launch post** — Draft refreshed for the live mission/equity/stewardship posture and current feature set; remaining work is manual publication using `https://wait-time.ca`. `Hold until explicit user go-ahead.` (30 min)
-- [ ] **P1 / B4: Video walkthrough** — Script 3–4 min; record with decent audio; upload unlisted YouTube (3 h)
+- [x] **P3 / B4: Video walkthrough** — Intentionally de-scoped on 2026-03-28. Kept out of active scope because the time cost and presentation burden are not justified right now relative to other work. Revisit only if future application needs make the payoff clearer.
 - [ ] **P2 / B5: GitHub topics & discoverability** — Add topic tags; check 1–2 open data registries (30 min)
 
 ### Phase C: After Verified Launch — Scholarly Artifacts & External Validation
@@ -182,7 +182,7 @@ Each feature maps to CanMEDS competencies for medical school admissions:
 | **Scholar** | Metric ontology, comparability matrix, citation export, aggregation pipeline, anomaly detection, methodology change detection, property-based testing, data dictionary, OpenAPI docs, Zenodo DOI | Technical report (C1), Ottawa–Gatineau case study (A6), quantified findings (A7), equity interpretive summary (C3), limitations section (A2) |
 | **Professional** | Clinical defensibility, divergence warnings, data quality transparency, peer benchmarking, SECURITY.md, LICENSE, CODE_OF_CONDUCT, privacy policy, terms of use, error boundaries, security headers, uptime monitoring | Operational transparency report (C4), incident post-mortem (C5), README mission/equity/stewardship section (A1) |
 | **Health Advocate** | Access Burden Estimator, equity layer (ON), temporal access patterns, accessibility testing (WCAG), French language support, mobile responsiveness | Stakeholder interview with ER professionals (A4), equity layer interpretation (C3) |
-| **Leader** | Multi-province scaling, systems architecture, regional dashboards, data quality monitoring, release management, operational documentation | Live production URL (B1), video walkthrough (B4), LinkedIn launch (B3), usage analytics (B2) |
+| **Leader** | Multi-province scaling, systems architecture, regional dashboards, data quality monitoring, release management, operational documentation | Live production URL (B1), LinkedIn launch (B3), usage analytics (B2) |
 | **Collaborator** | Province-aware telehealth routing, issue/PR templates, CODE_OF_CONDUCT, CONTRIBUTING guidelines | Stakeholder interview (A4), researcher outreach (C2), named reviewer acknowledgement (C6) |
 
 ---
@@ -266,7 +266,7 @@ Ranked by **defensible admissions value per hour of effort** (updated 2026-03-12
 3. **A6: Ottawa–Gatineau case study** — Most narratively compelling specific story; interview-ready (2–3 h)
 4. **A3: Fix placeholder Zenodo DOI** — Eliminates fake-DOI credibility risk; third-party attestation (90 min)
 5. **B3: LinkedIn launch post** — Public timestamp; asymmetric upside for 30 min of effort (30 min)
-6. **B4: Video walkthrough** — Only format where committee hears your voice and command of material (3 h)
+6. **B4: Video walkthrough** — Intentionally skipped; revisit only if future application needs make the payoff clearer
 7. **C1: Technical report** — Anchor Scholar artifact; no other pre-med applicant will have this (1–2 d)
 8. **A7: Quantified metrics** — Specificity is more credible than vagueness (3 h)
 9. **B2: Privacy-safe usage analytics** — Starts the clock on real usage evidence (2 h)
@@ -492,7 +492,7 @@ Archived (delivered):
 | Phase | Timeline | Items | Effort |
 |-------|----------|-------|--------|
 | **A: Credibility Cleanup** | Active | A1–A7 (mission/equity/stewardship, limitations, Zenodo DOI, stakeholder outreach, case study, metrics; A5 intentionally de-scoped) | ~10–13 h remaining |
-| **B: Launch Follow-Through** | Active | B2–B5 (analytics, LinkedIn, video, discoverability) | ~5–6 h remaining |
+| **B: Launch Follow-Through** | Active | B2, B3, B5 (analytics, LinkedIn, discoverability; B4 intentionally de-scoped) | ~2.5–3 h remaining plus any parked work |
 | **C: Scholarly Artifacts** | Weeks 2–4 post-launch | C1–C6 (technical report, researcher outreach, equity interpretation, ops report, post-mortem, reviewer) | ~2–3 d |
 | **D: If Time Permits** | Weeks 5–12 | D1–D5 (comparability matrix, QC equity, freshness indicators, NS scraper, grant/competition) | Variable |
 
