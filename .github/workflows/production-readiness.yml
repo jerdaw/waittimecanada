@@ -94,4 +94,26 @@ jobs:
             echo "Skipping smoke check: PRODUCTION_BASE_URL is not configured."
             exit 0
           fi
-          ./scripts/production-smoke.sh
+          set -o pipefail
+          ./scripts/production-smoke.sh | tee smoke-output.txt
+
+      - name: Write production smoke summary
+        if: ${{ always() && inputs.run_smoke_check }}
+        env:
+          PRODUCTION_BASE_URL: ${{ secrets.PRODUCTION_BASE_URL }}
+        run: |
+          {
+            echo "## Production Smoke"
+            echo
+            if [ -z "${PRODUCTION_BASE_URL}" ]; then
+              echo "_Skipped: PRODUCTION_BASE_URL is not configured._"
+            elif [ -f smoke-output.txt ]; then
+              echo "Base URL: ${PRODUCTION_BASE_URL}"
+              echo
+              echo '```text'
+              cat smoke-output.txt
+              echo '```'
+            else
+              echo "_Smoke output unavailable for this run._"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -41,4 +41,19 @@ jobs:
       - name: Run production smoke checks
         env:
           PRODUCTION_BASE_URL: ${{ steps.resolve-url.outputs.base_url }}
-        run: bash ./scripts/production-smoke.sh
+        run: |
+          set -o pipefail
+          bash ./scripts/production-smoke.sh | tee smoke-output.txt
+
+      - name: Write production smoke summary
+        if: always()
+        run: |
+          {
+            echo "## Production Smoke"
+            echo
+            echo "Base URL: ${{ steps.resolve-url.outputs.base_url }}"
+            echo
+            echo '```text'
+            cat smoke-output.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
