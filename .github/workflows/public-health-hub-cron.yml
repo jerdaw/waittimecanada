@@ -67,9 +67,9 @@ jobs:
           {
             echo "## Public Health Hub Ingest"
             echo
-            echo "- MOHSERLO: `${{ steps.ingest_mohserlo.outcome }}`"
-            echo "- OSM AED fallback: `${{ steps.ingest_aed.outcome }}`"
-            echo "- Health Canada alerts: `${{ steps.ingest_alerts.outcome }}`"
+            echo "- MOHSERLO: ${{ steps.ingest_mohserlo.outcome }}"
+            echo "- OSM AED fallback: ${{ steps.ingest_aed.outcome }}"
+            echo "- Health Canada alerts: ${{ steps.ingest_alerts.outcome }}"
             echo
           } >> "$GITHUB_STEP_SUMMARY"
 
