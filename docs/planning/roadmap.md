@@ -64,7 +64,7 @@ Netlify should now be treated as rollback-only for the frontend, and GitHub Acti
 
 **Parallel ops track (2026-03-26):** keep the VPS frontend stable, watch Neon transfer after the new read-cache guardrails, and treat backend migration as deferred pending an Ontario reachability investigation for the VPS path.
 
-**Public health hub track (2026-03-27):** Batch A is now live. The deferred Batch B source review is complete: naloxone has a real public ArcGIS-backed connector path but still needs reuse review, EMS/system-context remains analytics-only, and Toronto inspection datasets are strong but fragmented. Immediate follow-on work should stay in selective-expansion mode: keep `/resources` stable, avoid blind Batch B implementation, and only reopen expansion when legal/product gates are clearer.
+**Public health hub track (2026-03-28):** Batch A is now live. The deferred Batch B source review is complete, and Ontario naloxone now has a formal interim decision: use an official link-out posture only, not native ingestion, until reuse rights are clearer. EMS/system-context remains analytics-only, and Toronto inspection datasets are strong but fragmented. Immediate follow-on work should stay in selective-expansion mode: keep `/resources` stable, avoid blind Batch B implementation, and only reopen expansion when legal/product gates are clearer.
 
 Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT data is available; M35 (Nova Scotia scraper) when bandwidth allows. Both are Phase D (deferred) in the admissions plan. If Neon transfer remains tight after the March 26 guardrail deploy, the next optimization target is a more compact latest-snapshot path for `GET /api/hospitals`.
 
@@ -102,6 +102,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [x] **P1 / Public Health Hub: Batch A delivery (2026-03-27)** — Shipped `/resources`, Batch A APIs, public-health schema/migrations, live source ingest, source freshness/caveat UI, and production deployment on `wait-time.ca`
 - [x] **P1 / Public Health Hub: Ops hardening (2026-03-27)** — Added public-health ingest summaries, stateful hard-fail alerting, best-effort AED noise suppression, and production smoke/readiness coverage for `/resources`
 - [x] **P2 / D6: Public Health Hub Batch B source review (2026-03-27)** — Revalidated naloxone, EMS/system-context, and inspection datasets; naloxone now has a verified public ArcGIS connector path, EMS remains context-only, and Toronto inspections are strong but fragmented
+- [x] **P2 / D8: Ontario naloxone interim posture (2026-03-28)** — Recorded ADR-0024: use an official link-out only, not native ingestion or republication, until reuse rights are clearer
 - [x] **P1 / Ops: CI quota conservation (temporary)** — Minimized free-tier GitHub Actions burn
 - [x] **P1 / Ops: Raw retention + alerting stabilization** — Duplicate suppression added, 30-day retention enforcement restored, and heartbeat alerts made state-change driven with a 120-minute threshold
 - [x] **P1 / Ops: Bound database cleanup runtime (2026-03-23)** — Production cleanup deleted 207,059 rows older than 30 days, then the workflow/runtime was tightened to skip zero-yield aggregate refresh and finish in 22 seconds instead of 5m48s
@@ -162,8 +163,8 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P2 / D4: Nova Scotia scraper (M35)** — Only if NS methodology is confirmed novel (pre-research done)
 - [ ] **P2 / D5: Grant/competition application** — Opportunistic only; do not actively search
 - [ ] **P2 / D7: Official Ontario AED registry path** — Pursue partnership or explicit permission only if it improves coverage without weakening reuse clarity
-- [ ] **P2 / D8: Naloxone legal/reuse review** — Validate whether the Ontario ArcGIS-backed naloxone source can be ingested or proxied with acceptable rights and attribution
 - [ ] **P2 / D9: Municipal inspection pilot decision** — Decide whether Toronto-first DineSafe/BodySafe integration fits the product identity well enough to justify fragmented scope
+- [ ] **P2 / D10: Re-evaluate Ontario naloxone options** — Revisit link-out vs embed vs native ingestion only if reuse rights become clearer or explicit permission is obtained
 - [ ] **P2 / Occupancy-based recommendations** — Smart hospital suggestions based on current occupancy
 - [ ] **P2 / Monitoring dashboard** — Prometheus/Grafana integration for operational visibility
 - [ ] **P2 / Advanced analytics** — Predictive wait time modeling based on historical patterns

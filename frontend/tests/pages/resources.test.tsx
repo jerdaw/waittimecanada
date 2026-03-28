@@ -152,6 +152,20 @@ describe("ResourcesPage", () => {
         screen.getByText("No safety alerts available right now."),
       ).toBeInTheDocument();
     });
+    expect(screen.getByText("Ontario naloxone kits")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Official Ontario source. Wait Time Canada links to this resource instead of republishing the naloxone dataset.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", {
+        name: "Open official Ontario naloxone page",
+      }),
+    ).toHaveAttribute(
+      "href",
+      "https://www.ontario.ca/page/where-get-free-naloxone-kit",
+    );
     expect(screen.getAllByText("Current").length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Last refreshed:/).length).toBeGreaterThan(0);
     expect(

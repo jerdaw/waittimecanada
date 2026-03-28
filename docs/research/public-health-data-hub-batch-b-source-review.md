@@ -29,6 +29,8 @@ This revalidation changes the public-health-hub picture in three useful ways:
 - **Keep EMS/system-context as a later analytics/context layer.**
 - **Treat inspection/compliance as a Toronto-first pilot option, not an Ontario-wide Batch B default.**
 
+> Decision update (2026-03-28): the current product posture is now recorded in `docs/adr/0024-ontario-naloxone-link-out-posture.md`. Wait Time Canada should link out to the official Ontario naloxone source for now rather than ingesting or republishing the dataset.
+
 ---
 
 ## Revalidated Sources

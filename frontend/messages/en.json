@@ -217,6 +217,12 @@
         "loading": "Loading safety alerts...",
         "empty": "No safety alerts available right now."
       },
+      "naloxone": {
+        "title": "Ontario naloxone kits",
+        "description": "Official Ontario information on where to get free naloxone kits and training.",
+        "caveat": "Official Ontario source. Wait Time Canada links to this resource instead of republishing the naloxone dataset.",
+        "link": "Open official Ontario naloxone page"
+      },
       "aqhi": {
         "title": "Air quality health index",
         "description": "Official AQHI snapshots from GeoMet, requested for your location through a cached server-side proxy.",

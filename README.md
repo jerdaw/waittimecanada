@@ -25,7 +25,7 @@
 - **380+ Hospitals:** Near-real-time monitoring across all regions
 - **Hourly Updates:** Automated data collection currently via GitHub Actions
 - **First-in-Canada:** Real-time ED stretcher occupancy visualization (Quebec)
-- **Ontario Public Resources Module:** `/resources` now serves facilities, OSM-backed AED fallback data, Health Canada recalls, and AQHI
+- **Ontario Public Resources Module:** `/resources` now serves facilities, OSM-backed AED fallback data, Health Canada recalls, AQHI, and an official Ontario naloxone link-out
 
 ### Why This Matters
 
@@ -68,6 +68,7 @@ Provincial health authorities report ER wait times using **fundamentally differe
 - **Facilities & Services:** Ontario facility search grounded in MOHSERLO reference-directory data
 - **AED Fallback Map:** OpenStreetMap-based AED locations with explicit crowdsourced/incomplete labeling
 - **Safety Alerts:** Health Canada recalls and safety alerts with optional Drug Product Database enrichment
+- **Official Naloxone Link-Out:** Ontario naloxone guidance is linked to the provincial source rather than republished until reuse rights are clearer
 - **AQHI Overlay:** Cached GeoMet air-quality snapshots with freshness-aware suppression when upstream data is stale
 - **Source Transparency:** Provenance links, last refresh timestamps, and domain-specific caveats on every public-health slice
 

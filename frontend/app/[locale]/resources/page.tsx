@@ -538,6 +538,30 @@ export default function ResourcesPage() {
         <section className="grid gap-8 lg:grid-cols-1">
           <div className="rounded-3xl border border-border bg-card/80 p-6 shadow-sm">
             <h2 className="text-2xl font-semibold text-foreground">
+              {t("sections.naloxone.title")}
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t("sections.naloxone.description")}
+            </p>
+            <div className="mt-4 rounded-2xl border border-border bg-background p-4">
+              <p className="text-sm text-foreground">
+                {t("sections.naloxone.caveat")}
+              </p>
+              <a
+                href="https://www.ontario.ca/page/where-get-free-naloxone-kit"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex rounded-xl border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/15"
+              >
+                {t("sections.naloxone.link")}
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-8 lg:grid-cols-1">
+          <div className="rounded-3xl border border-border bg-card/80 p-6 shadow-sm">
+            <h2 className="text-2xl font-semibold text-foreground">
               {t("sections.aqhi.title")}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">

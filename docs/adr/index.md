@@ -30,6 +30,7 @@ Add or update an ADR when changing:
 - `docs/adr/0021-bounded-retention-cleanup-operations.md`
 - `docs/adr/0022-frontend-read-cache-for-neon-transfer-guardrails.md`
 - `docs/adr/0023-public-health-hub-module-boundary.md`
+- `docs/adr/0024-ontario-naloxone-link-out-posture.md`
 
 ## Template
 

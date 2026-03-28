@@ -217,6 +217,12 @@
         "loading": "Chargement des alertes de sécurité...",
         "empty": "Aucune alerte de sécurité disponible pour le moment."
       },
+      "naloxone": {
+        "title": "Trousses de naloxone en Ontario",
+        "description": "Information officielle de l'Ontario sur les endroits où obtenir gratuitement des trousses de naloxone et la formation associée.",
+        "caveat": "Source officielle de l'Ontario. Wait Time Canada renvoie vers cette ressource au lieu de republier le jeu de données sur la naloxone.",
+        "link": "Ouvrir la page officielle de l'Ontario sur la naloxone"
+      },
       "aqhi": {
         "title": "Cote air santé",
         "description": "Instantanés officiels de la CAS depuis GeoMet, demandés pour votre position via un proxy côté serveur mis en cache.",
