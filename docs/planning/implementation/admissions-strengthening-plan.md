@@ -246,6 +246,8 @@ Write it for the interview answer it produces: "What was the hardest problem?" n
 
 **Artifact:** `docs/operations/incident-reports/YYYY-MM-DD-quebec-zero-value.md`; interview preparation material.
 
+**Status:** Delivered 2026-03-28 at `docs/operations/incident-reports/2026-02-19-quebec-zero-value.md`.
+
 ### C6: Named Reviewer Acknowledgement
 **Priority:** 7 | **Effort:** 30 min if applicable | **CanMEDS:** Collaborator
 

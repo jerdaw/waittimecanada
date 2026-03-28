@@ -60,7 +60,7 @@ Netlify should now be treated as rollback-only for the frontend, and GitHub Acti
 
 ## Next Steps
 
-**Admissions strengthening plan active (2026-03-26).** Production launch verification is complete. Immediate work now shifts to credibility artifacts and post-launch follow-through: A6/A7 (case study + quantified findings) and B2/B5 (analytics + discoverability). A1 (README mission/equity/stewardship section) is now delivered. A3 (Zenodo DOI), A4 (stakeholder outreach), and B3 (LinkedIn launch) remain in scope but are held until explicit user go-ahead; B4 (video walkthrough) has been intentionally de-scoped. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
+**Admissions strengthening plan active (2026-03-26).** Production launch verification is complete. Immediate work now shifts to remaining internal credibility artifacts and selective follow-through. A1, A6, A7, B5, C4, and C5 are now delivered. A3 (Zenodo DOI), A4 (stakeholder outreach), and B3 (LinkedIn launch) remain in scope but are held until explicit user go-ahead; B4 (video walkthrough) has been intentionally de-scoped. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
 
 **Parallel ops track (2026-03-26):** keep the VPS frontend stable, watch Neon transfer after the new read-cache guardrails, and treat backend migration as deferred pending an Ontario reachability investigation for the VPS path.
 
@@ -152,7 +152,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P1 / C2: Targeted researcher outreach** — 3 specific researchers at ICES/INSPQ/university labs; share technical report. Not active while the C1 draft remains internal-only. (3 h + response time)
 - [ ] **P1 / C3: Equity layer interpretive summary** — First draft now exists inside the C1 draft report. Keep it internal-only with C1 for now. (merged with C1)
 - [x] **P2 / C4: Operational transparency report** — First monthly report added at `docs/operations/reports/2026-03-operational-report.md` on 2026-03-28, including the current cadence/KPI mismatch caveat.
-- [ ] **P2 / C5: Incident post-mortem** — Quebec zero-value parser incident; write for interview preparation (1–2 h)
+- [x] **P2 / C5: Incident post-mortem** — Added `docs/operations/incident-reports/2026-02-19-quebec-zero-value.md` on 2026-03-28, documenting the zero-value validation/persistence mismatch, resolution, and later occupancy-suppression follow-up
 - [ ] **P2 / C6: Named reviewer acknowledgement** — If A4 or C2 produces a willing reviewer, add Acknowledgements to README (30 min; conditional)
 
 ### Phase D: Deferred — If Time Permits
