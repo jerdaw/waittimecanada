@@ -183,6 +183,8 @@ Thanks,
 - [x] Feedback log template prepared (`docs/stakeholder-feedback.md`)
 - [x] Testimonial UI/data pipeline prepared (`frontend/components/Testimonial.tsx`, `frontend/content/stakeholderTestimonials.ts`)
 
+**Current posture:** Parked until explicit user go-ahead.
+
 ---
 
 ## 🟢 READY: Screenshot Capture for Portfolio

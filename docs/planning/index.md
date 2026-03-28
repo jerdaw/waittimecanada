@@ -19,6 +19,11 @@ This section contains the project planning control plane.
 - `docs/planning/public-health-data-hub-freshness-safety-rules.md`
 - `docs/planning/public-health-data-hub-municipal-inspection-pilot-decision.md`
 
+## Active Operational Artifacts
+
+- `docs/operations/reports/2026-03-operational-report.md`
+- `docs/operations/incident-reports/2026-02-19-quebec-zero-value.md`
+
 ## Archived Public Health Hub Batch A Planning Docs
 
 - `docs/planning/implementation/archived/public-health-data-hub-batch-a-plan.md`

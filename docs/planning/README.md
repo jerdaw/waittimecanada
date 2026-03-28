@@ -18,6 +18,11 @@ This directory is the planning control plane for Wait Time Canada.
 - `docs/planning/public-health-data-hub-freshness-safety-rules.md`
 - `docs/planning/public-health-data-hub-municipal-inspection-pilot-decision.md`
 
+## Active Operational Artifacts
+
+- `docs/operations/reports/2026-03-operational-report.md`
+- `docs/operations/incident-reports/2026-02-19-quebec-zero-value.md`
+
 ## Archived Milestone Plans
 
 - `docs/planning/implementation/archived/public-health-data-hub-batch-a-plan.md` (closed, delivered)
@@ -55,4 +60,4 @@ These documents are retained for context and may not match current implementatio
 3. Archive implementation plans once a milestone is delivered and no longer actively edited.
 4. Keep completed milestone details in archived files; keep roadmap focused on active next steps.
 
-Last Updated: 2026-03-27
+Last Updated: 2026-03-28

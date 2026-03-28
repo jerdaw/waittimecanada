@@ -13,6 +13,11 @@ Wait Time Canada is a clinically defensible Health Systems Observatory for audit
 
 As of **2026-03-26**, the frontend is live on the shared VPS at `https://wait-time.ca`, `https://www.wait-time.ca` redirects to the canonical host, and the backend scheduler path remains on GitHub Actions. See `docs/operations/direct-vps-frontend.md` and `docs/planning/roadmap.md`.
 
+## Current Operations Artifacts
+
+- Monthly operations review: `docs/operations/reports/2026-03-operational-report.md`
+- Incident report: `docs/operations/incident-reports/2026-02-19-quebec-zero-value.md`
+
 ## Safety
 
 This project does **not** provide medical advice. For emergencies, call **911**.

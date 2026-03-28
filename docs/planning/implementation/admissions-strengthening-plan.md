@@ -17,12 +17,12 @@
 **Evidence of use:** Still minimal. There are no completed stakeholder interviews yet, no published testimonials, no user analytics, no external citations, and no GitHub community signals. The placeholder Zenodo DOI has been removed from README, but no real DOI has been registered yet. The important launch gate is now cleared: `https://wait-time.ca` is live with valid HTTPS and verified redirects, so Phase B can focus on public-facing follow-through rather than infrastructure rescue.
 
 **Biggest gaps:**
-1. No meaningful public engagement yet — the canonical URL is live, but launch artifacts and stakeholder interaction still lag the engineering maturity.
+1. No meaningful public engagement yet — the canonical URL is live, but stakeholder interaction and outward-facing launch activity still lag the engineering maturity.
 2. No real-world human engagement — zero completed stakeholder conversations.
-3. No published academic or semi-academic output.
-4. Placeholder DOI undermines the "citable software" claim.
-5. The health equity analysis covers only Ontario — the Advocate claim is narrow.
-6. The README still lacks a clear public-facing mission, equity/EDIA posture, and stewardship statement that explains why the project matters beyond its engineering.
+3. No published academic or semi-academic output beyond internal drafts.
+4. No real Zenodo DOI has been activated yet, so the citable-software path remains parked.
+5. The health equity analysis still covers only Ontario — the Advocate claim remains narrower than the rest of the platform.
+6. Several outward-facing items are intentionally parked by choice (`A3`, `A4`, `B3`, outward `C1/C2`), which keeps quality high but also keeps external signal lower than the engineering maturity.
 
 ---
 
@@ -130,7 +130,7 @@ If the raw numbers are still early or modest, lead with operational metrics (upt
 
 **Artifact:** "By the Numbers" section in README; specific figures for ABS entries.
 
-**Phase A total: ~12–15 hours. Remaining items are still valuable even after launch because they improve interpretability and ownership.**
+**Phase A total:** mostly delivered. Remaining Phase A work is intentionally parked (`A3`, `A4`) rather than active.
 
 ---
 
@@ -183,7 +183,7 @@ Add repository topic tags (`health-systems`, `emergency-medicine`, `wait-times`,
 
 **Artifact:** GitHub topic tags and homepage link; no external directory submission for now.
 
-**Phase B total: ~2–3 hours remaining post-launch plus any parked work (B1 and B5 delivered).**
+**Phase B total:** mostly delivered or intentionally deferred. Remaining work is a future telemetry decision (`B2`) plus the parked manual launch post (`B3`).
 
 ---
 
@@ -257,7 +257,7 @@ Don't inflate titles. A 20-minute methodology review conversation makes someone 
 
 **Artifact:** Acknowledgements section in README (conditional).
 
-**Phase C total: ~2–3 days of work over 2–3 weeks.**
+**Phase C total:** partially delivered. `C1/C3` exist as internal drafts, `C4/C5` are delivered, `C2` remains parked while the report stays internal-only, and `C6` remains conditional on future reviewer activity.
 
 ---
 

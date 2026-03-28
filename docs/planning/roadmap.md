@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-03-27)
+## Current Status (Updated 2026-03-28)
 
 **Progress:** Public Health Hub Batch A Live (2026-03-27) | Production Domain Launch Complete (2026-03-12) | M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Ontario Timeout Hardening Verified In Production (2026-03-21) | Bounded Cleanup Runtime Verified In Production (2026-03-23) | Frontend Neon Transfer Guardrails Deployed In Production (2026-03-26) | Codecov Coverage Rollout Complete (2026-03-16) | CI/Tooling Maintenance Complete (2026-02-23) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived
 
@@ -60,7 +60,7 @@ Netlify should now be treated as rollback-only for the frontend, and GitHub Acti
 
 ## Next Steps
 
-**Admissions strengthening plan active (2026-03-26).** Production launch verification is complete. Immediate work now shifts to remaining internal credibility artifacts and selective follow-through. A1, A6, A7, B5, C4, and C5 are now delivered. A3 (Zenodo DOI), A4 (stakeholder outreach), and B3 (LinkedIn launch) remain in scope but are held until explicit user go-ahead; B4 (video walkthrough) has been intentionally de-scoped. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
+**Admissions strengthening plan active (2026-03-28).** Production launch verification is complete and the internal credibility pass is materially further along. A1, A2, A6, A7, B5, C4, and C5 are delivered; C1/C3 exist as internal-only drafts. A3 (Zenodo DOI), A4 (stakeholder outreach), and B3 (LinkedIn launch) remain intentionally parked until explicit user go-ahead; B4 (video walkthrough) and A5 (private reflection document) have been intentionally de-scoped. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
 
 **Parallel ops track (2026-03-26):** keep the VPS frontend stable, watch Neon transfer after the new read-cache guardrails, and treat backend migration as deferred pending an Ontario reachability investigation for the VPS path.
 
@@ -492,9 +492,9 @@ Archived (delivered):
 
 | Phase | Timeline | Items | Effort |
 |-------|----------|-------|--------|
-| **A: Credibility Cleanup** | Active | A1–A7 (mission/equity/stewardship, limitations, Zenodo DOI, stakeholder outreach, case study, metrics; A5 intentionally de-scoped) | ~10–13 h remaining |
-| **B: Launch Follow-Through** | Active | B2, B3 (analytics and LinkedIn; B4 intentionally de-scoped, B5 delivered) | ~2–2.5 h remaining plus any parked work |
-| **C: Scholarly Artifacts** | Weeks 2–4 post-launch | C1–C6 (technical report, researcher outreach, equity interpretation, ops report, post-mortem, reviewer) | ~2–3 d |
+| **A: Credibility Cleanup** | Mostly delivered | A1, A2, A6, A7 delivered; A3 and A4 parked; A5 intentionally de-scoped | Parked work only |
+| **B: Launch Follow-Through** | Selective / deferred | B5 delivered; B2 re-scoped for future first-party telemetry; B3 parked; B4 intentionally de-scoped | Low until reactivated |
+| **C: Scholarly Artifacts** | Internal pass largely complete | C1/C3 drafted internally; C4/C5 delivered; C2 parked while C1 stays internal; C6 conditional | Mostly conditional |
 | **D: If Time Permits** | Weeks 5–12 | D1–D5 (comparability matrix, QC equity, freshness indicators, NS scraper, grant/competition) | Variable |
 
-**Next Action:** Keep A3, A4, B3, and outward C1/C2 movement parked until explicitly activated. In the meantime, prioritize the remaining internal/non-outreach artifacts and ops reporting work.
+**Next Action:** Keep A3, A4, B3, and outward C1/C2 movement parked until explicitly activated. The next user-guided review should decide which remaining parked or conditional human-facing items stay on the roadmap versus being de-scoped; the strongest non-human follow-on remains D12 if the focus returns to engineering/ops.

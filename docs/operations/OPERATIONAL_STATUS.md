@@ -1,7 +1,12 @@
 # Operational Status Report
 
+> Historical snapshot: this document reflects the production posture review from **2026-03-21**.
+> For the current live state, use `docs/planning/roadmap.md`,
+> `docs/operations/reports/2026-03-operational-report.md`,
+> `docs/operations/direct-vps-frontend.md`, and `docs/operations/direct-vps-backend.md`.
+
 **Date:** 2026-03-21
-**Status:** ✅ Frontend Live On VPS | ✅ GitHub Actions Backend Operational | ⚠️ VPS Backend Deferred
+**Status:** Historical operational snapshot
 
 **Frontend addendum (2026-03-13):** `https://wait-time.ca` is now live on the shared VPS behind host Caddy, `https://www.wait-time.ca` redirects to the canonical host through Caddy, and production smoke checks pass against the canonical domain.
 

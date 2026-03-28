@@ -74,8 +74,8 @@ This sequence preserves the current identity while making the project:
 
 ## Public Health Data Hub Expansion
 
-An additional strategic direction emerged from the internal AI research scans in
-`docs/research/ai-deep-research/`.
+An additional strategic direction emerged from the internal exploratory source scans in
+`docs/research/source-discovery-scans/`.
 
 The initial planning funnel for that track is now archived in
 `docs/planning/archive/public-health-data-hub-preplan.md`, and the first
@@ -488,9 +488,9 @@ Engineering maturity is already strong. Evidence of real-world review and reuse 
 
 ---
 
-## Synthesis From Internal AI Research
+## Synthesis From Internal Source Scans
 
-The internal scans in `docs/research/ai-deep-research/` are directionally useful but should be treated
+The internal scans in `docs/research/source-discovery-scans/` are directionally useful but should be treated
 as **research leads, not final source-of-truth validation**.
 
 The strongest takeaways from those scans are:
@@ -520,7 +520,7 @@ Any source chosen from those research notes should still go through manual valid
 3. Add a "By the Numbers" section grounded in real measurement and ontology counts
 4. Publish monthly data snapshots with a manifest and checksums
 5. Add a researcher starter kit with one notebook and one DuckDB example
-6. Review the AI research outputs and convert the best data-hub candidates into a validated source shortlist
+6. Review the exploratory source-scan outputs and convert the best data-hub candidates into a validated source shortlist
 
 ### 6-Week Bets
 

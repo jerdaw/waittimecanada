@@ -334,5 +334,5 @@ If those outputs are not present, the planning effort is not complete enough to 
 - It is intended primarily for **strategic decision-making**
 - It should stop at **framework + prioritized funnel**, not full milestone design
 - It assumes a **12-month program horizon**
-- It assumes the AI research outputs are **inputs, not source-of-truth evidence**
+- It assumes the exploratory source-scan outputs are **inputs, not source-of-truth evidence**
 - It assumes Ontario-first remains the default scope unless later validation strongly supports expansion
