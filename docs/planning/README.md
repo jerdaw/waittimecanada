@@ -16,6 +16,7 @@ This directory is the planning control plane for Wait Time Canada.
 - `docs/planning/post-launch-growth-strategy.md`
 - `docs/planning/public-health-data-hub-metadata-contract.md`
 - `docs/planning/public-health-data-hub-freshness-safety-rules.md`
+- `docs/planning/public-health-data-hub-municipal-inspection-pilot-decision.md`
 
 ## Archived Milestone Plans
 

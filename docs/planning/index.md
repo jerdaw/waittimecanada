@@ -17,6 +17,7 @@ This section contains the project planning control plane.
 - `docs/planning/post-launch-growth-strategy.md`
 - `docs/planning/public-health-data-hub-metadata-contract.md`
 - `docs/planning/public-health-data-hub-freshness-safety-rules.md`
+- `docs/planning/public-health-data-hub-municipal-inspection-pilot-decision.md`
 
 ## Archived Public Health Hub Batch A Planning Docs
 
