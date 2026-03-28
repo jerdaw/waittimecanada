@@ -194,6 +194,8 @@ Add repository topic tags (`health-systems`, `emergency-medicine`, `wait-times`,
 
 Write a 2–4 page structured report: *"Methodological Heterogeneity in Canadian Emergency Department Wait-Time Reporting: A Four-Province Audit."*
 
+**Status:** Draft completed on 2026-03-28 at `docs/research/methodological-heterogeneity-four-province-audit-draft.md`. External read-through is still required before treating C1 as a finalized public scholarly artifact.
+
 **Check existing files first:** `docs/'Canadian ER Wait Time Data Audit.docx'` may be partially complete.
 
 **Structure:** Background → The Measurement Problem → Methodology (metric ontology) → Findings (specific divergences, within-province observations) → Equity Layer Analysis (descriptive association → limitations → required study design) → Limitations → Implications.
@@ -219,6 +221,8 @@ Don't cold-email Ontario Health's general inbox — target individuals whose wor
 Write as a section of the technical report (C1), not standalone. **The limitations ARE the finding.** Structure as: descriptive association → four specific reasons this cannot be interpreted causally (ecological fallacy, 2021/2025 temporal mismatch, confounders, census tract ≠ neighborhood) → what study design would answer the causal question.
 
 A structured analysis of what you *cannot* conclude from this data is a stronger Scholar signal than a finding that ignores those limits.
+
+**Status:** First draft section completed on 2026-03-28 inside `docs/research/methodological-heterogeneity-four-province-audit-draft.md`. Final status should remain tied to C1 review/publication.
 
 **Artifact:** Equity analysis section in technical report.
 

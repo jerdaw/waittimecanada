@@ -148,9 +148,9 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 ### Phase C: After Verified Launch — Scholarly Artifacts & External Validation
 [Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
 
-- [ ] **P1 / C1: Technical report** — 2–4 page “Methodological Heterogeneity in Canadian ED Wait-Time Reporting”; gate publication on external read-through (1–2 d)
+- [ ] **P1 / C1: Technical report** — Draft completed at `docs/research/methodological-heterogeneity-four-province-audit-draft.md` on 2026-03-28. External read-through still required before this becomes the finalized public scholarly artifact. (1–2 d)
 - [ ] **P1 / C2: Targeted researcher outreach** — 3 specific researchers at ICES/INSPQ/university labs; share technical report (3 h + response time)
-- [ ] **P1 / C3: Equity layer interpretive summary** — Section in technical report; limitations ARE the finding (merged with C1)
+- [ ] **P1 / C3: Equity layer interpretive summary** — First draft now exists inside the C1 draft report. Keep pending until the technical report has had external read-through and finalization. (merged with C1)
 - [ ] **P2 / C4: Operational transparency report** — One monthly report from DB tables; honest about cost-control mode (2 h)
 - [ ] **P2 / C5: Incident post-mortem** — Quebec zero-value parser incident; write for interview preparation (1–2 h)
 - [ ] **P2 / C6: Named reviewer acknowledgement** — If A4 or C2 produces a willing reviewer, add Acknowledgements to README (30 min; conditional)
