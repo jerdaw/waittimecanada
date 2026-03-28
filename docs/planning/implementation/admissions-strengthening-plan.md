@@ -24,6 +24,24 @@
 5. The health equity analysis still covers only Ontario — the Advocate claim remains narrower than the rest of the platform.
 6. Several outward-facing items are intentionally parked by choice (`A3`, `A4`, `B3`, outward `C1/C2`), which keeps quality high but also keeps external signal lower than the engineering maturity.
 
+## Current Posture
+
+The remaining human-facing items now fall into three buckets:
+
+1. **Parked by choice**
+   - `A3` Zenodo DOI
+   - `A4` stakeholder outreach
+   - `B3` LinkedIn launch post
+   - outward `C1/C2` publication and reviewer outreach
+2. **Internal-only assets**
+   - `C1` technical report draft
+   - `C3` equity interpretation inside that draft
+3. **Conditional / later**
+   - `B2` first-party privacy-safe telemetry, but only after the VPS/logging path is mature enough to justify it
+   - `C6` named reviewer acknowledgement, only if future outreach naturally produces it
+
+This means the plan remains useful, but most remaining work is now governed by activation decisions rather than immediate execution.
+
 ---
 
 ## Guiding Principles
@@ -148,7 +166,7 @@ Delivered on **2026-03-12**: custom-domain TLS + redirect validation completed, 
 
 Do not add paid or third-party analytics. If this work is activated later, implement only minimal first-party aggregate usage telemetry from the direct-VPS path once that runtime is the settled long-term baseline for the project. The goal is stewardship, not marketing instrumentation.
 
-**Status:** Re-scoped on 2026-03-28 away from Plausible/third-party analytics. Keep on the roadmap, but do not treat it as immediate work until direct-VPS usage telemetry becomes clearly worth the effort.
+**Status:** Re-scoped on 2026-03-28 away from Plausible/third-party analytics. Keep on the roadmap as a later VPS/logging stewardship item, not an active near-term deliverable.
 
 **Guardrails:** No cookies, no cross-site tracking, no user profiling, no advertising identifiers, and no vendor cost. Prefer aggregated ingress/log-derived reporting over client-side scripts.
 
@@ -204,7 +222,7 @@ Write a 2–4 page structured report: *"Methodological Heterogeneity in Canadian
 
 The comparison class for "Scholar" is other pre-med students, not JAMA. No other pre-med applicant will have a written methodological analysis of interprovincial ER data reporting.
 
-**Artifact:** Public, citable document with stable URL; SSRN deposit record or GitHub Pages link.
+**Artifact:** Internal draft for now. Only becomes a public, citable document with a stable URL if the outward review/publication path is explicitly activated later.
 
 ### C2: Targeted Researcher Outreach
 **Priority:** 6 | **Effort:** 3 h + response time | **CanMEDS:** Collaborator, Scholar
@@ -213,7 +231,7 @@ Identify 3 specific researchers at ICES, INSPQ, or university health informatics
 
 Don't cold-email Ontario Health's general inbox — target individuals whose work you've read. Canadian health informatics is a small community where informed, targeted outreach can get a response.
 
-**Status:** Not active while the C1 draft remains internal-only.
+**Status:** Parked by choice while the C1 draft remains internal-only.
 
 **Artifact:** Documented outreach log; potentially a named reviewer in Acknowledgements.
 
@@ -257,6 +275,8 @@ Don't inflate titles. A 20-minute methodology review conversation makes someone 
 
 **Artifact:** Acknowledgements section in README (conditional).
 
+**Status:** Conditional only. Do not pursue independently.
+
 **Phase C total:** partially delivered. `C1/C3` exist as internal drafts, `C4/C5` are delivered, `C2` remains parked while the report stays internal-only, and `C6` remains conditional on future reviewer activity.
 
 ---
@@ -290,27 +310,22 @@ Add `last_updated` timestamp and age indicator to hospital cards and export CSV.
 
 ---
 
-## Expected Outcome by Week 6
+## Current Outcome
 
-If Phases A–C execute on schedule, by mid-April 2026 the portfolio includes:
+As of late March 2026, this plan has produced:
 
-- A live, professional URL at `wait-time.ca` with current published data
-- A clear public-facing mission, equity/EDIA, and stewardship statement
-- A real Zenodo DOI resolving to a real record
-- An honest limitations section demonstrating intellectual maturity
-- At least one documented stakeholder conversation with an ER professional
-- A concrete Ottawa–Gatineau case study ready for any interview
-- Quantified metrics grounded in actual database queries
-- A published LinkedIn post with a public timestamp
-- A consciously skipped video walkthrough, with effort redirected toward higher-value written/public artifacts
-- First-party aggregate usage telemetry, if and when the direct-VPS path makes it worthwhile
-- A 2–4 page technical report reviewed by at least one external reader
-- One monthly operational report
-- One incident post-mortem for interview preparation
-- A consciously skipped private reflection exercise, with time redirected toward higher-value public artifacts
-- Potentially: a named reviewer acknowledged in the README
+- a live, professional URL at `wait-time.ca`
+- a clear public-facing mission, equity/EDIA, and stewardship statement
+- an honest limitations section
+- a concrete Ottawa–Gatineau case study
+- quantified methodology findings grounded in real platform data
+- a technical report draft retained internally for now
+- one monthly operational report
+- one incident post-mortem for interview preparation
+- deliberately skipped lower-value items (`A5`, `B4`)
+- deliberately parked outward-facing items (`A3`, `A4`, `B3`, outward `C1/C2`)
 
-Total effort: approximately 5–6 days of focused work spread across 6 weeks.
+The remaining value in this plan is now mostly optional activation work rather than missing foundational artifacts.
 
 ---
 
@@ -326,5 +341,5 @@ Key insights from the analysis:
 - The engineering foundation is already excellent. The gap is almost entirely in **real-world engagement, external validation, and public-facing artifacts**.
 - Items 2 (stakeholder interview) and 8 (README mission/equity/stewardship section) are the two highest-ROI actions. A1 is now delivered; A4 should remain parked until explicitly activated.
 - The technical report (C1) is the anchor scholarly artifact — the case study, findings, and equity interpretation all feed into it.
-- Usage analytics should be added immediately after deployment to establish baseline data, but numbers should not be publicized until they tell a good story.
+- Usage analytics should remain a later, first-party VPS/logging decision rather than an immediate post-launch task.
 - Phase D items are genuinely optional for admissions purposes and should not compete with Phase A–C execution.

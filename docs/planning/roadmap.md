@@ -137,10 +137,10 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [x] **P1 / A6: Ottawa–Gatineau case study** — Added the case study artifact, linked it from README/application summary, and verified the Ottawa/Gatineau pair against live production data on 2026-03-28
 - [x] **P1 / A7: Quantified metrics & methodology findings** — Added a dated "By the Numbers" section to README using operational and ontology-level findings only, with no cross-province performance claims
 
-### Phase B: Active Launch Cleanup
+### Phase B: Parked / Later Launch Items
 [Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
 
-- [ ] **P2 / B2: First-party privacy-safe usage telemetry** — Re-scoped away from Plausible/third-party analytics on 2026-03-28. If activated later, use minimal first-party aggregate telemetry from the direct-VPS/logging path, then update `/privacy` accordingly. Do not add paid analytics or client-side tracking scripts. (2 h)
+- [ ] **P2 / B2: First-party privacy-safe usage telemetry** — Re-scoped away from Plausible/third-party analytics on 2026-03-28. If activated later, use minimal first-party aggregate telemetry from the direct-VPS/logging path, then update `/privacy` accordingly. Do not add paid analytics or client-side tracking scripts. This is a later/VPS-maturity item, not near-term work. (2 h)
 - [ ] **P1 / B3: Publish LinkedIn launch post** — Draft refreshed for the live mission/equity/stewardship posture and current feature set; remaining work is manual publication using `https://wait-time.ca`. `Hold until explicit user go-ahead.` (30 min)
 - [x] **P3 / B4: Video walkthrough** — Intentionally de-scoped on 2026-03-28. Kept out of active scope because the time cost and presentation burden are not justified right now relative to other work. Revisit only if future application needs make the payoff clearer.
 - [x] **P2 / B5: GitHub topics & discoverability** — Delivered 2026-03-28. GitHub homepage now points to `https://wait-time.ca`, subject-matter topics were tightened, and a quick registry screen found no worthwhile immediate external listing step.
@@ -149,11 +149,11 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 [Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
 
 - [ ] **P1 / C1: Technical report** — Draft completed at `docs/research/methodological-heterogeneity-four-province-audit-draft.md` on 2026-03-28. Keep it as an internal draft for now; do not move to external review/publication until that path is explicitly reactivated. (1–2 d)
-- [ ] **P1 / C2: Targeted researcher outreach** — 3 specific researchers at ICES/INSPQ/university labs; share technical report. Not active while the C1 draft remains internal-only. (3 h + response time)
+- [ ] **P1 / C2: Targeted researcher outreach** — 3 specific researchers at ICES/INSPQ/university labs; share technical report. Parked by choice while the C1 draft remains internal-only. (3 h + response time)
 - [ ] **P1 / C3: Equity layer interpretive summary** — First draft now exists inside the C1 draft report. Keep it internal-only with C1 for now. (merged with C1)
 - [x] **P2 / C4: Operational transparency report** — First monthly report added at `docs/operations/reports/2026-03-operational-report.md` on 2026-03-28, including the current cadence/KPI mismatch caveat.
 - [x] **P2 / C5: Incident post-mortem** — Added `docs/operations/incident-reports/2026-02-19-quebec-zero-value.md` on 2026-03-28, documenting the zero-value validation/persistence mismatch, resolution, and later occupancy-suppression follow-up
-- [ ] **P2 / C6: Named reviewer acknowledgement** — If A4 or C2 produces a willing reviewer, add Acknowledgements to README (30 min; conditional)
+- [ ] **P2 / C6: Named reviewer acknowledgement** — If A4 or C2 produces a willing reviewer, add Acknowledgements to README. Conditional only; do not pursue as a standalone task. (30 min)
 
 ### Phase D: Deferred — If Time Permits
 [Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
@@ -481,20 +481,20 @@ Archived (delivered):
 | # | Item | Effort | Status |
 |---|------|--------|--------|
 | 41 | Add CITATION.cff file | S | ✅ Complete |
-| 42 | Add Zenodo integration for DOI | S | ✅ Complete |
-| 45 | Populate stakeholder interview examples | S | ✅ Complete |
+| 42 | Add Zenodo integration for DOI | S | ⏸️ Parked |
+| 45 | Populate stakeholder interview examples | S | ⏸️ Conditional |
 
 ---
 
 **Infrastructure Progress: 36/50 original items completed.** All governance, testing, documentation, and CI/CD infrastructure is in place.
 
-**Current Execution Plan:** [Admissions Strengthening Plan](implementation/admissions-strengthening-plan.md) — 4-phase approach (A/B/C/D) totaling ~5–6 days of focused work over 6 weeks.
+**Current Execution Plan:** [Admissions Strengthening Plan](implementation/admissions-strengthening-plan.md) — now functioning mainly as a decision framework. Most remaining items are parked by choice, internal-only, or conditional.
 
 | Phase | Timeline | Items | Effort |
 |-------|----------|-------|--------|
 | **A: Credibility Cleanup** | Mostly delivered | A1, A2, A6, A7 delivered; A3 and A4 parked; A5 intentionally de-scoped | Parked work only |
-| **B: Launch Follow-Through** | Selective / deferred | B5 delivered; B2 re-scoped for future first-party telemetry; B3 parked; B4 intentionally de-scoped | Low until reactivated |
-| **C: Scholarly Artifacts** | Internal pass largely complete | C1/C3 drafted internally; C4/C5 delivered; C2 parked while C1 stays internal; C6 conditional | Mostly conditional |
+| **B: Launch Follow-Through** | Selective / deferred | B5 delivered; B2 is a later/VPS-maturity item; B3 parked; B4 intentionally de-scoped | Low until reactivated |
+| **C: Scholarly Artifacts** | Internal pass largely complete | C1/C3 retained as internal assets; C4/C5 delivered; C2 parked by choice; C6 conditional only | Mostly conditional |
 | **D: If Time Permits** | Weeks 5–12 | D1–D5 (comparability matrix, QC equity, freshness indicators, NS scraper, grant/competition) | Variable |
 
-**Next Action:** Keep A3, A4, B3, and outward C1/C2 movement parked until explicitly activated. The next user-guided review should decide which remaining parked or conditional human-facing items stay on the roadmap versus being de-scoped; the strongest non-human follow-on remains D12 if the focus returns to engineering/ops.
+**Next Action:** Keep `A3`, `A4`, `B3`, and outward `C1/C2` movement parked by choice. Retain `C1/C3` as internal-only assets, treat `B2` as later/VPS-dependent, and leave `C6` conditional only. If focus returns to engineering/ops, `D12` remains the strongest concrete next item.
