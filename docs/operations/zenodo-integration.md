@@ -1,8 +1,8 @@
 # Zenodo DOI Integration Guide
 
-> **⚠️ Status: Repo Prepared, Zenodo Activation Still Required**
+> **⏸️ Status: Repo Prepared, External Activation Parked**
 >
-> The repository and release side are prepared, but the real DOI does **not** exist yet. A human with access to the GitHub/Zenodo accounts must complete Zenodo activation and publish the record.
+> The repository and release side are prepared, but the real DOI does **not** exist yet. The remaining Zenodo activation and publication steps are intentionally parked until explicit user go-ahead.
 
 ## Overview
 
@@ -14,7 +14,7 @@ This guide walks you through linking your GitHub repository to Zenodo to generat
 - ✅ Current public release prepared on GitHub
 - ⏸️ Zenodo activation and publication still require human account access
 
-**What's Left:** 🔄 Human action required in Zenodo (about 10 minutes)
+**What's Left:** 🔄 Human action required in Zenodo (about 10 minutes) once this track is explicitly activated
 
 ---
 

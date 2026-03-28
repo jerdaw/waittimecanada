@@ -60,7 +60,7 @@ Netlify should now be treated as rollback-only for the frontend, and GitHub Acti
 
 ## Next Steps
 
-**Admissions strengthening plan active (2026-03-26).** Production launch verification is complete. Immediate work now shifts to credibility artifacts and post-launch follow-through: A3 (real Zenodo DOI), A6/A7 (case study + quantified findings), and B2-B4 (analytics, launch post, walkthrough). A1 (README mission/equity/stewardship section) is now delivered. A4 (stakeholder outreach) remains in scope but is held until explicit user go-ahead. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
+**Admissions strengthening plan active (2026-03-26).** Production launch verification is complete. Immediate work now shifts to credibility artifacts and post-launch follow-through: A6/A7 (case study + quantified findings) and B2-B4 (analytics, launch post, walkthrough). A1 (README mission/equity/stewardship section) is now delivered. A3 (Zenodo DOI) and A4 (stakeholder outreach) remain in scope but are held until explicit user go-ahead. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
 
 **Parallel ops track (2026-03-26):** keep the VPS frontend stable, watch Neon transfer after the new read-cache guardrails, and treat backend migration as deferred pending an Ontario reachability investigation for the VPS path.
 
@@ -131,7 +131,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 
 - [x] **P1 / A1: Mission, equity, and stewardship section in README** — Replace the maintainer blurb with a public-facing mission/equity/stewardship statement aligned to the site's official posture
 - [x] **P1 / A2: Limitations section in README** — Specific, technical limitations demonstrating intellectual maturity (delivered in README + application summary)
-- [ ] **P1 / A3: Fix placeholder Zenodo DOI** — Repo-side preparation is complete (`CITATION.cff`, `.zenodo.json`, current GitHub release). Remaining work is Zenodo account activation, publish, and then restoring the README badge once the DOI is real
+- [ ] **P1 / A3: Fix placeholder Zenodo DOI** — Repo-side preparation is complete (`CITATION.cff`, `.zenodo.json`, current GitHub release). Remaining work is Zenodo account activation, publish, and then restoring the README badge once the DOI is real. `Hold until explicit user go-ahead.`
 - [ ] **P1 / A4: Stakeholder interview outreach** — Send 10–15 outreach messages to ER professionals using existing templates (2–3 h outreach; interviews on their schedule). `Hold until explicit user go-ahead.`
 - [ ] **P1 / A5: Private reflection document** — ABS/interview prep; motivation, decisions, surprises, ethical tensions (2 h; not committed to repo)
 - [x] **P1 / A6: Ottawa–Gatineau case study** — Added the case study artifact, linked it from README/application summary, and verified the Ottawa/Gatineau pair against live production data on 2026-03-28
@@ -496,4 +496,4 @@ Archived (delivered):
 | **C: Scholarly Artifacts** | Weeks 2–4 post-launch | C1–C6 (technical report, researcher outreach, equity interpretation, ops report, post-mortem, reviewer) | ~2–3 d |
 | **D: If Time Permits** | Weeks 5–12 | D1–D5 (comparability matrix, QC equity, freshness indicators, NS scraper, grant/competition) | Variable |
 
-**Next Action:** Keep A4 parked until explicitly activated. In the meantime, prioritize A3 (real Zenodo DOI) and B3 (publish the launch post).
+**Next Action:** Keep A3 and A4 parked until explicitly activated. In the meantime, prioritize B3 (publish the launch post) and the remaining non-Zenodo credibility/communication items.
