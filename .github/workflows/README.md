@@ -108,7 +108,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 **Trigger:** currently manual dispatch only (scheduled cron temporarily paused due to GitHub Actions quota exhaustion).
 
-**Purpose:** Verify public production routes respond with expected markers.
+**Purpose:** Verify public production routes respond with expected markers, including the public-health-hub `/resources` surface and its Batch A APIs.
 
 **Optimization controls:**
 - Single concurrency group with cancellation for stale overlapping runs.

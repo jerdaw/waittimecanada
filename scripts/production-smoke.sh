@@ -17,6 +17,11 @@ declare -a PATHS=(
   "/methods"
   "/data-quality"
   "/analytics"
+  "/resources"
+  "/api/resources/alerts?limit=1"
+  "/api/resources?kind=aed&province=ON&limit=1"
+  "/api/resources?kind=facility&province=ON&q=Toronto%20General&limit=1"
+  "/api/resources/aqhi?latitude=43.6532&longitude=-79.3832"
 )
 
 declare -a EXPECTED_TEXT=(
@@ -24,6 +29,11 @@ declare -a EXPECTED_TEXT=(
   "Understanding Wait Time Metrics"
   "Data Quality &amp; Provenance"
   "Analytics Dashboard"
+  "Safety alerts"
+  "\"source_id\":\"health-canada-recalls\""
+  "\"kind\":\"aed\""
+  "Toronto General Hospital"
+  "\"source_id\":\"aqhi-geomet\""
 )
 
 failures=0
