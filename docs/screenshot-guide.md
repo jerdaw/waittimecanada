@@ -11,7 +11,7 @@
 **Purpose:** Show clean, professional design and value proposition
 **What to capture:**
 - Full viewport showing hero section
-- "Why I Built Wait Time Canada" about section (expanded)
+- "Why Wait Time Canada Exists" mission section (expanded)
 - Map partially visible below
 
 **Settings:**

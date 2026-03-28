@@ -98,13 +98,15 @@ This is interview preparation that produces articulate, reflective answers. The 
 ### A6: Ottawa–Gatineau Case Study
 **Priority:** 2 | **Effort:** 2–3 h | **CanMEDS:** Scholar, Communicator, Health Advocate
 
+**Status:** Delivered 2026-03-28.
+
 Write a 2-page case study documenting the Ottawa–Gatineau methodology divergence. This is the project's clearest, most narratively compelling story: two cities across a provincial border, served by hospitals in two different provincial health systems, with patients who routinely cross the river for care — and reported wait times that measure fundamentally different things.
 
 **Before writing:** Verify that Ottawa-area and Gatineau-area hospitals are active in the database (5 min query). If they're missing, identify the best alternative cross-border pair.
 
 **Structure:** Context (border geography, patient behavior) → Specific metrics from each province → Why comparison is invalid (field-by-field ontology mismatch) → Clinical implication for patients → What a valid comparison would require.
 
-**Artifact:** `docs/case-studies/ottawa-gatineau-divergence.md`; linkable from README and application summary; interview-ready material.
+**Artifact:** `docs/case-studies/ottawa-gatineau-divergence.md`; linked from README and application summary; interview-ready material.
 
 ### A7: Quantified Metrics & Methodology Findings
 **Priority:** 5 | **Effort:** 3 h | **CanMEDS:** Scholar, Leader

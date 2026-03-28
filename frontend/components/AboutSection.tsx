@@ -50,23 +50,8 @@ export function AboutSection() {
             </p>
             <p>{t.rich("p3", { em: (chunks) => <em>{chunks}</em> })}</p>
 
-            <div className="flex items-center gap-6 pt-4 border-t border-slate-200 dark:border-slate-700">
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg"
-                  aria-label={t("aria.avatar")}
-                >
-                  JD
-                </div>
-                <div>
-                  <p className="font-semibold text-slate-900 dark:text-white">
-                    {t("author.name")}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {t("author.role")}
-                  </p>
-                </div>
-              </div>
+            <div className="flex items-center justify-between gap-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+              <p className="text-sm text-muted-foreground">{t("contact")}</p>
               <div className="flex gap-3">
                 <a
                   href="https://github.com/jerdaw/waittimecanada"

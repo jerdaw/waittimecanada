@@ -2,7 +2,7 @@
 
 ## Primary Summary (Applications)
 
-Wait Time Canada is a Health Systems Observatory that audits Canadian emergency department wait-time data across provinces. Rather than treating all wait numbers as directly comparable, the platform applies a strict metric ontology to each measurement (metric family, start event, end event, statistic type) and warns users when cross-hospital comparisons are methodologically invalid. For example, Ontario commonly reports P90 triage-to-physician time, while Quebec reports rolling-average registration-to-physician time; those metrics answer different operational questions and should not be compared as equivalent. The project combines full-stack technical execution (Python scrapers, PostgreSQL, Next.js analytics/dashboard tooling) with clinical defensibility principles: transparent limitations, explicit provenance, safety-oriented communication, and a barrier-reduction approach to public health-system information.
+Wait Time Canada is a Health Systems Observatory that audits Canadian emergency department wait-time data across provinces. Rather than treating all wait numbers as directly comparable, the platform applies a strict metric ontology to each measurement (metric family, start event, end event, statistic type) and warns users when cross-hospital comparisons are methodologically invalid. For example, Ontario's current public feed reports mean triage-to-physician time, while Quebec reports rolling-average registration-to-physician time; those metrics answer different operational questions and should not be compared as equivalent. The project combines full-stack technical execution (Python scrapers, PostgreSQL, Next.js analytics/dashboard tooling) with clinical defensibility principles: transparent limitations, explicit provenance, safety-oriented communication, and a barrier-reduction approach to public health-system information.
 
 ---
 
@@ -43,4 +43,6 @@ The key design choice is to audit and expose heterogeneity rather than normalize
 
 ---
 
-Last Updated: 2026-03-12
+Last Updated: 2026-03-28
+
+Related artifact: [Ottawa–Gatineau methodology divergence case study](case-studies/ottawa-gatineau-divergence.md)

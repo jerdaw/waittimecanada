@@ -397,22 +397,18 @@
     }
   },
   "AboutSection": {
-    "badge": "About This Project",
-    "title": "Why I Built Wait Time Canada",
-    "p1": "As a pre-medical student, I noticed something troubling: Canadian provinces report emergency room wait times using <strong>completely different methodologies</strong>. Ontario measures from triage to physician (90th percentile). Quebec measures from registration to physician (rolling average). These numbers can't be directly compared — but most apps present them side-by-side anyway.",
-    "p2": "<strong>Wait Time Canada is different.</strong> Instead of pretending the data is comparable, we audit it. We tag every measurement with its methodology and warn users when direct comparison is statistically invalid. This is what I call a \"Health Systems Observatory\" — a tool that exposes the black box of healthcare reporting.",
-    "p3": "This project demonstrates my approach to medicine: rigorous methodology, transparent limitations, and a commitment to helping patients make informed decisions — even when that means telling them what we <em>don't</em> know.",
+    "badge": "Mission and Stewardship",
+    "title": "Why Wait Time Canada Exists",
+    "p1": "Canadian provinces publish emergency department information using <strong>different definitions, clocks, and statistics</strong>. Ontario's current public feed reports mean triage-to-physician time, while Quebec reports rolling-average registration-to-physician time. Those numbers answer different operational questions and should not be treated as interchangeable.",
+    "p2": "<strong>Wait Time Canada is a public-interest health systems observatory.</strong> Instead of pretending the data is directly comparable, the project audits it. Every measurement is tagged with methodology, invalid comparisons are flagged, and official-source provenance remains visible.",
+    "p3": "The goal is to reduce barriers to public health-system information with an equity, EDIA, and stewardship lens: clearer definitions, clearer caveats, and more responsible interpretation for patients, clinicians, researchers, journalists, and decision-makers.",
+    "contact": "Project links and contact",
     "aria": {
       "expand": "Expand about section",
       "collapse": "Collapse about section",
-      "avatar": "Author avatar",
       "github": "View on GitHub",
       "linkedin": "LinkedIn profile",
       "email": "Email contact"
-    },
-    "author": {
-      "name": "Jeremy Dawson",
-      "role": "Pre-Medical Student"
     }
   },
   "RegionSelector": {
@@ -426,9 +422,9 @@
   "StructuredData": {
     "faq": {
       "q1": "How does Wait Time Canada measure ER wait times?",
-      "a1": "We aggregate data from provincial health authorities. For Ontario, we report P90 (90th percentile) wait times from triage to physician assessment.",
+      "a1": "We aggregate data from provincial health authorities and preserve the methodology attached to each source. Ontario's current public feed reports mean triage-to-physician wait time, while Quebec reports rolling-average registration-to-physician wait time.",
       "q2": "Why can't I compare Ontario and Quebec wait times directly?",
-      "a2": "Ontario reports P90 (90th percentile) triage-to-physician times, while Quebec reports rolling average registration-to-physician times. These different methodologies mean direct comparison is statistically invalid.",
+      "a2": "Ontario reports mean triage-to-physician times, while Quebec reports rolling-average registration-to-physician times. These different methodologies mean direct comparison is statistically invalid.",
       "q3": "How current is this data?",
       "a3": "We collect from official provincial sources on an automated schedule. In the current cost-control mode, the cross-province scrape cadence is every 4 hours; individual provinces may publish source updates on different intervals."
     },
@@ -736,7 +732,7 @@
       "items": {
         "q1": {
           "question": "Why can't I compare Ottawa and Gatineau directly?",
-          "answer": "Ottawa (Ontario) and Gatineau (Quebec) use different measurement methodologies. Ontario reports 90th percentile triage-to-physician time, while Quebec reports rolling average registration-to-provider time. These differences mean direct comparison would be statistically invalid. Our platform displays a methodology divergence warning when you attempt such comparisons."
+          "answer": "Ottawa (Ontario) and Gatineau (Quebec) use different measurement methodologies. Ontario reports mean triage-to-physician time, while Quebec reports rolling-average registration-to-provider time. These differences mean direct comparison would be statistically invalid. Our platform displays a methodology divergence warning when you attempt such comparisons."
         },
         "q2": {
           "question": "What does '90th percentile' mean in practice?",

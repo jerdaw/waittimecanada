@@ -91,6 +91,7 @@ async function getHospitalWithMeasurement(hospitalId: string) {
       SELECT *
       FROM measurements
       WHERE hospital_id = h.id
+        AND metric_family = 'TIME_TO_PROVIDER'
       ORDER BY timestamp_utc DESC
       LIMIT 1
     ) m ON true

@@ -397,22 +397,18 @@
     }
   },
   "AboutSection": {
-    "badge": "À Propos",
-    "title": "Pourquoi j'ai créé Wait Time Canada",
-    "p1": "En tant qu'étudiant en prémédecine, j'ai remarqué quelque chose de troublant : les provinces canadiennes rapportent les temps d'attente aux urgences en utilisant des <strong>méthodologies complètement différentes</strong>. L'Ontario mesure du triage au médecin (90e centile). Le Québec mesure de l'inscription au médecin (moyenne mobile). Ces chiffres ne peuvent pas être comparés directement, mais la plupart des applications les présentent côte à côte.",
-    "p2": "<strong>Wait Time Canada est différent.</strong> Au lieu de prétendre que les données sont comparables, nous les auditons. Nous marquons chaque mesure avec sa méthodologie et avertissons les utilisateurs lorsque la comparaison directe est statistiquement invalide. C'est ce que j'appelle un « Observatoire des Systèmes de Santé » — un outil qui expose la boîte noire des rapports de santé.",
-    "p3": "Ce projet démontre mon approche de la médecine : méthodologie rigoureuse, transparence sur les limites et engagement à aider les patients à prendre des décisions éclairées, même lorsque cela signifie leur dire ce que nous ne <em>savons pas</em>.",
+    "badge": "Mission et Intendance",
+    "title": "Pourquoi Wait Time Canada existe",
+    "p1": "Les provinces canadiennes publient l'information sur les urgences en utilisant des <strong>définitions, des points de départ et des statistiques différents</strong>. Le flux public actuel de l'Ontario rapporte le temps moyen du triage au médecin, tandis que le Québec rapporte la moyenne mobile de l'inscription au médecin. Ces chiffres répondent à des questions opérationnelles différentes et ne devraient pas être traités comme interchangeables.",
+    "p2": "<strong>Wait Time Canada est un observatoire d'intérêt public des systèmes de santé.</strong> Au lieu de prétendre que les données sont directement comparables, le projet les audite. Chaque mesure est marquée avec sa méthodologie, les comparaisons invalides sont signalées et la provenance des sources officielles demeure visible.",
+    "p3": "L'objectif est de réduire les barrières à l'information sur le système de santé avec une perspective d'équité en santé, d'EDIA et d'intendance : des définitions plus claires, des réserves plus claires et une interprétation plus responsable pour les patients, les cliniciens, les chercheurs, les journalistes et les décideurs.",
+    "contact": "Liens du projet et contact",
     "aria": {
       "expand": "Développer la section à propos",
       "collapse": "Réduire la section à propos",
-      "avatar": "Avatar de l'auteur",
       "github": "Voir sur GitHub",
       "linkedin": "Profil LinkedIn",
       "email": "Contact courriel"
-    },
-    "author": {
-      "name": "Jeremy Dawson",
-      "role": "Étudiant en Prémédecine"
     }
   },
   "RegionSelector": {
@@ -426,9 +422,9 @@
   "StructuredData": {
     "faq": {
       "q1": "Comment Wait Time Canada mesure-t-il les temps d'attente aux urgences ?",
-      "a1": "Nous agrégeons les données des autorités sanitaires provinciales. Pour l'Ontario, nous rapportons les temps d'attente au 90e centile (P90) du triage à l'évaluation par un médecin.",
+      "a1": "Nous agrégeons les données des autorités sanitaires provinciales et conservons la méthodologie associée à chaque source. Le flux public actuel de l'Ontario rapporte le temps moyen du triage au médecin, tandis que le Québec rapporte le temps d'attente moyen mobile de l'inscription au médecin.",
       "q2": "Pourquoi ne puis-je pas comparer directement les temps d'attente de l'Ontario et du Québec ?",
-      "a2": "L'Ontario rapporte les temps P90 (90e centile) du triage au médecin, tandis que le Québec rapporte la moyenne mobile de l'inscription au médecin. Ces méthodologies différentes rendent la comparaison directe statistiquement invalide.",
+      "a2": "L'Ontario rapporte les temps moyens du triage au médecin, tandis que le Québec rapporte la moyenne mobile de l'inscription au médecin. Ces méthodologies différentes rendent la comparaison directe statistiquement invalide.",
       "q3": "À quel point ces données sont-elles à jour ?",
       "a3": "Nous collectons les données des sources provinciales officielles selon un horaire automatisé. Dans le mode actuel de contrôle des coûts, la cadence interprovinciale est de 4 heures; chaque province peut toutefois publier ses propres mises à jour à un rythme différent."
     },
@@ -736,7 +732,7 @@
       "items": {
         "q1": {
           "question": "Pourquoi ne puis-je pas comparer Ottawa et Gatineau directement ?",
-          "answer": "Ottawa (Ontario) et Gatineau (Québec) utilisent des méthodologies de mesure différentes. L'Ontario rapporte le temps triage-médecin au 90e centile, tandis que le Québec rapporte la moyenne mobile inscription-fournisseur. Ces différences signifient qu'une comparaison directe serait statistiquement invalide. Notre plateforme affiche un avertissement de divergence méthodologique lorsque vous tentez de telles comparaisons."
+          "answer": "Ottawa (Ontario) et Gatineau (Québec) utilisent des méthodologies de mesure différentes. L'Ontario rapporte le temps moyen triage-médecin, tandis que le Québec rapporte la moyenne mobile inscription-fournisseur. Ces différences signifient qu'une comparaison directe serait statistiquement invalide. Notre plateforme affiche un avertissement de divergence méthodologique lorsque vous tentez de telles comparaisons."
         },
         "q2": {
           "question": "Que signifie « 90e centile » en pratique ?",

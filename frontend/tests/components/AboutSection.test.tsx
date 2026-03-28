@@ -9,11 +9,11 @@ describe("AboutSection", () => {
     expect(
       screen.getByRole("heading", { name: /Wait Time Canada/i }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/About This Project/i)).toBeInTheDocument();
+    expect(screen.getByText(/Mission and Stewardship/i)).toBeInTheDocument();
 
     // Content should NOT be visible when collapsed by default
     expect(
-      screen.queryByText(/As a pre-medical student/i),
+      screen.queryByText(/different definitions, clocks, and statistics/i),
     ).not.toBeInTheDocument();
   });
 
@@ -26,7 +26,9 @@ describe("AboutSection", () => {
     fireEvent.click(button);
 
     // Content should now be visible
-    expect(screen.getByText(/As a pre-medical student/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/different definitions, clocks, and statistics/i),
+    ).toBeInTheDocument();
   });
 
   it("collapses again when clicked twice", () => {
@@ -36,26 +38,25 @@ describe("AboutSection", () => {
 
     // Expand
     fireEvent.click(button);
-    expect(screen.getByText(/As a pre-medical student/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/different definitions, clocks, and statistics/i),
+    ).toBeInTheDocument();
 
     // Collapse
     fireEvent.click(button);
     expect(
-      screen.queryByText(/As a pre-medical student/i),
+      screen.queryByText(/different definitions, clocks, and statistics/i),
     ).not.toBeInTheDocument();
   });
 
-  it("displays author information when expanded", () => {
+  it("displays project contact label when expanded", () => {
     render(<AboutSection />);
 
     // Expand first
     const button = screen.getByRole("button");
     fireEvent.click(button);
 
-    expect(screen.getByText(/Jeremy Dawson/i)).toBeInTheDocument();
-    // Use getAllByText since "Pre-Medical Student" appears in the narrative too
-    const premedText = screen.getAllByText(/Pre-Medical Student/i);
-    expect(premedText.length).toBeGreaterThan(0);
+    expect(screen.getByText(/Project links and contact/i)).toBeInTheDocument();
   });
 
   it("renders social links when expanded", () => {
@@ -116,7 +117,7 @@ describe("AboutSection", () => {
     fireEvent.click(button);
 
     const strongElements = screen.getAllByText(
-      /completely different methodologies|Wait Time Canada is different/i,
+      /different definitions, clocks, and statistics|Wait Time Canada is a public-interest health systems observatory/i,
     );
     expect(strongElements.length).toBeGreaterThan(0);
   });
