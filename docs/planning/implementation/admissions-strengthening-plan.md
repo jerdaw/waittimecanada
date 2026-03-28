@@ -233,6 +233,8 @@ A structured analysis of what you *cannot* conclude from this data is a stronger
 
 Generate one monthly report from `data_quality_snapshots` and `scraper_status` tables. Be honest about the current hourly GitHub Actions runtime and any alert/recovery incidents. Store in `docs/operations/reports/`. The value is behavioral — demonstrating the practice of systematic operational review, not the specific numbers.
 
+**Status:** First report completed on 2026-03-28 at `docs/operations/reports/2026-03-operational-report.md`.
+
 **Artifact:** `docs/operations/reports/YYYY-MM-operational-report.md`.
 
 ### C5: Incident Post-Mortem

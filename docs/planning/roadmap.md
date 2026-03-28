@@ -151,7 +151,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P1 / C1: Technical report** — Draft completed at `docs/research/methodological-heterogeneity-four-province-audit-draft.md` on 2026-03-28. Keep it as an internal draft for now; do not move to external review/publication until that path is explicitly reactivated. (1–2 d)
 - [ ] **P1 / C2: Targeted researcher outreach** — 3 specific researchers at ICES/INSPQ/university labs; share technical report. Not active while the C1 draft remains internal-only. (3 h + response time)
 - [ ] **P1 / C3: Equity layer interpretive summary** — First draft now exists inside the C1 draft report. Keep it internal-only with C1 for now. (merged with C1)
-- [ ] **P2 / C4: Operational transparency report** — One monthly report from DB tables; honest about cost-control mode (2 h)
+- [x] **P2 / C4: Operational transparency report** — First monthly report added at `docs/operations/reports/2026-03-operational-report.md` on 2026-03-28, including the current cadence/KPI mismatch caveat.
 - [ ] **P2 / C5: Incident post-mortem** — Quebec zero-value parser incident; write for interview preparation (1–2 h)
 - [ ] **P2 / C6: Named reviewer acknowledgement** — If A4 or C2 produces a willing reviewer, add Acknowledgements to README (30 min; conditional)
 
@@ -166,6 +166,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P2 / D7: Official Ontario AED registry path** — Pursue partnership or explicit permission only if it improves coverage without weakening reuse clarity
 - [ ] **P2 / D10: Re-evaluate Ontario naloxone options** — Revisit link-out vs embed vs native ingestion only if reuse rights become clearer or explicit permission is obtained
 - [ ] **P2 / D11: Revisit municipal inspection strategy** — Reopen inspection/compliance work only if broader Ontario multi-jurisdiction coverage or a deliberate Toronto-first sidecar strategy emerges
+- [ ] **P2 / D12: Align public ops KPIs to live scheduler cadence** — Update `/api/status` and `/api/data-quality` so aggregate health reflects the current hourly GitHub Actions cadence and the actually active live source set, rather than the legacy 15-minute expectation model.
 - [ ] **P2 / Occupancy-based recommendations** — Smart hospital suggestions based on current occupancy
 - [ ] **P2 / Monitoring dashboard** — Prometheus/Grafana integration for operational visibility
 - [ ] **P2 / Advanced analytics** — Predictive wait time modeling based on historical patterns
