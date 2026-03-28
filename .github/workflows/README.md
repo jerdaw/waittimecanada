@@ -57,6 +57,11 @@ This directory contains operational and CI workflows for Wait Time Canada.
 **Optimization controls:**
 - Branch-level concurrency cancellation.
 - Coverage uploads to Codecov with the `scrapers` flag.
+- The security job currently delegates to the upstream `PyCQA/bandit-action@v1`
+  composite, which already uses `actions/checkout@v6`,
+  `actions/setup-python@v6`, and `github/codeql-action/upload-sarif@v4`.
+  The older Node 20 / `upload-sarif@v3` warning path has been reconciled and
+  is no longer an active repo-side migration task.
 
 ---
 
