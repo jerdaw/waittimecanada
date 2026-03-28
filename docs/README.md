@@ -14,7 +14,7 @@ This directory is the documentation control plane for Wait Time Canada.
 - Architecture overview: `docs/architecture/index.md`
 - ADRs: `docs/adr/`
 - Current operational report: `docs/operations/reports/2026-03-operational-report.md`
-- Current incident report: `docs/operations/incident-reports/2026-02-19-quebec-zero-value.md`
+- Current incident report: `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`
 - Direct-VPS backend deploy path: `docs/operations/direct-vps-backend.md`
 - Direct-VPS frontend deploy path: `docs/operations/direct-vps-frontend.md`
 - Development setup: `docs/development/setup.md`

@@ -11,12 +11,12 @@ Wait Time Canada is a clinically defensible Health Systems Observatory for audit
 
 ## Deployment Status
 
-As of **2026-03-28**, the frontend is live on the shared VPS at `https://wait-time.ca`, `https://www.wait-time.ca` redirects to the canonical host, the backend scheduler path remains on GitHub Actions, and the latest frontend/docs CI runs are green on `main`. See `docs/operations/direct-vps-frontend.md` and `docs/planning/roadmap.md`.
+As of **2026-03-28**, the frontend is live on the shared VPS at `https://wait-time.ca`, `https://www.wait-time.ca` redirects to the canonical host, and the backend scheduler path remains on GitHub Actions. However, the current production pause point is an external Neon transfer-quota incident that is leaving live DB-backed routes unavailable until quota/reset or DB-path changes restore connectivity. See `docs/operations/direct-vps-frontend.md`, `docs/planning/roadmap.md`, and `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`.
 
 ## Current Operations Artifacts
 
 - Monthly operations review: `docs/operations/reports/2026-03-operational-report.md`
-- Incident report: `docs/operations/incident-reports/2026-02-19-quebec-zero-value.md`
+- Current incident report: `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`
 
 ## Safety
 

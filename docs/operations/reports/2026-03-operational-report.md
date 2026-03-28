@@ -2,7 +2,9 @@
 
 **Date:** 2026-03-28
 **Scope:** Core emergency wait-time platform operations
-**Status:** Frontend live on shared VPS; backend scheduler live on GitHub Actions; public-health `/resources` module live
+**Status:** Historical snapshot for the daytime March 28 review. A later same-day
+production incident left Neon database connectivity blocked by transfer quota;
+see `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`.
 
 ## Executive Summary
 
