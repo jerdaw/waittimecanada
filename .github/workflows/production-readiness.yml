@@ -95,7 +95,7 @@ jobs:
             exit 0
           fi
           set -o pipefail
-          ./scripts/production-smoke.sh | tee smoke-output.txt
+          bash ./scripts/production-smoke.sh | tee smoke-output.txt
 
       - name: Write production smoke summary
         if: ${{ always() && inputs.run_smoke_check }}
