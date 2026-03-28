@@ -2,9 +2,9 @@
 
 ## Current Status (Updated 2026-03-27)
 
-**Progress:** Production Domain Launch Complete (2026-03-12) | M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Ontario Timeout Hardening Verified In Production (2026-03-21) | Bounded Cleanup Runtime Verified In Production (2026-03-23) | Frontend Neon Transfer Guardrails Deployed In Production (2026-03-26) | Codecov Coverage Rollout Complete (2026-03-16) | CI/Tooling Maintenance Complete (2026-02-23) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived
+**Progress:** Public Health Hub Batch A Live (2026-03-27) | Production Domain Launch Complete (2026-03-12) | M33 Complete (Historical Occupancy Trends) | M32 Complete (Deployment Readiness & CSV Divergence) | M31 Complete (Divergence Briefs & Quality Drift UI) | M30 Complete (Scraper Visibility & Reliability Hardening) | M29 Complete (Equity Academic Rigor Hardening) | M23 Complete (Quality & Standardization) | M19 Complete (Governance & Quality) | M18 Complete (Occupancy Frontend UI) | M17 Complete (Quebec Occupancy Implementation) | M16 Complete (Multi-Province Operationalization) | Ontario Timeout Hardening Verified In Production (2026-03-21) | Bounded Cleanup Runtime Verified In Production (2026-03-23) | Frontend Neon Transfer Guardrails Deployed In Production (2026-03-26) | Codecov Coverage Rollout Complete (2026-03-16) | CI/Tooling Maintenance Complete (2026-02-23) | Test Stabilization Complete | Milestone 15 Complete & Archived | Milestone 14 Complete & Archived
 
-**Strategic Direction:** **Admissions strengthening phase remains active (2026-03-27), with the frontend live on the shared VPS and the backend scheduler path still live on GitHub Actions.** Engineering foundation is mature (33 milestones, 821+ passing tests locally, 4 provinces). Focus remains on real-world engagement, external validation, public-facing artifacts, and keeping the VPS frontend path operationally cheap while backend cutover stays deferred until the Ontario source is reachable from the chosen runtime. The GitHub Actions Ontario fetch path now has scraper-specific read-timeout hardening, the manual cleanup workflow enforces 30-day retention without turning maintenance into a 5-minute aggregate backfill, and the live VPS frontend now serves repeat anonymous reads from a short-lived in-process cache to reduce Neon public transfer without changing collection/storage policy. The public-health-data-hub Batch A track now also has an agent-execution-readiness audit, which means implementation can be delegated safely as long as the approved source set and human sign-off gates are preserved. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md), [`public-health-data-hub-agent-execution-readiness.md`](public-health-data-hub-agent-execution-readiness.md), `docs/operations/direct-vps-frontend.md`, and `docs/operations/direct-vps-backend.md`.
+**Strategic Direction:** **Admissions strengthening phase remains active (2026-03-27), with the frontend live on the shared VPS and the backend scheduler path still live on GitHub Actions.** Engineering foundation is mature (33 milestones, 4 provinces, public `/resources` module live). Focus remains on real-world engagement, external validation, public-facing artifacts, and keeping the VPS frontend path operationally cheap while backend cutover stays deferred until the Ontario source is reachable from the chosen runtime. The GitHub Actions Ontario fetch path has scraper-specific read-timeout hardening, the manual cleanup workflow enforces 30-day retention without turning maintenance into a 5-minute aggregate backfill, the live VPS frontend serves repeat anonymous reads from a short-lived in-process cache, and the public-health-hub Batch A module now has production smoke/readiness coverage plus source-specific ingest monitoring and alerting. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md), `docs/operations/direct-vps-frontend.md`, and `docs/operations/direct-vps-backend.md`.
 
 **Deployment Note (2026-03-13):** Frontend hosting is now live on the shared VPS, `https://wait-time.ca` presents a valid Let's Encrypt certificate from Caddy, `https://www.wait-time.ca` redirects to the canonical host, and production smoke passes against the canonical domain.
 
@@ -54,6 +54,7 @@ Netlify should now be treated as rollback-only for the frontend, and GitHub Acti
 | **M31: Divergence Briefs & Quality Drift UI** | Scheduled daily data quality snapshots (cron + CLI), added methodology divergence context to analytics trends API, added 7-Day Quality Drift UI panel to `/data-quality` page |
 | **M32: Deployment Readiness & CSV Divergence** | Injected methodology divergence warnings into raw and aggregated CSV exports, fixed `netlify-ignore.sh` to enforce `[release]` gate logic on `main`, and implemented `release.yml` GitHub Actions workflow for automated version releases |
 | **M33: Historical Occupancy Trends** | Extended aggregation pipeline to include `STRETCHER_OCCUPANCY`, added `metric_family` filtering to analytics trends API and `SystemTrendChart`, collapsible occupancy trend panel on analytics page, DB migration `015`, ADR-0019 |
+| **Public Health Hub Batch A** | Delivered `/resources` with Ontario facility search, OSM-backed AED fallback, Health Canada alerts, AQHI, new public-health tables/migrations, ingest workflows, production smoke coverage, readiness coverage, and source-specific operational monitoring |
 
 ---
 
@@ -63,7 +64,7 @@ Netlify should now be treated as rollback-only for the frontend, and GitHub Acti
 
 **Parallel ops track (2026-03-26):** keep the VPS frontend stable, watch Neon transfer after the new read-cache guardrails, and treat backend migration as deferred pending an Ontario reachability investigation for the VPS path.
 
-**Exploratory strategy track (2026-03-27):** the Ontario-first public health data hub track now has an implementation-ready preflight bundle: decision brief, shortlist, scoring matrix, legal/reuse review, metadata contract, freshness rules, ADR-0023, and a Batch A implementation plan. The next step on that track is actual Batch A implementation if this direction is chosen.
+**Public health hub track (2026-03-27):** Batch A is now live. Immediate follow-on work should stay in hardening and selective expansion mode: keep the `/resources` module stable, monitor the live ingest path, and defer Batch B until source validation and product fit are re-reviewed.
 
 Beyond the admissions plan: M34 (multi-province equity layer) when StatsCan CT data is available; M35 (Nova Scotia scraper) when bandwidth allows. Both are Phase D (deferred) in the admissions plan. If Neon transfer remains tight after the March 26 guardrail deploy, the next optimization target is a more compact latest-snapshot path for `GET /api/hospitals`.
 
@@ -98,6 +99,8 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 
 - [x] **P0 / Ops: Quebec parser zero-value guard** — Zero-value occupancy as suppressed signal rather than hard failure
 - [x] **P1 / Performance: Frontend read-cache + polling guardrails (2026-03-26)** — Deployed short-lived in-process response caching for read-heavy VPS routes, kept shared cache headers/TTLs, and reduced status polling to a 5-minute visible-tab cadence
+- [x] **P1 / Public Health Hub: Batch A delivery (2026-03-27)** — Shipped `/resources`, Batch A APIs, public-health schema/migrations, live source ingest, source freshness/caveat UI, and production deployment on `wait-time.ca`
+- [x] **P1 / Public Health Hub: Ops hardening (2026-03-27)** — Added public-health ingest summaries, stateful hard-fail alerting, best-effort AED noise suppression, and production smoke/readiness coverage for `/resources`
 - [x] **P1 / Ops: CI quota conservation (temporary)** — Minimized free-tier GitHub Actions burn
 - [x] **P1 / Ops: Raw retention + alerting stabilization** — Duplicate suppression added, 30-day retention enforcement restored, and heartbeat alerts made state-change driven with a 120-minute threshold
 - [x] **P1 / Ops: Bound database cleanup runtime (2026-03-23)** — Production cleanup deleted 207,059 rows older than 30 days, then the workflow/runtime was tightened to skip zero-yield aggregate refresh and finish in 22 seconds instead of 5m48s
@@ -157,6 +160,8 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P2 / D3: Per-hospital data freshness indicators** — `last_updated` timestamp on hospital cards and export CSV
 - [ ] **P2 / D4: Nova Scotia scraper (M35)** — Only if NS methodology is confirmed novel (pre-research done)
 - [ ] **P2 / D5: Grant/competition application** — Opportunistic only; do not actively search
+- [ ] **P2 / D6: Public Health Hub Batch B source review** — Revalidate naloxone, EMS/system-context, and inspection datasets before expanding beyond Batch A
+- [ ] **P2 / D7: Official Ontario AED registry path** — Pursue partnership or explicit permission only if it improves coverage without weakening reuse clarity
 - [ ] **P2 / Occupancy-based recommendations** — Smart hospital suggestions based on current occupancy
 - [ ] **P2 / Monitoring dashboard** — Prometheus/Grafana integration for operational visibility
 - [ ] **P2 / Advanced analytics** — Predictive wait time modeling based on historical patterns
@@ -273,8 +278,16 @@ Active milestone plans in `docs/planning/implementation/`:
 - [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) — Phased plan (A/B/C/D) for real-world credibility, external validation, and public-facing artifacts. Includes full analytical rationale from three-pass review (original → devil's advocate → steelman → synthesis).
 
 Archived (delivered):
+- `docs/planning/implementation/archived/public-health-data-hub-batch-a-plan.md` — Public Health Hub Batch A implementation plan (delivered)
+- `docs/planning/archive/public-health-data-hub-preplan.md` — Ontario public health hub pre-plan (delivered and archived)
+- `docs/planning/archive/public-health-data-hub-decision-brief.md` — Ontario public health hub decision brief (delivered and archived)
+- `docs/planning/archive/public-health-data-hub-identity-memo.md` — Public health hub identity decision (delivered and archived)
+- `docs/planning/archive/public-health-data-hub-batch-a-handoff.md` — Batch A planning handoff (delivered and archived)
+- `docs/planning/archive/public-health-data-hub-agent-execution-readiness.md` — Agent execution packet for Batch A (delivered and archived)
+- `docs/planning/archive/public-health-data-hub-execution-order.md` — Locked Batch A execution order (delivered and archived)
 - `docs/planning/archive/maintenance-2026-02-23.md` — CI/tooling maintenance (2026-02-23)
 - `docs/planning/archive/maintenance-2026-03-21.md` — Ontario timeout hardening + repository maintenance sweep (2026-03-21)
+- `docs/planning/archive/maintenance-2026-03-27.md` — Public health hub Batch A maintenance, archive, and roadmap reconciliation
 - `docs/planning/archive/maintenance-2026-02-19.md` — Domain rebrand staging, M30 closeout (2026-02-19)
 - `docs/planning/archive/milestone-32-deployment-readiness.md` — Deployment Readiness & CSV Divergence (M32)
 - `docs/planning/archive/milestone-33-historical-occupancy-trends.md` — M33-M35 planning doc (M33 delivered)
@@ -324,7 +337,7 @@ Archived (delivered):
 
 ## Architecture
 
-### Database Schema (10 tables)
+### Database Schema (14 tables)
 
 | Table | Purpose |
 |-------|---------|
@@ -338,6 +351,10 @@ Archived (delivered):
 | `methodology_change_events` | Detected methodology shifts (M14) |
 | `regions` | Province region metadata for analytics segmentation (M15) |
 | `hospital_regions` | Hospital-to-region mappings for regional benchmarking (M15) |
+| `public_data_sources` | Public-health-hub source catalog with provenance, freshness, and reuse posture |
+| `resource_locations` | Normalized facility and AED locations for `/resources` |
+| `public_health_alerts` | Normalized Health Canada recall and safety alert records |
+| `public_health_source_alert_state` | Stateful incident tracking for public-health ingest alert deduplication |
 
 ### Key ADRs
 

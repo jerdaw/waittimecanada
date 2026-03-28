@@ -1,8 +1,8 @@
 # Public Health Data Hub Agent Execution Readiness
 
 **Created:** 2026-03-27
-**Status:** Ready for implementation hardening
-**Related:** `docs/planning/implementation/public-health-data-hub-batch-a-plan.md`
+**Status:** Archived after Batch A delivery
+**Related:** `docs/planning/implementation/archived/public-health-data-hub-batch-a-plan.md`
 
 ---
 
@@ -199,9 +199,9 @@ An implementation agent should stop and request human input if any of the follow
 
 Another agent should be able to start Batch A implementation with only these documents:
 
-1. `docs/planning/implementation/public-health-data-hub-batch-a-plan.md`
-2. `docs/planning/public-health-data-hub-agent-execution-readiness.md`
-3. `docs/planning/public-health-data-hub-execution-order.md`
+1. `docs/planning/implementation/archived/public-health-data-hub-batch-a-plan.md`
+2. `docs/planning/archive/public-health-data-hub-agent-execution-readiness.md`
+3. `docs/planning/archive/public-health-data-hub-execution-order.md`
 4. `docs/planning/public-health-data-hub-metadata-contract.md`
 5. `docs/planning/public-health-data-hub-freshness-safety-rules.md`
 6. `docs/research/public-health-data-hub-batch-a-legal-review.md`

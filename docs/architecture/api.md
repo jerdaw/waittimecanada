@@ -36,6 +36,12 @@ Characteristics:
 - `GET /api/analytics/occupancy`
 - `GET /api/analytics/equity-summary`
 
+## Public health resources
+
+- `GET /api/resources`
+- `GET /api/resources/alerts`
+- `GET /api/resources/aqhi`
+
 ## Equity layer
 
 - `GET /api/equity-layer`
@@ -76,6 +82,15 @@ Certain analytics endpoints return explicit states instead of silent nulls:
 
 This avoids overclaiming when source fields or tract datasets are not yet integrated.
 
+Public-health routes also carry explicit source freshness state:
+
+- `show`
+- `warn`
+- `suppress`
+
+and embed provenance/source-status metadata directly in the response so the UI
+can render caveats without inventing freshness certainty.
+
 ## Health route contract (M30 operational visibility)
 
 `GET /api/health` exposes an additive operational contract for scraper triage:
@@ -111,6 +126,9 @@ Analytics implementation note:
 
 - `hour_of_day` patterns and bounded hourly exports derive from raw `measurements` for fidelity.
 - Daily/weekly/monthly analytics continue to prefer `measurement_aggregates`.
+- Public-health resource routes use shared cache headers plus short-lived
+  server-side response caching for DB-backed resource/alert reads and the live
+  AQHI proxy.
 
 ## Related References
 

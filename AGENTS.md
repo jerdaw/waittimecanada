@@ -33,6 +33,7 @@ This file provides guidance to automated developer tools when working with code 
 - ✅ ONLY humans should be listed as authors or contributors in any part of this repository.
 - ✅ Use generic terms like "automated tool" or "agent" if you need to reference your own actions in documentation.
 - ❌ Do NOT include any AI tool names (Claude, Gemini, ChatGPT, etc.) in source code, comments, or documentation unless referring to the tools themselves as external dependencies.
+- ✅ `CLAUDE.md` and `GEMINI.md` must remain relative symlinks to `AGENTS.md` so the same human-authorship and security rules apply across all agent entrypoints.
 
 ---
 
@@ -40,24 +41,25 @@ This file provides guidance to automated developer tools when working with code 
 
 This is the **Wait Time Canada** project - a "Health Systems Observatory" designed to audit and standardize Canadian emergency room wait time data across provinces. This is **NOT a simple wait time app**, but rather a clinically defensible auditing platform that exposes methodological inconsistencies in healthcare reporting.
 
-**Current Status:** Milestone 33 (Historical Occupancy Trends) Complete. **Four-province breadth achieved** (ON, QC, AB, BC). All scrapers active, 380+ hospitals visible, methodology documentation complete for all provinces, occupancy trend aggregation pipeline operational, the production domain `wait-time.ca` is live on the VPS via Caddy, and raw measurements follow a 30-day retention policy with permanent aggregates for long-term analysis.
+**Current Status:** Milestone 33 (Historical Occupancy Trends) is complete and the Ontario-first **Public Health Hub Batch A** module is live. **Four-province breadth achieved** (ON, QC, AB, BC). All scrapers are active, 380+ hospitals are visible, methodology documentation is complete for all provinces, occupancy trend aggregation is operational, the production domain `wait-time.ca` is live on the VPS via Caddy, `/resources` is live with facilities/AED fallback/alerts/AQHI, and raw measurements follow a 30-day retention policy with permanent aggregates for long-term analysis.
 
 **Current Architecture:**
-- **Database**: Neon PostgreSQL 17 (10 tables: sources, hospitals, measurements, scraper_status, scraper_alert_state, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions)
+- **Database**: Neon PostgreSQL 17 (14 tables: sources, hospitals, measurements, scraper_status, scraper_alert_state, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions, public_data_sources, resource_locations, public_health_alerts, public_health_source_alert_state)
 - **Backend**: Python 3.12+ with psycopg2, pytest
-  - **Tests**: 454+ passing (unit + integration)
+  - **Tests**: 450+ passing backend tests (unit + integration)
   - Scrapers: Quebec (BeautifulSoup), Ontario (HTTP client), Alberta (Playwright), BC (JSON/__NEXT_DATA__)
-  - Services: DatabaseService, AggregationService, DataQualityService, AnomalyDetectionService, MethodologyChangeDetector, GeocodingService
-  - CLI tools: scraper runner, database cleanup, storage stats, seeding, aggregation, trusted hospital approval, region mapping
+  - Services: DatabaseService, AggregationService, DataQualityService, AnomalyDetectionService, MethodologyChangeDetector, GeocodingService, PublicHealthResourceService, PublicHealthAlertService
+  - CLI tools: scraper runner, database cleanup, storage stats, seeding, aggregation, trusted hospital approval, region mapping, public health ingest/status/alerting
 - **Frontend**: Next.js 14 + TypeScript + Mapbox GL JS
-  - **Tests**: 359+ passing (Vitest + React Testing Library)
+  - **Tests**: 350+ passing frontend tests (Vitest + React Testing Library)
   - Map component with hospital markers and methodology display
   - Data quality dashboard (`/data-quality`)
   - Analytics & benchmarking dashboard (`/analytics`)
+  - Public resources module (`/resources`) with facilities, AED fallback, alerts, and AQHI
   - Data export with granularity selector
   - Trend charts with aggregate visualization (90d/6m/1y)
   - Methods & governance page (`/methods`)
-  - API routes for hospitals, comparisons, health, data-quality, anomalies, export, analytics
+  - API routes for hospitals, comparisons, health, data-quality, anomalies, export, analytics, and public resources
 
 ## Core Architecture
 

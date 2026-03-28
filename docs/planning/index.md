@@ -14,18 +14,21 @@ This section contains the project planning control plane.
 ## Active Planning Docs
 
 - `docs/planning/implementation/admissions-strengthening-plan.md`
-- `docs/planning/implementation/public-health-data-hub-batch-a-plan.md`
 - `docs/planning/post-launch-growth-strategy.md`
-- `docs/planning/public-health-data-hub-preplan.md`
-- `docs/planning/public-health-data-hub-decision-brief.md`
-- `docs/planning/public-health-data-hub-identity-memo.md`
-- `docs/planning/public-health-data-hub-batch-a-handoff.md`
 - `docs/planning/public-health-data-hub-metadata-contract.md`
 - `docs/planning/public-health-data-hub-freshness-safety-rules.md`
-- `docs/planning/public-health-data-hub-agent-execution-readiness.md`
-- `docs/planning/public-health-data-hub-execution-order.md`
+
+## Archived Public Health Hub Batch A Planning Docs
+
+- `docs/planning/implementation/archived/public-health-data-hub-batch-a-plan.md`
+- `docs/planning/archive/public-health-data-hub-preplan.md`
+- `docs/planning/archive/public-health-data-hub-decision-brief.md`
+- `docs/planning/archive/public-health-data-hub-identity-memo.md`
+- `docs/planning/archive/public-health-data-hub-batch-a-handoff.md`
+- `docs/planning/archive/public-health-data-hub-agent-execution-readiness.md`
+- `docs/planning/archive/public-health-data-hub-execution-order.md`
 
 ## Maintenance Logs
 
-- `docs/planning/maintenance-2026-02-13.md`
-- `docs/planning/maintenance-2026-02-19.md`
+- `docs/planning/archive/maintenance-2026-03-27.md`
+- `docs/planning/archive/maintenance-2026-03-26.md`

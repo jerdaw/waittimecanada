@@ -43,6 +43,12 @@ Base URL:
 
 - `GET /api/equity-layer?province=ON`
 
+## Public health resources
+
+- `GET /api/resources?kind=facility|aed[&q=<term>&province=ON&latitude=<lat>&longitude=<lng>&radius=<km>&limit=<n>]`
+- `GET /api/resources/alerts?limit=<n>`
+- `GET /api/resources/aqhi?latitude=<lat>&longitude=<lng>`
+
 ## Export
 
 - `GET /api/export?format=csv|json&granularity=raw|hourly|daily|weekly|monthly`
@@ -79,6 +85,7 @@ Operational note:
 
 - On the shared VPS runtime, these same read-heavy routes also use short-lived in-process response caching to cut repeat public transfer from Neon without changing data collection or storage policy.
 - `GET /api/geolocation` and `GET /api/export` remain `Cache-Control: no-store`.
+- `GET /api/resources` and `GET /api/resources/alerts` currently use a 5-minute shared cache window; `GET /api/resources/aqhi` uses a 15-minute shared cache window with a live upstream fetch behind the server cache.
 
 ## Health endpoint operational contract (M30)
 
@@ -116,6 +123,47 @@ Failure categories currently emitted by backend heartbeat/classification logic:
 - `comparable: boolean`
 - `divergence_brief: string | null`
 - methodology fields for both hospitals
+
+## Public health resource contracts
+
+`GET /api/resources` returns:
+
+- `success`
+- `count`
+- `data`
+- `meta.kind`
+- `meta.query`
+- `meta.source_status`
+
+`GET /api/resources/alerts` returns:
+
+- `success`
+- `count`
+- `data`
+- `meta.limit`
+- `meta.source_status`
+
+`GET /api/resources/aqhi` returns:
+
+- `success`
+- `data` (`AQHIRecord | null`)
+- `meta.latitude`
+- `meta.longitude`
+- `meta.source_status`
+
+Each `source_status` row includes:
+
+- `source_id`
+- `source_name`
+- `provenance_url`
+- `last_refreshed_at`
+- `freshness_state` (`show | warn | suppress`)
+
+Operational note:
+
+- Facility rows are reference-directory data only and should not be interpreted as live operational availability.
+- AED rows are OSM-backed fallback data and remain explicitly crowdsourced/incomplete.
+- AQHI responses may intentionally return `data: null` when the upstream source freshness state is `suppress`.
 
 ## Occupancy availability contract
 

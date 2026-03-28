@@ -2,7 +2,7 @@
 
 **Created:** 2026-03-27
 **Status:** Frozen for Batch A planning
-**Related:** `docs/planning/public-health-data-hub-batch-a-handoff.md`
+**Related:** `docs/planning/archive/public-health-data-hub-batch-a-handoff.md`
 
 ---
 

@@ -25,6 +25,7 @@
 - **380+ Hospitals:** Near-real-time monitoring across all regions
 - **Hourly Updates:** Automated data collection currently via GitHub Actions
 - **First-in-Canada:** Real-time ED stretcher occupancy visualization (Quebec)
+- **Ontario Public Resources Module:** `/resources` now serves facilities, OSM-backed AED fallback data, Health Canada recalls, and AQHI
 
 ### Why This Matters
 
@@ -62,6 +63,13 @@ Provincial health authorities report ER wait times using **fundamentally differe
 - **Data Quality Dashboard:** Real-time visibility into scraper health, measurement counts, staleness
 - **Heartbeat Monitoring:** Dead Man's Switch alerts via Pushover if data becomes stale
 - **Methodology Change Detection:** Tracks when provincial reporting methods change
+
+### 🚑 Public Health Resources
+- **Facilities & Services:** Ontario facility search grounded in MOHSERLO reference-directory data
+- **AED Fallback Map:** OpenStreetMap-based AED locations with explicit crowdsourced/incomplete labeling
+- **Safety Alerts:** Health Canada recalls and safety alerts with optional Drug Product Database enrichment
+- **AQHI Overlay:** Cached GeoMet air-quality snapshots with freshness-aware suppression when upstream data is stale
+- **Source Transparency:** Provenance links, last refresh timestamps, and domain-specific caveats on every public-health slice
 
 ### 🏥 Real-Time Occupancy (Quebec)
 - **First-in-Canada:** Stretcher occupancy percentage visualization
@@ -123,7 +131,7 @@ graph TD
 
     subgraph "Next.js 14 Frontend"
         API[API Routes<br/>/api/hospitals<br/>/api/analytics<br/>/api/data-quality]
-        PAGES[Pages<br/>Map View<br/>Analytics Dashboard<br/>Methods Page]
+        PAGES[Pages<br/>Map View<br/>Analytics Dashboard<br/>Methods Page<br/>Resources]
         MAP[Mapbox GL JS<br/>380+ Hospital Markers]
     end
 
@@ -188,10 +196,10 @@ graph TD
 - **Testing:** Vitest with 287 tests (285 passing)
 - **Mapping:** Mapbox GL JS
 - **Components:** 30+ React components with comprehensive test coverage
-- **API Routes:** 15+ endpoints for hospitals, comparisons, analytics, data quality
-- **Pages:** Home (map + list), /data-quality, /analytics, /methods, /about
+- **API Routes:** Hospitals/comparisons, analytics, data quality, and public resources endpoints
+- **Pages:** Home (map + list), /data-quality, /analytics, /methods, /resources, /about
 
-### Database Schema (10 Tables)
+### Database Schema (14 Tables)
 - `sources` - Provincial data source metadata
 - `hospitals` - Facility metadata with verification workflow
 - `measurements` - Audit log with ontology tags (payload hashing, not full HTML)
@@ -202,6 +210,10 @@ graph TD
 - `methodology_change_events` - Detected methodology shifts
 - `regions` - Province region metadata for analytics
 - `hospital_regions` - Hospital-to-region mappings
+- `public_data_sources` - Public-health-hub source catalog and freshness metadata
+- `resource_locations` - Normalized facilities and AED locations for `/resources`
+- `public_health_alerts` - Health Canada recall and safety alert records
+- `public_health_source_alert_state` - Stateful alerting for public-health ingest incidents
 
 ### Automation
 - **GitHub Actions:** Scrapers run hourly, heartbeat checks every 30 minutes

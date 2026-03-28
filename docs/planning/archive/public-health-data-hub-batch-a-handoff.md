@@ -1,8 +1,8 @@
 # Public Health Data Hub Batch A Handoff Brief
 
 **Created:** 2026-03-27
-**Status:** Planning handoff completed
-**Related:** `docs/planning/public-health-data-hub-preplan.md`
+**Status:** Archived after Batch A delivery
+**Related:** `docs/planning/archive/public-health-data-hub-preplan.md`
 
 ---
 
@@ -113,8 +113,8 @@ These can remain in research or later batching.
 
 The resulting implementation-oriented milestone plan is:
 
-- `docs/planning/implementation/public-health-data-hub-batch-a-plan.md`
-- `docs/planning/public-health-data-hub-agent-execution-readiness.md` for delegation-safe execution boundaries
+- `docs/planning/implementation/archived/public-health-data-hub-batch-a-plan.md`
+- `docs/planning/archive/public-health-data-hub-agent-execution-readiness.md` for delegation-safe execution boundaries
 
 That milestone plan includes:
 

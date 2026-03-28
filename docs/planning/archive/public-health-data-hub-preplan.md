@@ -1,7 +1,7 @@
 # Ontario Public Health Data Hub Pre-Plan
 
 **Created:** 2026-03-27
-**Status:** Active pre-planning document
+**Status:** Archived after Batch A delivery
 **Scope:** Decision framework and planning funnel for evaluating whether and how Wait Time Canada should expand into an Ontario-first public health data hub.
 
 > Roadmap note: `docs/planning/roadmap.md` remains the canonical source of truth for committed work. This document is a pre-plan for deciding what should become a real implementation plan later.
@@ -23,11 +23,11 @@ This is a planning framework for a **12-month strategic initiative**, not a road
 
 The first planning package generated from this pre-plan now exists in:
 
-- `docs/planning/public-health-data-hub-decision-brief.md`
+- `docs/planning/archive/public-health-data-hub-decision-brief.md`
 - `docs/research/public-health-data-hub-source-shortlist.md`
 - `docs/research/public-health-data-hub-scoring-matrix.md`
-- `docs/planning/public-health-data-hub-identity-memo.md`
-- `docs/planning/public-health-data-hub-batch-a-handoff.md`
+- `docs/planning/archive/public-health-data-hub-identity-memo.md`
+- `docs/planning/archive/public-health-data-hub-batch-a-handoff.md`
 
 The implementation-ready preflight bundle now also includes:
 
@@ -35,7 +35,7 @@ The implementation-ready preflight bundle now also includes:
 - `docs/planning/public-health-data-hub-metadata-contract.md`
 - `docs/planning/public-health-data-hub-freshness-safety-rules.md`
 - `docs/adr/0023-public-health-hub-module-boundary.md`
-- `docs/planning/implementation/public-health-data-hub-batch-a-plan.md`
+- `docs/planning/implementation/archived/public-health-data-hub-batch-a-plan.md`
 
 ---
 

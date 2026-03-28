@@ -176,7 +176,7 @@ export default function Home() {
     }
 
     fetchHospitals();
-  }, [selectedProvince]);
+  }, [selectedProvince, t]);
 
   useEffect(() => {
     let cancelled = false;

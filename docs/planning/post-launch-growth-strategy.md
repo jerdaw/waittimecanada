@@ -77,10 +77,11 @@ This sequence preserves the current identity while making the project:
 An additional strategic direction emerged from the internal AI research scans in
 `docs/research/ai-deep-research/`.
 
-See `docs/planning/public-health-data-hub-preplan.md` for the decision framework that should be
-used before converting this direction into committed roadmap work.
-The first planning package for that track now also includes the decision brief, validated shortlist,
-scoring matrix, identity memo, and Batch A handoff artifacts.
+The initial planning funnel for that track is now archived in
+`docs/planning/archive/public-health-data-hub-preplan.md`, and the first
+delivery wave is no longer hypothetical: Batch A is live at `/resources` with
+Ontario facilities, OSM-backed AED fallback data, Health Canada alerts, and
+AQHI.
 
 The core idea is to expand beyond emergency wait times into a broader **public health data hub**
 for Ontario first, while preserving Wait Time Canada's current strengths in:

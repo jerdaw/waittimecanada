@@ -13,19 +13,19 @@ This directory is the planning control plane for Wait Time Canada.
 ## Active Planning Docs
 
 - `docs/planning/implementation/admissions-strengthening-plan.md`
-- `docs/planning/implementation/public-health-data-hub-batch-a-plan.md`
 - `docs/planning/post-launch-growth-strategy.md`
-- `docs/planning/public-health-data-hub-preplan.md`
-- `docs/planning/public-health-data-hub-decision-brief.md`
-- `docs/planning/public-health-data-hub-identity-memo.md`
-- `docs/planning/public-health-data-hub-batch-a-handoff.md`
 - `docs/planning/public-health-data-hub-metadata-contract.md`
 - `docs/planning/public-health-data-hub-freshness-safety-rules.md`
-- `docs/planning/public-health-data-hub-agent-execution-readiness.md`
-- `docs/planning/public-health-data-hub-execution-order.md`
 
 ## Archived Milestone Plans
 
+- `docs/planning/implementation/archived/public-health-data-hub-batch-a-plan.md` (closed, delivered)
+- `docs/planning/archive/public-health-data-hub-preplan.md` (closed, delivered)
+- `docs/planning/archive/public-health-data-hub-decision-brief.md` (closed, delivered)
+- `docs/planning/archive/public-health-data-hub-identity-memo.md` (closed, delivered)
+- `docs/planning/archive/public-health-data-hub-batch-a-handoff.md` (closed, delivered)
+- `docs/planning/archive/public-health-data-hub-agent-execution-readiness.md` (closed, delivered)
+- `docs/planning/archive/public-health-data-hub-execution-order.md` (closed, delivered)
 - `docs/planning/archive/milestone-15-analytics.md` (closed, delivered)
 - `docs/planning/archive/milestone-14-data-quality.md` (closed, delivered)
 - `docs/planning/archive/milestone-13-aggregation.md` (closed, delivered)
@@ -42,7 +42,7 @@ This directory is the planning control plane for Wait Time Canada.
 - `docs/planning/strategic-plan.md`
 - `docs/planning/expansion-roadmap.md`
 - `docs/planning/competitor-design-analysis.md`
-- `docs/planning/scraper-status-2026-02-04.md`
+- `docs/planning/archive/scraper-status-2026-02-04.md`
 - `docs/planning/ux-seo-implementation-plan.md`
 
 These documents are retained for context and may not match current implementation details.

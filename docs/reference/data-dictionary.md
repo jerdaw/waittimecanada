@@ -125,6 +125,19 @@ Normalized public recall and safety alert records.
 | `provenance_url` | TEXT | Canonical alert URL. |
 | `last_refreshed_at` | TIMESTAMPTZ | Last successful ingest timestamp for freshness rules. |
 
+### `public_health_source_alert_state`
+Persistent alert deduplication state for hard-fail public-health-hub sources.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `source_id` | TEXT (PK/FK) | Link to `public_data_sources.source_id`. |
+| `active_incident_kind` | TEXT | Current active incident kind, currently `degraded`. |
+| `active_incident_fingerprint` | TEXT | Stable fingerprint for the active incident reasons. |
+| `opened_at` | TIMESTAMPTZ | When the current public-health ingest incident began. |
+| `last_notified_at` | TIMESTAMPTZ | When the active incident last generated a notification attempt. |
+| `last_resolved_at` | TIMESTAMPTZ | When the most recent incident for this source was resolved. |
+| `updated_at` | TIMESTAMPTZ | Row update timestamp. |
+
 ## Analytics & Aggregation
 
 ### `measurement_aggregates`

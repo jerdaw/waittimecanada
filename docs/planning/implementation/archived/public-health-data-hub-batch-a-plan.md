@@ -1,7 +1,7 @@
 # Public Health Data Hub Batch A Implementation Plan
 
 **Created:** 2026-03-27
-**Status:** Ready for implementation
+**Status:** Delivered and archived after Batch A implementation
 **Scope:** Implement the first public-health-data-hub module inside Wait Time Canada using provider/facility baseline data, AED strategy, recalls/safety alerts, and AQHI.
 
 > Strategic questions are already settled by the public-health-data-hub planning package. This document should be treated as the implementation source of truth for Batch A if the team decides to build it.

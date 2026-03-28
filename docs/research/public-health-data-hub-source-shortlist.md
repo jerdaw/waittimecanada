@@ -2,7 +2,7 @@
 
 **Created:** 2026-03-27
 **Status:** Validated shortlist for planning
-**Related:** `docs/planning/public-health-data-hub-preplan.md`
+**Related:** `docs/planning/archive/public-health-data-hub-preplan.md`
 
 > This is a shortlist-first validation pass. It is intentionally not exhaustive. The goal is to validate only the strongest candidates needed to decide whether a real Batch A milestone plan should be written.
 

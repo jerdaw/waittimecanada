@@ -1,8 +1,8 @@
 # Ontario Public Health Data Hub Decision Brief
 
 **Created:** 2026-03-27
-**Status:** Active planning artifact
-**Related:** `docs/planning/public-health-data-hub-preplan.md`
+**Status:** Archived after Batch A delivery
+**Related:** `docs/planning/archive/public-health-data-hub-preplan.md`
 
 ---
 

@@ -72,7 +72,13 @@ fi
 
 echo
 echo "[2/3] Checking for non-human co-author trailers..."
-mapfile -t text_files < <(git ls-files "*.md" "*.txt" "*.rst")
+mapfile -t text_files < <(
+  git ls-files "*.md" "*.txt" "*.rst" | while IFS= read -r file; do
+    if [[ -e "${file}" ]]; then
+      printf '%s\n' "${file}"
+    fi
+  done
+)
 if rg -n -i "^Co-Authored-By:\\s*.*(claude|codex|gemini|chatgpt|ai assistant|automated tool)" "${text_files[@]}"; then
   failures=1
 else

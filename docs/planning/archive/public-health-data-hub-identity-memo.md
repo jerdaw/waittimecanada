@@ -1,8 +1,8 @@
 # Public Health Data Hub Identity Memo
 
 **Created:** 2026-03-27
-**Status:** Active planning artifact
-**Related:** `docs/planning/public-health-data-hub-decision-brief.md`
+**Status:** Archived after Batch A delivery
+**Related:** `docs/planning/archive/public-health-data-hub-decision-brief.md`
 
 ---
 

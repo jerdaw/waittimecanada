@@ -37,6 +37,8 @@ From `002_create_tables.sql`:
 - `methodology_change_events` (`009_create_methodology_change_events.sql`)
 - `regions` and `hospital_regions` (`010_create_regions_tables.sql`)
 - scraper observability metadata on `scraper_status` (`013_add_scraper_observability_columns.sql`)
+- public-health-hub tables (`018_create_public_health_hub_tables.sql`)
+- public-health-hub alert-state tracking (`019_add_public_health_source_alert_state.sql`)
 
 ## Scraper observability fields (M30)
 
@@ -59,6 +61,18 @@ These fields support deterministic triage in `check_heartbeat --verbose`, workfl
 - `last_resolved_at`
 
 This lets the heartbeat monitor send one incident alert when a source becomes unhealthy and one recovery notice when it returns to healthy, instead of repeating the same alert every run.
+
+## Public health hub tables
+
+The Ontario-first `/resources` module adds four database tables:
+
+- `public_data_sources`: source metadata, provenance, legal posture, and last refresh timestamps
+- `resource_locations`: normalized `facility` and `aed` rows for public search/map use
+- `public_health_alerts`: normalized Health Canada recall and safety alert items
+- `public_health_source_alert_state`: incident deduplication state for hard-fail public-health ingest sources
+
+These tables are operationally separate from the wait-time observatory schema.
+AQHI remains live-proxied and is intentionally not persisted in the database.
 
 ## Data Model Rules
 

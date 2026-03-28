@@ -87,10 +87,10 @@ This document tracks all tasks requiring significant human intervention, browser
 **Priority:** CRITICAL (needed for applications)
 
 ### Production Outcome:
-- **Platform:** Netlify
+- **Platform:** Shared VPS frontend via Caddy + Docker loopback runtime
 - **Canonical URL:** `https://wait-time.ca`
 - **Redirects:** `https://www.wait-time.ca` → `https://wait-time.ca/`
-- **Latest verified production release:** `main@f5da07c`
+- **Latest verified production release:** `main@85ed19d`
 
 ### GitHub Actions (Already Configured):
 ✅ Scraper cron already set up in `.github/workflows/scraper-cron.yml`
@@ -117,6 +117,11 @@ Deployment Date: 2026-03-12
    - `/methods`
    - `/data-quality`
    - `/analytics`
+   - `/resources`
+   - `/api/resources/alerts?limit=1`
+   - `/api/resources?kind=aed&province=ON&limit=1`
+   - `/api/resources?kind=facility&province=ON&q=Toronto%20General&limit=1`
+   - `/api/resources/aqhi?latitude=43.6532&longitude=-79.3832`
 
 ### Production Readiness Verification:
 1. Configure required/recommended secrets:

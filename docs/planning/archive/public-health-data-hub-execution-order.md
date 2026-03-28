@@ -1,8 +1,8 @@
 # Public Health Data Hub Batch A Execution Order
 
 **Created:** 2026-03-27
-**Status:** Locked before implementation
-**Related:** `docs/planning/implementation/public-health-data-hub-batch-a-plan.md`
+**Status:** Archived after Batch A delivery
+**Related:** `docs/planning/implementation/archived/public-health-data-hub-batch-a-plan.md`
 
 ---
 
@@ -87,7 +87,7 @@ This order is chosen to:
 
 The authoritative package definitions remain in:
 
-- `docs/planning/public-health-data-hub-agent-execution-readiness.md`
+- `docs/planning/archive/public-health-data-hub-agent-execution-readiness.md`
 
 ---
 
