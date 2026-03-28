@@ -45,13 +45,32 @@ jobs:
 
       - name: Ingest live OSM AED fallback
         id: ingest_aed
-        continue-on-error: true
         working-directory: ./backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.seed_public_health_resources \
-            --fetch-osm-aed-live
+          set +e
+          output="$(python -m waittime.cli.seed_public_health_resources \
+            --fetch-osm-aed-live 2>&1)"
+          exit_code=$?
+
+          echo "$output"
+
+          if [ "$exit_code" -eq 0 ]; then
+            {
+              echo "status=success"
+              echo "message=Live OSM AED fallback refresh succeeded."
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          {
+            echo "status=best_effort_failed"
+            echo "message=Best-effort OSM AED fallback refresh failed for this run; retained existing AED dataset state."
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Best-effort OSM AED fallback refresh failed for this run; retained existing AED dataset state."
+          exit 0
 
       - name: Ingest live public health alerts
         id: ingest_alerts
@@ -68,9 +87,13 @@ jobs:
             echo "## Public Health Hub Ingest"
             echo
             echo "- MOHSERLO: ${{ steps.ingest_mohserlo.outcome }}"
-            echo "- OSM AED fallback: ${{ steps.ingest_aed.outcome }}"
+            echo "- OSM AED fallback: ${{ steps.ingest_aed.outputs.status }}"
             echo "- Health Canada alerts: ${{ steps.ingest_alerts.outcome }}"
             echo
+            if [ "${{ steps.ingest_aed.outputs.status }}" = "best_effort_failed" ]; then
+              echo "_Best-effort AED refresh failed for this run. Existing AED dataset state was retained, and paging remains disabled for this source._"
+              echo
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Write source status summary

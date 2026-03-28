@@ -153,7 +153,8 @@ This directory contains operational and CI workflows for Wait Time Canada.
 - Reuses the existing `DATABASE_URL` secret; no new secrets required.
 - MOHSERLO and Health Canada alerts remain hard-fail paths; the Overpass AED
   fallback runs in its own best-effort step so transient AED mirror failures do
-  not block the rest of the batch.
+  not block the rest of the batch. AED mirror failures are recorded as explicit
+  best-effort summary state rather than as a failing workflow annotation.
 - Each run appends a GitHub Actions job summary with per-step outcomes plus the
   current source refresh timestamps, normalized row counts, and explicit
   `healthy` / `partial` / `degraded` operator classifications from the database
