@@ -1,310 +1,142 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
-// Test the comparability logic that's duplicated in multiple places
-describe("Comparability Logic", () => {
-  interface Methodology {
-    metric_family: string;
-    start_event: string;
-    end_event: string;
-    statistic_type: string;
-  }
+import {
+  areMethodologiesComparable,
+  buildUniquePairwiseComparisons,
+  generateDivergenceBrief,
+  getComparabilityDimensions,
+  getComparabilityLevel,
+  getComparabilityMatchCount,
+  type Methodology,
+  type MethodologySource,
+} from "@/utils/comparability";
 
-  function areComparable(a: Methodology, b: Methodology): boolean {
-    return (
-      a.metric_family === b.metric_family &&
-      a.start_event === b.start_event &&
-      a.end_event === b.end_event &&
-      a.statistic_type === b.statistic_type
-    );
-  }
+describe("comparability utility", () => {
+  const comparableMethodology: Methodology = {
+    metric_family: "TIME_TO_PROVIDER",
+    start_event: "TRIAGE",
+    end_event: "PHYSICIAN",
+    statistic_type: "P90",
+  };
 
-  function generateDivergenceBrief(
-    a: Methodology,
-    b: Methodology,
-  ): string | null {
-    if (areComparable(a, b)) return null;
-
-    const differences: string[] = [];
-
-    if (a.metric_family !== b.metric_family) {
-      differences.push(
-        `Different metrics: ${a.metric_family} vs ${b.metric_family}`,
-      );
-    }
-    if (a.start_event !== b.start_event) {
-      differences.push(
-        `Different start points: ${a.start_event} vs ${b.start_event}`,
-      );
-    }
-    if (a.end_event !== b.end_event) {
-      differences.push(
-        `Different end points: ${a.end_event} vs ${b.end_event}`,
-      );
-    }
-    if (a.statistic_type !== b.statistic_type) {
-      differences.push(
-        `Different statistics: ${a.statistic_type} vs ${b.statistic_type}`,
-      );
-    }
-
-    return (
-      "Methodology Divergence: Direct comparison is scientifically invalid. " +
-      differences.join("; ") +
-      "."
-    );
-  }
-
-  describe("areComparable", () => {
-    it("returns true for identical methodologies", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const b: Methodology = { ...a };
-
-      expect(areComparable(a, b)).toBe(true);
-    });
-
-    it("returns false if metric_family differs", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const b: Methodology = {
-        ...a,
-        metric_family: "TOTAL_LOS",
-      };
-
-      expect(areComparable(a, b)).toBe(false);
-    });
-
-    it("returns false if start_event differs", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const b: Methodology = {
-        ...a,
-        start_event: "REGISTRATION",
-      };
-
-      expect(areComparable(a, b)).toBe(false);
-    });
-
-    it("returns false if end_event differs", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const b: Methodology = {
-        ...a,
-        end_event: "PROVIDER",
-      };
-
-      expect(areComparable(a, b)).toBe(false);
-    });
-
-    it("returns false if statistic_type differs", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const b: Methodology = {
-        ...a,
-        statistic_type: "MEDIAN",
-      };
-
-      expect(areComparable(a, b)).toBe(false);
-    });
-
-    it("returns false if multiple dimensions differ", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const b: Methodology = {
-        metric_family: "TOTAL_LOS",
-        start_event: "REGISTRATION",
-        end_event: "DISCHARGE",
-        statistic_type: "MEDIAN",
-      };
-
-      expect(areComparable(a, b)).toBe(false);
-    });
+  it("treats identical methodologies as directly comparable", () => {
+    expect(
+      areMethodologiesComparable(comparableMethodology, {
+        ...comparableMethodology,
+      }),
+    ).toBe(true);
   });
 
-  describe("generateDivergenceBrief", () => {
-    it("returns null for comparable methodologies", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
+  it("counts field-by-field ontology matches", () => {
+    const partialMethodology: Methodology = {
+      metric_family: "TIME_TO_PROVIDER",
+      start_event: "REGISTRATION",
+      end_event: "PHYSICIAN",
+      statistic_type: "ROLLING_AVG",
+    };
 
-      const b: Methodology = { ...a };
-
-      expect(generateDivergenceBrief(a, b)).toBeNull();
-    });
-
-    it("explains single difference", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const b: Methodology = {
-        ...a,
-        start_event: "REGISTRATION",
-      };
-
-      const brief = generateDivergenceBrief(a, b);
-
-      expect(brief).toContain("TRIAGE vs REGISTRATION");
-      expect(brief).toContain("Methodology Divergence");
-    });
-
-    it("explains multiple differences", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const b: Methodology = {
-        ...a,
-        start_event: "REGISTRATION",
-        statistic_type: "ROLLING_AVG",
-      };
-
-      const brief = generateDivergenceBrief(a, b);
-
-      expect(brief).toContain("TRIAGE vs REGISTRATION");
-      expect(brief).toContain("P90 vs ROLLING_AVG");
-      expect(brief).toContain(";"); // Multiple differences separated
-    });
-
-    it("includes all four dimensions when all differ", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const b: Methodology = {
-        metric_family: "TOTAL_LOS",
-        start_event: "REGISTRATION",
-        end_event: "DISCHARGE",
-        statistic_type: "MEDIAN",
-      };
-
-      const brief = generateDivergenceBrief(a, b);
-
-      expect(brief).toContain("TIME_TO_PROVIDER vs TOTAL_LOS");
-      expect(brief).toContain("TRIAGE vs REGISTRATION");
-      expect(brief).toContain("PHYSICIAN vs DISCHARGE");
-      expect(brief).toContain("P90 vs MEDIAN");
-    });
-
-    it("formats message consistently", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const b: Methodology = {
-        ...a,
-        statistic_type: "MEDIAN",
-      };
-
-      const brief = generateDivergenceBrief(a, b);
-
-      expect(brief).toMatch(/^Methodology Divergence:/);
-      expect(brief).toMatch(/scientifically invalid/);
-      expect(brief).toMatch(/\.$/); // Ends with period
-    });
+    expect(
+      getComparabilityMatchCount(comparableMethodology, partialMethodology),
+    ).toBe(2);
   });
 
-  describe("Real-world scenarios", () => {
-    it("Ontario vs Quebec (incompatible)", () => {
-      const ontario: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const quebec: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "REGISTRATION",
-        end_event: "PHYSICIAN",
-        statistic_type: "ROLLING_AVG",
-      };
-
-      expect(areComparable(ontario, quebec)).toBe(false);
-
-      const brief = generateDivergenceBrief(ontario, quebec);
-      expect(brief).toContain("TRIAGE vs REGISTRATION");
-      expect(brief).toContain("P90 vs ROLLING_AVG");
+  it("returns explicit field verdicts for each ontology dimension", () => {
+    const dimensions = getComparabilityDimensions(comparableMethodology, {
+      metric_family: "TOTAL_LOS",
+      start_event: "TRIAGE",
+      end_event: "DISCHARGE",
+      statistic_type: "P90",
     });
 
-    it("Ontario vs Alberta (compatible)", () => {
-      const ontario: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
+    expect(dimensions).toEqual([
+      expect.objectContaining({ key: "metric_family", matches: false }),
+      expect.objectContaining({ key: "start_event", matches: true }),
+      expect.objectContaining({ key: "end_event", matches: false }),
+      expect.objectContaining({ key: "statistic_type", matches: true }),
+    ]);
+  });
 
-      const alberta: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
+  it("classifies source pairs by overall comparability level", () => {
+    const ontario: MethodologySource = {
+      id: "ontario-health",
+      name: "Ontario Health",
+      province: "Ontario",
+      default_metric_family: "TIME_TO_PROVIDER",
+      default_start_event: "TRIAGE",
+      default_end_event: "PHYSICIAN",
+      default_statistic_type: "POINT_ESTIMATE",
+    };
+    const bc: MethodologySource = {
+      id: "bc-phsa",
+      name: "BC PHSA",
+      province: "British Columbia",
+      default_metric_family: "TIME_TO_PROVIDER",
+      default_start_event: "TRIAGE",
+      default_end_event: "PHYSICIAN",
+      default_statistic_type: "P90",
+    };
+    const quebec: MethodologySource = {
+      id: "quebec-msss",
+      name: "Quebec MSSS",
+      province: "Quebec",
+      default_metric_family: "TIME_TO_PROVIDER",
+      default_start_event: "REGISTRATION",
+      default_end_event: "PHYSICIAN",
+      default_statistic_type: "ROLLING_AVG",
+    };
 
-      expect(areComparable(ontario, alberta)).toBe(true);
-      expect(generateDivergenceBrief(ontario, alberta)).toBeNull();
+    expect(getComparabilityLevel(ontario, bc)).toBe("partial");
+    expect(getComparabilityLevel(ontario, quebec)).toBe("partial");
+  });
+
+  it("builds a divergence brief from the real mismatch set", () => {
+    const brief = generateDivergenceBrief(comparableMethodology, {
+      metric_family: "TIME_TO_PROVIDER",
+      start_event: "REGISTRATION",
+      end_event: "PHYSICIAN",
+      statistic_type: "ROLLING_AVG",
     });
 
-    it("Two Toronto hospitals (compatible)", () => {
-      const torontoGeneral: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
+    expect(brief).toContain("REGISTRATION");
+    expect(brief).toContain("ROLLING_AVG");
+    expect(brief).toContain("Methodology Divergence");
+  });
 
-      const torontoWestern: Methodology = { ...torontoGeneral };
+  it("returns all unique province pairs for the methods matrix verdict section", () => {
+    const pairs = buildUniquePairwiseComparisons([
+      {
+        id: "ontario-health",
+        name: "Ontario Health",
+        province: "Ontario",
+        default_metric_family: "TIME_TO_PROVIDER",
+        default_start_event: "TRIAGE",
+        default_end_event: "PHYSICIAN",
+        default_statistic_type: "POINT_ESTIMATE",
+      },
+      {
+        id: "bc-phsa",
+        name: "BC PHSA",
+        province: "British Columbia",
+        default_metric_family: "TIME_TO_PROVIDER",
+        default_start_event: "TRIAGE",
+        default_end_event: "PHYSICIAN",
+        default_statistic_type: "P90",
+      },
+      {
+        id: "quebec-msss",
+        name: "Quebec MSSS",
+        province: "Quebec",
+        default_metric_family: "TIME_TO_PROVIDER",
+        default_start_event: "REGISTRATION",
+        default_end_event: "PHYSICIAN",
+        default_statistic_type: "ROLLING_AVG",
+      },
+    ]);
 
-      expect(areComparable(torontoGeneral, torontoWestern)).toBe(true);
-      expect(
-        generateDivergenceBrief(torontoGeneral, torontoWestern),
-      ).toBeNull();
+    expect(pairs).toHaveLength(3);
+    expect(pairs[0]).toMatchObject({
+      left: expect.objectContaining({ province: "Ontario" }),
+      right: expect.objectContaining({ province: "British Columbia" }),
     });
   });
 });

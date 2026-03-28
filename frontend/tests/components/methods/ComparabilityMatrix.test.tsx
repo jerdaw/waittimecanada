@@ -116,9 +116,13 @@ describe("ComparabilityMatrix", () => {
   it("displays comparison legend", () => {
     render(<ComparabilityMatrix sources={mockSources} />);
 
-    expect(screen.getByText("Directly comparable")).toBeInTheDocument();
-    expect(screen.getByText(/Partially comparable/i)).toBeInTheDocument();
-    expect(screen.getByText(/Not comparable/i)).toBeInTheDocument();
+    expect(screen.getAllByText("Directly comparable").length).toBeGreaterThan(
+      0,
+    );
+    expect(screen.getAllByText(/Partially comparable/i).length).toBeGreaterThan(
+      0,
+    );
+    expect(screen.getAllByText(/Not comparable/i).length).toBeGreaterThan(0);
   });
 
   it("shows detail panel when cell is clicked", async () => {
@@ -227,7 +231,7 @@ describe("ComparabilityMatrix", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(/Comparing Ontario with Quebec/i),
+        screen.getByRole("heading", { name: /Comparing Ontario with Quebec/i }),
       ).toBeInTheDocument();
     });
   });

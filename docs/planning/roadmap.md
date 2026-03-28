@@ -158,7 +158,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 ### Phase D: Deferred — If Time Permits
 [Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
 
-- [ ] **P2 / D1: Comparability matrix upgrade** — Explicit per-pair field-by-field verdicts on /methods (conditional on current state)
+- [x] **P2 / D1: Comparability matrix upgrade** — Delivered 2026-03-28. The `/methods` comparability matrix now shows explicit field-by-field match/mismatch verdicts for every unique province pair, plus pairwise match counts and short clinical implications. The shared frontend comparability utility also now powers the compare API's divergence logic so methodology verdicts stay consistent across surfaces.
 - [ ] **P2 / D2: Quebec equity layer extension (M34)** — Apply Ontario template to QC with full rigor (blocked on StatsCan CT data)
 - [x] **P2 / D3: Per-hospital data freshness indicators** — Confirmed delivered during roadmap reconciliation on 2026-03-28. Hospital APIs already expose `last_updated`, the public map/list/details surfaces already render freshness state, and raw exports already include `timestamp_utc`.
 - [ ] **P2 / D4: Nova Scotia scraper (M35)** — Only if NS methodology is confirmed novel (pre-research done)
@@ -498,4 +498,4 @@ Archived (delivered):
 | **C: Scholarly Artifacts** | Internal pass largely complete | C1/C3 retained as internal assets; C4/C5 delivered; C2 conditional on outward C1 activation; C6 conditional only | Mostly conditional |
 | **D: If Time Permits** | Weeks 5–12 | D1–D5 (comparability matrix, QC equity, freshness indicators, NS scraper, grant/competition) | Variable |
 
-**Next Action:** Keep `A3`, `A4`, and `B3` parked by choice. Retain `C1/C3` as internal-only assets; treat `C2` as conditional on any future outward `C1` activation, `B2` as later/VPS-dependent, and `C6` as conditional only. If focus returns to engineering/ops, `D12` remains the strongest concrete next item.
+**Next Action:** Keep `A3`, `A4`, and `B3` parked by choice. Retain `C1/C3` as internal-only assets; treat `C2` as conditional on any future outward `C1` activation, `B2` as later/VPS-dependent, and `C6` as conditional only. If focus returns to engineering/ops, `D13` is now the strongest concrete next item.

@@ -3,40 +3,18 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-
-interface Source {
-  id: string;
-  name: string;
-  province: string;
-  default_metric_family: string;
-  default_start_event: string;
-  default_end_event: string;
-  default_statistic_type: string;
-}
+import {
+  buildUniquePairwiseComparisons,
+  getComparabilityDimensions,
+  getComparabilityLevel,
+  getComparabilityMatchCount,
+  type ComparabilityDimension,
+  type ComparabilityLevel,
+  type MethodologySource,
+} from "@/utils/comparability";
 
 interface ComparabilityMatrixProps {
-  sources: Source[];
-}
-
-type ComparabilityLevel = "comparable" | "partial" | "not-comparable";
-
-function areComparable(a: Source, b: Source): ComparabilityLevel {
-  // Same source is always comparable
-  if (a.id === b.id) return "comparable";
-
-  // Check all four dimensions
-  const metricMatch = a.default_metric_family === b.default_metric_family;
-  const startMatch = a.default_start_event === b.default_start_event;
-  const endMatch = a.default_end_event === b.default_end_event;
-  const statMatch = a.default_statistic_type === b.default_statistic_type;
-
-  const matches = [metricMatch, startMatch, endMatch, statMatch].filter(
-    Boolean,
-  ).length;
-
-  if (matches === 4) return "comparable";
-  if (matches >= 2) return "partial";
-  return "not-comparable";
+  sources: MethodologySource[];
 }
 
 function getComparabilityColor(level: ComparabilityLevel): string {
@@ -61,7 +39,10 @@ function getComparabilityIcon(level: ComparabilityLevel): string {
   }
 }
 
-function exportMatrixToCSV(sources: Source[], tLevels: any) {
+function exportMatrixToCSV(
+  sources: MethodologySource[],
+  tLevels: (key: string) => string,
+) {
   // Build CSV content
   const rows: string[][] = [];
 
@@ -73,7 +54,7 @@ function exportMatrixToCSV(sources: Source[], tLevels: any) {
   sources.forEach((rowSource) => {
     const row = [rowSource.province];
     sources.forEach((colSource) => {
-      const level = areComparable(rowSource, colSource);
+      const level = getComparabilityLevel(rowSource, colSource);
       // Determine label key based on level
       let labelKey = "notComparable";
       if (level === "comparable") labelKey = "comparable";
@@ -107,8 +88,8 @@ function exportMatrixToCSV(sources: Source[], tLevels: any) {
 export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
   const t = useTranslations("Methods.ComparabilityMatrix");
   const [selectedCell, setSelectedCell] = useState<{
-    row: Source;
-    col: Source;
+    row: MethodologySource;
+    col: MethodologySource;
   } | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -126,7 +107,10 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
     }
   }, [searchParams, sources]);
 
-  const handleCellClick = (rowSource: Source, colSource: Source) => {
+  const handleCellClick = (
+    rowSource: MethodologySource,
+    colSource: MethodologySource,
+  ) => {
     setSelectedCell({ row: rowSource, col: colSource });
 
     // Update URL with deep link
@@ -156,6 +140,17 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
     );
   }
 
+  const pairwiseComparisons = buildUniquePairwiseComparisons(sources);
+  const selectedLevel = selectedCell
+    ? getComparabilityLevel(selectedCell.row, selectedCell.col)
+    : null;
+  const selectedDimensions = selectedCell
+    ? getComparabilityDimensions(selectedCell.row, selectedCell.col)
+    : [];
+  const selectedMatchCount = selectedCell
+    ? getComparabilityMatchCount(selectedCell.row, selectedCell.col)
+    : 0;
+
   return (
     <div className="space-y-6">
       {/* Matrix */}
@@ -182,7 +177,7 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
                     {rowSource.province}
                   </th>
                   {sources.map((colSource) => {
-                    const level = areComparable(rowSource, colSource);
+                    const level = getComparabilityLevel(rowSource, colSource);
                     const isSelected =
                       selectedCell?.row.id === rowSource.id &&
                       selectedCell?.col.id === colSource.id;
@@ -268,79 +263,238 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
       {/* Selected cell details */}
       {selectedCell && selectedCell.row.id !== selectedCell.col.id && (
         <div className="mt-6 p-6 rounded-xl border-2 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30">
-          <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-3">
-            {t("comparing", {
-              p1: selectedCell.row.province,
-              p2: selectedCell.col.province,
-            })}
-          </h4>
+          <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+            <h4 className="font-semibold text-blue-900 dark:text-blue-100">
+              {t("comparing", {
+                p1: selectedCell.row.province,
+                p2: selectedCell.col.province,
+              })}
+            </h4>
+            <span
+              className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${getComparabilityColor(
+                selectedLevel ?? "not-comparable",
+              )}`}
+            >
+              {getComparabilityIcon(selectedLevel ?? "not-comparable")}{" "}
+              {getComparabilityLabel(selectedLevel ?? "not-comparable")}
+            </span>
+          </div>
+          <p className="mb-4 text-sm text-blue-800 dark:text-blue-200">
+            {t("detailsIntro")}
+          </p>
+          <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <SummaryCard
+              label={t("summary.matchCount")}
+              value={t("summary.matchCountValue", {
+                count: selectedMatchCount,
+                total: 4,
+              })}
+            />
+            <SummaryCard
+              label={t("summary.implication")}
+              value={getClinicalImplication(
+                selectedLevel ?? "not-comparable",
+                t,
+              )}
+            />
+          </div>
           <div className="space-y-2 text-sm">
             <ComparisonRow
               label={t("metrics.family")}
-              value1={selectedCell.row.default_metric_family}
-              value2={selectedCell.col.default_metric_family}
+              dimension={selectedDimensions[0]}
+              t={t}
             />
             <ComparisonRow
               label={t("metrics.start")}
-              value1={selectedCell.row.default_start_event}
-              value2={selectedCell.col.default_start_event}
+              dimension={selectedDimensions[1]}
+              t={t}
             />
             <ComparisonRow
               label={t("metrics.end")}
-              value1={selectedCell.row.default_end_event}
-              value2={selectedCell.col.default_end_event}
+              dimension={selectedDimensions[2]}
+              t={t}
             />
             <ComparisonRow
               label={t("metrics.stat")}
-              value1={selectedCell.row.default_statistic_type}
-              value2={selectedCell.col.default_statistic_type}
+              dimension={selectedDimensions[3]}
+              t={t}
             />
           </div>
           <p className="mt-4 text-sm text-blue-800 dark:text-blue-200">
-            {areComparable(selectedCell.row, selectedCell.col) ===
-              "comparable" && <>{t("explanations.comparable")}</>}
-            {areComparable(selectedCell.row, selectedCell.col) ===
-              "partial" && <>{t("explanations.partial")}</>}
-            {areComparable(selectedCell.row, selectedCell.col) ===
-              "not-comparable" && <>{t("explanations.notComparable")}</>}
+            {selectedLevel === "comparable" && (
+              <>{t("explanations.comparable")}</>
+            )}
+            {selectedLevel === "partial" && <>{t("explanations.partial")}</>}
+            {selectedLevel === "not-comparable" && (
+              <>{t("explanations.notComparable")}</>
+            )}
           </p>
         </div>
       )}
+
+      <div className="space-y-4">
+        <div>
+          <h4 className="text-base font-semibold text-foreground">
+            {t("pairwise.title")}
+          </h4>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t("pairwise.description")}
+          </p>
+        </div>
+        <div className="grid gap-4 lg:grid-cols-2">
+          {pairwiseComparisons.map(({ left, right, level }) => (
+            <div
+              key={`${left.id}-${right.id}`}
+              className="rounded-xl border border-border/60 bg-card p-4 shadow-sm"
+            >
+              <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h5 className="font-semibold text-foreground">
+                    {left.province} vs {right.province}
+                  </h5>
+                  <p className="text-sm text-muted-foreground">
+                    {t("summary.matchCountValue", {
+                      count: getComparabilityMatchCount(left, right),
+                      total: 4,
+                    })}
+                  </p>
+                </div>
+                <span
+                  className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${getComparabilityColor(
+                    level,
+                  )}`}
+                >
+                  {getComparabilityIcon(level)} {getComparabilityLabel(level)}
+                </span>
+              </div>
+              <div className="space-y-2">
+                {getComparabilityDimensions(left, right).map((dimension) => (
+                  <PairwiseVerdictRow
+                    key={`${left.id}-${right.id}-${dimension.key}`}
+                    dimension={dimension}
+                    t={t}
+                  />
+                ))}
+              </div>
+              <p className="mt-3 text-sm text-muted-foreground">
+                {getClinicalImplication(level, t)}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
 
 function ComparisonRow({
   label,
-  value1,
-  value2,
+  dimension,
+  t,
 }: {
   label: string;
-  value1: string;
-  value2: string;
+  dimension: ComparabilityDimension;
+  t: ReturnType<typeof useTranslations>;
 }) {
-  const matches = value1 === value2;
-
   return (
     <div className="flex items-center justify-between py-2 border-b border-blue-200 dark:border-blue-800 last:border-0">
       <span className="font-medium text-blue-900 dark:text-blue-100">
         {label}:
       </span>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap justify-end">
         <code
-          className={`px-2 py-1 rounded text-xs ${matches ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300" : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"}`}
+          className={`px-2 py-1 rounded text-xs ${dimension.matches ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300" : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"}`}
         >
-          {value1}
+          {dimension.left_value}
         </code>
         <span className="text-blue-400 dark:text-blue-500">
-          {matches ? "=" : "≠"}
+          {dimension.matches ? "=" : "≠"}
         </span>
         <code
-          className={`px-2 py-1 rounded text-xs ${matches ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300" : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"}`}
+          className={`px-2 py-1 rounded text-xs ${dimension.matches ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300" : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"}`}
         >
-          {value2}
+          {dimension.right_value}
         </code>
+        <span
+          className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+            dimension.matches
+              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+              : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+          }`}
+        >
+          {dimension.matches ? t("verdicts.match") : t("verdicts.mismatch")}
+        </span>
       </div>
     </div>
   );
+}
+
+function PairwiseVerdictRow({
+  dimension,
+  t,
+}: {
+  dimension: ComparabilityDimension;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-3 rounded-lg border border-border/50 bg-muted/30 px-3 py-2 text-sm">
+      <div>
+        <div className="font-medium text-foreground">
+          {t(`metrics.${dimensionToMetricKey(dimension.key)}`)}
+        </div>
+        <div className="mt-1 text-xs text-muted-foreground">
+          {dimension.left_value} vs {dimension.right_value}
+        </div>
+      </div>
+      <span
+        className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+          dimension.matches
+            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+            : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+        }`}
+      >
+        {dimension.matches ? t("verdicts.match") : t("verdicts.mismatch")}
+      </span>
+    </div>
+  );
+}
+
+function SummaryCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-blue-200 dark:border-blue-800 bg-white/60 dark:bg-slate-900/40 p-3">
+      <div className="text-xs font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-300">
+        {label}
+      </div>
+      <div className="mt-1 text-sm text-blue-900 dark:text-blue-100">
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function dimensionToMetricKey(key: ComparabilityDimension["key"]) {
+  switch (key) {
+    case "metric_family":
+      return "family";
+    case "start_event":
+      return "start";
+    case "end_event":
+      return "end";
+    case "statistic_type":
+      return "stat";
+  }
+}
+
+function getClinicalImplication(
+  level: ComparabilityLevel,
+  t: ReturnType<typeof useTranslations>,
+) {
+  switch (level) {
+    case "comparable":
+      return t("implications.comparable");
+    case "partial":
+      return t("implications.partial");
+    case "not-comparable":
+      return t("implications.notComparable");
+  }
 }

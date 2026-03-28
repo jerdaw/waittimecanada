@@ -287,9 +287,9 @@ Don't inflate titles. A 20-minute methodology review conversation makes someone 
 These items improve the project as software but have diminishing admissions returns. Only pursue after Phases A–C are complete.
 
 ### D1: Comparability Matrix Upgrade
-**Effort:** M | **Condition:** Only if current `/methods` comparability matrix lacks explicit per-pair field-by-field justifications.
+**Status:** Delivered on 2026-03-28.
 
-Check current implementation. If province-pair verdicts are high-level, add explicit field-by-field comparability verdicts for all 6 province pairs (ON-QC, ON-AB, ON-BC, QC-AB, QC-BC, AB-BC) with clinical implications.
+The `/methods` comparability matrix now provides explicit pairwise field-by-field verdicts for all unique province pairs, including match/mismatch badges for each ontology dimension, match-count summaries, and short clinical-implication text. The compare API now reuses the same shared comparability utility so divergence language and methodology verdicts remain consistent across surfaces.
 
 ### D2: Quebec Equity Layer Extension
 **Effort:** M–L | **Condition:** Only after Phases A–C complete. Must apply full Ontario-equivalent rigor (ADR, suppression provenance, uncertainty bounds, non-causal framing).

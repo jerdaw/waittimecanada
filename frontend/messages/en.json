@@ -678,6 +678,10 @@
         "partial": "Partially comparable",
         "notComparable": "Not comparable"
       },
+      "verdicts": {
+        "match": "Match",
+        "mismatch": "Mismatch"
+      },
       "legend": {
         "comparable": "Directly comparable",
         "partial": "Partially comparable (2-3 matches)",
@@ -685,16 +689,31 @@
       },
       "export": "Export CSV",
       "comparing": "Comparing {p1} with {p2}",
+      "detailsIntro": "Field-by-field ontology verdict for this province pair.",
+      "summary": {
+        "matchCount": "Ontology alignment",
+        "matchCountValue": "{count} of {total} dimensions match",
+        "implication": "Clinical implication"
+      },
       "metrics": {
         "family": "Metric Family",
         "start": "Start Event",
         "end": "End Event",
         "stat": "Statistic Type"
       },
+      "implications": {
+        "comparable": "These sources align on all four ontology dimensions, so direct cross-province comparison is methodologically valid.",
+        "partial": "These sources share some ontology dimensions, but the remaining mismatches still make direct comparison unsafe without qualification.",
+        "notComparable": "These sources diverge on most core ontology dimensions. Ranking or treating them as equivalent would be misleading."
+      },
       "explanations": {
         "comparable": "✓ These provinces use identical methodologies and can be directly compared.",
         "partial": "⚠ These provinces differ in some dimensions. Comparisons should note these differences.",
         "notComparable": "✗ These provinces use fundamentally different methodologies. Direct comparison is statistically invalid."
+      },
+      "pairwise": {
+        "title": "Pairwise Verdicts",
+        "description": "Each province pair is broken down field by field so you can see exactly which ontology dimensions match and which ones invalidate direct comparison."
       }
     },
     "ProvinceMethodologyCard": {

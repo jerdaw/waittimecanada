@@ -678,6 +678,10 @@
         "partial": "Partiellement comparable",
         "notComparable": "Non comparable"
       },
+      "verdicts": {
+        "match": "Correspond",
+        "mismatch": "Diffère"
+      },
       "legend": {
         "comparable": "Directement comparable",
         "partial": "Partiellement comparable (2-3 correspondances)",
@@ -685,16 +689,31 @@
       },
       "export": "Exporter CSV",
       "comparing": "Comparaison de {p1} avec {p2}",
+      "detailsIntro": "Verdict ontologique champ par champ pour cette paire de provinces.",
+      "summary": {
+        "matchCount": "Alignement ontologique",
+        "matchCountValue": "{count} dimensions sur {total} correspondent",
+        "implication": "Implication clinique"
+      },
       "metrics": {
         "family": "Famille de Métriques",
         "start": "Événement de Début",
         "end": "Événement de Fin",
         "stat": "Type de Statistique"
       },
+      "implications": {
+        "comparable": "Ces sources concordent sur les quatre dimensions de l'ontologie; une comparaison directe interprovinciale est donc méthodologiquement valide.",
+        "partial": "Ces sources partagent certaines dimensions de l'ontologie, mais les divergences restantes rendent une comparaison directe imprudente sans mise en contexte.",
+        "notComparable": "Ces sources divergent sur la plupart des dimensions ontologiques essentielles. Les classer ou les traiter comme équivalentes serait trompeur."
+      },
       "explanations": {
         "comparable": "✓ Ces provinces utilisent des méthodologies identiques et peuvent être directement comparées.",
         "partial": "⚠ Ces provinces diffèrent sur certaines dimensions. Les comparaisons doivent noter ces différences.",
         "notComparable": "✗ Ces provinces utilisent des méthodologies fondamentalement différentes. La comparaison directe est statistiquement invalide."
+      },
+      "pairwise": {
+        "title": "Verdicts par paire",
+        "description": "Chaque paire de provinces est détaillée champ par champ afin de montrer exactement quelles dimensions de l'ontologie concordent et lesquelles invalident une comparaison directe."
       }
     },
     "ProvinceMethodologyCard": {
