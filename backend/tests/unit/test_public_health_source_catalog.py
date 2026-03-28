@@ -139,3 +139,46 @@ class TestPublicHealthSourceCatalogDatabaseService:
         executed_sql = mock_cursor.execute.call_args[0][0]
         assert "COALESCE(" in executed_sql
         assert "public_data_sources.last_refreshed_at" in executed_sql
+
+    @patch("psycopg2.connect")
+    def test_list_public_health_source_statuses(self, mock_connect, db_service):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [
+            {
+                "source_id": "test-mohserlo",
+                "source_name": "MOHSERLO",
+                "domain": "provider_facility",
+                "recommended_usage_mode": "scheduled_ingest",
+                "freshness_sensitivity": "low",
+                "last_refreshed_at": datetime(2026, 3, 27, 12, 0, tzinfo=UTC),
+                "resource_record_count": 123,
+                "alert_record_count": 0,
+                "latest_alert_published_at": None,
+            },
+            {
+                "source_id": "test-recalls",
+                "source_name": "Health Canada Recalls",
+                "domain": "safety_alert",
+                "recommended_usage_mode": "scheduled_ingest",
+                "freshness_sensitivity": "high",
+                "last_refreshed_at": datetime(2026, 3, 27, 12, 5, tzinfo=UTC),
+                "resource_record_count": 0,
+                "alert_record_count": 42,
+                "latest_alert_published_at": datetime(2026, 3, 27, 11, 45, tzinfo=UTC),
+            },
+        ]
+
+        results = db_service.list_public_health_source_statuses()
+
+        assert len(results) == 2
+        assert results[0].source_id == "test-mohserlo"
+        assert results[0].resource_record_count == 123
+        assert results[1].alert_record_count == 42
+        executed_sql = mock_cursor.execute.call_args[0][0]
+        assert "FROM public_data_sources" in executed_sql
+        assert "FROM resource_locations" in executed_sql
+        assert "FROM public_health_alerts" in executed_sql

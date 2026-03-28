@@ -10,6 +10,7 @@ import logging
 import os
 from collections.abc import Generator
 from contextlib import contextmanager
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -31,6 +32,21 @@ from waittime.core import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class PublicHealthSourceStatus:
+    """Operational summary for one public-health-hub source."""
+
+    source_id: str
+    source_name: str
+    domain: str
+    recommended_usage_mode: str
+    freshness_sensitivity: str
+    last_refreshed_at: datetime | None
+    resource_record_count: int
+    alert_record_count: int
+    latest_alert_published_at: datetime | None
 
 
 def _maybe_load_database_env() -> None:
@@ -148,6 +164,58 @@ class DatabaseService:
                 query += " ORDER BY domain, source_name"
                 cur.execute(query, params)
                 return [self._row_to_public_data_source(dict(row)) for row in cur.fetchall()]
+
+    def list_public_health_source_statuses(self) -> list[PublicHealthSourceStatus]:
+        """List operational status summaries for all public-health-hub sources."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT
+                        public_data_sources.source_id,
+                        public_data_sources.source_name,
+                        public_data_sources.domain,
+                        public_data_sources.recommended_usage_mode,
+                        public_data_sources.freshness_sensitivity,
+                        public_data_sources.last_refreshed_at,
+                        COALESCE(resource_counts.resource_record_count, 0) AS resource_record_count,
+                        COALESCE(alert_counts.alert_record_count, 0) AS alert_record_count,
+                        alert_counts.latest_alert_published_at
+                    FROM public_data_sources
+                    LEFT JOIN (
+                        SELECT
+                            source_id,
+                            COUNT(*)::integer AS resource_record_count
+                        FROM resource_locations
+                        GROUP BY source_id
+                    ) AS resource_counts
+                        ON resource_counts.source_id = public_data_sources.source_id
+                    LEFT JOIN (
+                        SELECT
+                            source_id,
+                            COUNT(*)::integer AS alert_record_count,
+                            MAX(published_at) AS latest_alert_published_at
+                        FROM public_health_alerts
+                        GROUP BY source_id
+                    ) AS alert_counts
+                        ON alert_counts.source_id = public_data_sources.source_id
+                    ORDER BY public_data_sources.domain, public_data_sources.source_name
+                    """
+                )
+                return [
+                    PublicHealthSourceStatus(
+                        source_id=str(row["source_id"]),
+                        source_name=str(row["source_name"]),
+                        domain=str(row["domain"]),
+                        recommended_usage_mode=str(row["recommended_usage_mode"]),
+                        freshness_sensitivity=str(row["freshness_sensitivity"]),
+                        last_refreshed_at=row["last_refreshed_at"],
+                        resource_record_count=int(row["resource_record_count"] or 0),
+                        alert_record_count=int(row["alert_record_count"] or 0),
+                        latest_alert_published_at=row["latest_alert_published_at"],
+                    )
+                    for row in cur.fetchall()
+                ]
 
     def upsert_public_data_source(self, source: PublicDataSource) -> PublicDataSource:
         """Insert or update a public-health-hub source metadata record."""

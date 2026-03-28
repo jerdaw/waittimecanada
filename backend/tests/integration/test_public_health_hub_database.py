@@ -194,3 +194,15 @@ class TestPublicHealthHubDatabase:
         alerts = public_health_hub_db.list_public_health_alerts(source_id="test-recalls")
         assert len(alerts) == 1
         assert alerts[0].title == "Example recall"
+
+        statuses = public_health_hub_db.list_public_health_source_statuses()
+        assert len(statuses) == 2
+
+        source_status = {status.source_id: status for status in statuses}
+        assert source_status["test-mohserlo"].resource_record_count == 1
+        assert source_status["test-mohserlo"].alert_record_count == 0
+        assert source_status["test-recalls"].resource_record_count == 0
+        assert source_status["test-recalls"].alert_record_count == 1
+        assert source_status["test-recalls"].latest_alert_published_at == datetime(
+            2026, 3, 27, 9, 0, tzinfo=UTC
+        )
