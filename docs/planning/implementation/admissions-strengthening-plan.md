@@ -86,6 +86,8 @@ One genuine 15-minute conversation with an ER nurse or physician, honestly docum
 ### A5: Private Reflection Document
 **Priority:** 3 | **Effort:** 2 h | **CanMEDS:** Professional, Scholar
 
+**Status:** Intentionally skipped on 2026-03-28. Kept out of active scope because the value is mostly private interview prep, not a public-facing credibility artifact, and the time is better spent elsewhere unless interview preparation needs change later.
+
 Write a private document (not committed to the repo) covering:
 1. What motivated the project — the specific insight or experience.
 2. One technical decision you'd revisit.
@@ -95,7 +97,7 @@ Write a private document (not committed to the repo) covering:
 
 This is interview preparation that produces articulate, reflective answers. The document is not the artifact — the interview performance is.
 
-**Artifact:** Private reflection document for ABS drafting and interview prep.
+**Artifact:** None for now. Revisit only if future interview preparation clearly needs it.
 
 ### A6: Ottawa–Gatineau Case Study
 **Priority:** 2 | **Effort:** 2–3 h | **CanMEDS:** Scholar, Communicator, Health Advocate
@@ -287,7 +289,7 @@ If Phases A–C execute on schedule, by mid-April 2026 the portfolio includes:
 - A 2–4 page technical report reviewed by at least one external reader
 - One monthly operational report
 - One incident post-mortem for interview preparation
-- A private reflection document for ABS drafting
+- A consciously skipped private reflection exercise, with time redirected toward higher-value public artifacts
 - Potentially: a named reviewer acknowledged in the README
 
 Total effort: approximately 5–6 days of focused work spread across 6 weeks.

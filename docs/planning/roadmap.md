@@ -133,7 +133,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [x] **P1 / A2: Limitations section in README** — Specific, technical limitations demonstrating intellectual maturity (delivered in README + application summary)
 - [ ] **P1 / A3: Fix placeholder Zenodo DOI** — Repo-side preparation is complete (`CITATION.cff`, `.zenodo.json`, current GitHub release). Remaining work is Zenodo account activation, publish, and then restoring the README badge once the DOI is real. `Hold until explicit user go-ahead.`
 - [ ] **P1 / A4: Stakeholder interview outreach** — Send 10–15 outreach messages to ER professionals using existing templates (2–3 h outreach; interviews on their schedule). `Hold until explicit user go-ahead.`
-- [ ] **P1 / A5: Private reflection document** — ABS/interview prep; motivation, decisions, surprises, ethical tensions (2 h; not committed to repo)
+- [x] **P3 / A5: Private reflection document** — Intentionally de-scoped on 2026-03-28. Kept out of active scope because it is private interview prep rather than a public-facing credibility artifact. Revisit only if future interview preparation clearly needs it.
 - [x] **P1 / A6: Ottawa–Gatineau case study** — Added the case study artifact, linked it from README/application summary, and verified the Ottawa/Gatineau pair against live production data on 2026-03-28
 - [x] **P1 / A7: Quantified metrics & methodology findings** — Added a dated "By the Numbers" section to README using operational and ontology-level findings only, with no cross-province performance claims
 
@@ -180,7 +180,7 @@ Each feature maps to CanMEDS competencies for medical school admissions:
 | Competency | Delivered | Admissions Plan (New) |
 |------------|----------|----------------------|
 | **Scholar** | Metric ontology, comparability matrix, citation export, aggregation pipeline, anomaly detection, methodology change detection, property-based testing, data dictionary, OpenAPI docs, Zenodo DOI | Technical report (C1), Ottawa–Gatineau case study (A6), quantified findings (A7), equity interpretive summary (C3), limitations section (A2) |
-| **Professional** | Clinical defensibility, divergence warnings, data quality transparency, peer benchmarking, SECURITY.md, LICENSE, CODE_OF_CONDUCT, privacy policy, terms of use, error boundaries, security headers, uptime monitoring | Operational transparency report (C4), incident post-mortem (C5), README mission/equity/stewardship section (A1), reflection document (A5) |
+| **Professional** | Clinical defensibility, divergence warnings, data quality transparency, peer benchmarking, SECURITY.md, LICENSE, CODE_OF_CONDUCT, privacy policy, terms of use, error boundaries, security headers, uptime monitoring | Operational transparency report (C4), incident post-mortem (C5), README mission/equity/stewardship section (A1) |
 | **Health Advocate** | Access Burden Estimator, equity layer (ON), temporal access patterns, accessibility testing (WCAG), French language support, mobile responsiveness | Stakeholder interview with ER professionals (A4), equity layer interpretation (C3) |
 | **Leader** | Multi-province scaling, systems architecture, regional dashboards, data quality monitoring, release management, operational documentation | Live production URL (B1), video walkthrough (B4), LinkedIn launch (B3), usage analytics (B2) |
 | **Collaborator** | Province-aware telehealth routing, issue/PR templates, CODE_OF_CONDUCT, CONTRIBUTING guidelines | Stakeholder interview (A4), researcher outreach (C2), named reviewer acknowledgement (C6) |
@@ -491,7 +491,7 @@ Archived (delivered):
 
 | Phase | Timeline | Items | Effort |
 |-------|----------|-------|--------|
-| **A: Credibility Cleanup** | Active | A1–A7 (mission/equity/stewardship, limitations, Zenodo DOI, stakeholder outreach, reflection doc, case study, metrics) | ~12–15 h |
+| **A: Credibility Cleanup** | Active | A1–A7 (mission/equity/stewardship, limitations, Zenodo DOI, stakeholder outreach, case study, metrics; A5 intentionally de-scoped) | ~10–13 h remaining |
 | **B: Launch Follow-Through** | Active | B2–B5 (analytics, LinkedIn, video, discoverability) | ~5–6 h remaining |
 | **C: Scholarly Artifacts** | Weeks 2–4 post-launch | C1–C6 (technical report, researcher outreach, equity interpretation, ops report, post-mortem, reviewer) | ~2–3 d |
 | **D: If Time Permits** | Weeks 5–12 | D1–D5 (comparability matrix, QC equity, freshness indicators, NS scraper, grant/competition) | Variable |
