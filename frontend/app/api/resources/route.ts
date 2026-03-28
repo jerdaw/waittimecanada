@@ -234,8 +234,7 @@ export async function GET(request: NextRequest) {
               ? dedupeFacilitySearchRows(normalizedRows, q)
               : normalizedRows;
 
-        const limitedRows = displayRows
-          .slice(0, limit);
+        const limitedRows = displayRows.slice(0, limit);
 
         const sourceStatusRows = (await sql.unsafe(
           `
@@ -388,15 +387,11 @@ function getFacilityQuerySortRank(
   const name = normalizeSearchText(resource.name);
   const city = normalizeSearchText(resource.city);
   const address = normalizeSearchText(resource.address);
-  const locationDescription = normalizeSearchText(resource.location_description);
+  const locationDescription = normalizeSearchText(
+    resource.location_description,
+  );
   const accessNotes = normalizeSearchText(resource.access_notes);
-  const combined = [
-    name,
-    city,
-    address,
-    locationDescription,
-    accessNotes,
-  ]
+  const combined = [name, city, address, locationDescription, accessNotes]
     .filter(Boolean)
     .join(" ");
   const genericIntentRank = getGenericFacilityQueryIntentRank(
@@ -523,7 +518,10 @@ function buildFacilitySearchDeduplicationKey(
   const normalizedName = normalizeSearchText(resource.name);
   const isGenericCategoryQuery = isGenericFacilityCategoryQuery(queryTokens);
 
-  if (!isGenericCategoryQuery && !queryTokens.every((token) => normalizedName.includes(token))) {
+  if (
+    !isGenericCategoryQuery &&
+    !queryTokens.every((token) => normalizedName.includes(token))
+  ) {
     return null;
   }
 
@@ -558,16 +556,11 @@ function normalizeDeduplicationPart(value: string | null | undefined): string {
 }
 
 function normalizeSearchText(value: string | null | undefined): string {
-  return (value ?? "")
-    .toLowerCase()
-    .replace(QUERY_TOKEN_SEPARATOR, " ")
-    .trim();
+  return (value ?? "").toLowerCase().replace(QUERY_TOKEN_SEPARATOR, " ").trim();
 }
 
 function tokenizeSearchQuery(value: string): string[] {
-  return normalizeSearchText(value)
-    .split(" ")
-    .filter(Boolean);
+  return normalizeSearchText(value).split(" ").filter(Boolean);
 }
 
 function roundCoordinateForGrouping(value: number): string {
@@ -584,11 +577,18 @@ function getGenericFacilityQueryIntentRank(
 
   const queryToken = queryTokens[0];
   const nameText = normalizeSearchText(resource.name);
-  const text = [resource.name, resource.location_description, resource.access_notes]
+  const text = [
+    resource.name,
+    resource.location_description,
+    resource.access_notes,
+  ]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
-  const hasHospitalKeywords = matchesKeywordGroup(text, EMERGENCY_FACILITY_KEYWORDS);
+  const hasHospitalKeywords = matchesKeywordGroup(
+    text,
+    EMERGENCY_FACILITY_KEYWORDS,
+  );
   const hasPharmacyKeywords = matchesKeywordGroup(text, PHARMACY_KEYWORDS);
   const hasDiagnosticKeywords = matchesKeywordGroup(
     text,
@@ -597,8 +597,10 @@ function getGenericFacilityQueryIntentRank(
   const hasClinicKeywords =
     matchesKeywordGroup(text, COMMUNITY_FACILITY_KEYWORDS) ||
     text.includes("clinic");
-  const hasStrongClinicKeywords =
-    matchesKeywordGroup(nameText, COMMUNITY_FACILITY_KEYWORDS);
+  const hasStrongClinicKeywords = matchesKeywordGroup(
+    nameText,
+    COMMUNITY_FACILITY_KEYWORDS,
+  );
 
   if (!queryToken) {
     return 0;
@@ -607,7 +609,12 @@ function getGenericFacilityQueryIntentRank(
   switch (queryToken) {
     case "hospital":
     case "emergency":
-      if (hasHospitalKeywords && !hasClinicKeywords && !hasPharmacyKeywords && !hasDiagnosticKeywords) {
+      if (
+        hasHospitalKeywords &&
+        !hasClinicKeywords &&
+        !hasPharmacyKeywords &&
+        !hasDiagnosticKeywords
+      ) {
         return 0;
       }
 

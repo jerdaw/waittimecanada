@@ -320,7 +320,9 @@ describe("API Route: Resources", () => {
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(
-      data.data.map((row: { name: string; city: string }) => `${row.name}|${row.city}`),
+      data.data.map(
+        (row: { name: string; city: string }) => `${row.name}|${row.city}`,
+      ),
     ).toEqual(
       expect.arrayContaining([
         "Toronto General Hospital|Toronto",
@@ -741,7 +743,11 @@ describe("API Route: Resources", () => {
 
     expect(res.status).toBe(200);
     const data = await res.json();
-    expect(data.data.map((row: { name: string; city: string }) => `${row.name}|${row.city}`)).toEqual([
+    expect(
+      data.data.map(
+        (row: { name: string; city: string }) => `${row.name}|${row.city}`,
+      ),
+    ).toEqual([
       "Alexandra Hospital|Ingersoll",
       "Alexandra Marine And General Hospital|Goderich",
     ]);

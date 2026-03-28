@@ -1,9 +1,6 @@
 import { useTranslations } from "next-intl";
 
-import type {
-  AQHIRecord,
-  SourceStatusRecord,
-} from "@/utils/public-health-hub";
+import type { AQHIRecord, SourceStatusRecord } from "@/utils/public-health-hub";
 
 interface AQHICardProps {
   aqhi: AQHIRecord | null;
