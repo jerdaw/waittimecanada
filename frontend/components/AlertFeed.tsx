@@ -51,7 +51,7 @@ export function AlertFeed({
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="font-medium text-foreground">{alert.title}</h3>
-            <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+            <span className="rounded-full bg-slate-200 px-2.5 py-1 text-[11px] font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-200">
               {alert.alert_type}
             </span>
           </div>

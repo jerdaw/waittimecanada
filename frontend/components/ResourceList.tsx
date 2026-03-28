@@ -73,7 +73,7 @@ export function ResourceList({
                     </span>
                   )}
                   {resource.completeness_status === "incomplete" && (
-                    <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+                    <span className="rounded-full bg-slate-200 px-2.5 py-1 text-[11px] font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-200">
                       {t("labels.incompleteCoverage")}
                     </span>
                   )}
@@ -83,7 +83,7 @@ export function ResourceList({
                     </span>
                   )}
                   {resource.distance_km !== undefined && (
-                    <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+                    <span className="rounded-full bg-slate-200 px-2.5 py-1 text-[11px] font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-200">
                       {t("distance", { distance: resource.distance_km })}
                     </span>
                   )}
