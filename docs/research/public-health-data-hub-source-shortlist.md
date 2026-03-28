@@ -5,6 +5,8 @@
 **Related:** `docs/planning/archive/public-health-data-hub-preplan.md`
 
 > This is a shortlist-first validation pass. It is intentionally not exhaustive. The goal is to validate only the strongest candidates needed to decide whether a real Batch A milestone plan should be written.
+>
+> Follow-on validation for deferred domains now lives in `docs/research/public-health-data-hub-batch-b-source-review.md`. That later review supersedes the original naloxone and inspection assumptions captured here.
 
 ---
 
@@ -43,7 +45,7 @@ This shortlist validates the source classes most relevant to a first Ontario-fir
 | Environmental overlay | AQHI forecasts via GeoMet | Canada-wide | GeoJSON/JSON API surface | Official API | Public federal open-data service | Real-time | High | Low | High | `live_ui` | Pass | Best first environmental overlay: official, machine-readable, current, and consumer-legible | https://api.weather.gc.ca/collections/aqhi-forecasts-realtime?f=html |
 | Environmental overlay | ISC long-term drinking water advisories map/data | Canada-wide; Ontario subset available | Public map with download link | Mixed map + downloadable data | Public federal source | Current operational updates | High | Medium | Medium | `scheduled_ingest` | Pass | Strong public-interest overlay, but narrower audience than AQHI; better Batch B/C candidate than first overlay | https://www.sac-isc.gc.ca/eng/1620925418298/1620925434679 |
 | EMS / system context | Land Ambulance Response Time Standard - Response Times | Ontario-wide | Ontario Data Catalogue CSV/JSON/XML | Open data portal dataset | Open Government Licence - Ontario | Annual public reporting cycle | Low to Medium | Low | Medium | `analytics_only` | Pass | Good system context layer, but weaker for first consumer batch than facilities/AED/alerts/AQHI | https://data.ontario.ca/dataset/land-ambulance-response-time-standard-response-times |
-| Naloxone access | Ontario naloxone kit location map | Ontario-wide | Public map and HTML table | Dashboard / map only | Public viewing is clear; direct reuse route is not validated | Unclear | High | Medium to High | Low to Medium | `research_only` | Conditional | Strong public-health value, but current access posture is weaker than Batch A domains | https://www.ontario.ca/page/where-get-free-naloxone-kit |
+| Naloxone access | Ontario naloxone kit location map | Ontario-wide | Public Ontario page backed by ArcGIS Web Map and public `FeatureServer` layer | Public web map + ArcGIS feature service | Public source is clear; explicit open-data licence for the layer is not confirmed | Unclear | High | Medium | Medium | `research_only` | Conditional | Strong public-health value and real technical access path, but reuse posture still needs explicit review before product dependence | https://www.ontario.ca/page/where-get-free-naloxone-kit |
 
 ---
 
@@ -60,7 +62,7 @@ This shortlist validates the source classes most relevant to a first Ontario-fir
 - **AQHI GeoMet:** the GeoMet AQHI collection exposes JSON, schema, queryables, and GeoJSON item endpoints for real-time forecasts.
 - **ISC drinking water advisories:** the ISC map page states that the map and table include long-term drinking water advisories on reserve systems and provides a “Download map data” route.
 - **Land ambulance response times:** the Ontario Data Catalogue resource page exposes CSV/TSV/JSON/XML and CKAN Data API access under the Open Government Licence - Ontario.
-- **Ontario naloxone map:** the Ontario page explicitly presents a public map of pickup locations, but the validation pass did not confirm an export or API route.
+- **Ontario naloxone map:** the Ontario page explicitly presents a public map of pickup locations and is backed by an Ontario-hosted ArcGIS Web Map plus a public `FeatureServer` layer, but this pass still did not confirm an explicit open-data licence for ingestion/reuse.
 
 ---
 

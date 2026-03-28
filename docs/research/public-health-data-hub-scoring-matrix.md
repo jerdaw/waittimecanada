@@ -2,7 +2,7 @@
 
 **Created:** 2026-03-27
 **Status:** Planning artifact
-**Related:** `docs/research/public-health-data-hub-source-shortlist.md`
+**Related:** `docs/research/public-health-data-hub-source-shortlist.md`, `docs/research/public-health-data-hub-batch-b-source-review.md`
 
 ---
 
@@ -57,7 +57,8 @@ A domain is blocked from Batch A if:
 | Recalls / safety alerts / product reference | 14 | 14 | 14 | 9 | 9 | 8 | 9 | 5 | 4 | 5 | **91** | Pass | Batch A |
 | Environmental overlay | 12 | 13 | 14 | 9 | 8 | 8 | 8 | 5 | 3 | 4 | **84** | Pass | Batch A |
 | EMS / system context | 9 | 13 | 12 | 5 | 8 | 9 | 8 | 5 | 3 | 4 | **76** | Pass | Batch B |
-| Naloxone access | 13 | 8 | 5 | 6 | 5 | 5 | 9 | 5 | 4 | 4 | **64** | Conditional | Batch B / park until reuse path improves |
+| Naloxone access | 13 | 8 | 10 | 7 | 6 | 5 | 9 | 5 | 4 | 4 | **71** | Conditional on reuse review | Batch B candidate |
+| Inspection / compliance | 11 | 10 | 12 | 7 | 6 | 8 | 7 | 2 | 4 | 4 | **71** | Conditional on municipal-scope acceptance | Toronto-first pilot only |
 
 ---
 
@@ -91,8 +92,15 @@ A domain is blocked from Batch A if:
 
 ### Naloxone access
 
-- **Why conditional:** high public value, but current validation only confirms a public map/table route, not a durable product ingestion path.
-- **Decision:** keep it warm, but do not allow it into Batch A unless a structured access route is verified.
+- **What changed in later validation:** the Ontario public page is backed by a public ArcGIS Web Map and queryable `FeatureServer` layer, so the technical connector path is much stronger than the original shortlist assumed.
+- **Why still conditional:** legal clarity is still weaker than the technical path; the key blocker is reuse approval, not machine access.
+- **Decision:** keep it warm as the strongest Batch B utility candidate, but do not implement until reuse is explicitly cleared.
+
+### Inspection / compliance
+
+- **Why newly scored:** Toronto’s DineSafe and BodySafe datasets are machine-readable, daily refreshed, and materially stronger than the early exploratory notes suggested.
+- **Why not higher:** coverage is municipal, not Ontario-wide, and the best-fit implementation shape would likely be a Toronto-only pilot rather than a clean province-wide module.
+- **Decision:** keep this out of default Batch B, but retain it as a possible pilot if fragmented scope is acceptable.
 
 ---
 
@@ -108,7 +116,11 @@ A domain is blocked from Batch A if:
 ### Recommended Batch B domains
 
 1. EMS / system context
-2. naloxone access, only if a stronger reuse path is confirmed
+2. naloxone access, only if reuse is explicitly cleared
+
+### Conditional Toronto-first pilot
+
+- inspection / compliance
 
 ### Parked for later broader scanning
 
