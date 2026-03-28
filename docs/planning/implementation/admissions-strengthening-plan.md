@@ -179,9 +179,11 @@ This is the only format where a committee hears your voice and experiences your 
 
 Add repository topic tags (`health-systems`, `emergency-medicine`, `wait-times`, `canada`, `data-observatory`, `open-data`). Check 1–2 open data registries for activity; submit if active.
 
-**Artifact:** GitHub topic tags; potentially external directory listing.
+**Status:** Delivered 2026-03-28. The GitHub repository now points its homepage to `https://wait-time.ca` and uses a cleaner subject-matter topic set (`canada`, `emergency-medicine`, `health-informatics`, `health-systems`, `open-data`, `public-health`, `data-observatory`, `wait-times`, `nextjs`, `postgresql`). A quick registry screen did not justify an immediate external submission: DataPortals.org is aimed at open data portals rather than this kind of project, and DataHub is oriented toward packaged open datasets rather than a live observatory site.
 
-**Phase B total: ~5–6 hours remaining post-launch (B1 delivered).**
+**Artifact:** GitHub topic tags and homepage link; no external directory submission for now.
+
+**Phase B total: ~2–3 hours remaining post-launch plus any parked work (B1 and B5 delivered).**
 
 ---
 

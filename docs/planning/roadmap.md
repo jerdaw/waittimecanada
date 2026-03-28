@@ -143,7 +143,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P2 / B2: First-party privacy-safe usage telemetry** — Re-scoped away from Plausible/third-party analytics on 2026-03-28. If activated later, use minimal first-party aggregate telemetry from the direct-VPS/logging path, then update `/privacy` accordingly. Do not add paid analytics or client-side tracking scripts. (2 h)
 - [ ] **P1 / B3: Publish LinkedIn launch post** — Draft refreshed for the live mission/equity/stewardship posture and current feature set; remaining work is manual publication using `https://wait-time.ca`. `Hold until explicit user go-ahead.` (30 min)
 - [x] **P3 / B4: Video walkthrough** — Intentionally de-scoped on 2026-03-28. Kept out of active scope because the time cost and presentation burden are not justified right now relative to other work. Revisit only if future application needs make the payoff clearer.
-- [ ] **P2 / B5: GitHub topics & discoverability** — Add topic tags; check 1–2 open data registries (30 min)
+- [x] **P2 / B5: GitHub topics & discoverability** — Delivered 2026-03-28. GitHub homepage now points to `https://wait-time.ca`, subject-matter topics were tightened, and a quick registry screen found no worthwhile immediate external listing step.
 
 ### Phase C: After Verified Launch — Scholarly Artifacts & External Validation
 [Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
@@ -492,7 +492,7 @@ Archived (delivered):
 | Phase | Timeline | Items | Effort |
 |-------|----------|-------|--------|
 | **A: Credibility Cleanup** | Active | A1–A7 (mission/equity/stewardship, limitations, Zenodo DOI, stakeholder outreach, case study, metrics; A5 intentionally de-scoped) | ~10–13 h remaining |
-| **B: Launch Follow-Through** | Active | B2, B3, B5 (analytics, LinkedIn, discoverability; B4 intentionally de-scoped) | ~2.5–3 h remaining plus any parked work |
+| **B: Launch Follow-Through** | Active | B2, B3 (analytics and LinkedIn; B4 intentionally de-scoped, B5 delivered) | ~2–2.5 h remaining plus any parked work |
 | **C: Scholarly Artifacts** | Weeks 2–4 post-launch | C1–C6 (technical report, researcher outreach, equity interpretation, ops report, post-mortem, reviewer) | ~2–3 d |
 | **D: If Time Permits** | Weeks 5–12 | D1–D5 (comparability matrix, QC equity, freshness indicators, NS scraper, grant/competition) | Variable |
 
