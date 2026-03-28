@@ -1,19 +1,20 @@
 # Zenodo DOI Integration Guide
 
-> **⏸️ Status: Deferred Until User Approval**
+> **⚠️ Status: Repo Prepared, Zenodo Activation Still Required**
 >
-> Automated setup is complete (`.zenodo.json`, DOI badge, documentation). User activation steps below are **deferred until explicit approval** to proceed with external service integration.
+> The repository and release side are prepared, but the real DOI does **not** exist yet. A human with access to the GitHub/Zenodo accounts must complete Zenodo activation and publish the record.
 
 ## Overview
 
 This guide walks you through linking your GitHub repository to Zenodo to generate a permanent Digital Object Identifier (DOI) for academic citations.
 
 **Current Status:**
-- ✅ Repository prepared with `.zenodo.json` metadata and DOI badge in README
-- ✅ Comprehensive integration guide created (this document)
-- ⏸️ User activation deferred until approval given
+- ✅ Repository prepared with `.zenodo.json` metadata
+- ✅ `CITATION.cff` updated for the current public release
+- ✅ Current public release prepared on GitHub
+- ⏸️ Zenodo activation and publication still require human account access
 
-**What's Left:** 🔄 User action required (10 minutes total - when approved)
+**What's Left:** 🔄 Human action required in Zenodo (about 10 minutes)
 
 ---
 
@@ -30,10 +31,10 @@ This guide walks you through linking your GitHub repository to Zenodo to generat
 
 ## Prerequisites
 
-- ✅ GitHub repository with releases (you have v0.1.0, v0.8.0, v0.9.0, v1.0.0)
+- ✅ GitHub repository with releases
 - ✅ `.zenodo.json` metadata file (created)
 - ✅ CITATION.cff file (created)
-- ✅ DOI badge in README (ready to activate)
+- ⏸️ README DOI badge will be added only after a real DOI exists
 - 🔄 Zenodo account (you'll create this)
 
 ---
@@ -61,7 +62,7 @@ This guide walks you through linking your GitHub repository to Zenodo to generat
 5. The switch should turn green, indicating the repository is now linked
 
 **What happens now?** Zenodo will automatically create a DOI for:
-- The latest release (v1.0.0)
+- The latest release
 - Future releases you create
 
 ---
@@ -70,9 +71,9 @@ This guide walks you through linking your GitHub repository to Zenodo to generat
 
 **Option A: Use Existing Release (Recommended)**
 
-Since you already have v1.0.0 released:
+Since the current public release already exists on GitHub:
 1. On the Zenodo GitHub page, click **"Sync now"** button
-2. Zenodo will fetch your latest release (v1.0.0)
+2. Zenodo will fetch your latest release
 3. Wait 30-60 seconds for processing
 4. You'll see a new entry on your [Zenodo Uploads page](https://zenodo.org/me/uploads)
 
@@ -81,11 +82,11 @@ Since you already have v1.0.0 released:
 If you prefer a fresh release:
 ```bash
 # Tag the current commit
-git tag -a v1.0.1 -m "v1.0.1 - Zenodo integration"
-git push origin v1.0.1
+git tag -a vX.Y.Z -m "vX.Y.Z"
+git push origin vX.Y.Z
 
 # Create GitHub release
-gh release create v1.0.1 --title "v1.0.1 - Zenodo Integration" --notes "Adds Zenodo DOI integration for permanent citation."
+gh release create vX.Y.Z --title "Release vX.Y.Z" --notes "Release for Zenodo archival."
 ```
 
 Zenodo will automatically detect the new release within minutes.
@@ -112,12 +113,10 @@ Zenodo will automatically detect the new release within minutes.
 ### Step 5: Verify DOI Badge (1 minute)
 
 1. Go to your GitHub repository: https://github.com/jerdaw/waittimecanada
-2. Check the README - the DOI badge should now display your DOI
+2. Check the README after the badge is added in a follow-up commit
 3. Click the badge to verify it links to your Zenodo record
 
-**Badge URL Format:**
-- Badge image: `https://zenodo.org/badge/1146067459.svg`
-- Badge link: `https://zenodo.org/badge/latestdoi/1146067459`
+**Badge URL Format:** Zenodo will provide both the badge image URL and the latest DOI link after publication.
 
 The badge automatically updates when you create new releases!
 
@@ -139,7 +138,7 @@ Zenodo creates **two types of DOIs**:
 - Use this when citing a particular version in research
 - Each release gets its own version DOI
 
-**Best Practice:** Use the **concept DOI** in your README badge and general citations.
+**Best Practice:** Use the **concept DOI** in the README badge and general citations.
 
 ---
 
@@ -211,13 +210,13 @@ Every time you create a GitHub release:
 
 ### APA Format
 ```
-Dawson, J. (2026). Wait Time Canada (Version 1.0.0) [Computer software].
+Dawson, J. (2026). Wait Time Canada (Version 1.3.0) [Computer software].
 https://doi.org/10.5281/zenodo.XXXXXXX
 ```
 
 ### IEEE Format
 ```
-J. Dawson, "Wait Time Canada," Version 1.0.0, 2026. [Online].
+J. Dawson, "Wait Time Canada," Version 1.3.0, 2026. [Online].
 Available: https://doi.org/10.5281/zenodo.XXXXXXX
 ```
 
@@ -226,7 +225,7 @@ Available: https://doi.org/10.5281/zenodo.XXXXXXX
 @software{dawson2026waittimecanada,
   author = {Dawson, Jeremy},
   title = {Wait Time Canada},
-  version = {1.0.0},
+  version = {1.3.0},
   year = {2026},
   doi = {10.5281/zenodo.XXXXXXX},
   url = {https://github.com/jerdaw/waittimecanada}

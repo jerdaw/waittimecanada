@@ -66,6 +66,8 @@ Most student projects overclaim. Honest limitations are a differentiated signal 
 
 The placeholder DOI has been removed from README, which is safer than displaying a fabricated citation signal. The remaining task is to register a real Zenodo deposit, update `CITATION.cff`, and restore the README badge only once the DOI is real.
 
+**Status:** Repo and release preparation completed on 2026-03-28; real DOI still pending Zenodo account activation and publication.
+
 A real Zenodo record is third-party-attested, timestamped evidence of the project's existence and authorship — not just a badge.
 
 **Artifact:** Real Zenodo record with DOI; updated CITATION.cff and README badge.

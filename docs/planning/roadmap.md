@@ -131,7 +131,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 
 - [x] **P1 / A1: Mission, equity, and stewardship section in README** — Replace the maintainer blurb with a public-facing mission/equity/stewardship statement aligned to the site's official posture
 - [x] **P1 / A2: Limitations section in README** — Specific, technical limitations demonstrating intellectual maturity (delivered in README + application summary)
-- [ ] **P1 / A3: Fix placeholder Zenodo DOI** — Register real deposit; update CITATION.cff and README badge (90 min)
+- [ ] **P1 / A3: Fix placeholder Zenodo DOI** — Repo-side preparation is complete (`CITATION.cff`, `.zenodo.json`, current GitHub release). Remaining work is Zenodo account activation, publish, and then restoring the README badge once the DOI is real
 - [ ] **P1 / A4: Stakeholder interview outreach** — Send 10–15 outreach messages to ER professionals using existing templates (2–3 h outreach; interviews on their schedule). `Hold until explicit user go-ahead.`
 - [ ] **P1 / A5: Private reflection document** — ABS/interview prep; motivation, decisions, surprises, ethical tensions (2 h; not committed to repo)
 - [x] **P1 / A6: Ottawa–Gatineau case study** — Added the case study artifact, linked it from README/application summary, and verified the Ottawa/Gatineau pair against live production data on 2026-03-28

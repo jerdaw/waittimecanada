@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-03-28
+
+### Added
+- Public Health Hub Batch A on `/resources`, including Ontario facility search, OSM-backed AED fallback, Health Canada alerts, AQHI, and an official Ontario naloxone link-out
+- Ottawa–Gatineau methodology divergence case study
+- Quantified "By the Numbers" methodology and operations findings in README
+
+### Changed
+- Reframed public-facing project language around mission, equity, EDIA, barrier reduction, and stewardship
+- Updated citation metadata and Zenodo preparation for a current public release
+- Added source-specific public-health ingest observability, smoke coverage, and readiness coverage
+
+### Fixed
+- Corrected the compare API to use the latest `TIME_TO_PROVIDER` measurement rather than accidentally comparing against a different latest metric such as Quebec occupancy
+- Improved public `/resources` degraded-state behavior, facility relevance, and search-result compression
+- Hardened public-health ingest reliability and best-effort AED failure handling
+
 ## [1.2.1] - 2026-02-23
 
 ### Changed

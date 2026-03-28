@@ -1,10 +1,10 @@
 {
   "title": "Wait Time Canada - Health Systems Observatory for Emergency Department Wait Times",
-  "description": "A clinically defensible Health Systems Observatory for Canadian emergency department wait-time methodology and data quality. This project audits and exposes methodological inconsistencies in ER reporting across provinces (ON, QC, AB, BC), providing real-time data for 380+ hospitals with comprehensive analytics, data quality monitoring, and first-in-Canada stretcher occupancy visualization.",
+  "description": "A clinically defensible public-interest Health Systems Observatory for Canadian emergency department wait-time methodology and data quality. The project audits and exposes methodological inconsistencies in ER reporting across provinces (ON, QC, AB, BC), provides access to current public hospital reporting, and publishes methodology-aware analytics, public health resources, and transparent limitations.",
   "creators": [
     {
       "name": "Dawson, Jeremy",
-      "affiliation": "Independent Researcher"
+      "affiliation": "Independent Maintainer"
     }
   ],
   "keywords": [
@@ -44,7 +44,7 @@
     {
       "name": "Dawson, Jeremy",
       "type": "ProjectLeader",
-      "affiliation": "Independent Researcher"
+      "affiliation": "Independent Maintainer"
     }
   ],
   "communities": [
@@ -70,5 +70,5 @@
       "scheme": "MeSH"
     }
   ],
-  "notes": "This is a portfolio project demonstrating health systems research methodology, full-stack software development, data quality monitoring, and clinical defensibility in health informatics. Developed for medical school admissions portfolio."
+  "notes": "Wait Time Canada is operated as a public-interest health data and methods observatory with an emphasis on methodology transparency, equity-aware access, stewardship, and responsible reuse of official public data."
 }
