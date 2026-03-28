@@ -79,6 +79,10 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.public_health_hub_status --format markdown | tee -a "$GITHUB_STEP_SUMMARY" || {
+          python -m waittime.cli.public_health_hub_status \
+            --source mohserlo \
+            --source osm-aed \
+            --source health-canada-recalls \
+            --format markdown | tee -a "$GITHUB_STEP_SUMMARY" || {
             echo "_Public health hub status summary unavailable for this run._" >> "$GITHUB_STEP_SUMMARY"
           }

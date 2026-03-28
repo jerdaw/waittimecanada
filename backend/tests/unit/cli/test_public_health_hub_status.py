@@ -95,3 +95,26 @@ def test_assess_source_status_marks_stale_alert_feed_as_degraded():
 
     assert assessment.state == "degraded"
     assert any("suppress threshold" in reason for reason in assessment.reasons)
+
+
+def test_render_markdown_overall_state_becomes_partial_when_any_source_is_partial():
+    from waittime.cli.public_health_hub_status import _render_markdown, assess_source_status
+
+    rendered = _render_markdown(
+        [
+            assess_source_status(_make_status(), now=datetime(2026, 3, 27, 20, 0, tzinfo=UTC)),
+            assess_source_status(
+                _make_status(
+                    source_id="osm-aed",
+                    source_name="OpenStreetMap AED",
+                    domain="aed",
+                    last_refreshed_at=None,
+                    resource_record_count=0,
+                ),
+                now=datetime(2026, 3, 27, 20, 0, tzinfo=UTC),
+            ),
+        ],
+        generated_at=datetime(2026, 3, 27, 20, 0, tzinfo=UTC),
+    )
+
+    assert "Overall state: `partial`" in rendered

@@ -41,6 +41,13 @@ def main() -> int:
     """Render a public-health-hub operational summary."""
     parser = argparse.ArgumentParser(description="Show public health hub ingest status")
     parser.add_argument(
+        "--source",
+        dest="source_ids",
+        action="append",
+        default=[],
+        help="Limit status output to a specific source_id. Repeat for multiple sources.",
+    )
+    parser.add_argument(
         "--format",
         choices=("text", "markdown", "json"),
         default="text",
@@ -50,6 +57,9 @@ def main() -> int:
 
     db = DatabaseService()
     statuses = db.list_public_health_source_statuses()
+    if args.source_ids:
+        requested_source_ids = set(args.source_ids)
+        statuses = [status for status in statuses if status.source_id in requested_source_ids]
     generated_at = datetime.now(UTC)
     assessments = [assess_source_status(status, now=generated_at) for status in statuses]
 
