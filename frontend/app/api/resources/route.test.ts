@@ -578,4 +578,172 @@ describe("API Route: Resources", () => {
     ]);
     expect(data.count).toBe(2);
   });
+
+  test("prefers clinic-like results over pharmacy brands for generic clinic search", async () => {
+    const refreshedAt = new Date().toISOString();
+    mockSql.unsafe
+      .mockResolvedValueOnce([
+        {
+          id: "facility-1",
+          kind: "facility",
+          name: "Clinic Pharmacy",
+          province: "ON",
+          city: "Toronto",
+          latitude: 43.65858,
+          longitude: -79.3893,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "585 University Avenue",
+          postal_code: "M5G2N2",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "Retail Pharmacy",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+        {
+          id: "facility-2",
+          kind: "facility",
+          name: "Hospital For Sick Children, Id2 Clinic",
+          province: "ON",
+          city: "Toronto",
+          latitude: 43.65708,
+          longitude: -79.38773,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "555 University Avenue",
+          postal_code: "M5G1X8",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "HIV Clinical Services",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          domain: "provider_facility",
+          last_refreshed_at: refreshedAt,
+        },
+      ]);
+
+    const req = new NextRequest(
+      "http://localhost/api/resources?kind=facility&province=ON&q=Clinic&limit=10",
+    );
+
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.data.map((row: { name: string }) => row.name)).toEqual([
+      "Hospital For Sick Children, Id2 Clinic",
+      "Clinic Pharmacy",
+    ]);
+  });
+
+  test("deduplicates same-address hospital variants for generic hospital search", async () => {
+    const refreshedAt = new Date().toISOString();
+    mockSql.unsafe
+      .mockResolvedValueOnce([
+        {
+          id: "facility-1",
+          kind: "facility",
+          name: "Alexandra Hospital",
+          province: "ON",
+          city: "Ingersoll",
+          latitude: 43.0319,
+          longitude: -80.8748,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "29 Noxon Street",
+          postal_code: "N5C3V6",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "Corporation",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+        {
+          id: "facility-2",
+          kind: "facility",
+          name: "Alexandra Hospital",
+          province: "ON",
+          city: "Ingersoll",
+          latitude: 43.03205,
+          longitude: -80.87545,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "29 Noxon Street",
+          postal_code: "N5C1B8",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "Licensed Hospital Lab Location",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+        {
+          id: "facility-3",
+          kind: "facility",
+          name: "Alexandra Marine And General Hospital",
+          province: "ON",
+          city: "Goderich",
+          latitude: 43.7499,
+          longitude: -81.7053,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "120 Napier Street",
+          postal_code: "N7A1W5",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "Licensed Hospital Lab Location",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          domain: "provider_facility",
+          last_refreshed_at: refreshedAt,
+        },
+      ]);
+
+    const req = new NextRequest(
+      "http://localhost/api/resources?kind=facility&province=ON&q=Hospital&limit=10",
+    );
+
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.data.map((row: { name: string; city: string }) => `${row.name}|${row.city}`)).toEqual([
+      "Alexandra Hospital|Ingersoll",
+      "Alexandra Marine And General Hospital|Goderich",
+    ]);
+  });
 });

@@ -74,6 +74,24 @@ const DIAGNOSTIC_FACILITY_KEYWORDS = [
   "nuclear medicine",
 ] as const;
 const QUERY_TOKEN_SEPARATOR = /[^a-z0-9]+/g;
+const GENERIC_FACILITY_QUERY_TOKENS = [
+  "hospital",
+  "emergency",
+  "clinic",
+  "pharmacy",
+  "drug",
+  "lab",
+  "laboratory",
+  "imaging",
+  "ultrasound",
+  "radiology",
+  "diagnostic",
+  "xray",
+  "mammography",
+] as const;
+const GENERIC_FACILITY_QUERY_TOKEN_SET = new Set<string>(
+  GENERIC_FACILITY_QUERY_TOKENS,
+);
 
 export async function GET(request: NextRequest) {
   const rateLimitResponse = await checkRateLimit(request);
@@ -381,54 +399,58 @@ function getFacilityQuerySortRank(
   ]
     .filter(Boolean)
     .join(" ");
+  const genericIntentRank = getGenericFacilityQueryIntentRank(
+    resource,
+    queryTokens,
+  );
 
   if (name === query) {
-    return 0;
+    return genericIntentRank * 20;
   }
 
   if (name.startsWith(query)) {
-    return 1;
+    return genericIntentRank * 20 + 1;
   }
 
   if (queryTokens.every((token) => name.includes(token))) {
-    return 2;
+    return genericIntentRank * 20 + 2;
   }
 
   if (city === query || address === query) {
-    return 3;
+    return genericIntentRank * 20 + 3;
   }
 
   if (city.startsWith(query) || address.startsWith(query)) {
-    return 4;
+    return genericIntentRank * 20 + 4;
   }
 
   if (
     queryTokens.every((token) => city.includes(token)) ||
     queryTokens.every((token) => address.includes(token))
   ) {
-    return 5;
+    return genericIntentRank * 20 + 5;
   }
 
   if (
     queryTokens.every((token) => locationDescription.includes(token)) ||
     queryTokens.every((token) => accessNotes.includes(token))
   ) {
-    return 6;
+    return genericIntentRank * 20 + 6;
   }
 
   if (queryTokens.every((token) => combined.includes(token))) {
-    return 7;
+    return genericIntentRank * 20 + 7;
   }
 
   if (name.includes(query)) {
-    return 8;
+    return genericIntentRank * 20 + 8;
   }
 
   if (combined.includes(query)) {
-    return 9;
+    return genericIntentRank * 20 + 9;
   }
 
-  return 10;
+  return genericIntentRank * 20 + 10;
 }
 
 function matchesKeywordGroup(
@@ -463,7 +485,7 @@ function dedupeFacilitySearchRows(
 ): ResourceRecord[] {
   const queryTokens = tokenizeSearchQuery(rawQuery);
 
-  if (queryTokens.length < 2) {
+  if (queryTokens.length < 2 && !isGenericFacilityCategoryQuery(queryTokens)) {
     return resources;
   }
 
@@ -499,9 +521,24 @@ function buildFacilitySearchDeduplicationKey(
   queryTokens: string[],
 ): string | null {
   const normalizedName = normalizeSearchText(resource.name);
+  const isGenericCategoryQuery = isGenericFacilityCategoryQuery(queryTokens);
 
-  if (!queryTokens.every((token) => normalizedName.includes(token))) {
+  if (!isGenericCategoryQuery && !queryTokens.every((token) => normalizedName.includes(token))) {
     return null;
+  }
+
+  if (isGenericCategoryQuery) {
+    const address = normalizeDeduplicationPart(resource.address);
+    if (!address) {
+      return null;
+    }
+
+    return [
+      resource.source_id,
+      normalizeDeduplicationPart(resource.city),
+      address,
+      queryTokens.join(" "),
+    ].join("|");
   }
 
   return [
@@ -535,4 +572,61 @@ function tokenizeSearchQuery(value: string): string[] {
 
 function roundCoordinateForGrouping(value: number): string {
   return value.toFixed(2);
+}
+
+function getGenericFacilityQueryIntentRank(
+  resource: ResourceRecord,
+  queryTokens: string[],
+): number {
+  if (!isGenericFacilityCategoryQuery(queryTokens)) {
+    return 0;
+  }
+
+  const queryToken = queryTokens[0];
+  const text = [resource.name, resource.location_description, resource.access_notes]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  const hasHospitalKeywords = matchesKeywordGroup(text, EMERGENCY_FACILITY_KEYWORDS);
+  const hasPharmacyKeywords = matchesKeywordGroup(text, PHARMACY_KEYWORDS);
+  const hasDiagnosticKeywords = matchesKeywordGroup(
+    text,
+    DIAGNOSTIC_FACILITY_KEYWORDS,
+  );
+  const hasClinicKeywords =
+    matchesKeywordGroup(text, COMMUNITY_FACILITY_KEYWORDS) ||
+    text.includes("clinic");
+
+  if (!queryToken) {
+    return 0;
+  }
+
+  switch (queryToken) {
+    case "hospital":
+    case "emergency":
+      return hasHospitalKeywords ? 0 : 1;
+    case "clinic":
+      return hasClinicKeywords && !hasPharmacyKeywords ? 0 : 1;
+    case "pharmacy":
+    case "drug":
+      return hasPharmacyKeywords ? 0 : 1;
+    case "lab":
+    case "laboratory":
+    case "imaging":
+    case "ultrasound":
+    case "radiology":
+    case "diagnostic":
+    case "xray":
+    case "mammography":
+      return hasDiagnosticKeywords ? 0 : 1;
+    default:
+      return 0;
+  }
+}
+
+function isGenericFacilityCategoryQuery(queryTokens: string[]): boolean {
+  return (
+    queryTokens.length === 1 &&
+    GENERIC_FACILITY_QUERY_TOKEN_SET.has(queryTokens[0] ?? "")
+  );
 }
