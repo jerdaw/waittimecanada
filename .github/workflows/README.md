@@ -155,7 +155,9 @@ This directory contains operational and CI workflows for Wait Time Canada.
   fallback runs in its own best-effort step so transient AED mirror failures do
   not block the rest of the batch.
 - Each run appends a GitHub Actions job summary with per-step outcomes plus the
-  current source refresh timestamps and normalized row counts from the database.
+  current source refresh timestamps, normalized row counts, and explicit
+  `healthy` / `partial` / `degraded` operator classifications from the database
+  state.
 
 ## Secrets Matrix
 
