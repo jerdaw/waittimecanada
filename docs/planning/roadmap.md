@@ -149,7 +149,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 [Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
 
 - [ ] **P1 / C1: Technical report** — Draft completed at `docs/research/methodological-heterogeneity-four-province-audit-draft.md` on 2026-03-28. Keep it as an internal draft for now; do not move to external review/publication until that path is explicitly reactivated. (1–2 d)
-- [ ] **P1 / C2: Targeted researcher outreach** — 3 specific researchers at ICES/INSPQ/university labs; share technical report. Parked by choice while the C1 draft remains internal-only. (3 h + response time)
+- [ ] **P1 / C2: Targeted researcher outreach** — 3 specific researchers at ICES/INSPQ/university labs; share technical report. Conditional only: activate this only if outward `C1` review/publication is intentionally reactivated later. (3 h + response time)
 - [ ] **P1 / C3: Equity layer interpretive summary** — First draft now exists inside the C1 draft report. Keep it internal-only with C1 for now. (merged with C1)
 - [x] **P2 / C4: Operational transparency report** — First monthly report added at `docs/operations/reports/2026-03-operational-report.md` on 2026-03-28, including the current cadence/KPI mismatch caveat.
 - [x] **P2 / C5: Incident post-mortem** — Added `docs/operations/incident-reports/2026-02-19-quebec-zero-value.md` on 2026-03-28, documenting the zero-value validation/persistence mismatch, resolution, and later occupancy-suppression follow-up
@@ -494,7 +494,7 @@ Archived (delivered):
 |-------|----------|-------|--------|
 | **A: Credibility Cleanup** | Mostly delivered | A1, A2, A6, A7 delivered; A3 and A4 parked; A5 intentionally de-scoped | Parked work only |
 | **B: Launch Follow-Through** | Selective / deferred | B5 delivered; B2 is a later/VPS-maturity item; B3 parked; B4 intentionally de-scoped | Low until reactivated |
-| **C: Scholarly Artifacts** | Internal pass largely complete | C1/C3 retained as internal assets; C4/C5 delivered; C2 parked by choice; C6 conditional only | Mostly conditional |
+| **C: Scholarly Artifacts** | Internal pass largely complete | C1/C3 retained as internal assets; C4/C5 delivered; C2 conditional on outward C1 activation; C6 conditional only | Mostly conditional |
 | **D: If Time Permits** | Weeks 5–12 | D1–D5 (comparability matrix, QC equity, freshness indicators, NS scraper, grant/competition) | Variable |
 
-**Next Action:** Keep `A3`, `A4`, `B3`, and outward `C1/C2` movement parked by choice. Retain `C1/C3` as internal-only assets, treat `B2` as later/VPS-dependent, and leave `C6` conditional only. If focus returns to engineering/ops, `D12` remains the strongest concrete next item.
+**Next Action:** Keep `A3`, `A4`, and `B3` parked by choice. Retain `C1/C3` as internal-only assets; treat `C2` as conditional on any future outward `C1` activation, `B2` as later/VPS-dependent, and `C6` as conditional only. If focus returns to engineering/ops, `D12` remains the strongest concrete next item.

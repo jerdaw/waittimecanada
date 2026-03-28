@@ -32,12 +32,13 @@ The remaining human-facing items now fall into three buckets:
    - `A3` Zenodo DOI
    - `A4` stakeholder outreach
    - `B3` LinkedIn launch post
-   - outward `C1/C2` publication and reviewer outreach
+   - outward `C1` publication/review activation
 2. **Internal-only assets**
    - `C1` technical report draft
    - `C3` equity interpretation inside that draft
 3. **Conditional / later**
    - `B2` first-party privacy-safe telemetry, but only after the VPS/logging path is mature enough to justify it
+   - `C2` targeted researcher outreach, but only if outward `C1` activation happens later
    - `C6` named reviewer acknowledgement, only if future outreach naturally produces it
 
 This means the plan remains useful, but most remaining work is now governed by activation decisions rather than immediate execution.
@@ -231,7 +232,7 @@ Identify 3 specific researchers at ICES, INSPQ, or university health informatics
 
 Don't cold-email Ontario Health's general inbox — target individuals whose work you've read. Canadian health informatics is a small community where informed, targeted outreach can get a response.
 
-**Status:** Parked by choice while the C1 draft remains internal-only.
+**Status:** Conditional only. This item should activate only if the technical report is intentionally moved outward for external review or publication.
 
 **Artifact:** Documented outreach log; potentially a named reviewer in Acknowledgements.
 
