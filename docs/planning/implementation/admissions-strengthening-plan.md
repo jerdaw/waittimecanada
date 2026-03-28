@@ -29,7 +29,7 @@
 ## Guiding Principles
 
 1. **Phase A items are all pre-deployment.** No blockers. Start immediately.
-2. **Stakeholder interview (#A4) and README mission/equity/stewardship section (#A1) are the two highest-ROI actions.** Both can be done today.
+2. **Stakeholder interview (#A4) and README mission/equity/stewardship section (#A1) are the two highest-ROI actions.** A1 is delivered. A4 remains high-value but should stay parked until explicitly activated.
 3. **The technical report (C1) is the anchor scholarly artifact.** The case study, findings, and equity interpretation feed into it.
 4. **Don't publicize anything you can't defend.** Every metric, finding, and claim must survive "how do you know that?" from a skeptical interviewer.
 5. **The live URL enables Phase B but does not automatically create value.** The value comes from the content (case study, findings, limitations) already visible when someone visits.
@@ -72,6 +72,8 @@ A real Zenodo record is third-party-attested, timestamped evidence of the projec
 
 ### A4: Stakeholder Interview Outreach
 **Priority:** 1 (tied with A1) | **Effort:** 2–3 h outreach; interviews on respondents' schedules | **CanMEDS:** Collaborator, Health Advocate
+
+**Status:** Parked pending explicit user go-ahead.
 
 Begin outreach to ER professionals using the existing templates in `docs/stakeholder-interviews/`. Aim for 10–15 contacts. The conversation, not the live URL, is the point — these interviews are about methodology, so no deployment is needed.
 
@@ -294,7 +296,7 @@ This plan is the product of three analytical passes:
 
 Key insights from the analysis:
 - The engineering foundation is already excellent. The gap is almost entirely in **real-world engagement, external validation, and public-facing artifacts**.
-- Items 2 (stakeholder interview) and 8 (README mission/equity/stewardship section) are the two highest-ROI actions — both can be started today with zero dependencies.
+- Items 2 (stakeholder interview) and 8 (README mission/equity/stewardship section) are the two highest-ROI actions. A1 is now delivered; A4 should remain parked until explicitly activated.
 - The technical report (C1) is the anchor scholarly artifact — the case study, findings, and equity interpretation all feed into it.
 - Usage analytics should be added immediately after deployment to establish baseline data, but numbers should not be publicized until they tell a good story.
 - Phase D items are genuinely optional for admissions purposes and should not compete with Phase A–C execution.
