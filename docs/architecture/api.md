@@ -99,6 +99,10 @@ Operational KPI note:
 - these routes intentionally exclude dormant legacy `sources` rows from their
   public rollups so the reported coverage reflects the actually live platform
   rather than historical inventory
+- `GET /api/data-quality?view=trend` and `view=diff` now emit
+  `historical_annotation` metadata when the returned snapshot window spans the
+  legacy 15-minute expectation model and the current hourly model, so clients
+  can disclose the mixed-cadence interpretation risk explicitly
 
 ## Health route contract (M30 operational visibility)
 

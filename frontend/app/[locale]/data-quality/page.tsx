@@ -37,6 +37,15 @@ interface SystemQuality {
   total_hospitals_reporting: number;
 }
 
+interface HistoricalAnnotation {
+  has_cadence_model_shift: boolean;
+  model_change_date: string;
+  legacy_scheduler_cadence: string;
+  legacy_expected_runs_per_day: number;
+  current_scheduler_cadence: string;
+  current_expected_runs_per_day: number;
+}
+
 function getStatusBadge(status: string) {
   const styles: Record<string, string> = {
     healthy:
@@ -57,7 +66,9 @@ function QualityTrendSection({
   sourceName: string;
   t: ReturnType<typeof useTranslations>;
 }) {
-  const [trend, setTrend] = useState<any>(null);
+  const [trend, setTrend] = useState<any[]>([]);
+  const [historicalAnnotation, setHistoricalAnnotation] =
+    useState<HistoricalAnnotation | null>(null);
   const [diff, setDiff] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -76,6 +87,7 @@ function QualityTrendSection({
       .then(([trendData, diffData]) => {
         if (!mounted) return;
         setTrend(trendData.trend?.reverse() || []);
+        setHistoricalAnnotation(trendData.historical_annotation ?? null);
         setDiff(diffData);
         setLoading(false);
       })
@@ -111,6 +123,21 @@ function QualityTrendSection({
 
   return (
     <div className="space-y-4">
+      {historicalAnnotation?.has_cadence_model_shift && (
+        <div className="rounded-lg border border-amber-300/70 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100">
+          <p className="font-medium">{t("historicalNote.title")}</p>
+          <p className="mt-1 text-amber-800 dark:text-amber-200">
+            {t("historicalNote.body", {
+              changeDate: historicalAnnotation.model_change_date,
+              legacyCadence: historicalAnnotation.legacy_scheduler_cadence,
+              legacyRuns: historicalAnnotation.legacy_expected_runs_per_day,
+              currentCadence: historicalAnnotation.current_scheduler_cadence,
+              currentRuns: historicalAnnotation.current_expected_runs_per_day,
+            })}
+          </p>
+        </div>
+      )}
+
       {diff?.has_baseline && (
         <div className="rounded-lg border border-border/50 bg-card p-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
           <div>

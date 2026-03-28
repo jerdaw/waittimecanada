@@ -553,6 +553,10 @@
     "coverage": "Coverage",
     "hospitals": "Hospitals",
     "successRate30d": "30-Day Success Rate",
+    "historicalNote": {
+      "title": "Note sur la qualité historique",
+      "body": "Ces instantanés historiques couvrent un changement de modèle d'horaire. Les instantanés antérieurs au {changeDate} ont été évalués selon l'ancien modèle d'attente {legacyCadence} ({legacyRuns} passages attendus par jour), tandis que les instantanés du {changeDate} et après utilisent le modèle actuel {currentCadence} ({currentRuns} passages attendus par jour). Interprétez les changements à long terme avec prudence."
+    },
     "noHistoricalData": "No historical snapshot data yet for {sourceName}.",
     "aboutMetrics": "About Data Quality Metrics",
     "metrics": {

@@ -133,8 +133,13 @@ Operational note:
   model
 - aggregate measurement counts are returned as actual counts, not reconstructed
   from percentage estimates
-- historical `view=trend` / `view=diff` quality snapshots may still include
-  older pre-alignment rates until a dedicated re-baselining pass is completed
+- historical `view=trend` / `view=diff` responses now include
+  `historical_annotation` metadata when the requested snapshot range spans both
+  the legacy 15-minute expectation model (`96` expected runs/day) and the
+  current hourly model (`24` expected runs/day)
+- the public `/data-quality` page renders that annotation directly instead of
+  implying long-range snapshot comparability that the historical records do not
+  fully support
 
 ## Comparability endpoint
 

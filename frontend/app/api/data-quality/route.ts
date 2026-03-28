@@ -20,6 +20,25 @@ import {
 
 import { DataQualityQuerySchema } from "@/utils/validations";
 
+const LEGACY_EXPECTED_SCRAPER_RUNS_PER_DAY = 96;
+const LEGACY_SCRAPER_CADENCE_LABEL = "15-minute";
+const QUALITY_CADENCE_MODEL_CHANGE_DATE = "2026-03-28";
+
+function buildHistoricalAnnotation(snapshotDates: Date[]) {
+  const changeDate = new Date(`${QUALITY_CADENCE_MODEL_CHANGE_DATE}T00:00:00Z`);
+  const hasLegacySnapshots = snapshotDates.some((date) => date < changeDate);
+  const hasHourlySnapshots = snapshotDates.some((date) => date >= changeDate);
+
+  return {
+    has_cadence_model_shift: hasLegacySnapshots && hasHourlySnapshots,
+    model_change_date: QUALITY_CADENCE_MODEL_CHANGE_DATE,
+    legacy_scheduler_cadence: LEGACY_SCRAPER_CADENCE_LABEL,
+    legacy_expected_runs_per_day: LEGACY_EXPECTED_SCRAPER_RUNS_PER_DAY,
+    current_scheduler_cadence: LIVE_SCRAPER_CADENCE_LABEL,
+    current_expected_runs_per_day: EXPECTED_SCRAPER_RUNS_PER_DAY,
+  };
+}
+
 export async function GET(request: Request) {
   try {
     const sql = getDb();
@@ -253,6 +272,10 @@ async function getSourceTrend(
     ORDER BY snapshot_date DESC
   `;
 
+  const historicalAnnotation = buildHistoricalAnnotation(
+    rows.map((row) => new Date(row.snapshot_date)),
+  );
+
   return NextResponse.json(
     {
       source_id: sourceId,
@@ -266,6 +289,7 @@ async function getSourceTrend(
         worst_gap_minutes:
           r.worst_gap_minutes !== null ? Number(r.worst_gap_minutes) : null,
       })),
+      historical_annotation: historicalAnnotation,
     },
     { headers: publicCacheHeaders(300, 900) },
   );
@@ -290,11 +314,16 @@ async function getSourceDiff(
     ORDER BY snapshot_date DESC
   `;
 
+  const historicalAnnotation = buildHistoricalAnnotation(
+    trend.map((row) => new Date(row.snapshot_date)),
+  );
+
   if (!trend || trend.length === 0) {
     return NextResponse.json(
       {
         has_baseline: false,
         summary: "No historical snapshot data available for comparison.",
+        historical_annotation: historicalAnnotation,
       },
       { headers: publicCacheHeaders(300, 900) },
     );
@@ -310,6 +339,7 @@ async function getSourceDiff(
       {
         has_baseline: false,
         summary: "Insufficient historical snapshot data for comparison.",
+        historical_annotation: historicalAnnotation,
       },
       { headers: publicCacheHeaders(300, 900) },
     );
@@ -362,6 +392,7 @@ async function getSourceDiff(
         worst_gap_delta: worstGapDelta,
       },
       summary,
+      historical_annotation: historicalAnnotation,
     },
     { headers: publicCacheHeaders(300, 900) },
   );

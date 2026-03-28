@@ -128,4 +128,84 @@ describe("/api/data-quality", () => {
     expect(res.status).toBe(400);
     expect(data.error).toBe("Validation Error");
   });
+
+  it("annotates source trend responses when snapshots span the cadence-model shift", async () => {
+    const mockSql = vi.fn();
+    (getDb as Mock).mockReturnValue(mockSql);
+
+    mockSql.mockResolvedValueOnce([
+      {
+        snapshot_date: new Date("2026-03-27T00:00:00Z"),
+        source_id: "ontario-health",
+        hospitals_snapshotted: 10,
+        avg_success_rate: 0.94,
+        min_success_rate: 0.9,
+        hospitals_critical: 0,
+        worst_gap_minutes: 60,
+      },
+      {
+        snapshot_date: new Date("2026-03-28T00:00:00Z"),
+        source_id: "ontario-health",
+        hospitals_snapshotted: 10,
+        avg_success_rate: 0.99,
+        min_success_rate: 0.97,
+        hospitals_critical: 0,
+        worst_gap_minutes: 20,
+      },
+    ]);
+
+    const res = await GET(
+      new Request(
+        "http://localhost/api/data-quality?view=trend&source_id=ontario-health&days=30",
+      ),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.historical_annotation).toMatchObject({
+      has_cadence_model_shift: true,
+      model_change_date: "2026-03-28",
+      legacy_expected_runs_per_day: 96,
+      current_expected_runs_per_day: 24,
+      current_scheduler_cadence: "hourly",
+    });
+  });
+
+  it("includes cadence-model metadata in diff responses", async () => {
+    const mockSql = vi.fn();
+    (getDb as Mock).mockReturnValue(mockSql);
+
+    mockSql.mockResolvedValueOnce([
+      {
+        snapshot_date: new Date("2026-03-28T00:00:00Z"),
+        avg_success_rate: 0.92,
+        hospitals_snapshotted: 10,
+        hospitals_critical: 1,
+        worst_gap_minutes: 75,
+      },
+      {
+        snapshot_date: new Date("2026-03-21T00:00:00Z"),
+        avg_success_rate: 0.81,
+        hospitals_snapshotted: 9,
+        hospitals_critical: 3,
+        worst_gap_minutes: 120,
+      },
+    ]);
+
+    const res = await GET(
+      new Request(
+        "http://localhost/api/data-quality?view=diff&source_id=ontario-health&compare_days=7",
+      ),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.has_baseline).toBe(true);
+    expect(data.historical_annotation).toMatchObject({
+      has_cadence_model_shift: true,
+      model_change_date: "2026-03-28",
+      legacy_scheduler_cadence: "15-minute",
+      current_scheduler_cadence: "hourly",
+    });
+  });
 });

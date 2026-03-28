@@ -553,6 +553,10 @@
     "coverage": "Coverage",
     "hospitals": "Hospitals",
     "successRate30d": "30-Day Success Rate",
+    "historicalNote": {
+      "title": "Historical quality note",
+      "body": "These historical snapshots span a scheduler-model change. Snapshots before {changeDate} were scored against a legacy {legacyCadence} expectation model ({legacyRuns} expected runs/day), while snapshots on and after {changeDate} use the current {currentCadence} model ({currentRuns} expected runs/day). Interpret long-range changes cautiously."
+    },
     "noHistoricalData": "No historical snapshot data yet for {sourceName}.",
     "aboutMetrics": "About Data Quality Metrics",
     "metrics": {
