@@ -22,7 +22,7 @@
 3. No published academic or semi-academic output beyond internal drafts.
 4. No real Zenodo DOI has been activated yet, so the citable-software path remains parked.
 5. The health equity analysis still covers only Ontario — the Advocate claim remains narrower than the rest of the platform.
-6. Several outward-facing items are intentionally parked by choice (`A3`, `A4`, `B3`, outward `C1/C2`), which keeps quality high but also keeps external signal lower than the engineering maturity.
+6. Several outward-facing items are intentionally parked by choice (`A3`, `A4`, `B3`, outward `C1` activation), which keeps quality high but also keeps external signal lower than the engineering maturity.
 
 ## Current Posture
 
@@ -278,7 +278,7 @@ Don't inflate titles. A 20-minute methodology review conversation makes someone 
 
 **Status:** Conditional only. Do not pursue independently.
 
-**Phase C total:** partially delivered. `C1/C3` exist as internal drafts, `C4/C5` are delivered, `C2` remains parked while the report stays internal-only, and `C6` remains conditional on future reviewer activity.
+**Phase C total:** partially delivered. `C1/C3` exist as internal drafts, `C4/C5` are delivered, `C2` remains conditional on future outward `C1` activation, and `C6` remains conditional on future reviewer activity.
 
 ---
 
