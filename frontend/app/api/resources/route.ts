@@ -583,6 +583,7 @@ function getGenericFacilityQueryIntentRank(
   }
 
   const queryToken = queryTokens[0];
+  const nameText = normalizeSearchText(resource.name);
   const text = [resource.name, resource.location_description, resource.access_notes]
     .filter(Boolean)
     .join(" ")
@@ -596,6 +597,8 @@ function getGenericFacilityQueryIntentRank(
   const hasClinicKeywords =
     matchesKeywordGroup(text, COMMUNITY_FACILITY_KEYWORDS) ||
     text.includes("clinic");
+  const hasStrongClinicKeywords =
+    matchesKeywordGroup(nameText, COMMUNITY_FACILITY_KEYWORDS);
 
   if (!queryToken) {
     return 0;
@@ -604,9 +607,33 @@ function getGenericFacilityQueryIntentRank(
   switch (queryToken) {
     case "hospital":
     case "emergency":
-      return hasHospitalKeywords ? 0 : 1;
+      if (hasHospitalKeywords && !hasClinicKeywords && !hasPharmacyKeywords && !hasDiagnosticKeywords) {
+        return 0;
+      }
+
+      if (hasHospitalKeywords) {
+        return 1;
+      }
+
+      return 2;
     case "clinic":
-      return hasClinicKeywords && !hasPharmacyKeywords ? 0 : 1;
+      if (hasStrongClinicKeywords && !hasPharmacyKeywords) {
+        return 0;
+      }
+
+      if (
+        nameText.includes("clinic") &&
+        !hasPharmacyKeywords &&
+        !hasDiagnosticKeywords
+      ) {
+        return 1;
+      }
+
+      if (hasClinicKeywords && !hasPharmacyKeywords) {
+        return 2;
+      }
+
+      return 3;
     case "pharmacy":
     case "drug":
       return hasPharmacyKeywords ? 0 : 1;

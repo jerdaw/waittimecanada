@@ -746,4 +746,151 @@ describe("API Route: Resources", () => {
       "Alexandra Marine And General Hospital|Goderich",
     ]);
   });
+
+  test("suppresses same-campus hospital subservice variants for generic hospital search", async () => {
+    const refreshedAt = new Date().toISOString();
+    mockSql.unsafe
+      .mockResolvedValueOnce([
+        {
+          id: "facility-1",
+          kind: "facility",
+          name: "Hospital For Sick Children, Id2 Clinic",
+          province: "ON",
+          city: "Toronto",
+          latitude: 43.65708,
+          longitude: -79.38773,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "555 University Avenue",
+          postal_code: "M5G1X8",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "HIV Clinical Services",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+        {
+          id: "facility-2",
+          kind: "facility",
+          name: "Hospital For Sick Children, The",
+          province: "ON",
+          city: "Toronto",
+          latitude: 43.65708,
+          longitude: -79.38773,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "555 University Avenue",
+          postal_code: "M5G1X8",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description: "Corporation",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          domain: "provider_facility",
+          last_refreshed_at: refreshedAt,
+        },
+      ]);
+
+    const req = new NextRequest(
+      "http://localhost/api/resources?kind=facility&province=ON&q=Hospital&limit=10",
+    );
+
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.data.map((row: { name: string }) => row.name)).toEqual([
+      "Hospital For Sick Children, The",
+    ]);
+  });
+
+  test("prefers direct clinic names over diagnostic technical brands for generic clinic search", async () => {
+    const refreshedAt = new Date().toISOString();
+    mockSql.unsafe
+      .mockResolvedValueOnce([
+        {
+          id: "facility-1",
+          kind: "facility",
+          name: "Clinic Management & Technical Services",
+          province: "ON",
+          city: "Whitby",
+          latitude: 43.88005,
+          longitude: -78.97885,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "198 Des Newman Boulevard",
+          postal_code: "L1P0P9",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description:
+            "Bone Mineral Dxa, General Ultrasound, Mammography, Radiography",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+        {
+          id: "facility-2",
+          kind: "facility",
+          name: "Albany Medical Clinic",
+          province: "ON",
+          city: "Toronto",
+          latitude: 43.67796,
+          longitude: -79.35825,
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          last_refreshed_at: refreshedAt,
+          address: "807 Broadview Avenue",
+          postal_code: "M4K2P8",
+          phone: null,
+          website_url: null,
+          reference_status: "directory_only",
+          location_description:
+            "Bone Mineral Dxa, General Ultrasound, Mammography, Radiography",
+          access_notes: null,
+          crowdsourced: false,
+          completeness_status: null,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          source_id: "mohserlo",
+          source_name: "MOHSERLO",
+          provenance_url: "https://data.ontario.ca/example",
+          domain: "provider_facility",
+          last_refreshed_at: refreshedAt,
+        },
+      ]);
+
+    const req = new NextRequest(
+      "http://localhost/api/resources?kind=facility&province=ON&q=Clinic&limit=10",
+    );
+
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.data.map((row: { name: string }) => row.name)).toEqual([
+      "Albany Medical Clinic",
+      "Clinic Management & Technical Services",
+    ]);
+  });
 });
