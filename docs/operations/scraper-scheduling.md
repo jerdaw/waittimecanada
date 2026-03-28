@@ -418,5 +418,5 @@ Notes:
 
 - Scraper CLI: `backend/src/waittime/cli/scraper.py`
 - Heartbeat monitor CLI: `backend/src/waittime/cli/check_heartbeat.py`
-- [GitHub Actions Workflows](../../.github/workflows/)
-- [Provincial Methodologies](../methodologies/)
+- Workflow catalog: `.github/workflows/README.md`
+- Provincial methodologies: `backend/docs/methodologies/`

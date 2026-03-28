@@ -183,4 +183,4 @@ playwright install chromium
 
 **See Also:**
 - [Full Operations Guide](./scraper-scheduling.md)
-- [Methodology Documentation](../methodologies/)
+- Methodology documentation lives in `backend/docs/methodologies/`

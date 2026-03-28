@@ -77,8 +77,8 @@ Without that alignment, a numeric difference is not a valid performance conclusi
 
 - Ontario public wait-time context: <https://www.ontario.ca/page/time-spent-emergency-department>
 - Quebec emergency room situation portal: <https://www.quebec.ca/en/health/health-system-and-services/service-organization/quebec-health-system-and-its-services/situation-in-emergency-rooms-in-quebec>
-- Wait Time Canada Ontario methodology notes: [../../backend/docs/methodologies/ontario-methodology.md](/home/jer/repos/waittimecanada/backend/docs/methodologies/ontario-methodology.md)
-- Wait Time Canada Quebec methodology notes: [../../backend/docs/methodologies/quebec-methodology.md](/home/jer/repos/waittimecanada/backend/docs/methodologies/quebec-methodology.md)
+- Wait Time Canada Ontario methodology notes: `backend/docs/methodologies/ontario-methodology.md`
+- Wait Time Canada Quebec methodology notes: `backend/docs/methodologies/quebec-methodology.md`
 
 ## Date of Verification
 

@@ -156,12 +156,12 @@ That is exactly why a system like Wait Time Canada should audit methodology firs
 
 ## Related Internal Artifacts
 
-- Ottawa-Gatineau case study: [ottawa-gatineau-divergence.md](/home/jer/repos/waittimecanada/docs/case-studies/ottawa-gatineau-divergence.md)
-- README methodology findings: [README.md](/home/jer/repos/waittimecanada/README.md)
-- Ontario methodology notes: [ontario-methodology.md](/home/jer/repos/waittimecanada/docs/ontario-methodology.md)
-- Alberta methodology notes: [alberta-methodology.md](/home/jer/repos/waittimecanada/backend/docs/methodologies/alberta-methodology.md)
-- BC methodology notes: [bc-methodology.md](/home/jer/repos/waittimecanada/backend/docs/methodologies/bc-methodology.md)
-- Quebec methodology notes: [quebec-methodology.md](/home/jer/repos/waittimecanada/backend/docs/methodologies/quebec-methodology.md)
+- Ottawa-Gatineau case study: `docs/case-studies/ottawa-gatineau-divergence.md`
+- README methodology findings: `README.md`
+- Ontario methodology notes: `docs/ontario-methodology.md`
+- Alberta methodology notes: `backend/docs/methodologies/alberta-methodology.md`
+- BC methodology notes: `backend/docs/methodologies/bc-methodology.md`
+- Quebec methodology notes: `backend/docs/methodologies/quebec-methodology.md`
 
 ## External Source URLs
 
