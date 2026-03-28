@@ -16,17 +16,14 @@ describe("/api/status", () => {
     const mockSql = vi.fn();
     (getDb as Mock).mockReturnValue(mockSql);
 
-    // Mock the sourceMetrics query response
-    // Using simple integers for uptime calculation: expected24h = 1 * 96 = 96.
-    // So measurements_24h = 96 => 100% uptime
     mockSql.mockResolvedValueOnce([
       {
-        source_id: "test-source",
+        source_id: "ontario-health",
         source_name: "Test Source",
         province: "ON",
-        measurements_24h: 96,
-        measurements_7d: 672,
-        measurements_30d: 2880,
+        runs_24h: 24,
+        runs_7d: 168,
+        runs_30d: 720,
         total_hospitals: 1,
         last_run: new Date("2026-02-19T12:00:00Z"),
         scraper_status: "healthy",
@@ -64,23 +61,22 @@ describe("/api/status", () => {
     expect(data.drift_events[0].source_id).toBe("test-source");
     expect(data.drift_events[0].shift_percent).toBe(30);
     expect(data.drift_events[0].explanation).toBe("Mean increased by 30%");
+    expect(data.scheduler_cadence).toBe("hourly");
+    expect(data.expected_runs_24h).toBe(24);
   });
 
   it("should return critical status when uptime is < 80%", async () => {
     const mockSql = vi.fn();
     (getDb as Mock).mockReturnValue(mockSql);
 
-    // Mock the sourceMetrics query response
-    // expected24h = 1 * 96 = 96.
-    // 50 measurements = ~52% uptime
     mockSql.mockResolvedValueOnce([
       {
-        source_id: "test-source",
+        source_id: "ontario-health",
         source_name: "Test Source",
         province: "ON",
-        measurements_24h: 50,
-        measurements_7d: 350,
-        measurements_30d: 1500,
+        runs_24h: 12,
+        runs_7d: 84,
+        runs_30d: 360,
         total_hospitals: 1,
         last_run: new Date("2026-02-19T12:00:00Z"),
         scraper_status: "healthy",
@@ -108,12 +104,12 @@ describe("/api/status", () => {
     // total_hospitals = 0
     mockSql.mockResolvedValueOnce([
       {
-        source_id: "test-source",
+        source_id: "ontario-health",
         source_name: "Test Source",
         province: "ON",
-        measurements_24h: 0,
-        measurements_7d: 0,
-        measurements_30d: 0,
+        runs_24h: 0,
+        runs_7d: 0,
+        runs_30d: 0,
         total_hospitals: 0,
         last_run: new Date("2026-02-19T12:00:00Z"),
         scraper_status: "healthy",
@@ -131,6 +127,47 @@ describe("/api/status", () => {
     expect(data.overall_status).toBe("critical");
     expect(data.system_uptime_24h).toBe(0);
     expect(data.sources[0].uptime_24h).toBe(0);
+  });
+
+  it("should ignore dormant sources in aggregate uptime", async () => {
+    const mockSql = vi.fn();
+    (getDb as Mock).mockReturnValue(mockSql);
+
+    mockSql.mockResolvedValueOnce([
+      {
+        source_id: "ontario-health",
+        source_name: "Ontario",
+        province: "ON",
+        runs_24h: 24,
+        runs_7d: 168,
+        runs_30d: 720,
+        total_hospitals: 1,
+        last_run: new Date("2026-02-19T12:00:00Z"),
+        scraper_status: "healthy",
+        heartbeat_age_minutes: 10,
+      },
+      {
+        source_id: "manitoba-shared-health",
+        source_name: "Dormant Manitoba",
+        province: "MB",
+        runs_24h: 0,
+        runs_7d: 0,
+        runs_30d: 0,
+        total_hospitals: 12,
+        last_run: null,
+        scraper_status: "unknown",
+        heartbeat_age_minutes: null,
+      },
+    ]);
+    mockSql.mockResolvedValueOnce([]);
+
+    const res = await GET();
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.sources).toHaveLength(1);
+    expect(data.sources[0].source_id).toBe("ontario-health");
+    expect(data.system_uptime_24h).toBe(1);
   });
 
   it("should handle database errors gracefully", async () => {

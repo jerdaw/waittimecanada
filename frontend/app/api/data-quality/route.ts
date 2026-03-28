@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { publicCacheHeaders } from "@/utils/cache";
+import {
+  EXPECTED_SCRAPER_RUNS_PER_DAY,
+  LIVE_SCRAPER_CADENCE_LABEL,
+  getExpectedRunsForDays,
+  isActiveLiveScraperSource,
+} from "@/utils/live-scraper-sources";
 
 /**
  * GET /api/data-quality
@@ -11,9 +17,6 @@ import { publicCacheHeaders } from "@/utils/cache";
  *   hospital_id (optional) - quality for a specific hospital
  *   days (optional, default 30) - lookback period
  */
-
-const EXPECTED_SCRAPES_PER_DAY = 96;
-const SCRAPE_INTERVAL_MINUTES = 15;
 
 import { DataQualityQuerySchema } from "@/utils/validations";
 
@@ -79,6 +82,12 @@ async function getSystemQuality(sql: ReturnType<typeof getDb>) {
       (SELECT COUNT(*) FROM measurements m
         WHERE m.source_id = s.id
         AND m.timestamp_utc >= NOW() - INTERVAL '7 days') as measurements_7d,
+      (SELECT COUNT(DISTINCT DATE_TRUNC('hour', m.timestamp_utc)) FROM measurements m
+        WHERE m.source_id = s.id
+        AND m.timestamp_utc >= NOW() - INTERVAL '24 hours') as runs_24h,
+      (SELECT COUNT(DISTINCT DATE_TRUNC('hour', m.timestamp_utc)) FROM measurements m
+        WHERE m.source_id = s.id
+        AND m.timestamp_utc >= NOW() - INTERVAL '7 days') as runs_7d,
       (SELECT COUNT(DISTINCT m.hospital_id) FROM measurements m
         WHERE m.source_id = s.id
         AND m.timestamp_utc >= NOW() - INTERVAL '24 hours') as hospitals_24h,
@@ -94,15 +103,17 @@ async function getSystemQuality(sql: ReturnType<typeof getDb>) {
     ORDER BY s.province, s.name
   `;
 
-  const sources = sourceMetrics.map((row) => {
+  const sources = sourceMetrics
+    .filter((row) => isActiveLiveScraperSource(row.source_id as string))
+    .map((row) => {
     const totalHospitals = Number(row.total_hospitals);
-    const expected24h = totalHospitals * EXPECTED_SCRAPES_PER_DAY;
-    const actual24h = Number(row.measurements_24h);
+    const expected24h = EXPECTED_SCRAPER_RUNS_PER_DAY;
+    const actual24h = Number(row.runs_24h);
     const rate24h =
       expected24h > 0 ? Math.min(actual24h / expected24h, 1.0) : 0;
 
-    const expected7d = totalHospitals * EXPECTED_SCRAPES_PER_DAY * 7;
-    const actual7d = Number(row.measurements_7d);
+    const expected7d = getExpectedRunsForDays(7);
+    const actual7d = Number(row.runs_7d);
     const rate7d = expected7d > 0 ? Math.min(actual7d / expected7d, 1.0) : 0;
 
     return {
@@ -111,6 +122,7 @@ async function getSystemQuality(sql: ReturnType<typeof getDb>) {
       province: row.province,
       last_24h_success_rate: Math.round(rate24h * 1000) / 1000,
       last_7d_success_rate: Math.round(rate7d * 1000) / 1000,
+      measurements_24h: Number(row.measurements_24h),
       hospitals_reporting: Number(row.hospitals_24h),
       total_hospitals: totalHospitals,
       last_heartbeat_age_minutes: row.heartbeat_age_minutes
@@ -118,7 +130,7 @@ async function getSystemQuality(sql: ReturnType<typeof getDb>) {
         : null,
       scraper_status: row.scraper_status ?? "unknown",
     };
-  });
+    });
 
   // Overall status
   const rates = sources.map((s) => s.last_24h_success_rate);
@@ -139,16 +151,12 @@ async function getSystemQuality(sql: ReturnType<typeof getDb>) {
       sources,
       system_uptime_24h: Math.round(avgRate * 1000) / 1000,
       total_measurements_24h: sources.reduce(
-        (acc, s) =>
-          acc +
-          Math.round(
-            s.last_24h_success_rate *
-              s.total_hospitals *
-              EXPECTED_SCRAPES_PER_DAY,
-          ),
+        (acc, s) => acc + s.measurements_24h,
         0,
       ),
       total_hospitals_reporting: total24h,
+      scheduler_cadence: LIVE_SCRAPER_CADENCE_LABEL,
+      expected_runs_24h: EXPECTED_SCRAPER_RUNS_PER_DAY,
     },
     { headers: publicCacheHeaders(300, 900) },
   );
@@ -175,7 +183,7 @@ async function getHospitalQuality(
     date: row.date,
     scrape_count: Number(row.scrape_count),
     success_rate: Math.min(
-      Number(row.scrape_count) / EXPECTED_SCRAPES_PER_DAY,
+      Number(row.scrape_count) / EXPECTED_SCRAPER_RUNS_PER_DAY,
       1.0,
     ),
   }));
@@ -205,9 +213,10 @@ async function getHospitalQuality(
       hospital_id: hospitalId,
       coverage_timeline: coverageTimeline,
       current_quality: {
-        success_rate: Math.min(currentCount / EXPECTED_SCRAPES_PER_DAY, 1.0),
+        success_rate: Math.min(currentCount / EXPECTED_SCRAPER_RUNS_PER_DAY, 1.0),
         actual_scrapes_24h: currentCount,
-        expected_scrapes_24h: EXPECTED_SCRAPES_PER_DAY,
+        expected_scrapes_24h: EXPECTED_SCRAPER_RUNS_PER_DAY,
+        scheduler_cadence: LIVE_SCRAPER_CADENCE_LABEL,
       },
       anomalies_7d: anomalies.map((a) => ({
         id: a.id,

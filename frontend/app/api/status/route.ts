@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { publicCacheHeaders } from "@/utils/cache";
+import {
+  EXPECTED_SCRAPER_RUNS_PER_DAY,
+  LIVE_SCRAPER_CADENCE_LABEL,
+  getExpectedRunsForDays,
+  isActiveLiveScraperSource,
+} from "@/utils/live-scraper-sources";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 
 /**
@@ -13,7 +19,6 @@ import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
  * - Methodology drift events (last 30 days)
  */
 
-const EXPECTED_SCRAPES_PER_DAY = 96;
 const STATUS_CACHE_TTL_MS = 300_000;
 
 export async function GET() {
@@ -29,15 +34,15 @@ export async function GET() {
             s.id            AS source_id,
             s.name          AS source_name,
             s.province,
-            (SELECT COUNT(*) FROM measurements m
+            (SELECT COUNT(DISTINCT DATE_TRUNC('hour', m.timestamp_utc)) FROM measurements m
               WHERE m.source_id = s.id
-              AND m.timestamp_utc >= NOW() - INTERVAL '24 hours') AS measurements_24h,
-            (SELECT COUNT(*) FROM measurements m
+              AND m.timestamp_utc >= NOW() - INTERVAL '24 hours') AS runs_24h,
+            (SELECT COUNT(DISTINCT DATE_TRUNC('hour', m.timestamp_utc)) FROM measurements m
               WHERE m.source_id = s.id
-              AND m.timestamp_utc >= NOW() - INTERVAL '7 days')   AS measurements_7d,
-            (SELECT COUNT(*) FROM measurements m
+              AND m.timestamp_utc >= NOW() - INTERVAL '7 days')   AS runs_7d,
+            (SELECT COUNT(DISTINCT DATE_TRUNC('hour', m.timestamp_utc)) FROM measurements m
               WHERE m.source_id = s.id
-              AND m.timestamp_utc >= NOW() - INTERVAL '30 days')  AS measurements_30d,
+              AND m.timestamp_utc >= NOW() - INTERVAL '30 days')  AS runs_30d,
             (SELECT COUNT(*) FROM hospitals h
               WHERE h.source_id = s.id
               AND h.is_verified = true
@@ -50,24 +55,26 @@ export async function GET() {
           ORDER BY s.province, s.name
         `;
 
-        const sources = sourceMetrics.map((row) => {
+        const sources = sourceMetrics
+          .filter((row) => isActiveLiveScraperSource(row.source_id as string))
+          .map((row) => {
           const totalHospitals = Number(row.total_hospitals);
 
-          const expected24h = totalHospitals * EXPECTED_SCRAPES_PER_DAY;
-          const expected7d = totalHospitals * EXPECTED_SCRAPES_PER_DAY * 7;
-          const expected30d = totalHospitals * EXPECTED_SCRAPES_PER_DAY * 30;
+          const expected24h = EXPECTED_SCRAPER_RUNS_PER_DAY;
+          const expected7d = getExpectedRunsForDays(7);
+          const expected30d = getExpectedRunsForDays(30);
 
           const rate24h =
             expected24h > 0
-              ? Math.min(Number(row.measurements_24h) / expected24h, 1.0)
+              ? Math.min(Number(row.runs_24h) / expected24h, 1.0)
               : 0;
           const rate7d =
             expected7d > 0
-              ? Math.min(Number(row.measurements_7d) / expected7d, 1.0)
+              ? Math.min(Number(row.runs_7d) / expected7d, 1.0)
               : 0;
           const rate30d =
             expected30d > 0
-              ? Math.min(Number(row.measurements_30d) / expected30d, 1.0)
+              ? Math.min(Number(row.runs_30d) / expected30d, 1.0)
               : 0;
 
           const heartbeatAge = row.heartbeat_age_minutes
@@ -88,7 +95,7 @@ export async function GET() {
               ? (row.last_run as Date).toISOString()
               : null,
           };
-        });
+          });
 
         const rates = sources.map((source) => source.uptime_24h);
         const avgRate =
@@ -122,6 +129,8 @@ export async function GET() {
         return {
           overall_status: overallStatus,
           system_uptime_24h: Math.round(avgRate * 1000) / 1000,
+          scheduler_cadence: LIVE_SCRAPER_CADENCE_LABEL,
+          expected_runs_24h: EXPECTED_SCRAPER_RUNS_PER_DAY,
           sources,
           drift_events: driftEvents.map((event) => ({
             source_id: event.source_id,

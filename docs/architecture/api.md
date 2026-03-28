@@ -91,6 +91,15 @@ Public-health routes also carry explicit source freshness state:
 and embed provenance/source-status metadata directly in the response so the UI
 can render caveats without inventing freshness certainty.
 
+Operational KPI note:
+
+- `GET /api/status` and aggregate `GET /api/data-quality` percentages are now
+  aligned to the active live scraper set and the current hourly scheduler
+  cadence
+- these routes intentionally exclude dormant legacy `sources` rows from their
+  public rollups so the reported coverage reflects the actually live platform
+  rather than historical inventory
+
 ## Health route contract (M30 operational visibility)
 
 `GET /api/health` exposes an additive operational contract for scraper triage:

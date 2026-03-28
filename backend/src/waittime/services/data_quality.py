@@ -17,14 +17,20 @@ logger = logging.getLogger(__name__)
 class DataQualityService:
     """Computes data quality metrics for hospitals and sources.
 
-    Scrapers run every 15 minutes, so we expect 96 measurements per
+    Live production scrapers currently run hourly, so we expect 24 measurements per
     hospital per day. This service measures actual vs expected collection
     rates and identifies gaps in data coverage.
     """
 
-    # Scrapers run every 15 minutes = 96 expected scrapes per day
-    EXPECTED_SCRAPES_PER_DAY = 96
-    SCRAPE_INTERVAL_MINUTES = 15
+    # Live GitHub Actions cadence is hourly = 24 expected scrapes per day
+    EXPECTED_SCRAPES_PER_DAY = 24
+    SCRAPE_INTERVAL_MINUTES = 60
+    ACTIVE_LIVE_SOURCE_IDS = (
+        "quebec-msss",
+        "ontario-health",
+        "alberta-ahs",
+        "bc-phsa",
+    )
 
     # Status thresholds
     HEALTHY_THRESHOLD = 0.95  # >=95% success rate
@@ -170,13 +176,21 @@ class DataQualityService:
         start_24h = now - timedelta(hours=24)
         start_7d = now - timedelta(days=7)
 
-        source_ids = self.db.get_all_source_ids()
+        source_ids = [
+            source_id
+            for source_id in self.db.get_all_source_ids()
+            if source_id in self.ACTIVE_LIVE_SOURCE_IDS
+        ]
         sources_info: list[dict[str, Any]] = []
         rates_24h: list[float] = []
+        total_measurements_24h = 0
+        total_measurements_7d = 0
 
         for source_id in source_ids:
             quality_24h = self.compute_source_quality(source_id, start_24h, now)
             quality_7d = self.compute_source_quality(source_id, start_7d, now)
+            total_measurements_24h += quality_24h["total_actual"]
+            total_measurements_7d += quality_7d["total_actual"]
 
             # Get source province
             source = self.db.get_source(source_id)
@@ -218,17 +232,13 @@ class DataQualityService:
         else:
             overall_status = "critical"
 
-        # Total measurements
-        total_24h = sum(s.get("hospitals_reporting", 0) for s in sources_info)
-        total_7d = total_24h  # approximate; real count from source quality
-
         return {
             "overall_status": overall_status,
             "sources": sources_info,
             "system_uptime_24h": min(system_rate, 1.0),
             "system_uptime_7d": min(system_rate, 1.0),
-            "total_measurements_24h": total_24h,
-            "total_measurements_7d": total_7d,
+            "total_measurements_24h": total_measurements_24h,
+            "total_measurements_7d": total_measurements_7d,
         }
 
     def get_coverage_timeline(self, hospital_id: str, days: int = 30) -> list[dict[str, Any]]:
@@ -326,7 +336,7 @@ class DataQualityService:
         """Compute gaps between consecutive measurements.
 
         A gap is any period longer than 1.5x the expected scrape interval
-        (22.5 minutes) with no data.
+        (90 minutes) with no data.
 
         Args:
             timestamps: Sorted list of measurement timestamps

@@ -44,7 +44,7 @@ Chosen option: "Flag anomalies transparently", because excluding data would unde
 
 **Anomaly Detection:** Dual approach using z-score (threshold: 3.0) and IQR (multiplier: 1.5x) against a 7-day rolling baseline. Minimum 20 samples required; insufficient data defaults to "not anomalous".
 
-**Data Quality:** 96 expected scrapes/day (15-minute intervals). Gap detection at 1.5x interval threshold (22.5 minutes). Per-hospital and system-wide metrics.
+**Data Quality:** This ADR established the quality-snapshot and anomaly-detection model. The live cadence assumptions were later updated as production scheduling changed. Current production quality KPIs use the active live source set with an hourly expectation model (24 expected runs/day, 60-minute interval, gap detection at 1.5x interval = 90 minutes). Historical notes about the earlier 15-minute model should be read as implementation history, not the current live contract.
 
 **Methodology Change Detection:** Compares week-over-week province-wide means. Flags shifts exceeding 20% across minimum 5 hospitals.
 

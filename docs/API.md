@@ -116,6 +116,26 @@ Failure categories currently emitted by backend heartbeat/classification logic:
 - `persistence_failure`
 - `unknown`
 
+## Status and data-quality KPI cadence (D12)
+
+`GET /api/status` and the aggregate `GET /api/data-quality` view now compute
+public KPI percentages against the active live scraper set only:
+
+- `quebec-msss`
+- `ontario-health`
+- `alberta-ahs`
+- `bc-phsa`
+
+Operational note:
+
+- these aggregate percentages now reflect the current hourly GitHub Actions
+  scraper cadence (`24` expected runs/day), not the older 15-minute expectation
+  model
+- aggregate measurement counts are returned as actual counts, not reconstructed
+  from percentage estimates
+- historical `view=trend` / `view=diff` quality snapshots may still include
+  older pre-alignment rates until a dedicated re-baselining pass is completed
+
 ## Comparability endpoint
 
 `GET /api/compare` returns:

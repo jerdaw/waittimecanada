@@ -24,7 +24,7 @@ def service(mock_db):
     return DataQualityService(mock_db)
 
 
-def _make_timestamps(day: datetime, count: int, interval_minutes: int = 15):
+def _make_timestamps(day: datetime, count: int, interval_minutes: int = 60):
     """Generate evenly-spaced timestamps starting from day_start."""
     start = datetime(day.year, day.month, day.day, tzinfo=UTC)
     return [start + timedelta(minutes=i * interval_minutes) for i in range(count)]
@@ -35,16 +35,16 @@ class TestComputeHospitalQuality:
 
     @pytest.mark.unit
     def test_full_coverage(self, service, mock_db):
-        """96/96 scrapes yields success_rate=1.0, no gaps."""
+        """24/24 scrapes yields success_rate=1.0, no gaps."""
         day = datetime(2026, 2, 1, tzinfo=UTC)
-        timestamps = _make_timestamps(day, 96, interval_minutes=15)
+        timestamps = _make_timestamps(day, 24, interval_minutes=60)
         mock_db.get_measurement_timestamps.return_value = timestamps
 
         result = service.compute_hospital_quality("ca-on-test", day)
 
         assert result["hospital_id"] == "ca-on-test"
-        assert result["expected_scrapes"] == 96
-        assert result["actual_scrapes"] == 96
+        assert result["expected_scrapes"] == 24
+        assert result["actual_scrapes"] == 24
         assert result["success_rate"] == 1.0
         assert result["gaps"] == []
         assert result["longest_gap_minutes"] is None
@@ -52,15 +52,15 @@ class TestComputeHospitalQuality:
 
     @pytest.mark.unit
     def test_partial_coverage(self, service, mock_db):
-        """72/96 scrapes yields 0.75 success rate."""
+        """18/24 scrapes yields 0.75 success rate."""
         day = datetime(2026, 2, 1, tzinfo=UTC)
-        timestamps = _make_timestamps(day, 72, interval_minutes=15)
+        timestamps = _make_timestamps(day, 18, interval_minutes=60)
         mock_db.get_measurement_timestamps.return_value = timestamps
 
         result = service.compute_hospital_quality("ca-on-test", day)
 
-        assert result["actual_scrapes"] == 72
-        assert result["success_rate"] == 72 / 96
+        assert result["actual_scrapes"] == 18
+        assert result["success_rate"] == 18 / 24
         # Should have at least one gap (from last timestamp to end of day)
         assert len(result["gaps"]) >= 1
 
@@ -79,14 +79,14 @@ class TestComputeHospitalQuality:
 
     @pytest.mark.unit
     def test_over_count_capped_at_one(self, service, mock_db):
-        """More than 96 scrapes still caps success_rate at 1.0."""
+        """More than 24 scrapes still caps success_rate at 1.0."""
         day = datetime(2026, 2, 1, tzinfo=UTC)
-        timestamps = _make_timestamps(day, 120, interval_minutes=10)
+        timestamps = _make_timestamps(day, 30, interval_minutes=30)
         mock_db.get_measurement_timestamps.return_value = timestamps
 
         result = service.compute_hospital_quality("ca-on-test", day)
 
-        assert result["actual_scrapes"] == 120
+        assert result["actual_scrapes"] == 30
         assert result["success_rate"] == 1.0
 
 
@@ -101,22 +101,22 @@ class TestGapDetection:
 
         # Create timestamps with a 3-hour gap (02:00-05:00)
         timestamps = []
-        # 00:00 to 01:45 (8 measurements)
-        for i in range(8):
-            timestamps.append(start + timedelta(minutes=i * 15))
-        # Skip 02:00-04:45 (12 measurements missing)
-        # 05:00 to 23:45 (76 measurements)
-        for i in range(76):
-            timestamps.append(start + timedelta(hours=5, minutes=i * 15))
+        # 00:00 to 01:00 (2 measurements)
+        for i in range(2):
+            timestamps.append(start + timedelta(minutes=i * 60))
+        # Skip 02:00-04:00
+        # 05:00 onward (19 measurements)
+        for i in range(19):
+            timestamps.append(start + timedelta(hours=5 + i))
 
         mock_db.get_measurement_timestamps.return_value = timestamps
 
         result = service.compute_hospital_quality("ca-on-test", day)
 
-        # Should have the 3-hour gap
+        # With hourly measurements, the detected gap spans from 01:00 to 05:00.
         gap_durations = [g["duration_minutes"] for g in result["gaps"]]
-        assert any(170 <= d <= 195 for d in gap_durations), (
-            f"Expected a ~180 min gap, got durations: {gap_durations}"
+        assert any(230 <= d <= 250 for d in gap_durations), (
+            f"Expected a ~240 min gap, got durations: {gap_durations}"
         )
 
     @pytest.mark.unit
@@ -146,7 +146,7 @@ class TestGapDetection:
         """Evenly spaced timestamps below threshold produce no gaps."""
         day_start = datetime(2026, 2, 1, 0, 0, tzinfo=UTC)
         day_end = day_start + timedelta(days=1)
-        timestamps = _make_timestamps(datetime(2026, 2, 1, tzinfo=UTC), 96, 15)
+        timestamps = _make_timestamps(datetime(2026, 2, 1, tzinfo=UTC), 24, 60)
 
         gaps = DataQualityService._compute_gaps(timestamps, day_start, day_end)
         assert gaps == []
@@ -185,10 +185,10 @@ class TestComputeSourceQuality:
             mock_hospital_2,
         ]
 
-        # Total counts: 96 + 48 = 144 out of 2 * 96 = 192 expected
+        # Total counts: 24 + 12 = 36 out of 2 * 24 = 48 expected
         mock_db.get_measurement_count_by_hospital.return_value = {
-            "ca-on-hosp-1": 96,
-            "ca-on-hosp-2": 48,
+            "ca-on-hosp-1": 24,
+            "ca-on-hosp-2": 12,
         }
         # Mock onboarding dates (all hospitals active before period start)
         mock_db.get_hospital_onboarding_dates.return_value = {
@@ -200,9 +200,9 @@ class TestComputeSourceQuality:
 
         assert result["source_id"] == "ontario-er"
         assert result["total_hospitals"] == 2
-        assert result["total_expected"] == 192
-        assert result["total_actual"] == 144
-        assert result["overall_success_rate"] == 144 / 192
+        assert result["total_expected"] == 48
+        assert result["total_actual"] == 36
+        assert result["overall_success_rate"] == 36 / 48
         assert result["hospitals_with_data_today"] == 2
         assert result["coverage_rate"] == 1.0
 
@@ -236,8 +236,8 @@ class TestComputeSourceQuality:
 
         # Only 2 out of 4 hospitals have data
         mock_db.get_measurement_count_by_hospital.return_value = {
-            "hosp-0": 90,
-            "hosp-2": 80,
+            "hosp-0": 20,
+            "hosp-2": 18,
         }
         # All hospitals onboarded early
         mock_db.get_hospital_onboarding_dates.return_value = {
@@ -257,12 +257,12 @@ class TestComputeSystemQuality:
     @pytest.mark.unit
     def test_healthy_system(self, service, mock_db):
         """All sources above 95% yields 'healthy'."""
-        mock_db.get_all_source_ids.return_value = ["src-1"]
+        mock_db.get_all_source_ids.return_value = ["ontario-health"]
 
         mock_hospitals = [Mock()]
         mock_hospitals[0].id = "h-1"
         mock_db.get_hospitals_by_source.return_value = mock_hospitals
-        mock_db.get_measurement_count_by_hospital.return_value = {"h-1": 96}
+        mock_db.get_measurement_count_by_hospital.return_value = {"h-1": 24}
 
         # Mock onboarding date
         mock_db.get_hospital_onboarding_dates.return_value = {
@@ -282,7 +282,7 @@ class TestComputeSystemQuality:
     @pytest.mark.unit
     def test_critical_system(self, service, mock_db):
         """Sources below 80% yields 'critical'."""
-        mock_db.get_all_source_ids.return_value = ["src-1"]
+        mock_db.get_all_source_ids.return_value = ["quebec-msss"]
 
         mock_hospitals = [Mock()]
         mock_hospitals[0].id = "h-1"
@@ -336,11 +336,11 @@ class TestCoverageTimeline:
     def test_timeline_detects_gaps(self, service, mock_db):
         """Days with large gaps have has_gaps=True."""
         day = datetime(2026, 2, 1, tzinfo=UTC)
-        # Timestamps with a 45-min gap (>= 30 min threshold = 2x15)
+        # Timestamps with a 180-min gap (>= 120 min threshold = 2x60)
         timestamps = [
             day,
-            day + timedelta(minutes=15),
-            day + timedelta(minutes=75),  # 60-min gap from previous
+            day + timedelta(hours=1),
+            day + timedelta(hours=4),  # 180-min gap from previous
         ]
         mock_db.get_measurement_timestamps.return_value = timestamps
 
@@ -353,7 +353,7 @@ class TestCoverageTimeline:
     def test_timeline_no_gaps(self, service, mock_db):
         """Evenly spaced timestamps have has_gaps=False."""
         day = datetime(2026, 2, 1, tzinfo=UTC)
-        timestamps = _make_timestamps(day, 96, interval_minutes=15)
+        timestamps = _make_timestamps(day, 24, interval_minutes=60)
         mock_db.get_measurement_timestamps.return_value = timestamps
 
         result = service.get_coverage_timeline("ca-on-test", days=1)
