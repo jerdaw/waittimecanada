@@ -153,6 +153,8 @@ Add Plausible Analytics to Next.js layout. Update `/privacy` page. Do not public
 
 The canonical URL is now live. Publish using `https://wait-time.ca`. Spend no more than 30 minutes total. The value is a public timestamp of work and asymmetric upside if it reaches health informatics professionals.
 
+**Status:** Copy refreshed on 2026-03-28 to match the current mission/equity/stewardship posture and live Batch A feature set. Manual publication still pending.
+
 **Artifact:** Public, timestamped LinkedIn post.
 
 ### B4: Video Walkthrough

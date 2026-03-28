@@ -226,12 +226,12 @@ Thanks,
 **Draft Ready:** `docs/linkedin-launch-post.md` (final recommended post prepared)
 
 ### Steps:
-1. [x] Finalize publish-ready copy in `docs/linkedin-launch-post.md`
+1. [x] Refresh publish-ready copy in `docs/linkedin-launch-post.md` to match the live mission/equity/stewardship posture
 2. [x] Set live demo URL to `https://wait-time.ca`
 3. [ ] Add 2-3 screenshots
 4. [ ] Publish
 
-**Hashtags:** #HealthTech #MedEd #DataScience #HealthcareInnovation #MedicalStudent #CanMEDS
+**Hashtags:** #HealthInformatics #EmergencyMedicine #PublicHealth #OpenData #HealthSystems #Canada
 
 ---
 

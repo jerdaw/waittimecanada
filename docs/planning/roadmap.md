@@ -141,7 +141,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 [Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
 
 - [ ] **P1 / B2: Privacy-safe usage analytics** — Add Plausible Analytics; update /privacy page; do not publicize numbers (2 h)
-- [ ] **P1 / B3: Publish LinkedIn launch post** — Publish the finalized post using `https://wait-time.ca`; max 30 min (30 min)
+- [ ] **P1 / B3: Publish LinkedIn launch post** — Draft refreshed for the live mission/equity/stewardship posture and current feature set; remaining work is manual publication using `https://wait-time.ca` (30 min)
 - [ ] **P1 / B4: Video walkthrough** — Script 3–4 min; record with decent audio; upload unlisted YouTube (3 h)
 - [ ] **P2 / B5: GitHub topics & discoverability** — Add topic tags; check 1–2 open data registries (30 min)
 
