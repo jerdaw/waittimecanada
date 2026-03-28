@@ -60,7 +60,7 @@ Netlify should now be treated as rollback-only for the frontend, and GitHub Acti
 
 ## Next Steps
 
-**Admissions strengthening plan active (2026-03-26).** Production launch verification is complete. Immediate work now shifts to credibility artifacts and post-launch follow-through: A1 (personal author bio), A3 (real Zenodo DOI), A4 (stakeholder outreach), A6/A7 (case study + quantified findings), and B2-B4 (analytics, launch post, walkthrough). See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
+**Admissions strengthening plan active (2026-03-26).** Production launch verification is complete. Immediate work now shifts to credibility artifacts and post-launch follow-through: A3 (real Zenodo DOI), A4 (stakeholder outreach), A6/A7 (case study + quantified findings), and B2-B4 (analytics, launch post, walkthrough). A1 (README mission/equity/stewardship section) is now delivered. See [`admissions-strengthening-plan.md`](implementation/admissions-strengthening-plan.md) for full details.
 
 **Parallel ops track (2026-03-26):** keep the VPS frontend stable, watch Neon transfer after the new read-cache guardrails, and treat backend migration as deferred pending an Ontario reachability investigation for the VPS path.
 
@@ -129,7 +129,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 ### Phase A: Immediate Credibility Cleanup
 [Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
 
-- [ ] **P1 / A1: Named author bio in README** — Expand the maintainer blurb into a 3–5 sentence personal motivation statement (30 min)
+- [x] **P1 / A1: Mission, equity, and stewardship section in README** — Replace the maintainer blurb with a public-facing mission/equity/stewardship statement aligned to the site's official posture
 - [x] **P1 / A2: Limitations section in README** — Specific, technical limitations demonstrating intellectual maturity (delivered in README + application summary)
 - [ ] **P1 / A3: Fix placeholder Zenodo DOI** — Register real deposit; update CITATION.cff and README badge (90 min)
 - [ ] **P1 / A4: Stakeholder interview outreach** — Send 10–15 outreach messages to ER professionals using existing templates (2–3 h outreach; interviews on their schedule)
@@ -180,7 +180,7 @@ Each feature maps to CanMEDS competencies for medical school admissions:
 | Competency | Delivered | Admissions Plan (New) |
 |------------|----------|----------------------|
 | **Scholar** | Metric ontology, comparability matrix, citation export, aggregation pipeline, anomaly detection, methodology change detection, property-based testing, data dictionary, OpenAPI docs, Zenodo DOI | Technical report (C1), Ottawa–Gatineau case study (A6), quantified findings (A7), equity interpretive summary (C3), limitations section (A2) |
-| **Professional** | Clinical defensibility, divergence warnings, data quality transparency, peer benchmarking, SECURITY.md, LICENSE, CODE_OF_CONDUCT, privacy policy, terms of use, error boundaries, security headers, uptime monitoring | Operational transparency report (C4), incident post-mortem (C5), named author bio (A1), reflection document (A5) |
+| **Professional** | Clinical defensibility, divergence warnings, data quality transparency, peer benchmarking, SECURITY.md, LICENSE, CODE_OF_CONDUCT, privacy policy, terms of use, error boundaries, security headers, uptime monitoring | Operational transparency report (C4), incident post-mortem (C5), README mission/equity/stewardship section (A1), reflection document (A5) |
 | **Health Advocate** | Access Burden Estimator, equity layer (ON), temporal access patterns, accessibility testing (WCAG), French language support, mobile responsiveness | Stakeholder interview with ER professionals (A4), equity layer interpretation (C3) |
 | **Leader** | Multi-province scaling, systems architecture, regional dashboards, data quality monitoring, release management, operational documentation | Live production URL (B1), video walkthrough (B4), LinkedIn launch (B3), usage analytics (B2) |
 | **Collaborator** | Province-aware telehealth routing, issue/PR templates, CODE_OF_CONDUCT, CONTRIBUTING guidelines | Stakeholder interview (A4), researcher outreach (C2), named reviewer acknowledgement (C6) |
@@ -261,7 +261,7 @@ All 50 roadmap items are categorized by their primary OMSAS/CanMEDS impact:
 
 Ranked by **defensible admissions value per hour of effort** (updated 2026-03-12 after production launch verification):
 
-1. **A1: Named author bio** — Establishes ownership; eliminates active credibility gap (30 min)
+1. **A1: Mission/equity/stewardship section** — Clarifies the site's public-interest posture and barrier-reduction goals (30 min)
 2. **A4: Stakeholder interview** — Unlocks Collaborator competency; transforms project category (2–3 h + scheduling)
 3. **A6: Ottawa–Gatineau case study** — Most narratively compelling specific story; interview-ready (2–3 h)
 4. **A3: Fix placeholder Zenodo DOI** — Eliminates fake-DOI credibility risk; third-party attestation (90 min)
@@ -491,9 +491,9 @@ Archived (delivered):
 
 | Phase | Timeline | Items | Effort |
 |-------|----------|-------|--------|
-| **A: Credibility Cleanup** | Active | A1–A7 (author bio, limitations, Zenodo DOI, stakeholder outreach, reflection doc, case study, metrics) | ~12–15 h |
+| **A: Credibility Cleanup** | Active | A1–A7 (mission/equity/stewardship, limitations, Zenodo DOI, stakeholder outreach, reflection doc, case study, metrics) | ~12–15 h |
 | **B: Launch Follow-Through** | Active | B2–B5 (analytics, LinkedIn, video, discoverability) | ~5–6 h remaining |
 | **C: Scholarly Artifacts** | Weeks 2–4 post-launch | C1–C6 (technical report, researcher outreach, equity interpretation, ops report, post-mortem, reviewer) | ~2–3 d |
 | **D: If Time Permits** | Weeks 5–12 | D1–D5 (comparability matrix, QC equity, freshness indicators, NS scraper, grant/competition) | Variable |
 
-**Next Action:** Start A1 (personal author bio) and A4 (stakeholder outreach), then finish B3 (publish the launch post) now that the canonical URL is live.
+**Next Action:** Start A4 (stakeholder outreach), then finish B3 (publish the launch post) now that the canonical URL is live.

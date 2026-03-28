@@ -524,7 +524,7 @@ waittimecanada/
 ### Planned Enhancements
 - [ ] Additional provinces (Nova Scotia, New Brunswick)
 - [ ] Multi-province equity layer beyond Ontario
-- [ ] Public-facing admissions artifacts (named author bio, real Zenodo DOI, case study, quantified findings)
+- [ ] Public-facing credibility artifacts (mission/equity/stewardship section, real Zenodo DOI, case study, quantified findings)
 - [ ] Privacy-safe usage analytics and launch follow-through artifacts
 - [ ] Prometheus/Grafana monitoring dashboard
 - [ ] Smart scheduling (reduce frequency during overnight hours)
@@ -565,16 +565,21 @@ All data sourced from publicly available provincial health authority websites.
 
 ---
 
-## 🎓 Author
+## 🎯 Mission
 
-Wait Time Canada is maintained by **Jeremy Dawson** as a health informatics portfolio and methodology-audit project focused on transparent interpretation of Canadian emergency department reporting.
+Wait Time Canada is a public health data and methods observatory focused on transparent interpretation of Canadian emergency department reporting.
 
-This project demonstrates:
-- Full-stack software development
-- Health systems research methodology
-- Data quality and anomaly detection
-- Clinical defensibility in health informatics
-- Systems-level thinking and architecture
+The project exists to improve access to operational health-system information, make methodological differences visible, and support safer interpretation of reported wait-time data by patients, clinicians, researchers, journalists, and policy users.
+
+## ⚖️ Equity and Access
+
+Wait Time Canada is developed with a health equity, EDIA, and barrier-reduction lens. Public health information is often fragmented, inconsistently defined, difficult to compare, or difficult to find. Those gaps can create barriers for people navigating care, for communities experiencing unequal access, and for decision-makers trying to improve the system responsibly.
+
+The project aims to reduce those barriers by improving transparency, surfacing limitations, documenting methodological differences, and prioritizing public-interest access to operational health-system information.
+
+## 🛡️ Stewardship
+
+Wait Time Canada prioritizes provenance, comparability, limitations, and responsible reuse of public data. It does not provide medical advice, does not claim to resolve underlying reporting inconsistencies, and does not present invalid cross-system comparisons as if they were directly comparable.
 
 **Contact:** Use the repository issue tracker or the repository owner's GitHub profile for project inquiries.
 

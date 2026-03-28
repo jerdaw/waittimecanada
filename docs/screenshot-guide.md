@@ -127,10 +127,10 @@
 
 ### 6. About Section Expanded
 **Location:** Homepage with About section expanded
-**Purpose:** Show personal narrative and professional presentation
+**Purpose:** Show mission clarity, equity posture, and professional presentation
 **What to capture:**
 - Full about section text visible
-- Author bio section
+- Mission / equity / stewardship section
 - Social links (GitHub, LinkedIn, Email)
 
 **Filename:** `06-about-section.png`

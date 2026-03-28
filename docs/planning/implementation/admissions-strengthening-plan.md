@@ -22,14 +22,14 @@
 3. No published academic or semi-academic output.
 4. Placeholder DOI undermines the "citable software" claim.
 5. The health equity analysis covers only Ontario — the Advocate claim is narrow.
-6. No personal narrative connecting the applicant to the project's existence.
+6. The README still lacks a clear public-facing mission, equity/EDIA posture, and stewardship statement that explains why the project matters beyond its engineering.
 
 ---
 
 ## Guiding Principles
 
 1. **Phase A items are all pre-deployment.** No blockers. Start immediately.
-2. **Stakeholder interview (#A4) and author bio (#A1) are the two highest-ROI actions.** Both can be done today.
+2. **Stakeholder interview (#A4) and README mission/equity/stewardship section (#A1) are the two highest-ROI actions.** Both can be done today.
 3. **The technical report (C1) is the anchor scholarly artifact.** The case study, findings, and equity interpretation feed into it.
 4. **Don't publicize anything you can't defend.** Every metric, finding, and claim must survive "how do you know that?" from a skeptical interviewer.
 5. **The live URL enables Phase B but does not automatically create value.** The value comes from the content (case study, findings, limitations) already visible when someone visits.
@@ -39,12 +39,14 @@
 
 ## Phase A: Immediate Credibility Cleanup
 
-### A1: Named Author Bio in README
+### A1: Mission, Equity, and Stewardship Section in README
 **Priority:** 1 (tied with A4) | **Effort:** 30 min | **CanMEDS:** Professional, Communicator
 
-Expand the named maintainer section in README into a 3–5 sentence personal motivation statement. Don't make it sound like an OMSAS essay — write as a developer-researcher who happens to be going into medicine. The current maintainer blurb is now factual, but it still lacks the personal motivation that would make the work feel owned rather than merely maintained.
+Replace the maintainer-oriented README blurb with a short public-facing section that states the project's mission, health/data equity and EDIA posture, barrier-reduction aims, and stewardship standards. The goal is to make the site read like a serious public-interest health data observatory rather than a personal portfolio or pet project.
 
-**Artifact:** Named, personally motivated `## Author` section in README.
+**Artifact:** `## Mission`, `## Equity and Access`, and `## Stewardship` sections in README.
+
+**Status:** Delivered 2026-03-28.
 
 ### A2: Limitations Section in README
 **Priority:** 1 | **Effort:** 1 h | **CanMEDS:** Scholar, Professional
@@ -263,7 +265,7 @@ Add `last_updated` timestamp and age indicator to hospital cards and export CSV.
 If Phases A–C execute on schedule, by mid-April 2026 the portfolio includes:
 
 - A live, professional URL at `wait-time.ca` with current published data
-- A named author with personal motivation statement
+- A clear public-facing mission, equity/EDIA, and stewardship statement
 - A real Zenodo DOI resolving to a real record
 - An honest limitations section demonstrating intellectual maturity
 - At least one documented stakeholder conversation with an ER professional
@@ -292,7 +294,7 @@ This plan is the product of three analytical passes:
 
 Key insights from the analysis:
 - The engineering foundation is already excellent. The gap is almost entirely in **real-world engagement, external validation, and public-facing artifacts**.
-- Items 2 (stakeholder interview) and 8 (author bio) are the two highest-ROI actions — both can be started today with zero dependencies.
+- Items 2 (stakeholder interview) and 8 (README mission/equity/stewardship section) are the two highest-ROI actions — both can be started today with zero dependencies.
 - The technical report (C1) is the anchor scholarly artifact — the case study, findings, and equity interpretation all feed into it.
 - Usage analytics should be added immediately after deployment to establish baseline data, but numbers should not be publicized until they tell a good story.
 - Phase D items are genuinely optional for admissions purposes and should not compete with Phase A–C execution.
