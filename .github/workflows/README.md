@@ -158,6 +158,10 @@ This directory contains operational and CI workflows for Wait Time Canada.
   current source refresh timestamps, normalized row counts, and explicit
   `healthy` / `partial` / `degraded` operator classifications from the database
   state.
+- Hard-fail public-health sources (`mohserlo`, `health-canada-recalls`) now use
+  transition-aware alerting via persisted incident state so operators receive
+  one degraded alert and one recovery alert instead of repeat duplicates. The
+  best-effort AED fallback is intentionally excluded from paging.
 
 ## Secrets Matrix
 

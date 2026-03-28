@@ -86,3 +86,13 @@ jobs:
             --format markdown | tee -a "$GITHUB_STEP_SUMMARY" || {
             echo "_Public health hub status summary unavailable for this run._" >> "$GITHUB_STEP_SUMMARY"
           }
+
+      - name: Check transition-aware public health ingest alerts
+        if: always()
+        working-directory: ./backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PUSHOVER_USER_KEY: ${{ secrets.PUSHOVER_USER_KEY }}
+          PUSHOVER_API_TOKEN: ${{ secrets.PUSHOVER_API_TOKEN }}
+        run: |
+          python -m waittime.cli.check_public_health_hub_ingest --verbose

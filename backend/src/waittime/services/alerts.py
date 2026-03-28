@@ -124,6 +124,42 @@ class AlertService:
             url=run_url or self.config.reference_url,
         )
 
+    def alert_public_health_source_degraded(
+        self,
+        source_id: str,
+        *,
+        source_name: str,
+        reasons: list[str],
+        run_url: str | None = None,
+    ) -> bool:
+        """Alert that a hard-fail public-health source is degraded."""
+        reason_text = "; ".join(reasons)[:250]
+        return self.send_alert(
+            title=f"⚠️ Public Health Source Degraded: {source_name}",
+            message=f"Source {source_id} is degraded. Reasons: {reason_text}",
+            priority=1,
+            url=run_url or self.config.reference_url,
+        )
+
+    def alert_public_health_source_resolved(
+        self,
+        source_id: str,
+        *,
+        source_name: str,
+        duration: str | None = None,
+        run_url: str | None = None,
+    ) -> bool:
+        """Alert that a public-health ingest incident has recovered."""
+        message = f"{source_name} ({source_id}) is healthy again."
+        if duration:
+            message = f"Recovered after {duration}. {message}"
+        return self.send_alert(
+            title=f"✅ Public Health Source Recovered: {source_name}",
+            message=message,
+            priority=0,
+            url=run_url or self.config.reference_url,
+        )
+
     def alert_scraper_error(
         self,
         source_id: str,

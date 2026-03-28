@@ -10,11 +10,17 @@ from waittime.services.database import DatabaseService
 MIGRATION_PATH = (
     Path(__file__).resolve().parents[2] / "migrations" / "018_create_public_health_hub_tables.sql"
 )
+ALERT_STATE_MIGRATION_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "migrations"
+    / "019_add_public_health_source_alert_state.sql"
+)
 
 
 def _apply_public_health_hub_migration(conn) -> None:
     with conn.cursor() as cur:
         cur.execute(MIGRATION_PATH.read_text(encoding="utf-8"))
+        cur.execute(ALERT_STATE_MIGRATION_PATH.read_text(encoding="utf-8"))
 
 
 def _build_source(**overrides) -> PublicDataSource:
@@ -206,3 +212,23 @@ class TestPublicHealthHubDatabase:
         assert source_status["test-recalls"].latest_alert_published_at == datetime(
             2026, 3, 27, 9, 0, tzinfo=UTC
         )
+
+    def test_public_health_source_alert_state_round_trip(
+        self,
+        public_health_hub_db: DatabaseService,
+    ):
+        public_health_hub_db.upsert_public_data_source(_build_source())
+
+        opened = public_health_hub_db.open_public_health_source_alert_incident(
+            "test-mohserlo",
+            "degraded",
+            "degraded:test-mohserlo:abc123",
+        )
+        assert opened.active_incident_kind == "degraded"
+
+        fetched = public_health_hub_db.get_public_health_source_alert_state("test-mohserlo")
+        assert fetched is not None
+        assert fetched.active_incident_fingerprint == "degraded:test-mohserlo:abc123"
+
+        resolved = public_health_hub_db.resolve_public_health_source_alert_incident("test-mohserlo")
+        assert resolved.active_incident_kind is None

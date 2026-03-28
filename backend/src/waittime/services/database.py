@@ -25,6 +25,7 @@ from waittime.core import (
     MeasurementAggregate,
     PublicDataSource,
     PublicHealthAlert,
+    PublicHealthSourceAlertState,
     ResourceLocation,
     ScraperAlertState,
     ScraperStatus,
@@ -2138,6 +2139,96 @@ class DatabaseService:
                     raise ValueError(f"Failed to resolve alert incident for {source_id}")
                 return self._row_to_scraper_alert_state(dict(row))
 
+    def get_public_health_source_alert_state(
+        self,
+        source_id: str,
+    ) -> PublicHealthSourceAlertState | None:
+        """Get the current persisted alert state for a public-health source."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT *
+                    FROM public_health_source_alert_state
+                    WHERE source_id = %s
+                    """,
+                    (source_id,),
+                )
+                row = cur.fetchone()
+                if row is None:
+                    return None
+                return self._row_to_public_health_source_alert_state(dict(row))
+
+    def open_public_health_source_alert_incident(
+        self,
+        source_id: str,
+        incident_kind: str,
+        incident_fingerprint: str,
+    ) -> PublicHealthSourceAlertState:
+        """Persist a newly opened active public-health alert incident."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO public_health_source_alert_state (
+                        source_id,
+                        active_incident_kind,
+                        active_incident_fingerprint,
+                        opened_at,
+                        last_notified_at
+                    ) VALUES (
+                        %s, %s, %s, NOW(), NOW()
+                    )
+                    ON CONFLICT (source_id) DO UPDATE SET
+                        active_incident_kind = EXCLUDED.active_incident_kind,
+                        active_incident_fingerprint = EXCLUDED.active_incident_fingerprint,
+                        opened_at = NOW(),
+                        last_notified_at = NOW(),
+                        updated_at = NOW()
+                    RETURNING *
+                    """,
+                    (source_id, incident_kind, incident_fingerprint),
+                )
+                row = cur.fetchone()
+                if row is None:
+                    raise ValueError(f"Failed to open public health alert incident for {source_id}")
+                return self._row_to_public_health_source_alert_state(dict(row))
+
+    def resolve_public_health_source_alert_incident(
+        self,
+        source_id: str,
+    ) -> PublicHealthSourceAlertState:
+        """Clear the active public-health incident and record the latest resolution time."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO public_health_source_alert_state (
+                        source_id,
+                        active_incident_kind,
+                        active_incident_fingerprint,
+                        last_resolved_at
+                    ) VALUES (
+                        %s, NULL, NULL, NOW()
+                    )
+                    ON CONFLICT (source_id) DO UPDATE SET
+                        active_incident_kind = NULL,
+                        active_incident_fingerprint = NULL,
+                        opened_at = NULL,
+                        last_notified_at = NULL,
+                        last_resolved_at = NOW(),
+                        updated_at = NOW()
+                    RETURNING *
+                    """,
+                    (source_id,),
+                )
+                row = cur.fetchone()
+                if row is None:
+                    raise ValueError(
+                        f"Failed to resolve public health alert incident for {source_id}"
+                    )
+                return self._row_to_public_health_source_alert_state(dict(row))
+
     # ─────────────────────────────────────────────────────────────────
     # Private helpers
     # ─────────────────────────────────────────────────────────────────
@@ -2239,6 +2330,21 @@ class DatabaseService:
     def _row_to_scraper_alert_state(self, row: dict[str, Any]) -> ScraperAlertState:
         """Convert database row to ScraperAlertState model."""
         return ScraperAlertState(
+            source_id=row["source_id"],
+            active_incident_kind=row.get("active_incident_kind"),
+            active_incident_fingerprint=row.get("active_incident_fingerprint"),
+            opened_at=row.get("opened_at"),
+            last_notified_at=row.get("last_notified_at"),
+            last_resolved_at=row.get("last_resolved_at"),
+            updated_at=row.get("updated_at"),
+        )
+
+    def _row_to_public_health_source_alert_state(
+        self,
+        row: dict[str, Any],
+    ) -> PublicHealthSourceAlertState:
+        """Convert database row to PublicHealthSourceAlertState model."""
+        return PublicHealthSourceAlertState(
             source_id=row["source_id"],
             active_incident_kind=row.get("active_incident_kind"),
             active_incident_fingerprint=row.get("active_incident_fingerprint"),

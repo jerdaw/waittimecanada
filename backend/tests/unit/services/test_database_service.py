@@ -14,6 +14,7 @@ from waittime.core.models import (
     Hospital,
     Measurement,
     MeasurementAggregate,
+    PublicHealthSourceAlertState,
     ScraperAlertState,
     Source,
 )
@@ -336,6 +337,58 @@ class TestDatabaseService:
         assert result.source_id == "ontario-health"
         assert result.active_incident_kind is None
         assert "INSERT INTO scraper_alert_state" in mock_cursor.execute.call_args[0][0]
+
+    @patch("psycopg2.connect")
+    def test_open_public_health_source_alert_incident(self, mock_connect, db_service):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_cursor.fetchone.return_value = {
+            "source_id": "mohserlo",
+            "active_incident_kind": "degraded",
+            "active_incident_fingerprint": "degraded:mohserlo:abc123",
+            "opened_at": datetime.now(UTC),
+            "last_notified_at": datetime.now(UTC),
+            "last_resolved_at": None,
+            "updated_at": datetime.now(UTC),
+        }
+
+        result = db_service.open_public_health_source_alert_incident(
+            "mohserlo",
+            "degraded",
+            "degraded:mohserlo:abc123",
+        )
+
+        assert isinstance(result, PublicHealthSourceAlertState)
+        assert result.source_id == "mohserlo"
+        assert result.active_incident_kind == "degraded"
+        assert "INSERT INTO public_health_source_alert_state" in mock_cursor.execute.call_args[0][0]
+
+    @patch("psycopg2.connect")
+    def test_resolve_public_health_source_alert_incident(self, mock_connect, db_service):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_cursor.fetchone.return_value = {
+            "source_id": "mohserlo",
+            "active_incident_kind": None,
+            "active_incident_fingerprint": None,
+            "opened_at": None,
+            "last_notified_at": None,
+            "last_resolved_at": datetime.now(UTC),
+            "updated_at": datetime.now(UTC),
+        }
+
+        result = db_service.resolve_public_health_source_alert_incident("mohserlo")
+
+        assert isinstance(result, PublicHealthSourceAlertState)
+        assert result.source_id == "mohserlo"
+        assert result.active_incident_kind is None
+        assert "INSERT INTO public_health_source_alert_state" in mock_cursor.execute.call_args[0][0]
 
     @patch("psycopg2.connect")
     def test_cleanup_old_measurements(self, mock_connect, db_service):

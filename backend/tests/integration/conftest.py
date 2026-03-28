@@ -70,6 +70,12 @@ def clean_database(db_service: DatabaseService) -> Generator[DatabaseService, No
     # Clear any test data before test (delete in correct order due to foreign keys)
     with db_service.get_connection() as conn:
         with db_service.get_cursor(conn) as cur:
+            _delete_if_table_exists(
+                cur,
+                "public_health_source_alert_state",
+                "source_id LIKE %s",
+                ("test-%",),
+            )
             _delete_if_table_exists(cur, "public_health_alerts", "id LIKE %s", ("test-%",))
             _delete_if_table_exists(cur, "resource_locations", "id LIKE %s", ("test-%",))
             _delete_if_table_exists(cur, "public_data_sources", "source_id LIKE %s", ("test-%",))
@@ -83,6 +89,12 @@ def clean_database(db_service: DatabaseService) -> Generator[DatabaseService, No
     # Clear test data after test (delete in correct order due to foreign keys)
     with db_service.get_connection() as conn:
         with db_service.get_cursor(conn) as cur:
+            _delete_if_table_exists(
+                cur,
+                "public_health_source_alert_state",
+                "source_id LIKE %s",
+                ("test-%",),
+            )
             _delete_if_table_exists(cur, "public_health_alerts", "id LIKE %s", ("test-%",))
             _delete_if_table_exists(cur, "resource_locations", "id LIKE %s", ("test-%",))
             _delete_if_table_exists(cur, "public_data_sources", "source_id LIKE %s", ("test-%",))
