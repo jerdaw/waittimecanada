@@ -37,6 +37,20 @@ Provincial health authorities report ER wait times using **fundamentally differe
 
 **Direct comparison without methodology awareness is clinically misleading.** This observatory makes those differences transparent.
 
+### By the Numbers
+
+As verified on **2026-03-28**:
+
+- **393 hospital records** across the 4 active provincial source inventories
+- **8,804 measurements** collected in the most recent 24-hour quality window
+- **273 hospitals** with at least one reported measurement in that same 24-hour window
+- **4 distinct statistic types** across the 4 active provinces: `MEAN`, `ROLLING_AVG`, `POINT_ESTIMATE`, and `P90`
+- **6 of 6 cross-province source pairs** fail direct comparability on the current ontology tags
+- **3 of 6 cross-province source pairs** differ on at least 2 ontology dimensions
+- **1 province** currently publishes stretcher occupancy in the live platform: Quebec
+
+These are methodology and operations findings, not performance rankings. They describe what the system is auditing and how the data is structured, not which province or hospital is "better."
+
 ---
 
 ## Limitations

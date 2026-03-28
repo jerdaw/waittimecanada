@@ -135,7 +135,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 - [ ] **P1 / A4: Stakeholder interview outreach** — Send 10–15 outreach messages to ER professionals using existing templates (2–3 h outreach; interviews on their schedule). `Hold until explicit user go-ahead.`
 - [ ] **P1 / A5: Private reflection document** — ABS/interview prep; motivation, decisions, surprises, ethical tensions (2 h; not committed to repo)
 - [x] **P1 / A6: Ottawa–Gatineau case study** — Added the case study artifact, linked it from README/application summary, and verified the Ottawa/Gatineau pair against live production data on 2026-03-28
-- [ ] **P1 / A7: Quantified metrics & methodology findings** — Query DB for honest metrics; methodology-characterization findings only, no cross-province performance claims (3 h)
+- [x] **P1 / A7: Quantified metrics & methodology findings** — Added a dated "By the Numbers" section to README using operational and ontology-level findings only, with no cross-province performance claims
 
 ### Phase B: Active Launch Cleanup
 [Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
@@ -496,4 +496,4 @@ Archived (delivered):
 | **C: Scholarly Artifacts** | Weeks 2–4 post-launch | C1–C6 (technical report, researcher outreach, equity interpretation, ops report, post-mortem, reviewer) | ~2–3 d |
 | **D: If Time Permits** | Weeks 5–12 | D1–D5 (comparability matrix, QC equity, freshness indicators, NS scraper, grant/competition) | Variable |
 
-**Next Action:** Keep A4 parked until explicitly activated. In the meantime, prioritize A3 (real Zenodo DOI), A7 (quantified findings), and B3 (publish the launch post).
+**Next Action:** Keep A4 parked until explicitly activated. In the meantime, prioritize A3 (real Zenodo DOI) and B3 (publish the launch post).

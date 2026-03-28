@@ -111,6 +111,8 @@ Write a 2-page case study documenting the Ottawa–Gatineau methodology divergen
 ### A7: Quantified Metrics & Methodology Findings
 **Priority:** 5 | **Effort:** 3 h | **CanMEDS:** Scholar, Leader
 
+**Status:** Delivered 2026-03-28.
+
 Query the database for the strongest honest metrics. Add a "By the Numbers" section to README.
 
 **Important scope constraint:** Findings must be methodology-characterization only — no cross-province performance claims. The project's premise is that cross-province comparisons are invalid; writing findings that implicitly compare performance would be self-undermining.
