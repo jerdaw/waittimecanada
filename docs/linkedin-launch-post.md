@@ -1,5 +1,7 @@
 # LinkedIn Launch Post - Wait Time Canada
 
+> **Status:** Draft prepared and current as of 2026-03-28. Manual publication is intentionally parked until explicit user go-ahead.
+
 ## Final Recommended Post (Ready To Publish)
 
 Wait Time Canada is now live: https://wait-time.ca

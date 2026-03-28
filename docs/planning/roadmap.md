@@ -141,7 +141,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 [Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
 
 - [ ] **P1 / B2: Privacy-safe usage analytics** — Add Plausible Analytics; update /privacy page; do not publicize numbers (2 h)
-- [ ] **P1 / B3: Publish LinkedIn launch post** — Draft refreshed for the live mission/equity/stewardship posture and current feature set; remaining work is manual publication using `https://wait-time.ca` (30 min)
+- [ ] **P1 / B3: Publish LinkedIn launch post** — Draft refreshed for the live mission/equity/stewardship posture and current feature set; remaining work is manual publication using `https://wait-time.ca`. `Hold until explicit user go-ahead.` (30 min)
 - [ ] **P1 / B4: Video walkthrough** — Script 3–4 min; record with decent audio; upload unlisted YouTube (3 h)
 - [ ] **P2 / B5: GitHub topics & discoverability** — Add topic tags; check 1–2 open data registries (30 min)
 
@@ -496,4 +496,4 @@ Archived (delivered):
 | **C: Scholarly Artifacts** | Weeks 2–4 post-launch | C1–C6 (technical report, researcher outreach, equity interpretation, ops report, post-mortem, reviewer) | ~2–3 d |
 | **D: If Time Permits** | Weeks 5–12 | D1–D5 (comparability matrix, QC equity, freshness indicators, NS scraper, grant/competition) | Variable |
 
-**Next Action:** Keep A3 and A4 parked until explicitly activated. In the meantime, prioritize B3 (publish the launch post) and the remaining non-Zenodo credibility/communication items.
+**Next Action:** Keep A3, A4, and B3 parked until explicitly activated. In the meantime, prioritize the remaining non-Zenodo, non-outreach credibility/communication items.

@@ -216,14 +216,14 @@ Thanks,
 
 ---
 
-## 🟢 READY: LinkedIn Launch Post
+## ⏸️ PARKED: LinkedIn Launch Post
 
 **Why:** Announce project to network, potential admissions committees
 **Milestone:** M9 Phase 4 - Launch Materials
 **Estimated Time:** 15 minutes (review and publish)
 **Priority:** HIGH (visibility for applications)
 
-**Draft Ready:** `docs/linkedin-launch-post.md` (final recommended post prepared)
+**Draft Ready:** `docs/linkedin-launch-post.md` (final recommended post prepared; publish only when explicitly activated)
 
 ### Steps:
 1. [x] Refresh publish-ready copy in `docs/linkedin-launch-post.md` to match the live mission/equity/stewardship posture
