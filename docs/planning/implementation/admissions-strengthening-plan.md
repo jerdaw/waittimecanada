@@ -146,9 +146,13 @@ Delivered on **2026-03-12**: custom-domain TLS + redirect validation completed, 
 ### B2: Privacy-Safe Usage Analytics
 **Priority:** 3 | **Effort:** 2 h | **CanMEDS:** Professional, Privacy
 
-Add Plausible Analytics to Next.js layout. Update `/privacy` page. Do not publicize numbers until they're meaningful. Every month without analytics is a month of data you can never recover — add now, report later.
+Do not add paid or third-party analytics. If this work is activated later, implement only minimal first-party aggregate usage telemetry from the direct-VPS path once that runtime is the settled long-term baseline for the project. The goal is stewardship, not marketing instrumentation.
 
-**Artifact:** Analytics collecting baseline data; updated privacy policy.
+**Status:** Re-scoped on 2026-03-28 away from Plausible/third-party analytics. Keep on the roadmap, but do not treat it as immediate work until direct-VPS usage telemetry becomes clearly worth the effort.
+
+**Guardrails:** No cookies, no cross-site tracking, no user profiling, no advertising identifiers, and no vendor cost. Prefer aggregated ingress/log-derived reporting over client-side scripts.
+
+**Artifact:** First-party aggregate usage telemetry with an updated privacy policy once activated.
 
 ### B3: Publish LinkedIn Launch Post
 **Priority:** 3 | **Effort:** 30 min | **CanMEDS:** Communicator, Leader
@@ -287,7 +291,7 @@ If Phases A–C execute on schedule, by mid-April 2026 the portfolio includes:
 - Quantified metrics grounded in actual database queries
 - A published LinkedIn post with a public timestamp
 - A consciously skipped video walkthrough, with effort redirected toward higher-value written/public artifacts
-- Usage analytics collecting baseline data
+- First-party aggregate usage telemetry, if and when the direct-VPS path makes it worthwhile
 - A 2–4 page technical report reviewed by at least one external reader
 - One monthly operational report
 - One incident post-mortem for interview preparation

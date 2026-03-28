@@ -140,7 +140,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 ### Phase B: Active Launch Cleanup
 [Full details: admissions-strengthening-plan.md](implementation/admissions-strengthening-plan.md)
 
-- [ ] **P1 / B2: Privacy-safe usage analytics** — Add Plausible Analytics; update /privacy page; do not publicize numbers (2 h)
+- [ ] **P2 / B2: First-party privacy-safe usage telemetry** — Re-scoped away from Plausible/third-party analytics on 2026-03-28. If activated later, use minimal first-party aggregate telemetry from the direct-VPS/logging path, then update `/privacy` accordingly. Do not add paid analytics or client-side tracking scripts. (2 h)
 - [ ] **P1 / B3: Publish LinkedIn launch post** — Draft refreshed for the live mission/equity/stewardship posture and current feature set; remaining work is manual publication using `https://wait-time.ca`. `Hold until explicit user go-ahead.` (30 min)
 - [x] **P3 / B4: Video walkthrough** — Intentionally de-scoped on 2026-03-28. Kept out of active scope because the time cost and presentation burden are not justified right now relative to other work. Revisit only if future application needs make the payoff clearer.
 - [ ] **P2 / B5: GitHub topics & discoverability** — Add topic tags; check 1–2 open data registries (30 min)
@@ -269,7 +269,7 @@ Ranked by **defensible admissions value per hour of effort** (updated 2026-03-12
 6. **B4: Video walkthrough** — Intentionally skipped; revisit only if future application needs make the payoff clearer
 7. **C1: Technical report** — Anchor Scholar artifact; no other pre-med applicant will have this (1–2 d)
 8. **A7: Quantified metrics** — Specificity is more credible than vagueness (3 h)
-9. **B2: Privacy-safe usage analytics** — Starts the clock on real usage evidence (2 h)
+9. **B2: First-party privacy-safe usage telemetry** — Useful later for stewardship and usage evidence, but only if the direct-VPS/logging path makes it worth the added policy/ops surface (2 h)
 10. **C4: Operational transparency report** — Demonstrates disciplined stewardship, not just shipping (2 h)
 
 Completed from the prior ranking: **A2 (limitations)** and **B1 (production hosting)** are now done. The remaining gap is real-world engagement and public-facing artifacts.
