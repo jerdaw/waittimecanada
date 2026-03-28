@@ -194,7 +194,7 @@ Add repository topic tags (`health-systems`, `emergency-medicine`, `wait-times`,
 
 Write a 2–4 page structured report: *"Methodological Heterogeneity in Canadian Emergency Department Wait-Time Reporting: A Four-Province Audit."*
 
-**Status:** Draft completed on 2026-03-28 at `docs/research/methodological-heterogeneity-four-province-audit-draft.md`. External read-through is still required before treating C1 as a finalized public scholarly artifact.
+**Status:** Draft completed on 2026-03-28 at `docs/research/methodological-heterogeneity-four-province-audit-draft.md`. Keep it as an internal review draft for now. Do not treat it as a finalized public scholarly artifact or push it outward until the reviewer/outreach path is explicitly reactivated.
 
 **Check existing files first:** `docs/'Canadian ER Wait Time Data Audit.docx'` may be partially complete.
 
@@ -213,6 +213,8 @@ Identify 3 specific researchers at ICES, INSPQ, or university health informatics
 
 Don't cold-email Ontario Health's general inbox — target individuals whose work you've read. Canadian health informatics is a small community where informed, targeted outreach can get a response.
 
+**Status:** Not active while the C1 draft remains internal-only.
+
 **Artifact:** Documented outreach log; potentially a named reviewer in Acknowledgements.
 
 ### C3: Equity Layer Interpretive Summary
@@ -222,7 +224,7 @@ Write as a section of the technical report (C1), not standalone. **The limitatio
 
 A structured analysis of what you *cannot* conclude from this data is a stronger Scholar signal than a finding that ignores those limits.
 
-**Status:** First draft section completed on 2026-03-28 inside `docs/research/methodological-heterogeneity-four-province-audit-draft.md`. Final status should remain tied to C1 review/publication.
+**Status:** First draft section completed on 2026-03-28 inside `docs/research/methodological-heterogeneity-four-province-audit-draft.md`. Keep it internal-only with C1 for now; final status remains tied to later review/publication.
 
 **Artifact:** Equity analysis section in technical report.
 
