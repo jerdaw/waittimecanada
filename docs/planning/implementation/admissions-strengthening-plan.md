@@ -297,9 +297,9 @@ Check current implementation. If province-pair verdicts are high-level, add expl
 A methodology that works for one province is interesting. A methodology with a proven framework that can be applied province-by-province is a system. But a rushed extension that cuts corners undermines Ontario's credibility.
 
 ### D3: Per-Hospital Data Freshness Indicators
-**Effort:** S | Feature development, not admissions-critical.
+**Status:** Delivered already; confirmed during roadmap reconciliation on 2026-03-28.
 
-Add `last_updated` timestamp and age indicator to hospital cards and export CSV. Consistent with the project's transparency identity but does not change how committees evaluate the project.
+The hospital API already exposes `last_updated`, the public map/list/details surfaces already render freshness cues, and raw export already includes `timestamp_utc`. No additional feature work is needed unless a future pass wants separate freshness treatment for aggregated exports.
 
 ### D4: Nova Scotia Scraper (M35)
 **Effort:** L | **Condition:** Only if NS methodology is confirmed to add a genuinely new ontology combination AND all higher-priority items are complete.

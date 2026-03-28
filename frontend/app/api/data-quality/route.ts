@@ -106,30 +106,30 @@ async function getSystemQuality(sql: ReturnType<typeof getDb>) {
   const sources = sourceMetrics
     .filter((row) => isActiveLiveScraperSource(row.source_id as string))
     .map((row) => {
-    const totalHospitals = Number(row.total_hospitals);
-    const expected24h = EXPECTED_SCRAPER_RUNS_PER_DAY;
-    const actual24h = Number(row.runs_24h);
-    const rate24h =
-      expected24h > 0 ? Math.min(actual24h / expected24h, 1.0) : 0;
+      const totalHospitals = Number(row.total_hospitals);
+      const expected24h = EXPECTED_SCRAPER_RUNS_PER_DAY;
+      const actual24h = Number(row.runs_24h);
+      const rate24h =
+        expected24h > 0 ? Math.min(actual24h / expected24h, 1.0) : 0;
 
-    const expected7d = getExpectedRunsForDays(7);
-    const actual7d = Number(row.runs_7d);
-    const rate7d = expected7d > 0 ? Math.min(actual7d / expected7d, 1.0) : 0;
+      const expected7d = getExpectedRunsForDays(7);
+      const actual7d = Number(row.runs_7d);
+      const rate7d = expected7d > 0 ? Math.min(actual7d / expected7d, 1.0) : 0;
 
-    return {
-      source_id: row.source_id,
-      source_name: row.source_name,
-      province: row.province,
-      last_24h_success_rate: Math.round(rate24h * 1000) / 1000,
-      last_7d_success_rate: Math.round(rate7d * 1000) / 1000,
-      measurements_24h: Number(row.measurements_24h),
-      hospitals_reporting: Number(row.hospitals_24h),
-      total_hospitals: totalHospitals,
-      last_heartbeat_age_minutes: row.heartbeat_age_minutes
-        ? Math.round(Number(row.heartbeat_age_minutes))
-        : null,
-      scraper_status: row.scraper_status ?? "unknown",
-    };
+      return {
+        source_id: row.source_id,
+        source_name: row.source_name,
+        province: row.province,
+        last_24h_success_rate: Math.round(rate24h * 1000) / 1000,
+        last_7d_success_rate: Math.round(rate7d * 1000) / 1000,
+        measurements_24h: Number(row.measurements_24h),
+        hospitals_reporting: Number(row.hospitals_24h),
+        total_hospitals: totalHospitals,
+        last_heartbeat_age_minutes: row.heartbeat_age_minutes
+          ? Math.round(Number(row.heartbeat_age_minutes))
+          : null,
+        scraper_status: row.scraper_status ?? "unknown",
+      };
     });
 
   // Overall status
@@ -213,7 +213,10 @@ async function getHospitalQuality(
       hospital_id: hospitalId,
       coverage_timeline: coverageTimeline,
       current_quality: {
-        success_rate: Math.min(currentCount / EXPECTED_SCRAPER_RUNS_PER_DAY, 1.0),
+        success_rate: Math.min(
+          currentCount / EXPECTED_SCRAPER_RUNS_PER_DAY,
+          1.0,
+        ),
         actual_scrapes_24h: currentCount,
         expected_scrapes_24h: EXPECTED_SCRAPER_RUNS_PER_DAY,
         scheduler_cadence: LIVE_SCRAPER_CADENCE_LABEL,

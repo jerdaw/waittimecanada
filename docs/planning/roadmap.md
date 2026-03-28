@@ -160,7 +160,7 @@ Engineering foundation is mature (33 milestones, 777+ tests, 4 provinces). The g
 
 - [ ] **P2 / D1: Comparability matrix upgrade** — Explicit per-pair field-by-field verdicts on /methods (conditional on current state)
 - [ ] **P2 / D2: Quebec equity layer extension (M34)** — Apply Ontario template to QC with full rigor (blocked on StatsCan CT data)
-- [ ] **P2 / D3: Per-hospital data freshness indicators** — `last_updated` timestamp on hospital cards and export CSV
+- [x] **P2 / D3: Per-hospital data freshness indicators** — Confirmed delivered during roadmap reconciliation on 2026-03-28. Hospital APIs already expose `last_updated`, the public map/list/details surfaces already render freshness state, and raw exports already include `timestamp_utc`.
 - [ ] **P2 / D4: Nova Scotia scraper (M35)** — Only if NS methodology is confirmed novel (pre-research done)
 - [ ] **P2 / D5: Grant/competition application** — Opportunistic only; do not actively search
 - [ ] **P2 / D7: Official Ontario AED registry path** — Pursue partnership or explicit permission only if it improves coverage without weakening reuse clarity

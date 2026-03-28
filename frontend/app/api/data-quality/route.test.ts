@@ -66,10 +66,9 @@ describe("/api/data-quality", () => {
 
     expect(res.status).toBe(200);
     expect(data.sources).toHaveLength(2);
-    expect(data.sources.map((source: { source_id: string }) => source.source_id)).toEqual([
-      "ontario-health",
-      "bc-phsa",
-    ]);
+    expect(
+      data.sources.map((source: { source_id: string }) => source.source_id),
+    ).toEqual(["ontario-health", "bc-phsa"]);
     expect(data.system_uptime_24h).toBe(0.75);
     expect(data.total_measurements_24h).toBe(36);
     expect(data.total_hospitals_reporting).toBe(14);

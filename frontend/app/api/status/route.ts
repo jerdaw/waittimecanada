@@ -58,43 +58,43 @@ export async function GET() {
         const sources = sourceMetrics
           .filter((row) => isActiveLiveScraperSource(row.source_id as string))
           .map((row) => {
-          const totalHospitals = Number(row.total_hospitals);
+            const totalHospitals = Number(row.total_hospitals);
 
-          const expected24h = EXPECTED_SCRAPER_RUNS_PER_DAY;
-          const expected7d = getExpectedRunsForDays(7);
-          const expected30d = getExpectedRunsForDays(30);
+            const expected24h = EXPECTED_SCRAPER_RUNS_PER_DAY;
+            const expected7d = getExpectedRunsForDays(7);
+            const expected30d = getExpectedRunsForDays(30);
 
-          const rate24h =
-            expected24h > 0
-              ? Math.min(Number(row.runs_24h) / expected24h, 1.0)
-              : 0;
-          const rate7d =
-            expected7d > 0
-              ? Math.min(Number(row.runs_7d) / expected7d, 1.0)
-              : 0;
-          const rate30d =
-            expected30d > 0
-              ? Math.min(Number(row.runs_30d) / expected30d, 1.0)
-              : 0;
+            const rate24h =
+              expected24h > 0
+                ? Math.min(Number(row.runs_24h) / expected24h, 1.0)
+                : 0;
+            const rate7d =
+              expected7d > 0
+                ? Math.min(Number(row.runs_7d) / expected7d, 1.0)
+                : 0;
+            const rate30d =
+              expected30d > 0
+                ? Math.min(Number(row.runs_30d) / expected30d, 1.0)
+                : 0;
 
-          const heartbeatAge = row.heartbeat_age_minutes
-            ? Math.round(Number(row.heartbeat_age_minutes))
-            : null;
+            const heartbeatAge = row.heartbeat_age_minutes
+              ? Math.round(Number(row.heartbeat_age_minutes))
+              : null;
 
-          return {
-            source_id: row.source_id as string,
-            source_name: row.source_name as string,
-            province: row.province as string,
-            uptime_24h: Math.round(rate24h * 1000) / 1000,
-            uptime_7d: Math.round(rate7d * 1000) / 1000,
-            uptime_30d: Math.round(rate30d * 1000) / 1000,
-            total_hospitals: totalHospitals,
-            last_heartbeat_age_minutes: heartbeatAge,
-            scraper_status: (row.scraper_status as string) ?? "unknown",
-            last_run: row.last_run
-              ? (row.last_run as Date).toISOString()
-              : null,
-          };
+            return {
+              source_id: row.source_id as string,
+              source_name: row.source_name as string,
+              province: row.province as string,
+              uptime_24h: Math.round(rate24h * 1000) / 1000,
+              uptime_7d: Math.round(rate7d * 1000) / 1000,
+              uptime_30d: Math.round(rate30d * 1000) / 1000,
+              total_hospitals: totalHospitals,
+              last_heartbeat_age_minutes: heartbeatAge,
+              scraper_status: (row.scraper_status as string) ?? "unknown",
+              last_run: row.last_run
+                ? (row.last_run as Date).toISOString()
+                : null,
+            };
           });
 
         const rates = sources.map((source) => source.uptime_24h);
