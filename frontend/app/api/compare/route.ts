@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/utils/db";
 import { publicCacheHeaders } from "@/utils/cache";
+import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 import {
   type Methodology,
   areMethodologiesComparable,
@@ -25,8 +26,10 @@ interface ComparisonResponse {
   comparison_timestamp: string;
 }
 
-async function getHospitalWithMeasurement(hospitalId: string) {
-  const sql = getDb();
+async function getHospitalWithMeasurement(
+  sql: ReturnType<typeof getDb>,
+  hospitalId: string,
+) {
   const result = await sql`
     SELECT
       h.id,
@@ -78,6 +81,8 @@ import { CompareQuerySchema } from "@/utils/validations";
 
 import { checkRateLimit } from "@/utils/rate-limit";
 
+const COMPARE_CACHE_TTL_MS = 300_000;
+
 export async function GET(request: NextRequest) {
   // 1. Rate Limit
   const rateLimitResponse = await checkRateLimit(request);
@@ -113,59 +118,73 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch both hospitals with measurements
-    const [dataA, dataB] = await Promise.all([
-      getHospitalWithMeasurement(hospitalA),
-      getHospitalWithMeasurement(hospitalB),
-    ]);
+    const cacheKeyParts =
+      hospitalA < hospitalB
+        ? { a: hospitalA, b: hospitalB }
+        : { a: hospitalB, b: hospitalA };
 
-    if (!dataA) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Hospital not found",
-          message: `Hospital ${hospitalA} not found or has no measurements`,
-        },
-        { status: 404 },
-      );
-    }
+    const payload = await getOrSetServerCache(
+      buildServerCacheKey("api:compare", cacheKeyParts),
+      COMPARE_CACHE_TTL_MS,
+      async () => {
+        const sql = getDb();
+        const [dataA, dataB] = await Promise.all([
+          getHospitalWithMeasurement(sql, hospitalA),
+          getHospitalWithMeasurement(sql, hospitalB),
+        ]);
 
-    if (!dataB) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Hospital not found",
-          message: `Hospital ${hospitalB} not found or has no measurements`,
-        },
-        { status: 404 },
-      );
-    }
+        if (!dataA) {
+          return {
+            status: 404,
+            body: {
+              success: false,
+              error: "Hospital not found",
+              message: `Hospital ${hospitalA} not found or has no measurements`,
+            },
+          };
+        }
 
-    // Check comparability
-    const comparable = areMethodologiesComparable(
-      dataA.methodology,
-      dataB.methodology,
+        if (!dataB) {
+          return {
+            status: 404,
+            body: {
+              success: false,
+              error: "Hospital not found",
+              message: `Hospital ${hospitalB} not found or has no measurements`,
+            },
+          };
+        }
+
+        const comparable = areMethodologiesComparable(
+          dataA.methodology,
+          dataB.methodology,
+        );
+
+        const divergenceBrief = comparable
+          ? null
+          : generateDivergenceBrief(dataA.methodology, dataB.methodology);
+
+        const response: ComparisonResponse = {
+          hospital_a: dataA,
+          hospital_b: dataB,
+          comparable,
+          divergence_brief: divergenceBrief,
+          comparison_timestamp: new Date().toISOString(),
+        };
+
+        return {
+          status: 200,
+          body: {
+            success: true,
+            data: response,
+          },
+        };
+      },
     );
 
-    // Generate divergence brief
-    const divergenceBrief = comparable
-      ? null
-      : generateDivergenceBrief(dataA.methodology, dataB.methodology);
-
-    const response: ComparisonResponse = {
-      hospital_a: dataA,
-      hospital_b: dataB,
-      comparable,
-      divergence_brief: divergenceBrief,
-      comparison_timestamp: new Date().toISOString(),
-    };
-
     return NextResponse.json(
-      {
-        success: true,
-        data: response,
-      },
-      { headers: publicCacheHeaders(300, 900) },
+      payload.body,
+      { status: payload.status, headers: publicCacheHeaders(300, 900) },
     );
   } catch (error) {
     console.error("Failed to compare hospitals:", error);

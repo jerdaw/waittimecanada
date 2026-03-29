@@ -78,14 +78,15 @@ Additional optional export params:
 These routes are intentionally cache-friendly on the public frontend path:
 
 - `GET /api/health` and `GET /api/status`: 2-minute shared cache window
-- `GET /api/hospitals`, `GET /api/analytics/benchmarks`, `GET /api/analytics/trends`, `GET /api/analytics/regions`, `GET /api/analytics/occupancy`: 5-minute shared cache window
+- `GET /api/hospitals`, `GET /api/resources`, `GET /api/resources/alerts`, `GET /api/data-quality`, `GET /api/anomalies`, `GET /api/compare`, `GET /api/analytics/benchmarks`, `GET /api/analytics/trends`, `GET /api/analytics/regions`, `GET /api/analytics/occupancy`, `GET /api/analytics/equity-summary`, and `GET /api/analytics/patterns`: 5-minute shared cache window
+- `GET /api/methodology`: 1-minute shared cache window
 - `GET /api/hospitals/[slug]/trends`: 10-minute shared cache window
 
 Operational note:
 
 - On the shared VPS runtime, these same read-heavy routes also use short-lived in-process response caching to cut repeat public transfer from Neon without changing data collection or storage policy.
 - `GET /api/geolocation` and `GET /api/export` remain `Cache-Control: no-store`.
-- `GET /api/resources` and `GET /api/resources/alerts` currently use a 5-minute shared cache window; `GET /api/resources/aqhi` uses a 15-minute shared cache window with a live upstream fetch behind the server cache.
+- `GET /api/resources/aqhi` uses a 15-minute shared cache window with a live upstream fetch behind the server cache.
 
 ## Health endpoint operational contract (M30)
 

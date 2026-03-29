@@ -103,7 +103,8 @@ git push origin main
 - The direct-VPS runtime also applies short-lived in-process response caching via `frontend/utils/server-cache.ts` for repeated anonymous reads.
 - Typical cache windows:
   - `120s` for `/api/health`
-  - `300s` for hospitals and analytics endpoints
+  - `300s` for hospitals, resources, data-quality, anomalies, compare, and analytics endpoints
+  - `60s` for methodology change events
   - `600s` for hospital trend timelines
 - Admin, geolocation, and export endpoints are explicitly `Cache-Control: no-store`.
 

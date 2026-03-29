@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { publicCacheHeaders } from "@/utils/cache";
+import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 import {
   EXPECTED_SCRAPER_RUNS_PER_DAY,
   LIVE_SCRAPER_CADENCE_LABEL,
@@ -23,6 +24,7 @@ import { DataQualityQuerySchema } from "@/utils/validations";
 const LEGACY_EXPECTED_SCRAPER_RUNS_PER_DAY = 96;
 const LEGACY_SCRAPER_CADENCE_LABEL = "15-minute";
 const QUALITY_CADENCE_MODEL_CHANGE_DATE = "2026-03-28";
+const DATA_QUALITY_CACHE_TTL_MS = 300_000;
 
 function buildHistoricalAnnotation(snapshotDates: Date[]) {
   const changeDate = new Date(`${QUALITY_CADENCE_MODEL_CHANGE_DATE}T00:00:00Z`);
@@ -41,7 +43,6 @@ function buildHistoricalAnnotation(snapshotDates: Date[]) {
 
 export async function GET(request: Request) {
   try {
-    const sql = getDb();
     const { searchParams } = new URL(request.url);
     const rawParams = Object.fromEntries(searchParams.entries());
 
@@ -66,19 +67,37 @@ export async function GET(request: Request) {
       compare_days: compareDays,
     } = validation.data;
 
-    if (view === "trend" && sourceId) {
-      return await getSourceTrend(sql, sourceId, days);
-    }
+    const payload = await getOrSetServerCache(
+      buildServerCacheKey("api:data-quality", {
+        view,
+        hospital_id: hospitalId ?? null,
+        source_id: sourceId ?? null,
+        days,
+        compare_days: compareDays,
+      }),
+      DATA_QUALITY_CACHE_TTL_MS,
+      async () => {
+        const sql = getDb();
 
-    if (view === "diff" && sourceId) {
-      return await getSourceDiff(sql, sourceId, compareDays);
-    }
+        if (view === "trend" && sourceId) {
+          return getSourceTrend(sql, sourceId, days);
+        }
 
-    if (hospitalId) {
-      return await getHospitalQuality(sql, hospitalId, days);
-    }
+        if (view === "diff" && sourceId) {
+          return getSourceDiff(sql, sourceId, compareDays);
+        }
 
-    return await getSystemQuality(sql);
+        if (hospitalId) {
+          return getHospitalQuality(sql, hospitalId, days);
+        }
+
+        return getSystemQuality(sql);
+      },
+    );
+
+    return NextResponse.json(payload, {
+      headers: publicCacheHeaders(300, 900),
+    });
   } catch (error) {
     console.error("Failed to fetch data quality:", error);
     return NextResponse.json(
@@ -151,34 +170,29 @@ async function getSystemQuality(sql: ReturnType<typeof getDb>) {
       };
     });
 
-  // Overall status
   const rates = sources.map((s) => s.last_24h_success_rate);
   const avgRate =
     rates.length > 0 ? rates.reduce((a, b) => a + b, 0) / rates.length : 0;
   const overallStatus =
     avgRate >= 0.95 ? "healthy" : avgRate >= 0.8 ? "degraded" : "critical";
 
-  // Total counts
   const total24h = sources.reduce(
     (acc, s) => acc + (Number(s.hospitals_reporting) || 0),
     0,
   );
 
-  return NextResponse.json(
-    {
-      overall_status: overallStatus,
-      sources,
-      system_uptime_24h: Math.round(avgRate * 1000) / 1000,
-      total_measurements_24h: sources.reduce(
-        (acc, s) => acc + s.measurements_24h,
-        0,
-      ),
-      total_hospitals_reporting: total24h,
-      scheduler_cadence: LIVE_SCRAPER_CADENCE_LABEL,
-      expected_runs_24h: EXPECTED_SCRAPER_RUNS_PER_DAY,
-    },
-    { headers: publicCacheHeaders(300, 900) },
-  );
+  return {
+    overall_status: overallStatus,
+    sources,
+    system_uptime_24h: Math.round(avgRate * 1000) / 1000,
+    total_measurements_24h: sources.reduce(
+      (acc, s) => acc + s.measurements_24h,
+      0,
+    ),
+    total_hospitals_reporting: total24h,
+    scheduler_cadence: LIVE_SCRAPER_CADENCE_LABEL,
+    expected_runs_24h: EXPECTED_SCRAPER_RUNS_PER_DAY,
+  };
 }
 
 async function getHospitalQuality(
@@ -227,28 +241,22 @@ async function getHospitalQuality(
     LIMIT 50
   `;
 
-  return NextResponse.json(
-    {
-      hospital_id: hospitalId,
-      coverage_timeline: coverageTimeline,
-      current_quality: {
-        success_rate: Math.min(
-          currentCount / EXPECTED_SCRAPER_RUNS_PER_DAY,
-          1.0,
-        ),
-        actual_scrapes_24h: currentCount,
-        expected_scrapes_24h: EXPECTED_SCRAPER_RUNS_PER_DAY,
-        scheduler_cadence: LIVE_SCRAPER_CADENCE_LABEL,
-      },
-      anomalies_7d: anomalies.map((a) => ({
-        id: a.id,
-        value: Number(a.value),
-        timestamp: a.timestamp_utc,
-        reason: a.anomaly_reason,
-      })),
+  return {
+    hospital_id: hospitalId,
+    coverage_timeline: coverageTimeline,
+    current_quality: {
+      success_rate: Math.min(currentCount / EXPECTED_SCRAPER_RUNS_PER_DAY, 1.0),
+      actual_scrapes_24h: currentCount,
+      expected_scrapes_24h: EXPECTED_SCRAPER_RUNS_PER_DAY,
+      scheduler_cadence: LIVE_SCRAPER_CADENCE_LABEL,
     },
-    { headers: publicCacheHeaders(300, 900) },
-  );
+    anomalies_7d: anomalies.map((a) => ({
+      id: a.id,
+      value: Number(a.value),
+      timestamp: a.timestamp_utc,
+      reason: a.anomaly_reason,
+    })),
+  };
 }
 
 async function getSourceTrend(
@@ -276,23 +284,20 @@ async function getSourceTrend(
     rows.map((row) => new Date(row.snapshot_date)),
   );
 
-  return NextResponse.json(
-    {
-      source_id: sourceId,
-      days,
-      trend: rows.map((r) => ({
-        snapshot_date: r.snapshot_date,
-        hospitals_snapshotted: Number(r.hospitals_snapshotted),
-        avg_success_rate: Number(r.avg_success_rate),
-        min_success_rate: Number(r.min_success_rate),
-        hospitals_critical: Number(r.hospitals_critical),
-        worst_gap_minutes:
-          r.worst_gap_minutes !== null ? Number(r.worst_gap_minutes) : null,
-      })),
-      historical_annotation: historicalAnnotation,
-    },
-    { headers: publicCacheHeaders(300, 900) },
-  );
+  return {
+    source_id: sourceId,
+    days,
+    trend: rows.map((r) => ({
+      snapshot_date: r.snapshot_date,
+      hospitals_snapshotted: Number(r.hospitals_snapshotted),
+      avg_success_rate: Number(r.avg_success_rate),
+      min_success_rate: Number(r.min_success_rate),
+      hospitals_critical: Number(r.hospitals_critical),
+      worst_gap_minutes:
+        r.worst_gap_minutes !== null ? Number(r.worst_gap_minutes) : null,
+    })),
+    historical_annotation: historicalAnnotation,
+  };
 }
 
 async function getSourceDiff(
@@ -319,14 +324,11 @@ async function getSourceDiff(
   );
 
   if (!trend || trend.length === 0) {
-    return NextResponse.json(
-      {
-        has_baseline: false,
-        summary: "No historical snapshot data available for comparison.",
-        historical_annotation: historicalAnnotation,
-      },
-      { headers: publicCacheHeaders(300, 900) },
-    );
+    return {
+      has_baseline: false,
+      summary: "No historical snapshot data available for comparison.",
+      historical_annotation: historicalAnnotation,
+    };
   }
 
   const current = trend[0];
@@ -335,14 +337,11 @@ async function getSourceDiff(
   if (
     current.snapshot_date.toISOString() === baseline.snapshot_date.toISOString()
   ) {
-    return NextResponse.json(
-      {
-        has_baseline: false,
-        summary: "Insufficient historical snapshot data for comparison.",
-        historical_annotation: historicalAnnotation,
-      },
-      { headers: publicCacheHeaders(300, 900) },
-    );
+    return {
+      has_baseline: false,
+      summary: "Insufficient historical snapshot data for comparison.",
+      historical_annotation: historicalAnnotation,
+    };
   }
 
   const currRate = Number(current.avg_success_rate) || 0;
@@ -371,29 +370,26 @@ async function getSourceDiff(
 
   const summary = `Coverage ${polarity.toLowerCase()} vs. ${compareDays} days ago. Tracking ${currHosp} hospitals (delta: ${hospitalsDelta > 0 ? "+" : ""}${hospitalsDelta}). ${Number(current.hospitals_critical)} hospitals currently reporting critical coverage (<80%).`;
 
-  return NextResponse.json(
-    {
-      has_baseline: true,
-      period_a_date: baseline.snapshot_date,
-      period_b_date: current.snapshot_date,
-      current_metrics: {
-        avg_success_rate: currRate,
-        hospitals_snapshotted: currHosp,
-        worst_gap_minutes: currGap,
-      },
-      baseline_metrics: {
-        avg_success_rate: baseRate,
-        hospitals_snapshotted: baseHosp,
-        worst_gap_minutes: baseGap,
-      },
-      deltas: {
-        success_rate_delta: successRateDelta,
-        hospitals_reporting_delta: hospitalsDelta,
-        worst_gap_delta: worstGapDelta,
-      },
-      summary,
-      historical_annotation: historicalAnnotation,
+  return {
+    has_baseline: true,
+    period_a_date: baseline.snapshot_date,
+    period_b_date: current.snapshot_date,
+    current_metrics: {
+      avg_success_rate: currRate,
+      hospitals_snapshotted: currHosp,
+      worst_gap_minutes: currGap,
     },
-    { headers: publicCacheHeaders(300, 900) },
-  );
+    baseline_metrics: {
+      avg_success_rate: baseRate,
+      hospitals_snapshotted: baseHosp,
+      worst_gap_minutes: baseGap,
+    },
+    deltas: {
+      success_rate_delta: successRateDelta,
+      hospitals_reporting_delta: hospitalsDelta,
+      worst_gap_delta: worstGapDelta,
+    },
+    summary,
+    historical_annotation: historicalAnnotation,
+  };
 }

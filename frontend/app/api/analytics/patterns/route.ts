@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { publicCacheHeaders } from "@/utils/cache";
+import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 
 type PatternType = "hour_of_day" | "day_of_week" | "monthly";
 
@@ -74,9 +75,10 @@ function formatDate(date: Date): string {
 
 import { PatternsQuerySchema } from "@/utils/validations";
 
+const PATTERNS_CACHE_TTL_MS = 300_000;
+
 export async function GET(request: Request) {
   try {
-    const sql = getDb();
     const { searchParams } = new URL(request.url);
     const rawParams = Object.fromEntries(searchParams.entries());
 
@@ -99,305 +101,330 @@ export async function GET(request: Request) {
       lookback_days,
       lookback_months,
     } = validation.data;
-    // patternType is already typed as PatternType by Zod enum
+    const payload = await getOrSetServerCache(
+      buildServerCacheKey("api:analytics:patterns", {
+        hospital_id: hospitalId,
+        type: patternType,
+        lookback_days: lookback_days ?? null,
+        lookback_months: lookback_months ?? null,
+      }),
+      PATTERNS_CACHE_TTL_MS,
+      async () => {
+        const sql = getDb();
+        const hospitalRows = await sql`
+          SELECT id, name
+          FROM hospitals
+          WHERE id = ${hospitalId}
+            AND is_visible = true
+            AND is_verified = true
+          LIMIT 1
+        `;
 
-    const hospitalRows = await sql`
-      SELECT id, name
-      FROM hospitals
-      WHERE id = ${hospitalId}
-        AND is_visible = true
-        AND is_verified = true
-      LIMIT 1
-    `;
+        if (hospitalRows.length === 0) {
+          return {
+            status: 404,
+            body: {
+              success: false,
+              error: "Hospital not found",
+              message: "Hospital not found or not visible",
+            },
+          };
+        }
 
-    if (hospitalRows.length === 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Hospital not found",
-          message: "Hospital not found or not visible",
-        },
-        { status: 404 },
-      );
-    }
+        const hospitalName = String(hospitalRows[0].name);
+        const now = new Date();
 
-    const hospitalName = String(hospitalRows[0].name);
-    const now = new Date();
+        if (patternType === "hour_of_day") {
+          const lookbackDays = parsePositiveInt(
+            searchParams.get("lookback_days"),
+            30,
+            365,
+          );
+          const start = new Date(
+            now.getTime() - lookbackDays * 24 * 60 * 60 * 1000,
+          );
 
-    if (patternType === "hour_of_day") {
-      const lookbackDays = parsePositiveInt(
-        searchParams.get("lookback_days"),
-        30,
-        365,
-      );
-      const start = new Date(
-        now.getTime() - lookbackDays * 24 * 60 * 60 * 1000,
-      );
+          const rows = await sql`
+            SELECT
+              EXTRACT(HOUR FROM m.timestamp_utc)::int AS hour,
+              AVG(m.value)::float AS mean,
+              PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY m.value)::float AS median,
+              COUNT(*)::int AS sample_count
+            FROM measurements m
+            WHERE m.hospital_id = ${hospitalId}
+              AND m.timestamp_utc >= ${start.toISOString()}::timestamptz
+            GROUP BY EXTRACT(HOUR FROM m.timestamp_utc)
+            ORDER BY hour
+          `;
 
-      const rows = await sql`
-        SELECT
-          EXTRACT(HOUR FROM m.timestamp_utc)::int AS hour,
-          AVG(m.value)::float AS mean,
-          PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY m.value)::float AS median,
-          COUNT(*)::int AS sample_count
-        FROM measurements m
-        WHERE m.hospital_id = ${hospitalId}
-          AND m.timestamp_utc >= ${start.toISOString()}::timestamptz
-        GROUP BY EXTRACT(HOUR FROM m.timestamp_utc)
-        ORDER BY hour
-      `;
-
-      const byHour = new Map<number, HourPattern>();
-      for (const row of rows) {
-        byHour.set(Number(row.hour), {
-          hour: Number(row.hour),
-          mean: row.mean === null ? null : Number(Number(row.mean).toFixed(1)),
-          median:
-            row.median === null ? null : Number(Number(row.median).toFixed(1)),
-          sample_count: toNumber(row.sample_count),
-        });
-      }
-
-      const patterns: HourPattern[] = Array.from({ length: 24 }, (_, hour) => {
-        return (
-          byHour.get(hour) ?? {
-            hour,
-            mean: null,
-            median: null,
-            sample_count: 0,
+          const byHour = new Map<number, HourPattern>();
+          for (const row of rows) {
+            byHour.set(Number(row.hour), {
+              hour: Number(row.hour),
+              mean:
+                row.mean === null ? null : Number(Number(row.mean).toFixed(1)),
+              median:
+                row.median === null
+                  ? null
+                  : Number(Number(row.median).toFixed(1)),
+              sample_count: toNumber(row.sample_count),
+            });
           }
-        );
-      });
 
-      const populated = patterns.filter((row) => row.mean !== null);
-      const peak = populated.length
-        ? populated.reduce((best, row) =>
-            (row.mean ?? 0) > (best.mean ?? 0) ? row : best,
-          )
-        : null;
-      const quiet = populated.length
-        ? populated.reduce((best, row) =>
-            (row.mean ?? 0) < (best.mean ?? 0) ? row : best,
-          )
-        : null;
+          const patterns: HourPattern[] = Array.from(
+            { length: 24 },
+            (_, hour) =>
+              byHour.get(hour) ?? {
+                hour,
+                mean: null,
+                median: null,
+                sample_count: 0,
+              },
+          );
 
-      const peakMean = peak?.mean ?? null;
-      const quietMean = quiet?.mean ?? null;
+          const populated = patterns.filter((row) => row.mean !== null);
+          const peak = populated.length
+            ? populated.reduce((best, row) =>
+                (row.mean ?? 0) > (best.mean ?? 0) ? row : best,
+              )
+            : null;
+          const quiet = populated.length
+            ? populated.reduce((best, row) =>
+                (row.mean ?? 0) < (best.mean ?? 0) ? row : best,
+              )
+            : null;
 
-      return NextResponse.json(
-        {
-          success: true,
-          data: {
-            hospital_id: hospitalId,
-            hospital_name: hospitalName,
-            pattern_type: "hour_of_day",
-            data_period: {
-              start: formatDate(start),
-              end: formatDate(now),
+          const peakMean = peak?.mean ?? null;
+          const quietMean = quiet?.mean ?? null;
+
+          return {
+            status: 200,
+            body: {
+              success: true,
+              data: {
+                hospital_id: hospitalId,
+                hospital_name: hospitalName,
+                pattern_type: "hour_of_day",
+                data_period: {
+                  start: formatDate(start),
+                  end: formatDate(now),
+                },
+                sample_count: patterns.reduce(
+                  (sum, row) => sum + row.sample_count,
+                  0,
+                ),
+                patterns,
+                insights: {
+                  peak_hour: peak?.hour ?? null,
+                  quietest_hour: quiet?.hour ?? null,
+                  peak_mean: peakMean,
+                  quietest_mean: quietMean,
+                  peak_vs_quiet_ratio:
+                    peakMean !== null && quietMean !== null && quietMean > 0
+                      ? Number((peakMean / quietMean).toFixed(2))
+                      : null,
+                },
+              },
             },
-            sample_count: patterns.reduce(
-              (sum, row) => sum + row.sample_count,
-              0,
-            ),
-            patterns,
-            insights: {
-              peak_hour: peak?.hour ?? null,
-              quietest_hour: quiet?.hour ?? null,
-              peak_mean: peakMean,
-              quietest_mean: quietMean,
-              peak_vs_quiet_ratio:
-                peakMean !== null && quietMean !== null && quietMean > 0
-                  ? Number((peakMean / quietMean).toFixed(2))
-                  : null,
-            },
-          },
-        },
-        { headers: publicCacheHeaders(300, 900) },
-      );
-    }
+          };
+        }
 
-    if (patternType === "day_of_week") {
-      const lookbackDays = parsePositiveInt(
-        searchParams.get("lookback_days"),
-        90,
-        365,
-      );
-      const start = new Date(
-        now.getTime() - lookbackDays * 24 * 60 * 60 * 1000,
-      );
+        if (patternType === "day_of_week") {
+          const lookbackDays = parsePositiveInt(
+            searchParams.get("lookback_days"),
+            90,
+            365,
+          );
+          const start = new Date(
+            now.getTime() - lookbackDays * 24 * 60 * 60 * 1000,
+          );
 
-      const rows = await sql`
-        SELECT
-          EXTRACT(ISODOW FROM period_start)::int - 1 AS day_index,
-          AVG(mean_value)::float AS mean,
-          AVG(median_value)::float AS median,
-          SUM(sample_count)::int AS sample_count
-        FROM measurement_aggregates
-        WHERE hospital_id = ${hospitalId}
-          AND period_type = 'daily'
-          AND period_start >= ${start.toISOString()}::timestamptz
-        GROUP BY EXTRACT(ISODOW FROM period_start)
-        ORDER BY day_index
-      `;
+          const rows = await sql`
+            SELECT
+              EXTRACT(ISODOW FROM period_start)::int - 1 AS day_index,
+              AVG(mean_value)::float AS mean,
+              AVG(median_value)::float AS median,
+              SUM(sample_count)::int AS sample_count
+            FROM measurement_aggregates
+            WHERE hospital_id = ${hospitalId}
+              AND period_type = 'daily'
+              AND period_start >= ${start.toISOString()}::timestamptz
+            GROUP BY EXTRACT(ISODOW FROM period_start)
+            ORDER BY day_index
+          `;
 
-      const byDay = new Map<number, DayPattern>();
-      for (const row of rows) {
-        const dayIndex = Number(row.day_index);
-        byDay.set(dayIndex, {
-          day: DAYS_OF_WEEK[dayIndex],
-          day_index: dayIndex,
-          mean: row.mean === null ? null : Number(Number(row.mean).toFixed(1)),
-          median:
-            row.median === null ? null : Number(Number(row.median).toFixed(1)),
-          sample_count: toNumber(row.sample_count),
-        });
-      }
-
-      const patterns: DayPattern[] = DAYS_OF_WEEK.map((day, dayIndex) => {
-        return (
-          byDay.get(dayIndex) ?? {
-            day,
-            day_index: dayIndex,
-            mean: null,
-            median: null,
-            sample_count: 0,
+          const byDay = new Map<number, DayPattern>();
+          for (const row of rows) {
+            const dayIndex = Number(row.day_index);
+            byDay.set(dayIndex, {
+              day: DAYS_OF_WEEK[dayIndex],
+              day_index: dayIndex,
+              mean:
+                row.mean === null ? null : Number(Number(row.mean).toFixed(1)),
+              median:
+                row.median === null
+                  ? null
+                  : Number(Number(row.median).toFixed(1)),
+              sample_count: toNumber(row.sample_count),
+            });
           }
+
+          const patterns: DayPattern[] = DAYS_OF_WEEK.map(
+            (day, dayIndex) =>
+              byDay.get(dayIndex) ?? {
+                day,
+                day_index: dayIndex,
+                mean: null,
+                median: null,
+                sample_count: 0,
+              },
+          );
+
+          const populated = patterns.filter((row) => row.mean !== null);
+          const worst = populated.length
+            ? populated.reduce((best, row) =>
+                (row.mean ?? 0) > (best.mean ?? 0) ? row : best,
+              )
+            : null;
+          const best = populated.length
+            ? populated.reduce((best, row) =>
+                (row.mean ?? 0) < (best.mean ?? 0) ? row : best,
+              )
+            : null;
+
+          const weekendMean = mean(
+            patterns
+              .filter((row) => row.day_index >= 5 && row.mean !== null)
+              .map((row) => Number(row.mean)),
+          );
+          const weekdayMean = mean(
+            patterns
+              .filter((row) => row.day_index <= 4 && row.mean !== null)
+              .map((row) => Number(row.mean)),
+          );
+
+          return {
+            status: 200,
+            body: {
+              success: true,
+              data: {
+                hospital_id: hospitalId,
+                hospital_name: hospitalName,
+                pattern_type: "day_of_week",
+                data_period: {
+                  start: formatDate(start),
+                  end: formatDate(now),
+                },
+                sample_count: patterns.reduce(
+                  (sum, row) => sum + row.sample_count,
+                  0,
+                ),
+                patterns,
+                insights: {
+                  worst_day: worst?.day ?? null,
+                  best_day: best?.day ?? null,
+                  weekend_vs_weekday_ratio:
+                    weekendMean !== null &&
+                    weekdayMean !== null &&
+                    weekdayMean > 0
+                      ? Number((weekendMean / weekdayMean).toFixed(2))
+                      : null,
+                },
+              },
+            },
+          };
+        }
+
+        const lookbackMonths = parsePositiveInt(
+          searchParams.get("lookback_months"),
+          12,
+          36,
         );
-      });
+        const start = new Date(
+          now.getTime() - lookbackMonths * 31 * 24 * 60 * 60 * 1000,
+        );
 
-      const populated = patterns.filter((row) => row.mean !== null);
-      const worst = populated.length
-        ? populated.reduce((best, row) =>
-            (row.mean ?? 0) > (best.mean ?? 0) ? row : best,
-          )
-        : null;
-      const best = populated.length
-        ? populated.reduce((best, row) =>
-            (row.mean ?? 0) < (best.mean ?? 0) ? row : best,
-          )
-        : null;
+        const rows = await sql`
+          SELECT
+            date_trunc('month', period_start) AS month_start,
+            AVG(mean_value)::float AS mean,
+            AVG(median_value)::float AS median,
+            SUM(sample_count)::int AS sample_count
+          FROM measurement_aggregates
+          WHERE hospital_id = ${hospitalId}
+            AND period_type = 'monthly'
+            AND period_start >= ${start.toISOString()}::timestamptz
+          GROUP BY date_trunc('month', period_start)
+          ORDER BY month_start
+        `;
 
-      const weekendMean = mean(
-        patterns
-          .filter((row) => row.day_index >= 5 && row.mean !== null)
-          .map((row) => Number(row.mean)),
-      );
-      const weekdayMean = mean(
-        patterns
-          .filter((row) => row.day_index <= 4 && row.mean !== null)
-          .map((row) => Number(row.mean)),
-      );
+        const patterns: MonthPattern[] = rows.map((row) => {
+          const monthDate = new Date(String(row.month_start));
+          return {
+            month: `${monthDate.getUTCFullYear()}-${String(monthDate.getUTCMonth() + 1).padStart(2, "0")}`,
+            mean:
+              row.mean === null ? null : Number(Number(row.mean).toFixed(1)),
+            median:
+              row.median === null
+                ? null
+                : Number(Number(row.median).toFixed(1)),
+            sample_count: toNumber(row.sample_count),
+          };
+        });
 
-      return NextResponse.json(
-        {
-          success: true,
-          data: {
-            hospital_id: hospitalId,
-            hospital_name: hospitalName,
-            pattern_type: "day_of_week",
-            data_period: {
-              start: formatDate(start),
-              end: formatDate(now),
+        const populated = patterns.filter((row) => row.mean !== null);
+        const startMean = populated.length ? Number(populated[0].mean) : null;
+        const endMean = populated.length
+          ? Number(populated[populated.length - 1].mean)
+          : null;
+
+        let direction: "improving" | "stable" | "worsening" = "stable";
+        let changePercent = 0;
+
+        if (startMean !== null && endMean !== null && startMean > 0) {
+          changePercent = Number(
+            (((endMean - startMean) / startMean) * 100).toFixed(1),
+          );
+          if (changePercent < -5) {
+            direction = "improving";
+          } else if (changePercent > 5) {
+            direction = "worsening";
+          }
+        }
+
+        return {
+          status: 200,
+          body: {
+            success: true,
+            data: {
+              hospital_id: hospitalId,
+              hospital_name: hospitalName,
+              pattern_type: "monthly",
+              data_period: {
+                start: formatDate(start),
+                end: formatDate(now),
+              },
+              sample_count: patterns.reduce(
+                (sum, row) => sum + row.sample_count,
+                0,
+              ),
+              patterns,
+              insights: {
+                direction,
+                change_percent: changePercent,
+                start_mean: startMean,
+                end_mean: endMean,
+              },
             },
-            sample_count: patterns.reduce(
-              (sum, row) => sum + row.sample_count,
-              0,
-            ),
-            patterns,
-            insights: {
-              worst_day: worst?.day ?? null,
-              best_day: best?.day ?? null,
-              weekend_vs_weekday_ratio:
-                weekendMean !== null && weekdayMean !== null && weekdayMean > 0
-                  ? Number((weekendMean / weekdayMean).toFixed(2))
-                  : null,
-            },
           },
-        },
-        { headers: publicCacheHeaders(300, 900) },
-      );
-    }
-
-    const lookbackMonths = parsePositiveInt(
-      searchParams.get("lookback_months"),
-      12,
-      36,
-    );
-    const start = new Date(
-      now.getTime() - lookbackMonths * 31 * 24 * 60 * 60 * 1000,
-    );
-
-    const rows = await sql`
-      SELECT
-        date_trunc('month', period_start) AS month_start,
-        AVG(mean_value)::float AS mean,
-        AVG(median_value)::float AS median,
-        SUM(sample_count)::int AS sample_count
-      FROM measurement_aggregates
-      WHERE hospital_id = ${hospitalId}
-        AND period_type = 'monthly'
-        AND period_start >= ${start.toISOString()}::timestamptz
-      GROUP BY date_trunc('month', period_start)
-      ORDER BY month_start
-    `;
-
-    const patterns: MonthPattern[] = rows.map((row) => {
-      const monthDate = new Date(String(row.month_start));
-      return {
-        month: `${monthDate.getUTCFullYear()}-${String(monthDate.getUTCMonth() + 1).padStart(2, "0")}`,
-        mean: row.mean === null ? null : Number(Number(row.mean).toFixed(1)),
-        median:
-          row.median === null ? null : Number(Number(row.median).toFixed(1)),
-        sample_count: toNumber(row.sample_count),
-      };
-    });
-
-    const populated = patterns.filter((row) => row.mean !== null);
-    const startMean = populated.length ? Number(populated[0].mean) : null;
-    const endMean = populated.length
-      ? Number(populated[populated.length - 1].mean)
-      : null;
-
-    let direction: "improving" | "stable" | "worsening" = "stable";
-    let changePercent = 0;
-
-    if (startMean !== null && endMean !== null && startMean > 0) {
-      changePercent = Number(
-        (((endMean - startMean) / startMean) * 100).toFixed(1),
-      );
-      if (changePercent < -5) {
-        direction = "improving";
-      } else if (changePercent > 5) {
-        direction = "worsening";
-      }
-    }
-
-    return NextResponse.json(
-      {
-        success: true,
-        data: {
-          hospital_id: hospitalId,
-          hospital_name: hospitalName,
-          pattern_type: "monthly",
-          data_period: {
-            start: formatDate(start),
-            end: formatDate(now),
-          },
-          sample_count: patterns.reduce(
-            (sum, row) => sum + row.sample_count,
-            0,
-          ),
-          patterns,
-          insights: {
-            direction,
-            change_percent: changePercent,
-            start_mean: startMean,
-            end_mean: endMean,
-          },
-        },
+        };
       },
-      { headers: publicCacheHeaders(300, 900) },
     );
+
+    return NextResponse.json(payload.body, {
+      status: payload.status,
+      headers: publicCacheHeaders(300, 900),
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     if (message.includes("Invalid lookback value")) {
