@@ -6,12 +6,10 @@ on:
     paths:
       - 'backend/**'
       - '.github/workflows/scraper-ci.yml'
-      - 'codecov.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'backend/**'
-      - 'codecov.yml'
 
 env:
   PYTHON_VERSION: '3.12'
@@ -89,12 +87,13 @@ jobs:
         run: |
           pytest --cov=src --cov-report=xml --cov-report=term
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+      - name: Upload coverage artifact
+        if: hashFiles('backend/coverage.xml') != ''
+        uses: actions/upload-artifact@v7
         with:
-          files: ./backend/coverage.xml
-          flags: scrapers
-          name: scraper-coverage
+          name: backend-coverage
+          path: backend/coverage.xml
+          retention-days: 7
 
   security:
     name: Security Scan

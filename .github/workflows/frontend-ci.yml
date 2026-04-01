@@ -6,12 +6,10 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
-      - 'codecov.yml'
   pull_request:
     branches: [main, develop]
     paths:
       - 'frontend/**'
-      - 'codecov.yml'
   workflow_dispatch:
 
 env:
@@ -130,13 +128,13 @@ jobs:
         working-directory: ./frontend
         run: npm run test:unit --coverage
 
-      - name: Upload coverage
-        if: hashFiles('frontend/coverage/coverage-final.json') != ''
-        uses: codecov/codecov-action@v5
+      - name: Upload coverage artifact
+        if: hashFiles('frontend/coverage/**/*') != ''
+        uses: actions/upload-artifact@v7
         with:
-          files: ./frontend/coverage/coverage-final.json
-          flags: frontend
           name: frontend-coverage
+          path: frontend/coverage/
+          retention-days: 7
 
   test-e2e:
     name: E2E Tests (Playwright)

@@ -23,7 +23,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 2. `frontend-ci.yml` - Frontend CI
 
-**Trigger:** push/PR affecting `frontend/**` or `codecov.yml`.
+**Trigger:** push/PR affecting `frontend/**`.
 
 **Purpose:** Keep frontend quality gates strict while reducing redundant runtime.
 
@@ -40,13 +40,13 @@ This directory contains operational and CI workflows for Wait Time Canada.
 - Changed-path gating for heavy E2E/build steps.
 - Playwright E2E is currently manual-dispatch only while the suite is being stabilized; routine push/PR CI relies on lint, type-check, unit tests, and build.
 - Explicit failures (no permissive "skip on error" fallbacks).
-- Unit-test coverage uploads to Codecov with the `frontend` flag.
+- Unit-test coverage is retained as a short-lived GitHub Actions artifact.
 
 ---
 
 ### 3. `scraper-ci.yml` - Backend/Scraper CI
 
-**Trigger:** push/PR affecting `backend/**` or `codecov.yml`.
+**Trigger:** push/PR affecting `backend/**`.
 
 **Jobs:**
 - `lint` (ruff)
@@ -56,7 +56,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 **Optimization controls:**
 - Branch-level concurrency cancellation.
-- Coverage uploads to Codecov with the `scrapers` flag.
+- Coverage is retained as a short-lived GitHub Actions artifact.
 - The security job currently delegates to the upstream `PyCQA/bandit-action@v1`
   composite, which already uses `actions/checkout@v6`,
   `actions/setup-python@v6`, and `github/codeql-action/upload-sarif@v4`.
