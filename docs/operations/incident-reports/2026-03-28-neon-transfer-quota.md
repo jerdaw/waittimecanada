@@ -29,9 +29,10 @@ Live verification on **2026-04-01** showed:
 - scheduled `Heartbeat Monitor (Dead Man's Switch)` runs were succeeding again
 - scheduled `Production Smoke` was succeeding again
 
-The remaining follow-up is separate from the original quota outage:
-`/api/status` and `/api/data-quality` still show critical aggregate values and
-inactive legacy source IDs despite healthy live source runs on 2026-04-01.
+The remaining follow-up is separate from the original quota outage: repo-side
+hardening for `/api/status` and aggregate `/api/data-quality` has now landed,
+but the current frontend release still needs to be deployed and re-verified on
+the shared VPS.
 
 ## User-Facing Impact
 
@@ -135,7 +136,9 @@ Completed on 2026-04-01:
 2. confirmed `/api/hospitals` and `/api/resources` no longer returned `500`
 3. confirmed scheduled `Production Smoke` was succeeding again
 4. confirmed `Heartbeat Monitor (Dead Man's Switch)` had recovered
-5. recorded the remaining public-status-summary mismatch as a separate follow-up
+5. recorded the remaining public-status-summary issue as a separate follow-up
+6. landed repo-side source-filtering hardening and direct smoke coverage for
+   `/api/status` plus aggregate `/api/data-quality`
 
 ## Follow-Up
 

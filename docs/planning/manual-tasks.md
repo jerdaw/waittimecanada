@@ -38,6 +38,34 @@ and `5 GB/month` public transfer ceilings.
 
 ---
 
+## 🟢 READY: Deploy Latest VPS Frontend Release And Verify Public Status Summaries
+
+**Why:** The repo-side fix for `/api/status` and aggregate
+`/api/data-quality` is merged and CI-green, but the live VPS frontend still
+needs to be updated and verified so `wait-time.ca` reflects the hardened source
+filtering and new smoke coverage.
+**Milestone:** Active ops follow-up
+**Estimated Time:** 10-15 minutes
+**Priority:** HIGH
+
+### Steps:
+1. From a clean checkout, run
+   `./scripts/release-vps-frontend.sh <ssh-target> --deploy`.
+2. Verify:
+   - `curl -fsS https://wait-time.ca/api/health`
+   - `PRODUCTION_BASE_URL=https://wait-time.ca ./scripts/production-smoke.sh`
+3. Confirm that live `/api/status` and aggregate `/api/data-quality`:
+   - include the active live source IDs (`quebec-msss`, `ontario-health`,
+     `alberta-ahs`, `bc-phsa`)
+   - do not include `manitoba-shared-health` or `on-health`
+4. Once verified, update `docs/planning/roadmap.md` to close the remaining VPS
+   status-summary follow-up.
+
+**Result:** The public VPS frontend is confirmed to be serving the hardened
+status/data-quality rollups rather than an older release.
+
+---
+
 ## 🟡 OPTIONAL: Apply To The Neon Open Source Program
 
 **Why:** Offset Launch-plan costs with credits now that the repo explicitly

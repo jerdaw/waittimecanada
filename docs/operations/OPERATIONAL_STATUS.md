@@ -8,10 +8,10 @@
 > Current-state addendum (2026-04-01): the March 28 Neon transfer-quota outage
 > is no longer the active blocker. Live verification on 2026-04-01 showed
 > `/api/health` returning `healthy: true` with the database connected again, and
-> `/api/hospitals` plus `/api/resources` responding normally. A separate
-> follow-up remains: `/api/status` and `/api/data-quality` still expose critical
-> aggregate values and inactive legacy source IDs that do not match the healthy
-> live source runs observed on 2026-04-01. See
+> `/api/hospitals` plus `/api/resources` responding normally. Repo-side
+> hardening for `/api/status` and aggregate `/api/data-quality` is also merged.
+> The remaining follow-up is a frontend VPS release plus live verification that
+> `wait-time.ca` is serving the updated summary behavior. See
 > `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md` and
 > `docs/planning/roadmap.md`.
 

@@ -32,6 +32,15 @@ lightweight verification.
 - Added manual-task entries for the remaining Neon cost follow-up:
   - upgrade the production project to Neon Launch
   - optionally apply to the Neon Open Source Program
+- Hardened public status-summary handling in the repo:
+  - centralized active live source filtering for `/api/status` and aggregate
+    `/api/data-quality`
+  - added regression tests for legacy source IDs (`manitoba-shared-health`,
+    `on-health`)
+  - extended production smoke coverage to hit `/api/status` and aggregate
+    `/api/data-quality` directly
+- Added a manual task for the remaining VPS-specific step:
+  - deploy the latest frontend release and verify the live public summaries
 
 ## Verified Live State
 
@@ -48,10 +57,11 @@ Observed on **2026-04-01**:
 ## Remaining Follow-Up
 
 - The March 28 Neon transfer-quota outage is no longer the live blocker.
-- A separate public-surface mismatch remains: `/api/status` and
-  `/api/data-quality` still expose critical aggregate values and inactive legacy
-  source IDs (`manitoba-shared-health`, `on-health`) that do not match the
-  healthy live source runs observed on 2026-04-01.
+- Repo-side hardening for the public status/data-quality summaries is complete
+  and CI-green.
+- The remaining follow-up is to deploy the current frontend release to the VPS
+  and verify that live `/api/status` and aggregate `/api/data-quality` no
+  longer expose `manitoba-shared-health` or `on-health`.
 - Frontend dependency maintenance remains intentionally batched rather than
   drip-merged from Dependabot.
 - The admissions-strengthening plan remains active and should not be archived.
@@ -63,6 +73,10 @@ Observed on **2026-04-01**:
 - `git log origin/main --format='%an <%ae>' | sort -u`
 - `gh pr list`
 - `gh run list --limit 12`
+- `npm run lint`
+- `npm run type-check`
+- `npm run test:unit`
+- `npm run build`
 - live route checks against:
   - `/api/health`
   - `/api/hospitals?province=ON&limit=1`
