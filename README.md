@@ -283,6 +283,19 @@ This project demonstrates multiple CanMEDS competencies for medical school appli
 - PostgreSQL (Neon account recommended)
 - Mapbox account (free tier sufficient)
 
+### Recommended Database Path: Neon
+
+Wait Time Canada uses standard PostgreSQL and can be run against any compatible
+database, but the default documented path is Neon:
+
+1. create a Neon project
+2. copy the pooled `DATABASE_URL`
+3. place it in `backend/.env.local`
+4. run the repo migrations and analytics bootstrap commands below
+
+This keeps local setup lightweight while preserving a fully portable Postgres
+schema and migration workflow.
+
 ### 1. Clone and Setup Environment
 
 ```bash
