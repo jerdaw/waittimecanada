@@ -131,7 +131,7 @@ PRODUCTION_BASE_URL=https://wait-time.ca ./scripts/production-smoke.sh
 Expected outcome:
 
 1. private and public health return HTTP `200`
-2. page smoke checks pass for `/`, `/methods`, `/data-quality`, and `/analytics`
+2. page and API smoke checks pass for `/`, `/methods`, `/data-quality`, `/analytics`, `/api/status`, and aggregate `/api/data-quality`
 3. `/api/health` reflects the current backend freshness state in the database, so `healthy` may be `false` even when the frontend cutover itself is correct
 
 Suggested Caddy shape after cutover:

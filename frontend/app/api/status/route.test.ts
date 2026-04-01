@@ -170,6 +170,52 @@ describe("/api/status", () => {
     expect(data.system_uptime_24h).toBe(1);
   });
 
+  it("should exclude legacy ontario aliases from public status payloads", async () => {
+    const mockSql = vi.fn();
+    (getDb as Mock).mockReturnValue(mockSql);
+
+    mockSql.mockResolvedValueOnce([
+      {
+        source_id: "ontario-health",
+        source_name: "Ontario Health",
+        province: "ON",
+        runs_24h: 24,
+        runs_7d: 168,
+        runs_30d: 720,
+        total_hospitals: 10,
+        last_run: new Date("2026-04-01T12:00:00Z"),
+        scraper_status: "healthy",
+        heartbeat_age_minutes: 5,
+      },
+      {
+        source_id: "on-health",
+        source_name: "Legacy Ontario Health",
+        province: "ON",
+        runs_24h: 0,
+        runs_7d: 0,
+        runs_30d: 0,
+        total_hospitals: 99,
+        last_run: null,
+        scraper_status: "unknown",
+        heartbeat_age_minutes: null,
+      },
+    ]);
+    mockSql.mockResolvedValueOnce([]);
+
+    const res = await GET();
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.sources).toHaveLength(1);
+    expect(data.sources[0].source_id).toBe("ontario-health");
+    expect(
+      data.sources.some(
+        (source: { source_id: string }) => source.source_id === "on-health",
+      ),
+    ).toBe(false);
+    expect(data.overall_status).toBe("healthy");
+  });
+
   it("should handle database errors gracefully", async () => {
     const mockSql = vi
       .fn()

@@ -76,6 +76,52 @@ describe("/api/data-quality", () => {
     expect(data.expected_runs_24h).toBe(24);
   });
 
+  it("excludes legacy ontario aliases from system quality aggregates", async () => {
+    const mockSql = vi.fn();
+    (getDb as Mock).mockReturnValue(mockSql);
+
+    mockSql.mockResolvedValueOnce([
+      {
+        source_id: "ontario-health",
+        source_name: "Ontario Health",
+        province: "ON",
+        measurements_24h: 24,
+        measurements_7d: 168,
+        runs_24h: 24,
+        runs_7d: 168,
+        hospitals_24h: 10,
+        total_hospitals: 10,
+        last_run: new Date("2026-04-01T12:00:00Z"),
+        scraper_status: "healthy",
+        heartbeat_age_minutes: 5,
+      },
+      {
+        source_id: "on-health",
+        source_name: "Legacy Ontario",
+        province: "ON",
+        measurements_24h: 999,
+        measurements_7d: 999,
+        runs_24h: 0,
+        runs_7d: 0,
+        hospitals_24h: 99,
+        total_hospitals: 99,
+        last_run: null,
+        scraper_status: "unknown",
+        heartbeat_age_minutes: null,
+      },
+    ]);
+
+    const res = await GET(new Request("http://localhost/api/data-quality"));
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.sources).toHaveLength(1);
+    expect(data.sources[0].source_id).toBe("ontario-health");
+    expect(data.total_measurements_24h).toBe(24);
+    expect(data.total_hospitals_reporting).toBe(10);
+    expect(data.overall_status).toBe("healthy");
+  });
+
   it("returns hospital quality using the hourly expectation model", async () => {
     const mockSql = vi.fn();
     (getDb as Mock).mockReturnValue(mockSql);

@@ -202,3 +202,4 @@ This directory contains operational and CI workflows for Wait Time Canada.
 - Playwright E2E is GitHub-CI-only and manual-dispatch while stabilization work is outstanding.
 - `frontend-ci.yml` keeps strict quality gates while avoiding heavy jobs when changes do not affect user-facing frontend runtime behavior.
 - `production-readiness.yml` and `production-smoke.yml` are the operational preflight/postflight checks for live deployment confidence.
+- Production smoke now exercises `/api/status` and aggregate `/api/data-quality` directly and fails if dormant legacy source IDs such as `manitoba-shared-health` or `on-health` leak into the public payload.

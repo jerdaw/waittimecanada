@@ -5,8 +5,8 @@ import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 import {
   EXPECTED_SCRAPER_RUNS_PER_DAY,
   LIVE_SCRAPER_CADENCE_LABEL,
+  filterActiveLiveSourceRows,
   getExpectedRunsForDays,
-  isActiveLiveScraperSource,
 } from "@/utils/live-scraper-sources";
 
 /**
@@ -141,34 +141,52 @@ async function getSystemQuality(sql: ReturnType<typeof getDb>) {
     ORDER BY s.province, s.name
   `;
 
-  const sources = sourceMetrics
-    .filter((row) => isActiveLiveScraperSource(row.source_id as string))
-    .map((row) => {
-      const totalHospitals = Number(row.total_hospitals);
-      const expected24h = EXPECTED_SCRAPER_RUNS_PER_DAY;
-      const actual24h = Number(row.runs_24h);
-      const rate24h =
-        expected24h > 0 ? Math.min(actual24h / expected24h, 1.0) : 0;
-
-      const expected7d = getExpectedRunsForDays(7);
-      const actual7d = Number(row.runs_7d);
-      const rate7d = expected7d > 0 ? Math.min(actual7d / expected7d, 1.0) : 0;
-
-      return {
-        source_id: row.source_id,
-        source_name: row.source_name,
-        province: row.province,
-        last_24h_success_rate: Math.round(rate24h * 1000) / 1000,
-        last_7d_success_rate: Math.round(rate7d * 1000) / 1000,
-        measurements_24h: Number(row.measurements_24h),
-        hospitals_reporting: Number(row.hospitals_24h),
-        total_hospitals: totalHospitals,
-        last_heartbeat_age_minutes: row.heartbeat_age_minutes
-          ? Math.round(Number(row.heartbeat_age_minutes))
+  const sources = filterActiveLiveSourceRows(
+    sourceMetrics.map((row) => ({
+      source_id: row.source_id as string,
+      source_name: row.source_name as string,
+      province: row.province as string,
+      measurements_24h: Number(row.measurements_24h),
+      measurements_7d: Number(row.measurements_7d),
+      runs_24h: Number(row.runs_24h),
+      runs_7d: Number(row.runs_7d),
+      hospitals_24h: Number(row.hospitals_24h),
+      total_hospitals: Number(row.total_hospitals),
+      last_run: row.last_run as Date | null,
+      scraper_status: (row.scraper_status as string | null) ?? "unknown",
+      heartbeat_age_minutes:
+        row.heartbeat_age_minutes !== null &&
+        row.heartbeat_age_minutes !== undefined
+          ? Number(row.heartbeat_age_minutes)
           : null,
-        scraper_status: row.scraper_status ?? "unknown",
-      };
-    });
+    })),
+  ).map((row) => {
+    const totalHospitals = row.total_hospitals;
+    const expected24h = EXPECTED_SCRAPER_RUNS_PER_DAY;
+    const actual24h = row.runs_24h;
+    const rate24h =
+      expected24h > 0 ? Math.min(actual24h / expected24h, 1.0) : 0;
+
+    const expected7d = getExpectedRunsForDays(7);
+    const actual7d = row.runs_7d;
+    const rate7d = expected7d > 0 ? Math.min(actual7d / expected7d, 1.0) : 0;
+
+    return {
+      source_id: row.source_id,
+      source_name: row.source_name,
+      province: row.province,
+      last_24h_success_rate: Math.round(rate24h * 1000) / 1000,
+      last_7d_success_rate: Math.round(rate7d * 1000) / 1000,
+      measurements_24h: row.measurements_24h,
+      hospitals_reporting: row.hospitals_24h,
+      total_hospitals: totalHospitals,
+      last_heartbeat_age_minutes:
+        row.heartbeat_age_minutes !== null
+          ? Math.round(row.heartbeat_age_minutes)
+          : null,
+      scraper_status: row.scraper_status,
+    };
+  });
 
   const rates = sources.map((s) => s.last_24h_success_rate);
   const avgRate =

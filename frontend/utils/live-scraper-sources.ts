@@ -5,6 +5,11 @@ export const ACTIVE_LIVE_SCRAPER_SOURCE_IDS = [
   "bc-phsa",
 ] as const;
 
+export const LEGACY_PUBLIC_SOURCE_IDS = [
+  "manitoba-shared-health",
+  "on-health",
+] as const;
+
 export const LIVE_SCRAPER_CADENCE_LABEL = "hourly";
 export const EXPECTED_SCRAPER_RUNS_PER_DAY = 24;
 export const EXPECTED_SCRAPER_INTERVAL_MINUTES = 60;
@@ -15,6 +20,18 @@ const ACTIVE_LIVE_SCRAPER_SOURCE_ID_SET = new Set<string>(
 
 export function isActiveLiveScraperSource(sourceId: string): boolean {
   return ACTIVE_LIVE_SCRAPER_SOURCE_ID_SET.has(sourceId);
+}
+
+export function filterActiveLiveSourceRows<T extends { source_id: string }>(
+  rows: readonly T[],
+): T[] {
+  return rows.filter((row) => isActiveLiveScraperSource(row.source_id));
+}
+
+export function hasLegacyPublicSourceId(payload: string): boolean {
+  return LEGACY_PUBLIC_SOURCE_IDS.some((sourceId) =>
+    payload.includes(sourceId),
+  );
 }
 
 export function getExpectedRunsForDays(days: number): number {

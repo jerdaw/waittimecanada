@@ -4,8 +4,8 @@ import { publicCacheHeaders } from "@/utils/cache";
 import {
   EXPECTED_SCRAPER_RUNS_PER_DAY,
   LIVE_SCRAPER_CADENCE_LABEL,
+  filterActiveLiveSourceRows,
   getExpectedRunsForDays,
-  isActiveLiveScraperSource,
 } from "@/utils/live-scraper-sources";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 
@@ -55,47 +55,55 @@ export async function GET() {
           ORDER BY s.province, s.name
         `;
 
-        const sources = sourceMetrics
-          .filter((row) => isActiveLiveScraperSource(row.source_id as string))
-          .map((row) => {
-            const totalHospitals = Number(row.total_hospitals);
+        const sources = filterActiveLiveSourceRows(
+          sourceMetrics.map((row) => ({
+            source_id: row.source_id as string,
+            source_name: row.source_name as string,
+            province: row.province as string,
+            runs_24h: Number(row.runs_24h),
+            runs_7d: Number(row.runs_7d),
+            runs_30d: Number(row.runs_30d),
+            total_hospitals: Number(row.total_hospitals),
+            last_run: row.last_run as Date | null,
+            scraper_status: (row.scraper_status as string | null) ?? "unknown",
+            heartbeat_age_minutes:
+              row.heartbeat_age_minutes !== null &&
+              row.heartbeat_age_minutes !== undefined
+                ? Number(row.heartbeat_age_minutes)
+                : null,
+          })),
+        ).map((row) => {
+          const totalHospitals = row.total_hospitals;
 
-            const expected24h = EXPECTED_SCRAPER_RUNS_PER_DAY;
-            const expected7d = getExpectedRunsForDays(7);
-            const expected30d = getExpectedRunsForDays(30);
+          const expected24h = EXPECTED_SCRAPER_RUNS_PER_DAY;
+          const expected7d = getExpectedRunsForDays(7);
+          const expected30d = getExpectedRunsForDays(30);
 
-            const rate24h =
-              expected24h > 0
-                ? Math.min(Number(row.runs_24h) / expected24h, 1.0)
-                : 0;
-            const rate7d =
-              expected7d > 0
-                ? Math.min(Number(row.runs_7d) / expected7d, 1.0)
-                : 0;
-            const rate30d =
-              expected30d > 0
-                ? Math.min(Number(row.runs_30d) / expected30d, 1.0)
-                : 0;
+          const rate24h =
+            expected24h > 0 ? Math.min(row.runs_24h / expected24h, 1.0) : 0;
+          const rate7d =
+            expected7d > 0 ? Math.min(row.runs_7d / expected7d, 1.0) : 0;
+          const rate30d =
+            expected30d > 0 ? Math.min(row.runs_30d / expected30d, 1.0) : 0;
 
-            const heartbeatAge = row.heartbeat_age_minutes
-              ? Math.round(Number(row.heartbeat_age_minutes))
+          const heartbeatAge =
+            row.heartbeat_age_minutes !== null
+              ? Math.round(row.heartbeat_age_minutes)
               : null;
 
-            return {
-              source_id: row.source_id as string,
-              source_name: row.source_name as string,
-              province: row.province as string,
-              uptime_24h: Math.round(rate24h * 1000) / 1000,
-              uptime_7d: Math.round(rate7d * 1000) / 1000,
-              uptime_30d: Math.round(rate30d * 1000) / 1000,
-              total_hospitals: totalHospitals,
-              last_heartbeat_age_minutes: heartbeatAge,
-              scraper_status: (row.scraper_status as string) ?? "unknown",
-              last_run: row.last_run
-                ? (row.last_run as Date).toISOString()
-                : null,
-            };
-          });
+          return {
+            source_id: row.source_id,
+            source_name: row.source_name,
+            province: row.province,
+            uptime_24h: Math.round(rate24h * 1000) / 1000,
+            uptime_7d: Math.round(rate7d * 1000) / 1000,
+            uptime_30d: Math.round(rate30d * 1000) / 1000,
+            total_hospitals: totalHospitals,
+            last_heartbeat_age_minutes: heartbeatAge,
+            scraper_status: row.scraper_status,
+            last_run: row.last_run ? row.last_run.toISOString() : null,
+          };
+        });
 
         const rates = sources.map((source) => source.uptime_24h);
         const avgRate =
