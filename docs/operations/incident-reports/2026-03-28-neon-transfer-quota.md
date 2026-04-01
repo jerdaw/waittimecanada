@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-28
 **Severity:** High
-**Status:** Open external blocker
+**Status:** Resolved as live blocker on 2026-04-01; follow-up monitoring remains open
 **Scope:** Production database connectivity, live API availability, heartbeat monitoring
 
 ## Summary
@@ -14,6 +14,24 @@ was rejecting database connections for the live project with the error:
 
 This is not a scraper/parser bug or a frontend deploy bug. It is an external
 production database quota failure.
+
+## Resolution Status
+
+The transfer-quota outage is no longer the active production blocker.
+
+Live verification on **2026-04-01** showed:
+
+- `https://wait-time.ca/api/health` returned `healthy: true` with
+  `database.status: "connected"`
+- `https://wait-time.ca/api/hospitals?province=ON&limit=1` returned live data
+- `https://wait-time.ca/api/resources?kind=facility&province=ON&limit=1`
+  returned live data
+- scheduled `Heartbeat Monitor (Dead Man's Switch)` runs were succeeding again
+- scheduled `Production Smoke` was succeeding again
+
+The remaining follow-up is separate from the original quota outage:
+`/api/status` and `/api/data-quality` still show critical aggregate values and
+inactive legacy source IDs despite healthy live source runs on 2026-04-01.
 
 ## User-Facing Impact
 
@@ -106,16 +124,18 @@ One of the following must happen before roadmap execution resumes:
 3. production moves to a different database/runtime path that restores
    connectivity
 
+This step has been satisfied enough for live DB connectivity to recover by
+2026-04-01.
+
 ## Recovery Verification Checklist
 
-When external remediation is complete:
+Completed on 2026-04-01:
 
-1. confirm `https://wait-time.ca/api/health` reports the database as connected
-2. confirm `/api/hospitals`, `/api/resources`, `/api/status`, and
-   `/api/data-quality` no longer return `500`
-3. rerun production smoke/readiness
-4. confirm `Heartbeat Monitor (Dead Man's Switch)` has recovered
-5. then resume the next open engineering item on the roadmap
+1. confirmed `https://wait-time.ca/api/health` reported the database as connected
+2. confirmed `/api/hospitals` and `/api/resources` no longer returned `500`
+3. confirmed scheduled `Production Smoke` was succeeding again
+4. confirmed `Heartbeat Monitor (Dead Man's Switch)` had recovered
+5. recorded the remaining public-status-summary mismatch as a separate follow-up
 
 ## Follow-Up
 

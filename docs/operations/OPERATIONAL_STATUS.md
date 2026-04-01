@@ -5,12 +5,15 @@
 > `docs/operations/reports/2026-03-operational-report.md`,
 > `docs/operations/direct-vps-frontend.md`, and `docs/operations/direct-vps-backend.md`.
 
-> Current-state addendum (2026-03-28 evening): the later production state is no
-> longer fully healthy. Neon is currently rejecting production database
-> connections because the project exceeded its data transfer quota, which leaves
-> live DB-backed routes returning `500` until quota/reset or DB-path changes are
-> addressed. See
-> `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`.
+> Current-state addendum (2026-04-01): the March 28 Neon transfer-quota outage
+> is no longer the active blocker. Live verification on 2026-04-01 showed
+> `/api/health` returning `healthy: true` with the database connected again, and
+> `/api/hospitals` plus `/api/resources` responding normally. A separate
+> follow-up remains: `/api/status` and `/api/data-quality` still expose critical
+> aggregate values and inactive legacy source IDs that do not match the healthy
+> live source runs observed on 2026-04-01. See
+> `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md` and
+> `docs/planning/roadmap.md`.
 
 **Date:** 2026-03-21
 **Status:** Historical operational snapshot

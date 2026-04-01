@@ -41,7 +41,7 @@ This file provides guidance to automated developer tools when working with code 
 
 This is the **Wait Time Canada** project - a "Health Systems Observatory" designed to audit and standardize Canadian emergency room wait time data across provinces. This is **NOT a simple wait time app**, but rather a clinically defensible auditing platform that exposes methodological inconsistencies in healthcare reporting.
 
-**Current Status:** Milestone 33 (Historical Occupancy Trends) is complete and the Ontario-first **Public Health Hub Batch A** module is live. **Four-province breadth achieved** (ON, QC, AB, BC). Methodology documentation is complete for all provinces, occupancy trend aggregation is operational, the production domain `wait-time.ca` is live on the VPS via Caddy, `/resources` is live with facilities/AED fallback/alerts/AQHI, and raw measurements follow a 30-day retention policy with permanent aggregates for long-term analysis. **Current external blocker:** as of 2026-03-28, production Neon connectivity is interrupted by a data transfer quota incident; see `docs/planning/roadmap.md` and `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md` before assuming live DB-backed routes are healthy.
+**Current Status:** Milestone 33 (Historical Occupancy Trends) is complete and the Ontario-first **Public Health Hub Batch A** module is live. **Four-province breadth achieved** (ON, QC, AB, BC). Methodology documentation is complete for all provinces, occupancy trend aggregation is operational, the production domain `wait-time.ca` is live on the VPS via Caddy, `/resources` is live with facilities/AED fallback/alerts/AQHI, and raw measurements follow a 30-day retention policy with permanent aggregates for long-term analysis. As of **2026-04-01**, production Neon connectivity is healthy again: live `/api/health` reports `healthy: true` with the database connected, heartbeat monitoring is green, and core DB-backed routes are responding. The remaining live ops follow-up is public status-surface drift: `/api/status` and `/api/data-quality` still present critical aggregate values and inactive legacy source IDs that do not match the healthy live source runs verified on 2026-04-01. See `docs/planning/roadmap.md` and `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md` before treating the public status summary as authoritative.
 
 **Current Architecture:**
 - **Database**: Neon PostgreSQL 17 (14 tables: sources, hospitals, measurements, scraper_status, scraper_alert_state, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions, public_data_sources, resource_locations, public_health_alerts, public_health_source_alert_state)
@@ -210,7 +210,7 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 - A Netlify production build is allowed only when commit message contains `[release]` or `[deploy]`.
 - Non-production branches are skipped by default.
 - This guardrail keeps the old Netlify path available as rollback-only infrastructure without making it the active frontend runtime again.
-- `production-smoke.yml` remains manual-dispatch to conserve GitHub Actions minutes on the free tier; use explicit release commits and manual smoke checks rather than high-frequency automated production probes.
+- `production-smoke.yml` currently runs every 6 hours and also supports manual dispatch; keep it lightweight and avoid adding more frequent production probes without a clear operational reason.
 
 ## Runtime Usage Guardrails
 

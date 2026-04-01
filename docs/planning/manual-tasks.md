@@ -17,6 +17,51 @@ This document tracks all tasks requiring significant human intervention, browser
 
 ---
 
+## 🟢 READY: Upgrade Production Neon Project To Launch
+
+**Why:** The free tier has already proven too fragile for production use. The
+project hit a real transfer-quota outage on 2026-03-28 and a storage warning at
+89% of the free allocation on 2026-03-31.
+**Milestone:** Active ops follow-up
+**Estimated Time:** 5-10 minutes
+**Priority:** HIGH
+
+### Steps:
+1. Open the Neon project billing/plan page for `waittimecanada`.
+2. Upgrade the production project to the Launch plan.
+3. Verify the plan change and current monthly usage dashboard.
+4. Record the date of the billing change in `docs/planning/roadmap.md` if it
+   is completed outside a normal maintenance pass.
+
+**Result:** Production no longer depends on the free tier's `0.5 GB` storage
+and `5 GB/month` public transfer ceilings.
+
+---
+
+## 🟡 OPTIONAL: Apply To The Neon Open Source Program
+
+**Why:** Offset Launch-plan costs with credits now that the repo explicitly
+documents Neon as the default hosted quick-start path.
+**Milestone:** Active cost follow-up
+**Estimated Time:** 10-15 minutes
+**Priority:** MEDIUM
+
+### Steps:
+1. Open the Neon Open Source Program application page.
+2. Submit:
+   - Project URL: `https://github.com/jerdaw/waittimecanada`
+   - Contact email: your preferred maintainer email
+3. Use the current repository positioning:
+   - MIT-licensed open-source project
+   - runs on PostgreSQL
+   - Neon is the default documented hosted quick-start path
+4. If accepted, record the outcome in `docs/planning/roadmap.md`.
+
+**Result:** Potential credits/support without changing the project's current
+managed-Postgres posture.
+
+---
+
 ## 🟡 OPTIONAL: Pushover Alert Configuration
 
 **Why:** Enable push notifications for scraper health alerts

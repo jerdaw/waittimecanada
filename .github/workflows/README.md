@@ -111,7 +111,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 8. `production-smoke.yml` - Live Route Smoke Checks
 
-**Trigger:** currently manual dispatch only (scheduled cron temporarily paused due to GitHub Actions quota exhaustion).
+**Trigger:** cron `17 */6 * * *` (every 6 hours) + manual dispatch.
 
 **Purpose:** Verify public production routes respond with expected markers, including the public-health-hub `/resources` surface and its Batch A APIs.
 

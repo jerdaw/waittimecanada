@@ -11,12 +11,13 @@ Wait Time Canada is a clinically defensible Health Systems Observatory for audit
 
 ## Deployment Status
 
-As of **2026-03-28**, the frontend is live on the shared VPS at `https://wait-time.ca`, `https://www.wait-time.ca` redirects to the canonical host, and the backend scheduler path remains on GitHub Actions. However, the current production pause point is an external Neon transfer-quota incident that is leaving live DB-backed routes unavailable until quota/reset or DB-path changes restore connectivity. See `docs/operations/direct-vps-frontend.md`, `docs/planning/roadmap.md`, and `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`.
+As of **2026-04-01**, the frontend is live on the shared VPS at `https://wait-time.ca`, `https://www.wait-time.ca` redirects to the canonical host, and the backend scheduler path remains on GitHub Actions. Live verification on 2026-04-01 showed `/api/health` returning `healthy: true` with the database connected again, and DB-backed routes such as `/api/hospitals` and `/api/resources` responding normally. The remaining live follow-up is that `/api/status` and `/api/data-quality` still expose critical aggregate values and inactive legacy source IDs that do not match the healthy live source runs observed on 2026-04-01. See `docs/planning/roadmap.md` and `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`.
 
 ## Current Operations Artifacts
 
 - Monthly operations review: `docs/operations/reports/2026-03-operational-report.md`
-- Current incident report: `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`
+- Latest incident report: `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`
+- Latest maintenance log: `docs/planning/archive/maintenance-2026-04-01.md`
 
 ## Safety
 
