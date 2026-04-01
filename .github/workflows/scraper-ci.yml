@@ -98,8 +98,6 @@ jobs:
   security:
     name: Security Scan
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write
 
     steps:
       - uses: actions/checkout@v6
@@ -114,11 +112,12 @@ jobs:
 
       - name: Run Bandit security scan
         working-directory: ./backend
-        continue-on-error: true
-        run: bandit -r src -f sarif -o bandit-results.sarif
+        run: bandit -r src -f json -o bandit-results.json --exit-zero
 
-      - name: Upload Bandit SARIF
-        if: always() && hashFiles('backend/bandit-results.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v4
+      - name: Upload Bandit report
+        if: hashFiles('backend/bandit-results.json') != ''
+        uses: actions/upload-artifact@v7
         with:
-          sarif_file: backend/bandit-results.sarif
+          name: backend-bandit-report
+          path: backend/bandit-results.json
+          retention-days: 7

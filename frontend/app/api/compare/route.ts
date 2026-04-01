@@ -182,10 +182,10 @@ export async function GET(request: NextRequest) {
       },
     );
 
-    return NextResponse.json(
-      payload.body,
-      { status: payload.status, headers: publicCacheHeaders(300, 900) },
-    );
+    return NextResponse.json(payload.body, {
+      status: payload.status,
+      headers: publicCacheHeaders(300, 900),
+    });
   } catch (error) {
     console.error("Failed to compare hospitals:", error);
     return NextResponse.json(
