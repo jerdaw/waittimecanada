@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![Node.js 20+](https://img.shields.io/badge/node.js-20+-green.svg)](https://nodejs.org/)
-[![Tests](https://img.shields.io/badge/tests-821%2B%20passing-success.svg)](https://github.com/jerdaw/waittimecanada)
+[![Tests](https://img.shields.io/badge/tests-verified-success.svg)](https://github.com/jerdaw/waittimecanada)
 [![Documentation](https://img.shields.io/badge/docs-deployed-blue.svg)](https://jerdaw.github.io/waittimecanada/)
 [![Data Freshness](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fjerdaw%2Fwaittimecanada%2Fbadges%2Ffreshness.json&query=%24.message&label=Last%20Scrape&color=%24.color)](https://github.com/jerdaw/waittimecanada/actions/workflows/scraper-cron.yml)
 
@@ -196,7 +196,7 @@ graph TD
 
 ### Backend
 - **Language:** Python 3.12+
-- **Testing:** pytest with 375+ tests, 77% code coverage
+- **Testing:** pytest with broad unit/integration coverage across scrapers, services, and API paths
 - **Scrapers:** 4 provincial scrapers (BeautifulSoup, HTTP/HTML parsing, Playwright, JSON extraction)
 - **Database:** Neon PostgreSQL 17 with 10 tables, strict ontology constraints
 - **Services:**
@@ -207,7 +207,7 @@ graph TD
 
 ### Frontend
 - **Framework:** Next.js 14 App Router + TypeScript
-- **Testing:** Vitest with 287 tests (285 passing)
+- **Testing:** Vitest + React Testing Library for unit/component coverage, with Playwright browser verification kept CI-first and manual-dispatch
 - **Mapping:** Mapbox GL JS
 - **Components:** 30+ React components with comprehensive test coverage
 - **API Routes:** Hospitals/comparisons, analytics, data quality, and public resources endpoints

@@ -241,10 +241,12 @@ function extractEquityPopupData(
 
 // Custom marker component
 function HospitalMarker({
+  hospitalId,
   waitTime,
   isSelected,
   isSelectedForComparison,
 }: {
+  hospitalId: string;
   waitTime: number | undefined;
   isSelected: boolean;
   isSelectedForComparison?: boolean;
@@ -253,7 +255,11 @@ function HospitalMarker({
   const hasData = waitTime !== undefined && waitTime !== null;
 
   return (
-    <div className="relative cursor-pointer group">
+    <div
+      className="relative cursor-pointer group"
+      data-testid={`hospital-marker-${hospitalId}`}
+      data-hospital-id={hospitalId}
+    >
       {/* Outer ring animation for selected state */}
       {isSelected && !isSelectedForComparison && (
         <div
@@ -1074,6 +1080,7 @@ export default function Map({
               }}
             >
               <HospitalMarker
+                hospitalId={hospital.id}
                 waitTime={hospital.current_wait_time}
                 isSelected={isSelected}
                 isSelectedForComparison={isSelectedComparison}

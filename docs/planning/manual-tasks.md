@@ -38,7 +38,7 @@ and `5 GB/month` public transfer ceilings.
 
 ---
 
-## 🟢 READY: Deploy Latest VPS Frontend Release And Verify Public Status Summaries
+## 🔴 BLOCKED: Deploy Latest VPS Frontend Release And Verify Public Status Summaries
 
 **Why:** The repo-side fix for `/api/status` and aggregate
 `/api/data-quality` is merged and CI-green, but the live VPS frontend still
@@ -47,6 +47,10 @@ filtering and new smoke coverage.
 **Milestone:** Active ops follow-up
 **Estimated Time:** 10-15 minutes
 **Priority:** HIGH
+
+**Current Blocker (2026-04-09):** The current workstation session could not
+resolve or reach a usable shared-VPS SSH target, so the release step could not
+be executed from automation in this pass.
 
 ### Steps:
 1. From a clean checkout, run

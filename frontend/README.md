@@ -43,7 +43,9 @@ npm run format:check
 npm run test:unit
 ```
 
-`npm run test:e2e` exists but is generally CI-only for this repo.
+`npm run test:e2e` exists but is generally CI-only for this repo and is
+normally run from GitHub Actions manual dispatch rather than as a routine local
+check.
 
 ## Key Routes
 

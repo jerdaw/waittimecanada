@@ -17,7 +17,7 @@ As of **2026-04-01**, the frontend is live on the shared VPS at `https://wait-ti
 
 - Monthly operations review: `docs/operations/reports/2026-03-operational-report.md`
 - Latest incident report: `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`
-- Latest maintenance log: `docs/planning/archive/maintenance-2026-04-01.md`
+- Latest maintenance log: `docs/planning/archive/maintenance-2026-04-09.md`
 
 ## Safety
 

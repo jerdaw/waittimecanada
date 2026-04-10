@@ -27,10 +27,7 @@ export function Footer() {
             <h3 className="font-semibold text-sm text-foreground">
               {t("nav.resources")}
             </h3>
-            <nav
-              className="flex flex-col gap-2 text-sm"
-              aria-label={t("nav.resources")}
-            >
+            <div className="flex flex-col gap-2 text-sm">
               <Link
                 href="/resources"
                 className="text-muted-foreground hover:text-primary transition-colors"
@@ -61,7 +58,7 @@ export function Footer() {
               >
                 {t("nav.faq")}
               </Link>
-            </nav>
+            </div>
           </div>
 
           {/* Legal & Project Links */}
@@ -69,10 +66,7 @@ export function Footer() {
             <h3 className="font-semibold text-sm text-foreground">
               {t("nav.project")}
             </h3>
-            <nav
-              className="flex flex-col gap-2 text-sm"
-              aria-label={t("nav.project")}
-            >
+            <div className="flex flex-col gap-2 text-sm">
               <a
                 href="https://github.com/jerdaw/waittimecanada"
                 target="_blank"
@@ -93,7 +87,7 @@ export function Footer() {
               >
                 {t("nav.terms")}
               </Link>
-            </nav>
+            </div>
           </div>
         </div>
 

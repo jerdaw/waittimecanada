@@ -32,13 +32,13 @@ This directory contains operational and CI workflows for Wait Time Canada.
 - `lint` (ESLint + Prettier check)
 - `type-check` (TypeScript)
 - `test-unit` (Vitest + coverage)
-- `test-e2e` (Playwright Chromium only, manual dispatch while the suite is being stabilized)
+- `test-e2e` (Playwright Chromium only, manual dispatch for CI-first browser verification)
 - `build` (Next.js production build, diff-gated)
 
 **Optimization controls:**
 - Branch-level concurrency cancellation.
 - Changed-path gating for heavy E2E/build steps.
-- Playwright E2E is currently manual-dispatch only while the suite is being stabilized; routine push/PR CI relies on lint, type-check, unit tests, and build.
+- Playwright E2E remains manual-dispatch only to conserve free-tier minutes; the suite was repo-side stabilized on 2026-04-09, so routine push/PR CI continues to rely on lint, type-check, unit tests, and build.
 - Explicit failures (no permissive "skip on error" fallbacks).
 - Unit-test coverage is retained as a short-lived GitHub Actions artifact.
 
@@ -199,7 +199,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ## Operational Notes
 
-- Playwright E2E is GitHub-CI-only and manual-dispatch while stabilization work is outstanding.
+- Playwright E2E is GitHub-CI-only and manual-dispatch to conserve free-tier minutes, even though the current suite has been repo-side stabilized.
 - `frontend-ci.yml` keeps strict quality gates while avoiding heavy jobs when changes do not affect user-facing frontend runtime behavior.
 - `production-readiness.yml` and `production-smoke.yml` are the operational preflight/postflight checks for live deployment confidence.
 - Production smoke now exercises `/api/status` and aggregate `/api/data-quality` directly and fails if dormant legacy source IDs such as `manitoba-shared-health` or `on-health` leak into the public payload.

@@ -179,6 +179,14 @@ export default function Home() {
   }, [selectedProvince, t]);
 
   useEffect(() => {
+    if (showHero) {
+      setRegionsLoading(false);
+      setSelectedRegionId(null);
+      setRegionRows([]);
+      setProvinceRegionMean(null);
+      return;
+    }
+
     let cancelled = false;
 
     async function fetchRegionAnalytics() {
@@ -223,7 +231,7 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, [selectedProvince, REGION_PERIOD]);
+  }, [selectedProvince, REGION_PERIOD, showHero]);
 
   const selectedRegionHospitalIds = useMemo(() => {
     if (!selectedRegionId) return null;

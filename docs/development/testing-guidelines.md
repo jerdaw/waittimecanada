@@ -55,7 +55,7 @@ cd frontend
 npm run test:e2e
 ```
 
-Default rule: do not run E2E locally unless investigating a specific browser-flow bug. Use GitHub Actions manual dispatch for routine browser verification until the Playwright stabilization item is closed.
+Default rule: do not run E2E locally unless investigating a specific browser-flow bug. Use GitHub Actions manual dispatch for routine browser verification; the suite was repo-side stabilized on 2026-04-09, but heavy browser coverage remains CI-first to conserve GitHub Actions free-tier minutes.
 
 ## Coverage and Quality Expectations
 
@@ -96,7 +96,7 @@ npm run test:unit
 - Treat local runs as fast preflight to reduce CI churn.
 - If local and CI disagree, prioritize reproducing and fixing CI conditions.
 - Frontend and backend coverage artifacts are produced from separate path-scoped workflows and kept as short-lived build artifacts for debugging.
-- Playwright is currently manual-dispatch in GitHub Actions while the suite is being stabilized; default merge readiness relies on lint, type-check, unit tests, and build.
+- Playwright remains manual-dispatch in GitHub Actions even after the 2026-04-09 stabilization pass; default merge readiness relies on lint, type-check, unit tests, and build, with browser E2E reserved for explicit verification runs.
 
 ## Free-Tier CI Conservation (Temporary)
 
@@ -105,4 +105,4 @@ When GitHub Actions minutes are constrained:
 - Run targeted backend/frontend tests locally before pushing.
 - Prefer focused test commands for touched modules during iteration.
 - Avoid local Playwright runs unless diagnosing a browser-specific defect.
-- Reserve full CI-heavy runs (especially E2E) for final verification pushes.
+- Reserve full CI-heavy runs (especially manual-dispatch Playwright) for final verification pushes or targeted browser regressions.

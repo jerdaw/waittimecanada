@@ -31,8 +31,16 @@ Live verification on **2026-04-01** showed:
 
 The remaining follow-up is separate from the original quota outage: repo-side
 hardening for `/api/status` and aggregate `/api/data-quality` has now landed,
-but the current frontend release still needs to be deployed and re-verified on
-the shared VPS.
+and the repo-side Playwright stabilization pass is complete, but the current
+frontend release still needs to be deployed and re-verified on the shared VPS.
+
+Observed on **2026-04-09**:
+
+- `https://wait-time.ca/api/health` still reported healthy connectivity
+- live `/api/status` still exposed legacy source IDs
+- live aggregate `/api/data-quality` still exposed legacy source IDs
+- `bash scripts/production-smoke.sh https://wait-time.ca` still failed on those
+  two endpoints
 
 ## User-Facing Impact
 

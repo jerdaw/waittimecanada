@@ -22,7 +22,7 @@ This section contains the project planning control plane.
 ## Active Operational Artifacts
 
 - `docs/operations/reports/2026-03-operational-report.md`
-- `docs/operations/incident-reports/2026-02-19-quebec-zero-value.md`
+- `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`
 
 ## Archived Public Health Hub Batch A Planning Docs
 
@@ -36,6 +36,7 @@ This section contains the project planning control plane.
 
 ## Maintenance Logs
 
+- `docs/planning/archive/maintenance-2026-04-09.md`
 - `docs/planning/archive/maintenance-2026-04-01.md`
 - `docs/planning/archive/maintenance-2026-03-28.md`
 - `docs/planning/archive/maintenance-2026-03-27.md`

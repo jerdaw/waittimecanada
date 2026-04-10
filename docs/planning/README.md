@@ -21,7 +21,7 @@ This directory is the planning control plane for Wait Time Canada.
 ## Active Operational Artifacts
 
 - `docs/operations/reports/2026-03-operational-report.md`
-- `docs/operations/incident-reports/2026-02-19-quebec-zero-value.md`
+- `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`
 
 ## Archived Milestone Plans
 
@@ -60,8 +60,8 @@ These documents are retained for context and may not match current implementatio
 3. Archive implementation plans once a milestone is delivered and no longer actively edited.
 4. Keep completed milestone details in archived files; keep roadmap focused on active next steps.
 
-Last Updated: 2026-04-01
+Last Updated: 2026-04-09
 
 ## Latest Maintenance Log
 
-- `docs/planning/archive/maintenance-2026-04-01.md`
+- `docs/planning/archive/maintenance-2026-04-09.md`
