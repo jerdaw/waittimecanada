@@ -160,6 +160,10 @@ class TestRecordFailure:
 class TestCheckHealth:
     """Test health check for individual scrapers."""
 
+    def test_default_threshold_matches_live_ops_contract(self, heartbeat_service):
+        """The service default should stay aligned with the documented 120-minute posture."""
+        assert heartbeat_service.DEFAULT_STALE_THRESHOLD == 120
+
     def test_no_heartbeat_returns_unhealthy(self, heartbeat_service, mock_db):
         """Should return unhealthy if no heartbeat ever recorded."""
         mock_cursor = MagicMock()

@@ -15,6 +15,14 @@ Required:
 
 - `DATABASE_URL`: Neon PostgreSQL connection string
 
+Backend runtime note:
+
+- Backend services and CLI commands read `DATABASE_URL` from the current
+  process environment directly.
+- `backend/.env.local` may still be used as a personal template or by
+  human-invoked tooling that explicitly sources it, but backend runtime code
+  does not auto-load secret env files.
+
 Optional:
 
 - `MAPBOX_TOKEN`: secret Mapbox token for backend geocoding

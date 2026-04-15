@@ -130,10 +130,10 @@ describe("/api/data-quality", () => {
       .mockResolvedValueOnce([
         {
           date: "2026-03-27",
-          scrape_count: 12,
+          scrape_count: 1,
         },
       ])
-      .mockResolvedValueOnce([{ cnt: 18 }])
+      .mockResolvedValueOnce([{ cnt: 1 }])
       .mockResolvedValueOnce([
         {
           id: 1,
@@ -152,15 +152,15 @@ describe("/api/data-quality", () => {
 
     expect(res.status).toBe(200);
     expect(data.current_quality).toMatchObject({
-      success_rate: 0.75,
-      actual_scrapes_24h: 18,
+      success_rate: 1 / 24,
+      actual_scrapes_24h: 1,
       expected_scrapes_24h: 24,
       scheduler_cadence: "hourly",
     });
     expect(data.coverage_timeline[0]).toMatchObject({
       date: "2026-03-27",
-      scrape_count: 12,
-      success_rate: 0.5,
+      scrape_count: 1,
+      success_rate: 1 / 24,
     });
     expect(data.anomalies_7d).toHaveLength(1);
   });
@@ -169,6 +169,20 @@ describe("/api/data-quality", () => {
     const res = await GET(
       new Request("http://localhost/api/data-quality?days=0"),
     );
+    const data = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(data.error).toBe("Validation Error");
+  });
+
+  it.each([
+    "http://localhost/api/data-quality?view=trend",
+    "http://localhost/api/data-quality?view=diff",
+    "http://localhost/api/data-quality?view=hospital",
+    "http://localhost/api/data-quality?source_id=ontario-health",
+    "http://localhost/api/data-quality?hospital_id=ca-on-test&source_id=ontario-health",
+  ])("returns 400 for invalid data-quality query combinations: %s", async (url) => {
+    const res = await GET(new Request(url));
     const data = await res.json();
 
     expect(res.status).toBe(400);

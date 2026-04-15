@@ -33,35 +33,22 @@ def db_service(mock_db_url):
 
 
 class TestDatabaseService:
-    @patch("waittime.services.database.load_dotenv")
-    def test_init_uses_existing_env_without_loading_files(self, mock_load_dotenv, monkeypatch):
+    def test_init_uses_existing_env(self, monkeypatch):
         monkeypatch.setenv("DATABASE_URL", "postgresql://user@localhost/db")
 
         db = DatabaseService(database_url=None)
 
         assert db.database_url == "postgresql://user@localhost/db"
-        mock_load_dotenv.assert_not_called()
 
-    @patch("waittime.services.database.load_dotenv")
-    @patch("pathlib.Path.exists")
-    def test_init_loads_env_file_only_when_needed(self, mock_exists, mock_load_dotenv, monkeypatch):
+    def test_init_prefers_explicit_database_url(self, monkeypatch):
+        monkeypatch.setenv("DATABASE_URL", "postgresql://env@localhost/db")
+
+        db = DatabaseService(database_url="postgresql://explicit@localhost/db")
+
+        assert db.database_url == "postgresql://explicit@localhost/db"
+
+    def test_init_raises_if_no_url(self, monkeypatch):
         monkeypatch.delenv("DATABASE_URL", raising=False)
-        mock_exists.return_value = False
-        mock_load_dotenv.side_effect = lambda *_args, **_kwargs: monkeypatch.setenv(
-            "DATABASE_URL", "postgresql://loaded-from-env-file/db"
-        )
-
-        db = DatabaseService(database_url=None)
-
-        assert db.database_url == "postgresql://loaded-from-env-file/db"
-        mock_load_dotenv.assert_called_once()
-
-    @patch("waittime.services.database.load_dotenv")
-    @patch("pathlib.Path.exists")
-    def test_init_raises_if_no_url(self, mock_exists, mock_load_dotenv, monkeypatch):
-        monkeypatch.delenv("DATABASE_URL", raising=False)
-        mock_exists.return_value = False
-        mock_load_dotenv.return_value = False
         with pytest.raises(ValueError, match="Database URL or connection required"):
             DatabaseService(database_url=None)
 

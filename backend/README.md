@@ -26,13 +26,16 @@ From `backend/` directly:
 python -m pip install -e '.[dev]'
 ```
 
-Create local env file:
+Optional local template:
 
 ```bash
 cp backend/.env.example backend/.env.local
+export DATABASE_URL="postgresql://user:pass@host:5432/dbname"
 ```
 
 Required env var: `DATABASE_URL`.
+The backend runtime reads it from the current process environment rather than
+auto-loading `.env.local`.
 
 ## Database Initialization
 
@@ -54,7 +57,7 @@ python -m waittime.cli.scraper --all
 python -m waittime.cli.scraper --source ontario-health
 
 # Heartbeat check
-python -m waittime.cli.check_heartbeat --max-age 60
+python -m waittime.cli.check_heartbeat --max-age 120
 
 # Seed source/hospital data
 python -m waittime.cli.seed_sources backend/data/sources/ontario-health.json

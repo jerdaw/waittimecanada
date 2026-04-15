@@ -38,7 +38,7 @@ class TestComputeHospitalQuality:
         """24/24 scrapes yields success_rate=1.0, no gaps."""
         day = datetime(2026, 2, 1, tzinfo=UTC)
         timestamps = _make_timestamps(day, 24, interval_minutes=60)
-        mock_db.get_measurement_timestamps.return_value = timestamps
+        mock_db.get_scrape_window_timestamps.return_value = timestamps
 
         result = service.compute_hospital_quality("ca-on-test", day)
 
@@ -55,7 +55,7 @@ class TestComputeHospitalQuality:
         """18/24 scrapes yields 0.75 success rate."""
         day = datetime(2026, 2, 1, tzinfo=UTC)
         timestamps = _make_timestamps(day, 18, interval_minutes=60)
-        mock_db.get_measurement_timestamps.return_value = timestamps
+        mock_db.get_scrape_window_timestamps.return_value = timestamps
 
         result = service.compute_hospital_quality("ca-on-test", day)
 
@@ -68,7 +68,7 @@ class TestComputeHospitalQuality:
     def test_no_data(self, service, mock_db):
         """0 scrapes yields success_rate=0.0 and one full-day gap."""
         day = datetime(2026, 2, 1, tzinfo=UTC)
-        mock_db.get_measurement_timestamps.return_value = []
+        mock_db.get_scrape_window_timestamps.return_value = []
 
         result = service.compute_hospital_quality("ca-on-test", day)
 
@@ -82,12 +82,24 @@ class TestComputeHospitalQuality:
         """More than 24 scrapes still caps success_rate at 1.0."""
         day = datetime(2026, 2, 1, tzinfo=UTC)
         timestamps = _make_timestamps(day, 30, interval_minutes=30)
-        mock_db.get_measurement_timestamps.return_value = timestamps
+        mock_db.get_scrape_window_timestamps.return_value = timestamps
 
         result = service.compute_hospital_quality("ca-on-test", day)
 
         assert result["actual_scrapes"] == 30
         assert result["success_rate"] == 1.0
+
+    @pytest.mark.unit
+    def test_multi_metric_rows_do_not_double_count_scrapes(self, service, mock_db):
+        """Distinct hourly scrape windows should not inflate multi-metric hospitals."""
+        day = datetime(2026, 2, 1, tzinfo=UTC)
+        scrape_windows = [day, day + timedelta(hours=1)]
+        mock_db.get_scrape_window_timestamps.return_value = scrape_windows
+
+        result = service.compute_hospital_quality("ca-qc-chum", day)
+
+        assert result["actual_scrapes"] == 2
+        assert result["success_rate"] == 2 / 24
 
 
 class TestGapDetection:
@@ -109,7 +121,7 @@ class TestGapDetection:
         for i in range(19):
             timestamps.append(start + timedelta(hours=5 + i))
 
-        mock_db.get_measurement_timestamps.return_value = timestamps
+        mock_db.get_scrape_window_timestamps.return_value = timestamps
 
         result = service.compute_hospital_quality("ca-on-test", day)
 
@@ -132,7 +144,7 @@ class TestGapDetection:
             start + timedelta(hours=4),
             start + timedelta(hours=5),
         ]
-        mock_db.get_measurement_timestamps.return_value = timestamps
+        mock_db.get_scrape_window_timestamps.return_value = timestamps
 
         result = service.compute_hospital_quality("ca-on-test", day)
 
@@ -186,7 +198,7 @@ class TestComputeSourceQuality:
         ]
 
         # Total counts: 24 + 12 = 36 out of 2 * 24 = 48 expected
-        mock_db.get_measurement_count_by_hospital.return_value = {
+        mock_db.get_scrape_window_count_by_hospital.return_value = {
             "ca-on-hosp-1": 24,
             "ca-on-hosp-2": 12,
         }
@@ -213,7 +225,7 @@ class TestComputeSourceQuality:
         end = datetime(2026, 2, 2, tzinfo=UTC)
 
         mock_db.get_hospitals_by_source.return_value = []
-        mock_db.get_measurement_count_by_hospital.return_value = {}
+        mock_db.get_scrape_window_count_by_hospital.return_value = {}
         mock_db.get_hospital_onboarding_dates.return_value = {}
 
         result = service.compute_source_quality("empty-source", start, end)
@@ -235,7 +247,7 @@ class TestComputeSourceQuality:
         mock_db.get_hospitals_by_source.return_value = mock_hospitals
 
         # Only 2 out of 4 hospitals have data
-        mock_db.get_measurement_count_by_hospital.return_value = {
+        mock_db.get_scrape_window_count_by_hospital.return_value = {
             "hosp-0": 20,
             "hosp-2": 18,
         }
@@ -250,6 +262,25 @@ class TestComputeSourceQuality:
         assert result["total_hospitals"] == 4
         assert result["coverage_rate"] == 0.5
 
+    @pytest.mark.unit
+    def test_source_quality_uses_distinct_scrape_windows(self, service, mock_db):
+        """Quebec wait/occupancy pairs should count as one hourly scrape window."""
+        start = datetime(2026, 2, 1, tzinfo=UTC)
+        end = datetime(2026, 2, 2, tzinfo=UTC)
+
+        hospital = Mock()
+        hospital.id = "ca-qc-chum"
+        mock_db.get_hospitals_by_source.return_value = [hospital]
+        mock_db.get_scrape_window_count_by_hospital.return_value = {"ca-qc-chum": 12}
+        mock_db.get_hospital_onboarding_dates.return_value = {
+            "ca-qc-chum": start - timedelta(days=1)
+        }
+
+        result = service.compute_source_quality("quebec-msss", start, end)
+
+        assert result["total_actual"] == 12
+        assert result["overall_success_rate"] == 0.5
+
 
 class TestComputeSystemQuality:
     """Tests for compute_system_quality()."""
@@ -262,7 +293,7 @@ class TestComputeSystemQuality:
         mock_hospitals = [Mock()]
         mock_hospitals[0].id = "h-1"
         mock_db.get_hospitals_by_source.return_value = mock_hospitals
-        mock_db.get_measurement_count_by_hospital.return_value = {"h-1": 24}
+        mock_db.get_scrape_window_count_by_hospital.return_value = {"h-1": 24}
 
         # Mock onboarding date
         mock_db.get_hospital_onboarding_dates.return_value = {
@@ -288,7 +319,7 @@ class TestComputeSystemQuality:
         mock_hospitals[0].id = "h-1"
         mock_db.get_hospitals_by_source.return_value = mock_hospitals
         # Very few measurements
-        mock_db.get_measurement_count_by_hospital.return_value = {"h-1": 10}
+        mock_db.get_scrape_window_count_by_hospital.return_value = {"h-1": 10}
 
         # Mock onboarding date
         mock_db.get_hospital_onboarding_dates.return_value = {
@@ -321,7 +352,7 @@ class TestCoverageTimeline:
     @pytest.mark.unit
     def test_timeline_30_days(self, service, mock_db):
         """Returns 30 daily entries."""
-        mock_db.get_measurement_timestamps.return_value = []
+        mock_db.get_scrape_window_timestamps.return_value = []
 
         result = service.get_coverage_timeline("ca-on-test", days=30)
 
@@ -342,7 +373,7 @@ class TestCoverageTimeline:
             day + timedelta(hours=1),
             day + timedelta(hours=4),  # 180-min gap from previous
         ]
-        mock_db.get_measurement_timestamps.return_value = timestamps
+        mock_db.get_scrape_window_timestamps.return_value = timestamps
 
         result = service.get_coverage_timeline("ca-on-test", days=1)
 
@@ -354,7 +385,7 @@ class TestCoverageTimeline:
         """Evenly spaced timestamps have has_gaps=False."""
         day = datetime(2026, 2, 1, tzinfo=UTC)
         timestamps = _make_timestamps(day, 24, interval_minutes=60)
-        mock_db.get_measurement_timestamps.return_value = timestamps
+        mock_db.get_scrape_window_timestamps.return_value = timestamps
 
         result = service.get_coverage_timeline("ca-on-test", days=1)
 
@@ -370,7 +401,7 @@ class TestSnapshotDailyQuality:
     def test_snapshot_saves(self, service, mock_db):
         """Snapshots are saved for each hospital."""
         mock_db.get_all_hospital_ids.return_value = ["h-1", "h-2"]
-        mock_db.get_measurement_timestamps.return_value = []
+        mock_db.get_scrape_window_timestamps.return_value = []
 
         mock_hospital = Mock()
         mock_hospital.source_id = "src-1"
@@ -387,7 +418,7 @@ class TestSnapshotDailyQuality:
     def test_snapshot_idempotent(self, service, mock_db):
         """Second snapshot run returns 0 when all already exist."""
         mock_db.get_all_hospital_ids.return_value = ["h-1"]
-        mock_db.get_measurement_timestamps.return_value = []
+        mock_db.get_scrape_window_timestamps.return_value = []
 
         mock_hospital = Mock()
         mock_hospital.source_id = "src-1"
@@ -404,7 +435,7 @@ class TestSnapshotDailyQuality:
     def test_snapshot_skips_missing_hospital(self, service, mock_db):
         """Hospital not found in DB is skipped."""
         mock_db.get_all_hospital_ids.return_value = ["h-missing"]
-        mock_db.get_measurement_timestamps.return_value = []
+        mock_db.get_scrape_window_timestamps.return_value = []
         mock_db.get_hospital.return_value = None
 
         day = datetime(2026, 2, 1, tzinfo=UTC)

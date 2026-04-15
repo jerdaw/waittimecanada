@@ -16,7 +16,6 @@ from typing import Any
 
 import psycopg2
 import psycopg2.extras
-from dotenv import load_dotenv
 from psycopg2 import sql
 
 from waittime.core import (
@@ -31,6 +30,7 @@ from waittime.core import (
     ScraperStatus,
     Source,
 )
+from waittime.services.runtime_config import get_heartbeat_stale_threshold_minutes
 
 logger = logging.getLogger(__name__)
 
@@ -48,26 +48,6 @@ class PublicHealthSourceStatus:
     resource_record_count: int
     alert_record_count: int
     latest_alert_published_at: datetime | None
-
-
-def _maybe_load_database_env() -> None:
-    """Load DATABASE_URL from local env files only when needed.
-
-    This avoids probing secret-bearing files during module import, which keeps
-    tests and agent tooling from touching `.env.local` / `.env` unless a runtime
-    path genuinely needs them.
-    """
-    if os.environ.get("DATABASE_URL"):
-        return
-
-    from pathlib import Path
-
-    env_file = Path(__file__).parents[3] / ".env.local"
-    if not env_file.exists():
-        env_file = Path(__file__).parents[3] / ".env"
-
-    load_dotenv(env_file)
-
 
 class DatabaseService:
     """Service for interacting with PostgreSQL database.
@@ -87,9 +67,6 @@ class DatabaseService:
             database_url: PostgreSQL connection string (defaults to DATABASE_URL env var)
             conn: Optional existing connection to reuse
         """
-        if database_url is None and conn is None and not os.environ.get("DATABASE_URL"):
-            _maybe_load_database_env()
-
         self.database_url = database_url or os.environ.get("DATABASE_URL")
         self._provided_conn = conn
 
@@ -1472,6 +1449,57 @@ class DatabaseService:
                 )
                 return {row["hospital_id"]: row["cnt"] for row in cur.fetchall()}
 
+    def get_scrape_window_timestamps(
+        self, hospital_id: str, start: datetime, end: datetime
+    ) -> list[datetime]:
+        """Get distinct UTC hourly scrape windows for a hospital.
+
+        Data-quality logic measures scraper coverage by hourly collection windows,
+        not by raw measurement rows. A single scraper pass may emit multiple
+        measurement rows for different metric families.
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT DISTINCT DATE_TRUNC('hour', timestamp_utc AT TIME ZONE 'UTC')
+                        AS scrape_window_utc
+                    FROM measurements
+                    WHERE hospital_id = %s
+                      AND timestamp_utc >= %s
+                      AND timestamp_utc < %s
+                    ORDER BY scrape_window_utc
+                    """,
+                    (hospital_id, start, end),
+                )
+                return [
+                    row["scrape_window_utc"].replace(tzinfo=UTC)
+                    if row["scrape_window_utc"].tzinfo is None
+                    else row["scrape_window_utc"]
+                    for row in cur.fetchall()
+                ]
+
+    def get_scrape_window_count_by_hospital(
+        self, source_id: str, start: datetime, end: datetime
+    ) -> dict[str, int]:
+        """Get distinct UTC hourly scrape-window counts grouped by hospital."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT
+                        hospital_id,
+                        COUNT(DISTINCT DATE_TRUNC('hour', timestamp_utc AT TIME ZONE 'UTC')) AS cnt
+                    FROM measurements
+                    WHERE source_id = %s
+                      AND timestamp_utc >= %s
+                      AND timestamp_utc < %s
+                    GROUP BY hospital_id
+                    """,
+                    (source_id, start, end),
+                )
+                return {row["hospital_id"]: row["cnt"] for row in cur.fetchall()}
+
     def get_hospital_onboarding_dates(self, source_id: str) -> dict[str, datetime]:
         """Get the earliest measurement timestamp for each hospital in a source.
 
@@ -2027,8 +2055,10 @@ class DatabaseService:
                     last_run_duration_ms=row_dict.get("last_run_duration_ms"),
                 )
 
-    def get_stale_scrapers(self, threshold_minutes: int = 60) -> list[ScraperStatus]:
+    def get_stale_scrapers(self, threshold_minutes: int | None = None) -> list[ScraperStatus]:
         """Get scrapers that haven't run recently."""
+        if threshold_minutes is None:
+            threshold_minutes = get_heartbeat_stale_threshold_minutes()
         with self.get_connection() as conn:
             with self.get_cursor(conn) as cur:
                 cur.execute(

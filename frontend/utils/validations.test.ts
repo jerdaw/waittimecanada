@@ -9,6 +9,7 @@ import {
   BenchmarkQuerySchema,
   PatternsQuerySchema,
   ExportQuerySchema,
+  DataQualityQuerySchema,
 } from "./validations";
 
 describe("Validation Schemas", () => {
@@ -171,6 +172,47 @@ describe("Validation Schemas", () => {
         ExportQuerySchema.safeParse({ start_date: "2023-01-01T00:00:00Z" })
           .success,
       ).toBe(true);
+    });
+  });
+
+  describe("DataQualityQuerySchema", () => {
+    it("accepts hospital shorthand without view", () => {
+      const result = DataQualityQuerySchema.safeParse({
+        hospital_id: "ca-on-test",
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it("requires source_id for trend and diff views", () => {
+      expect(DataQualityQuerySchema.safeParse({ view: "trend" }).success).toBe(
+        false,
+      );
+      expect(DataQualityQuerySchema.safeParse({ view: "diff" }).success).toBe(
+        false,
+      );
+    });
+
+    it("requires hospital_id for hospital view", () => {
+      expect(
+        DataQualityQuerySchema.safeParse({ view: "hospital" }).success,
+      ).toBe(false);
+    });
+
+    it("rejects source_id without a source-based view", () => {
+      expect(
+        DataQualityQuerySchema.safeParse({ source_id: "ontario-health" })
+          .success,
+      ).toBe(false);
+    });
+
+    it("rejects hospital_id and source_id together", () => {
+      expect(
+        DataQualityQuerySchema.safeParse({
+          hospital_id: "ca-on-test",
+          source_id: "ontario-health",
+          view: "trend",
+        }).success,
+      ).toBe(false);
     });
   });
 });

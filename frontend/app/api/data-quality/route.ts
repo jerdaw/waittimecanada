@@ -17,6 +17,7 @@ import {
  * Query params:
  *   hospital_id (optional) - quality for a specific hospital
  *   days (optional, default 30) - lookback period
+ *   view=trend|diff requires source_id
  */
 
 import { DataQualityQuerySchema } from "@/utils/validations";
@@ -79,16 +80,16 @@ export async function GET(request: Request) {
       async () => {
         const sql = getDb();
 
-        if (view === "trend" && sourceId) {
-          return getSourceTrend(sql, sourceId, days);
+        if (view === "trend") {
+          return getSourceTrend(sql, sourceId!, days);
         }
 
-        if (view === "diff" && sourceId) {
-          return getSourceDiff(sql, sourceId, compareDays);
+        if (view === "diff") {
+          return getSourceDiff(sql, sourceId!, compareDays);
         }
 
-        if (hospitalId) {
-          return getHospitalQuality(sql, hospitalId, days);
+        if (view === "hospital" || hospitalId) {
+          return getHospitalQuality(sql, hospitalId!, days);
         }
 
         return getSystemQuality(sql);
@@ -218,15 +219,15 @@ async function getHospitalQuality(
   hospitalId: string,
   days: number,
 ) {
-  // Coverage timeline
+  // Coverage timeline uses distinct hourly scrape windows, not raw measurement rows.
   const timeline = await sql`
     SELECT
-      DATE(timestamp_utc) as date,
-      COUNT(*) as scrape_count
+      DATE(timestamp_utc AT TIME ZONE 'UTC') as date,
+      COUNT(DISTINCT DATE_TRUNC('hour', timestamp_utc AT TIME ZONE 'UTC')) as scrape_count
     FROM measurements
     WHERE hospital_id = ${hospitalId}
       AND timestamp_utc >= NOW() - ${days + " days"}::INTERVAL
-    GROUP BY DATE(timestamp_utc)
+    GROUP BY DATE(timestamp_utc AT TIME ZONE 'UTC')
     ORDER BY date
   `;
 
@@ -239,9 +240,9 @@ async function getHospitalQuality(
     ),
   }));
 
-  // Current quality (last 24h)
+  // Current quality uses distinct hourly scrape windows, not raw measurement rows.
   const recentCounts = await sql`
-    SELECT COUNT(*) as cnt
+    SELECT COUNT(DISTINCT DATE_TRUNC('hour', timestamp_utc AT TIME ZONE 'UTC')) as cnt
     FROM measurements
     WHERE hospital_id = ${hospitalId}
       AND timestamp_utc >= NOW() - INTERVAL '24 hours'

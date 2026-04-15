@@ -61,7 +61,7 @@ class TestHospitalOnboardingLogic:
         # Hospital A: Perfect data for 3 days (24 * 3 = 72)
         # Hospital B: Perfect data for 1 day (24 * 1 = 24)
         # Total Actual: 96
-        mock_db.get_measurement_count_by_hospital.return_value = {
+        mock_db.get_scrape_window_count_by_hospital.return_value = {
             "hosp-a": 72,
             "hosp-b": 24,
         }

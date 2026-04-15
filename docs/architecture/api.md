@@ -99,10 +99,16 @@ Operational KPI note:
 - these routes intentionally exclude dormant legacy `sources` rows from their
   public rollups so the reported coverage reflects the actually live platform
   rather than historical inventory
+- hospital-level `GET /api/data-quality` coverage counts are based on distinct
+  UTC hourly scrape windows rather than raw measurement rows, so multi-metric
+  scrapes do not overstate success
 - `GET /api/data-quality?view=trend` and `view=diff` now emit
   `historical_annotation` metadata when the returned snapshot window spans the
   legacy 15-minute expectation model and the current hourly model, so clients
   can disclose the mixed-cadence interpretation risk explicitly
+- invalid `GET /api/data-quality` parameter combinations now return `400`
+  validation errors instead of silently falling back to the aggregate system
+  view
 
 ## Health route contract (M30 operational visibility)
 

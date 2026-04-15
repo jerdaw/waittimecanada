@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 class DataQualityService:
     """Computes data quality metrics for hospitals and sources.
 
-    Live production scrapers currently run hourly, so we expect 24 measurements per
-    hospital per day. This service measures actual vs expected collection
-    rates and identifies gaps in data coverage.
+    Live production scrapers currently run hourly, so we expect 24 scrape
+    windows per hospital per day. This service measures actual vs expected
+    collection rates and identifies gaps in data coverage.
     """
 
     # Live GitHub Actions cadence is hourly = 24 expected scrapes per day
@@ -53,12 +53,12 @@ class DataQualityService:
         day_start = datetime(date.year, date.month, date.day, tzinfo=UTC)
         day_end = day_start + timedelta(days=1)
 
-        timestamps = self.db.get_measurement_timestamps(hospital_id, day_start, day_end)
+        timestamps = self.db.get_scrape_window_timestamps(hospital_id, day_start, day_end)
 
         actual_scrapes = len(timestamps)
         success_rate = actual_scrapes / self.EXPECTED_SCRAPES_PER_DAY
 
-        # Compute gaps between consecutive measurements
+        # Compute gaps between consecutive scrape windows
         gaps = self._compute_gaps(timestamps, day_start, day_end)
 
         longest_gap = max((g["duration_minutes"] for g in gaps), default=None)
@@ -92,7 +92,7 @@ class DataQualityService:
         hospitals = self.db.get_hospitals_by_source(source_id)
         total_hospitals = len(hospitals)
 
-        counts = self.db.get_measurement_count_by_hospital(source_id, start_date, end_date)
+        counts = self.db.get_scrape_window_count_by_hospital(source_id, start_date, end_date)
 
         days = max((end_date - start_date).days, 1)
         total_expected = total_hospitals * self.EXPECTED_SCRAPES_PER_DAY * days
@@ -104,7 +104,7 @@ class DataQualityService:
         current = start_date
         while current < end_date:
             next_day = current + timedelta(days=1)
-            day_counts = self.db.get_measurement_count_by_hospital(source_id, current, next_day)
+            day_counts = self.db.get_scrape_window_count_by_hospital(source_id, current, next_day)
             day_total = sum(day_counts.values())
             day_expected = total_hospitals * self.EXPECTED_SCRAPES_PER_DAY
             daily_rates.append(
@@ -259,7 +259,7 @@ class DataQualityService:
             day_start = datetime(day.year, day.month, day.day, tzinfo=UTC)
             day_end = day_start + timedelta(days=1)
 
-            timestamps = self.db.get_measurement_timestamps(hospital_id, day_start, day_end)
+            timestamps = self.db.get_scrape_window_timestamps(hospital_id, day_start, day_end)
             scrape_count = len(timestamps)
             success_rate = min(scrape_count / self.EXPECTED_SCRAPES_PER_DAY, 1.0)
 

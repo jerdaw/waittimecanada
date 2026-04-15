@@ -12,7 +12,7 @@
 
 1. Create a Neon project.
 2. Copy the project's pooled Postgres connection string.
-3. Use that value for `DATABASE_URL` in `backend/.env.local`.
+3. Export that value in your shell as `DATABASE_URL`.
 
 Wait Time Canada uses standard PostgreSQL migrations, so Neon is the default
 hosted path, but the schema remains portable to other Postgres environments.
@@ -20,11 +20,13 @@ hosted path, but the schema remains portable to other Postgres environments.
 ## 3. Initialize Local Environment
 
 ```bash
-cp backend/.env.example backend/.env.local
 cp frontend/.env.example frontend/.env.local
+export DATABASE_URL="postgresql://user:pass@host:5432/dbname"
 ```
 
-Populate required values in both files.
+Populate required frontend values in `frontend/.env.local`. The backend runtime
+expects `DATABASE_URL` in the process environment; `backend/.env.local` is
+optional as a human-managed local template only.
 
 ## 4. Install Backend + Frontend Dependencies
 

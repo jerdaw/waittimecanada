@@ -289,7 +289,7 @@ database, but the default documented path is Neon:
 
 1. create a Neon project
 2. copy the pooled `DATABASE_URL`
-3. place it in `backend/.env.local`
+3. export it into your shell before running backend commands
 4. run the repo migrations and analytics bootstrap commands below
 
 This keeps local setup lightweight while preserving a fully portable Postgres
@@ -301,14 +301,17 @@ schema and migration workflow.
 git clone https://github.com/yourusername/waittimecanada.git
 cd waittimecanada
 
-# Backend environment
-cp backend/.env.example backend/.env.local
-# Edit backend/.env.local with DATABASE_URL
-
 # Frontend environment
 cp frontend/.env.example frontend/.env.local
 # Edit frontend/.env.local with NEXT_PUBLIC_MAPBOX_TOKEN
+
+# Backend runtime config
+export DATABASE_URL="postgresql://user:pass@host:5432/dbname"
 ```
+
+`backend/.env.local` can still be kept as a human convenience template, but the
+backend runtime expects `DATABASE_URL` to already be present in the process
+environment.
 
 ### 2. Backend Setup
 

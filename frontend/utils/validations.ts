@@ -104,13 +104,58 @@ export const AnomaliesQuerySchema = z.object({
   days: z.coerce.number().int().positive().max(30).default(7),
 });
 
-export const DataQualityQuerySchema = z.object({
-  view: z.enum(["system", "hospital", "trend", "diff"]).optional(),
-  hospital_id: z.string().optional(),
-  source_id: z.string().optional(),
-  days: z.coerce.number().int().positive().max(90).default(30),
-  compare_days: z.coerce.number().int().positive().max(90).default(7),
-});
+export const DataQualityQuerySchema = z
+  .object({
+    view: z.enum(["system", "hospital", "trend", "diff"]).optional(),
+    hospital_id: z.string().optional(),
+    source_id: z.string().optional(),
+    days: z.coerce.number().int().positive().max(90).default(30),
+    compare_days: z.coerce.number().int().positive().max(90).default(7),
+  })
+  .superRefine((data, ctx) => {
+    const hasHospitalId = data.hospital_id !== undefined;
+    const hasSourceId = data.source_id !== undefined;
+
+    if (hasHospitalId && hasSourceId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "hospital_id and source_id cannot be provided together",
+        path: ["source_id"],
+      });
+    }
+
+    if (data.view === "hospital" && !hasHospitalId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "hospital_id is required when view=hospital",
+        path: ["hospital_id"],
+      });
+    }
+
+    if ((data.view === "trend" || data.view === "diff") && !hasSourceId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "source_id is required when view=trend or view=diff",
+        path: ["source_id"],
+      });
+    }
+
+    if (hasSourceId && data.view !== "trend" && data.view !== "diff") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "source_id is only valid when view=trend or view=diff",
+        path: ["source_id"],
+      });
+    }
+
+    if (data.view === "system" && (hasHospitalId || hasSourceId)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "view=system cannot be combined with hospital_id or source_id",
+        path: ["view"],
+      });
+    }
+  });
 
 export const ExportQuerySchema = z.object({
   province: ProvinceSchema.optional(),

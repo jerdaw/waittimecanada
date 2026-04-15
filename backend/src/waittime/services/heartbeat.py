@@ -5,12 +5,12 @@ Wraps the DatabaseService heartbeat methods with additional logic for stale dete
 """
 
 import logging
-import os
 from datetime import UTC, datetime
 from typing import Any
 
 from waittime.core import ScraperStatus
 from waittime.services.database import DatabaseService
+from waittime.services.runtime_config import get_heartbeat_stale_threshold_minutes
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ class HeartbeatService:
     """
 
     # Default threshold for considering a scraper stale (in minutes)
-    DEFAULT_STALE_THRESHOLD = int(os.environ.get("HEARTBEAT_STALE_THRESHOLD_MINUTES", "90"))
+    DEFAULT_STALE_THRESHOLD = get_heartbeat_stale_threshold_minutes()
 
     def __init__(self, db: DatabaseService) -> None:
         """Initialize with database service.

@@ -16,7 +16,7 @@ The default documented database path for this project is Neon PostgreSQL:
 
 1. create a Neon project
 2. copy the pooled Postgres connection string
-3. place it in `backend/.env.local` as `DATABASE_URL`
+3. export it in your shell as `DATABASE_URL` before backend commands
 
 The application and migrations use standard Postgres, so this remains portable,
 but Neon is the supported quick-start path.
@@ -27,11 +27,13 @@ but Neon is the supported quick-start path.
 git clone https://github.com/jerdaw/waittimecanada.git
 cd waittimecanada
 
-cp backend/.env.example backend/.env.local
 cp frontend/.env.example frontend/.env.local
+export DATABASE_URL="postgresql://user:pass@host:5432/dbname"
 ```
 
-Populate required values in both files.
+Populate required frontend values in `frontend/.env.local`. The backend runtime
+reads `DATABASE_URL` from the process environment directly; `backend/.env.local`
+is optional as a personal template only.
 
 ## 2. Python Environment and Backend Dependencies
 

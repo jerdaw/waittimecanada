@@ -28,7 +28,17 @@ Base URL:
 
 - `GET /api/health`
 - `GET /api/data-quality?hospital_id=<id>&days=30`
+- `GET /api/data-quality?view=trend&source_id=<source_id>&days=30`
+- `GET /api/data-quality?view=diff&source_id=<source_id>&compare_days=7`
 - `GET /api/anomalies?source_id=<source_id>&days=7`
+
+Invalid `GET /api/data-quality` query combinations now return `400` instead of
+silently falling back to the aggregate system view. In particular:
+
+- `view=trend` and `view=diff` require `source_id`
+- `view=hospital` requires `hospital_id`
+- `hospital_id` and `source_id` cannot be combined
+- bare `source_id` without `view=trend|diff` is rejected
 
 ## Analytics
 
@@ -132,6 +142,8 @@ Operational note:
 - these aggregate percentages now reflect the current hourly GitHub Actions
   scraper cadence (`24` expected runs/day), not the older 15-minute expectation
   model
+- hospital-level scrape counts and success rates are computed from distinct UTC
+  hourly scrape windows, not raw measurement-row counts
 - aggregate measurement counts are returned as actual counts, not reconstructed
   from percentage estimates
 - historical `view=trend` / `view=diff` responses now include
