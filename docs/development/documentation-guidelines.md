@@ -48,6 +48,8 @@ bash scripts/check-docs.sh
 
 This check enforces high-signal documentation hygiene rules used by CI.
 
+The docs platform remains on MkDocs 1.x in the current wave. Do not swap this repo to Zensical or replace the `mkdocs gh-deploy` publishing path until the shared Wave 3 migration gate is explicitly opened in `docs/planning/roadmap.md`.
+
 ## Attribution Policy
 
 Only human contributors may be listed as authors/co-authors in documentation and commits.
