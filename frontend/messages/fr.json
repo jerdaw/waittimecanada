@@ -66,7 +66,7 @@
     },
     "provinces": {
       "title": "Données de sources officielles",
-      "on": "Santé Ontario",
+      "on": "Health Quality Ontario",
       "qc": "MSSS Québec",
       "ab": "Alberta Health Services",
       "bc": "BC PHSA"
@@ -170,31 +170,30 @@
   "ResourcesPage": {
     "eyebrow": "Module Ontario d'abord",
     "title": "Ressources de santé publique",
-    "description": "Un hub de ressources publiques axé d'abord sur les établissements, construit à partir de jeux de données publics approuvés. Cette couche fournit des données de référence avec provenance et fraîcheur, et non un état opérationnel en direct.",
+    "description": "Un hub de ressources publiques ontarien construit à partir de jeux de données publics approuvés. Les établissements, les DEA de secours et l'orientation naloxone sont actuellement des couches de référence ontariennes avec provenance et fraîcheur visibles, et non un état opérationnel en direct.",
     "common": {
       "unknown": "inconnu"
     },
     "filters": {
-      "province": "Province",
       "search": "Recherche",
-      "searchPlaceholder": "Rechercher hôpitaux, cliniques ou services",
+      "searchPlaceholder": "Rechercher des hôpitaux, cliniques ou services en Ontario",
       "useLocation": "Utiliser ma position",
       "locationUnsupported": "L'accès à la position n'est pas disponible dans ce navigateur.",
-      "locationDenied": "L'accès à la position a été refusé. Vous pouvez tout de même parcourir par province.",
+      "locationDenied": "L'accès à la position a été refusé. Vous pouvez tout de même rechercher des établissements ontariens par nom.",
       "locationError": "Nous n'avons pas pu déterminer votre position pour le moment."
     },
     "sections": {
       "resources": {
         "title": "Ressources",
         "nearbyTitle": "Ressources à proximité",
-        "description": "Données de répertoire de référence provenant de sources publiques approuvées, avec priorité aux établissements ontariens. Recherchez un établissement ou partagez votre position pour charger les résultats.",
-        "nearbyDescription": "Données de répertoire de référence provenant de sources publiques approuvées, filtrées et triées selon la distance depuis votre position.",
-        "gated": "Recherchez un établissement ou partagez votre position pour charger les résultats du répertoire de référence.",
+        "description": "Données de répertoire d'établissements ontariens provenant de sources publiques approuvées. Recherchez un établissement ou partagez votre position pour charger les résultats de référence ontariens.",
+        "nearbyDescription": "Données de répertoire d'établissements ontariens provenant de sources publiques approuvées, filtrées et triées selon la distance depuis votre position.",
+        "gated": "Recherchez un établissement ontarien ou partagez votre position pour charger les résultats du répertoire de référence.",
         "empty": "Aucun établissement ne correspond à vos filtres actuels."
       },
       "transparency": {
         "title": "Transparence des sources",
-        "description": "Chaque source affichée ici conserve la provenance et les métadonnées de mise à jour visibles.",
+        "description": "Chaque source affichée ici conserve la provenance, les métadonnées de mise à jour et la portée Ontario visible.",
         "empty": "Aucune métadonnée de source disponible pour le moment.",
         "updated": "Dernière mise à jour : {timestamp}",
         "freshness": {
@@ -205,11 +204,11 @@
         "sourceLink": "Voir la source officielle"
       },
       "aed": {
-        "title": "Emplacements de DEA",
-        "nearbyTitle": "Emplacements de DEA à proximité",
-        "description": "Les enregistrements DEA collaboratifs sont affichés avec des libellés explicites de provenance, d'incomplétude et de fraîcheur. Partagez votre position pour trier par distance.",
-        "nearbyDescription": "Enregistrements DEA collaboratifs près de votre position, avec des libellés explicites de provenance, d'incomplétude et de fraîcheur.",
-        "empty": "Aucun enregistrement DEA ne correspond à vos filtres actuels."
+        "title": "Emplacements de DEA en Ontario",
+        "nearbyTitle": "Emplacements de DEA en Ontario à proximité",
+        "description": "Les enregistrements DEA de secours pour l'Ontario sont affichés avec des libellés explicites de provenance, d'incomplétude et de fraîcheur. Partagez votre position pour trier par distance.",
+        "nearbyDescription": "Enregistrements DEA de secours pour l'Ontario près de votre position, avec des libellés explicites de provenance, d'incomplétude et de fraîcheur.",
+        "empty": "Aucun enregistrement DEA ontarien ne correspond à vos filtres actuels."
       },
       "alerts": {
         "title": "Alertes de sécurité",
@@ -426,7 +425,7 @@
       "q2": "Pourquoi ne puis-je pas comparer directement les temps d'attente de l'Ontario et du Québec ?",
       "a2": "L'Ontario rapporte les temps moyens du triage au médecin, tandis que le Québec rapporte la moyenne mobile de l'inscription au médecin. Ces méthodologies différentes rendent la comparaison directe statistiquement invalide.",
       "q3": "À quel point ces données sont-elles à jour ?",
-      "a3": "Nous collectons les données des sources provinciales officielles selon un horaire automatisé. Dans le mode actuel de contrôle des coûts, la cadence interprovinciale est de 4 heures; chaque province peut toutefois publier ses propres mises à jour à un rythme différent."
+      "a3": "Nous collectons les données des sources provinciales officielles selon un horaire automatisé. La cadence interprovinciale actuelle est horaire sur GitHub Actions, tandis que chaque province peut publier ses propres mises à jour à un rythme différent."
     },
     "medicalPage": {
       "desc": "Temps d'attente aux urgences publiés et audit méthodologique pour les hôpitaux canadiens."
@@ -454,7 +453,7 @@
   "StatusPage": {
     "backToMap": "Back to live map",
     "title": "System Status",
-    "subtitle": "Santé opérationnelle de tous les scrapers provinciaux. Le taux de disponibilité compare les collectes réelles aux collectes attendues selon la cadence actuelle de 4 heures.",
+    "subtitle": "Santé opérationnelle de tous les scrapers provinciaux. Le taux de disponibilité compare les collectes réelles aux collectes attendues selon la cadence horaire actuelle.",
     "overallHealth": "Overall Health",
     "systemUptime24h": "System Uptime (24h)",
     "activeProvinces": "Active Provinces",
@@ -466,7 +465,7 @@
     "dataFreshness": "Data freshness:",
     "statusGeneratedAt": "Status generated at {time}.",
     "uptimeCalc": "Uptime calculation:",
-    "uptimeCalcDesc": "Les scrapers s'exécutent actuellement toutes les 4 heures (6 collectes attendues par hôpital et par jour). Disponibilité = réel / attendu, plafonné à 100 %.",
+    "uptimeCalcDesc": "Les scrapers s'exécutent actuellement chaque heure (24 collectes attendues par hôpital et par jour). Disponibilité = réel / attendu, plafonné à 100 %.",
     "detailedQuality": "For detailed data quality metrics, visit the",
     "dataQualityDashboard": "Data Quality dashboard",
     "uptime": {
@@ -494,7 +493,7 @@
     "items": {
       "q1": {
         "question": "Are these wait times official?",
-        "answer": "We collect data directly from official provincial health sources (e.g., Ontario Health, Health Quebec). However, we are an independent observatory, not a government agency. Always rely on professional medical advice. If you have a medical emergency, call 911 immediately."
+        "answer": "We collect data directly from official provincial health sources (e.g., Health Quality Ontario, Québec MSSS). However, we are an independent observatory, not a government agency. Always rely on professional medical advice. If you have a medical emergency, call 911 immediately."
       },
       "q2": {
         "question": "Why do wait times change so quickly?",
@@ -514,11 +513,11 @@
       },
       "q6": {
         "question": "Can I compare hospitals across provinces?",
-        "answer": "Only if they use the same measurement methodology. Ontario reports P90 (90th percentile) triage-to-physician time, while Quebec reports rolling average registration-to-provider time. Our platform flags when direct comparison is statistically invalid and shows a methodology divergence warning."
+        "answer": "Seulement si elles utilisent la même méthodologie de mesure. L'Ontario rapporte le temps moyen triage-médecin, tandis que le Québec rapporte la moyenne mobile inscription-fournisseur. Notre plateforme signale quand une comparaison directe est statistiquement invalide et affiche un avertissement de divergence méthodologique."
       },
       "q7": {
         "question": "What do the methodology badges on hospital cards mean?",
-        "answer": "Each hospital card shows how that province measures wait times — including the metric family (e.g., Time to Provider), start/end events (e.g., Triage to Physician), and statistic type (e.g., P90). These tags help you understand exactly what each number represents."
+        "answer": "Chaque fiche d'hôpital montre comment cette province mesure les temps d'attente, y compris la famille de métriques (p. ex. Temps jusqu'au fournisseur), les événements de début et de fin (p. ex. Triage à Médecin) et le type de statistique (p. ex. Moyenne). Ces étiquettes vous aident à comprendre exactement ce que représente chaque valeur."
       },
       "q8": {
         "question": "How do you ensure data quality?",
@@ -561,7 +560,7 @@
     "aboutMetrics": "About Data Quality Metrics",
     "metrics": {
       "successRate": "Success Rate:",
-      "successRateDesc": "Les scrapers s'exécutent actuellement toutes les 4 heures (6 collectes attendues par hôpital et par jour). Le taux de succès mesure les collectes réelles par rapport aux collectes attendues.",
+      "successRateDesc": "Les scrapers s'exécutent actuellement chaque heure (24 collectes attendues par hôpital et par jour). Le taux de succès mesure les collectes réelles par rapport aux collectes attendues.",
       "anomalyDetection": "Anomaly Detection:",
       "anomalyDetectionDesc": "Uses z-score (3 standard deviations) and IQR methods against a 7-day rolling baseline. Requires 20+ historical data points before flagging.",
       "whyTransparency": "Why Transparency Matters:",
@@ -767,11 +766,11 @@
         },
         "q4": {
           "question": "À quelle fréquence ces données sont-elles mises à jour ?",
-          "answer": "La fréquence de mise à jour varie selon la province et les organismes sources ne publient pas tous au même rythme. Dans le mode actuel de contrôle des coûts, notre workflow interprovincial s'exécute toutes les 4 heures via GitHub Actions, même si certaines sources provinciales peuvent se rafraîchir plus souvent en amont."
+          "answer": "La fréquence de mise à jour varie selon la province et les organismes sources ne publient pas tous au même rythme. Notre workflow interprovincial s'exécute maintenant chaque heure via GitHub Actions, même si certaines sources provinciales peuvent se rafraîchir plus souvent en amont."
         },
         "q5": {
           "question": "D'où viennent ces données ?",
-          "answer": "Nous agrégeons les données des sources provinciales officielles : ER Watch pour l'Ontario, Index Santé pour le Québec, et les portails officiels des autorités sanitaires pour les autres provinces. Toutes les sources sont documentées dans nos pages méthodologiques avec des liens vers les sources originales."
+          "answer": "Nous agrégeons les données des sources provinciales officielles : Health Quality Ontario pour l'Ontario, Index Santé pour le Québec, et les portails officiels des autorités sanitaires pour les autres provinces. Toutes les sources sont documentées dans nos pages méthodologiques avec des liens vers les sources originales."
         },
         "q6": {
           "question": "Et si j'ai besoin d'aide médicale maintenant ?",
@@ -893,7 +892,7 @@
       },
       "summary": {
         "title": "Pourquoi C'est Important",
-        "description": "Une attente de 60 minutes en Ontario (P90, Triage→Médecin) est fondamentalement différente d'une attente de 60 minutes au Québec (Moyenne Mobile, Inscription→Fournisseur). Notre plateforme détecte automatiquement ces différences et vous avertit lorsque vous comparez des mesures incompatibles."
+        "description": "Une attente de 60 minutes en Ontario (Moyenne, Triage→Médecin) est fondamentalement différente d'une attente de 60 minutes au Québec (Moyenne Mobile, Inscription→Fournisseur). Notre plateforme détecte automatiquement ces différences et vous avertit lorsque vous comparez des mesures incompatibles."
       }
     }
   }

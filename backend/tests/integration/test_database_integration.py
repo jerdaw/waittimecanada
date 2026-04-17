@@ -51,6 +51,28 @@ class TestDatabaseServiceIntegration:
         assert fetched.id == "test-source-1"
         assert fetched.province == "ON"
 
+        updated = db.upsert_source(
+            source.model_copy(
+                update={
+                    "name": "Updated Source",
+                    "url": "https://updated.example.com",
+                    "methodology_url": "https://updated.example.com/methods",
+                    "telehealth_name": "Updated Telehealth",
+                    "default_statistic_type": StatisticType.MEAN,
+                }
+            )
+        )
+        assert updated.name == "Updated Source"
+        assert updated.url == "https://updated.example.com"
+        assert updated.methodology_url == "https://updated.example.com/methods"
+        assert updated.telehealth_name == "Updated Telehealth"
+        assert updated.default_statistic_type == StatisticType.MEAN
+
+        refetched = db.get_source("test-source-1")
+        assert refetched is not None
+        assert refetched.name == "Updated Source"
+        assert refetched.default_statistic_type == StatisticType.MEAN
+
         # Verify in all sources list
         all_sources = db.list_sources()
         test_sources = [s for s in all_sources if s.id.startswith("test-")]

@@ -66,9 +66,9 @@ def test_pipeline_flow(db_service: DatabaseService) -> None:
         metric_family=MetricFamily.TIME_TO_PROVIDER,
         start_event=StartEvent.TRIAGE,
         end_event=EndEvent.PHYSICIAN,
-        statistic_type=StatisticType.P90,
+        statistic_type=StatisticType.MEAN,
         patient_scope=PatientScope.ALL,
-        source_id="on-health",
+        source_id="ontario-health",
         raw_payload_hash=payload_hash,
         raw_payload_snippet=payload_str,
         parser_version="e2e-v1",
@@ -87,7 +87,7 @@ def test_pipeline_flow(db_service: DatabaseService) -> None:
                 cur.execute(
                     """
                         INSERT INTO sources (id, name, province, url, telehealth_name, default_metric_family, default_start_event, default_end_event, default_statistic_type)
-                        VALUES ('on-health', 'Ontario Health', 'ON', 'http://example.com', 'Telehealth', 'TIME_TO_PROVIDER', 'TRIAGE', 'PHYSICIAN', 'P90')
+                        VALUES ('ontario-health', 'Health Quality Ontario', 'ON', 'http://example.com', 'Telehealth', 'TIME_TO_PROVIDER', 'TRIAGE', 'PHYSICIAN', 'MEAN')
                         ON CONFLICT (id) DO NOTHING
                     """
                 )
@@ -95,7 +95,7 @@ def test_pipeline_flow(db_service: DatabaseService) -> None:
                 cur.execute(
                     """
                         INSERT INTO hospitals (id, name, province, city, latitude, longitude, is_visible, source_id, is_verified)
-                        VALUES (%s, %s, 'ON', 'Ottawa', 45.0, -75.0, true, 'on-health', true)
+                        VALUES (%s, %s, 'ON', 'Ottawa', 45.0, -75.0, true, 'ontario-health', true)
                         ON CONFLICT (id) DO NOTHING
                     """,
                     (test_hospital_id, "E2E Test Hospital"),

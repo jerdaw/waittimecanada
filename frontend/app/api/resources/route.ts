@@ -37,7 +37,16 @@ type ResourceRow = {
   completeness_status: "incomplete" | null;
 };
 
+type ResourcesScopeMetadata = {
+  mode: "ontario_only";
+  available_provinces: ["ON"];
+  requested_province: string | null;
+  note: string;
+};
+
 const RESOURCES_CACHE_TTL_MS = 300_000;
+const RESOURCES_SCOPE_NOTE =
+  "Facility directories, AED fallback data, and naloxone guidance are currently shipped for Ontario only.";
 const EMERGENCY_FACILITY_KEYWORDS = [
   "emergency",
   "urgent care",
@@ -116,6 +125,13 @@ export async function GET(request: NextRequest) {
     const { kind, q, province, latitude, longitude, radius, limit } =
       validation.data;
 
+    const scope: ResourcesScopeMetadata = {
+      mode: "ontario_only",
+      available_provinces: ["ON"],
+      requested_province: province ?? null,
+      note: RESOURCES_SCOPE_NOTE,
+    };
+
     const payload = await getOrSetServerCache(
       buildServerCacheKey("api:resources", {
         kind,
@@ -128,6 +144,27 @@ export async function GET(request: NextRequest) {
       }),
       RESOURCES_CACHE_TTL_MS,
       async () => {
+        if (province && province !== "ON") {
+          return {
+            success: true as const,
+            count: 0,
+            data: [],
+            meta: {
+              kind,
+              query: {
+                q,
+                province,
+                latitude,
+                longitude,
+                radius,
+                limit,
+              },
+              scope,
+              source_status: [],
+            },
+          };
+        }
+
         const sql = getDb();
         const domain = kind === "facility" ? "provider_facility" : "aed";
 
@@ -271,6 +308,7 @@ export async function GET(request: NextRequest) {
               radius,
               limit,
             },
+            scope,
             source_status: buildSourceStatusRecords(sourceStatusRows),
           },
         };

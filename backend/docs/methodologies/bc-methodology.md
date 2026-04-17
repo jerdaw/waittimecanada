@@ -186,8 +186,8 @@ Based on the Wait Time Canada ontology system:
 
 ### Critical Comparability Note
 
-**BC's wait time metric is COMPARABLE to:**
-- Ontario's "Time to Physician Assessment" (both P90, Triage → MD)
+**BC's wait time metric is CLOSEST to:**
+- Ontario's "Time to Physician Assessment" on event boundaries only (`TRIAGE -> PHYSICIAN`)
 - Any province using TRIAGE → PHYSICIAN with P90
 
 **BC's wait time metric is NOT COMPARABLE to:**
@@ -434,9 +434,9 @@ with sync_playwright() as p:
 | Province | Wait Metric Start | Wait Metric End | Statistic | Comparable to BC? |
 |----------|-------------------|-----------------|-----------|-------------------|
 | BC       | TRIAGE            | PHYSICIAN       | P90       | ✅ (reference)    |
-| Ontario  | TRIAGE            | PHYSICIAN       | P90       | ✅ **YES**        |
+| Ontario  | TRIAGE            | PHYSICIAN       | MEAN      | ⚠️ **PARTIAL**    |
 | Quebec   | REGISTRATION      | PHYSICIAN       | Mean      | ❌ **NO**         |
-| Alberta  | TBD               | TBD             | TBD       | ❓ Unknown        |
+| Alberta  | TRIAGE            | PHYSICIAN       | POINT_ESTIMATE | ⚠️ **PARTIAL** |
 
 ### Divergence Brief Example
 

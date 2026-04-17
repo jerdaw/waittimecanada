@@ -62,7 +62,7 @@ describe("DataQualityPage", () => {
               sources: [
                 {
                   source_id: "ontario-health",
-                  source_name: "Ontario Health",
+                  source_name: "Health Quality Ontario",
                   province: "ON",
                   last_24h_success_rate: 1,
                   last_7d_success_rate: 0.95,
@@ -132,6 +132,6 @@ describe("DataQualityPage", () => {
     expect(
       screen.getByText(/Snapshots before 2026-03-28 were scored/),
     ).toBeInTheDocument();
-    expect(screen.getByText("Ontario Health")).toBeInTheDocument();
+    expect(screen.getByText("Health Quality Ontario")).toBeInTheDocument();
   });
 });

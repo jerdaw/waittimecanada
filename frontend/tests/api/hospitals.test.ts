@@ -23,7 +23,7 @@ vi.mock("@/utils/db", () => ({
               longitude: -79.3832,
               is_visible: true,
               current_wait_time: 45,
-              source_id: "on-health",
+              source_id: "ontario-health",
               is_verified: true,
             },
           ]),

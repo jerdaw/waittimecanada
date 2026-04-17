@@ -20,6 +20,12 @@ interface ResourcesResponse {
   count: number;
   data: ResourceRecord[];
   meta: {
+    scope?: {
+      mode: "ontario_only";
+      available_provinces: ["ON"];
+      requested_province: string | null;
+      note: string;
+    };
     source_status: SourceStatusRecord[];
   };
 }
@@ -54,7 +60,6 @@ function formatTimestamp(value: string | null | undefined) {
 
 export default function ResourcesPage() {
   const t = useTranslations("ResourcesPage");
-  const [province, setProvince] = useState("ON");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [resources, setResources] = useState<ResourceRecord[]>([]);
@@ -82,6 +87,7 @@ export default function ResourcesPage() {
   const [aqhiSourceStatus, setAQHISourceStatus] = useState<
     SourceStatusRecord[]
   >([]);
+  const province = "ON";
   const facilityDiscoveryReady = Boolean(
     userLocation || debouncedSearchQuery.trim(),
   );
@@ -152,7 +158,7 @@ export default function ResourcesPage() {
     return () => {
       mounted = false;
     };
-  }, [debouncedSearchQuery, facilityDiscoveryReady, province, userLocation]);
+  }, [debouncedSearchQuery, facilityDiscoveryReady, userLocation]);
 
   useEffect(() => {
     let mounted = true;
@@ -203,7 +209,7 @@ export default function ResourcesPage() {
     return () => {
       mounted = false;
     };
-  }, [debouncedSearchQuery, province, userLocation]);
+  }, [debouncedSearchQuery, userLocation]);
 
   useEffect(() => {
     let mounted = true;
@@ -367,23 +373,7 @@ export default function ResourcesPage() {
             </p>
           </div>
 
-          <div className="mt-6 grid gap-3 lg:grid-cols-[180px_minmax(0,1fr)_auto]">
-            <label className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-foreground">
-                {t("filters.province")}
-              </span>
-              <select
-                value={province}
-                onChange={(event) => setProvince(event.target.value)}
-                className="rounded-xl border border-border bg-background px-3 py-2 text-sm"
-              >
-                <option value="ON">Ontario</option>
-                <option value="QC">Quebec</option>
-                <option value="AB">Alberta</option>
-                <option value="BC">British Columbia</option>
-              </select>
-            </label>
-
+          <div className="mt-6 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
             <label className="flex flex-col gap-2">
               <span className="text-sm font-medium text-foreground">
                 {t("filters.search")}

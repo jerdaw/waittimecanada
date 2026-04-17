@@ -4,7 +4,11 @@ import { QualityDriftPanel } from "@/components/QualityDriftPanel";
 
 describe("QualityDriftPanel", () => {
   const mockSources = [
-    { source_id: "on-health", source_name: "Ontario Health", province: "ON" },
+    {
+      source_id: "ontario-health",
+      source_name: "Health Quality Ontario",
+      province: "ON",
+    },
   ];
 
   beforeEach(() => {

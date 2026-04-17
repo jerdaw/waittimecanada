@@ -76,6 +76,11 @@ def generate_test_data(
     Returns:
         Number of measurements generated
     """
+    source = db.get_source(source_id)
+    if source is None:
+        logger.error(f"Source not found: {source_id}")
+        return 0
+
     # Get all hospitals for this source
     hospitals = db.get_hospitals_by_source(source_id)
 
@@ -90,13 +95,19 @@ def generate_test_data(
     for hospital in hospitals:
         for _ in range(count):
             measurement = generate_measurement_for_hospital(hospital.id, source_id)
+            measurement.metric_family = source.default_metric_family
+            measurement.start_event = source.default_start_event
+            measurement.end_event = source.default_end_event
+            measurement.statistic_type = source.default_statistic_type
 
             if dry_run:
                 logger.info(f"[DRY RUN] Would insert: {hospital.id} - {measurement.value:.0f} min")
             else:
                 db.insert_measurement(measurement)
                 logger.info(
-                    f"✓ {hospital.name}: {measurement.value:.0f} min (P90 triage→physician)"
+                    f"✓ {hospital.name}: {measurement.value:.0f} min "
+                    f"({measurement.statistic_type.value} "
+                    f"{measurement.start_event.value.lower()}→{measurement.end_event.value.lower()})"
                 )
 
             total_generated += 1

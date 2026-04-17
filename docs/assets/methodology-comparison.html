@@ -80,7 +80,7 @@
         <h1>🏥 Provincial Emergency Department Wait Time Methodology Comparison</h1>
         <div class="metadata">
             <strong>Wait Time Canada</strong> - Health Systems Observatory<br>
-            Generated: 2026-02-13 10:06:15 UTC<br>
+            Generated: 2026-04-16 14:15:55 UTC<br>
             Provinces: Ontario, Alberta, British Columbia, Quebec<br>
             Source: <a href="https://github.com/jerdaw/waittimecanada">github.com/jerdaw/waittimecanada</a>
         </div>
@@ -109,9 +109,9 @@
                     <td><code>ontario-health</code></td>
                     <td><span class="ontology-field">TRIAGE</span></td>
                     <td><span class="ontology-field">PHYSICIAN</span></td>
-                    <td><span class="ontology-field">POINT_ESTIMATE</span></td>
-                    <td>~15 min</td>
-                    <td>Real-time instantaneous wait times</td>
+                    <td><span class="ontology-field">MEAN</span></td>
+                    <td>Quarterly</td>
+                    <td>Historical mean TRIAGE → PHYSICIAN wait times from Ontario's official performance reporting.</td>
                 </tr>
                 <tr>
                     <td><span class="province-code">AB</span> Alberta</td>
@@ -120,7 +120,7 @@
                     <td><span class="ontology-field">PHYSICIAN</span></td>
                     <td><span class="ontology-field">POINT_ESTIMATE</span></td>
                     <td>~2 min</td>
-                    <td>Real-time instantaneous wait times, fastest update frequency</td>
+                    <td>Real-time point estimate with the fastest public refresh cadence in the active set.</td>
                 </tr>
                 <tr>
                     <td><span class="province-code">BC</span> British Columbia</td>
@@ -129,7 +129,7 @@
                     <td><span class="ontology-field">PHYSICIAN</span></td>
                     <td><span class="ontology-field">P90</span></td>
                     <td>~5 min</td>
-                    <td>90th percentile statistic, not directly comparable to real-time estimates</td>
+                    <td>P90 TRIAGE → PHYSICIAN reporting; more conservative than mean or point-estimate displays.</td>
                 </tr>
                 <tr>
                     <td><span class="province-code">QC</span> Quebec</td>
@@ -138,7 +138,7 @@
                     <td><span class="ontology-field">PHYSICIAN</span></td>
                     <td><span class="ontology-field">ROLLING_AVG</span></td>
                     <td>Periodic</td>
-                    <td>Uses REGISTRATION (not TRIAGE) start event; rolling average statistic; incomparable to all other provinces on two ontology dimensions</td>
+                    <td>Uses REGISTRATION (not TRIAGE) start event plus a rolling average statistic.</td>
                 </tr>
             </tbody>
         </table>
@@ -163,7 +163,7 @@
             <tr>
                 <td><span class="ontology-field">STATISTIC_TYPE</span></td>
                 <td>How the value is calculated</td>
-                <td>POINT_ESTIMATE = current/instantaneous; P90 = 90th percentile; ROLLING_AVG = moving average</td>
+                <td>MEAN = arithmetic average; POINT_ESTIMATE = current/instantaneous; P90 = 90th percentile; ROLLING_AVG = moving average</td>
             </tr>
         </table>
 

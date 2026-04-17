@@ -132,28 +132,28 @@ class TestComparability:
 
     @pytest.fixture
     def quebec_measurement(self) -> Measurement:
-        """Quebec uses Registration-to-Physician with MEAN."""
+        """Quebec uses Registration-to-Physician with ROLLING_AVG."""
         return Measurement(
             hospital_id="ca-qc-chum",
             value=120.0,
             metric_family=MetricFamily.TIME_TO_PROVIDER,
             start_event=StartEvent.REGISTRATION,
             end_event=EndEvent.PHYSICIAN,
-            statistic_type=StatisticType.MEAN,
+            statistic_type=StatisticType.ROLLING_AVG,
             source_id="quebec-msss",
             raw_payload_hash="a" * 64,
         )
 
     @pytest.fixture
     def alberta_measurement(self) -> Measurement:
-        """Alberta uses Triage-to-Physician with P90."""
+        """Alberta uses Triage-to-Physician with POINT_ESTIMATE."""
         return Measurement(
             hospital_id="ca-ab-foothills",
             value=90.0,
             metric_family=MetricFamily.TIME_TO_PROVIDER,
             start_event=StartEvent.TRIAGE,
             end_event=EndEvent.PHYSICIAN,
-            statistic_type=StatisticType.P90,
+            statistic_type=StatisticType.POINT_ESTIMATE,
             source_id="alberta-ahs",
             raw_payload_hash="b" * 64,
         )
@@ -167,7 +167,7 @@ class TestComparability:
             metric_family=MetricFamily.TIME_TO_PROVIDER,
             start_event=StartEvent.REGISTRATION,
             end_event=EndEvent.PHYSICIAN,
-            statistic_type=StatisticType.MEAN,
+            statistic_type=StatisticType.ROLLING_AVG,
             source_id="quebec-msss",
             raw_payload_hash="c" * 64,
         )
@@ -201,5 +201,5 @@ class TestComparability:
         assert "Methodology Divergence" in brief
         assert "REGISTRATION" in brief
         assert "TRIAGE" in brief
-        assert "MEAN" in brief
-        assert "P90" in brief
+        assert "ROLLING_AVG" in brief
+        assert "POINT_ESTIMATE" in brief

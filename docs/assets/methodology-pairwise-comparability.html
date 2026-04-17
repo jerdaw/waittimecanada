@@ -90,16 +90,15 @@
         <h1>🔍 Pairwise Province Comparability Matrix</h1>
         <div class="metadata">
             <strong>Wait Time Canada</strong> - Health Systems Observatory<br>
-            Generated: 2026-02-13 10:06:15 UTC<br>
+            Generated: 2026-04-16 14:15:55 UTC<br>
             Comparisons: 6 pairwise combinations (4 provinces)<br>
             Source: <a href="https://github.com/jerdaw/waittimecanada">github.com/jerdaw/waittimecanada</a>
         </div>
 
         <div class="key-finding">
-            <strong>🔬 Key Finding:</strong> No province pair is fully comparable. Ontario and Alberta share
-            the closest methodology (both TRIAGE → PHYSICIAN, POINT_ESTIMATE), but even these represent
-            instantaneous snapshots that may vary by measurement timing. <strong>Quebec is the most
-            methodologically distinct province.</strong>
+            <strong>🔬 Key Finding:</strong> No province pair is fully comparable. Ontario and Alberta
+            share TRIAGE → PHYSICIAN event boundaries, but they still diverge on statistic type
+            (MEAN vs POINT_ESTIMATE). <strong>Quebec remains the most methodologically distinct province.</strong>
         </div>
 
         <table>
@@ -117,43 +116,43 @@
                     <td><strong>Ontario</strong></td>
                     <td><strong>Alberta</strong></td>
                     <td><span class="comparable-partial">Partial</span></td>
-                    <td>statistic_type matches (both POINT_ESTIMATE)</td>
-                    <td>Same ontology when using real-time Ontario data. Most comparable pair.</td>
+                    <td>statistic_type (MEAN vs POINT_ESTIMATE)</td>
+                    <td>Same metric and event boundaries, but different statistics still block direct comparison (MEAN vs POINT_ESTIMATE).</td>
                 </tr>
                 <tr>
                     <td><strong>Ontario</strong></td>
-                    <td><strong>BC</strong></td>
-                    <td><span class="comparable-no">No</span></td>
-                    <td>statistic_type (POINT_ESTIMATE vs P90)</td>
-                    <td>Same start/end events but different statistics. P90 systematically higher.</td>
+                    <td><strong>British Columbia</strong></td>
+                    <td><span class="comparable-partial">Partial</span></td>
+                    <td>statistic_type (MEAN vs P90)</td>
+                    <td>Same metric and event boundaries, but different statistics still block direct comparison (MEAN vs P90).</td>
                 </tr>
                 <tr>
                     <td><strong>Ontario</strong></td>
                     <td><strong>Quebec</strong></td>
-                    <td><span class="comparable-no">No</span></td>
+                    <td><span class="comparable-partial">Partial</span></td>
                     <td>start_event + statistic_type</td>
-                    <td>Two dimensions differ. Quebec times systematically higher due to REGISTRATION start.</td>
+                    <td>Clock start and statistic type both differ, making this one of the least aligned province pairs.</td>
                 </tr>
                 <tr>
                     <td><strong>Alberta</strong></td>
-                    <td><strong>BC</strong></td>
-                    <td><span class="comparable-no">No</span></td>
+                    <td><strong>British Columbia</strong></td>
+                    <td><span class="comparable-partial">Partial</span></td>
                     <td>statistic_type (POINT_ESTIMATE vs P90)</td>
-                    <td>Same start/end events but different statistics. P90 systematically higher.</td>
+                    <td>Same metric and event boundaries, but different statistics still block direct comparison (POINT_ESTIMATE vs P90).</td>
                 </tr>
                 <tr>
                     <td><strong>Alberta</strong></td>
                     <td><strong>Quebec</strong></td>
-                    <td><span class="comparable-no">No</span></td>
+                    <td><span class="comparable-partial">Partial</span></td>
                     <td>start_event + statistic_type</td>
-                    <td>Two dimensions differ. Quebec most distinct methodology.</td>
+                    <td>Clock start and statistic type both differ, making this one of the least aligned province pairs.</td>
                 </tr>
                 <tr>
-                    <td><strong>BC</strong></td>
+                    <td><strong>British Columbia</strong></td>
                     <td><strong>Quebec</strong></td>
-                    <td><span class="comparable-no">No</span></td>
+                    <td><span class="comparable-partial">Partial</span></td>
                     <td>start_event + statistic_type</td>
-                    <td>Two dimensions differ. Quebec most distinct methodology.</td>
+                    <td>Clock start and statistic type both differ, making this one of the least aligned province pairs.</td>
                 </tr>
             </tbody>
         </table>

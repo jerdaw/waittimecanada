@@ -96,7 +96,10 @@ class TestDatabaseService:
         # Verify
         assert result.id == "test_source"
         mock_cursor.execute.assert_called_once()
-        assert "INSERT INTO sources" in mock_cursor.execute.call_args[0][0]
+        executed_sql = mock_cursor.execute.call_args[0][0]
+        assert "INSERT INTO sources" in executed_sql
+        assert "methodology_url = EXCLUDED.methodology_url" in executed_sql
+        assert "default_statistic_type = EXCLUDED.default_statistic_type" in executed_sql
 
     @patch("psycopg2.connect")
     def test_upsert_hospital(self, mock_connect, db_service):

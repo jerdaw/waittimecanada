@@ -257,9 +257,9 @@ export default function TermsPage() {
                 See CITATION.cff for structured citation metadata
               </div>
               <p className="leading-relaxed">
-                Always attribute original data sources (Ontario Health, Quebec
-                MSSS, Alberta AHS, BC PHSA) when using or republishing wait time
-                data.
+                Always attribute original data sources (Health Quality Ontario,
+                Quebec MSSS, Alberta AHS, BC PHSA) when using or republishing
+                wait time data.
               </p>
             </div>
           </section>

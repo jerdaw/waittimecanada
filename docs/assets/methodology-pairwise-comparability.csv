@@ -1,7 +1,7 @@
 province_a,province_b,comparable,divergent_fields,notes
-Ontario,Alberta,Partial,statistic_type matches (both POINT_ESTIMATE),Same ontology when using real-time Ontario data. Most comparable pair.
-Ontario,BC,No,statistic_type (POINT_ESTIMATE vs P90),Same start/end events but different statistics. P90 systematically higher.
-Ontario,Quebec,No,start_event + statistic_type,Two dimensions differ. Quebec times systematically higher due to REGISTRATION start.
-Alberta,BC,No,statistic_type (POINT_ESTIMATE vs P90),Same start/end events but different statistics. P90 systematically higher.
-Alberta,Quebec,No,start_event + statistic_type,Two dimensions differ. Quebec most distinct methodology.
-BC,Quebec,No,start_event + statistic_type,Two dimensions differ. Quebec most distinct methodology.
+Ontario,Alberta,Partial,statistic_type (MEAN vs POINT_ESTIMATE),"Same metric and event boundaries, but different statistics still block direct comparison (MEAN vs POINT_ESTIMATE)."
+Ontario,British Columbia,Partial,statistic_type (MEAN vs P90),"Same metric and event boundaries, but different statistics still block direct comparison (MEAN vs P90)."
+Ontario,Quebec,Partial,start_event + statistic_type,"Clock start and statistic type both differ, making this one of the least aligned province pairs."
+Alberta,British Columbia,Partial,statistic_type (POINT_ESTIMATE vs P90),"Same metric and event boundaries, but different statistics still block direct comparison (POINT_ESTIMATE vs P90)."
+Alberta,Quebec,Partial,start_event + statistic_type,"Clock start and statistic type both differ, making this one of the least aligned province pairs."
+British Columbia,Quebec,Partial,start_event + statistic_type,"Clock start and statistic type both differ, making this one of the least aligned province pairs."

@@ -12,123 +12,179 @@ Output files:
     - docs/assets/methodology-pairwise-comparability.html
 """
 
+from __future__ import annotations
+
 import csv
-from datetime import datetime
+import json
+from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+OUTPUT_DIR = PROJECT_ROOT / "docs" / "assets"
+SOURCE_DATA_DIR = PROJECT_ROOT / "backend" / "data" / "sources"
+ORDERED_SOURCE_IDS = [
+    "ontario-health",
+    "alberta-ahs",
+    "bc-phsa",
+    "quebec-msss",
+]
+COMPARABILITY_FIELDS = [
+    "metric_family",
+    "start_event",
+    "end_event",
+    "statistic_type",
+]
+PROVINCE_METADATA: dict[str, dict[str, str]] = {
+    "ontario-health": {
+        "province": "Ontario",
+        "province_code": "ON",
+        "update_frequency": "Quarterly",
+        "data_source": "Health Quality Ontario",
+        "notes": "Historical mean TRIAGE → PHYSICIAN wait times from Ontario's official performance reporting.",
+    },
+    "alberta-ahs": {
+        "province": "Alberta",
+        "province_code": "AB",
+        "update_frequency": "~2 min",
+        "data_source": "Alberta Health Services Wait Times Portal",
+        "notes": "Real-time point estimate with the fastest public refresh cadence in the active set.",
+    },
+    "bc-phsa": {
+        "province": "British Columbia",
+        "province_code": "BC",
+        "update_frequency": "~5 min",
+        "data_source": "Provincial Health Services Authority (edwaittimes.ca)",
+        "notes": "P90 TRIAGE → PHYSICIAN reporting; more conservative than mean or point-estimate displays.",
+    },
+    "quebec-msss": {
+        "province": "Quebec",
+        "province_code": "QC",
+        "update_frequency": "Periodic",
+        "data_source": "MSSS Emergency Room Situation Portal",
+        "notes": "Uses REGISTRATION (not TRIAGE) start event plus a rolling average statistic.",
+    },
+}
+
+
+def load_source_catalog() -> dict[str, dict[str, Any]]:
+    """Load canonical source definitions from backend/data/sources."""
+    catalog: dict[str, dict[str, Any]] = {}
+
+    for source_id in ORDERED_SOURCE_IDS:
+        source_path = SOURCE_DATA_DIR / f"{source_id}.json"
+        with open(source_path, encoding="utf-8") as source_file:
+            catalog[source_id] = json.load(source_file)
+
+    return catalog
+
+
+def build_province_rows(catalog: dict[str, dict[str, Any]]) -> list[dict[str, str]]:
+    """Build methodology comparison rows from canonical source metadata."""
+    provinces: list[dict[str, str]] = []
+
+    for source_id in ORDERED_SOURCE_IDS:
+        source = catalog[source_id]
+        metadata = PROVINCE_METADATA[source_id]
+        provinces.append(
+            {
+                "province": metadata["province"],
+                "province_code": metadata["province_code"],
+                "source_id": source["id"],
+                "metric_family": source["default_metric_family"],
+                "start_event": source["default_start_event"],
+                "end_event": source["default_end_event"],
+                "statistic_type": source["default_statistic_type"],
+                "update_frequency": metadata["update_frequency"],
+                "data_source": metadata["data_source"],
+                "notes": metadata["notes"],
+            }
+        )
+
+    return provinces
+
+
+def build_pairwise_rows(provinces: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Build pairwise comparability verdicts from province rows."""
+    pairwise: list[dict[str, str]] = []
+
+    for index, left in enumerate(provinces):
+        for right in provinces[index + 1 :]:
+            differences = [field for field in COMPARABILITY_FIELDS if left[field] != right[field]]
+            match_count = len(COMPARABILITY_FIELDS) - len(differences)
+
+            if not differences:
+                comparable = "Yes"
+            elif match_count >= 2:
+                comparable = "Partial"
+            else:
+                comparable = "No"
+
+            pairwise.append(
+                {
+                    "province_a": left["province"],
+                    "province_b": right["province"],
+                    "comparable": comparable,
+                    "divergent_fields": format_divergent_fields(left, right, differences),
+                    "notes": build_pairwise_note(left, right, differences),
+                }
+            )
+
+    return pairwise
+
+
+def format_divergent_fields(
+    left: dict[str, str], right: dict[str, str], differences: list[str]
+) -> str:
+    """Format a concise divergence summary."""
+    if not differences:
+        return "none"
+
+    if len(differences) == 1:
+        field = differences[0]
+        return f"{field} ({left[field]} vs {right[field]})"
+
+    return " + ".join(differences)
+
+
+def build_pairwise_note(left: dict[str, str], right: dict[str, str], differences: list[str]) -> str:
+    """Build a human-readable note for pairwise comparisons."""
+    if not differences:
+        return "All four ontology dimensions match."
+
+    if differences == ["statistic_type"]:
+        return (
+            "Same metric and event boundaries, but different statistics still block "
+            f"direct comparison ({left['statistic_type']} vs {right['statistic_type']})."
+        )
+
+    if differences == ["start_event"]:
+        return "Clock start definitions differ, so the reported durations are not aligned."
+
+    if "start_event" in differences and "statistic_type" in differences:
+        return (
+            "Clock start and statistic type both differ, making this one of the least "
+            "aligned province pairs."
+        )
+
+    return (
+        "Multiple ontology dimensions differ, so direct comparison would mix unlike "
+        "measurement definitions."
+    )
 
 
 def main() -> None:
     """Generate methodology comparison matrices."""
-    # Define project root (script is in backend/scripts/)
-    project_root = Path(__file__).parent.parent.parent
-    output_dir = project_root / "docs" / "assets"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Provincial methodology data
-    # Source: backend/docs/methodologies/README.md (lines 49-55)
-    provinces = [
-        {
-            "province": "Ontario",
-            "province_code": "ON",
-            "source_id": "ontario-health",
-            "start_event": "TRIAGE",
-            "end_event": "PHYSICIAN",
-            "statistic_type": "POINT_ESTIMATE",
-            "metric_family": "TIME_TO_PROVIDER",
-            "update_frequency": "~15 min",
-            "data_source": "Ontario Health (ER Watch)",
-            "notes": "Real-time instantaneous wait times",
-        },
-        {
-            "province": "Alberta",
-            "province_code": "AB",
-            "source_id": "alberta-ahs",
-            "start_event": "TRIAGE",
-            "end_event": "PHYSICIAN",
-            "statistic_type": "POINT_ESTIMATE",
-            "metric_family": "TIME_TO_PROVIDER",
-            "update_frequency": "~2 min",
-            "data_source": "Alberta Health Services (AHS) Wait Times Portal",
-            "notes": "Real-time instantaneous wait times, fastest update frequency",
-        },
-        {
-            "province": "British Columbia",
-            "province_code": "BC",
-            "source_id": "bc-phsa",
-            "start_event": "TRIAGE",
-            "end_event": "PHYSICIAN",
-            "statistic_type": "P90",
-            "metric_family": "TIME_TO_PROVIDER",
-            "update_frequency": "~5 min",
-            "data_source": "BC PHSA (edwaittimes.ca)",
-            "notes": "90th percentile statistic, not directly comparable to real-time estimates",
-        },
-        {
-            "province": "Quebec",
-            "province_code": "QC",
-            "source_id": "quebec-msss",
-            "start_event": "REGISTRATION",
-            "end_event": "PHYSICIAN",
-            "statistic_type": "ROLLING_AVG",
-            "metric_family": "TIME_TO_PROVIDER",
-            "update_frequency": "Periodic",
-            "data_source": "MSSS Emergency Room Situation Portal",
-            "notes": "Uses REGISTRATION (not TRIAGE) start event; rolling average statistic; incomparable to all other provinces on two ontology dimensions",
-        },
-    ]
+    catalog = load_source_catalog()
+    provinces = build_province_rows(catalog)
+    pairwise = build_pairwise_rows(provinces)
 
-    # Pairwise comparability data
-    # Source: backend/docs/methodologies/README.md (lines 58-66)
-    pairwise = [
-        {
-            "province_a": "Ontario",
-            "province_b": "Alberta",
-            "comparable": "Partial",
-            "divergent_fields": "statistic_type matches (both POINT_ESTIMATE)",
-            "notes": "Same ontology when using real-time Ontario data. Most comparable pair.",
-        },
-        {
-            "province_a": "Ontario",
-            "province_b": "BC",
-            "comparable": "No",
-            "divergent_fields": "statistic_type (POINT_ESTIMATE vs P90)",
-            "notes": "Same start/end events but different statistics. P90 systematically higher.",
-        },
-        {
-            "province_a": "Ontario",
-            "province_b": "Quebec",
-            "comparable": "No",
-            "divergent_fields": "start_event + statistic_type",
-            "notes": "Two dimensions differ. Quebec times systematically higher due to REGISTRATION start.",
-        },
-        {
-            "province_a": "Alberta",
-            "province_b": "BC",
-            "comparable": "No",
-            "divergent_fields": "statistic_type (POINT_ESTIMATE vs P90)",
-            "notes": "Same start/end events but different statistics. P90 systematically higher.",
-        },
-        {
-            "province_a": "Alberta",
-            "province_b": "Quebec",
-            "comparable": "No",
-            "divergent_fields": "start_event + statistic_type",
-            "notes": "Two dimensions differ. Quebec most distinct methodology.",
-        },
-        {
-            "province_a": "BC",
-            "province_b": "Quebec",
-            "comparable": "No",
-            "divergent_fields": "start_event + statistic_type",
-            "notes": "Two dimensions differ. Quebec most distinct methodology.",
-        },
-    ]
-
-    # Generate main comparison CSV
-    csv_path = output_dir / "methodology-comparison.csv"
-    with open(csv_path, "w", newline="", encoding="utf-8") as f:
+    csv_path = OUTPUT_DIR / "methodology-comparison.csv"
+    with open(csv_path, "w", newline="", encoding="utf-8") as file_handle:
         writer = csv.DictWriter(
-            f,
+            file_handle,
             fieldnames=[
                 "province",
                 "province_code",
@@ -147,18 +203,16 @@ def main() -> None:
 
     print(f"✓ Generated: {csv_path}")
 
-    # Generate main comparison HTML
-    html_path = output_dir / "methodology-comparison.html"
-    with open(html_path, "w", encoding="utf-8") as f:
-        f.write(generate_main_html(provinces))
+    html_path = OUTPUT_DIR / "methodology-comparison.html"
+    with open(html_path, "w", encoding="utf-8") as file_handle:
+        file_handle.write(generate_main_html(provinces))
 
     print(f"✓ Generated: {html_path}")
 
-    # Generate pairwise comparability CSV
-    pairwise_csv_path = output_dir / "methodology-pairwise-comparability.csv"
-    with open(pairwise_csv_path, "w", newline="", encoding="utf-8") as f:
+    pairwise_csv_path = OUTPUT_DIR / "methodology-pairwise-comparability.csv"
+    with open(pairwise_csv_path, "w", newline="", encoding="utf-8") as file_handle:
         writer = csv.DictWriter(
-            f,
+            file_handle,
             fieldnames=[
                 "province_a",
                 "province_b",
@@ -172,20 +226,19 @@ def main() -> None:
 
     print(f"✓ Generated: {pairwise_csv_path}")
 
-    # Generate pairwise comparability HTML
-    pairwise_html_path = output_dir / "methodology-pairwise-comparability.html"
-    with open(pairwise_html_path, "w", encoding="utf-8") as f:
-        f.write(generate_pairwise_html(pairwise))
+    pairwise_html_path = OUTPUT_DIR / "methodology-pairwise-comparability.html"
+    with open(pairwise_html_path, "w", encoding="utf-8") as file_handle:
+        file_handle.write(generate_pairwise_html(pairwise))
 
     print(f"✓ Generated: {pairwise_html_path}")
 
     print("\n✅ All methodology comparison assets generated successfully!")
-    print(f"\nOutput directory: {output_dir}")
+    print(f"\nOutput directory: {OUTPUT_DIR}")
 
 
-def generate_main_html(provinces: list[dict]) -> str:
+def generate_main_html(provinces: list[dict[str, str]]) -> str:
     """Generate HTML table for main methodology comparison."""
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")
+    timestamp = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -295,15 +348,15 @@ def generate_main_html(provinces: list[dict]) -> str:
             <tbody>
 """
 
-    for p in provinces:
+    for province in provinces:
         html += f"""                <tr>
-                    <td><span class="province-code">{p['province_code']}</span> {p['province']}</td>
-                    <td><code>{p['source_id']}</code></td>
-                    <td><span class="ontology-field">{p['start_event']}</span></td>
-                    <td><span class="ontology-field">{p['end_event']}</span></td>
-                    <td><span class="ontology-field">{p['statistic_type']}</span></td>
-                    <td>{p['update_frequency']}</td>
-                    <td>{p['notes']}</td>
+                    <td><span class="province-code">{province["province_code"]}</span> {province["province"]}</td>
+                    <td><code>{province["source_id"]}</code></td>
+                    <td><span class="ontology-field">{province["start_event"]}</span></td>
+                    <td><span class="ontology-field">{province["end_event"]}</span></td>
+                    <td><span class="ontology-field">{province["statistic_type"]}</span></td>
+                    <td>{province["update_frequency"]}</td>
+                    <td>{province["notes"]}</td>
                 </tr>
 """
 
@@ -330,7 +383,7 @@ def generate_main_html(provinces: list[dict]) -> str:
             <tr>
                 <td><span class="ontology-field">STATISTIC_TYPE</span></td>
                 <td>How the value is calculated</td>
-                <td>POINT_ESTIMATE = current/instantaneous; P90 = 90th percentile; ROLLING_AVG = moving average</td>
+                <td>MEAN = arithmetic average; POINT_ESTIMATE = current/instantaneous; P90 = 90th percentile; ROLLING_AVG = moving average</td>
             </tr>
         </table>
 
@@ -350,9 +403,9 @@ def generate_main_html(provinces: list[dict]) -> str:
     return html
 
 
-def generate_pairwise_html(pairwise: list[dict]) -> str:
+def generate_pairwise_html(pairwise: list[dict[str, str]]) -> str:
     """Generate HTML table for pairwise comparability analysis."""
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")
+    timestamp = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -452,10 +505,9 @@ def generate_pairwise_html(pairwise: list[dict]) -> str:
         </div>
 
         <div class="key-finding">
-            <strong>🔬 Key Finding:</strong> No province pair is fully comparable. Ontario and Alberta share
-            the closest methodology (both TRIAGE → PHYSICIAN, POINT_ESTIMATE), but even these represent
-            instantaneous snapshots that may vary by measurement timing. <strong>Quebec is the most
-            methodologically distinct province.</strong>
+            <strong>🔬 Key Finding:</strong> No province pair is fully comparable. Ontario and Alberta
+            share TRIAGE → PHYSICIAN event boundaries, but they still diverge on statistic type
+            (MEAN vs POINT_ESTIMATE). <strong>Quebec remains the most methodologically distinct province.</strong>
         </div>
 
         <table>
@@ -471,19 +523,19 @@ def generate_pairwise_html(pairwise: list[dict]) -> str:
             <tbody>
 """
 
-    for pw in pairwise:
+    for comparison in pairwise:
         comparable_class = {
             "Yes": "comparable-yes",
             "No": "comparable-no",
             "Partial": "comparable-partial",
-        }[pw["comparable"]]
+        }[comparison["comparable"]]
 
         html += f"""                <tr>
-                    <td><strong>{pw['province_a']}</strong></td>
-                    <td><strong>{pw['province_b']}</strong></td>
-                    <td><span class="{comparable_class}">{pw['comparable']}</span></td>
-                    <td>{pw['divergent_fields']}</td>
-                    <td>{pw['notes']}</td>
+                    <td><strong>{comparison["province_a"]}</strong></td>
+                    <td><strong>{comparison["province_b"]}</strong></td>
+                    <td><span class="{comparable_class}">{comparison["comparable"]}</span></td>
+                    <td>{comparison["divergent_fields"]}</td>
+                    <td>{comparison["notes"]}</td>
                 </tr>
 """
 

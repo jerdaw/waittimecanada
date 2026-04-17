@@ -1,7 +1,7 @@
 # Direct VPS Backend Deployment
 
 **Status:** Deferred migration target; not the live production scheduler path
-**Last Updated:** 2026-03-13
+**Last Updated:** 2026-04-16
 
 This document defines the app-local deployment path for moving the Wait Time
 Canada backend scheduler/runtime from GitHub Actions onto the shared VPS.
@@ -17,7 +17,7 @@ Shared-VPS ownership note:
 
 ## Current State
 
-As of 2026-03-13:
+As of 2026-04-16:
 
 1. production scraper scheduling still runs on GitHub Actions
 2. heartbeat monitoring still runs on GitHub Actions
@@ -58,6 +58,43 @@ Operational meaning:
 1. this is not currently treated as a packaging or deploy-script problem
 2. GitHub Actions remains the live scheduler path because it can still reach the Ontario source
 3. do not re-enable the VPS timers until an Ontario-compatible runtime path is proven
+
+## Ontario Reachability Diagnostic
+
+Before revisiting backend cutover on any VPS-like host, record a reproducible
+Ontario reachability check using the current source URL:
+
+```bash
+curl -I -L -sS -o /dev/null \
+  -w 'connect=%{time_connect} tls=%{time_appconnect} start=%{time_starttransfer} total=%{time_total}\n' \
+  https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments
+
+cd /srv/apps/waittime-backend/current/backend
+./.venv/bin/python - <<'PY'
+import httpx
+from waittime.scrapers.observability import (
+    DEFAULT_HTTP_CONNECT_TIMEOUT_SECONDS,
+    DEFAULT_HTTP_POOL_TIMEOUT_SECONDS,
+    DEFAULT_HTTP_READ_TIMEOUT_SECONDS,
+    DEFAULT_HTTP_WRITE_TIMEOUT_SECONDS,
+)
+
+timeout = httpx.Timeout(
+    connect=DEFAULT_HTTP_CONNECT_TIMEOUT_SECONDS,
+    read=DEFAULT_HTTP_READ_TIMEOUT_SECONDS,
+    write=DEFAULT_HTTP_WRITE_TIMEOUT_SECONDS,
+    pool=DEFAULT_HTTP_POOL_TIMEOUT_SECONDS,
+)
+url = "https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments"
+with httpx.Client(timeout=timeout, follow_redirects=True) as client:
+    response = client.get(url)
+    print({"status_code": response.status_code, "bytes": len(response.text)})
+PY
+```
+
+If Chromium is available, optionally run a one-off Playwright navigation from
+the same host and record whether it succeeds or times out. Treat the result as
+cutover evidence, not as a one-time anecdote.
 
 ## Required Env Contract
 
@@ -216,6 +253,12 @@ Do not disable the GitHub Actions backend schedulers until:
 1. the VPS scraper timer has completed successfully at least once
 2. the heartbeat timer verifies fresh rows on the VPS path
 3. rollback to GitHub Actions remains straightforward
+4. the Ontario reachability diagnostic above passes reproducibly on the target host
 
-As of 2026-03-13, keep GitHub Actions live and treat the VPS backend path as
+Decision gate:
+
+1. if the Ontario source still times out from the shared VPS, keep the timers disabled and do not reopen cutover
+2. only revisit cutover after a reproducible pass on the target host or after proving a different runtime path
+
+As of 2026-04-16, keep GitHub Actions live and treat the VPS backend path as
 deferred.

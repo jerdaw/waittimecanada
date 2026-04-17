@@ -66,7 +66,7 @@
     },
     "provinces": {
       "title": "Data from official sources",
-      "on": "Ontario Health",
+      "on": "Health Quality Ontario",
       "qc": "Québec MSSS",
       "ab": "Alberta Health Services",
       "bc": "BC PHSA"
@@ -170,31 +170,30 @@
   "ResourcesPage": {
     "eyebrow": "Ontario-first module",
     "title": "Public Health Resources",
-    "description": "A facilities-first public resource hub built on approved public datasets. This layer is reference data with provenance and freshness, not live operational status.",
+    "description": "An Ontario public resource hub built on approved public datasets. Facilities, AED fallback data, and naloxone guidance are currently Ontario-scoped reference layers with visible provenance and freshness, not live operational status.",
     "common": {
       "unknown": "unknown"
     },
     "filters": {
-      "province": "Province",
       "search": "Search",
-      "searchPlaceholder": "Search hospitals, clinics, or services",
+      "searchPlaceholder": "Search Ontario hospitals, clinics, or services",
       "useLocation": "Use my location",
       "locationUnsupported": "Location access is not available in this browser.",
-      "locationDenied": "Location access was denied. You can still browse by province.",
+      "locationDenied": "Location access was denied. You can still search Ontario facilities by name.",
       "locationError": "We could not determine your location right now."
     },
     "sections": {
       "resources": {
         "title": "Resources",
         "nearbyTitle": "Nearby resources",
-        "description": "Reference directory data from approved public sources, with Ontario facilities prioritized first. Search by facility name or share your location to load results.",
-        "nearbyDescription": "Reference directory data from approved public sources, filtered and sorted by distance from your location.",
-        "gated": "Search for a facility or share your location to load reference directory results.",
+        "description": "Ontario facility directory data from approved public sources. Search by facility name or share your location to load Ontario reference results.",
+        "nearbyDescription": "Ontario facility directory data from approved public sources, filtered and sorted by distance from your location.",
+        "gated": "Search for an Ontario facility or share your location to load reference directory results.",
         "empty": "No facility records matched your current filters."
       },
       "transparency": {
         "title": "Source transparency",
-        "description": "Every source shown here keeps provenance and refresh metadata visible.",
+        "description": "Every source shown here keeps provenance, refresh metadata, and Ontario-only scope visible.",
         "empty": "No source metadata available yet.",
         "updated": "Last refreshed: {timestamp}",
         "freshness": {
@@ -205,11 +204,11 @@
         "sourceLink": "View official source"
       },
       "aed": {
-        "title": "AED locations",
-        "nearbyTitle": "Nearby AED locations",
-        "description": "Crowdsourced AED records are shown with explicit provenance, incompleteness, and freshness labels. Share your location to sort by distance.",
-        "nearbyDescription": "Crowdsourced AED records near your location, shown with explicit provenance, incompleteness, and freshness labels.",
-        "empty": "No AED records matched your current filters."
+        "title": "Ontario AED locations",
+        "nearbyTitle": "Nearby Ontario AED locations",
+        "description": "Ontario AED fallback records are shown with explicit provenance, incompleteness, and freshness labels. Share your location to sort by distance.",
+        "nearbyDescription": "Ontario AED fallback records near your location, shown with explicit provenance, incompleteness, and freshness labels.",
+        "empty": "No Ontario AED records matched your current filters."
       },
       "alerts": {
         "title": "Safety alerts",
@@ -426,7 +425,7 @@
       "q2": "Why can't I compare Ontario and Quebec wait times directly?",
       "a2": "Ontario reports mean triage-to-physician times, while Quebec reports rolling-average registration-to-physician times. These different methodologies mean direct comparison is statistically invalid.",
       "q3": "How current is this data?",
-      "a3": "We collect from official provincial sources on an automated schedule. In the current cost-control mode, the cross-province scrape cadence is every 4 hours; individual provinces may publish source updates on different intervals."
+      "a3": "We collect from official provincial sources on an automated schedule. The current cross-province scrape cadence is hourly on GitHub Actions, while individual provinces may publish source updates on different intervals."
     },
     "medicalPage": {
       "desc": "Published emergency room wait times and methodology auditing for Canadian hospitals."
@@ -454,7 +453,7 @@
   "StatusPage": {
     "backToMap": "Back to live map",
     "title": "System Status",
-    "subtitle": "Operational health of all provincial scrapers. Uptime is measured as actual vs. expected collections under the current 4-hour cost-control cadence.",
+    "subtitle": "Operational health of all provincial scrapers. Uptime is measured as actual vs. expected collections under the current hourly scheduler cadence.",
     "overallHealth": "Overall Health",
     "systemUptime24h": "System Uptime (24h)",
     "activeProvinces": "Active Provinces",
@@ -466,7 +465,7 @@
     "dataFreshness": "Data freshness:",
     "statusGeneratedAt": "Status generated at {time}.",
     "uptimeCalc": "Uptime calculation:",
-    "uptimeCalcDesc": "Scrapers currently run every 4 hours (6 expected collections per hospital per day). Uptime = actual / expected, capped at 100%.",
+    "uptimeCalcDesc": "Scrapers currently run hourly (24 expected collections per hospital per day). Uptime = actual / expected, capped at 100%.",
     "detailedQuality": "For detailed data quality metrics, visit the",
     "dataQualityDashboard": "Data Quality dashboard",
     "uptime": {
@@ -494,7 +493,7 @@
     "items": {
       "q1": {
         "question": "Are these wait times official?",
-        "answer": "We collect data directly from official provincial health sources (e.g., Ontario Health, Health Quebec). However, we are an independent observatory, not a government agency. Always rely on professional medical advice. If you have a medical emergency, call 911 immediately."
+        "answer": "We collect data directly from official provincial health sources (e.g., Health Quality Ontario, Quebec MSSS). However, we are an independent observatory, not a government agency. Always rely on professional medical advice. If you have a medical emergency, call 911 immediately."
       },
       "q2": {
         "question": "Why do wait times change so quickly?",
@@ -514,11 +513,11 @@
       },
       "q6": {
         "question": "Can I compare hospitals across provinces?",
-        "answer": "Only if they use the same measurement methodology. Ontario reports P90 (90th percentile) triage-to-physician time, while Quebec reports rolling average registration-to-provider time. Our platform flags when direct comparison is statistically invalid and shows a methodology divergence warning."
+        "answer": "Only if they use the same measurement methodology. Ontario reports mean triage-to-physician time, while Quebec reports rolling average registration-to-provider time. Our platform flags when direct comparison is statistically invalid and shows a methodology divergence warning."
       },
       "q7": {
         "question": "What do the methodology badges on hospital cards mean?",
-        "answer": "Each hospital card shows how that province measures wait times — including the metric family (e.g., Time to Provider), start/end events (e.g., Triage to Physician), and statistic type (e.g., P90). These tags help you understand exactly what each number represents."
+        "answer": "Each hospital card shows how that province measures wait times — including the metric family (e.g., Time to Provider), start/end events (e.g., Triage to Physician), and statistic type (e.g., Mean). These tags help you understand exactly what each number represents."
       },
       "q8": {
         "question": "How do you ensure data quality?",
@@ -561,7 +560,7 @@
     "aboutMetrics": "About Data Quality Metrics",
     "metrics": {
       "successRate": "Success Rate:",
-      "successRateDesc": "Scrapers currently run every 4 hours (6 expected per day per hospital). Success rate measures actual vs expected data collection.",
+      "successRateDesc": "Scrapers currently run hourly (24 expected collections per hospital per day). Success rate measures actual vs expected data collection.",
       "anomalyDetection": "Anomaly Detection:",
       "anomalyDetectionDesc": "Uses z-score (3 standard deviations) and IQR methods against a 7-day rolling baseline. Requires 20+ historical data points before flagging.",
       "whyTransparency": "Why Transparency Matters:",
@@ -767,11 +766,11 @@
         },
         "q4": {
           "question": "How often is this data updated?",
-          "answer": "Update frequency varies by province, and source organizations do not all publish on the same cadence. In the current cost-control mode, our cross-province scraper workflow runs every 4 hours via GitHub Actions, while some provincial sources may refresh more frequently upstream."
+          "answer": "Update frequency varies by province, and source organizations do not all publish on the same cadence. Our cross-province scraper workflow now runs hourly via GitHub Actions, while some provincial sources may refresh more frequently upstream."
         },
         "q5": {
           "question": "Where does this data come from?",
-          "answer": "We aggregate data from official provincial sources: ER Watch for Ontario (which consolidates Ontario Health data), Index Santé for Quebec (which uses MSSS data), and official health authority portals for other provinces. All sources are documented in our methodology pages with links to original sources."
+          "answer": "We aggregate data from official provincial sources: Health Quality Ontario for Ontario, Index Santé for Quebec (which uses MSSS data), and official health authority portals for other provinces. All sources are documented in our methodology pages with links to original sources."
         },
         "q6": {
           "question": "What if I need medical help right now?",
@@ -893,7 +892,7 @@
       },
       "summary": {
         "title": "Why This Matters",
-        "description": "A 60-minute wait in Ontario (P90, Triage→Physician) is fundamentally different from a 60-minute wait in Quebec (Rolling Avg, Registration→Provider). Our platform automatically detects these differences and warns you when comparing incompatible measurements."
+        "description": "A 60-minute wait in Ontario (Mean, Triage→Physician) is fundamentally different from a 60-minute wait in Quebec (Rolling Avg, Registration→Provider). Our platform automatically detects these differences and warns you when comparing incompatible measurements."
       }
     }
   }

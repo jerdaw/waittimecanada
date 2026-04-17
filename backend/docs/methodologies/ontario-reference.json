@@ -1,66 +1,40 @@
 {
   "province": "Ontario",
   "province_code": "ON",
-  "last_updated": "2026-02-01",
+  "last_updated": "2026-04-16",
   "sources": [
     {
-      "id": "on-erwatch",
-      "name": "Ontario Real-Time Wait Times",
-      "type": "real-time",
-      "update_frequency_minutes": 15,
-      "coverage": "140+ hospitals",
+      "id": "ontario-health",
+      "name": "Health Quality Ontario",
+      "type": "historical_reporting",
+      "url": "https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments",
+      "coverage": "Ontario hospitals in public performance reporting",
+      "update_frequency": "Quarterly public reporting",
       "methodology": {
         "metric_family": "TIME_TO_PROVIDER",
         "start_event": "TRIAGE",
         "end_event": "PHYSICIAN",
-        "statistic_type": "POINT_ESTIMATE",
+        "statistic_type": "MEAN",
         "patient_scope": "ALL"
       },
-      "description": "Real-time point estimates updated every 15 minutes. Shows current wait time as of last update.",
+      "description": "Published average wait times from triage to first physician assessment.",
       "limitations": [
-        "High temporal variability",
-        "Point-in-time measurement",
-        "Not suitable for performance benchmarking"
+        "Not a live operational feed",
+        "Public reporting cadence is slower than real-time dashboards",
+        "Should not be mixed with point-estimate or percentile reporting"
       ],
       "best_for": [
-        "Patient decision-making",
-        "Live capacity monitoring",
-        "Media reporting"
-      ]
-    },
-    {
-      "id": "on-hqo",
-      "name": "Health Quality Ontario",
-      "type": "historical",
-      "url": "https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments",
-      "update_frequency_days": 90,
-      "coverage": "All Ontario hospitals",
-      "methodology": {
-        "metric_family": "TIME_TO_PROVIDER",
-        "start_event": "TRIAGE",
-        "end_event": "PHYSICIAN",
-        "statistic_type": "P90",
-        "patient_scope": "MID_ACUITY"
-      },
-      "description": "90th percentile (P90) of historical wait times, aggregated monthly. Official government data.",
-      "limitations": [
-        "1-3 month lag time",
-        "Not real-time",
-        "Excludes CTAS 1 (most critical)"
-      ],
-      "best_for": [
-        "Performance benchmarking",
-        "Policy analysis",
-        "Research studies"
+        "Methodology documentation",
+        "System-level interpretation",
+        "Cross-province ontology comparison"
       ]
     }
   ],
   "telehealth": {
-    "name": "Health Connect Ontario",
+    "name": "Health811",
     "phone": "811",
-    "description": "24/7 nurse triage and advice",
-    "languages": "300+ languages via interpretation",
-    "url": "https://healthconnectontario.health.gov.on.ca/"
+    "description": "Ontario's 24/7 nurse and navigation line",
+    "url": "https://health811.ontario.ca/"
   },
   "triage_system": {
     "name": "Canadian Triage and Acuity Scale (CTAS)",
@@ -69,7 +43,7 @@
         "level": 1,
         "name": "Resuscitation",
         "target_minutes": 0,
-        "description": "Immediate life-threatening"
+        "description": "Immediate life-threatening condition"
       },
       {
         "level": 2,
@@ -96,74 +70,60 @@
         "description": "Condition may be treated elsewhere"
       }
     ],
-    "note": "Wait time data typically excludes CTAS 1 patients"
+    "note": "Ontario wait-time reporting in this repository is mapped to TRIAGE -> PHYSICIAN."
   },
   "comparability": {
     "within_province": {
-      "er_watch_vs_er_watch": {
+      "ontario_vs_ontario": {
         "compatible": true,
-        "reason": "Same methodology (both POINT_ESTIMATE)"
-      },
-      "hqo_vs_hqo": {
-        "compatible": true,
-        "reason": "Same methodology (both P90)"
-      },
-      "er_watch_vs_hqo": {
-        "compatible": false,
-        "reason": "Different statistic types (POINT_ESTIMATE vs P90)",
-        "divergence_brief": "Methodology Divergence: Direct comparison is scientifically invalid. Different statistics: POINT_ESTIMATE vs P90."
+        "reason": "Same maintained source and ontology definition (MEAN TRIAGE -> PHYSICIAN)."
       }
     },
     "cross_province_examples": {
-      "ontario_erwatch_vs_quebec": {
+      "ontario_vs_alberta": {
         "compatible": false,
-        "reason": "Different statistics (POINT_ESTIMATE vs ROLLING_AVG)",
+        "reason": "Same metric and event boundaries, but statistic_type differs (MEAN vs POINT_ESTIMATE).",
         "severity": "partial"
-      },
-      "ontario_hqo_vs_alberta": {
-        "compatible": true,
-        "reason": "Both use P90 and TIME_TO_PROVIDER",
-        "note": "Verify Alberta methodology confirms P90"
       },
       "ontario_vs_bc": {
         "compatible": false,
-        "reason": "Different metrics (TIME_TO_PROVIDER vs TOTAL_LOS)",
-        "severity": "incompatible"
+        "reason": "Same metric and event boundaries, but statistic_type differs (MEAN vs P90).",
+        "severity": "partial"
+      },
+      "ontario_vs_quebec": {
+        "compatible": false,
+        "reason": "Different start_event and statistic_type (TRIAGE/MEAN vs REGISTRATION/ROLLING_AVG).",
+        "severity": "partial",
+        "divergence_brief": "Methodology Divergence: Direct comparison is scientifically invalid. Different start points: TRIAGE vs REGISTRATION. Different statistics: MEAN vs ROLLING_AVG."
       }
     }
   },
   "validation_checklist": [
     "Hospital ID follows format ca-on-{city}-{hospital-slug}",
-    "source_id matches data source (on-erwatch or on-hqo)",
+    "source_id is ontario-health",
     "metric_family is TIME_TO_PROVIDER",
     "start_event is TRIAGE",
     "end_event is PHYSICIAN",
-    "statistic_type is POINT_ESTIMATE (ER Watch) or P90 (HQO)",
-    "patient_scope is ALL (ER Watch) or MID_ACUITY (HQO)",
+    "statistic_type is MEAN",
+    "patient_scope is ALL",
     "Timestamp is in UTC",
-    "Raw payload is hashed (not stored in full)"
+    "Raw payload is hashed rather than stored in full"
   ],
   "references": [
     {
-      "title": "Health Quality Ontario - ED Performance",
+      "title": "Health Quality Ontario - Time Spent in Emergency Departments",
       "url": "https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments",
       "type": "official"
     },
     {
-      "title": "Ontario Ministry of Health - Wait Times",
-      "url": "https://www.ontario.ca/page/time-spent-emergency-department",
+      "title": "Health Quality Ontario - Emergency Department Performance Methodology",
+      "url": "https://www.hqontario.ca/System-Performance/Emergency-Department-Performance",
       "type": "official"
     },
     {
-      "title": "Ontario Real-Time Wait Time Service",
-      "source_id": "on-erwatch",
-      "url": "https://example.com/data-sources",
-      "type": "data_source"
-    },
-    {
-      "title": "Canadian Triage and Acuity Scale (CTAS)",
-      "url": "https://caep.ca/wp-content/uploads/2017/06/module_1_slides_v2.5_2012.pdf",
-      "type": "academic"
+      "title": "Health811",
+      "url": "https://health811.ontario.ca/",
+      "type": "official"
     }
   ],
   "documentation_url": "/docs/methodologies/ontario-methodology.md"

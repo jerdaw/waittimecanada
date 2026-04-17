@@ -14,7 +14,7 @@ They assume:
 Installed timers:
 
 1. `waittime-backend-scraper.timer`
-   - runs all scrapers every 4 hours
+   - runs all scrapers hourly
 2. `waittime-backend-heartbeat.timer`
    - checks scraper freshness every 30 minutes
 3. `waittime-backend-quality-snapshot.timer`

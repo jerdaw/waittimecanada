@@ -112,8 +112,8 @@ This means Quebec's reported wait times inherently include the registration-to-t
 - **Comparable?** No
 - **Differences:**
   - Start event: Quebec REGISTRATION vs Ontario TRIAGE
-  - Statistic: Quebec ROLLING_AVG vs Ontario POINT_ESTIMATE (real-time) or P90 (HQO)
-- **Verdict:** Two ontology dimensions differ. Quebec's times are systematically longer due to the earlier start event, and a rolling average cannot be compared to a point estimate or P90.
+  - Statistic: Quebec ROLLING_AVG vs Ontario MEAN
+- **Verdict:** Two ontology dimensions differ. Quebec's times are systematically longer due to the earlier start event, and a rolling average cannot be compared directly to Ontario's published mean.
 
 **Quebec vs BC:**
 - **Comparable?** No

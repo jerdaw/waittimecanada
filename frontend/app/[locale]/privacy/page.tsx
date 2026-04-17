@@ -111,7 +111,7 @@ export default function PrivacyPage() {
               </p>
               <ul className="list-disc ml-6 space-y-1">
                 <li>
-                  <strong>Ontario:</strong> Ontario Health
+                  <strong>Ontario:</strong> Health Quality Ontario
                 </li>
                 <li>
                   <strong>Quebec:</strong> Ministère de la Santé et des Services

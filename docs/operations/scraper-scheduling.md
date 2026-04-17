@@ -92,7 +92,7 @@ python -m waittime.cli.check_heartbeat --max-age 120
 - **Special Features:** ✅ Stretcher occupancy data (M17/M18)
 - **Data Quality:** 86% test coverage
 
-### Ontario (Health Ontario)
+### Ontario (Health Quality Ontario)
 - **Methodology:** TRIAGE → PHYSICIAN (MEAN)
 - **Technology:** Direct HTTP fetch + HTML table parsing
 - **Coverage:** 220+ hospitals
@@ -100,7 +100,7 @@ python -m waittime.cli.check_heartbeat --max-age 120
 - **Reliability Hardening:** read timeouts retry once with an extended HTTP read timeout before failing
 
 ### Alberta (AHS)
-- **Methodology:** TRIAGE → PHYSICIAN (P90)
+- **Methodology:** TRIAGE → PHYSICIAN (POINT_ESTIMATE)
 - **Technology:** Playwright (JavaScript rendering required)
 - **Coverage:** 26 hospitals
 - **Update Frequency:** Hourly
@@ -126,7 +126,8 @@ SELECT id, name, province FROM sources WHERE id IN (
 );
 ```
 
-**Seeded via:** `migrations/004_seed_sources.sql`
+**Seeded via:** `migrations/004_seed_sources.sql`, then corrected to the current
+canonical source definitions by `migrations/020_sync_active_source_definitions.sql`
 
 ### Scraper Status Table
 Heartbeat tracking in `scraper_status`:

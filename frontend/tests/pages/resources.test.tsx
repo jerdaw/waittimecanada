@@ -129,14 +129,14 @@ describe("ResourcesPage", () => {
     expect(screen.getByText("Source transparency")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Search for a facility or share your location to load reference directory results.",
+        "Search for an Ontario facility or share your location to load reference directory results.",
       ),
     ).toBeInTheDocument();
     expect(
       screen.queryByText("Toronto General Hospital"),
     ).not.toBeInTheDocument();
 
-    expect(screen.getByText("AED locations")).toBeInTheDocument();
+    expect(screen.getByText("Ontario AED locations")).toBeInTheDocument();
     await waitFor(() => {
       expect(screen.getByText("Union Station AED")).toBeInTheDocument();
     });
@@ -173,7 +173,9 @@ describe("ResourcesPage", () => {
     ).toBeInTheDocument();
 
     fireEvent.change(
-      screen.getByPlaceholderText("Search hospitals, clinics, or services"),
+      screen.getByPlaceholderText(
+        "Search Ontario hospitals, clinics, or services",
+      ),
       {
         target: { value: "Toronto" },
       },
@@ -187,5 +189,6 @@ describe("ResourcesPage", () => {
         "Reference directory data. This is not a live operational status feed.",
       ),
     ).toBeInTheDocument();
+    expect(screen.queryByText("Province")).not.toBeInTheDocument();
   });
 });

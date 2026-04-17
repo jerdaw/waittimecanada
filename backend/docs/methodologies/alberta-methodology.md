@@ -7,7 +7,7 @@ Alberta Health Services (AHS) reports real-time emergency department wait times 
 **Key Findings:**
 - Alberta uses a **single real-time methodology**: point estimates of triage-to-physician time
 - Data covers **20+ emergency departments** across all 5 AHS geographic zones
-- Wait times are **POINT_ESTIMATE** (instantaneous snapshots), fundamentally different from Ontario's P90 or BC's P90
+- Wait times are **POINT_ESTIMATE** (instantaneous snapshots), fundamentally different from Ontario's MEAN and BC's P90
 - AHS operates as a single provincial health authority (unlike other provinces with regional authorities)
 
 ---
@@ -87,11 +87,11 @@ patient_scope: ALL
 
 ### Cross-Province Comparisons
 
-**Alberta vs Ontario (Real-Time):**
+**Alberta vs Ontario:**
 - **Comparable?** Partially
-- **Similarities:** Both measure TRIAGE to PHYSICIAN, both are real-time
-- **Differences:** Ontario's real-time data is also POINT_ESTIMATE, so ontology fields match
-- **Verdict:** Comparable when Ontario uses POINT_ESTIMATE. Not comparable with Ontario HQO (P90).
+- **Similarities:** Both measure TRIAGE to PHYSICIAN
+- **Differences:** Alberta uses POINT_ESTIMATE; Ontario uses MEAN
+- **Verdict:** Same event boundaries, but different statistic types still block direct comparison.
 
 **Alberta vs BC:**
 - **Comparable?** No

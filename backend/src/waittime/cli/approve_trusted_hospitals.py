@@ -1,6 +1,6 @@
 """CLI to approve hospitals from trusted government sources.
 
-All four current provincial data sources (Ontario Health, Quebec MSSS,
+All four current provincial data sources (Health Quality Ontario, Quebec MSSS,
 Alberta AHS, BC PHSA) are official government health authority websites.
 Hospitals scraped from these sources should be auto-approved (is_verified=true,
 is_visible=true) per project policy.  Quality is enforced through automated

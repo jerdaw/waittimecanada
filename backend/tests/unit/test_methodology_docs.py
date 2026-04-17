@@ -37,14 +37,13 @@ class TestOntarioMethodologyJSON:
         assert ontario_json["province_code"] == "ON"
         assert "last_updated" in ontario_json
 
-    def test_has_two_data_sources(self, ontario_json):
-        """Should document both ER Watch and HQO sources."""
+    def test_has_current_data_source(self, ontario_json):
+        """Should document the maintained Ontario source."""
         sources = ontario_json["sources"]
-        assert len(sources) == 2
+        assert len(sources) == 1
 
         source_ids = {s["id"] for s in sources}
-        assert "on-erwatch" in source_ids
-        assert "on-hqo" in source_ids
+        assert "ontario-health" in source_ids
 
     def test_source_has_methodology(self, ontario_json):
         """Each source should have complete methodology specification."""
@@ -57,19 +56,14 @@ class TestOntarioMethodologyJSON:
             assert "statistic_type" in methodology
             assert "patient_scope" in methodology
 
-    def test_erwatch_is_point_estimate(self, ontario_json):
-        """ER Watch should use POINT_ESTIMATE statistic type."""
-        erwatch = next(s for s in ontario_json["sources"] if s["id"] == "on-erwatch")
+    def test_current_source_is_mean(self, ontario_json):
+        """Ontario should currently be documented as MEAN TRIAGE -> PHYSICIAN."""
+        ontario_source = next(s for s in ontario_json["sources"] if s["id"] == "ontario-health")
 
-        assert erwatch["methodology"]["statistic_type"] == "POINT_ESTIMATE"
-        assert erwatch["type"] == "real-time"
-
-    def test_hqo_is_p90(self, ontario_json):
-        """HQO should use P90 statistic type."""
-        hqo = next(s for s in ontario_json["sources"] if s["id"] == "on-hqo")
-
-        assert hqo["methodology"]["statistic_type"] == "P90"
-        assert hqo["type"] == "historical"
+        assert ontario_source["methodology"]["statistic_type"] == "MEAN"
+        assert ontario_source["methodology"]["start_event"] == "TRIAGE"
+        assert ontario_source["methodology"]["end_event"] == "PHYSICIAN"
+        assert ontario_source["type"] == "historical_reporting"
 
     def test_both_use_time_to_provider(self, ontario_json):
         """Both sources should use TIME_TO_PROVIDER metric."""
@@ -79,11 +73,11 @@ class TestOntarioMethodologyJSON:
             assert source["methodology"]["end_event"] == "PHYSICIAN"
 
     def test_telehealth_has_811(self, ontario_json):
-        """Should document Health Connect Ontario (811)."""
+        """Should document Health811 (811)."""
         telehealth = ontario_json["telehealth"]
 
         assert telehealth["phone"] == "811"
-        assert "Health Connect Ontario" in telehealth["name"]
+        assert "Health811" in telehealth["name"]
         assert "url" in telehealth
 
     def test_triage_system_has_five_levels(self, ontario_json):
@@ -104,10 +98,13 @@ class TestOntarioMethodologyJSON:
         assert "within_province" in comparability
         assert "cross_province_examples" in comparability
 
-        # Should document ER Watch vs HQO incompatibility
         within = comparability["within_province"]
-        assert "er_watch_vs_hqo" in within
-        assert within["er_watch_vs_hqo"]["compatible"] is False
+        assert "ontario_vs_ontario" in within
+        assert within["ontario_vs_ontario"]["compatible"] is True
+
+        cross = comparability["cross_province_examples"]
+        assert cross["ontario_vs_alberta"]["compatible"] is False
+        assert cross["ontario_vs_quebec"]["compatible"] is False
 
     def test_has_validation_checklist(self, ontario_json):
         """Should have validation checklist for measurements."""

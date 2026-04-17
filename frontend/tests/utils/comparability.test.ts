@@ -16,7 +16,7 @@ describe("comparability utility", () => {
     metric_family: "TIME_TO_PROVIDER",
     start_event: "TRIAGE",
     end_event: "PHYSICIAN",
-    statistic_type: "P90",
+    statistic_type: "MEAN",
   };
 
   it("treats identical methodologies as directly comparable", () => {
@@ -52,19 +52,19 @@ describe("comparability utility", () => {
       expect.objectContaining({ key: "metric_family", matches: false }),
       expect.objectContaining({ key: "start_event", matches: true }),
       expect.objectContaining({ key: "end_event", matches: false }),
-      expect.objectContaining({ key: "statistic_type", matches: true }),
+      expect.objectContaining({ key: "statistic_type", matches: false }),
     ]);
   });
 
   it("classifies source pairs by overall comparability level", () => {
     const ontario: MethodologySource = {
       id: "ontario-health",
-      name: "Ontario Health",
+      name: "Health Quality Ontario",
       province: "Ontario",
       default_metric_family: "TIME_TO_PROVIDER",
       default_start_event: "TRIAGE",
       default_end_event: "PHYSICIAN",
-      default_statistic_type: "POINT_ESTIMATE",
+      default_statistic_type: "MEAN",
     };
     const bc: MethodologySource = {
       id: "bc-phsa",
@@ -106,12 +106,12 @@ describe("comparability utility", () => {
     const pairs = buildUniquePairwiseComparisons([
       {
         id: "ontario-health",
-        name: "Ontario Health",
+        name: "Health Quality Ontario",
         province: "Ontario",
         default_metric_family: "TIME_TO_PROVIDER",
         default_start_event: "TRIAGE",
         default_end_event: "PHYSICIAN",
-        default_statistic_type: "POINT_ESTIMATE",
+        default_statistic_type: "MEAN",
       },
       {
         id: "bc-phsa",

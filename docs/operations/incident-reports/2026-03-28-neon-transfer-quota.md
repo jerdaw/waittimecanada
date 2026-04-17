@@ -34,7 +34,7 @@ hardening for `/api/status` and aggregate `/api/data-quality` has now landed,
 and the repo-side Playwright stabilization pass is complete, but the current
 frontend release still needs to be deployed and re-verified on the shared VPS.
 
-Observed on **2026-04-09**:
+Observed on **2026-04-09** and re-confirmed on **2026-04-16**:
 
 - `https://wait-time.ca/api/health` still reported healthy connectivity
 - live `/api/status` still exposed legacy source IDs

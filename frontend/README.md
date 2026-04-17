@@ -77,7 +77,7 @@ API routes (selected):
 
 - Only verified + visible hospitals are shown publicly.
 - Occupancy and equity routes include explicit availability states when source data is not ready.
-- Map layer equity geometry is scaffolded placeholder data until StatsCan integration is completed.
+- The equity layer now ships a real Ontario StatsCan-based geometry/metadata path; other provinces remain explicitly unavailable until equivalent source work is completed.
 - The direct-VPS frontend packaging path is `frontend/Dockerfile`; service-local deploy and rollback steps live in `docs/operations/direct-vps-frontend.md`.
 - The backend worker/timer migration path is documented separately in `docs/operations/direct-vps-backend.md`.
 - The production frontend now runs on the shared VPS at `https://wait-time.ca`.

@@ -18,7 +18,7 @@ python run_migrations.py
 
 **Output:**
 ```
-Found 17 migration files:
+Found 20 migration files:
 
 Running: 001_create_enums.sql
   ✓ Success
@@ -45,7 +45,7 @@ Migrations use `DO $$ ... EXCEPTION WHEN duplicate_object THEN NULL; END $$;` bl
 NNN_descriptive_name.sql
 ```
 
-- `NNN`: Zero-padded sequential number (001, 002, ..., 017)
+- `NNN`: Zero-padded sequential number (001, 002, ..., 020)
 - `descriptive_name`: Action and target (e.g., `create_enums`, `add_occupancy_columns`)
 - **Always use `.sql` extension** (`.sql.skip` files are intentionally excluded)
 
@@ -59,7 +59,7 @@ Migrations run in **lexicographic order** (alphabetical). The numeric prefix ens
 
 **Behavior:**
 - Reads all `*.sql` files from `backend/migrations/`
-- Sorts alphabetically (001 → 017)
+- Sorts alphabetically (001 → 020)
 - Executes each in a transaction
 - Stops on first error (unless safe duplicate)
 - Safe duplicate errors (already exists): ⚠ Warning, continues
@@ -156,7 +156,7 @@ DROP TABLE IF EXISTS sources;
 
 **Sources Seeded:**
 - `quebec-msss`: Quebec MSSS (Ministère de la Santé)
-- `ontario-health`: Ontario Health
+- `ontario-health`: historical seed later corrected to Health Quality Ontario semantics by `020_sync_active_source_definitions.sql`
 - `alberta-ahs`: Alberta Health Services
 - `bc-phsa`: BC Provincial Health Services Authority
 
@@ -170,6 +170,17 @@ DROP TABLE IF EXISTS sources;
 ```sql
 DELETE FROM sources WHERE id IN ('quebec-msss', 'ontario-health', 'alberta-ahs', 'bc-phsa');
 ```
+
+#### 020_sync_active_source_definitions.sql
+**Purpose:** Re-align active source rows to the canonical source catalog in
+`backend/data/sources/*.json`
+**Created:** 2026-04-16
+**Milestone:** Ontario completion / source-metadata sync
+
+**Key Corrections Applied:**
+- `ontario-health`: Health Quality Ontario, current HQO URLs, `MEAN`
+- `alberta-ahs`: `POINT_ESTIMATE`
+- active source URLs and telehealth metadata re-synced without changing source IDs
 
 ---
 
@@ -383,8 +394,8 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 
 ```bash
 ls backend/migrations/*.sql | tail -1
-# Output: backend/migrations/017_add_scraper_alert_state.sql
-# Next: 018
+# Output: backend/migrations/020_sync_active_source_definitions.sql
+# Next: 021
 ```
 
 ### Step 2: Create Migration File
@@ -796,7 +807,7 @@ For migration questions or issues:
 
 ---
 
-**Last Updated:** 2026-03-13
-**Total Migrations:** 17
+**Last Updated:** 2026-04-16
+**Total Migrations:** 20
 **Database Provider:** Neon PostgreSQL 17
-**Schema Version:** 017 (Scraper Alert State)
+**Schema Version:** 020 (Active Source Definition Sync)

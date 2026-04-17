@@ -26,16 +26,16 @@ Create a JSON file in `data/sources/` with the following structure:
 ```json
 {
   "id": "ontario-health",
-  "name": "Ontario Health - Wait Times",
+  "name": "Health Quality Ontario",
   "province": "ON",
-  "url": "https://www.ontariohealth.ca/our-priorities/wait-times/emergency-departments",
-  "methodology_url": "https://www.ontariohealth.ca/our-priorities/wait-times/how-wait-times-are-measured",
+  "url": "https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments",
+  "methodology_url": "https://www.hqontario.ca/System-Performance/Emergency-Department-Performance",
   "telehealth_number": "811",
   "telehealth_name": "Health811",
   "default_metric_family": "TIME_TO_PROVIDER",
   "default_start_event": "TRIAGE",
   "default_end_event": "PHYSICIAN",
-  "default_statistic_type": "P90"
+  "default_statistic_type": "MEAN"
 }
 ```
 

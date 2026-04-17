@@ -86,6 +86,11 @@ describe("API Route: Resources", () => {
     expect(data.meta).toMatchObject({
       kind: "facility",
       query: { province: "ON", limit: 5 },
+      scope: {
+        mode: "ontario_only",
+        available_provinces: ["ON"],
+        requested_province: "ON",
+      },
     });
     expect(data.meta.source_status[0]).toMatchObject({
       source_id: "mohserlo",
@@ -150,6 +155,11 @@ describe("API Route: Resources", () => {
     expect(data.meta).toMatchObject({
       kind: "aed",
       query: { province: "ON", limit: 5 },
+      scope: {
+        mode: "ontario_only",
+        available_provinces: ["ON"],
+        requested_province: "ON",
+      },
     });
     expect(data.meta.source_status[0]).toMatchObject({
       source_id: "osm-aed",
@@ -228,6 +238,31 @@ describe("API Route: Resources", () => {
       "Toronto General Hospital",
       "1000005758 Ontario Inc.",
     ]);
+  });
+
+  test("returns an explicit Ontario-only scope response for unsupported provinces", async () => {
+    const req = new NextRequest(
+      "http://localhost/api/resources?kind=facility&province=QC&limit=5",
+    );
+
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.success).toBe(true);
+    expect(data.count).toBe(0);
+    expect(data.data).toEqual([]);
+    expect(data.meta).toMatchObject({
+      kind: "facility",
+      query: { province: "QC", limit: 5 },
+      scope: {
+        mode: "ontario_only",
+        available_provinces: ["ON"],
+        requested_province: "QC",
+      },
+      source_status: [],
+    });
+    expect(mockSql.unsafe).not.toHaveBeenCalled();
   });
 
   test("deduplicates default facility view for repeated campus records", async () => {

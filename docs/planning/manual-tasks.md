@@ -48,9 +48,12 @@ filtering and new smoke coverage.
 **Estimated Time:** 10-15 minutes
 **Priority:** HIGH
 
-**Current Blocker (2026-04-09):** The current workstation session could not
-resolve or reach a usable shared-VPS SSH target, so the release step could not
-be executed from automation in this pass.
+**Current Blocker (2026-04-16):** Live verification still shows the shared-VPS
+frontend on an older release. `bash ./scripts/production-smoke.sh
+https://wait-time.ca` still fails on `/api/status` and aggregate
+`/api/data-quality` because `manitoba-shared-health` is still exposed, and the
+current workstation session still does not have a confirmed reachable shared-VPS
+SSH target for the release step.
 
 ### Steps:
 1. From a clean checkout, run
@@ -67,6 +70,16 @@ be executed from automation in this pass.
 
 **Result:** The public VPS frontend is confirmed to be serving the hardened
 status/data-quality rollups rather than an older release.
+
+### Ontario completion handoff
+Once the release above is verified, keep the remaining Ontario scope explicit:
+
+1. `/resources` is intentionally Ontario-only for facilities, AED fallback, and
+   naloxone guidance.
+2. OSM-backed AED fallback remains the shipped AED posture until an official
+   Ontario registry path has explicit permission or partnership coverage.
+3. Naloxone remains official Ontario link-out only; do not ingest, proxy, or
+   republish the native dataset without clearer reuse rights.
 
 ---
 
@@ -226,7 +239,7 @@ Deployment Date: 2026-03-12
 
 ### Interview Questions (15-minute format):
 1. "When you look at wait time data, what methodology details matter most to you?"
-2. "How would you react if you saw this warning: 'Ontario uses P90 triage-to-doctor, Quebec uses average registration-to-doctor'?"
+2. "How would you react if you saw this warning: 'Ontario uses mean triage-to-doctor, Quebec uses average registration-to-doctor'?"
 3. "Would a tool showing these methodology differences be useful in your work?"
 4. "What concerns would you have about patients comparing wait times across provinces?"
 
@@ -238,7 +251,7 @@ Hi [Name],
 
 I'm a medical student building a tool that audits Canadian ER wait time
 methodologies. I'm looking for 15 minutes of your time to validate whether
-exposing methodology differences (P90 vs averages, triage vs registration)
+exposing methodology differences (mean vs rolling averages, triage vs registration)
 would be useful for professionals or patients.
 
 Would you be available for a brief call/coffee chat?
@@ -354,7 +367,7 @@ Contains:
 **Priority:** LOW (nice-to-have feature)
 
 ### Research Questions:
-1. Does Ontario Health provide "patients waiting" or "patients in treatment" counts?
+1. Does Health Quality Ontario provide "patients waiting" or "patients in treatment" counts?
 2. Does Quebec MSSS provide similar data?
 3. Are these counts in the same data source or separate?
 4. What is the update frequency?

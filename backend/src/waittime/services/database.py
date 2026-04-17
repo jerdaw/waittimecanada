@@ -49,6 +49,7 @@ class PublicHealthSourceStatus:
     alert_record_count: int
     latest_alert_published_at: datetime | None
 
+
 class DatabaseService:
     """Service for interacting with PostgreSQL database.
 
@@ -477,7 +478,15 @@ class DatabaseService:
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (id) DO UPDATE SET
                         name = EXCLUDED.name,
+                        province = EXCLUDED.province,
                         url = EXCLUDED.url,
+                        methodology_url = EXCLUDED.methodology_url,
+                        telehealth_name = EXCLUDED.telehealth_name,
+                        telehealth_number = EXCLUDED.telehealth_number,
+                        default_metric_family = EXCLUDED.default_metric_family,
+                        default_start_event = EXCLUDED.default_start_event,
+                        default_end_event = EXCLUDED.default_end_event,
+                        default_statistic_type = EXCLUDED.default_statistic_type,
                         updated_at = NOW()
                     RETURNING *
                     """,

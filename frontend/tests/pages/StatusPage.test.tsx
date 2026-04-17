@@ -20,7 +20,7 @@ vi.mock("../../components/Header", () => ({
 
 const makeSource = (overrides = {}) => ({
   source_id: "ca-on-oh",
-  source_name: "Ontario Health",
+  source_name: "Health Quality Ontario",
   province: "ON",
   uptime_24h: 0.97,
   uptime_7d: 0.95,
@@ -105,7 +105,7 @@ describe("StatusPage", () => {
     const sources = [
       makeSource({
         source_id: "ca-on-oh",
-        source_name: "Ontario Health",
+        source_name: "Health Quality Ontario",
         province: "ON",
       }),
       makeSource({
@@ -123,7 +123,7 @@ describe("StatusPage", () => {
     await waitFor(() => {
       expect(screen.getAllByTestId("source-card")).toHaveLength(2);
     });
-    expect(screen.getByText("Ontario Health")).toBeInTheDocument();
+    expect(screen.getByText("Health Quality Ontario")).toBeInTheDocument();
     expect(screen.getByText("Quebec MSSS")).toBeInTheDocument();
   });
 

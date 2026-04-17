@@ -38,13 +38,13 @@ describe("ComparabilityMatrix", () => {
 
   const mockSources = [
     {
-      id: "on-health",
-      name: "Health Ontario",
+      id: "ontario-health",
+      name: "Health Quality Ontario",
       province: "Ontario",
       default_metric_family: "TIME_TO_PROVIDER",
       default_start_event: "TRIAGE",
       default_end_event: "PHYSICIAN",
-      default_statistic_type: "P90",
+      default_statistic_type: "MEAN",
     },
     {
       id: "qc-msss",
@@ -56,13 +56,13 @@ describe("ComparabilityMatrix", () => {
       default_statistic_type: "ROLLING_AVG",
     },
     {
-      id: "ab-ahs",
+      id: "alberta-ahs",
       name: "Alberta AHS",
       province: "Alberta",
       default_metric_family: "TIME_TO_PROVIDER",
       default_start_event: "TRIAGE",
       default_end_event: "PHYSICIAN",
-      default_statistic_type: "P90",
+      default_statistic_type: "POINT_ESTIMATE",
     },
   ];
 
@@ -180,19 +180,19 @@ describe("ComparabilityMatrix", () => {
     }
   });
 
-  it("identifies Ontario and Alberta as compatible", () => {
+  it("identifies Ontario and Alberta as partially aligned", () => {
     render(<ComparabilityMatrix sources={mockSources} />);
 
-    // Ontario and Alberta both use: TRIAGE → PHYSICIAN, P90
-    // They should be marked as compatible
-    const checkmarks = screen.getAllByText("✓");
-    expect(checkmarks.length).toBeGreaterThanOrEqual(3); // At least diagonal + ON-AB
+    // Ontario and Alberta both use TRIAGE → PHYSICIAN but differ on statistic type.
+    // They should still be shown as partially comparable.
+    const warnings = screen.queryAllByText("⚠");
+    expect(warnings.length).toBeGreaterThan(0);
   });
 
   it("identifies Ontario and Quebec as incompatible", () => {
     render(<ComparabilityMatrix sources={mockSources} />);
 
-    // Ontario: TRIAGE → PHYSICIAN, P90
+    // Ontario: TRIAGE → PHYSICIAN, MEAN
     // Quebec: REGISTRATION → PHYSICIAN, ROLLING_AVG
     // They should be marked as not comparable or partial
     const warnings = screen.queryAllByText("⚠");

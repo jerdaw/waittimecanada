@@ -19,7 +19,7 @@ describe("/api/data-quality", () => {
     mockSql.mockResolvedValueOnce([
       {
         source_id: "ontario-health",
-        source_name: "Ontario Health",
+        source_name: "Health Quality Ontario",
         province: "ON",
         measurements_24h: 24,
         measurements_7d: 168,
@@ -83,7 +83,7 @@ describe("/api/data-quality", () => {
     mockSql.mockResolvedValueOnce([
       {
         source_id: "ontario-health",
-        source_name: "Ontario Health",
+        source_name: "Health Quality Ontario",
         province: "ON",
         measurements_24h: 24,
         measurements_7d: 168,
@@ -181,13 +181,16 @@ describe("/api/data-quality", () => {
     "http://localhost/api/data-quality?view=hospital",
     "http://localhost/api/data-quality?source_id=ontario-health",
     "http://localhost/api/data-quality?hospital_id=ca-on-test&source_id=ontario-health",
-  ])("returns 400 for invalid data-quality query combinations: %s", async (url) => {
-    const res = await GET(new Request(url));
-    const data = await res.json();
+  ])(
+    "returns 400 for invalid data-quality query combinations: %s",
+    async (url) => {
+      const res = await GET(new Request(url));
+      const data = await res.json();
 
-    expect(res.status).toBe(400);
-    expect(data.error).toBe("Validation Error");
-  });
+      expect(res.status).toBe(400);
+      expect(data.error).toBe("Validation Error");
+    },
+  );
 
   it("annotates source trend responses when snapshots span the cadence-model shift", async () => {
     const mockSql = vi.fn();

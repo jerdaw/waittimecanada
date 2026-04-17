@@ -177,7 +177,7 @@ describe("/api/status", () => {
     mockSql.mockResolvedValueOnce([
       {
         source_id: "ontario-health",
-        source_name: "Ontario Health",
+        source_name: "Health Quality Ontario",
         province: "ON",
         runs_24h: 24,
         runs_7d: 168,

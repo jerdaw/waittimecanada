@@ -19,14 +19,14 @@ describe("live-scraper-sources", () => {
   it("filters dormant and legacy source rows from aggregate payloads", () => {
     const rows = [
       { source_id: "quebec-msss", source_name: "Quebec MSSS" },
-      { source_id: "ontario-health", source_name: "Ontario Health" },
+      { source_id: "ontario-health", source_name: "Health Quality Ontario" },
       { source_id: "manitoba-shared-health", source_name: "Manitoba" },
       { source_id: "on-health", source_name: "Legacy Ontario" },
     ];
 
     expect(filterActiveLiveSourceRows(rows)).toEqual([
       { source_id: "quebec-msss", source_name: "Quebec MSSS" },
-      { source_id: "ontario-health", source_name: "Ontario Health" },
+      { source_id: "ontario-health", source_name: "Health Quality Ontario" },
     ]);
   });
 

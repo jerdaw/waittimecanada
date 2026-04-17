@@ -42,7 +42,7 @@ the VPS backend path.
 | Component | Status | Details |
 |-----------|--------|---------|
 | **Quebec Scraper** | ✅ Active | MSSS portal, BeautifulSoup, 120+ hospitals |
-| **Ontario Scraper** | ✅ Active | Health Ontario, direct HTTP + HTML table parsing, 220+ hospitals |
+| **Ontario Scraper** | ✅ Active | Health Quality Ontario, direct HTTP + HTML table parsing, 220+ hospitals |
 | **Alberta Scraper** | ✅ Active | AHS portal, Playwright, 26 hospitals |
 | **BC Scraper** | ✅ Active | PHSA portal, JSON extraction, 25 hospitals |
 
@@ -127,7 +127,7 @@ $ python -m waittime.cli.scraper --list
 - Methodology: `TRIAGE → PHYSICIAN, P90` (was: `REGISTRATION → PHYSICIAN, POINT_ESTIMATE`)
 - Methodology URL: `https://www.edwaittimes.ca/about` (was: NULL)
 
-**Migration File:** `004_seed_sources.sql` updated
+**Migration Files:** `004_seed_sources.sql` plus `020_sync_active_source_definitions.sql`
 
 ### 4. Testing ✅
 
