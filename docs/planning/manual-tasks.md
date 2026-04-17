@@ -38,38 +38,32 @@ and `5 GB/month` public transfer ceilings.
 
 ---
 
-## 🔴 BLOCKED: Deploy Latest VPS Frontend Release And Verify Public Status Summaries
+## ✅ COMPLETED: Deploy Latest VPS Frontend Release And Verify Public Status Summaries
 
-**Why:** The repo-side fix for `/api/status` and aggregate
-`/api/data-quality` is merged and CI-green, but the live VPS frontend still
-needs to be updated and verified so `wait-time.ca` reflects the hardened source
-filtering and new smoke coverage.
+**Why:** Confirm the shared-VPS frontend is serving the hardened public
+status/data-quality filtering rather than an older release.
 **Milestone:** Active ops follow-up
-**Estimated Time:** 10-15 minutes
-**Priority:** HIGH
+**Status:** Completed on **2026-04-17**
 
-**Current Blocker (2026-04-16):** Live verification still shows the shared-VPS
-frontend on an older release. `bash ./scripts/production-smoke.sh
-https://wait-time.ca` still fails on `/api/status` and aggregate
-`/api/data-quality` because `manitoba-shared-health` is still exposed, and the
-current workstation session still does not have a confirmed reachable shared-VPS
-SSH target for the release step.
-
-### Steps:
-1. From a clean checkout, run
-   `./scripts/release-vps-frontend.sh <ssh-target> --deploy`.
-2. Verify:
+### Verification outcome
+1. The shared-VPS frontend was released from a clean workstation checkout to
+   `main@c3b442b`.
+2. The staged release was deployed on the VPS using
+   `sudo ./scripts/deploy-vps-frontend.sh /etc/projects-merge/env/waittime-frontend.env`.
+3. Verification passed:
+   - `curl -fsS http://127.0.0.1:3400/api/health`
    - `curl -fsS https://wait-time.ca/api/health`
    - `PRODUCTION_BASE_URL=https://wait-time.ca ./scripts/production-smoke.sh`
-3. Confirm that live `/api/status` and aggregate `/api/data-quality`:
+4. Live `/api/status` and aggregate `/api/data-quality` now:
    - include the active live source IDs (`quebec-msss`, `ontario-health`,
      `alberta-ahs`, `bc-phsa`)
    - do not include `manitoba-shared-health` or `on-health`
-4. Once verified, update `docs/planning/roadmap.md` to close the remaining VPS
-   status-summary follow-up.
+5. Production Ontario scope spot checks passed for:
+   - `/api/resources?kind=facility&province=QC&limit=1`
+   - `/api/resources?kind=facility&province=ON&q=Toronto%20General&limit=1`
 
-**Result:** The public VPS frontend is confirmed to be serving the hardened
-status/data-quality rollups rather than an older release.
+**Result:** The public VPS frontend is verified to be serving the hardened
+status/data-quality rollups in production.
 
 ### Ontario completion handoff
 Once the release above is verified, keep the remaining Ontario scope explicit:
@@ -180,7 +174,7 @@ managed-Postgres posture.
 - **Platform:** Shared VPS frontend via Caddy + Docker loopback runtime
 - **Canonical URL:** `https://wait-time.ca`
 - **Redirects:** `https://www.wait-time.ca` → `https://wait-time.ca/`
-- **Latest verified production release:** `main@85ed19d`
+- **Latest verified production release:** `main@c3b442b`
 
 ### GitHub Actions (Already Configured):
 ✅ Scraper cron already set up in `.github/workflows/scraper-cron.yml`

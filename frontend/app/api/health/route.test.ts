@@ -23,8 +23,8 @@ describe("API Route Integration: Health", () => {
     // 2. Mock Sources Query (Success)
     mockSqlFn.mockResolvedValueOnce([
       {
-        source_id: "s1",
-        source_name: "Source 1",
+        source_id: "ontario-health",
+        source_name: "Health Quality Ontario",
         last_run: new Date().toISOString(),
         status: "success",
         measurements_count: 100,
@@ -65,8 +65,8 @@ describe("API Route Integration: Health", () => {
     mockSqlFn.mockResolvedValueOnce([]);
     mockSqlFn.mockResolvedValueOnce([
       {
-        source_id: "s1",
-        source_name: "Source 1",
+        source_id: "ontario-health",
+        source_name: "Health Quality Ontario",
         last_run: new Date().toISOString(),
         status: "error",
         error_message: "Selector not found",
@@ -91,5 +91,66 @@ describe("API Route Integration: Health", () => {
     expect(data.sources[0].last_error_category).toBe("parser_breakage");
     expect(data.sources[0].last_error_stage).toBe("parse");
     expect(data.sources[0].consecutive_failures).toBe(2);
+  });
+
+  test("filters dormant legacy sources from the public health payload", async () => {
+    mockSqlFn.mockResolvedValueOnce([]);
+    mockSqlFn.mockResolvedValueOnce([
+      {
+        source_id: "manitoba-shared-health",
+        source_name: "Shared Health Manitoba",
+        last_run: null,
+        status: null,
+        error_message: null,
+        measurements_count: 0,
+        age_minutes: null,
+        last_success_run: null,
+        last_success_measurements_count: null,
+        last_error_run: null,
+        last_error_category: null,
+        last_error_stage: null,
+        consecutive_failures: 0,
+        last_run_duration_ms: null,
+      },
+      {
+        source_id: "ontario-health",
+        source_name: "Health Quality Ontario",
+        last_run: new Date().toISOString(),
+        status: "success",
+        error_message: null,
+        measurements_count: 124,
+        age_minutes: 4,
+        last_success_run: new Date().toISOString(),
+        last_success_measurements_count: 124,
+        last_error_run: null,
+        last_error_category: null,
+        last_error_stage: null,
+        consecutive_failures: 0,
+        last_run_duration_ms: 3200,
+      },
+      {
+        source_id: "on-health",
+        source_name: "Ontario Health",
+        last_run: null,
+        status: null,
+        error_message: null,
+        measurements_count: 0,
+        age_minutes: null,
+        last_success_run: null,
+        last_success_measurements_count: null,
+        last_error_run: null,
+        last_error_category: null,
+        last_error_stage: null,
+        consecutive_failures: 0,
+        last_run_duration_ms: null,
+      },
+    ]);
+
+    const res = await GET(new NextRequest("http://localhost"));
+    expect(res.status).toBe(200);
+    const data = await res.json();
+
+    expect(data.sources).toHaveLength(1);
+    expect(data.sources[0].source_id).toBe("ontario-health");
   });
 });

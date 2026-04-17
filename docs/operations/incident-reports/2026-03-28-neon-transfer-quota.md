@@ -29,10 +29,10 @@ Live verification on **2026-04-01** showed:
 - scheduled `Heartbeat Monitor (Dead Man's Switch)` runs were succeeding again
 - scheduled `Production Smoke` was succeeding again
 
-The remaining follow-up is separate from the original quota outage: repo-side
-hardening for `/api/status` and aggregate `/api/data-quality` has now landed,
-and the repo-side Playwright stabilization pass is complete, but the current
-frontend release still needs to be deployed and re-verified on the shared VPS.
+The remaining follow-up was separate from the original quota outage: repo-side
+hardening for `/api/status` and aggregate `/api/data-quality` had landed, and
+the repo-side Playwright stabilization pass was complete, but the current
+frontend release still needed to be deployed and re-verified on the shared VPS.
 
 Observed on **2026-04-09** and re-confirmed on **2026-04-16**:
 
@@ -41,6 +41,15 @@ Observed on **2026-04-09** and re-confirmed on **2026-04-16**:
 - live aggregate `/api/data-quality` still exposed legacy source IDs
 - `bash scripts/production-smoke.sh https://wait-time.ca` still failed on those
   two endpoints
+
+That follow-up was closed on **2026-04-17**:
+
+- the shared-VPS frontend was released and deployed from a clean workstation
+  checkout
+- `PRODUCTION_BASE_URL=https://wait-time.ca ./scripts/production-smoke.sh`
+  passed again
+- live `/api/status` and aggregate `/api/data-quality` no longer exposed
+  `manitoba-shared-health` or `on-health`
 
 ## User-Facing Impact
 

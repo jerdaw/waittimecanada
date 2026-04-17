@@ -3,6 +3,7 @@ import { getDb } from "@/utils/db";
 import { NO_STORE_HEADERS } from "@/utils/cache";
 import { checkRateLimit } from "@/utils/rate-limit";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
+import { filterActiveLiveSourceRows } from "@/utils/live-scraper-sources";
 import { logger } from "@/utils/logger";
 
 export interface SourceHealth {
@@ -122,54 +123,58 @@ export async function GET(req: NextRequest) {
             ORDER BY s.province, s.name
             `;
 
-          const sources: SourceHealth[] = result.map((row) => {
-            const ageMinutes = row.age_minutes ? Number(row.age_minutes) : null;
-            const consecutiveFailures = Number(row.consecutive_failures ?? 0);
+          const sources: SourceHealth[] = filterActiveLiveSourceRows(
+            result.map((row) => {
+              const ageMinutes = row.age_minutes
+                ? Number(row.age_minutes)
+                : null;
+              const consecutiveFailures = Number(row.consecutive_failures ?? 0);
 
-            let status: SourceHealth["status"] = "unknown";
-            if (!row.last_run) {
-              status = "unknown";
-            } else if (row.status === "error") {
-              status = "error";
-            } else if (consecutiveFailures > 0) {
-              status = "error";
-            } else if (ageMinutes && ageMinutes > STALE_THRESHOLD_MINUTES) {
-              status = "stale";
-            } else {
-              status = "healthy";
-            }
+              let status: SourceHealth["status"] = "unknown";
+              if (!row.last_run) {
+                status = "unknown";
+              } else if (row.status === "error") {
+                status = "error";
+              } else if (consecutiveFailures > 0) {
+                status = "error";
+              } else if (ageMinutes && ageMinutes > STALE_THRESHOLD_MINUTES) {
+                status = "stale";
+              } else {
+                status = "healthy";
+              }
 
-            return {
-              source_id: row.source_id,
-              source_name: row.source_name,
-              last_run: row.last_run
-                ? new Date(row.last_run).toISOString()
-                : null,
-              status,
-              error_message: row.error_message ?? null,
-              measurements_count: Number(row.measurements_count),
-              age_minutes: ageMinutes ? Math.round(ageMinutes) : null,
-              last_success_run: row.last_success_run
-                ? new Date(row.last_success_run).toISOString()
-                : null,
-              last_success_measurements_count:
-                row.last_success_measurements_count !== null &&
-                row.last_success_measurements_count !== undefined
-                  ? Number(row.last_success_measurements_count)
+              return {
+                source_id: row.source_id,
+                source_name: row.source_name,
+                last_run: row.last_run
+                  ? new Date(row.last_run).toISOString()
                   : null,
-              last_error_run: row.last_error_run
-                ? new Date(row.last_error_run).toISOString()
-                : null,
-              last_error_category: row.last_error_category ?? null,
-              last_error_stage: row.last_error_stage ?? null,
-              consecutive_failures: consecutiveFailures,
-              last_run_duration_ms:
-                row.last_run_duration_ms !== null &&
-                row.last_run_duration_ms !== undefined
-                  ? Number(row.last_run_duration_ms)
+                status,
+                error_message: row.error_message ?? null,
+                measurements_count: Number(row.measurements_count),
+                age_minutes: ageMinutes ? Math.round(ageMinutes) : null,
+                last_success_run: row.last_success_run
+                  ? new Date(row.last_success_run).toISOString()
                   : null,
-            };
-          });
+                last_success_measurements_count:
+                  row.last_success_measurements_count !== null &&
+                  row.last_success_measurements_count !== undefined
+                    ? Number(row.last_success_measurements_count)
+                    : null,
+                last_error_run: row.last_error_run
+                  ? new Date(row.last_error_run).toISOString()
+                  : null,
+                last_error_category: row.last_error_category ?? null,
+                last_error_stage: row.last_error_stage ?? null,
+                consecutive_failures: consecutiveFailures,
+                last_run_duration_ms:
+                  row.last_run_duration_ms !== null &&
+                  row.last_run_duration_ms !== undefined
+                    ? Number(row.last_run_duration_ms)
+                    : null,
+              };
+            }),
+          );
 
           healthResponse.sources = sources;
         }
