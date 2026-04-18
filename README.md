@@ -7,7 +7,7 @@
 [![Production Readiness](https://github.com/jerdaw/waittimecanada/actions/workflows/production-readiness.yml/badge.svg)](https://github.com/jerdaw/waittimecanada/actions/workflows/production-readiness.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
-[![Node.js 20+](https://img.shields.io/badge/node.js-20+-green.svg)](https://nodejs.org/)
+[![Node.js 22+](https://img.shields.io/badge/node.js-22+-green.svg)](https://nodejs.org/)
 [![Tests](https://img.shields.io/badge/tests-verified-success.svg)](https://github.com/jerdaw/waittimecanada)
 [![Documentation](https://img.shields.io/badge/docs-deployed-blue.svg)](https://jerdaw.github.io/waittimecanada/)
 [![Data Freshness](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fjerdaw%2Fwaittimecanada%2Fbadges%2Ffreshness.json&query=%24.message&label=Last%20Scrape&color=%24.color)](https://github.com/jerdaw/waittimecanada/actions/workflows/scraper-cron.yml)
@@ -278,7 +278,7 @@ This project demonstrates multiple CanMEDS competencies for medical school appli
 ### Prerequisites
 
 - Python 3.12+
-- Node.js 20+
+- Node.js 22+
 - PostgreSQL (Neon account recommended)
 - Mapbox account (free tier sufficient)
 
@@ -306,7 +306,7 @@ cp frontend/.env.example frontend/.env.local
 # Edit frontend/.env.local with NEXT_PUBLIC_MAPBOX_TOKEN
 
 # Backend runtime config
-export DATABASE_URL="postgresql://user:pass@host:5432/dbname"
+export DATABASE_URL="postgresql://user:pass@host:5432/dbname" # pragma: allowlist secret
 ```
 
 `backend/.env.local` can still be kept as a human convenience template, but the

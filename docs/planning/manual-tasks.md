@@ -47,7 +47,7 @@ status/data-quality filtering rather than an older release.
 
 ### Verification outcome
 1. The shared-VPS frontend was released from a clean workstation checkout to
-   `main@c3b442b`.
+   `main@2eb0faf`.
 2. The staged release was deployed on the VPS using
    `sudo ./scripts/deploy-vps-frontend.sh /etc/projects-merge/env/waittime-frontend.env`.
 3. Verification passed:
@@ -174,7 +174,7 @@ managed-Postgres posture.
 - **Platform:** Shared VPS frontend via Caddy + Docker loopback runtime
 - **Canonical URL:** `https://wait-time.ca`
 - **Redirects:** `https://www.wait-time.ca` → `https://wait-time.ca/`
-- **Latest verified production release:** `main@c3b442b`
+- **Latest verified production release:** `main@2eb0faf`
 
 ### GitHub Actions (Already Configured):
 ✅ Scraper cron already set up in `.github/workflows/scraper-cron.yml`

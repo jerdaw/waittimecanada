@@ -10,6 +10,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import type {
+  NameType,
+  ValueType,
+} from "recharts/types/component/DefaultTooltipContent";
 import { DataQualityCard } from "@/components/DataQualityCard";
 import { AnomalyFeed } from "@/components/AnomalyFeed";
 import { QualityDriftPanel } from "@/components/QualityDriftPanel";
@@ -44,6 +48,23 @@ interface HistoricalAnnotation {
   legacy_expected_runs_per_day: number;
   current_scheduler_cadence: string;
   current_expected_runs_per_day: number;
+}
+
+function formatSuccessRateTooltip(
+  value: ValueType | undefined,
+  _name: NameType | undefined,
+) {
+  const numericValue =
+    typeof value === "number"
+      ? value
+      : typeof value === "string"
+        ? Number(value)
+        : 0;
+
+  return [
+    `${(Number.isFinite(numericValue) ? numericValue : 0).toFixed(1)}%`,
+    "Success Rate",
+  ];
 }
 
 function getStatusBadge(status: string) {
@@ -200,10 +221,7 @@ function QualityTrendSection({
               domain={[0, 100]}
             />
             <Tooltip
-              formatter={(value: number | undefined) => [
-                `${(value ?? 0).toFixed(1)}%`,
-                "Success Rate",
-              ]}
+              formatter={formatSuccessRateTooltip}
               contentStyle={{
                 backgroundColor: "var(--card)",
                 border: "1px solid var(--border)",

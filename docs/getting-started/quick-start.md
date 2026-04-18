@@ -3,7 +3,7 @@
 ## 1. Prerequisites
 
 - Python 3.12+
-- Node.js 20+
+- Node.js 22+
 - npm
 - Neon `DATABASE_URL`
 - Mapbox token (`NEXT_PUBLIC_MAPBOX_TOKEN`)
@@ -21,7 +21,7 @@ hosted path, but the schema remains portable to other Postgres environments.
 
 ```bash
 cp frontend/.env.example frontend/.env.local
-export DATABASE_URL="postgresql://user:pass@host:5432/dbname"
+export DATABASE_URL="postgresql://user:pass@host:5432/dbname" # pragma: allowlist secret
 ```
 
 Populate required frontend values in `frontend/.env.local`. The backend runtime

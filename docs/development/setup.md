@@ -5,7 +5,7 @@ This guide documents the supported local development workflow for Wait Time Cana
 ## Prerequisites
 
 - Python 3.12+
-- Node.js 20+
+- Node.js 22+
 - npm
 - Neon PostgreSQL connection string (`DATABASE_URL`)
 - Mapbox public token (`NEXT_PUBLIC_MAPBOX_TOKEN`)
@@ -28,7 +28,7 @@ git clone https://github.com/jerdaw/waittimecanada.git
 cd waittimecanada
 
 cp frontend/.env.example frontend/.env.local
-export DATABASE_URL="postgresql://user:pass@host:5432/dbname"
+export DATABASE_URL="postgresql://user:pass@host:5432/dbname" # pragma: allowlist secret
 ```
 
 Populate required frontend values in `frontend/.env.local`. The backend runtime

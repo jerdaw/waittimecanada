@@ -20,6 +20,17 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+    groups:
+      frontend-nonbreaking:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     labels:
       - "dependencies"
       - "javascript"

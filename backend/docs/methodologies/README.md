@@ -69,7 +69,7 @@ Key takeaway:
 
 ## Generated Assets
 
-The downloadable comparison assets in [`docs/assets`](/home/jer/repos/waittimecanada/docs/assets/README.md)
+The downloadable comparison assets in [`docs/assets`](../../../docs/assets/README.md)
 are generated from `backend/data/sources/*.json` plus curated update-frequency
 notes in `backend/scripts/generate_methodology_comparison.py`. Keep the source
 catalog aligned before regenerating assets.
