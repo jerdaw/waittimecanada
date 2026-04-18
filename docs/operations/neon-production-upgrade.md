@@ -105,10 +105,13 @@ After the upgrade:
 
 ## Optional Credit Follow-Up
 
-After Launch is active, optionally apply to the Neon Open Source Program:
+After Launch is active, the Neon Open Source Program was pursued as an optional
+credit follow-up:
 
-- this is a cost-offset follow-up, not a blocker
-- if approved, record the outcome in `docs/planning/roadmap.md`
+- outcome observed on **2026-04-18**: the project was not approved into the
+  program, but Neon granted a one-time **`$100` credit**
+- this means the application track is closed; the remaining follow-up is still
+  the billed-month monitoring window on Launch
 
 ## Do Not Do
 

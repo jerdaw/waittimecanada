@@ -17,6 +17,9 @@ and final confirmation that the production Neon project was already on Launch.
 - Confirmed on **2026-04-18** that the production Neon dashboard already shows
   **Launch** active, with the current billing period beginning on
   **2026-04-16**
+- Recorded the separate Neon Open Source Program outcome:
+  - not approved into the program itself
+  - received a one-time **`$100` credit**
 - Reconciled the active docs again so the Launch upgrade is now marked
   completed rather than still pending
 - Updated active operational docs to point to the new runbook:
@@ -40,15 +43,12 @@ Observed on **2026-04-18**:
 - the production Neon Launch upgrade is already complete
 - active docs now consistently treat Neon free tier as a local/evaluation path,
   not a preferred steady-state production posture
-- the remaining Neon follow-up is only first-billing-window monitoring plus the
-  optional Open Source Program application
+- the remaining Neon follow-up is only first-billing-window monitoring
 
 ## Remaining Follow-Up
 
 - Monitor one billed month on Launch before revisiting any deeper
   production DB-path changes.
-- Optionally apply to the Neon Open Source Program after the Launch confirmation
-  confirmed.
 
 ## Verification
 

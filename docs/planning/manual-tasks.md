@@ -84,28 +84,22 @@ Once the release above is verified, keep the remaining Ontario scope explicit:
 
 ---
 
-## 🟡 OPTIONAL: Apply To The Neon Open Source Program
+## ✅ COMPLETED: Apply To The Neon Open Source Program
 
 **Why:** Offset Launch-plan costs with credits now that the repo explicitly
 documents Neon as the default hosted quick-start path.
 **Milestone:** Active cost follow-up
-**Estimated Time:** 10-15 minutes
-**Priority:** MEDIUM
+**Status:** Application submitted; outcome recorded on **2026-04-18**
 
-### Steps:
-1. Open the Neon Open Source Program application page.
-2. Submit:
-   - Project URL: `https://github.com/jerdaw/waittimecanada`
-   - Contact email: your preferred maintainer email
-3. Use the current repository positioning:
-   - MIT-licensed open-source project
-   - runs on PostgreSQL
-   - Neon is the default documented hosted quick-start path
-4. If accepted, record the outcome in `docs/planning/roadmap.md`.
+### Outcome
 
-**Result:** Potential credits/support without changing the project's current
-managed-Postgres posture. Do this after the Launch upgrade runbook in
-`docs/operations/neon-production-upgrade.md`, not instead of it.
+1. The application was submitted.
+2. Neon did **not** approve the project into the program itself.
+3. Neon granted a **one-time `$100` credit** instead.
+
+**Result:** The optional credit/application follow-up is no longer pending.
+The remaining Neon work is Launch-window monitoring, not another application
+cycle.
 
 ---
 
