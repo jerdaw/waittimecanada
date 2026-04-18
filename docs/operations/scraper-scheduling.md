@@ -396,7 +396,7 @@ If Neon sends a public transfer warning (for example 80% usage), apply this runb
 Notes:
 - The scraper anomaly pipeline now computes baseline stats in SQL (count/mean/stddev/quartiles) to reduce transfer from Neon to scraper workers.
 - The shared VPS frontend now serves repeated anonymous reads for key public routes from a short-lived in-process cache before re-querying Neon.
-- For production, the next manual step is now the Launch upgrade runbook in `docs/operations/neon-production-upgrade.md`; do not treat the free tier as a steady-state production target just because these guardrails are in place.
+- Production is now on Neon Launch; use `docs/operations/neon-production-upgrade.md` for the recorded billing posture and post-upgrade monitoring guidance, and do not treat the old free tier as a viable steady-state production target just because these guardrails exist.
 
 ---
 

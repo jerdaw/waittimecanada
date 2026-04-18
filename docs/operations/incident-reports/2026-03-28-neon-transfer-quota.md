@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-28
 **Severity:** High
-**Status:** Resolved as live blocker on 2026-04-01; production plan-upgrade follow-up remains open
+**Status:** Resolved as live blocker on 2026-04-01; Neon Launch confirmed on 2026-04-18
 **Scope:** Production database connectivity, live API availability, heartbeat monitoring
 
 ## Summary
@@ -51,13 +51,20 @@ That follow-up was closed on **2026-04-17**:
 - live `/api/status` and aggregate `/api/data-quality` no longer exposed
   `manitoba-shared-health` or `on-health`
 
-The remaining ops follow-up after that release is now narrower and manual:
+The remaining ops follow-up after that release became narrower and manual:
 
 - upgrade the production Neon project to **Launch**
 - monitor the first billed month after the upgrade
 - optionally apply to the Neon Open Source Program afterward
 
-Use `docs/operations/neon-production-upgrade.md`.
+That plan-upgrade follow-up is now confirmed complete:
+
+- the Neon dashboard shows **Launch** active
+- the current billing period begins on **2026-04-16**
+- live `/api/health` and production smoke re-passed on **2026-04-18**
+
+Use `docs/operations/neon-production-upgrade.md` for the recorded runbook and
+monitoring posture.
 
 ## User-Facing Impact
 

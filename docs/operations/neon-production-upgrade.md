@@ -1,16 +1,19 @@
 # Production Neon Upgrade Runbook
 
-**Status:** Current manual runbook
+**Status:** Completed in production on 2026-04-16; retained as current reference
 **Last Updated:** 2026-04-18
 **Applies To:** Production Neon project for `waittimecanada`
 
 ## Purpose
 
-This runbook covers the remaining manual production database cost/reliability
-follow-up after the March 28, 2026 transfer-quota outage.
+This runbook records the production database cost/reliability follow-up after
+the March 28, 2026 transfer-quota outage.
 
-Use this when upgrading the production Neon project off the free tier and when
-recording the result back into the repository.
+The production project was confirmed on Neon Launch on **2026-04-18**, with the
+current billing period showing a start date of **2026-04-16**.
+
+Keep this document as the reference for what was done and for future billing
+posture re-verification.
 
 ## Why This Is Needed
 
@@ -49,6 +52,12 @@ See:
 5. Record the exact upgrade date in your notes.
 6. Confirm the plan change is reflected in the Neon dashboard.
 7. Review current storage and transfer usage after the plan change.
+
+## Completion Record
+
+- Neon dashboard confirmed **Launch** active
+- Current billing period observed as **2026-04-16 to 2026-05-01**
+- Live verification re-passed on **2026-04-18**
 
 ## Expected Runtime Impact
 

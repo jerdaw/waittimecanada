@@ -9,8 +9,11 @@
 > is no longer the active blocker. Live verification now includes the
 > 2026-04-17 shared-VPS frontend release, so `/api/health`, `/api/status`, and
 > aggregate `/api/data-quality` are all re-verified in production. The
-> remaining cost/reliability follow-up is the manual Neon Launch upgrade
-> documented in `docs/operations/neon-production-upgrade.md`. See also
+> remaining cost/reliability follow-up is Launch usage monitoring, because the
+> production Neon project is already confirmed on Launch with the current
+> billing period beginning on 2026-04-16. See
+> `docs/operations/neon-production-upgrade.md` for the recorded runbook and
+> monitoring posture. See also
 > `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md` and
 > `docs/planning/roadmap.md`.
 

@@ -122,10 +122,10 @@ If counts are normal but transfer is still high:
 
 - keep the existing scraper/frontend guardrails in place
 - use `docs/operations/neon-production-upgrade.md` for the current production
-  Launch upgrade path
+  Launch reference and post-upgrade monitoring posture
 - use `docs/operations/scraper-scheduling.md` under "Neon Public Transfer
-  Guardrails" only for cadence/guardrail review, not as a substitute for the
-  Launch upgrade
+  Guardrails" for cadence/guardrail review, not as a substitute for production
+  plan monitoring
 
 Current production guardrails already applied on the frontend path:
 

@@ -17,18 +17,28 @@ This document tracks all tasks requiring significant human intervention, browser
 
 ---
 
-## 🟢 READY: Upgrade Production Neon Project To Launch
+## ✅ COMPLETED: Upgrade Production Neon Project To Launch
 
 **Why:** The free tier has already proven too fragile for production use. The
 project hit a real transfer-quota outage on 2026-03-28 and a storage warning at
 89% of the free allocation on 2026-03-31.
 **Milestone:** Active ops follow-up
-**Estimated Time:** 5-10 minutes
-**Priority:** HIGH
+**Status:** Confirmed completed on **2026-04-16**
 
-### Runbook
+### Verification outcome
 
-Use `docs/operations/neon-production-upgrade.md`.
+1. Neon billing now shows **Launch** active for the current billing period
+   starting **2026-04-16**.
+2. The production project summary confirms that the free-tier ceilings are no
+   longer the live production plan.
+3. Live verification re-passed on **2026-04-18**:
+   - `curl -fsS https://wait-time.ca/api/health`
+   - `bash ./scripts/production-smoke.sh https://wait-time.ca`
+
+### Reference
+
+See `docs/operations/neon-production-upgrade.md` for the recorded runbook and
+post-upgrade monitoring guidance.
 
 **Result:** Production no longer depends on the free tier's `0.5 GB` storage
 and `5 GB/month` public transfer ceilings.
