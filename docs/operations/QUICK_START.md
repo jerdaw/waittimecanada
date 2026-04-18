@@ -118,7 +118,14 @@ GROUP BY source_id
 ORDER BY source_id;
 ```
 
-If counts are normal but transfer is still high, use the runbook in `docs/operations/scraper-scheduling.md` under "Neon Public Transfer Guardrails".
+If counts are normal but transfer is still high:
+
+- keep the existing scraper/frontend guardrails in place
+- use `docs/operations/neon-production-upgrade.md` for the current production
+  Launch upgrade path
+- use `docs/operations/scraper-scheduling.md` under "Neon Public Transfer
+  Guardrails" only for cadence/guardrail review, not as a substitute for the
+  Launch upgrade
 
 Current production guardrails already applied on the frontend path:
 

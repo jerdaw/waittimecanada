@@ -5,13 +5,12 @@
 > `docs/operations/reports/2026-03-operational-report.md`,
 > `docs/operations/direct-vps-frontend.md`, and `docs/operations/direct-vps-backend.md`.
 
-> Current-state addendum (2026-04-01): the March 28 Neon transfer-quota outage
-> is no longer the active blocker. Live verification on 2026-04-01 showed
-> `/api/health` returning `healthy: true` with the database connected again, and
-> `/api/hospitals` plus `/api/resources` responding normally. Repo-side
-> hardening for `/api/status` and aggregate `/api/data-quality` is also merged.
-> The remaining follow-up is a frontend VPS release plus live verification that
-> `wait-time.ca` is serving the updated summary behavior. See
+> Current-state addendum (2026-04-18): the March 28 Neon transfer-quota outage
+> is no longer the active blocker. Live verification now includes the
+> 2026-04-17 shared-VPS frontend release, so `/api/health`, `/api/status`, and
+> aggregate `/api/data-quality` are all re-verified in production. The
+> remaining cost/reliability follow-up is the manual Neon Launch upgrade
+> documented in `docs/operations/neon-production-upgrade.md`. See also
 > `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md` and
 > `docs/planning/roadmap.md`.
 

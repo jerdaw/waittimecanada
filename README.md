@@ -480,7 +480,7 @@ waittimecanada/
 ### Deployment Configuration
 - **Frontend:** Shared VPS via host Caddy + loopback Docker container
 - **Backend:** GitHub Actions runners remain live; VPS backend cutover is deferred on Ontario reachability from this host
-- **Database:** Neon PostgreSQL (free tier: 512 MB)
+- **Database:** Managed Neon PostgreSQL (Launch recommended for production; free tier is acceptable for local evaluation only)
 - **Secrets Management:** GitHub Secrets for `DATABASE_URL`, `PUSHOVER_*`, `MAPBOX_TOKEN`
 
 **Quick Production Check:**
