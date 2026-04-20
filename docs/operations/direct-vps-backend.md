@@ -9,8 +9,8 @@ Canada backend scheduler/runtime from GitHub Actions onto the shared VPS.
 Shared-VPS ownership note:
 
 1. Shared host topology, ingress ownership, release-root conventions, and live
-   cross-project inventory are canonical in `/home/jer/repos/platform-ops`.
-2. Use `/home/jer/repos/platform-ops/docs/standards/PLAT-009-shared-vps-documentation-boundary.md`
+   cross-project inventory are canonical in `/home/jer/repos/vps/platform-ops`.
+2. Use `/home/jer/repos/vps/platform-ops/docs/standards/PLAT-009-shared-vps-documentation-boundary.md`
    for the documentation boundary.
 3. This repo remains canonical for Wait Time Canada's backend packaging,
    scheduler units, deploy, verify, and rollback steps.
@@ -154,7 +154,7 @@ The direct-VPS backend path uses:
 Before preparing a backend release:
 
 ```bash
-cd /home/jer/repos/waittimecanada/backend
+cd /home/jer/repos/vps/waittimecanada/backend
 python -m pytest tests/unit/test_scraper_cli.py \
   tests/unit/test_check_heartbeat_cli.py \
   tests/unit/test_cleanup_cli.py \
@@ -196,7 +196,7 @@ Cleanup note:
 ## Stage And Release From A Workstation
 
 ```bash
-cd /home/jer/repos/waittimecanada
+cd /home/jer/repos/vps/waittimecanada
 ./scripts/release-vps-backend.sh user@your-vps --deploy
 ```
 

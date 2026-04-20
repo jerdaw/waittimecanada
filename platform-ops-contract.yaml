@@ -25,4 +25,6 @@ services:
         expect_status:
           - 200
     boundary_entrypoints:
+      - AGENTS.md
       - docs/operations/direct-vps-frontend.md
+      - docs/operations/direct-vps-backend.md

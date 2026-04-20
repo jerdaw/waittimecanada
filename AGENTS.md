@@ -44,11 +44,19 @@ This is the **Wait Time Canada** project - a "Health Systems Observatory" design
 **Current Status:** Milestone 33 (Historical Occupancy Trends) is complete and the Ontario-first **Public Health Hub Batch A** module is live. **Four-province breadth achieved** (ON, QC, AB, BC). Methodology documentation is complete for all provinces, occupancy trend aggregation is operational, the production domain `wait-time.ca` is live on the VPS via Caddy, `/resources` is live with facilities/AED fallback/alerts/AQHI, and raw measurements follow a 30-day retention policy with permanent aggregates for long-term analysis. As of **2026-04-15**, production Neon connectivity remains healthy, repo-side hardening for `/api/status` plus aggregate `/api/data-quality` is merged, data-quality coverage now uses distinct UTC hourly scrape windows, backend runtime bootstrap no longer probes secret env files directly, backend heartbeat defaults are aligned to the live 120-minute contract, and the repo-side Playwright stabilization pass is complete. The remaining live ops follow-up is still frontend release/verification on the shared VPS so `wait-time.ca` is confirmed to be serving the updated status/data-quality behavior. See `docs/planning/roadmap.md` and `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md` before treating the public status summary as fully re-verified in production.
 
 **Cross-Repo Runtime Contract Sync:** Shared-VPS facts that must stay aligned with
-`/home/jer/repos/platform-ops` now also live in the repo-root
+`/home/jer/repos/vps/platform-ops` now also live in the repo-root
 `platform-ops-contract.yaml`. When changing the live frontend's canonical host,
 private bind, env-file path, release root, runtime owner, or shared health
 endpoint contract, update that manifest and the matching `platform-ops`
 inventory/current-state surfaces in the same change window.
+
+**Cross-project ops note:** Wait Time Canada app behavior belongs in this repo.
+Shared VPS standards, live service inventory, shared ingress ownership, shared
+host access posture, and cross-project migration/operations state belong in
+`/home/jer/repos/vps/platform-ops`. Use
+`/home/jer/repos/vps/platform-ops/docs/standards/PLAT-009-shared-vps-documentation-boundary.md`
+as the default ownership rule. Host-side paths under `/etc/projects-merge/...`
+remain intentionally unchanged.
 
 **Current Architecture:**
 - **Database**: Neon PostgreSQL 17 (14 tables: sources, hospitals, measurements, scraper_status, scraper_alert_state, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions, public_data_sources, resource_locations, public_health_alerts, public_health_source_alert_state)

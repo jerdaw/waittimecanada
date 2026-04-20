@@ -55,5 +55,5 @@ Ontario,ON,ontario-health,TIME_TO_PROVIDER,TRIAGE,PHYSICIAN,MEAN,Quarterly,Healt
 
 ## Related Docs
 
-- [backend/docs/methodologies/README.md](/home/jer/repos/waittimecanada/backend/docs/methodologies/README.md)
-- [backend/docs/methodologies/ontario-methodology.md](/home/jer/repos/waittimecanada/backend/docs/methodologies/ontario-methodology.md)
+- [backend/docs/methodologies/README.md](/home/jer/repos/vps/waittimecanada/backend/docs/methodologies/README.md)
+- [backend/docs/methodologies/ontario-methodology.md](/home/jer/repos/vps/waittimecanada/backend/docs/methodologies/ontario-methodology.md)

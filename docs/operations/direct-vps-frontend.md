@@ -9,8 +9,8 @@ frontend now running on the shared VPS.
 Shared-VPS ownership note:
 
 1. Shared host topology, ingress ownership, release-root conventions, and live
-   cross-project inventory are canonical in `/home/jer/repos/platform-ops`.
-2. Use `/home/jer/repos/platform-ops/docs/standards/PLAT-009-shared-vps-documentation-boundary.md`
+   cross-project inventory are canonical in `/home/jer/repos/vps/platform-ops`.
+2. Use `/home/jer/repos/vps/platform-ops/docs/standards/PLAT-009-shared-vps-documentation-boundary.md`
    for the documentation boundary.
 3. This repo remains canonical for Wait Time Canada's frontend packaging,
    deploy, verify, and rollback steps.
@@ -71,7 +71,7 @@ The direct-VPS path uses:
 Before preparing a release:
 
 ```bash
-cd /home/jer/repos/waittimecanada/frontend
+cd /home/jer/repos/vps/waittimecanada/frontend
 npm run lint
 npm run format:check
 npm run type-check
@@ -109,7 +109,7 @@ The deploy script:
 ## Stage And Release From A Workstation
 
 ```bash
-cd /home/jer/repos/waittimecanada
+cd /home/jer/repos/vps/waittimecanada
 ./scripts/release-vps-frontend.sh user@your-vps --deploy
 ```
 
