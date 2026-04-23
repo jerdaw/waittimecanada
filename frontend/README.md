@@ -55,6 +55,7 @@ Pages:
 - `/methods` methodology and comparability
 - `/data-quality` quality and anomalies
 - `/analytics` benchmarking, trends, regions, occupancy/equity insights
+- `/resources` Ontario public-health resources, provenance, and source catalog
 - `/faq`
 
 API routes (selected):
@@ -72,12 +73,18 @@ API routes (selected):
 - `/api/analytics/equity-summary`
 - `/api/equity-layer`
 - `/api/export`
+- `/api/resources`
+- `/api/resources/alerts`
+- `/api/resources/system-context`
+- `/api/resources/water-advisories`
+- `/api/resources/aqhi`
 
 ## Notes
 
 - Only verified + visible hospitals are shown publicly.
 - Occupancy and equity routes include explicit availability states when source data is not ready.
 - The equity layer now ships a real Ontario StatsCan-based geometry/metadata path; other provinces remain explicitly unavailable until equivalent source work is completed.
+- `/resources` now keeps Ontario public-health access data provenance-first, including source-catalog metadata, analytics-only EMS context, and Ontario reserve-system water advisories.
 - The direct-VPS frontend packaging path is `frontend/Dockerfile`; service-local deploy and rollback steps live in `docs/operations/direct-vps-frontend.md`.
 - The backend worker/timer migration path is documented separately in `docs/operations/direct-vps-backend.md`.
 - The production frontend now runs on the shared VPS at `https://wait-time.ca`.

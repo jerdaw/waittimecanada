@@ -1,16 +1,21 @@
 # Public Health Data Hub Freshness And Safety Rules
 
 **Created:** 2026-03-27
-**Status:** Frozen for Batch A planning
+**Status:** Historical planning baseline. Batch A is delivered and later Ontario additions are live; use `docs/API.md`, `docs/architecture/*`, and route tests for the current shipped freshness behavior.
 **Related:** `docs/planning/public-health-data-hub-metadata-contract.md`
 
 ---
 
 ## Summary
 
-Batch A contains public, user-facing data with different freshness and safety profiles. This document freezes the minimum show/warn/suppress rules and the mandatory caveat language classes the implementation must support.
+Batch A contained public, user-facing data with different freshness and safety
+profiles. This document preserves the original minimum show/warn/suppress rules
+and caveat classes that the implementation had to support.
 
-The implementation may be stricter than these rules, but it must not be looser.
+The implementation could be stricter than these rules, but not looser. Later
+Ontario additions such as EMS system context and water advisories now use
+product-specific behavior in the shipped runtime; this file remains the Batch A
+planning baseline rather than the current source of truth.
 
 ---
 

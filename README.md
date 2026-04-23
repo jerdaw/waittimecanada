@@ -24,7 +24,7 @@
 - **380+ Hospitals:** Near-real-time monitoring across all regions
 - **Hourly Updates:** Automated data collection currently via GitHub Actions
 - **First-in-Canada:** Real-time ED stretcher occupancy visualization (Quebec)
-- **Ontario Public Resources Module:** `/resources` now serves facilities, OSM-backed AED fallback data, Health Canada recalls, AQHI, Ontario EMS system context, and an official Ontario naloxone link-out with a first-class source catalog
+- **Ontario Public Resources Module:** `/resources` now serves facilities, OSM-backed AED fallback data, Health Canada recalls, AQHI, analytics-only Ontario EMS system context, Ontario reserve-system long-term drinking water advisories, and an official Ontario naloxone link-out with a first-class source catalog
 
 ### Why This Matters
 
@@ -81,6 +81,8 @@ These are methodology and operations findings, not performance rankings. They de
 - **Facilities & Services:** Ontario facility search grounded in MOHSERLO reference-directory data
 - **AED Fallback Map:** OpenStreetMap-based AED locations with explicit crowdsourced/incomplete labeling
 - **Safety Alerts:** Health Canada recalls and safety alerts with optional Drug Product Database enrichment
+- **Ontario EMS Context:** Annual land-ambulance response-time summaries presented as background system context only
+- **Ontario Water Advisories:** Official ISC long-term drinking water advisories for Ontario reserve systems with freshness-aware suppression
 - **Official Naloxone Link-Out:** Ontario naloxone guidance is linked to the provincial source rather than republished until reuse rights are clearer
 - **AQHI Overlay:** Cached GeoMet air-quality snapshots with freshness-aware suppression when upstream data is stale
 - **Source Transparency:** Provenance links, last refresh timestamps, and domain-specific caveats on every public-health slice
@@ -198,7 +200,7 @@ graph TD
 - **Language:** Python 3.12+
 - **Testing:** pytest with broad unit/integration coverage across scrapers, services, and API paths
 - **Scrapers:** 4 provincial scrapers (BeautifulSoup, HTTP/HTML parsing, Playwright, JSON extraction)
-- **Database:** Neon PostgreSQL 17 with 10 tables, strict ontology constraints
+- **Database:** Neon PostgreSQL 17 with 15 tables, including the public-health-hub source/resource/alert/system-context lane
 - **Services:**
   - DatabaseService, AggregationService, DataQualityService
   - AnomalyDetectionService, MethodologyChangeDetector

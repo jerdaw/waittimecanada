@@ -30,7 +30,7 @@ Optional local template:
 
 ```bash
 cp backend/.env.example backend/.env.local
-export DATABASE_URL="postgresql://user:pass@host:5432/dbname"
+export DATABASE_URL="postgresql://user:pass@host:5432/dbname" # pragma: allowlist secret
 ```
 
 Required env var: `DATABASE_URL`.
@@ -66,6 +66,11 @@ python -m waittime.cli.seed backend/data/hospitals/ontario-seed.json
 # Region mapping audit / auto-assign
 python -m waittime.cli.region_mapping --province ON
 python -m waittime.cli.region_mapping --province ON --auto-assign
+
+# Public-health-hub ingest/status
+python -m waittime.cli.seed_public_health_resources --fetch-mohserlo-live
+python -m waittime.cli.seed_public_health_system_context --fetch-live
+python -m waittime.cli.public_health_hub_status --format markdown
 ```
 
 ## Testing and Quality
@@ -91,11 +96,17 @@ Primary tables:
 - `hospitals`
 - `measurements`
 - `scraper_status`
+- `scraper_alert_state`
 - `measurement_aggregates`
 - `data_quality_snapshots`
 - `methodology_change_events`
 - `regions`
 - `hospital_regions`
+- `public_data_sources`
+- `resource_locations`
+- `public_health_alerts`
+- `public_health_system_metrics`
+- `public_health_source_alert_state`
 
 Migrations live in `backend/migrations/`.
 

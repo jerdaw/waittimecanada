@@ -1127,7 +1127,7 @@ test.describe('Hospital Map', () => {
     "bradlc.vscode-tailwindcss",
     "yzhang.markdown-all-in-one",
     "bierner.markdown-mermaid",
-    "GitHub.copilot",
+    "GitHub.vscode-pull-request-github",
     "eamodio.gitlens"
   ]
 }

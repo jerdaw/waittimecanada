@@ -1,18 +1,21 @@
 # Public Health Data Hub Source Metadata Contract
 
 **Created:** 2026-03-27
-**Status:** Frozen for Batch A planning
+**Status:** Historical planning baseline. Batch A is delivered and later Ontario additions are live; use `docs/API.md` and `docs/architecture/*` for the current shipped contract.
 **Related:** `docs/planning/archive/public-health-data-hub-batch-a-handoff.md`
 
 ---
 
 ## Summary
 
-This document freezes the v1 metadata contract for public health data sources used by the public-health-data-hub module.
+This document preserves the v1 metadata contract that locked the original
+public-health source-catalog field names for Batch A planning.
 
 The goal is to prevent the Batch A implementation plan from inventing schema names, field meanings, or enum values ad hoc.
 
-This contract is a planning-level interface. It must be reflected in implementation, migrations, API responses, and tests without renaming fields.
+This contract is a historical planning interface. It informed implementation,
+migrations, API responses, and tests without renaming fields, but it is no
+longer the living implementation spec.
 
 ---
 

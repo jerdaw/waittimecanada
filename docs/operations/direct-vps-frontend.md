@@ -1,7 +1,7 @@
 # Direct VPS Frontend Deployment
 
 **Status:** Live production frontend path
-**Last Updated:** 2026-03-26
+**Last Updated:** 2026-04-23
 
 This document defines the app-local deployment path for the Wait Time Canada
 frontend now running on the shared VPS.
@@ -19,7 +19,7 @@ Shared-VPS ownership note:
 
 ## Current State
 
-As of 2026-03-26:
+As of 2026-04-23:
 
 1. `https://wait-time.ca` is live on the shared VPS through host Caddy.
 2. `https://www.wait-time.ca` redirects to the apex host through the same VPS route.
@@ -123,6 +123,21 @@ Defaults:
 1. app root: `/srv/apps/waittime-frontend`
 2. env file: `/etc/projects-merge/env/waittime-frontend.env`
 
+Operational note:
+
+1. `scripts/release-vps-frontend.sh --deploy` stages the release remotely
+   before attempting the deploy step.
+2. If the remote deploy step reports
+   `env file not found: /etc/projects-merge/env/waittime-frontend.env`, treat
+   that as a likely permissions problem on `/etc/projects-merge/env`, not as a
+   failed stage.
+3. In that case, SSH to the VPS and rerun:
+
+```bash
+cd /srv/apps/waittime-frontend/current
+sudo ./scripts/deploy-vps-frontend.sh /etc/projects-merge/env/waittime-frontend.env
+```
+
 ## Verification
 
 After deploy, verify:
@@ -136,7 +151,7 @@ PRODUCTION_BASE_URL=https://wait-time.ca ./scripts/production-smoke.sh
 Expected outcome:
 
 1. private and public health return HTTP `200`
-2. page and API smoke checks pass for `/`, `/methods`, `/data-quality`, `/analytics`, `/api/status`, and aggregate `/api/data-quality`
+2. page and API smoke checks pass for `/`, `/methods`, `/data-quality`, `/analytics`, `/resources`, `/api/resources/system-context`, `/api/resources/water-advisories`, `/api/status`, and aggregate `/api/data-quality`
 3. `/api/health` reflects the current backend freshness state in the database, so `healthy` may be `false` even when the frontend cutover itself is correct
 
 Suggested Caddy shape after cutover:

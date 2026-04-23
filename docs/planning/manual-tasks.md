@@ -69,6 +69,10 @@ status/data-quality filtering rather than an older release.
    - `/api/resources?kind=facility&province=QC&limit=1`
    - `/api/resources?kind=facility&province=ON&q=Toronto%20General&limit=1`
    - `/api/resources/system-context?province=ON&limit=1`
+6. Production was re-verified on **2026-04-23** on `main@b795f1a`, including:
+   - `/api/resources/system-context?province=ON&limit=1`
+   - `/api/resources/water-advisories?province=ON&limit=1`
+   - full `scripts/production-smoke.sh https://wait-time.ca`
 
 **Result:** The public VPS frontend is verified to be serving the hardened
 status/data-quality rollups in production.
@@ -179,7 +183,7 @@ cycle.
 - **Platform:** Shared VPS frontend via Caddy + Docker loopback runtime
 - **Canonical URL:** `https://wait-time.ca`
 - **Redirects:** `https://www.wait-time.ca` → `https://wait-time.ca/`
-- **Latest verified production release:** `main@2eb0faf`
+- **Latest verified production release:** `main@b795f1a`
 
 ### GitHub Actions (Already Configured):
 ✅ Scraper cron already set up in `.github/workflows/scraper-cron.yml`
@@ -211,6 +215,7 @@ Deployment Date: 2026-03-12
    - `/api/resources?kind=aed&province=ON&limit=1`
    - `/api/resources?kind=facility&province=ON&q=Toronto%20General&limit=1`
    - `/api/resources/system-context?province=ON&limit=1`
+   - `/api/resources/water-advisories?province=ON&limit=1`
    - `/api/resources/aqhi?latitude=43.6532&longitude=-79.3832`
 
 ### Production Readiness Verification:

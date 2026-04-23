@@ -111,7 +111,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 **Trigger:** cron `17 */6 * * *` (every 6 hours) + manual dispatch.
 
-**Purpose:** Verify public production routes respond with expected markers, including the public-health-hub `/resources` surface, the additive source-catalog contract, and the Ontario EMS system-context API.
+**Purpose:** Verify public production routes respond with expected markers, including the public-health-hub `/resources` surface, the additive source-catalog contract, the Ontario EMS system-context API, and the Ontario water-advisories API.
 
 **Optimization controls:**
 - Single concurrency group with cancellation for stale overlapping runs.
@@ -146,29 +146,32 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 **Trigger:** cron `15 */6 * * *` (every 6 hours) + manual dispatch.
 
-**Purpose:** Refresh Batch A public-health-hub datasets from approved live upstreams:
+**Purpose:** Refresh shipped public-health-hub datasets from approved live upstreams:
 - MOHSERLO via the Ontario ArcGIS feature service
 - Statistics Canada ODHF via the official zipped CSV archive
 - Ontario AED fallback via the approved Overpass query
 - Health Canada recalls via the approved RSS feed
+- Ontario land ambulance response times via approved Ontario Data Catalogue CSV downloads
 
 **Optimization controls:**
 - Serialized concurrency group to avoid overlapping ingest runs.
 - Reuses the existing `DATABASE_URL` secret; no new secrets required.
-- MOHSERLO, ODHF, and Health Canada alerts remain hard-fail paths; the
-  Overpass AED fallback runs in its own best-effort step so transient AED
-  mirror failures do not block the rest of the batch. AED mirror failures are
-  recorded as explicit best-effort summary state rather than as a failing
-  workflow annotation.
+- MOHSERLO, ODHF, Health Canada alerts, and Ontario EMS system context remain
+  hard-fail paths; the Overpass AED fallback runs in its own best-effort step
+  so transient AED mirror failures do not block the rest of the batch. AED
+  mirror failures are recorded as explicit best-effort summary state rather
+  than as a failing workflow annotation.
+- ISC water advisories remain a live-proxied frontend route and are
+  intentionally outside this scheduled DB-ingest workflow.
 - Each run appends a GitHub Actions job summary with per-step outcomes plus the
   current source refresh timestamps, normalized row counts, and explicit
   `healthy` / `partial` / `degraded` operator classifications from the database
   state.
 - Hard-fail public-health sources (`mohserlo`, `odhf`,
-  `health-canada-recalls`) now use transition-aware alerting via persisted
-  incident state so operators receive one degraded alert and one recovery alert
-  instead of repeat duplicates. The best-effort AED fallback is intentionally
-  excluded from paging.
+  `health-canada-recalls`, `ontario-land-ambulance-response-times`) now use
+  transition-aware alerting via persisted incident state so operators receive
+  one degraded alert and one recovery alert instead of repeat duplicates. The
+  best-effort AED fallback is intentionally excluded from paging.
 
 ### 12. `deploy-docs.yml` - Documentation Publishing
 

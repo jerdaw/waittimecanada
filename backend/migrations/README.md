@@ -647,7 +647,7 @@ GRANT CREATE ON SCHEMA public TO your_user;
 
 ## Schema Visualization
 
-### Current Schema (10 tables)
+### Current Schema (15 tables)
 
 ```
 sources (4 rows)
@@ -662,7 +662,7 @@ hospitals (380+ rows)
   ├── province, city, latitude, longitude
   └── is_verified, is_visible
 
-measurements (100,000+ rows, full retained history)
+measurements (30-day retained raw history)
   ├── id (BIGSERIAL, PK)
   ├── hospital_id → hospitals(id)
   ├── metric_family, start_event, end_event, statistic_type, patient_scope
@@ -681,6 +681,11 @@ scraper_status (4 rows, one per source)
   ├── source_id → sources(id)
   ├── last_run, status (healthy|error|stale)
   └── error_message
+
+scraper_alert_state (4 rows, one per source)
+  ├── source_id → sources(id)
+  ├── active_incident_kind, active_incident_fingerprint
+  └── opened_at, last_notified_at, last_resolved_at
 
 data_quality_snapshots (daily)
   ├── source_id → sources(id)
@@ -701,6 +706,34 @@ regions (15 rows)
 hospital_regions (380+ mappings)
   ├── hospital_id → hospitals(id)
   └── region_id → regions(id)
+
+public_data_sources (public-health-hub source catalog)
+  ├── source_id (TEXT, PK)
+  ├── domain, connector_type, license_reuse_status
+  └── provenance_url, last_verified_at, last_refreshed_at
+
+resource_locations (public-health facilities and AEDs)
+  ├── id (TEXT, PK)
+  ├── source_id → public_data_sources(source_id)
+  ├── kind, name, province
+  └── latitude, longitude, provenance_url, last_refreshed_at
+
+public_health_alerts (recalls and safety alerts)
+  ├── id (TEXT, PK)
+  ├── source_id → public_data_sources(source_id)
+  ├── title, alert_type, published_at
+  └── provenance_url, last_refreshed_at
+
+public_health_system_metrics (Ontario EMS context)
+  ├── id (TEXT, PK)
+  ├── source_id → public_data_sources(source_id)
+  ├── series_key, geography_name, reporting_year
+  └── metrics (JSONB), provenance_url, last_refreshed_at
+
+public_health_source_alert_state (public-health incident state)
+  ├── source_id → public_data_sources(source_id)
+  ├── active_incident_kind, active_incident_fingerprint
+  └── opened_at, last_notified_at, last_resolved_at
 ```
 
 ### Entity Relationships
@@ -708,6 +741,7 @@ hospital_regions (380+ mappings)
 - **sources** ← **hospitals** (one source, many hospitals)
 - **hospitals** ← **measurements** (one hospital, many measurements)
 - **hospitals** ← **hospital_regions** → **regions** (many-to-many)
+- **public_data_sources** ← **resource_locations / public_health_alerts / public_health_system_metrics** (one source, many normalized public-health rows)
 - **sources** ← **scraper_status** (one source, one status)
 - **sources** ← **data_quality_snapshots** (one source, daily snapshots)
 - **sources** ← **methodology_change_events** (one source, historical events)

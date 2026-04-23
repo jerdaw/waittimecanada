@@ -15,14 +15,18 @@ This section contains the project planning control plane.
 
 - `docs/planning/implementation/admissions-strengthening-plan.md`
 - `docs/planning/post-launch-growth-strategy.md`
+- `docs/planning/public-health-data-hub-municipal-inspection-pilot-decision.md`
+
+## Historical Planning Baselines
+
 - `docs/planning/public-health-data-hub-metadata-contract.md`
 - `docs/planning/public-health-data-hub-freshness-safety-rules.md`
-- `docs/planning/public-health-data-hub-municipal-inspection-pilot-decision.md`
 
 ## Active Operational Artifacts
 
 - `docs/operations/reports/2026-03-operational-report.md`
 - `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`
+- `docs/operations/neon-production-upgrade.md`
 
 ## Archived Public Health Hub Batch A Planning Docs
 
@@ -36,6 +40,9 @@ This section contains the project planning control plane.
 
 ## Maintenance Logs
 
+- `docs/planning/archive/maintenance-2026-04-23.md`
+- `docs/planning/archive/maintenance-2026-04-18.md`
+- `docs/planning/archive/maintenance-2026-04-17.md`
 - `docs/planning/archive/maintenance-2026-04-15.md`
 - `docs/planning/archive/maintenance-2026-04-09.md`
 - `docs/planning/archive/maintenance-2026-04-01.md`
