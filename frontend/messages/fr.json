@@ -193,13 +193,52 @@
       },
       "transparency": {
         "title": "Transparence des sources",
-        "description": "Chaque source affichée ici conserve la provenance, les métadonnées de mise à jour et la portée Ontario visible.",
+        "description": "Chaque source affichée ici conserve la provenance, les métadonnées de mise à jour, la posture de réutilisation et la portée Ontario visible.",
         "empty": "Aucune métadonnée de source disponible pour le moment.",
-        "updated": "Dernière mise à jour : {timestamp}",
+        "lastRefreshed": "Dernière mise à jour : {timestamp}",
         "freshness": {
           "show": "Récent",
           "warn": "Périmé",
           "suppress": "Masqué"
+        },
+        "fields": {
+          "lastVerified": "Dernière vérification",
+          "connectorType": "Connecteur",
+          "accessRoute": "Voie d'accès",
+          "reusePosture": "Posture de réutilisation",
+          "attribution": "Attribution",
+          "updateCadence": "Cadence de mise à jour",
+          "usageMode": "Mode d'usage",
+          "methodologyNote": "Note méthodologique"
+        },
+        "values": {
+          "connectorType": {
+            "api": "API",
+            "feed": "Flux",
+            "open_data_portal": "Portail de données ouvertes",
+            "file_download": "Téléchargement de fichier",
+            "dashboard_only": "Tableau de bord seulement",
+            "request_based": "Sur demande",
+            "partner_only": "Partenaire seulement",
+            "crowdsourced_registry": "Registre collaboratif"
+          },
+          "licenseReuseStatus": {
+            "approved": "Approuvé",
+            "approved_with_conditions": "Approuvé avec conditions",
+            "blocked": "Bloqué"
+          },
+          "recommendedUsageMode": {
+            "live_ui": "Interface en direct",
+            "scheduled_ingest": "Ingestion planifiée",
+            "analytics_only": "Analytique seulement",
+            "research_only": "Recherche seulement",
+            "do_not_use": "Ne pas utiliser"
+          },
+          "updateCadence": {
+            "annual": "Annuelle",
+            "ongoing": "Continue",
+            "real-time": "Temps réel"
+          }
         },
         "sourceLink": "Voir la source officielle"
       },
@@ -208,7 +247,37 @@
         "nearbyTitle": "Emplacements de DEA en Ontario à proximité",
         "description": "Les enregistrements DEA de secours pour l'Ontario sont affichés avec des libellés explicites de provenance, d'incomplétude et de fraîcheur. Partagez votre position pour trier par distance.",
         "nearbyDescription": "Enregistrements DEA de secours pour l'Ontario près de votre position, avec des libellés explicites de provenance, d'incomplétude et de fraîcheur.",
+        "caveatTitle": "Source collaborative de secours",
+        "caveat": "Ces enregistrements DEA proviennent d'une voie de secours ontarienne bâtie sur OpenStreetMap. La couverture peut être incomplète ou périmée et ne doit pas être traitée comme un registre définitif.",
         "empty": "Aucun enregistrement DEA ontarien ne correspond à vos filtres actuels."
+      },
+      "systemContext": {
+        "title": "Contexte systémique de l'Ontario",
+        "description": "Les rapports officiels ontariens sur les services ambulanciers terrestres sont présentés ici comme contexte de système, et non comme disponibilité EMS en direct ou consignes de répartition.",
+        "methodologyLabel": "Posture méthodologique",
+        "fallbackMethodology": "Rapport officiel ontarien sur les services ambulanciers, pour contexte seulement. Cette section n'est pas un outil opérationnel en direct.",
+        "loading": "Chargement du contexte systémique ontarien...",
+        "suppressed": "Les enregistrements EMS contextuels de l'Ontario sont temporairement masqués parce que la source est périmée ou indisponible.",
+        "reportingYear": "Année de référence : {year}",
+        "notReported": "Non déclaré",
+        "dispatchCentres": {
+          "title": "Centres de répartition",
+          "description": "Sommaires du temps de réponse moyen et du volume d'appels par géographie de CACC.",
+          "empty": "Aucune ligne de centre de répartition ne correspond à vos filtres actuels.",
+          "averageResponseTime": "Temps de réponse moyen",
+          "averageResponseTimeValue": "{value} minutes",
+          "callVolume": "Volume d'appels"
+        },
+        "paramedicServices": {
+          "title": "Services paramédicaux",
+          "description": "Rendement prévu versus déclaré par zone de couverture du service ambulancier et gravité du patient.",
+          "empty": "Aucune ligne de service paramédical ne correspond à vos filtres actuels.",
+          "responsePlan": "Plan de temps de réponse",
+          "plannedResponse": "Réponse prévue",
+          "performance": "Rendement",
+          "minutesValue": "{value} minutes",
+          "percentValue": "{value} %"
+        }
       },
       "alerts": {
         "title": "Alertes de sécurité",

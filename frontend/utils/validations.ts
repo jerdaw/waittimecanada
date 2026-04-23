@@ -204,3 +204,9 @@ export const ResourceAQHIQuerySchema = z.object({
   latitude: z.coerce.number().min(-90).max(90),
   longitude: z.coerce.number().min(-180).max(180),
 });
+
+export const ResourceSystemContextQuerySchema = z.object({
+  province: ProvinceEnum,
+  q: z.string().trim().min(1).max(200).optional(),
+  limit: z.coerce.number().int().positive().max(20).default(8),
+});

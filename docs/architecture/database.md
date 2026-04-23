@@ -64,15 +64,19 @@ This lets the heartbeat monitor send one incident alert when a source becomes un
 
 ## Public health hub tables
 
-The Ontario-first `/resources` module adds four database tables:
+The Ontario-first `/resources` module now uses five dedicated database tables:
 
 - `public_data_sources`: source metadata, provenance, legal posture, and last refresh timestamps
 - `resource_locations`: normalized `facility` and `aed` rows for public search/map use
 - `public_health_alerts`: normalized Health Canada recall and safety alert items
+- `public_health_system_metrics`: analytics-only Ontario EMS system-context rows for `/resources/system-context`
 - `public_health_source_alert_state`: incident deduplication state for hard-fail public-health ingest sources
 
 These tables are operationally separate from the wait-time observatory schema.
 AQHI remains live-proxied and is intentionally not persisted in the database.
+The source catalog metadata exposed by `/resources`, `/api/resources/alerts`,
+`/api/resources/aqhi`, and `/api/resources/system-context` is derived from
+`public_data_sources` rather than duplicated in route code.
 
 ## Data Model Rules
 

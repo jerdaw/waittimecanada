@@ -63,6 +63,14 @@ describe("API Route: Resources", () => {
           source_name: "MOHSERLO",
           provenance_url: "https://data.ontario.ca/example",
           domain: "provider_facility",
+          connector_type: "open_data_portal",
+          access_route: "Ontario Data Catalogue CSV download",
+          license_reuse_status: "approved_with_conditions",
+          attribution_requirement: "Visible Ontario provenance required.",
+          update_cadence: "annual",
+          recommended_usage_mode: "scheduled_ingest",
+          public_methodology_note: "Reference directory only.",
+          last_verified_at: refreshedAt,
           last_refreshed_at: refreshedAt,
         },
       ]);
@@ -94,6 +102,12 @@ describe("API Route: Resources", () => {
     });
     expect(data.meta.source_status[0]).toMatchObject({
       source_id: "mohserlo",
+      freshness_state: "show",
+    });
+    expect(data.meta.source_catalog[0]).toMatchObject({
+      source_id: "mohserlo",
+      connector_type: "open_data_portal",
+      recommended_usage_mode: "scheduled_ingest",
       freshness_state: "show",
     });
   });
@@ -131,6 +145,14 @@ describe("API Route: Resources", () => {
           source_name: "OpenStreetMap AED",
           provenance_url: "https://www.openstreetmap.org",
           domain: "aed",
+          connector_type: "crowdsourced_registry",
+          access_route: "OpenStreetMap export fallback",
+          license_reuse_status: "approved_with_conditions",
+          attribution_requirement: "Keep OpenStreetMap provenance visible.",
+          update_cadence: "ongoing",
+          recommended_usage_mode: "scheduled_ingest",
+          public_methodology_note: "Crowdsourced fallback coverage only.",
+          last_verified_at: refreshedAt,
           last_refreshed_at: refreshedAt,
         },
       ]);
@@ -163,6 +185,11 @@ describe("API Route: Resources", () => {
     });
     expect(data.meta.source_status[0]).toMatchObject({
       source_id: "osm-aed",
+      freshness_state: "show",
+    });
+    expect(data.meta.source_catalog[0]).toMatchObject({
+      source_id: "osm-aed",
+      connector_type: "crowdsourced_registry",
       freshness_state: "show",
     });
   });
@@ -261,6 +288,7 @@ describe("API Route: Resources", () => {
         requested_province: "QC",
       },
       source_status: [],
+      source_catalog: [],
     });
     expect(mockSql.unsafe).not.toHaveBeenCalled();
   });

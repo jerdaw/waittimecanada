@@ -61,6 +61,14 @@ describe("API Route: Resource Alerts", () => {
           source_name: "Health Canada Recalls",
           provenance_url: "https://recalls-rappels.canada.ca/example",
           domain: "safety_alert",
+          connector_type: "feed",
+          access_route: "Health Canada recalls feed",
+          license_reuse_status: "approved_with_conditions",
+          attribution_requirement: "Keep Health Canada provenance visible.",
+          update_cadence: "ongoing",
+          recommended_usage_mode: "scheduled_ingest",
+          public_methodology_note: "Official Health Canada safety alert feed.",
+          last_verified_at: refreshedAt,
           last_refreshed_at: refreshedAt,
         },
       ]);
@@ -82,6 +90,11 @@ describe("API Route: Resource Alerts", () => {
     expect(data.meta.limit).toBe(10);
     expect(data.meta.source_status[0]).toMatchObject({
       source_id: "health-canada-recalls",
+      freshness_state: "show",
+    });
+    expect(data.meta.source_catalog[0]).toMatchObject({
+      source_id: "health-canada-recalls",
+      connector_type: "feed",
       freshness_state: "show",
     });
   });
@@ -145,6 +158,15 @@ describe("API Route: Resource Alerts", () => {
         expect.objectContaining({ source_id: "health-canada-dpd" }),
       ]),
     );
+    expect(data.meta.source_catalog).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ source_id: "health-canada-recalls" }),
+        expect.objectContaining({
+          source_id: "health-canada-dpd",
+          connector_type: "api",
+        }),
+      ]),
+    );
   });
 
   test("degrades gracefully when DPD enrichment fails", async () => {
@@ -192,6 +214,12 @@ describe("API Route: Resource Alerts", () => {
       din: null,
     });
     expect(data.meta.source_status).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ source_id: "health-canada-recalls" }),
+        expect.objectContaining({ source_id: "health-canada-dpd" }),
+      ]),
+    );
+    expect(data.meta.source_catalog).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ source_id: "health-canada-recalls" }),
         expect.objectContaining({ source_id: "health-canada-dpd" }),

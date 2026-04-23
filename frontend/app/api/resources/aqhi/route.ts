@@ -5,6 +5,7 @@ import { logger } from "@/utils/logger";
 import {
   deriveFreshnessState,
   type AQHIRecord,
+  type SourceCatalogRecord,
   type SourceStatusRecord,
 } from "@/utils/public-health-hub";
 import { checkRateLimit } from "@/utils/rate-limit";
@@ -17,6 +18,22 @@ const AQHI_COLLECTION_URL =
 const AQHI_PROVENANCE_URL =
   "https://api.weather.gc.ca/collections/aqhi-forecasts-realtime";
 const AQHI_SOURCE_NAME = "AQHI GeoMet";
+const AQHI_SOURCE_CATALOG = {
+  source_id: "aqhi-geomet",
+  domain: "environmental_overlay",
+  source_name: AQHI_SOURCE_NAME,
+  connector_type: "api",
+  access_route: "GeoMet AQHI collection API",
+  license_reuse_status: "approved_with_conditions",
+  attribution_requirement:
+    "Keep Environment and Climate Change Canada provenance visible.",
+  update_cadence: "real-time",
+  recommended_usage_mode: "live_ui",
+  public_methodology_note:
+    "Official AQHI forecast from Environment and Climate Change Canada. Conditions may change.",
+  provenance_url: AQHI_PROVENANCE_URL,
+  last_verified_at: "2026-03-27",
+} as const;
 const SEARCH_RADII_DEGREES = [0.5, 1.5, 4] as const;
 
 export async function GET(request: NextRequest) {
@@ -71,6 +88,9 @@ export async function GET(request: NextRequest) {
             latitude,
             longitude,
             source_status: [sourceStatus],
+            source_catalog: [
+              buildAQHISourceCatalogRecord(sourceStatus),
+            ] satisfies SourceCatalogRecord[],
           },
         };
       },
@@ -90,6 +110,16 @@ export async function GET(request: NextRequest) {
       { status: 500 },
     );
   }
+}
+
+function buildAQHISourceCatalogRecord(
+  sourceStatus: SourceStatusRecord,
+): SourceCatalogRecord {
+  return {
+    ...AQHI_SOURCE_CATALOG,
+    last_refreshed_at: sourceStatus.last_refreshed_at,
+    freshness_state: sourceStatus.freshness_state,
+  };
 }
 
 type AQHIFeature = {

@@ -57,6 +57,7 @@ silently falling back to the aggregate system view. In particular:
 
 - `GET /api/resources?kind=facility|aed[&q=<term>&province=ON&latitude=<lat>&longitude=<lng>&radius=<km>&limit=<n>]`
 - `GET /api/resources/alerts?limit=<n>`
+- `GET /api/resources/system-context?province=ON[&q=<term>&limit=<n>]`
 - `GET /api/resources/aqhi?latitude=<lat>&longitude=<lng>`
 
 ## Export
@@ -88,7 +89,7 @@ Additional optional export params:
 These routes are intentionally cache-friendly on the public frontend path:
 
 - `GET /api/health` and `GET /api/status`: 2-minute shared cache window
-- `GET /api/hospitals`, `GET /api/resources`, `GET /api/resources/alerts`, `GET /api/data-quality`, `GET /api/anomalies`, `GET /api/compare`, `GET /api/analytics/benchmarks`, `GET /api/analytics/trends`, `GET /api/analytics/regions`, `GET /api/analytics/occupancy`, `GET /api/analytics/equity-summary`, and `GET /api/analytics/patterns`: 5-minute shared cache window
+- `GET /api/hospitals`, `GET /api/resources`, `GET /api/resources/alerts`, `GET /api/resources/system-context`, `GET /api/data-quality`, `GET /api/anomalies`, `GET /api/compare`, `GET /api/analytics/benchmarks`, `GET /api/analytics/trends`, `GET /api/analytics/regions`, `GET /api/analytics/occupancy`, `GET /api/analytics/equity-summary`, and `GET /api/analytics/patterns`: 5-minute shared cache window
 - `GET /api/methodology`: 1-minute shared cache window
 - `GET /api/hospitals/[slug]/trends`: 10-minute shared cache window
 
@@ -172,6 +173,7 @@ Operational note:
 - `meta.kind`
 - `meta.query`
 - `meta.source_status`
+- `meta.source_catalog`
 
 `GET /api/resources/alerts` returns:
 
@@ -180,6 +182,17 @@ Operational note:
 - `data`
 - `meta.limit`
 - `meta.source_status`
+- `meta.source_catalog`
+
+`GET /api/resources/system-context` returns:
+
+- `success`
+- `data.dispatch_centres`
+- `data.paramedic_services`
+- `meta.query`
+- `meta.scope`
+- `meta.source_status`
+- `meta.source_catalog`
 
 `GET /api/resources/aqhi` returns:
 
@@ -188,6 +201,7 @@ Operational note:
 - `meta.latitude`
 - `meta.longitude`
 - `meta.source_status`
+- `meta.source_catalog`
 
 Each `source_status` row includes:
 
@@ -197,10 +211,28 @@ Each `source_status` row includes:
 - `last_refreshed_at`
 - `freshness_state` (`show | warn | suppress`)
 
+Each `source_catalog` row includes:
+
+- `source_id`
+- `domain`
+- `source_name`
+- `connector_type`
+- `access_route`
+- `license_reuse_status`
+- `attribution_requirement`
+- `update_cadence`
+- `recommended_usage_mode`
+- `public_methodology_note`
+- `provenance_url`
+- `last_verified_at`
+- `last_refreshed_at`
+- `freshness_state`
+
 Operational note:
 
 - Facility rows are reference-directory data only and should not be interpreted as live operational availability.
 - AED rows are OSM-backed fallback data and remain explicitly crowdsourced/incomplete.
+- Ontario EMS system-context rows are background context only and should not be interpreted as live dispatch availability or routing guidance.
 - AQHI responses may intentionally return `data: null` when the upstream source freshness state is `suppress`.
 
 ## Occupancy availability contract

@@ -111,7 +111,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 **Trigger:** cron `17 */6 * * *` (every 6 hours) + manual dispatch.
 
-**Purpose:** Verify public production routes respond with expected markers, including the public-health-hub `/resources` surface and its Batch A APIs.
+**Purpose:** Verify public production routes respond with expected markers, including the public-health-hub `/resources` surface, the additive source-catalog contract, and the Ontario EMS system-context API.
 
 **Optimization controls:**
 - Single concurrency group with cancellation for stale overlapping runs.

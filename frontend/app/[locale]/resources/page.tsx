@@ -11,8 +11,12 @@ import { ResourceList } from "@/components/ResourceList";
 import type {
   AlertRecord,
   AQHIRecord,
+  FreshnessState,
   ResourceRecord,
+  SourceCatalogRecord,
   SourceStatusRecord,
+  SystemContextDispatchCentreRecord,
+  SystemContextParamedicServiceRecord,
 } from "@/utils/public-health-hub";
 
 interface ResourcesResponse {
@@ -27,6 +31,7 @@ interface ResourcesResponse {
       note: string;
     };
     source_status: SourceStatusRecord[];
+    source_catalog: SourceCatalogRecord[];
   };
 }
 
@@ -36,6 +41,7 @@ interface AlertsResponse {
   data: AlertRecord[];
   meta: {
     source_status: SourceStatusRecord[];
+    source_catalog: SourceCatalogRecord[];
   };
 }
 
@@ -44,8 +50,23 @@ interface AQHIResponse {
   data: AQHIRecord | null;
   meta: {
     source_status: SourceStatusRecord[];
+    source_catalog: SourceCatalogRecord[];
   };
 }
+
+interface SystemContextResponse {
+  success: boolean;
+  data: {
+    dispatch_centres: SystemContextDispatchCentreRecord[];
+    paramedic_services: SystemContextParamedicServiceRecord[];
+  };
+  meta: {
+    source_status: SourceStatusRecord[];
+    source_catalog: SourceCatalogRecord[];
+  };
+}
+
+type TranslationFn = ReturnType<typeof useTranslations>;
 
 function formatTimestamp(value: string | null | undefined) {
   if (!value) {
@@ -56,6 +77,96 @@ function formatTimestamp(value: string | null | undefined) {
     dateStyle: "medium",
     timeStyle: "short",
   });
+}
+
+function formatSourceCatalogEnum(
+  t: TranslationFn,
+  group:
+    | "connectorType"
+    | "licenseReuseStatus"
+    | "recommendedUsageMode"
+    | "updateCadence",
+  value: string,
+) {
+  const translationKey = `sections.transparency.values.${group}.${value}`;
+  const translated = t.raw(translationKey);
+
+  if (typeof translated === "string" && translated !== translationKey) {
+    return translated;
+  }
+
+  return value
+    .replace(/[_-]+/g, " ")
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function formatCompactNumber(
+  value: number | null | undefined,
+  options?: Intl.NumberFormatOptions,
+) {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  return formatPresentNumber(value, options);
+}
+
+function formatPresentNumber(
+  value: number,
+  options?: Intl.NumberFormatOptions,
+) {
+  return new Intl.NumberFormat(undefined, options).format(value);
+}
+
+function getFreshnessBadgeClasses(freshnessState: FreshnessState) {
+  return clsx(
+    "rounded-full px-2.5 py-1 text-[11px] font-medium",
+    freshnessState === "show" &&
+      "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200",
+    freshnessState === "warn" &&
+      "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200",
+    freshnessState === "suppress" &&
+      "bg-muted text-muted-foreground",
+  );
+}
+
+function getFreshnessPriority(freshnessState: FreshnessState) {
+  switch (freshnessState) {
+    case "show":
+      return 0;
+    case "warn":
+      return 1;
+    case "suppress":
+    default:
+      return 2;
+  }
+}
+
+function dedupeSourceCatalogRecords(records: SourceCatalogRecord[]) {
+  const deduped = new Map<string, SourceCatalogRecord>();
+
+  for (const record of records) {
+    const existing = deduped.get(record.source_id);
+    if (!existing) {
+      deduped.set(record.source_id, record);
+      continue;
+    }
+
+    const existingPriority = getFreshnessPriority(existing.freshness_state);
+    const nextPriority = getFreshnessPriority(record.freshness_state);
+    if (
+      nextPriority < existingPriority ||
+      (nextPriority === existingPriority &&
+        record.last_refreshed_at &&
+        !existing.last_refreshed_at)
+    ) {
+      deduped.set(record.source_id, record);
+    }
+  }
+
+  return Array.from(deduped.values()).sort((left, right) =>
+    left.source_name.localeCompare(right.source_name),
+  );
 }
 
 export default function ResourcesPage() {
@@ -70,22 +181,35 @@ export default function ResourcesPage() {
   const [alertsLoading, setAlertsLoading] = useState(true);
   const [aqhi, setAQHI] = useState<AQHIRecord | null>(null);
   const [aqhiLoading, setAQHILoading] = useState(false);
+  const [dispatchCentres, setDispatchCentres] = useState<
+    SystemContextDispatchCentreRecord[]
+  >([]);
+  const [paramedicServices, setParamedicServices] = useState<
+    SystemContextParamedicServiceRecord[]
+  >([]);
+  const [systemContextLoading, setSystemContextLoading] = useState(true);
   const [userLocation, setUserLocation] = useState<{
     latitude: number;
     longitude: number;
   } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [facilitySourceStatus, setFacilitySourceStatus] = useState<
-    SourceStatusRecord[]
+  const [facilitySourceCatalog, setFacilitySourceCatalog] = useState<
+    SourceCatalogRecord[]
   >([]);
-  const [aedSourceStatus, setAEDSourceStatus] = useState<SourceStatusRecord[]>(
-    [],
-  );
-  const [alertSourceStatus, setAlertSourceStatus] = useState<
-    SourceStatusRecord[]
+  const [aedSourceCatalog, setAEDSourceCatalog] = useState<
+    SourceCatalogRecord[]
+  >([]);
+  const [alertSourceCatalog, setAlertSourceCatalog] = useState<
+    SourceCatalogRecord[]
   >([]);
   const [aqhiSourceStatus, setAQHISourceStatus] = useState<
     SourceStatusRecord[]
+  >([]);
+  const [aqhiSourceCatalog, setAQHISourceCatalog] = useState<
+    SourceCatalogRecord[]
+  >([]);
+  const [systemContextSourceCatalog, setSystemContextSourceCatalog] = useState<
+    SourceCatalogRecord[]
   >([]);
   const province = "ON";
   const facilityDiscoveryReady = Boolean(
@@ -108,7 +232,7 @@ export default function ResourcesPage() {
     async function loadResources() {
       if (!facilityDiscoveryReady) {
         setResources([]);
-        setFacilitySourceStatus([]);
+        setFacilitySourceCatalog([]);
         setResourcesLoading(false);
         return;
       }
@@ -138,15 +262,15 @@ export default function ResourcesPage() {
 
         if (response.ok && payload.success) {
           setResources(payload.data);
-          setFacilitySourceStatus(payload.meta.source_status ?? []);
+          setFacilitySourceCatalog(payload.meta.source_catalog ?? []);
         } else {
           setResources([]);
-          setFacilitySourceStatus([]);
+          setFacilitySourceCatalog([]);
         }
       } catch {
         if (!mounted) return;
         setResources([]);
-        setFacilitySourceStatus([]);
+        setFacilitySourceCatalog([]);
       } finally {
         if (mounted) {
           setResourcesLoading(false);
@@ -189,15 +313,15 @@ export default function ResourcesPage() {
 
         if (response.ok && payload.success) {
           setAEDResources(payload.data);
-          setAEDSourceStatus(payload.meta.source_status ?? []);
+          setAEDSourceCatalog(payload.meta.source_catalog ?? []);
         } else {
           setAEDResources([]);
-          setAEDSourceStatus([]);
+          setAEDSourceCatalog([]);
         }
       } catch {
         if (!mounted) return;
         setAEDResources([]);
-        setAEDSourceStatus([]);
+        setAEDSourceCatalog([]);
       } finally {
         if (mounted) {
           setAEDLoading(false);
@@ -224,15 +348,15 @@ export default function ResourcesPage() {
 
         if (response.ok && payload.success) {
           setAlerts(payload.data);
-          setAlertSourceStatus(payload.meta.source_status ?? []);
+          setAlertSourceCatalog(payload.meta.source_catalog ?? []);
         } else {
           setAlerts([]);
-          setAlertSourceStatus([]);
+          setAlertSourceCatalog([]);
         }
       } catch {
         if (!mounted) return;
         setAlerts([]);
-        setAlertSourceStatus([]);
+        setAlertSourceCatalog([]);
       } finally {
         if (mounted) {
           setAlertsLoading(false);
@@ -253,6 +377,7 @@ export default function ResourcesPage() {
       if (!userLocation) {
         setAQHI(null);
         setAQHISourceStatus([]);
+        setAQHISourceCatalog([]);
         return;
       }
 
@@ -272,14 +397,17 @@ export default function ResourcesPage() {
         if (response.ok && payload.success) {
           setAQHI(payload.data);
           setAQHISourceStatus(payload.meta.source_status ?? []);
+          setAQHISourceCatalog(payload.meta.source_catalog ?? []);
         } else {
           setAQHI(null);
           setAQHISourceStatus([]);
+          setAQHISourceCatalog([]);
         }
       } catch {
         if (!mounted) return;
         setAQHI(null);
         setAQHISourceStatus([]);
+        setAQHISourceCatalog([]);
       } finally {
         if (mounted) {
           setAQHILoading(false);
@@ -293,24 +421,77 @@ export default function ResourcesPage() {
     };
   }, [userLocation]);
 
-  const sourceStatus = useMemo(() => {
-    const entries = [
-      ...facilitySourceStatus,
-      ...aedSourceStatus,
-      ...alertSourceStatus,
-      ...aqhiSourceStatus,
-    ];
-    const deduped = new Map<string, SourceStatusRecord>();
-    for (const entry of entries) {
-      deduped.set(entry.source_id, entry);
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadSystemContext() {
+      setSystemContextLoading(true);
+      try {
+        const params = new URLSearchParams({
+          province,
+          limit: "8",
+        });
+
+        if (debouncedSearchQuery) {
+          params.set("q", debouncedSearchQuery);
+        }
+
+        const response = await fetch(
+          `/api/resources/system-context?${params.toString()}`,
+        );
+        const payload = (await response.json()) as SystemContextResponse;
+
+        if (!mounted) return;
+
+        if (response.ok && payload.success) {
+          setDispatchCentres(payload.data.dispatch_centres);
+          setParamedicServices(payload.data.paramedic_services);
+          setSystemContextSourceCatalog(payload.meta.source_catalog ?? []);
+        } else {
+          setDispatchCentres([]);
+          setParamedicServices([]);
+          setSystemContextSourceCatalog([]);
+        }
+      } catch {
+        if (!mounted) return;
+        setDispatchCentres([]);
+        setParamedicServices([]);
+        setSystemContextSourceCatalog([]);
+      } finally {
+        if (mounted) {
+          setSystemContextLoading(false);
+        }
+      }
     }
-    return Array.from(deduped.values());
+
+    loadSystemContext();
+    return () => {
+      mounted = false;
+    };
+  }, [debouncedSearchQuery]);
+
+  const sourceCatalog = useMemo(() => {
+    const entries = [
+      ...facilitySourceCatalog,
+      ...aedSourceCatalog,
+      ...alertSourceCatalog,
+      ...aqhiSourceCatalog,
+      ...systemContextSourceCatalog,
+    ];
+    return dedupeSourceCatalogRecords(entries);
   }, [
-    facilitySourceStatus,
-    aedSourceStatus,
-    alertSourceStatus,
-    aqhiSourceStatus,
+    facilitySourceCatalog,
+    aedSourceCatalog,
+    alertSourceCatalog,
+    aqhiSourceCatalog,
+    systemContextSourceCatalog,
   ]);
+  const systemContextSource = systemContextSourceCatalog[0] ?? null;
+  const systemContextSuppressed =
+    systemContextSource?.freshness_state === "suppress";
+  const systemContextMethodologyNote =
+    systemContextSource?.public_methodology_note ??
+    t("sections.systemContext.fallbackMethodology");
 
   const resourcesSectionTitle = userLocation
     ? t("sections.resources.nearbyTitle")
@@ -437,12 +618,12 @@ export default function ResourcesPage() {
               </p>
             </div>
             <div className="space-y-3">
-              {sourceStatus.length === 0 ? (
+              {sourceCatalog.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-border bg-card/40 p-6 text-sm text-muted-foreground">
                   {t("sections.transparency.empty")}
                 </div>
               ) : (
-                sourceStatus.map((source) => (
+                sourceCatalog.map((source) => (
                   <article
                     key={source.source_id}
                     className="rounded-2xl border border-border bg-card/80 p-4"
@@ -453,7 +634,7 @@ export default function ResourcesPage() {
                           {source.source_name}
                         </h3>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {t("sections.transparency.updated", {
+                          {t("sections.transparency.lastRefreshed", {
                             timestamp:
                               formatTimestamp(source.last_refreshed_at) ??
                               t("common.unknown"),
@@ -461,14 +642,8 @@ export default function ResourcesPage() {
                         </p>
                       </div>
                       <span
-                        className={clsx(
-                          "rounded-full px-2.5 py-1 text-[11px] font-medium",
-                          source.freshness_state === "show" &&
-                            "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200",
-                          source.freshness_state === "warn" &&
-                            "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200",
-                          source.freshness_state === "suppress" &&
-                            "bg-muted text-muted-foreground",
+                        className={getFreshnessBadgeClasses(
+                          source.freshness_state,
                         )}
                       >
                         {t(
@@ -476,6 +651,87 @@ export default function ResourcesPage() {
                         )}
                       </span>
                     </div>
+                    <dl className="mt-4 grid gap-3 text-xs text-muted-foreground sm:grid-cols-2">
+                      <div className="space-y-1">
+                        <dt className="font-medium text-foreground">
+                          {t("sections.transparency.fields.lastVerified")}
+                        </dt>
+                        <dd>
+                          {formatTimestamp(source.last_verified_at) ??
+                            t("common.unknown")}
+                        </dd>
+                      </div>
+                      <div className="space-y-1">
+                        <dt className="font-medium text-foreground">
+                          {t("sections.transparency.fields.connectorType")}
+                        </dt>
+                        <dd>
+                          {formatSourceCatalogEnum(
+                            t,
+                            "connectorType",
+                            source.connector_type,
+                          )}
+                        </dd>
+                      </div>
+                      <div className="space-y-1">
+                        <dt className="font-medium text-foreground">
+                          {t("sections.transparency.fields.accessRoute")}
+                        </dt>
+                        <dd>{source.access_route}</dd>
+                      </div>
+                      <div className="space-y-1">
+                        <dt className="font-medium text-foreground">
+                          {t("sections.transparency.fields.reusePosture")}
+                        </dt>
+                        <dd>
+                          {formatSourceCatalogEnum(
+                            t,
+                            "licenseReuseStatus",
+                            source.license_reuse_status,
+                          )}
+                        </dd>
+                      </div>
+                      <div className="space-y-1">
+                        <dt className="font-medium text-foreground">
+                          {t("sections.transparency.fields.attribution")}
+                        </dt>
+                        <dd>{source.attribution_requirement}</dd>
+                      </div>
+                      <div className="space-y-1">
+                        <dt className="font-medium text-foreground">
+                          {t("sections.transparency.fields.updateCadence")}
+                        </dt>
+                        <dd>
+                          {formatSourceCatalogEnum(
+                            t,
+                            "updateCadence",
+                            source.update_cadence,
+                          )}
+                        </dd>
+                      </div>
+                      <div className="space-y-1">
+                        <dt className="font-medium text-foreground">
+                          {t("sections.transparency.fields.usageMode")}
+                        </dt>
+                        <dd>
+                          {formatSourceCatalogEnum(
+                            t,
+                            "recommendedUsageMode",
+                            source.recommended_usage_mode,
+                          )}
+                        </dd>
+                      </div>
+                    </dl>
+                    {source.public_methodology_note && (
+                      <div className="mt-4 rounded-xl border border-primary/10 bg-primary/5 p-3 text-xs leading-6 text-foreground">
+                        <p className="font-medium">
+                          {t("sections.transparency.fields.methodologyNote")}
+                        </p>
+                        <p className="mt-1 text-muted-foreground">
+                          {source.public_methodology_note}
+                        </p>
+                      </div>
+                    )}
                     <a
                       href={source.provenance_url}
                       target="_blank"
@@ -499,6 +755,12 @@ export default function ResourcesPage() {
             <p className="mt-2 text-sm text-muted-foreground">
               {aedSectionDescription}
             </p>
+            <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/80 p-4 text-sm text-amber-950">
+              <p className="font-medium">{t("sections.aed.caveatTitle")}</p>
+              <p className="mt-1 text-amber-900">
+                {t("sections.aed.caveat")}
+              </p>
+            </div>
             <div className="mt-4">
               <ResourceList
                 resources={aedResources}
@@ -522,6 +784,231 @@ export default function ResourcesPage() {
                 emptyTitle={t("sections.alerts.empty")}
               />
             </div>
+          </div>
+        </section>
+
+        <section className="rounded-3xl border border-border bg-card/80 p-6 shadow-sm">
+          <div className="max-w-3xl">
+            <h2 className="text-2xl font-semibold text-foreground">
+              {t("sections.systemContext.title")}
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t("sections.systemContext.description")}
+            </p>
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-sky-200 bg-sky-50/80 p-4 text-sm text-sky-950">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em]">
+              {t("sections.systemContext.methodologyLabel")}
+            </p>
+            <p className="mt-2 leading-6">{systemContextMethodologyNote}</p>
+          </div>
+
+          <div className="mt-6 grid gap-6 xl:grid-cols-2">
+            <article className="rounded-2xl border border-border bg-background p-5">
+              <h3 className="text-lg font-semibold text-foreground">
+                {t("sections.systemContext.dispatchCentres.title")}
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {t("sections.systemContext.dispatchCentres.description")}
+              </p>
+              <div className="mt-4">
+                {systemContextLoading ? (
+                  <div className="rounded-2xl border border-dashed border-border bg-card/40 p-4 text-sm text-muted-foreground">
+                    {t("sections.systemContext.loading")}
+                  </div>
+                ) : systemContextSuppressed ? (
+                  <div className="rounded-2xl border border-dashed border-border bg-card/40 p-4 text-sm text-muted-foreground">
+                    {t("sections.systemContext.suppressed")}
+                  </div>
+                ) : dispatchCentres.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-border bg-card/40 p-4 text-sm text-muted-foreground">
+                    {t("sections.systemContext.dispatchCentres.empty")}
+                  </div>
+                ) : (
+                  <ul className="space-y-3">
+                    {dispatchCentres.map((centre) => (
+                      <li
+                        key={centre.id}
+                        className="rounded-2xl border border-border bg-card/80 p-4"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h4 className="font-medium text-foreground">
+                              {centre.geography_name}
+                            </h4>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              {t("sections.systemContext.reportingYear", {
+                                year: centre.reporting_year,
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                        <dl className="mt-4 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
+                          <div className="space-y-1">
+                            <dt className="font-medium text-foreground">
+                              {t(
+                                "sections.systemContext.dispatchCentres.averageResponseTime",
+                              )}
+                            </dt>
+                            <dd>
+                              {centre.average_response_time_minutes !== null
+                                ? t(
+                                    "sections.systemContext.dispatchCentres.averageResponseTimeValue",
+                                    {
+                                      value: formatPresentNumber(
+                                        centre.average_response_time_minutes,
+                                        {
+                                          maximumFractionDigits: 1,
+                                        },
+                                      ),
+                                    },
+                                  )
+                                : t("sections.systemContext.notReported")}
+                            </dd>
+                          </div>
+                          <div className="space-y-1">
+                            <dt className="font-medium text-foreground">
+                              {t("sections.systemContext.dispatchCentres.callVolume")}
+                            </dt>
+                            <dd>
+                              {centre.call_volume !== null
+                                ? formatCompactNumber(centre.call_volume)
+                                : t("sections.systemContext.notReported")}
+                            </dd>
+                          </div>
+                        </dl>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </article>
+
+            <article className="rounded-2xl border border-border bg-background p-5">
+              <h3 className="text-lg font-semibold text-foreground">
+                {t("sections.systemContext.paramedicServices.title")}
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {t("sections.systemContext.paramedicServices.description")}
+              </p>
+              <div className="mt-4">
+                {systemContextLoading ? (
+                  <div className="rounded-2xl border border-dashed border-border bg-card/40 p-4 text-sm text-muted-foreground">
+                    {t("sections.systemContext.loading")}
+                  </div>
+                ) : systemContextSuppressed ? (
+                  <div className="rounded-2xl border border-dashed border-border bg-card/40 p-4 text-sm text-muted-foreground">
+                    {t("sections.systemContext.suppressed")}
+                  </div>
+                ) : paramedicServices.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-border bg-card/40 p-4 text-sm text-muted-foreground">
+                    {t("sections.systemContext.paramedicServices.empty")}
+                  </div>
+                ) : (
+                  <ul className="space-y-3">
+                    {paramedicServices.map((service) => (
+                      <li
+                        key={service.id}
+                        className="rounded-2xl border border-border bg-card/80 p-4"
+                      >
+                        <div>
+                          <h4 className="font-medium text-foreground">
+                            {service.geography_name}
+                          </h4>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {t("sections.systemContext.reportingYear", {
+                              year: service.reporting_year,
+                            })}
+                          </p>
+                        </div>
+                        <ul className="mt-4 space-y-3">
+                          {service.severity_breakdown.map((severity, index) => (
+                            <li
+                              key={`${service.id}-${severity.patient_severity ?? "na"}-${index}`}
+                              className="rounded-xl border border-border/70 bg-background p-3"
+                            >
+                              <p className="text-sm font-medium text-foreground">
+                                {severity.patient_severity ??
+                                  t("sections.systemContext.notReported")}
+                              </p>
+                              <dl className="mt-3 grid gap-3 text-xs text-muted-foreground sm:grid-cols-3">
+                                <div className="space-y-1">
+                                  <dt className="font-medium text-foreground">
+                                    {t(
+                                      "sections.systemContext.paramedicServices.responsePlan",
+                                    )}
+                                  </dt>
+                                  <dd>
+                                    {severity.response_time_plan_minutes !== null
+                                      ? t(
+                                          "sections.systemContext.paramedicServices.minutesValue",
+                                          {
+                                            value: formatPresentNumber(
+                                              severity.response_time_plan_minutes,
+                                              {
+                                                maximumFractionDigits: 1,
+                                              },
+                                            ),
+                                          },
+                                        )
+                                      : t("sections.systemContext.notReported")}
+                                  </dd>
+                                </div>
+                                <div className="space-y-1">
+                                  <dt className="font-medium text-foreground">
+                                    {t(
+                                      "sections.systemContext.paramedicServices.plannedResponse",
+                                    )}
+                                  </dt>
+                                  <dd>
+                                    {severity.planned_response_pct !== null
+                                      ? t(
+                                          "sections.systemContext.paramedicServices.percentValue",
+                                          {
+                                            value: formatPresentNumber(
+                                              severity.planned_response_pct,
+                                              {
+                                                maximumFractionDigits: 1,
+                                              },
+                                            ),
+                                          },
+                                        )
+                                      : t("sections.systemContext.notReported")}
+                                  </dd>
+                                </div>
+                                <div className="space-y-1">
+                                  <dt className="font-medium text-foreground">
+                                    {t(
+                                      "sections.systemContext.paramedicServices.performance",
+                                    )}
+                                  </dt>
+                                  <dd>
+                                    {severity.performance_pct !== null
+                                      ? t(
+                                          "sections.systemContext.paramedicServices.percentValue",
+                                          {
+                                            value: formatPresentNumber(
+                                              severity.performance_pct,
+                                              {
+                                                maximumFractionDigits: 1,
+                                              },
+                                            ),
+                                          },
+                                        )
+                                      : t("sections.systemContext.notReported")}
+                                  </dd>
+                                </div>
+                              </dl>
+                            </li>
+                          ))}
+                        </ul>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </article>
           </div>
         </section>
 

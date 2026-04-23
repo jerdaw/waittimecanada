@@ -13,6 +13,7 @@ def _make_status(**overrides) -> PublicHealthSourceStatus:
         "last_refreshed_at": datetime(2026, 3, 27, 19, 5, tzinfo=UTC),
         "resource_record_count": 321,
         "alert_record_count": 0,
+        "system_metric_record_count": 0,
         "latest_alert_published_at": None,
     }
     base.update(overrides)
@@ -44,7 +45,7 @@ def test_render_markdown_includes_counts_and_timestamps():
     assert "Overall state: `healthy`" in rendered
     assert "`mohserlo`<br>MOHSERLO" in rendered
     assert "✅ healthy" in rendered
-    assert "| provider_facility | 2026-03-27T19:05:00+00:00 | 321 | 0 | never |" in rendered
+    assert "| provider_facility | 2026-03-27T19:05:00+00:00 | 321 | 0 | 0 | never |" in rendered
     assert "Health Canada Recalls" in rendered
     assert "2026-03-27T18:30:00+00:00" in rendered
 
@@ -95,6 +96,25 @@ def test_assess_source_status_marks_stale_alert_feed_as_degraded():
 
     assert assessment.state == "degraded"
     assert any("suppress threshold" in reason for reason in assessment.reasons)
+
+
+def test_assess_source_status_marks_empty_system_context_as_degraded():
+    from waittime.cli.public_health_hub_status import assess_source_status
+
+    assessment = assess_source_status(
+        _make_status(
+            source_id="ontario-land-ambulance-response-times",
+            source_name="Ontario Land Ambulance Response Times",
+            domain="system_context",
+            resource_record_count=0,
+            alert_record_count=0,
+            system_metric_record_count=0,
+        ),
+        now=datetime(2026, 3, 27, 20, 0, tzinfo=UTC),
+    )
+
+    assert assessment.state == "degraded"
+    assert "No normalized system metric rows available" in assessment.reasons
 
 
 def test_render_markdown_overall_state_becomes_partial_when_any_source_is_partial():

@@ -68,6 +68,7 @@ status/data-quality filtering rather than an older release.
 5. Production Ontario scope spot checks passed for:
    - `/api/resources?kind=facility&province=QC&limit=1`
    - `/api/resources?kind=facility&province=ON&q=Toronto%20General&limit=1`
+   - `/api/resources/system-context?province=ON&limit=1`
 
 **Result:** The public VPS frontend is verified to be serving the hardened
 status/data-quality rollups in production.
@@ -81,6 +82,8 @@ Once the release above is verified, keep the remaining Ontario scope explicit:
    Ontario registry path has explicit permission or partnership coverage.
 3. Naloxone remains official Ontario link-out only; do not ingest, proxy, or
    republish the native dataset without clearer reuse rights.
+4. Ontario EMS/system-context remains analytics-only background context inside
+   `/resources`; do not present it as live dispatch or ambulance availability.
 
 ---
 
@@ -207,6 +210,7 @@ Deployment Date: 2026-03-12
    - `/api/resources/alerts?limit=1`
    - `/api/resources?kind=aed&province=ON&limit=1`
    - `/api/resources?kind=facility&province=ON&q=Toronto%20General&limit=1`
+   - `/api/resources/system-context?province=ON&limit=1`
    - `/api/resources/aqhi?latitude=43.6532&longitude=-79.3832`
 
 ### Production Readiness Verification:

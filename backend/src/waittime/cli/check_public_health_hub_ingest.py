@@ -12,7 +12,11 @@ from waittime.core import PublicHealthSourceAlertState
 from waittime.services.alerts import AlertService
 from waittime.services.database import DatabaseService
 
-DEFAULT_HARD_FAIL_SOURCE_IDS = ("health-canada-recalls", "mohserlo")
+DEFAULT_HARD_FAIL_SOURCE_IDS = (
+    "health-canada-recalls",
+    "mohserlo",
+    "ontario-land-ambulance-response-times",
+)
 
 
 def _get_sources_to_check(source_ids: list[str]) -> list[str]:
@@ -77,7 +81,8 @@ def evaluate_source_status(assessment: SourceOperationalAssessment) -> IngestEva
                 (
                     f"last_refreshed={assessment.status.last_refreshed_at} "
                     f"resources={assessment.status.resource_record_count} "
-                    f"alerts={assessment.status.alert_record_count}"
+                    f"alerts={assessment.status.alert_record_count} "
+                    f"system_metrics={assessment.status.system_metric_record_count}"
                 )
             ],
             incident=CurrentIncident(

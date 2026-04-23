@@ -76,6 +76,12 @@ def clean_database(db_service: DatabaseService) -> Generator[DatabaseService, No
                 "source_id LIKE %s",
                 ("test-%",),
             )
+            _delete_if_table_exists(
+                cur,
+                "public_health_system_metrics",
+                "id LIKE %s",
+                ("test-%",),
+            )
             _delete_if_table_exists(cur, "public_health_alerts", "id LIKE %s", ("test-%",))
             _delete_if_table_exists(cur, "resource_locations", "id LIKE %s", ("test-%",))
             _delete_if_table_exists(cur, "public_data_sources", "source_id LIKE %s", ("test-%",))
@@ -93,6 +99,12 @@ def clean_database(db_service: DatabaseService) -> Generator[DatabaseService, No
                 cur,
                 "public_health_source_alert_state",
                 "source_id LIKE %s",
+                ("test-%",),
+            )
+            _delete_if_table_exists(
+                cur,
+                "public_health_system_metrics",
+                "id LIKE %s",
                 ("test-%",),
             )
             _delete_if_table_exists(cur, "public_health_alerts", "id LIKE %s", ("test-%",))

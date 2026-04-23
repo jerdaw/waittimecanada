@@ -4,7 +4,7 @@ from pathlib import Path
 import psycopg2.extras
 import pytest
 
-from waittime.core import PublicDataSource
+from waittime.core import PublicDataSource, PublicHealthSystemMetric
 from waittime.services.database import DatabaseService
 
 MIGRATION_PATH = (
@@ -15,12 +15,16 @@ ALERT_STATE_MIGRATION_PATH = (
     / "migrations"
     / "019_add_public_health_source_alert_state.sql"
 )
+SYSTEM_METRICS_MIGRATION_PATH = (
+    Path(__file__).resolve().parents[2] / "migrations" / "020_add_public_health_system_metrics.sql"
+)
 
 
 def _apply_public_health_hub_migration(conn) -> None:
     with conn.cursor() as cur:
         cur.execute(MIGRATION_PATH.read_text(encoding="utf-8"))
         cur.execute(ALERT_STATE_MIGRATION_PATH.read_text(encoding="utf-8"))
+        cur.execute(SYSTEM_METRICS_MIGRATION_PATH.read_text(encoding="utf-8"))
 
 
 def _build_source(**overrides) -> PublicDataSource:
@@ -207,11 +211,83 @@ class TestPublicHealthHubDatabase:
         source_status = {status.source_id: status for status in statuses}
         assert source_status["test-mohserlo"].resource_record_count == 1
         assert source_status["test-mohserlo"].alert_record_count == 0
+        assert source_status["test-mohserlo"].system_metric_record_count == 0
         assert source_status["test-recalls"].resource_record_count == 0
         assert source_status["test-recalls"].alert_record_count == 1
+        assert source_status["test-recalls"].system_metric_record_count == 0
         assert source_status["test-recalls"].latest_alert_published_at == datetime(
             2026, 3, 27, 9, 0, tzinfo=UTC
         )
+
+    def test_public_health_system_metrics_replace_and_list(
+        self,
+        public_health_hub_db: DatabaseService,
+    ):
+        public_health_hub_db.upsert_public_data_source(
+            _build_source(
+                source_id="test-system-context",
+                domain="system_context",
+                source_name="Ontario EMS Context",
+                connector_type="open_data_portal",
+                access_route="Ontario Data Catalogue CSV download",
+                update_cadence="annual",
+                recommended_usage_mode="analytics_only",
+                public_methodology_note="Context only; not live EMS availability.",
+            )
+        )
+
+        inserted = public_health_hub_db.replace_public_health_system_metrics(
+            "test-system-context",
+            [
+                PublicHealthSystemMetric(
+                    id="test-cacc-toronto-2024",
+                    source_id="test-system-context",
+                    series_key="cacc_average_response_times",
+                    province="ON",
+                    geography_type="dispatch_centre",
+                    geography_name="Toronto CACC",
+                    reporting_year=2024,
+                    dimension_label=None,
+                    metrics={
+                        "average_response_time_minutes": 8.4,
+                        "call_volume": 10123,
+                    },
+                    provenance_url="https://data.ontario.ca/example/cacc",
+                    last_refreshed_at=datetime(2026, 4, 29, 12, 0, tzinfo=UTC),
+                ),
+                PublicHealthSystemMetric(
+                    id="test-paramedic-durham-ctas1-2024",
+                    source_id="test-system-context",
+                    series_key="paramedic_service_response_performance",
+                    province="ON",
+                    geography_type="ambulance_service_coverage_area",
+                    geography_name="Durham Region",
+                    reporting_year=2024,
+                    dimension_label="CTAS 1",
+                    metrics={
+                        "response_time_plan_minutes": 8,
+                        "planned_response_pct": 90,
+                        "performance_pct": 87.5,
+                    },
+                    provenance_url="https://data.ontario.ca/example/paramedic",
+                    last_refreshed_at=datetime(2026, 4, 29, 12, 0, tzinfo=UTC),
+                ),
+            ],
+        )
+        assert inserted == 2
+
+        rows = public_health_hub_db.list_public_health_system_metrics(
+            source_id="test-system-context"
+        )
+        assert len(rows) == 2
+        assert rows[0].geography_name == "Durham Region"
+        assert rows[1].geography_name == "Toronto CACC"
+
+        statuses = public_health_hub_db.list_public_health_source_statuses()
+        source_status = {status.source_id: status for status in statuses}
+        assert source_status["test-system-context"].system_metric_record_count == 2
+        assert source_status["test-system-context"].resource_record_count == 0
+        assert source_status["test-system-context"].alert_record_count == 0
 
     def test_public_health_source_alert_state_round_trip(
         self,

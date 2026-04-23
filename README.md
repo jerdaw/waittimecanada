@@ -24,7 +24,7 @@
 - **380+ Hospitals:** Near-real-time monitoring across all regions
 - **Hourly Updates:** Automated data collection currently via GitHub Actions
 - **First-in-Canada:** Real-time ED stretcher occupancy visualization (Quebec)
-- **Ontario Public Resources Module:** `/resources` now serves facilities, OSM-backed AED fallback data, Health Canada recalls, AQHI, and an official Ontario naloxone link-out
+- **Ontario Public Resources Module:** `/resources` now serves facilities, OSM-backed AED fallback data, Health Canada recalls, AQHI, Ontario EMS system context, and an official Ontario naloxone link-out with a first-class source catalog
 
 ### Why This Matters
 
@@ -213,7 +213,7 @@ graph TD
 - **API Routes:** Hospitals/comparisons, analytics, data quality, and public resources endpoints
 - **Pages:** Home (map + list), /data-quality, /analytics, /methods, /resources, /about
 
-### Database Schema (14 Tables)
+### Database Schema (15 Tables)
 - `sources` - Provincial data source metadata
 - `hospitals` - Facility metadata with verification workflow
 - `measurements` - Audit log with ontology tags (payload hashing, not full HTML)
@@ -227,6 +227,7 @@ graph TD
 - `public_data_sources` - Public-health-hub source catalog and freshness metadata
 - `resource_locations` - Normalized facilities and AED locations for `/resources`
 - `public_health_alerts` - Health Canada recall and safety alert records
+- `public_health_system_metrics` - Ontario EMS system-context records for analytics-only `/resources` context cards
 - `public_health_source_alert_state` - Stateful alerting for public-health ingest incidents
 
 ### Automation

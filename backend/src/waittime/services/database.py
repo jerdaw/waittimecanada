@@ -25,6 +25,7 @@ from waittime.core import (
     PublicDataSource,
     PublicHealthAlert,
     PublicHealthSourceAlertState,
+    PublicHealthSystemMetric,
     ResourceLocation,
     ScraperAlertState,
     ScraperStatus,
@@ -47,6 +48,7 @@ class PublicHealthSourceStatus:
     last_refreshed_at: datetime | None
     resource_record_count: int
     alert_record_count: int
+    system_metric_record_count: int
     latest_alert_published_at: datetime | None
 
 
@@ -159,6 +161,7 @@ class DatabaseService:
                         public_data_sources.last_refreshed_at,
                         COALESCE(resource_counts.resource_record_count, 0) AS resource_record_count,
                         COALESCE(alert_counts.alert_record_count, 0) AS alert_record_count,
+                        COALESCE(system_metric_counts.system_metric_record_count, 0) AS system_metric_record_count,
                         alert_counts.latest_alert_published_at
                     FROM public_data_sources
                     LEFT JOIN (
@@ -178,6 +181,14 @@ class DatabaseService:
                         GROUP BY source_id
                     ) AS alert_counts
                         ON alert_counts.source_id = public_data_sources.source_id
+                    LEFT JOIN (
+                        SELECT
+                            source_id,
+                            COUNT(*)::integer AS system_metric_record_count
+                        FROM public_health_system_metrics
+                        GROUP BY source_id
+                    ) AS system_metric_counts
+                        ON system_metric_counts.source_id = public_data_sources.source_id
                     ORDER BY public_data_sources.domain, public_data_sources.source_name
                     """
                 )
@@ -191,6 +202,7 @@ class DatabaseService:
                         last_refreshed_at=row["last_refreshed_at"],
                         resource_record_count=int(row["resource_record_count"] or 0),
                         alert_record_count=int(row["alert_record_count"] or 0),
+                        system_metric_record_count=int(row["system_metric_record_count"] or 0),
                         latest_alert_published_at=row["latest_alert_published_at"],
                     )
                     for row in cur.fetchall()
@@ -460,6 +472,86 @@ class DatabaseService:
                         alert.last_refreshed_at,
                     )
                     for alert in alerts
+                ]
+                psycopg2.extras.execute_values(cur, insert_query, rows)
+                return len(rows)
+
+    def list_public_health_system_metrics(
+        self,
+        source_id: str | None = None,
+        series_key: str | None = None,
+    ) -> list[PublicHealthSystemMetric]:
+        """List normalized system-context metrics with optional filters."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                query = "SELECT * FROM public_health_system_metrics WHERE 1 = 1"
+                params: list[Any] = []
+
+                if source_id:
+                    query += " AND source_id = %s"
+                    params.append(source_id)
+
+                if series_key:
+                    query += " AND series_key = %s"
+                    params.append(series_key)
+
+                query += (
+                    " ORDER BY geography_name, reporting_year DESC, dimension_label NULLS FIRST"
+                )
+                cur.execute(query, params)
+                return [
+                    self._row_to_public_health_system_metric(dict(row)) for row in cur.fetchall()
+                ]
+
+    def replace_public_health_system_metrics(
+        self,
+        source_id: str,
+        system_metrics: list[PublicHealthSystemMetric],
+    ) -> int:
+        """Replace normalized system-context metric rows for one source."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    DELETE FROM public_health_system_metrics
+                    WHERE source_id = %s
+                    """,
+                    (source_id,),
+                )
+
+                if not system_metrics:
+                    return 0
+
+                insert_query = """
+                    INSERT INTO public_health_system_metrics (
+                        id,
+                        source_id,
+                        series_key,
+                        province,
+                        geography_type,
+                        geography_name,
+                        reporting_year,
+                        dimension_label,
+                        metrics,
+                        provenance_url,
+                        last_refreshed_at
+                    ) VALUES %s
+                """
+                rows = [
+                    (
+                        system_metric.id,
+                        system_metric.source_id,
+                        system_metric.series_key,
+                        system_metric.province,
+                        system_metric.geography_type,
+                        system_metric.geography_name,
+                        system_metric.reporting_year,
+                        system_metric.dimension_label,
+                        psycopg2.extras.Json(system_metric.metrics),
+                        system_metric.provenance_url,
+                        system_metric.last_refreshed_at,
+                    )
+                    for system_metric in system_metrics
                 ]
                 psycopg2.extras.execute_values(cur, insert_query, rows)
                 return len(rows)
@@ -2360,6 +2452,27 @@ class DatabaseService:
             published_at=row["published_at"],
             source_updated_at=row.get("source_updated_at"),
             affected_products=affected_products,
+            provenance_url=row["provenance_url"],
+            last_refreshed_at=row.get("last_refreshed_at"),
+            created_at=row.get("created_at"),
+            updated_at=row.get("updated_at"),
+        )
+
+    def _row_to_public_health_system_metric(
+        self,
+        row: dict[str, Any],
+    ) -> PublicHealthSystemMetric:
+        """Convert database row to PublicHealthSystemMetric model."""
+        return PublicHealthSystemMetric(
+            id=row["id"],
+            source_id=row["source_id"],
+            series_key=row["series_key"],
+            province=row["province"],
+            geography_type=row["geography_type"],
+            geography_name=row["geography_name"],
+            reporting_year=int(row["reporting_year"]),
+            dimension_label=row.get("dimension_label"),
+            metrics=dict(row.get("metrics") or {}),
             provenance_url=row["provenance_url"],
             last_refreshed_at=row.get("last_refreshed_at"),
             created_at=row.get("created_at"),

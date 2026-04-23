@@ -234,6 +234,24 @@ class PublicHealthAlert(BaseModel):
     updated_at: datetime | None = None
 
 
+class PublicHealthSystemMetric(BaseModel):
+    """Normalized public health system-context metric stored for the hub module."""
+
+    id: str
+    source_id: str
+    series_key: str = Field(min_length=1, max_length=100)
+    province: str = Field(min_length=2, max_length=2)
+    geography_type: str = Field(min_length=1, max_length=100)
+    geography_name: str = Field(min_length=1, max_length=255)
+    reporting_year: int = Field(ge=1900, le=3000)
+    dimension_label: str | None = None
+    metrics: dict[str, float | int | str | None]
+    provenance_url: str
+    last_refreshed_at: datetime | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
 class MeasurementAggregate(BaseModel):
     """Aggregated statistics for a hospital over a time period.
 

@@ -4,6 +4,7 @@ import { publicCacheHeaders } from "@/utils/cache";
 import { getDb } from "@/utils/db";
 import { logger } from "@/utils/logger";
 import {
+  buildSourceCatalogRecords,
   buildSourceStatusRecords,
   calculateDistanceKm,
   deriveFreshnessState,
@@ -35,6 +36,22 @@ type ResourceRow = {
   access_notes: string | null;
   crowdsourced: boolean;
   completeness_status: "incomplete" | null;
+};
+
+type SourceCatalogRow = {
+  source_id: string;
+  source_name: string;
+  provenance_url: string;
+  domain: "provider_facility" | "aed";
+  connector_type: string;
+  access_route: string;
+  license_reuse_status: string;
+  attribution_requirement: string;
+  update_cadence: string;
+  recommended_usage_mode: string;
+  public_methodology_note: string | null;
+  last_verified_at: string | Date | null;
+  last_refreshed_at: string | Date | null;
 };
 
 type ResourcesScopeMetadata = {
@@ -161,6 +178,7 @@ export async function GET(request: NextRequest) {
               },
               scope,
               source_status: [],
+              source_catalog: [],
             },
           };
         }
@@ -261,38 +279,40 @@ export async function GET(request: NextRequest) {
             return left.name.localeCompare(right.name);
           });
 
-        const displayRows =
-          kind === "facility" &&
-          latitude === undefined &&
-          longitude === undefined &&
-          !q
+        const defaultDedupedRows =
+          kind === "facility"
             ? dedupeDefaultFacilityRows(normalizedRows)
-            : kind === "facility" && q
-              ? dedupeFacilitySearchRows(normalizedRows, q)
-              : normalizedRows;
+            : normalizedRows;
+
+        const displayRows =
+          kind === "facility" && q
+            ? dedupeFacilitySearchRows(defaultDedupedRows, q)
+            : defaultDedupedRows;
 
         const limitedRows = displayRows.slice(0, limit);
 
-        const sourceStatusRows = (await sql.unsafe(
+        const sourceCatalogRows = (await sql.unsafe(
           `
           SELECT
             source_id,
             source_name,
             provenance_url,
             domain,
+            connector_type,
+            access_route,
+            license_reuse_status,
+            attribution_requirement,
+            update_cadence,
+            recommended_usage_mode,
+            public_methodology_note,
+            last_verified_at,
             last_refreshed_at
           FROM public_data_sources
           WHERE domain = $1
           ORDER BY source_name
           `,
           [domain],
-        )) as Array<{
-          source_id: string;
-          source_name: string;
-          provenance_url: string;
-          domain: "provider_facility" | "aed";
-          last_refreshed_at: string | Date | null;
-        }>;
+        )) as SourceCatalogRow[];
 
         return {
           success: true as const,
@@ -309,7 +329,8 @@ export async function GET(request: NextRequest) {
               limit,
             },
             scope,
-            source_status: buildSourceStatusRecords(sourceStatusRows),
+            source_status: buildSourceStatusRecords(sourceCatalogRows),
+            source_catalog: buildSourceCatalogRecords(sourceCatalogRows),
           },
         };
       },

@@ -157,6 +157,7 @@ class TestPublicHealthSourceCatalogDatabaseService:
                 "last_refreshed_at": datetime(2026, 3, 27, 12, 0, tzinfo=UTC),
                 "resource_record_count": 123,
                 "alert_record_count": 0,
+                "system_metric_record_count": 0,
                 "latest_alert_published_at": None,
             },
             {
@@ -168,6 +169,7 @@ class TestPublicHealthSourceCatalogDatabaseService:
                 "last_refreshed_at": datetime(2026, 3, 27, 12, 5, tzinfo=UTC),
                 "resource_record_count": 0,
                 "alert_record_count": 42,
+                "system_metric_record_count": 0,
                 "latest_alert_published_at": datetime(2026, 3, 27, 11, 45, tzinfo=UTC),
             },
         ]
@@ -178,7 +180,9 @@ class TestPublicHealthSourceCatalogDatabaseService:
         assert results[0].source_id == "test-mohserlo"
         assert results[0].resource_record_count == 123
         assert results[1].alert_record_count == 42
+        assert results[1].system_metric_record_count == 0
         executed_sql = mock_cursor.execute.call_args[0][0]
         assert "FROM public_data_sources" in executed_sql
         assert "FROM resource_locations" in executed_sql
         assert "FROM public_health_alerts" in executed_sql
+        assert "FROM public_health_system_metrics" in executed_sql

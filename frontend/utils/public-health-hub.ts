@@ -17,6 +17,23 @@ export interface SourceStatusRecord {
   freshness_state: FreshnessState;
 }
 
+export interface SourceCatalogRecord {
+  source_id: string;
+  domain: SourceDomain;
+  source_name: string;
+  connector_type: string;
+  access_route: string;
+  license_reuse_status: string;
+  attribution_requirement: string;
+  update_cadence: string;
+  recommended_usage_mode: string;
+  public_methodology_note: string | null;
+  provenance_url: string;
+  last_verified_at: string | null;
+  last_refreshed_at: string | null;
+  freshness_state: FreshnessState;
+}
+
 export interface ResourceRecord {
   id: string;
   kind: ResourceKind;
@@ -76,6 +93,40 @@ export interface AQHIRecord {
   caveat_class: "official_forecast";
 }
 
+export interface SystemContextSeverityRecord {
+  patient_severity: string | null;
+  response_time_plan_minutes: number | null;
+  planned_response_pct: number | null;
+  performance_pct: number | null;
+}
+
+export interface SystemContextDispatchCentreRecord {
+  id: string;
+  geography_name: string;
+  reporting_year: number;
+  average_response_time_minutes: number | null;
+  call_volume: number | null;
+  source_id: string;
+  source_name: string;
+  provenance_url: string;
+  last_refreshed_at: string | null;
+  freshness_state: FreshnessState;
+  caveat_class: "official_system_context";
+}
+
+export interface SystemContextParamedicServiceRecord {
+  id: string;
+  geography_name: string;
+  reporting_year: number;
+  severity_breakdown: SystemContextSeverityRecord[];
+  source_id: string;
+  source_name: string;
+  provenance_url: string;
+  last_refreshed_at: string | null;
+  freshness_state: FreshnessState;
+  caveat_class: "official_system_context";
+}
+
 type FreshnessThresholds = {
   showMs: number;
   warnMs: number;
@@ -87,6 +138,17 @@ type SourceStatusRow = {
   provenance_url: string;
   domain: SourceDomain;
   last_refreshed_at: string | Date | null;
+};
+
+type SourceCatalogRow = SourceStatusRow & {
+  connector_type: string;
+  access_route: string;
+  license_reuse_status: string;
+  attribution_requirement: string;
+  update_cadence: string;
+  recommended_usage_mode: string;
+  public_methodology_note: string | null;
+  last_verified_at: string | Date | null;
 };
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -166,6 +228,31 @@ export function buildSourceStatusRecords(
     source_id: row.source_id,
     source_name: row.source_name,
     provenance_url: row.provenance_url,
+    last_refreshed_at: toIsoTimestamp(row.last_refreshed_at),
+    freshness_state: deriveFreshnessState(
+      row.domain,
+      row.last_refreshed_at,
+      row.provenance_url,
+    ),
+  }));
+}
+
+export function buildSourceCatalogRecords(
+  rows: SourceCatalogRow[],
+): SourceCatalogRecord[] {
+  return rows.map((row) => ({
+    source_id: row.source_id,
+    domain: row.domain,
+    source_name: row.source_name,
+    connector_type: row.connector_type,
+    access_route: row.access_route,
+    license_reuse_status: row.license_reuse_status,
+    attribution_requirement: row.attribution_requirement,
+    update_cadence: row.update_cadence,
+    recommended_usage_mode: row.recommended_usage_mode,
+    public_methodology_note: row.public_methodology_note,
+    provenance_url: row.provenance_url,
+    last_verified_at: toIsoTimestamp(row.last_verified_at),
     last_refreshed_at: toIsoTimestamp(row.last_refreshed_at),
     freshness_state: deriveFreshnessState(
       row.domain,

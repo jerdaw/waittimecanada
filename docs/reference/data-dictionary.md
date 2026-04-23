@@ -82,13 +82,17 @@ Public-health-hub source catalog and sync metadata.
 | Column | Type | Description |
 |--------|------|-------------|
 | `source_id` | TEXT (PK) | Stable identifier for the public-health-hub source record. |
-| `domain` | TEXT | Source domain such as `provider_facility`, `aed`, or `safety_alert`. |
+| `domain` | TEXT | Source domain such as `provider_facility`, `aed`, `safety_alert`, `environmental_overlay`, or `system_context`. |
 | `source_name` | TEXT | Public display name used in provenance UI. |
 | `connector_type` | TEXT | Access posture such as `api`, `feed`, `open_data_portal`, or `crowdsourced_registry`. |
+| `access_route` | TEXT | Human-readable technical access path used by the source catalog UI and ops runbooks. |
 | `license_reuse_status` | TEXT | Hard implementation gate: `approved`, `approved_with_conditions`, or `blocked`. |
+| `attribution_requirement` | TEXT | Required attribution or provenance posture for shipped UI/API use. |
+| `update_cadence` | TEXT | Source refresh rhythm such as `annual`, `ongoing`, or `real-time`. |
 | `recommended_usage_mode` | TEXT | Whether the source is used via `live_ui`, `scheduled_ingest`, or a non-runtime mode. |
 | `provenance_url` | TEXT | Canonical upstream source URL shown in public provenance surfaces. |
 | `last_verified_at` | DATE | Last manual review date for source access/reuse posture. |
+| `public_methodology_note` | TEXT | Short user-facing caveat explaining how the source should and should not be interpreted. |
 | `last_refreshed_at` | TIMESTAMPTZ | Last successful in-product refresh timestamp for freshness rules. |
 
 ### `resource_locations`
@@ -124,6 +128,25 @@ Normalized public recall and safety alert records.
 | `affected_products` | JSONB | Structured affected-product list for optional enrichment/rendering. |
 | `provenance_url` | TEXT | Canonical alert URL. |
 | `last_refreshed_at` | TIMESTAMPTZ | Last successful ingest timestamp for freshness rules. |
+
+### `public_health_system_metrics`
+Normalized Ontario EMS system-context records for analytics-only `/resources`
+cards.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | TEXT (PK) | Stable metric identifier derived from source, series, geography, year, and optional dimension label. |
+| `source_id` | TEXT (FK) | Link to `public_data_sources.source_id`. |
+| `series_key` | TEXT | Bounded metric family, currently `cacc_average_response_times` or `paramedic_service_response_performance`. |
+| `province` | CHAR(2) | Two-letter province code, currently `ON`. |
+| `geography_type` | TEXT | Geography semantics such as `dispatch_centre` or `ambulance_service_coverage_area`. |
+| `geography_name` | TEXT | Public geography label shown in the system-context UI. |
+| `reporting_year` | INTEGER | Official reporting year for the record. |
+| `dimension_label` | TEXT | Optional row dimension such as patient-severity category. |
+| `metrics` | JSONB | Structured numeric payload for route-specific rendering (for example response minutes, planned response rate, performance rate, call volume). |
+| `provenance_url` | TEXT | Canonical Ontario resource page for the specific row family. |
+| `last_refreshed_at` | TIMESTAMPTZ | Last successful ingest timestamp used for freshness and degradation rules. |
+| `created_at` / `updated_at` | TIMESTAMPTZ | Row lifecycle timestamps. |
 
 ### `public_health_source_alert_state`
 Persistent alert deduplication state for hard-fail public-health-hub sources.

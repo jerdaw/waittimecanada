@@ -80,6 +80,14 @@ jobs:
         run: |
           python -m waittime.cli.seed_public_health_alerts --fetch-live
 
+      - name: Ingest Ontario EMS system context
+        id: ingest_system_context
+        working-directory: ./backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python -m waittime.cli.seed_public_health_system_context --fetch-live
+
       - name: Write ingest step summary
         if: always()
         run: |
@@ -89,6 +97,7 @@ jobs:
             echo "- MOHSERLO: ${{ steps.ingest_mohserlo.outcome }}"
             echo "- OSM AED fallback: ${{ steps.ingest_aed.outputs.status }}"
             echo "- Health Canada alerts: ${{ steps.ingest_alerts.outcome }}"
+            echo "- Ontario EMS system context: ${{ steps.ingest_system_context.outcome }}"
             echo
             if [ "${{ steps.ingest_aed.outputs.status }}" = "best_effort_failed" ]; then
               echo "_Best-effort AED refresh failed for this run. Existing AED dataset state was retained, and paging remains disabled for this source._"
@@ -106,6 +115,7 @@ jobs:
             --source mohserlo \
             --source osm-aed \
             --source health-canada-recalls \
+            --source ontario-land-ambulance-response-times \
             --format markdown | tee -a "$GITHUB_STEP_SUMMARY" || {
             echo "_Public health hub status summary unavailable for this run._" >> "$GITHUB_STEP_SUMMARY"
           }

@@ -98,6 +98,7 @@ def _render_text(
                 f"  Last refreshed: {_format_datetime(status.last_refreshed_at)}",
                 f"  Resource rows: {status.resource_record_count}",
                 f"  Alert rows: {status.alert_record_count}",
+                f"  System metric rows: {status.system_metric_record_count}",
                 f"  Latest alert published: {_format_datetime(status.latest_alert_published_at)}",
                 f"  Mode: {status.recommended_usage_mode}",
                 f"  Reasons: {_format_reasons(assessment.reasons)}",
@@ -126,8 +127,8 @@ def _render_markdown(
 
     lines.extend(
         [
-            "| Source | State | Domain | Last refreshed | Resource rows | Alert rows | Latest alert published | Reasons |",
-            "| --- | --- | --- | --- | ---: | ---: | --- | --- |",
+            "| Source | State | Domain | Last refreshed | Resource rows | Alert rows | System metric rows | Latest alert published | Reasons |",
+            "| --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |",
         ]
     )
 
@@ -143,6 +144,7 @@ def _render_markdown(
                     _format_datetime(status.last_refreshed_at),
                     str(status.resource_record_count),
                     str(status.alert_record_count),
+                    str(status.system_metric_record_count),
                     _format_datetime(status.latest_alert_published_at),
                     _escape_markdown_cell(_format_reasons(assessment.reasons)),
                 ]
@@ -172,6 +174,7 @@ def _render_json(
                 "last_refreshed_at": _format_datetime(assessment.status.last_refreshed_at),
                 "resource_record_count": assessment.status.resource_record_count,
                 "alert_record_count": assessment.status.alert_record_count,
+                "system_metric_record_count": assessment.status.system_metric_record_count,
                 "latest_alert_published_at": _format_datetime(
                     assessment.status.latest_alert_published_at
                 ),
@@ -218,6 +221,10 @@ def assess_source_status(
     if status.domain == "safety_alert" and status.alert_record_count == 0:
         severity = max(severity, 2)
         reasons.append("No normalized alert rows available")
+
+    if status.domain == "system_context" and status.system_metric_record_count == 0:
+        severity = max(severity, 2)
+        reasons.append("No normalized system metric rows available")
 
     if not reasons:
         reasons.append("Freshness and normalized row checks passed")

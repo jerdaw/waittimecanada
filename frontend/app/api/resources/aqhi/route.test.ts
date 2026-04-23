@@ -63,5 +63,11 @@ describe("API Route: AQHI", () => {
       source_id: "aqhi-geomet",
       freshness_state: "show",
     });
+    expect(data.meta.source_catalog[0]).toMatchObject({
+      source_id: "aqhi-geomet",
+      connector_type: "api",
+      recommended_usage_mode: "live_ui",
+      freshness_state: "show",
+    });
   });
 });

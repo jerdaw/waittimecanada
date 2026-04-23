@@ -23,6 +23,7 @@ def _make_status(**overrides) -> PublicHealthSourceStatus:
         "last_refreshed_at": datetime(2026, 3, 27, 19, 5, tzinfo=UTC),
         "resource_record_count": 321,
         "alert_record_count": 0,
+        "system_metric_record_count": 0,
         "latest_alert_published_at": None,
     }
     base.update(overrides)
@@ -43,7 +44,11 @@ def _make_assessment(
 
 
 def test_get_sources_to_check_defaults_to_hard_fail_sources():
-    assert _get_sources_to_check([]) == ["health-canada-recalls", "mohserlo"]
+    assert _get_sources_to_check([]) == [
+        "health-canada-recalls",
+        "mohserlo",
+        "ontario-land-ambulance-response-times",
+    ]
 
 
 def test_build_degraded_fingerprint_normalizes_reason_whitespace():
@@ -72,6 +77,7 @@ def test_evaluate_source_status_marks_degraded_assessment_as_incident():
     assert evaluation.incident is not None
     assert evaluation.incident.kind == "degraded"
     assert "degraded" in evaluation.summary
+    assert "system_metrics=0" in evaluation.details[0]
 
 
 def test_reconcile_incident_state_opens_new_degraded_incident():

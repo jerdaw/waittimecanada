@@ -193,13 +193,52 @@
       },
       "transparency": {
         "title": "Source transparency",
-        "description": "Every source shown here keeps provenance, refresh metadata, and Ontario-only scope visible.",
+        "description": "Every source shown here keeps provenance, refresh metadata, reuse posture, and Ontario-only scope visible.",
         "empty": "No source metadata available yet.",
-        "updated": "Last refreshed: {timestamp}",
+        "lastRefreshed": "Last refreshed: {timestamp}",
         "freshness": {
           "show": "Current",
           "warn": "Stale",
           "suppress": "Hidden"
+        },
+        "fields": {
+          "lastVerified": "Last verified",
+          "connectorType": "Connector",
+          "accessRoute": "Access route",
+          "reusePosture": "Reuse posture",
+          "attribution": "Attribution",
+          "updateCadence": "Update cadence",
+          "usageMode": "Usage mode",
+          "methodologyNote": "Methodology note"
+        },
+        "values": {
+          "connectorType": {
+            "api": "API",
+            "feed": "Feed",
+            "open_data_portal": "Open data portal",
+            "file_download": "File download",
+            "dashboard_only": "Dashboard only",
+            "request_based": "Request based",
+            "partner_only": "Partner only",
+            "crowdsourced_registry": "Crowdsourced registry"
+          },
+          "licenseReuseStatus": {
+            "approved": "Approved",
+            "approved_with_conditions": "Approved with conditions",
+            "blocked": "Blocked"
+          },
+          "recommendedUsageMode": {
+            "live_ui": "Live UI",
+            "scheduled_ingest": "Scheduled ingest",
+            "analytics_only": "Analytics only",
+            "research_only": "Research only",
+            "do_not_use": "Do not use"
+          },
+          "updateCadence": {
+            "annual": "Annual",
+            "ongoing": "Ongoing",
+            "real-time": "Real-time"
+          }
         },
         "sourceLink": "View official source"
       },
@@ -208,7 +247,37 @@
         "nearbyTitle": "Nearby Ontario AED locations",
         "description": "Ontario AED fallback records are shown with explicit provenance, incompleteness, and freshness labels. Share your location to sort by distance.",
         "nearbyDescription": "Ontario AED fallback records near your location, shown with explicit provenance, incompleteness, and freshness labels.",
+        "caveatTitle": "Crowdsourced fallback",
+        "caveat": "These AED records come from an Ontario fallback path built on OpenStreetMap. Coverage can be incomplete or outdated and should not be treated as a definitive registry.",
         "empty": "No Ontario AED records matched your current filters."
+      },
+      "systemContext": {
+        "title": "Ontario system context",
+        "description": "Official Ontario land ambulance reporting is shown here as background system context, not as live EMS availability or dispatch guidance.",
+        "methodologyLabel": "Methodology posture",
+        "fallbackMethodology": "Official Ontario ambulance reporting for context only. This section is not a live operational tool.",
+        "loading": "Loading Ontario system context...",
+        "suppressed": "Ontario EMS system-context records are temporarily hidden because the source is stale or unavailable.",
+        "reportingYear": "Reporting year: {year}",
+        "notReported": "Not reported",
+        "dispatchCentres": {
+          "title": "Dispatch centres",
+          "description": "Average response time and call-volume summaries by CACC geography.",
+          "empty": "No dispatch-centre rows matched your current filters.",
+          "averageResponseTime": "Average response time",
+          "averageResponseTimeValue": "{value} minutes",
+          "callVolume": "Call volume"
+        },
+        "paramedicServices": {
+          "title": "Paramedic services",
+          "description": "Planned-versus-reported response performance by ambulance service coverage area and patient severity.",
+          "empty": "No paramedic-service rows matched your current filters.",
+          "responsePlan": "Response-time plan",
+          "plannedResponse": "Planned response",
+          "performance": "Performance",
+          "minutesValue": "{value} minutes",
+          "percentValue": "{value}%"
+        }
       },
       "alerts": {
         "title": "Safety alerts",

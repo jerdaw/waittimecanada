@@ -11,6 +11,7 @@ from waittime.services.database import DatabaseService
 from waittime.services.geocoding import GeocodingService
 from waittime.services.methodology_change import MethodologyChangeDetector
 from waittime.services.patterns import TemporalPatternService
+from waittime.services.public_health_system_context import PublicHealthSystemContextService
 from waittime.services.trends import SystemTrendService
 
 __all__ = [
@@ -21,6 +22,7 @@ __all__ = [
     "DatabaseService",
     "GeocodingService",
     "MethodologyChangeDetector",
+    "PublicHealthSystemContextService",
     "SystemTrendService",
     "TemporalPatternService",
 ]

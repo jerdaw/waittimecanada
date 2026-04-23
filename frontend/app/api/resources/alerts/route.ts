@@ -4,9 +4,11 @@ import { publicCacheHeaders } from "@/utils/cache";
 import { getDb } from "@/utils/db";
 import { logger } from "@/utils/logger";
 import {
+  buildSourceCatalogRecords,
   buildSourceStatusRecords,
   deriveFreshnessState,
   type AlertRecord,
+  type SourceCatalogRecord,
   type SourceStatusRecord,
 } from "@/utils/public-health-hub";
 import { checkRateLimit } from "@/utils/rate-limit";
@@ -40,6 +42,38 @@ const DPD_SOURCE_STATUS = {
   source_name: "Drug Product Database (DPD)",
   provenance_url: DPD_PROVENANCE_URL,
 } as const;
+const DPD_SOURCE_CATALOG = {
+  source_id: "health-canada-dpd",
+  domain: "health_product_reference",
+  source_name: "Drug Product Database (DPD)",
+  connector_type: "api",
+  access_route: "Health Canada DPD API",
+  license_reuse_status: "approved_with_conditions",
+  attribution_requirement:
+    "Keep Health Canada provenance visible for enriched DIN lookups.",
+  update_cadence: "ongoing",
+  recommended_usage_mode: "live_ui",
+  public_methodology_note:
+    "Official Health Canada product-reference API used to enrich missing DIN values.",
+  provenance_url: DPD_PROVENANCE_URL,
+  last_verified_at: "2026-03-27",
+} as const;
+
+type SourceCatalogRow = {
+  source_id: string;
+  source_name: string;
+  provenance_url: string;
+  domain: "safety_alert";
+  connector_type: string;
+  access_route: string;
+  license_reuse_status: string;
+  attribution_requirement: string;
+  update_cadence: string;
+  recommended_usage_mode: string;
+  public_methodology_note: string | null;
+  last_verified_at: string | Date | null;
+  last_refreshed_at: string | Date | null;
+};
 
 export async function GET(request: NextRequest) {
   const rateLimitResponse = await checkRateLimit(request);
@@ -91,26 +125,28 @@ export async function GET(request: NextRequest) {
           [limit],
         )) as AlertRow[];
 
-        const sourceStatusRows = (await sql.unsafe(
+        const sourceCatalogRows = (await sql.unsafe(
           `
           SELECT
             source_id,
             source_name,
             provenance_url,
             domain,
+            connector_type,
+            access_route,
+            license_reuse_status,
+            attribution_requirement,
+            update_cadence,
+            recommended_usage_mode,
+            public_methodology_note,
+            last_verified_at,
             last_refreshed_at
           FROM public_data_sources
           WHERE domain = $1
           ORDER BY source_name
           `,
           ["safety_alert"],
-        )) as Array<{
-          source_id: string;
-          source_name: string;
-          provenance_url: string;
-          domain: "safety_alert";
-          last_refreshed_at: string | Date | null;
-        }>;
+        )) as SourceCatalogRow[];
 
         const dpdEnrichment = await enrichAlertsWithDPD(rows);
 
@@ -121,7 +157,11 @@ export async function GET(request: NextRequest) {
           meta: {
             limit,
             source_status: buildAlertsSourceStatus(
-              sourceStatusRows,
+              sourceCatalogRows,
+              dpdEnrichment.sourceStatus,
+            ),
+            source_catalog: buildAlertsSourceCatalog(
+              sourceCatalogRows,
               dpdEnrichment.sourceStatus,
             ),
           },
@@ -146,17 +186,30 @@ export async function GET(request: NextRequest) {
 }
 
 function buildAlertsSourceStatus(
-  sourceStatusRows: Array<{
-    source_id: string;
-    source_name: string;
-    provenance_url: string;
-    domain: "safety_alert";
-    last_refreshed_at: string | Date | null;
-  }>,
+  sourceCatalogRows: SourceCatalogRow[],
   dpdSourceStatus: SourceStatusRecord | null,
 ): SourceStatusRecord[] {
-  const baseStatus = buildSourceStatusRecords(sourceStatusRows);
+  const baseStatus = buildSourceStatusRecords(sourceCatalogRows);
   return dpdSourceStatus ? [...baseStatus, dpdSourceStatus] : baseStatus;
+}
+
+function buildAlertsSourceCatalog(
+  sourceCatalogRows: SourceCatalogRow[],
+  dpdSourceStatus: SourceStatusRecord | null,
+): SourceCatalogRecord[] {
+  const baseCatalog = buildSourceCatalogRecords(sourceCatalogRows);
+  if (!dpdSourceStatus) {
+    return baseCatalog;
+  }
+
+  return [
+    ...baseCatalog,
+    {
+      ...DPD_SOURCE_CATALOG,
+      last_refreshed_at: dpdSourceStatus.last_refreshed_at,
+      freshness_state: dpdSourceStatus.freshness_state,
+    },
+  ];
 }
 
 async function enrichAlertsWithDPD(rows: AlertRow[]): Promise<{

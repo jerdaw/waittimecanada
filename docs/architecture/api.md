@@ -40,6 +40,7 @@ Characteristics:
 
 - `GET /api/resources`
 - `GET /api/resources/alerts`
+- `GET /api/resources/system-context`
 - `GET /api/resources/aqhi`
 
 ## Equity layer
@@ -90,6 +91,13 @@ Public-health routes also carry explicit source freshness state:
 
 and embed provenance/source-status metadata directly in the response so the UI
 can render caveats without inventing freshness certainty.
+
+The public-health routes now also expose additive `meta.source_catalog` records
+for every shipped dependency, including connector type, access route, reuse
+posture, update cadence, usage mode, public methodology note, provenance URL,
+last verified timestamp, last refreshed timestamp, and derived freshness state.
+This keeps `/resources` provenance-first even as Ontario scope broadens beyond
+facility directories.
 
 Operational KPI note:
 
