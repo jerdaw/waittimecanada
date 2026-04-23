@@ -82,6 +82,7 @@ check_route "/api/resources/alerts?limit=1" "\"source_id\":\"health-canada-recal
 check_route "/api/resources?kind=aed&province=ON&limit=1" "\"kind\":\"aed\""
 check_route "/api/resources?kind=facility&province=ON&q=Toronto%20General&limit=1" "Toronto General Hospital"
 check_route "/api/resources/system-context?province=ON&limit=1" "\"source_id\":\"ontario-land-ambulance-response-times\""
+check_route "/api/resources/water-advisories?province=ON&limit=1" "\"source_id\":\"isc-drinking-water-advisories\""
 check_route "/api/resources/aqhi?latitude=43.6532&longitude=-79.3832" "\"source_id\":\"aqhi-geomet\""
 check_route "/api/status" "\"source_id\":\"ontario-health\"" "${LEGACY_SOURCE_IDS[@]}"
 check_route "/api/data-quality" "\"source_id\":\"ontario-health\"" "${LEGACY_SOURCE_IDS[@]}"

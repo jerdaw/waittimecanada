@@ -237,6 +237,7 @@
           "updateCadence": {
             "annual": "Annuelle",
             "ongoing": "Continue",
+            "periodic": "Périodique",
             "real-time": "Temps réel"
           }
         },
@@ -277,6 +278,27 @@
           "performance": "Rendement",
           "minutesValue": "{value} minutes",
           "percentValue": "{value} %"
+        }
+      },
+      "waterAdvisories": {
+        "title": "Avis ontariens à long terme sur l'eau potable",
+        "description": "Dossiers officiels de SAC sur les avis à long terme actifs touchant les réseaux publics sur réserve en Ontario.",
+        "methodologyLabel": "Note de portée",
+        "fallbackMethodology": "Données officielles de SAC sur les avis à long terme actifs touchant les réseaux publics sur réserve en Ontario. Il ne s'agit pas d'une carte complète de tous les avis ontariens sur l'eau potable.",
+        "loading": "Chargement des avis ontariens sur l'eau potable...",
+        "suppressed": "Les avis ontariens sur l'eau potable sont temporairement masqués parce que la source est périmée ou indisponible.",
+        "empty": "Aucun avis ontarien sur l'eau potable ne correspond à vos filtres actuels.",
+        "notReported": "Non déclaré",
+        "summary": {
+          "active": "Avis actifs",
+          "communities": "Communautés touchées"
+        },
+        "fields": {
+          "longTermSince": "À long terme depuis",
+          "advisorySet": "Avis émis",
+          "population": "Estimation de population",
+          "phase": "Phase du projet",
+          "correctiveMeasure": "Mesure corrective"
         }
       },
       "alerts": {

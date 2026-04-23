@@ -41,6 +41,7 @@ Characteristics:
 - `GET /api/resources`
 - `GET /api/resources/alerts`
 - `GET /api/resources/system-context`
+- `GET /api/resources/water-advisories`
 - `GET /api/resources/aqhi`
 
 ## Equity layer
@@ -155,7 +156,7 @@ Analytics implementation note:
 - Daily/weekly/monthly analytics continue to prefer `measurement_aggregates`.
 - Public-health resource routes use shared cache headers plus short-lived
   server-side response caching for DB-backed resource/alert reads and the live
-  AQHI proxy.
+  AQHI and ISC water-advisory proxies.
 
 ## Related References
 

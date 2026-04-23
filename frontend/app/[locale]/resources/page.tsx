@@ -17,6 +17,7 @@ import type {
   SourceStatusRecord,
   SystemContextDispatchCentreRecord,
   SystemContextParamedicServiceRecord,
+  WaterAdvisoryRecord,
 } from "@/utils/public-health-hub";
 
 interface ResourcesResponse {
@@ -66,6 +67,20 @@ interface SystemContextResponse {
   };
 }
 
+interface WaterAdvisoriesResponse {
+  success: boolean;
+  count: number;
+  data: WaterAdvisoryRecord[];
+  meta: {
+    source_status: SourceStatusRecord[];
+    source_catalog: SourceCatalogRecord[];
+    summary: {
+      active_advisories: number;
+      affected_communities: number;
+    };
+  };
+}
+
 type TranslationFn = ReturnType<typeof useTranslations>;
 
 function formatTimestamp(value: string | null | undefined) {
@@ -76,6 +91,16 @@ function formatTimestamp(value: string | null | undefined) {
   return new Date(value).toLocaleString("en-CA", {
     dateStyle: "medium",
     timeStyle: "short",
+  });
+}
+
+function formatDateOnly(value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  return new Date(value).toLocaleDateString("en-CA", {
+    dateStyle: "medium",
   });
 }
 
@@ -188,6 +213,14 @@ export default function ResourcesPage() {
     SystemContextParamedicServiceRecord[]
   >([]);
   const [systemContextLoading, setSystemContextLoading] = useState(true);
+  const [waterAdvisories, setWaterAdvisories] = useState<WaterAdvisoryRecord[]>(
+    [],
+  );
+  const [waterAdvisoriesLoading, setWaterAdvisoriesLoading] = useState(true);
+  const [waterAdvisoriesSummary, setWaterAdvisoriesSummary] = useState({
+    active_advisories: 0,
+    affected_communities: 0,
+  });
   const [userLocation, setUserLocation] = useState<{
     latitude: number;
     longitude: number;
@@ -211,6 +244,8 @@ export default function ResourcesPage() {
   const [systemContextSourceCatalog, setSystemContextSourceCatalog] = useState<
     SourceCatalogRecord[]
   >([]);
+  const [waterAdvisoriesSourceCatalog, setWaterAdvisoriesSourceCatalog] =
+    useState<SourceCatalogRecord[]>([]);
   const province = "ON";
   const facilityDiscoveryReady = Boolean(
     userLocation || debouncedSearchQuery.trim(),
@@ -470,6 +505,66 @@ export default function ResourcesPage() {
     };
   }, [debouncedSearchQuery]);
 
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadWaterAdvisories() {
+      setWaterAdvisoriesLoading(true);
+      try {
+        const params = new URLSearchParams({
+          province,
+          limit: "8",
+        });
+
+        if (debouncedSearchQuery) {
+          params.set("q", debouncedSearchQuery);
+        }
+
+        const response = await fetch(
+          `/api/resources/water-advisories?${params.toString()}`,
+        );
+        const payload = (await response.json()) as WaterAdvisoriesResponse;
+
+        if (!mounted) return;
+
+        if (response.ok && payload.success) {
+          setWaterAdvisories(payload.data);
+          setWaterAdvisoriesSummary(
+            payload.meta.summary ?? {
+              active_advisories: 0,
+              affected_communities: 0,
+            },
+          );
+          setWaterAdvisoriesSourceCatalog(payload.meta.source_catalog ?? []);
+        } else {
+          setWaterAdvisories([]);
+          setWaterAdvisoriesSummary({
+            active_advisories: 0,
+            affected_communities: 0,
+          });
+          setWaterAdvisoriesSourceCatalog([]);
+        }
+      } catch {
+        if (!mounted) return;
+        setWaterAdvisories([]);
+        setWaterAdvisoriesSummary({
+          active_advisories: 0,
+          affected_communities: 0,
+        });
+        setWaterAdvisoriesSourceCatalog([]);
+      } finally {
+        if (mounted) {
+          setWaterAdvisoriesLoading(false);
+        }
+      }
+    }
+
+    loadWaterAdvisories();
+    return () => {
+      mounted = false;
+    };
+  }, [debouncedSearchQuery]);
+
   const sourceCatalog = useMemo(() => {
     const entries = [
       ...facilitySourceCatalog,
@@ -477,6 +572,7 @@ export default function ResourcesPage() {
       ...alertSourceCatalog,
       ...aqhiSourceCatalog,
       ...systemContextSourceCatalog,
+      ...waterAdvisoriesSourceCatalog,
     ];
     return dedupeSourceCatalogRecords(entries);
   }, [
@@ -485,6 +581,7 @@ export default function ResourcesPage() {
     alertSourceCatalog,
     aqhiSourceCatalog,
     systemContextSourceCatalog,
+    waterAdvisoriesSourceCatalog,
   ]);
   const systemContextSource = systemContextSourceCatalog[0] ?? null;
   const systemContextSuppressed =
@@ -492,6 +589,12 @@ export default function ResourcesPage() {
   const systemContextMethodologyNote =
     systemContextSource?.public_methodology_note ??
     t("sections.systemContext.fallbackMethodology");
+  const waterAdvisoriesSource = waterAdvisoriesSourceCatalog[0] ?? null;
+  const waterAdvisoriesSuppressed =
+    waterAdvisoriesSource?.freshness_state === "suppress";
+  const waterAdvisoriesMethodologyNote =
+    waterAdvisoriesSource?.public_methodology_note ??
+    t("sections.waterAdvisories.fallbackMethodology");
 
   const resourcesSectionTitle = userLocation
     ? t("sections.resources.nearbyTitle")
@@ -1009,6 +1112,144 @@ export default function ResourcesPage() {
                 )}
               </div>
             </article>
+          </div>
+        </section>
+
+        <section className="grid gap-8 lg:grid-cols-1">
+          <div className="rounded-3xl border border-border bg-card/80 p-6 shadow-sm">
+            <div className="max-w-3xl">
+              <h2 className="text-2xl font-semibold text-foreground">
+                {t("sections.waterAdvisories.title")}
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {t("sections.waterAdvisories.description")}
+              </p>
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-cyan-200 bg-cyan-50/80 p-4 text-sm text-cyan-950">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em]">
+                {t("sections.waterAdvisories.methodologyLabel")}
+              </p>
+              <p className="mt-2 leading-6">{waterAdvisoriesMethodologyNote}</p>
+            </div>
+
+            <dl className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl border border-border bg-background p-4">
+                <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("sections.waterAdvisories.summary.active")}
+                </dt>
+                <dd className="mt-2 text-3xl font-semibold text-foreground">
+                  {formatCompactNumber(
+                    waterAdvisoriesSummary.active_advisories,
+                  ) ?? "0"}
+                </dd>
+              </div>
+              <div className="rounded-2xl border border-border bg-background p-4">
+                <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("sections.waterAdvisories.summary.communities")}
+                </dt>
+                <dd className="mt-2 text-3xl font-semibold text-foreground">
+                  {formatCompactNumber(
+                    waterAdvisoriesSummary.affected_communities,
+                  ) ?? "0"}
+                </dd>
+              </div>
+            </dl>
+
+            <div className="mt-6">
+              {waterAdvisoriesLoading ? (
+                <div className="rounded-2xl border border-dashed border-border bg-card/40 p-4 text-sm text-muted-foreground">
+                  {t("sections.waterAdvisories.loading")}
+                </div>
+              ) : waterAdvisoriesSuppressed ? (
+                <div className="rounded-2xl border border-dashed border-border bg-card/40 p-4 text-sm text-muted-foreground">
+                  {t("sections.waterAdvisories.suppressed")}
+                </div>
+              ) : waterAdvisories.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-border bg-card/40 p-4 text-sm text-muted-foreground">
+                  {t("sections.waterAdvisories.empty")}
+                </div>
+              ) : (
+                <ul className="grid gap-4 xl:grid-cols-2">
+                  {waterAdvisories.map((advisory) => (
+                    <li
+                      key={advisory.id}
+                      className="rounded-2xl border border-border bg-background p-5"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="text-lg font-semibold text-foreground">
+                            {advisory.community_name}
+                          </h3>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {advisory.water_system_name}
+                          </p>
+                        </div>
+                        <span
+                          className={getFreshnessBadgeClasses(
+                            advisory.freshness_state,
+                          )}
+                        >
+                          {t(
+                            `sections.transparency.freshness.${advisory.freshness_state}`,
+                          )}
+                        </span>
+                      </div>
+                      <p className="mt-3 text-sm font-medium text-foreground">
+                        {advisory.advisory_type}
+                      </p>
+                      <dl className="mt-4 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
+                        <div className="space-y-1">
+                          <dt className="font-medium text-foreground">
+                            {t("sections.waterAdvisories.fields.longTermSince")}
+                          </dt>
+                          <dd>
+                            {formatDateOnly(advisory.long_term_since) ??
+                              t("common.unknown")}
+                          </dd>
+                        </div>
+                        <div className="space-y-1">
+                          <dt className="font-medium text-foreground">
+                            {t("sections.waterAdvisories.fields.advisorySet")}
+                          </dt>
+                          <dd>
+                            {formatDateOnly(advisory.advisory_set_at) ??
+                              t("common.unknown")}
+                          </dd>
+                        </div>
+                        <div className="space-y-1">
+                          <dt className="font-medium text-foreground">
+                            {t("sections.waterAdvisories.fields.population")}
+                          </dt>
+                          <dd>
+                            {advisory.population_estimate ??
+                              t("sections.waterAdvisories.notReported")}
+                          </dd>
+                        </div>
+                        <div className="space-y-1">
+                          <dt className="font-medium text-foreground">
+                            {t("sections.waterAdvisories.fields.phase")}
+                          </dt>
+                          <dd>
+                            {advisory.project_phase ??
+                              t("sections.waterAdvisories.notReported")}
+                          </dd>
+                        </div>
+                        <div className="space-y-1 sm:col-span-2">
+                          <dt className="font-medium text-foreground">
+                            {t("sections.waterAdvisories.fields.correctiveMeasure")}
+                          </dt>
+                          <dd>
+                            {advisory.corrective_measure ??
+                              t("sections.waterAdvisories.notReported")}
+                          </dd>
+                        </div>
+                      </dl>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
         </section>
 

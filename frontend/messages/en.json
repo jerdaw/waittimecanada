@@ -237,6 +237,7 @@
           "updateCadence": {
             "annual": "Annual",
             "ongoing": "Ongoing",
+            "periodic": "Periodic",
             "real-time": "Real-time"
           }
         },
@@ -277,6 +278,27 @@
           "performance": "Performance",
           "minutesValue": "{value} minutes",
           "percentValue": "{value}%"
+        }
+      },
+      "waterAdvisories": {
+        "title": "Ontario long-term drinking water advisories",
+        "description": "Official ISC records for active long-term drinking water advisories affecting public systems on reserve in Ontario.",
+        "methodologyLabel": "Scope note",
+        "fallbackMethodology": "Official ISC data on active long-term drinking water advisories for public systems on reserve in Ontario. This is not a complete map of all Ontario drinking water advisories.",
+        "loading": "Loading Ontario drinking water advisories...",
+        "suppressed": "Ontario drinking water advisories are temporarily hidden because the source is stale or unavailable.",
+        "empty": "No Ontario drinking water advisories matched your current filters.",
+        "notReported": "Not reported",
+        "summary": {
+          "active": "Active advisories",
+          "communities": "Affected communities"
+        },
+        "fields": {
+          "longTermSince": "Long-term since",
+          "advisorySet": "Advisory set",
+          "population": "Population estimate",
+          "phase": "Project phase",
+          "correctiveMeasure": "Corrective measure"
         }
       },
       "alerts": {

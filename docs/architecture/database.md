@@ -73,10 +73,12 @@ The Ontario-first `/resources` module now uses five dedicated database tables:
 - `public_health_source_alert_state`: incident deduplication state for hard-fail public-health ingest sources
 
 These tables are operationally separate from the wait-time observatory schema.
-AQHI remains live-proxied and is intentionally not persisted in the database.
-The source catalog metadata exposed by `/resources`, `/api/resources/alerts`,
-`/api/resources/aqhi`, and `/api/resources/system-context` is derived from
-`public_data_sources` rather than duplicated in route code.
+AQHI and the ISC drinking-water advisory layer remain live-proxied and are
+intentionally not persisted in the database. The source catalog metadata
+exposed by `/resources`, `/api/resources/alerts`, and
+`/api/resources/system-context` is DB-backed; the live-proxied `/api/resources/aqhi`
+and `/api/resources/water-advisories` routes ship the equivalent source
+metadata contract directly from the route layer.
 
 ## Data Model Rules
 

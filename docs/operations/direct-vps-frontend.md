@@ -85,7 +85,7 @@ The live VPS frontend is expected to preserve these low-transfer controls:
 
 1. `SystemStatus` polls `/api/health` every 5 minutes and only while the tab is visible.
 2. Shared anonymous read routes keep short cache headers via `frontend/utils/cache.ts`.
-3. The VPS runtime applies short-lived in-process response caching via `frontend/utils/server-cache.ts` for repeated reads to `/api/health`, `/api/status`, `/api/hospitals`, `/api/hospitals/[slug]/trends`, `/api/resources`, `/api/resources/alerts`, `/api/resources/system-context`, `/api/data-quality`, `/api/anomalies`, `/api/compare`, `/api/methodology`, and the analytics routes.
+3. The VPS runtime applies short-lived in-process response caching via `frontend/utils/server-cache.ts` for repeated reads to `/api/health`, `/api/status`, `/api/hospitals`, `/api/hospitals/[slug]/trends`, `/api/resources`, `/api/resources/alerts`, `/api/resources/system-context`, `/api/resources/water-advisories`, `/api/resources/aqhi`, `/api/data-quality`, `/api/anomalies`, `/api/compare`, `/api/methodology`, and the analytics routes.
 4. Geolocation and export routes remain `Cache-Control: no-store`.
 
 ## Deploy On The VPS

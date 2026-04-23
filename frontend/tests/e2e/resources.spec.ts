@@ -17,23 +17,29 @@ test.describe("Public Health Resources", () => {
     ).toBeVisible();
     await expect(
       page.getByText(
-        "Search for a facility or share your location to load reference directory results.",
+        "Search for an Ontario facility or share your location to load reference directory results.",
       ),
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "AED locations" }),
+      page.getByRole("heading", { name: "Ontario AED locations" }),
     ).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Safety alerts" }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        name: "Ontario long-term drinking water advisories",
+      }),
+    ).toBeVisible();
     await expect(page.getByText("Union Station AED")).toBeVisible();
     await expect(page.getByText("Test Recall Notice")).toBeVisible();
+    await expect(page.getByText("Neskantaga First Nation")).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Toronto General Hospital" }),
     ).not.toBeVisible();
 
     await page
-      .getByPlaceholder("Search hospitals, clinics, or services")
+      .getByPlaceholder("Search Ontario hospitals, clinics, or services")
       .fill("Toronto General");
 
     await expect(
@@ -60,7 +66,7 @@ test.describe("Public Health Resources", () => {
       page.getByRole("heading", { name: "Nearby resources" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Nearby AED locations" }),
+      page.getByRole("heading", { name: "Nearby Ontario AED locations" }),
     ).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Toronto General Hospital" }),

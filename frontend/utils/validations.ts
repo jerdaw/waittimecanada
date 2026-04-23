@@ -210,3 +210,9 @@ export const ResourceSystemContextQuerySchema = z.object({
   q: z.string().trim().min(1).max(200).optional(),
   limit: z.coerce.number().int().positive().max(20).default(8),
 });
+
+export const ResourceWaterAdvisoriesQuerySchema = z.object({
+  province: ProvinceEnum,
+  q: z.string().trim().min(1).max(200).optional(),
+  limit: z.coerce.number().int().positive().max(20).default(8),
+});

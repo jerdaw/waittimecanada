@@ -93,6 +93,27 @@ export interface AQHIRecord {
   caveat_class: "official_forecast";
 }
 
+export interface WaterAdvisoryRecord {
+  id: string;
+  community_name: string;
+  water_system_name: string;
+  advisory_type: string;
+  advisory_set_at: string;
+  long_term_since: string;
+  projected_lift_date?: string | null;
+  population_estimate?: string | null;
+  corrective_measure?: string | null;
+  project_phase?: string | null;
+  latitude: number;
+  longitude: number;
+  source_id: string;
+  source_name: string;
+  provenance_url: string;
+  last_refreshed_at: string | null;
+  freshness_state: FreshnessState;
+  caveat_class: "official_environmental_advisory";
+}
+
 export interface SystemContextSeverityRecord {
   patient_severity: string | null;
   response_time_plan_minutes: number | null;

@@ -139,6 +139,72 @@ describe("ResourcesPage", () => {
                   }),
                 ],
               },
+          }),
+        });
+      }
+
+      if (url.includes("/api/resources/water-advisories")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              success: true,
+              count: 1,
+              data: [
+                {
+                  id: "water-1",
+                  community_name: "Neskantaga First Nation",
+                  water_system_name: "Neskantaga Public Water System",
+                  advisory_type: "Boil water advisory",
+                  advisory_set_at: "1995-02-01T00:00:00.000Z",
+                  long_term_since: "1996-02-01T00:00:00.000Z",
+                  projected_lift_date: null,
+                  population_estimate: "501 to 1000 people",
+                  corrective_measure: "New treatment plant",
+                  project_phase: "Construction",
+                  latitude: 52.58,
+                  longitude: -86.95,
+                  source_id: "isc-drinking-water-advisories",
+                  source_name: "ISC Long-term Drinking Water Advisories",
+                  provenance_url:
+                    "https://www.sac-isc.gc.ca/eng/1620925418298/1620925434679",
+                  last_refreshed_at: "2026-04-22T00:00:00.000Z",
+                  freshness_state: "show",
+                  caveat_class: "official_environmental_advisory",
+                },
+              ],
+              meta: {
+                summary: {
+                  active_advisories: 28,
+                  affected_communities: 26,
+                },
+                source_status: [
+                  {
+                    source_id: "isc-drinking-water-advisories",
+                    source_name: "ISC Long-term Drinking Water Advisories",
+                    provenance_url:
+                      "https://www.sac-isc.gc.ca/eng/1620925418298/1620925434679",
+                    last_refreshed_at: "2026-04-22T00:00:00.000Z",
+                    freshness_state: "show",
+                  },
+                ],
+                source_catalog: [
+                  buildSourceCatalogRecord({
+                    source_id: "isc-drinking-water-advisories",
+                    source_name: "ISC Long-term Drinking Water Advisories",
+                    provenance_url:
+                      "https://www.sac-isc.gc.ca/eng/1620925418298/1620925434679",
+                    domain: "environmental_overlay",
+                    connector_type: "file_download",
+                    access_route: "ISC map data JSON export",
+                    update_cadence: "periodic",
+                    recommended_usage_mode: "scheduled_ingest",
+                    public_methodology_note:
+                      "Official ISC data on active long-term drinking water advisories for public systems on reserve in Ontario. This is not a complete map of all Ontario drinking water advisories.",
+                    last_refreshed_at: "2026-04-22T00:00:00.000Z",
+                  }),
+                ],
+              },
             }),
         });
       }
@@ -294,13 +360,28 @@ describe("ResourcesPage", () => {
       expect(screen.getByText("CTAS 1")).toBeInTheDocument();
     });
 
+    await waitFor(() => {
+      expect(
+        screen.getByText("Ontario long-term drinking water advisories"),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Neskantaga First Nation")).toBeInTheDocument();
+      expect(screen.getByText("Active advisories")).toBeInTheDocument();
+      expect(screen.getByText("Affected communities")).toBeInTheDocument();
+    });
+
     expect(screen.getAllByText("Connector").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Reuse posture").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Approved with conditions").length).toBeGreaterThan(0);
     expect(screen.getByText("Analytics only")).toBeInTheDocument();
+    expect(screen.getAllByText("Scheduled ingest").length).toBeGreaterThan(0);
     expect(
       screen.getAllByText(
         "Official Ontario ambulance response-time reporting for context only.",
+      ).length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(
+        "Official ISC data on active long-term drinking water advisories for public systems on reserve in Ontario. This is not a complete map of all Ontario drinking water advisories.",
       ).length,
     ).toBeGreaterThan(0);
     expect(screen.getByText("Ontario naloxone kits")).toBeInTheDocument();
@@ -382,6 +463,49 @@ describe("ResourcesPage", () => {
                   }),
                 ],
               },
+          }),
+        });
+      }
+
+      if (url.includes("/api/resources/water-advisories")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              success: true,
+              count: 0,
+              data: [],
+              meta: {
+                summary: {
+                  active_advisories: 28,
+                  affected_communities: 26,
+                },
+                source_status: [
+                  {
+                    source_id: "isc-drinking-water-advisories",
+                    source_name: "ISC Long-term Drinking Water Advisories",
+                    provenance_url:
+                      "https://www.sac-isc.gc.ca/eng/1620925418298/1620925434679",
+                    last_refreshed_at: "2025-01-01T00:00:00.000Z",
+                    freshness_state: "suppress",
+                  },
+                ],
+                source_catalog: [
+                  buildSourceCatalogRecord({
+                    source_id: "isc-drinking-water-advisories",
+                    source_name: "ISC Long-term Drinking Water Advisories",
+                    provenance_url:
+                      "https://www.sac-isc.gc.ca/eng/1620925418298/1620925434679",
+                    domain: "environmental_overlay",
+                    connector_type: "file_download",
+                    access_route: "ISC map data JSON export",
+                    update_cadence: "periodic",
+                    recommended_usage_mode: "scheduled_ingest",
+                    last_refreshed_at: "2025-01-01T00:00:00.000Z",
+                    freshness_state: "suppress",
+                  }),
+                ],
+              },
             }),
         });
       }
@@ -413,6 +537,14 @@ describe("ResourcesPage", () => {
           "Ontario EMS system-context records are temporarily hidden because the source is stale or unavailable.",
         ).length,
       ).toBe(2);
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          "Ontario drinking water advisories are temporarily hidden because the source is stale or unavailable.",
+        ),
+      ).toBeInTheDocument();
     });
 
     expect(screen.getByText("Ontario AED locations")).toBeInTheDocument();
