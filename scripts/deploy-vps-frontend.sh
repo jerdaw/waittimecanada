@@ -12,6 +12,8 @@ frontend_dir="${repo_root}/frontend"
 image_name="waittime-frontend"
 container_name="waittime-frontend"
 host_bind="127.0.0.1:3400:3000"
+private_base_url="http://127.0.0.1:3400"
+startup_timeout_seconds="${WAITTIME_FRONTEND_STARTUP_TIMEOUT_SECONDS:-120}"
 
 if [[ ! -f "$env_file" ]]; then
   echo "env file not found: $env_file" >&2
@@ -35,6 +37,36 @@ read_env_value() {
   value="${value%\'}"
   value="${value#\'}"
   printf '%s' "$value"
+}
+
+wait_for_ready_route() {
+  local path="$1"
+  local description="$2"
+  local deadline=$((SECONDS + startup_timeout_seconds))
+  local http_code="000"
+  local url="${private_base_url}${path}"
+
+  while (( SECONDS < deadline )); do
+    http_code="$(
+      curl \
+        --silent \
+        --location \
+        --max-time 10 \
+        --output /dev/null \
+        --write-out "%{http_code}" \
+        "$url" || true
+    )"
+
+    if [[ "$http_code" == "200" ]]; then
+      echo "ready ${description}: ${url} (${http_code})"
+      return 0
+    fi
+
+    sleep 2
+  done
+
+  echo "timed out waiting for ${description}: ${url} (last status: ${http_code})" >&2
+  return 1
 }
 
 next_public_mapbox_token="$(read_env_value "NEXT_PUBLIC_MAPBOX_TOKEN")"
@@ -73,6 +105,10 @@ docker run -d \
   -p "$host_bind" \
   "${image_name}:${tag}"
 
+wait_for_ready_route "/api/health" "private health endpoint"
+wait_for_ready_route "/" "root page"
+wait_for_ready_route "/methods" "methods page"
+
 echo "container=${container_name}"
 echo "image=${image_name}:${tag}"
-echo "health_url=http://127.0.0.1:3400/api/health"
+echo "health_url=${private_base_url}/api/health"

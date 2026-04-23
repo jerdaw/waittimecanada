@@ -104,7 +104,12 @@ The deploy script:
 3. replaces any existing `waittime-frontend` container
 4. runs the container with `--restart unless-stopped`
 5. binds it privately at `127.0.0.1:3400:3000`
-6. sets `APP_VERSION` for health visibility
+6. waits for the private `/api/health`, `/`, and `/methods` routes to return `200` before exiting
+7. sets `APP_VERSION` for health visibility
+
+Optional override:
+
+- `WAITTIME_FRONTEND_STARTUP_TIMEOUT_SECONDS` controls how long the deploy script waits for route readiness before failing (default `120`)
 
 ## Stage And Release From A Workstation
 
