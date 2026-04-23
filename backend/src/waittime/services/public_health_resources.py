@@ -400,7 +400,7 @@ def normalize_odhf_csv(
         postal_code_keys=["postal_code", "postcode"],
         phone_keys=["phone", "telephone"],
         website_keys=["website", "website_url"],
-        record_id_keys=["facility_id", "id", "record_id"],
+        record_id_keys=["facility_id", "id", "record_id", "index"],
         description_keys=["facility_type", "subtype", "naics_name"],
         province_keys=["province", "province_code", "pruid"],
     )

@@ -53,6 +53,23 @@ def test_normalize_odhf_csv_preserves_province_codes() -> None:
     assert records[0].reference_status == "directory_only"
 
 
+def test_normalize_odhf_csv_uses_index_as_fallback_record_identifier() -> None:
+    csv_text = """index,facility_name,province,city,latitude,longitude
+101,Hotel-Dieu Grace Healthcare Css,ON,Windsor,42.3,-83.0
+202,Hotel-Dieu Grace Healthcare Css,ON,Clarence-Rockland,45.6,-75.3
+"""
+
+    records = normalize_odhf_csv(
+        csv_text,
+        refreshed_at=datetime(2026, 3, 27, 12, 0, tzinfo=UTC),
+    )
+
+    assert len(records) == 2
+    assert records[0].source_record_id == "101"
+    assert records[1].source_record_id == "202"
+    assert records[0].id != records[1].id
+
+
 def test_load_odhf_csv_file_decodes_cp1252_exports(tmp_path: Path) -> None:
     odhf_file = tmp_path / "odhf.csv"
     odhf_file.write_bytes(
