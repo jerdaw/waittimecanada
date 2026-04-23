@@ -165,6 +165,54 @@ describe("API Route: Water Advisories", () => {
     expect(data.data[0].community_name).toBe("Chippewas of Nawash First Nation");
   });
 
+  test("keeps weekly-ish ISC data in the show state", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-04-23T12:00:00.000Z"));
+
+    // @ts-ignore
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          GenerateDate: "2026-04-15",
+          data: [
+            {
+              CommunityName: "Neskantaga First Nation",
+              ProvinceAcronym: "ON",
+              LTDWACurrent: [
+                {
+                  AdvisoryID: "1664",
+                  WaterSystemName: "Neskantaga Public Water System",
+                  AdvisoryType: "Boil water advisory",
+                  DateSet: "1995-02-01",
+                  DateLTDWASet: "1996-02-01",
+                  Lattitude: 52.20458,
+                  Longitude: -88.01144,
+                },
+              ],
+            },
+          ],
+        }),
+    });
+
+    const req = new NextRequest(
+      "http://localhost/api/resources/water-advisories?province=ON&limit=1",
+    );
+
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.data[0]).toMatchObject({
+      id: "isc-drinking-water-advisories-1664",
+      freshness_state: "show",
+    });
+    expect(data.meta.source_status[0]).toMatchObject({
+      freshness_state: "show",
+      last_refreshed_at: "2026-04-15T00:00:00.000Z",
+    });
+  });
+
   test("returns an explicit Ontario-only scope response for unsupported provinces", async () => {
     const req = new NextRequest(
       "http://localhost/api/resources/water-advisories?province=QC&limit=5",

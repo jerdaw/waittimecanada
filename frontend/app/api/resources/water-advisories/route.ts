@@ -14,6 +14,8 @@ import { ResourceWaterAdvisoriesQuerySchema } from "@/utils/validations";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WATER_ADVISORIES_CACHE_TTL_MS = 3_600_000;
+const WATER_ADVISORIES_SHOW_MS = 14 * DAY_MS;
+const WATER_ADVISORIES_WARN_MS = 45 * DAY_MS;
 const WATER_ADVISORIES_DATA_URL =
   "https://www.sac-isc.gc.ca/DAM/DAM-ISC-SAC/DAM-WTR/STAGING/texte-text/lTDWA_map_data_1572010201618_eng.txt";
 const WATER_ADVISORIES_PROVENANCE_URL =
@@ -311,10 +313,10 @@ function deriveWaterAdvisoryFreshnessState(
   }
 
   const ageMs = Date.now() - new Date(lastRefreshedAt).getTime();
-  if (ageMs <= 7 * DAY_MS) {
+  if (ageMs <= WATER_ADVISORIES_SHOW_MS) {
     return "show";
   }
-  if (ageMs <= 30 * DAY_MS) {
+  if (ageMs <= WATER_ADVISORIES_WARN_MS) {
     return "warn";
   }
   return "suppress";
