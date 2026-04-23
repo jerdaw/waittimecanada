@@ -148,24 +148,27 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 **Purpose:** Refresh Batch A public-health-hub datasets from approved live upstreams:
 - MOHSERLO via the Ontario ArcGIS feature service
+- Statistics Canada ODHF via the official zipped CSV archive
 - Ontario AED fallback via the approved Overpass query
 - Health Canada recalls via the approved RSS feed
 
 **Optimization controls:**
 - Serialized concurrency group to avoid overlapping ingest runs.
 - Reuses the existing `DATABASE_URL` secret; no new secrets required.
-- MOHSERLO and Health Canada alerts remain hard-fail paths; the Overpass AED
-  fallback runs in its own best-effort step so transient AED mirror failures do
-  not block the rest of the batch. AED mirror failures are recorded as explicit
-  best-effort summary state rather than as a failing workflow annotation.
+- MOHSERLO, ODHF, and Health Canada alerts remain hard-fail paths; the
+  Overpass AED fallback runs in its own best-effort step so transient AED
+  mirror failures do not block the rest of the batch. AED mirror failures are
+  recorded as explicit best-effort summary state rather than as a failing
+  workflow annotation.
 - Each run appends a GitHub Actions job summary with per-step outcomes plus the
   current source refresh timestamps, normalized row counts, and explicit
   `healthy` / `partial` / `degraded` operator classifications from the database
   state.
-- Hard-fail public-health sources (`mohserlo`, `health-canada-recalls`) now use
-  transition-aware alerting via persisted incident state so operators receive
-  one degraded alert and one recovery alert instead of repeat duplicates. The
-  best-effort AED fallback is intentionally excluded from paging.
+- Hard-fail public-health sources (`mohserlo`, `odhf`,
+  `health-canada-recalls`) now use transition-aware alerting via persisted
+  incident state so operators receive one degraded alert and one recovery alert
+  instead of repeat duplicates. The best-effort AED fallback is intentionally
+  excluded from paging.
 
 ### 12. `deploy-docs.yml` - Documentation Publishing
 

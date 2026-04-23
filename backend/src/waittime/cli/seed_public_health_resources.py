@@ -4,7 +4,7 @@ Usage:
     python -m waittime.cli.seed_public_health_resources --mohserlo-file path/to/mohserlo.csv
     python -m waittime.cli.seed_public_health_resources --mohserlo-file file.csv --odhf-file file.csv
     python -m waittime.cli.seed_public_health_resources --osm-aed-file ontario-aed.json
-    python -m waittime.cli.seed_public_health_resources --fetch-mohserlo-live --fetch-osm-aed-live
+    python -m waittime.cli.seed_public_health_resources --fetch-mohserlo-live --fetch-odhf-live --fetch-osm-aed-live
     python -m waittime.cli.seed_public_health_resources --list
 """
 
@@ -19,8 +19,10 @@ from waittime.services.database import DatabaseService
 from waittime.services.public_health_resources import (
     FacilityIngestSummary,
     PublicHealthResourceService,
+    load_odhf_csv_file,
     load_text_file,
     normalize_mohserlo_geojson,
+    normalize_odhf_csv,
     normalize_osm_aed_overpass_json,
 )
 
@@ -37,7 +39,7 @@ Examples:
   python -m waittime.cli.seed_public_health_resources --mohserlo-file mohserlo.csv
   python -m waittime.cli.seed_public_health_resources --mohserlo-file mohserlo.csv --odhf-file odhf.csv
   python -m waittime.cli.seed_public_health_resources --osm-aed-file ontario-aed.json
-  python -m waittime.cli.seed_public_health_resources --fetch-mohserlo-live --fetch-osm-aed-live
+  python -m waittime.cli.seed_public_health_resources --fetch-mohserlo-live --fetch-odhf-live --fetch-osm-aed-live
   python -m waittime.cli.seed_public_health_resources --list
         """,
     )
@@ -52,6 +54,11 @@ Examples:
         "--fetch-mohserlo-live",
         action="store_true",
         help="Fetch MOHSERLO directly from the approved Ontario ArcGIS feature service",
+    )
+    parser.add_argument(
+        "--fetch-odhf-live",
+        action="store_true",
+        help="Fetch ODHF directly from the approved Statistics Canada archive",
     )
     parser.add_argument(
         "--fetch-osm-aed-live",
@@ -82,16 +89,15 @@ Examples:
         and not args.odhf_file
         and not args.osm_aed_file
         and not args.fetch_mohserlo_live
+        and not args.fetch_odhf_live
         and not args.fetch_osm_aed_live
     ):
         print("Error: provide a file flag, a live-fetch flag, or use --list")
         return 1
 
     try:
-        db = DatabaseService()
-        service = PublicHealthResourceService(db)
-
         if args.list:
+            db = DatabaseService()
             sources = db.list_public_data_sources()
             if not sources:
                 print("No public data sources found.")
@@ -106,9 +112,12 @@ Examples:
                 print()
             return 0
 
+        service = PublicHealthResourceService(db=None)
         if args.dry_run:
             logger.info("[DRY RUN MODE - No changes will be made]\n")
         else:
+            db = DatabaseService()
+            service = PublicHealthResourceService(db)
             service.ensure_batch_a_facility_sources()
             service.ensure_aed_sources()
 
@@ -125,6 +134,7 @@ Examples:
                 file_path=args.odhf_file,
                 label="ODHF",
                 dry_run=args.dry_run,
+                text_loader=load_odhf_csv_file,
                 loader=lambda text: service.ingest_odhf_csv(text),
             )
 
@@ -145,6 +155,15 @@ Examples:
                     normalize_mohserlo_geojson(text, refreshed_at=_now())
                 ),
                 loader=lambda text: service.ingest_mohserlo_geojson(text),
+            )
+
+        if args.fetch_odhf_live:
+            _process_live_payload(
+                label="ODHF",
+                dry_run=args.dry_run,
+                fetcher=service.fetch_odhf_csv,
+                dry_run_counter=lambda text: len(normalize_odhf_csv(text, refreshed_at=_now())),
+                loader=lambda text: service.ingest_odhf_csv(text),
             )
 
         if args.fetch_osm_aed_live:
@@ -172,10 +191,11 @@ def _process_file(
     file_path: Path,
     label: str,
     dry_run: bool,
+    text_loader: Callable[[Path], str] = load_text_file,
     loader: Callable[[str], FacilityIngestSummary],
 ) -> None:
     logger.info("Loading %s from %s...", label, file_path)
-    text = load_text_file(file_path)
+    text = text_loader(file_path)
 
     if dry_run:
         logger.info("[DRY RUN] Loaded %s (%s bytes)", label, len(text))

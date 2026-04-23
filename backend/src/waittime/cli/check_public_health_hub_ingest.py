@@ -15,6 +15,7 @@ from waittime.services.database import DatabaseService
 DEFAULT_HARD_FAIL_SOURCE_IDS = (
     "health-canada-recalls",
     "mohserlo",
+    "odhf",
     "ontario-land-ambulance-response-times",
 )
 

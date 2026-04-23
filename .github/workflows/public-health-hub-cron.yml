@@ -43,6 +43,15 @@ jobs:
           python -m waittime.cli.seed_public_health_resources \
             --fetch-mohserlo-live
 
+      - name: Ingest live ODHF resources
+        id: ingest_odhf
+        working-directory: ./backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python -m waittime.cli.seed_public_health_resources \
+            --fetch-odhf-live
+
       - name: Ingest live OSM AED fallback
         id: ingest_aed
         working-directory: ./backend
@@ -95,6 +104,7 @@ jobs:
             echo "## Public Health Hub Ingest"
             echo
             echo "- MOHSERLO: ${{ steps.ingest_mohserlo.outcome }}"
+            echo "- ODHF: ${{ steps.ingest_odhf.outcome }}"
             echo "- OSM AED fallback: ${{ steps.ingest_aed.outputs.status }}"
             echo "- Health Canada alerts: ${{ steps.ingest_alerts.outcome }}"
             echo "- Ontario EMS system context: ${{ steps.ingest_system_context.outcome }}"
@@ -113,6 +123,7 @@ jobs:
         run: |
           python -m waittime.cli.public_health_hub_status \
             --source mohserlo \
+            --source odhf \
             --source osm-aed \
             --source health-canada-recalls \
             --source ontario-land-ambulance-response-times \

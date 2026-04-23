@@ -1,3 +1,5 @@
+import io
+import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -5,9 +7,11 @@ import httpx
 
 from waittime.services.public_health_resources import (
     MOHSERLO_SOURCE,
+    ODHF_DOWNLOAD_URL,
     ODHF_SOURCE,
     OSM_OVERPASS_API_URLS,
     PublicHealthResourceService,
+    load_odhf_csv_file,
     normalize_mohserlo_csv,
     normalize_mohserlo_geojson,
     normalize_odhf_csv,
@@ -47,6 +51,19 @@ def test_normalize_odhf_csv_preserves_province_codes() -> None:
     assert records[1].province == "QC"
     assert records[0].provenance_url == ODHF_SOURCE.provenance_url
     assert records[0].reference_status == "directory_only"
+
+
+def test_load_odhf_csv_file_decodes_cp1252_exports(tmp_path: Path) -> None:
+    odhf_file = tmp_path / "odhf.csv"
+    odhf_file.write_bytes(
+        (
+            "index,facility_name,province,latitude,longitude\n1,H\u00f4pital Test,on,43.65,-79.38\n"
+        ).encode("cp1252")
+    )
+
+    decoded = load_odhf_csv_file(odhf_file)
+
+    assert "H\u00f4pital Test" in decoded
 
 
 def test_normalize_mohserlo_geojson_creates_directory_only_facilities() -> None:
@@ -175,3 +192,28 @@ def test_fetch_osm_aed_overpass_json_raises_after_all_endpoints_fail(
             assert endpoint in message
     else:
         raise AssertionError("Expected all-endpoint Overpass failure to raise")
+
+
+def test_fetch_odhf_csv_extracts_archive_and_decodes_cp1252(monkeypatch) -> None:
+    archive_buffer = io.BytesIO()
+    with zipfile.ZipFile(archive_buffer, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr(
+            "ODHF_v1.1/odhf_v1.1.csv",
+            (
+                "index,facility_name,province,latitude,longitude\n"
+                "1,H\u00f4pital Test,on,43.65,-79.38\n"
+            ).encode("cp1252"),
+        )
+
+    def fake_get(self, url, headers=None):  # type: ignore[no-untyped-def]
+        request = httpx.Request("GET", url, headers=headers)
+        return httpx.Response(200, request=request, content=archive_buffer.getvalue())
+
+    monkeypatch.setattr(httpx.Client, "get", fake_get)
+
+    service = PublicHealthResourceService(db=None)  # type: ignore[arg-type]
+
+    result = service.fetch_odhf_csv()
+
+    assert "H\u00f4pital Test" in result
+    assert ODHF_DOWNLOAD_URL.startswith("https://www150.statcan.gc.ca/")

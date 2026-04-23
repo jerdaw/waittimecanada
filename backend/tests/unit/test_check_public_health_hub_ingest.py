@@ -47,6 +47,7 @@ def test_get_sources_to_check_defaults_to_hard_fail_sources():
     assert _get_sources_to_check([]) == [
         "health-canada-recalls",
         "mohserlo",
+        "odhf",
         "ontario-land-ambulance-response-times",
     ]
 

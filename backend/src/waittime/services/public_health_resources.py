@@ -7,6 +7,7 @@ import json
 import logging
 import re
 import unicodedata
+import zipfile
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
@@ -32,6 +33,7 @@ OSM_OVERPASS_API_URLS = (
     "https://lz4.overpass-api.de/api/interpreter",
     "https://overpass.private.coffee/api/interpreter",
 )
+ODHF_DOWNLOAD_URL = "https://www150.statcan.gc.ca/n1/en/pub/13-26-0001/2020001/ODHF_v1.1.zip"
 ONTARIO_AED_OVERPASS_QUERY = """
 [out:json][timeout:90];
 area["ISO3166-2"="CA-ON"]->.searchArea;
@@ -112,19 +114,19 @@ class FacilityIngestSummary:
 class PublicHealthResourceService:
     """Service for normalizing and persisting public health hub resources."""
 
-    def __init__(self, db: DatabaseService):
+    def __init__(self, db: DatabaseService | None):
         self.db = db
 
     def ensure_batch_a_facility_sources(self) -> list[PublicDataSource]:
         """Persist the Batch A facility source metadata records."""
         return [
-            self.db.upsert_public_data_source(MOHSERLO_SOURCE),
-            self.db.upsert_public_data_source(ODHF_SOURCE),
+            self._require_db().upsert_public_data_source(MOHSERLO_SOURCE),
+            self._require_db().upsert_public_data_source(ODHF_SOURCE),
         ]
 
     def ensure_aed_sources(self) -> list[PublicDataSource]:
         """Persist the approved AED source metadata record."""
-        return [self.db.upsert_public_data_source(OSM_AED_SOURCE)]
+        return [self._require_db().upsert_public_data_source(OSM_AED_SOURCE)]
 
     def ingest_mohserlo_csv(
         self,
@@ -133,12 +135,13 @@ class PublicHealthResourceService:
     ) -> FacilityIngestSummary:
         """Normalize and persist a MOHSERLO file."""
         effective_refreshed_at = refreshed_at or datetime.now(UTC)
-        self.db.upsert_public_data_source(
+        db = self._require_db()
+        db.upsert_public_data_source(
             MOHSERLO_SOURCE.model_copy(update={"last_refreshed_at": effective_refreshed_at})
         )
         records = normalize_mohserlo_csv(csv_text, effective_refreshed_at)
-        count = self.db.replace_resource_locations("mohserlo", "facility", records)
-        self.db.mark_public_data_source_refreshed("mohserlo", effective_refreshed_at)
+        count = db.replace_resource_locations("mohserlo", "facility", records)
+        db.mark_public_data_source_refreshed("mohserlo", effective_refreshed_at)
         return FacilityIngestSummary(source_id="mohserlo", records_loaded=count)
 
     def ingest_mohserlo_geojson(
@@ -148,12 +151,13 @@ class PublicHealthResourceService:
     ) -> FacilityIngestSummary:
         """Normalize and persist a live MOHSERLO GeoJSON export."""
         effective_refreshed_at = refreshed_at or datetime.now(UTC)
-        self.db.upsert_public_data_source(
+        db = self._require_db()
+        db.upsert_public_data_source(
             MOHSERLO_SOURCE.model_copy(update={"last_refreshed_at": effective_refreshed_at})
         )
         records = normalize_mohserlo_geojson(payload, effective_refreshed_at)
-        count = self.db.replace_resource_locations("mohserlo", "facility", records)
-        self.db.mark_public_data_source_refreshed("mohserlo", effective_refreshed_at)
+        count = db.replace_resource_locations("mohserlo", "facility", records)
+        db.mark_public_data_source_refreshed("mohserlo", effective_refreshed_at)
         return FacilityIngestSummary(source_id="mohserlo", records_loaded=count)
 
     def ingest_odhf_csv(
@@ -163,12 +167,13 @@ class PublicHealthResourceService:
     ) -> FacilityIngestSummary:
         """Normalize and persist an ODHF file."""
         effective_refreshed_at = refreshed_at or datetime.now(UTC)
-        self.db.upsert_public_data_source(
+        db = self._require_db()
+        db.upsert_public_data_source(
             ODHF_SOURCE.model_copy(update={"last_refreshed_at": effective_refreshed_at})
         )
         records = normalize_odhf_csv(csv_text, effective_refreshed_at)
-        count = self.db.replace_resource_locations("odhf", "facility", records)
-        self.db.mark_public_data_source_refreshed("odhf", effective_refreshed_at)
+        count = db.replace_resource_locations("odhf", "facility", records)
+        db.mark_public_data_source_refreshed("odhf", effective_refreshed_at)
         return FacilityIngestSummary(source_id="odhf", records_loaded=count)
 
     def ingest_osm_aed_overpass_json(
@@ -178,12 +183,13 @@ class PublicHealthResourceService:
     ) -> FacilityIngestSummary:
         """Normalize and persist an OSM Overpass-style AED export."""
         effective_refreshed_at = refreshed_at or datetime.now(UTC)
-        self.db.upsert_public_data_source(
+        db = self._require_db()
+        db.upsert_public_data_source(
             OSM_AED_SOURCE.model_copy(update={"last_refreshed_at": effective_refreshed_at})
         )
         records = normalize_osm_aed_overpass_json(payload, effective_refreshed_at)
-        count = self.db.replace_resource_locations("osm-aed", "aed", records)
-        self.db.mark_public_data_source_refreshed("osm-aed", effective_refreshed_at)
+        count = db.replace_resource_locations("osm-aed", "aed", records)
+        db.mark_public_data_source_refreshed("osm-aed", effective_refreshed_at)
         return FacilityIngestSummary(source_id="osm-aed", records_loaded=count)
 
     def fetch_mohserlo_geojson(self) -> str:
@@ -245,10 +251,36 @@ class PublicHealthResourceService:
         error_summary = "; ".join(errors) if errors else "unknown error"
         raise RuntimeError(f"All Overpass AED endpoints failed: {error_summary}")
 
+    def fetch_odhf_csv(self) -> str:
+        """Fetch and decode the approved Statistics Canada ODHF CSV archive."""
+        with httpx.Client(timeout=HTTP_TIMEOUT_SECONDS, follow_redirects=True) as client:
+            response = client.get(
+                ODHF_DOWNLOAD_URL,
+                headers={"Accept": "application/zip, application/octet-stream"},
+            )
+            response.raise_for_status()
+
+        with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
+            csv_names = [name for name in archive.namelist() if name.lower().endswith(".csv")]
+            if not csv_names:
+                raise RuntimeError("ODHF archive did not contain a CSV payload.")
+
+            return _decode_odhf_csv_bytes(archive.read(csv_names[0]))
+
+    def _require_db(self) -> DatabaseService:
+        if self.db is None:
+            raise RuntimeError("Database service is required for this operation.")
+        return self.db
+
 
 def load_text_file(file_path: Path) -> str:
     """Read a UTF-8 text file for ingest."""
     return file_path.read_text(encoding="utf-8-sig")
+
+
+def load_odhf_csv_file(file_path: Path) -> str:
+    """Read and decode an ODHF CSV export from disk."""
+    return _decode_odhf_csv_bytes(file_path.read_bytes())
 
 
 def normalize_mohserlo_csv(
@@ -564,6 +596,22 @@ def _normalize_province_code(value: str | None) -> str | None:
         }
         return code_map.get(cleaned)
     return cleaned[:2]
+
+
+def _decode_odhf_csv_bytes(payload: bytes) -> str:
+    for encoding in ("utf-8-sig", "cp1252"):
+        try:
+            return payload.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+
+    raise UnicodeDecodeError(
+        "odhf",
+        payload,
+        0,
+        1,
+        "Unable to decode ODHF CSV payload as utf-8-sig or cp1252.",
+    )
 
 
 def _build_resource_id(
