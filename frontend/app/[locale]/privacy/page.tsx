@@ -18,7 +18,7 @@ export default function PrivacyPage() {
       <main className="container max-w-4xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
         <p className="text-muted-foreground mb-8">
-          Last updated: February 12, 2026
+          Last updated: April 23, 2026
         </p>
 
         <div className="prose prose-slate dark:prose-invert max-w-none space-y-8">
@@ -62,11 +62,74 @@ export default function PrivacyPage() {
               </div>
 
               <div>
+                <h3 className="text-lg font-medium mb-2">
+                  Request and Usage Metadata
+                </h3>
+                <div className="space-y-2">
+                  <p className="leading-relaxed">
+                    We do not use advertising analytics, cookies, or third-party
+                    tracking scripts. We do, however, process standard web
+                    request metadata as part of normal site delivery and
+                    operations.
+                  </p>
+                  <ul className="list-disc ml-6 space-y-1">
+                    <li>
+                      Hosting and reverse-proxy infrastructure may process IP
+                      addresses, hostnames, request paths, and user-agent
+                      strings in ordinary access logs.
+                    </li>
+                    <li>
+                      Our API middleware adds response-timing headers and logs
+                      request path, status, duration, and user-agent for
+                      observability.
+                    </li>
+                    <li>
+                      We do not intentionally build advertising profiles or
+                      store visitor IP addresses in the application database.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-medium mb-2">
+                  Approximate Location Data
+                </h3>
+                <div className="space-y-2">
+                  <p className="leading-relaxed">
+                    Wait Time Canada offers optional location-aware features for
+                    distance sorting and nearby public-health resources.
+                  </p>
+                  <ul className="list-disc ml-6 space-y-1">
+                    <li>
+                      If you allow browser geolocation, your browser shares your
+                      device location with the site for that session.
+                    </li>
+                    <li>
+                      If browser geolocation is unavailable or denied, the
+                      homepage may request coarse IP-based geolocation through
+                      our server-side `/api/geolocation` route.
+                    </li>
+                    <li>
+                      That route reads proxy IP headers and sends the apparent
+                      requester IP address, or the server-observed request, to
+                      `ipapi.co` to estimate a city-level location.
+                    </li>
+                    <li>
+                      Geolocation responses are returned with `Cache-Control:
+                      no-store`, and the app does not write those location
+                      results into the main application database.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div>
                 <h3 className="text-lg font-medium mb-2">Analytics Data</h3>
                 <p className="leading-relaxed">
                   We do not use analytics tracking, cookies, or third-party
-                  tracking scripts. We do not collect IP addresses, browser
-                  fingerprints, or usage analytics.
+                  ad-tech scripts, and we do not use browser fingerprinting for
+                  marketing or audience profiling.
                 </p>
               </div>
 
@@ -74,8 +137,8 @@ export default function PrivacyPage() {
                 <h3 className="text-lg font-medium mb-2">No User Accounts</h3>
                 <p className="leading-relaxed">
                   This platform does not require user registration, accounts, or
-                  login. We do not collect names, email addresses, or any
-                  personal information from visitors.
+                  login. We do not collect names, email addresses, or
+                  user-submitted profile information from visitors.
                 </p>
               </div>
             </div>
@@ -144,9 +207,13 @@ export default function PrivacyPage() {
                   PIPEDA (Personal Information Protection and Electronic
                   Documents Act):
                 </strong>{" "}
-                This project does not collect, use, or disclose personal
-                information as defined by PIPEDA. We exclusively use aggregate,
-                anonymized, publicly available health system data.
+                The platform&apos;s core dataset is public health-system data,
+                not patient records or user accounts. Standard web request
+                metadata and optional location-related requests may still
+                involve personal information such as IP address or approximate
+                location when the site is delivered or geolocation features are
+                used. We do not use that information for advertising,
+                profiling, or sale.
               </p>
               <p className="leading-relaxed">
                 <strong>
@@ -196,8 +263,8 @@ export default function PrivacyPage() {
               <ul className="list-disc ml-6 space-y-2">
                 <li>
                   <strong>Mapbox:</strong> Map tile rendering for hospital
-                  location visualization. Mapbox may collect geolocation data
-                  for map rendering. See{" "}
+                  location visualization. Your browser requests map tiles and
+                  related assets directly from Mapbox when the map is used. See{" "}
                   <a
                     href="https://www.mapbox.com/privacy"
                     target="_blank"
@@ -209,11 +276,22 @@ export default function PrivacyPage() {
                   .
                 </li>
                 <li>
-                  <strong>Neon PostgreSQL:</strong> Database hosting (data is
-                  encrypted at rest and in transit).
+                  <strong>ipapi.co:</strong> Server-side IP geolocation for the
+                  homepage fallback location flow. Requests to `/api/geolocation`
+                  may send an IP address to ipapi.co so the app can estimate a
+                  coarse location.
                 </li>
                 <li>
-                  <strong>Netlify:</strong> Frontend hosting with CDN caching.
+                  <strong>Neon PostgreSQL:</strong> Database hosting for public
+                  wait-time and resource data. Data is encrypted at rest and in
+                  transit.
+                </li>
+                <li>
+                  <strong>Official public-data upstreams:</strong> some resource
+                  routes fetch or enrich data from official third-party services
+                  such as Environment and Climate Change Canada GeoMet,
+                  Indigenous Services Canada, and Health Canada when you use the
+                  related resource views.
                 </li>
               </ul>
               <p className="leading-relaxed mt-3">
@@ -228,9 +306,11 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-semibold mb-4">Your Rights</h2>
             <div className="text-foreground/90">
               <p className="leading-relaxed mb-2">
-                Since we do not collect personal information, traditional data
-                subject rights (access, deletion, correction) do not apply.
-                However:
+                We do not maintain user accounts or build visitor profiles, but
+                standard request metadata may still be processed by hosting,
+                logging, or third-party geolocation/map providers. If you have
+                a privacy question about those flows, raise it through the
+                project contact paths below. In addition:
               </p>
               <ul className="list-disc ml-6 space-y-1">
                 <li>

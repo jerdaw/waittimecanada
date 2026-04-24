@@ -154,6 +154,30 @@ Expected outcome:
 2. page and API smoke checks pass for `/`, `/methods`, `/data-quality`, `/analytics`, `/resources`, `/api/resources/system-context`, `/api/resources/water-advisories`, `/api/status`, and aggregate `/api/data-quality`
 3. `/api/health` reflects the current backend freshness state in the database, so `healthy` may be `false` even when the frontend cutover itself is correct
 
+## Header Verification Posture
+
+The live frontend currently publishes a hardened header baseline, but CSP
+remains intentionally report-only. Do not treat this runtime as enforcing a
+blocking `Content-Security-Policy` yet.
+
+Verify headers explicitly after deploy:
+
+```bash
+curl -I https://wait-time.ca/
+curl -I https://wait-time.ca/api/health
+```
+
+Expected header posture:
+
+1. document routes return `X-Frame-Options: DENY`,
+   `X-Content-Type-Options: nosniff`, `Referrer-Policy:
+   strict-origin-when-cross-origin`, and `Permissions-Policy`.
+2. document routes return `Content-Security-Policy-Report-Only`, not an
+   enforced blocking `Content-Security-Policy`.
+3. API routes return the same hardening headers plus the documented CORS
+   response shape (`Access-Control-Allow-Origin: *`,
+   `Access-Control-Allow-Methods: GET, OPTIONS`).
+
 Suggested Caddy shape after cutover:
 
 ```caddy

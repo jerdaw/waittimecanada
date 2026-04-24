@@ -12,6 +12,8 @@ This directory is the planning control plane for Wait Time Canada.
 
 ## Active Planning Docs
 
+- `docs/planning/2026-04-23-repo-audit-follow-up-board.md`
+- `docs/planning/2026-04-23-repo-audit-remediation-plan.md`
 - `docs/planning/implementation/admissions-strengthening-plan.md`
 - `docs/planning/post-launch-growth-strategy.md`
 - `docs/planning/public-health-data-hub-municipal-inspection-pilot-decision.md`

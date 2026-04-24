@@ -6,7 +6,7 @@ This project treats testing as a reliability control for clinical data interpret
 
 - Backend: `pytest` (`backend/tests`)
 - Frontend unit/component: `Vitest` + React Testing Library
-- Frontend E2E: `Playwright` (CI-first; local only when debugging)
+- Frontend E2E: `Playwright` (manual-dispatch CI lane; local only when debugging; not part of the default push/PR merge gate)
 
 ## Core Principles
 
@@ -28,6 +28,8 @@ python -m pytest -m unit backend/tests
 ### Integration (`@pytest.mark.integration`)
 
 Use for DB interactions, scraper parsing integration, and service composition.
+These tests require `DATABASE_URL` and will skip when that prerequisite is not
+present.
 
 ```bash
 python -m pytest -m integration backend/tests
@@ -38,6 +40,11 @@ python -m pytest -m integration backend/tests
 ```bash
 python -m pytest backend/tests
 ```
+
+Note:
+`backend/tests/e2e/test_pipeline.py` is an opt-in local smoke path layered into
+the pytest tree. It also expects `DATABASE_URL` plus a local frontend server on
+`http://localhost:3000`, and it will skip if those prerequisites are missing.
 
 ## Frontend Test Types
 
@@ -55,7 +62,11 @@ cd frontend
 npm run test:e2e
 ```
 
-Default rule: do not run E2E locally unless investigating a specific browser-flow bug. Use GitHub Actions manual dispatch for routine browser verification; the suite was repo-side stabilized on 2026-04-09, but heavy browser coverage remains CI-first to conserve GitHub Actions free-tier minutes.
+Default rule: do not run E2E locally unless investigating a specific
+browser-flow bug. Use GitHub Actions manual dispatch for routine browser
+verification; the suite was repo-side stabilized on 2026-04-09, but heavy
+browser coverage remains CI-first to conserve GitHub Actions free-tier minutes
+and is not the default merge-readiness gate.
 
 ## Coverage and Quality Expectations
 
@@ -97,6 +108,7 @@ npm run test:unit
 - If local and CI disagree, prioritize reproducing and fixing CI conditions.
 - Frontend and backend coverage artifacts are produced from separate path-scoped workflows and kept as short-lived build artifacts for debugging.
 - Playwright remains manual-dispatch in GitHub Actions even after the 2026-04-09 stabilization pass; default merge readiness relies on lint, type-check, unit tests, and build, with browser E2E reserved for explicit verification runs.
+- Backend integration coverage exists, but DB-backed integration and local smoke assertions are still prerequisite-dependent rather than universally enforced in every local or CI context.
 
 ## Free-Tier CI Conservation (Temporary)
 

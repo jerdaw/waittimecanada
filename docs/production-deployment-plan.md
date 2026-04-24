@@ -1,8 +1,20 @@
-# Production Deployment Plan - Historical Netlify Baseline
+# Historical Production Deployment Plan - Netlify Baseline
 
 **Status:** Historical reference; Netlify is no longer the live frontend host
 **Date:** March 12, 2026
 **Platform:** Netlify (historical production baseline; rollback-only)
+
+> Current live baseline (2026-04-23): the frontend runs on the shared VPS
+> through host Caddy at `https://wait-time.ca`, while backend scheduling and
+> heartbeat checks remain on GitHub Actions because the Ontario source is still
+> not reliably reachable from that VPS. Use
+> `docs/operations/direct-vps-frontend.md`,
+> `docs/operations/direct-vps-backend.md`, and
+> `docs/operations/scraper-scheduling.md` for current operational truth.
+>
+> The platform and vendor comparisons below are retained as historical planning
+> context and rollback background only. They are not the active deployment
+> instructions.
 
 > Update (March 12, 2026): Netlify deploys were restored and the application served successfully from the Netlify site, `https://wait-time.ca` was live with a valid Let's Encrypt certificate, `https://www.wait-time.ca` redirected to the canonical host, and production smoke passed against the canonical domain.
 >
@@ -30,6 +42,11 @@
 1. **No blocking deployment tasks remain**
 2. **Ongoing release discipline** via explicit `[release]` commits
 3. **Launch-material follow-through** (LinkedIn post, screenshots, walkthrough)
+
+Historical note:
+The option analysis below reflects pre-cutover planning and should not be read
+as a recommendation to move the live frontend back to Netlify, Render, or
+another hosted path without a new decision/update.
 
 ---
 

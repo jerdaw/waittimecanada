@@ -198,7 +198,7 @@ graph TD
 
 ### Backend
 - **Language:** Python 3.12+
-- **Testing:** pytest with broad unit/integration coverage across scrapers, services, and API paths
+- **Testing:** pytest with broad unit coverage plus database-backed integration tests; some backend integration and smoke checks require `DATABASE_URL`, and the local pipeline smoke path also expects a frontend server on `localhost:3000`
 - **Scrapers:** 4 provincial scrapers (BeautifulSoup, HTTP/HTML parsing, Playwright, JSON extraction)
 - **Database:** Neon PostgreSQL 17 with 15 tables, including the public-health-hub source/resource/alert/system-context lane
 - **Services:**
@@ -209,9 +209,9 @@ graph TD
 
 ### Frontend
 - **Framework:** Next.js 14 App Router + TypeScript
-- **Testing:** Vitest + React Testing Library for unit/component coverage, with Playwright browser verification kept CI-first and manual-dispatch
+- **Testing:** Vitest + React Testing Library for unit/component coverage, with Playwright browser verification kept CI-first, manual-dispatch, and outside the default push/PR merge gate
 - **Mapping:** Mapbox GL JS
-- **Components:** 30+ React components with comprehensive test coverage
+- **Components:** 30+ React components with targeted coverage across major user-facing flows
 - **API Routes:** Hospitals/comparisons, analytics, data quality, and public resources endpoints
 - **Pages:** Home (map + list), /data-quality, /analytics, /methods, /resources, /about
 
@@ -277,6 +277,15 @@ This project demonstrates multiple CanMEDS competencies for medical school appli
 ---
 
 ## 🚀 Quick Start (Local Development)
+
+This section is for local development. The current production baseline is
+split: the public frontend runs on the shared VPS at `https://wait-time.ca`,
+while the authoritative backend scheduler and heartbeat path remain on GitHub
+Actions because the Ontario source is still not reliably reachable from that
+VPS. Use `docs/operations/direct-vps-frontend.md`,
+`docs/operations/direct-vps-backend.md`, and
+`docs/operations/scraper-scheduling.md` for the live deployment/runtime
+baseline.
 
 ### Prerequisites
 
@@ -388,8 +397,8 @@ python -m waittime.cli.storage_stats              # Inspect measurements table g
 
 # Testing
 pytest tests/unit                                  # Unit tests only
-pytest tests/integration                           # Integration tests
-pytest tests/ -v --cov=waittime                   # Full suite with coverage
+pytest tests/integration                           # Integration tests (requires DATABASE_URL)
+pytest tests/ -v --cov=waittime                   # Full suite with coverage; backend smoke tests may skip without DATABASE_URL and a local frontend server
 ```
 
 ### Frontend
@@ -443,6 +452,7 @@ waittimecanada/
 │   │   ├── core/              # Models, enums, ontology
 │   │   └── cli/               # Command-line tools
 │   ├── tests/                 # 375+ tests (unit + integration)
+│   │                          # plus an opt-in local smoke/E2E path
 │   ├── migrations/            # Database schema migrations
 │   ├── seed_data/             # Hospital/region seed data
 │   └── docs/                  # Backend-specific documentation

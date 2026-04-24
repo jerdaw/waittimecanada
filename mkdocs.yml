@@ -151,13 +151,13 @@ nav:
     - OpenAPI Spec: openapi.yaml
 
   - Operations:
-    - operations/QUICK_START.md
+    - Operations Quick Start: operations/QUICK_START.md
     - operations/OPERATIONAL_STATUS.md
     - Direct VPS Backend: operations/direct-vps-backend.md
     - operations/scraper-scheduling.md
     - operations/zenodo-integration.md
     - Direct VPS Frontend: operations/direct-vps-frontend.md
-    - Production Deployment Plan: production-deployment-plan.md
+    - Historical Netlify Deployment Plan: production-deployment-plan.md
 
   - Development:
     - development/setup.md
