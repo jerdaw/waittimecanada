@@ -1,5 +1,13 @@
 # Quick Start
 
+This guide is for local development only. The live production baseline is
+split: the public frontend runs on the shared VPS at `https://wait-time.ca`,
+while backend scheduling and heartbeat checks remain on GitHub Actions because
+the Ontario source is still not reliably reachable from that VPS. For live
+deployment/runtime docs, use `docs/operations/direct-vps-frontend.md`,
+`docs/operations/direct-vps-backend.md`, and
+`docs/operations/scraper-scheduling.md`.
+
 ## 1. Prerequisites
 
 - Python 3.12+

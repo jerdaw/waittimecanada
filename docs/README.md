@@ -5,6 +5,8 @@ This directory is the documentation control plane for Wait Time Canada.
 ## Start Here
 
 - Project overview and local setup: `README.md` (repo root)
+- Live split-runtime baseline: `docs/operations/direct-vps-frontend.md`,
+  `docs/operations/direct-vps-backend.md`, `docs/operations/scraper-scheduling.md`
 - Active roadmap and milestone status: `docs/planning/roadmap.md`
 - Human-intervention queue: `docs/planning/manual-tasks.md`
 

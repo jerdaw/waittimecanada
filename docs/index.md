@@ -5,6 +5,8 @@ Wait Time Canada is a clinically defensible Health Systems Observatory for audit
 ## Start Here
 
 - Project overview: `README.md` (repo root)
+- Live runtime baseline: `docs/operations/direct-vps-frontend.md`,
+  `docs/operations/direct-vps-backend.md`, `docs/operations/scraper-scheduling.md`
 - Roadmap (source of truth): `docs/planning/roadmap.md`
 - API reference: `docs/API.md`
 - Architecture overview: `docs/architecture/index.md`

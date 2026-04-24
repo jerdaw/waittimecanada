@@ -2,6 +2,15 @@
 
 **Purpose:** Quick reference for running scrapers and checking system health locally.
 
+Current live production baseline:
+- frontend runtime on the shared VPS at `https://wait-time.ca`
+- backend scheduler and heartbeat path on GitHub Actions because the Ontario source remains unreachable from that VPS
+
+Use `docs/operations/direct-vps-frontend.md`,
+`docs/operations/direct-vps-backend.md`, and
+`docs/operations/scraper-scheduling.md` for the full live runtime/deploy
+contracts.
+
 ---
 
 ## Prerequisites
