@@ -12,16 +12,14 @@ This directory is the planning control plane for Wait Time Canada.
 
 ## Active Planning Docs
 
-- `docs/planning/2026-04-23-repo-audit-follow-up-board.md`
-- `docs/planning/2026-04-23-repo-audit-remediation-plan.md`
 - `docs/planning/implementation/admissions-strengthening-plan.md`
 - `docs/planning/post-launch-growth-strategy.md`
-- `docs/planning/public-health-data-hub-municipal-inspection-pilot-decision.md`
 
 ## Historical Planning Baselines
 
 - `docs/planning/public-health-data-hub-metadata-contract.md`
 - `docs/planning/public-health-data-hub-freshness-safety-rules.md`
+- `docs/planning/archive/public-health-data-hub-municipal-inspection-pilot-decision.md`
 
 ## Active Operational Artifacts
 
@@ -66,10 +64,11 @@ These documents are retained for context and may not match current implementatio
 3. Archive implementation plans once a milestone is delivered and no longer actively edited.
 4. Keep completed milestone details in archived files; keep roadmap focused on active next steps.
 
-Last Updated: 2026-04-23
+Last Updated: 2026-04-24
 
 ## Latest Maintenance Log
 
+- `docs/planning/archive/maintenance-2026-04-24.md`
 - `docs/planning/archive/maintenance-2026-04-23.md`
 - `docs/planning/archive/maintenance-2026-04-18.md`
 - `docs/planning/archive/maintenance-2026-04-17.md`

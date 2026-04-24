@@ -196,7 +196,8 @@ export async function GET(request: NextRequest) {
 
         const sourceStatus = buildSourceStatusRecords(sourceCatalogRows);
         const sourceCatalog = buildSourceCatalogRecords(sourceCatalogRows);
-        const sourceFreshnessState = sourceStatus[0]?.freshness_state ?? "suppress";
+        const sourceFreshnessState =
+          sourceStatus[0]?.freshness_state ?? "suppress";
         const dispatchCentres =
           sourceFreshnessState === "suppress"
             ? []
@@ -308,7 +309,9 @@ function mapParamedicServiceRecords(
   return Array.from(grouped.values());
 }
 
-function toNullableNumber(value: string | number | null | undefined): number | null {
+function toNullableNumber(
+  value: string | number | null | undefined,
+): number | null {
   if (value === null || value === undefined || value === "") {
     return null;
   }
@@ -316,10 +319,14 @@ function toNullableNumber(value: string | number | null | undefined): number | n
   return Number.isFinite(numeric) ? numeric : null;
 }
 
-function toIsoTimestamp(value: string | Date | null | undefined): string | null {
+function toIsoTimestamp(
+  value: string | Date | null | undefined,
+): string | null {
   if (!value) {
     return null;
   }
 
-  return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
+  return value instanceof Date
+    ? value.toISOString()
+    : new Date(value).toISOString();
 }

@@ -20,8 +20,7 @@ const WATER_ADVISORIES_DATA_URL =
   "https://www.sac-isc.gc.ca/DAM/DAM-ISC-SAC/DAM-WTR/STAGING/texte-text/lTDWA_map_data_1572010201618_eng.txt";
 const WATER_ADVISORIES_PROVENANCE_URL =
   "https://www.sac-isc.gc.ca/eng/1620925418298/1620925434679";
-const WATER_ADVISORIES_SOURCE_NAME =
-  "ISC Long-term Drinking Water Advisories";
+const WATER_ADVISORIES_SOURCE_NAME = "ISC Long-term Drinking Water Advisories";
 const WATER_ADVISORIES_SCOPE_NOTE =
   "Long-term drinking water advisories are currently surfaced for Ontario reserve systems only.";
 const WATER_ADVISORIES_SOURCE_CATALOG = {
@@ -31,7 +30,8 @@ const WATER_ADVISORIES_SOURCE_CATALOG = {
   connector_type: "file_download",
   access_route: "ISC map data JSON export",
   license_reuse_status: "approved_with_conditions",
-  attribution_requirement: "Keep Indigenous Services Canada provenance visible.",
+  attribution_requirement:
+    "Keep Indigenous Services Canada provenance visible.",
   update_cadence: "periodic",
   recommended_usage_mode: "scheduled_ingest",
   public_methodology_note:
@@ -219,7 +219,10 @@ function flattenOntarioWaterAdvisories(
   const advisories: WaterAdvisoryRecord[] = [];
 
   for (const community of rows) {
-    if (community.ProvinceAcronym !== "ON" && community.Province !== "Ontario") {
+    if (
+      community.ProvinceAcronym !== "ON" &&
+      community.Province !== "Ontario"
+    ) {
       continue;
     }
 

@@ -150,8 +150,7 @@ function getFreshnessBadgeClasses(freshnessState: FreshnessState) {
       "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200",
     freshnessState === "warn" &&
       "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200",
-    freshnessState === "suppress" &&
-      "bg-muted text-muted-foreground",
+    freshnessState === "suppress" && "bg-muted text-muted-foreground",
   );
 }
 
@@ -860,9 +859,7 @@ export default function ResourcesPage() {
             </p>
             <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/80 p-4 text-sm text-amber-950">
               <p className="font-medium">{t("sections.aed.caveatTitle")}</p>
-              <p className="mt-1 text-amber-900">
-                {t("sections.aed.caveat")}
-              </p>
+              <p className="mt-1 text-amber-900">{t("sections.aed.caveat")}</p>
             </div>
             <div className="mt-4">
               <ResourceList
@@ -972,7 +969,9 @@ export default function ResourcesPage() {
                           </div>
                           <div className="space-y-1">
                             <dt className="font-medium text-foreground">
-                              {t("sections.systemContext.dispatchCentres.callVolume")}
+                              {t(
+                                "sections.systemContext.dispatchCentres.callVolume",
+                              )}
                             </dt>
                             <dd>
                               {centre.call_volume !== null
@@ -1043,7 +1042,8 @@ export default function ResourcesPage() {
                                     )}
                                   </dt>
                                   <dd>
-                                    {severity.response_time_plan_minutes !== null
+                                    {severity.response_time_plan_minutes !==
+                                    null
                                       ? t(
                                           "sections.systemContext.paramedicServices.minutesValue",
                                           {
@@ -1237,7 +1237,9 @@ export default function ResourcesPage() {
                         </div>
                         <div className="space-y-1 sm:col-span-2">
                           <dt className="font-medium text-foreground">
-                            {t("sections.waterAdvisories.fields.correctiveMeasure")}
+                            {t(
+                              "sections.waterAdvisories.fields.correctiveMeasure",
+                            )}
                           </dt>
                           <dd>
                             {advisory.corrective_measure ??

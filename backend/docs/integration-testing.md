@@ -228,7 +228,10 @@ def test_hospital_workflow(clean_database: DatabaseService):
 
 ### GitHub Actions
 
-Add integration tests to CI workflow:
+The default blocking backend workflow does **not** currently provision a
+database-backed integration lane on every push or PR. Use the example below
+only if you intentionally add a dedicated opt-in integration workflow or a
+separate CI lane with a real test database:
 
 ```yaml
 # .github/workflows/integration-tests.yml
@@ -301,10 +304,14 @@ export DATABASE_URL="postgresql://user@host/database"
 
 ## Test Statistics
 
-Current integration test coverage:
-- **13 integration tests** covering database and scraper workflows
-- **Test execution time:** ~5-10 seconds with Neon, ~1-2 seconds with local PostgreSQL
-- **Database operations tested:** Insert, Update, Query, Delete, Transaction rollback
+Current integration coverage changes over time. Treat the files under
+`backend/tests/integration/` plus local pytest output as the source of truth
+instead of relying on a fixed test-count claim in this document.
+
+Typical characteristics:
+- database and scraper workflows are covered
+- tests run fastest against a local PostgreSQL instance
+- `DATABASE_URL` is still required, otherwise the integration lane skips
 
 ## Future Improvements
 
