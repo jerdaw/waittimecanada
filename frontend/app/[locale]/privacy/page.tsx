@@ -212,8 +212,8 @@ export default function PrivacyPage() {
                 metadata and optional location-related requests may still
                 involve personal information such as IP address or approximate
                 location when the site is delivered or geolocation features are
-                used. We do not use that information for advertising,
-                profiling, or sale.
+                used. We do not use that information for advertising, profiling,
+                or sale.
               </p>
               <p className="leading-relaxed">
                 <strong>
@@ -277,9 +277,9 @@ export default function PrivacyPage() {
                 </li>
                 <li>
                   <strong>ipapi.co:</strong> Server-side IP geolocation for the
-                  homepage fallback location flow. Requests to `/api/geolocation`
-                  may send an IP address to ipapi.co so the app can estimate a
-                  coarse location.
+                  homepage fallback location flow. Requests to
+                  `/api/geolocation` may send an IP address to ipapi.co so the
+                  app can estimate a coarse location.
                 </li>
                 <li>
                   <strong>Neon PostgreSQL:</strong> Database hosting for public
@@ -308,9 +308,9 @@ export default function PrivacyPage() {
               <p className="leading-relaxed mb-2">
                 We do not maintain user accounts or build visitor profiles, but
                 standard request metadata may still be processed by hosting,
-                logging, or third-party geolocation/map providers. If you have
-                a privacy question about those flows, raise it through the
-                project contact paths below. In addition:
+                logging, or third-party geolocation/map providers. If you have a
+                privacy question about those flows, raise it through the project
+                contact paths below. In addition:
               </p>
               <ul className="list-disc ml-6 space-y-1">
                 <li>

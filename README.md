@@ -38,15 +38,17 @@ Provincial health authorities report ER wait times using **fundamentally differe
 
 ### By the Numbers
 
-As verified on **2026-03-28**:
+As reflected in the current runtime and roadmap baseline on **2026-04-23**:
 
-- **393 hospital records** across the 4 active provincial source inventories
-- **8,804 measurements** collected in the most recent 24-hour quality window
-- **273 hospitals** with at least one reported measurement in that same 24-hour window
-- **4 distinct statistic types** across the 4 active provinces: `MEAN`, `ROLLING_AVG`, `POINT_ESTIMATE`, and `P90`
-- **6 of 6 cross-province source pairs** fail direct comparability on the current ontology tags
-- **3 of 6 cross-province source pairs** differ on at least 2 ontology dimensions
-- **1 province** currently publishes stretcher occupancy in the live platform: Quebec
+- **4 provinces** remain in the active audited source set: Quebec, Ontario,
+  Alberta, and British Columbia
+- **380+ hospitals** are represented across the current provincial inventories
+- **4 distinct statistic types** are still present across the active provinces:
+  `MEAN`, `ROLLING_AVG`, `POINT_ESTIMATE`, and `P90`
+- **6 of 6 cross-province source pairs** still fail direct comparability on the
+  current ontology tags
+- **1 province** currently publishes live stretcher occupancy in the platform:
+  Quebec
 
 These are methodology and operations findings, not performance rankings. They describe what the system is auditing and how the data is structured, not which province or hospital is "better."
 
@@ -530,7 +532,7 @@ waittimecanada/
 
 ---
 
-## 📊 Current Status (as of 2026-03-16)
+## 📊 Current Status (as of 2026-04-23)
 
 ### Milestones Completed
 - ✅ M1-M4: Database foundation, Ontario/Quebec scrapers, methodology warnings, PWA setup
@@ -550,10 +552,16 @@ waittimecanada/
 - ✅ Operations: Production verification and comprehensive documentation
 - ✅ Operations: CI coverage artifacts retained for both frontend and backend verification
 
-### Test Coverage
-- **Backend:** 460 tests passing locally, ~80% line coverage
-- **Frontend:** 361 tests passing locally
-- **Total:** 821 tests across the locally verified stack
+### Validation Posture
+- **Backend:** broad unit coverage, plus opt-in database-backed integration and
+  local pipeline smoke checks when `DATABASE_URL` and a local frontend server
+  are available
+- **Frontend:** Vitest unit/component coverage is part of the normal workflow,
+  while Playwright browser verification stays CI-first and manual-dispatch to
+  conserve GitHub free-tier minutes
+- **Current source of truth:** see `docs/planning/roadmap.md` for the active
+  validation and deployment posture instead of relying on a fixed test-count
+  snapshot here
 
 ### Data Freshness
 - **Update Frequency:** Hourly via GitHub Actions

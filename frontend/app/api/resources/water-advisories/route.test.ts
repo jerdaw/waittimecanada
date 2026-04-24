@@ -13,7 +13,9 @@ describe("API Route: Water Advisories", () => {
   });
 
   test("returns 400 when province is missing", async () => {
-    const req = new NextRequest("http://localhost/api/resources/water-advisories");
+    const req = new NextRequest(
+      "http://localhost/api/resources/water-advisories",
+    );
 
     const res = await GET(req);
 
@@ -162,7 +164,9 @@ describe("API Route: Water Advisories", () => {
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.count).toBe(1);
-    expect(data.data[0].community_name).toBe("Chippewas of Nawash First Nation");
+    expect(data.data[0].community_name).toBe(
+      "Chippewas of Nawash First Nation",
+    );
   });
 
   test("keeps weekly-ish ISC data in the show state", async () => {

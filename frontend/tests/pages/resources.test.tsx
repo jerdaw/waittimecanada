@@ -107,7 +107,8 @@ describe("ResourcesPage", () => {
                     ],
                     source_id: "ontario-land-ambulance-response-times",
                     source_name: "Ontario Land Ambulance Response Times",
-                    provenance_url: "https://data.ontario.ca/resource/paramedic",
+                    provenance_url:
+                      "https://data.ontario.ca/resource/paramedic",
                     last_refreshed_at: "2026-03-27T12:00:00.000Z",
                     freshness_state: "show",
                     caveat_class: "official_system_context",
@@ -139,7 +140,7 @@ describe("ResourcesPage", () => {
                   }),
                 ],
               },
-          }),
+            }),
         });
       }
 
@@ -371,7 +372,9 @@ describe("ResourcesPage", () => {
 
     expect(screen.getAllByText("Connector").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Reuse posture").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Approved with conditions").length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText("Approved with conditions").length,
+    ).toBeGreaterThan(0);
     expect(screen.getByText("Analytics only")).toBeInTheDocument();
     expect(screen.getAllByText("Scheduled ingest").length).toBeGreaterThan(0);
     expect(
@@ -463,7 +466,7 @@ describe("ResourcesPage", () => {
                   }),
                 ],
               },
-          }),
+            }),
         });
       }
 
