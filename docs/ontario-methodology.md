@@ -1,7 +1,7 @@
 # Ontario Wait Time Methodology
 
 This note mirrors the maintained Ontario methodology record in
-[`backend/docs/methodologies/ontario-methodology.md`](../backend/docs/methodologies/ontario-methodology.md).
+`backend/docs/methodologies/ontario-methodology.md`.
 
 ## Current Ontario Mapping
 

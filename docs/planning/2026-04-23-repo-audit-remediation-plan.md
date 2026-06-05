@@ -12,4 +12,4 @@ The remediation sequencing from this plan was executed and closed during the
 
 - [Maintenance log — 2026-04-24](archive/maintenance-2026-04-24.md)
 - [Roadmap](roadmap.md)
-- [Planning index](README.md)
+- Planning index
