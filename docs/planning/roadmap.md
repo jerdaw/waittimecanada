@@ -1,11 +1,12 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-06-04)
+## Current Status (Updated 2026-06-05)
 
 **Progress:** Milestone 14 and Milestone 15 are complete, and the public
 roadmap has been cleaned to emphasize methodology, limitations, local
 development, and safe public use. The public documentation boundary cleanup is
-complete and captured in ADR-0026.
+complete and captured in ADR-0026. Roadmap wording now avoids hospital-choice
+recommendation framing and uses system-pressure terminology instead.
 
 Wait Time Canada is a four-province health systems observatory covering Ontario,
 Quebec, Alberta, and British Columbia. The platform audits publicly reported

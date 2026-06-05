@@ -128,7 +128,7 @@ def _create_occupancy_measurement(
 
 1. Frontend visualization (M18)
 2. Historical occupancy trends
-3. Occupancy-based hospital recommendations
+3. Occupancy-based system-pressure indicators
 4. Alert thresholds for overcrowding
 
 ## Effort Estimate vs Actual

@@ -1,6 +1,6 @@
 # Maintenance: Public Documentation Cleanup
 
-Date: 2026-06-04
+Date: 2026-06-05
 
 Status: Archived
 
@@ -22,6 +22,8 @@ source attribution, API behavior, and contributor guidance.
 - Added ADR-0026 to define the public documentation boundary.
 - Kept emergency disclaimers, methodology caveats, and source attribution in
   public documentation.
+- Replaced leftover hospital-choice recommendation roadmap wording with
+  "system-pressure indicators" framing.
 
 ## Follow-Up
 

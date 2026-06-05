@@ -547,7 +547,7 @@ environment-specific paths are kept outside public documentation.
 - [ ] Public research artifacts, including case studies and quantified methodology findings
 - [ ] Privacy-safe usage analytics where compatible with the project privacy posture
 - [ ] Smart scheduling (reduce frequency during overnight hours)
-- [ ] Occupancy-based hospital recommendations
+- [ ] Occupancy-based system-pressure indicators
 
 ### Deferred / Research
 - [ ] Manitoba scraper (data source unclear)
