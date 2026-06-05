@@ -63,11 +63,11 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ---
 
-### 4. `scraper-cron.yml` - Scheduled Scraper Execution
+### 4. `scraper-cron.yml` - Scraper Execution
 
-**Trigger:** cron `0 * * * *` (hourly) + manual dispatch.
+**Trigger:** manual dispatch. Scheduled trigger is temporarily paused to conserve GitHub Actions free-tier minutes.
 
-**Purpose:** Run all provincial scrapers against production DB and emit classified operational alerts.
+**Purpose:** Run all provincial scrapers against the configured database and emit classified source-health state.
 
 **Optimization controls:**
 - Serialized concurrency group to avoid overlapping cron runs.
@@ -76,7 +76,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 5. `heartbeat-monitor.yml` - Dead Man's Switch
 
-**Trigger:** cron `*/30 * * * *` (every 30 minutes) + manual dispatch.
+**Trigger:** manual dispatch. Scheduled trigger is temporarily paused to conserve GitHub Actions free-tier minutes.
 
 **Purpose:** Ensure scraper heartbeat freshness remains within threshold and report consecutive/classified failures.
 
@@ -109,7 +109,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 8. `production-smoke.yml` - Live Route Smoke Checks
 
-**Trigger:** cron `17 */6 * * *` (every 6 hours) + manual dispatch.
+**Trigger:** manual dispatch. Scheduled trigger is temporarily paused to conserve GitHub Actions free-tier minutes.
 
 **Purpose:** Verify public production routes respond with expected markers, including the public-health-hub `/resources` surface, the additive source-catalog contract, the Ontario EMS system-context API, and the Ontario water-advisories API.
 
@@ -118,7 +118,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ---
 
-### 9. `portfolio-screenshots.yml` - Portfolio Screenshot Artifact Generation
+### 9. `demo-screenshots.yml` - Demo Screenshot Artifact Generation
 
 **Trigger:** manual dispatch.
 
@@ -133,7 +133,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 **Trigger:** push to `main` for `database/migrations/**` + manual dispatch.
 
-**Purpose:** Apply database migrations to the live Neon PostgreSQL database using `backend/run_migrations.py`.
+**Purpose:** Apply database migrations to the configured PostgreSQL database using `backend/run_migrations.py`.
 
 **Optimization controls:**
 - Serialized concurrency per ref.
@@ -144,7 +144,7 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 11. `public-health-hub-cron.yml` - Public Health Hub Ingest
 
-**Trigger:** cron `15 */6 * * *` (every 6 hours) + manual dispatch.
+**Trigger:** manual dispatch. Scheduled trigger is temporarily paused to conserve GitHub Actions free-tier minutes.
 
 **Purpose:** Refresh shipped public-health-hub datasets from approved live upstreams:
 - MOHSERLO via the Ontario ArcGIS feature service
@@ -191,21 +191,22 @@ This directory contains operational and CI workflows for Wait Time Canada.
 - `NEXT_PUBLIC_MAPBOX_TOKEN` (required by frontend build/test/screenshot workflows)
 
 ### Alerting/observability
-- `PUSHOVER_USER_KEY` (optional but recommended)
-- `PUSHOVER_API_TOKEN` (optional but recommended)
+- `ALERT_API_URL`, `ALERT_USER_KEY`, `ALERT_API_TOKEN` if operational alerting is enabled
 - `SENTRY_DSN` (optional)
 
 ### Production smoke
-- `PRODUCTION_BASE_URL` (required for scheduled smoke checks and optional readiness smoke)
+- `PRODUCTION_BASE_URL` (required for smoke checks)
 
 ### Database migration workflow
-- `ALERT_EMAIL_USER`
-- `ALERT_EMAIL_PASSWORD`
-- `ALERT_EMAIL_TO`
+- Optional notification email credentials, if migration failure email is enabled
 
 ## Operational Notes
 
 - Playwright E2E is GitHub-CI-only and manual-dispatch to conserve free-tier minutes, even though the current suite has been repo-side stabilized.
+- Scheduled operational workflows are temporarily paused to conserve GitHub
+  Actions free-tier minutes. Use manual dispatch for scraper, heartbeat,
+  snapshot, public-health ingest, and smoke checks until the quota reset allows
+  restoring cadence.
 - `frontend-ci.yml` keeps strict quality gates while avoiding heavy jobs when changes do not affect user-facing frontend runtime behavior.
-- `production-readiness.yml` and `production-smoke.yml` are the operational preflight/postflight checks for live deployment confidence.
+- `production-readiness.yml` and `production-smoke.yml` are lightweight operational preflight/postflight checks.
 - Production smoke now exercises `/api/status` and aggregate `/api/data-quality` directly and fails if dormant legacy source IDs such as `manitoba-shared-health` or `on-health` leak into the public payload.

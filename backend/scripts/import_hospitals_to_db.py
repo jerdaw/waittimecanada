@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Import geocoded hospitals into Neon PostgreSQL database.
+"""Import geocoded hospitals into PostgreSQL database.
 
 Usage:
     python scripts/import_hospitals_to_db.py

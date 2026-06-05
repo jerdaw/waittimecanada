@@ -1,9 +1,7 @@
 name: Snapshot Quality Cron
 
 on:
-  schedule:
-    # Run daily at 01:00 UTC, after scrapers have had a chance to collect data
-    - cron: '0 1 * * *'
+  # Scheduled trigger paused to conserve GitHub Actions free-tier minutes.
   workflow_dispatch:
     # Allows manual trigger for testing or backfills
 

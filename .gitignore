@@ -96,6 +96,20 @@ secrets/
 *.key
 key.txt
 
+# Local/private maintainer notes. Do not commit plaintext private notes.
+private/**
+!private/**/
+private/**/*.md
+private/**/*.txt
+private/**/*.log
+private/**/*.local.*
+.private/
+
+# Encrypted private notes may be tracked only if an encryption workflow is intentionally used.
+!private/**/*.age
+!private/**/*.md.age
+!private/**/*.enc.md
+
 # Migration backups
 backup-*/
 

@@ -11,7 +11,7 @@ The seeding process involves three steps:
 
 ## Prerequisites
 
-- Neon PostgreSQL database connection configured (`.env.local`)
+- PostgreSQL database connection configured in the current environment
 - Python virtual environment activated
 - Backend package installed in development mode
 

@@ -22,7 +22,7 @@
 
 - **4 Provinces:** Quebec, Ontario, Alberta, British Columbia
 - **380+ Hospitals:** Near-real-time monitoring across all regions
-- **Hourly Updates:** Automated data collection currently via GitHub Actions
+- **Scheduled Updates:** Automated data collection from public provincial sources
 - **First-in-Canada:** Real-time ED stretcher occupancy visualization (Quebec)
 - **Ontario Public Resources Module:** `/resources` now serves facilities, OSM-backed AED fallback data, Health Canada recalls, AQHI, analytics-only Ontario EMS system context, Ontario reserve-system long-term drinking water advisories, and an official Ontario naloxone link-out with a first-class source catalog
 
@@ -56,12 +56,14 @@ These are methodology and operations findings, not performance rankings. They de
 
 ## Limitations
 
-- Scraper freshness currently reflects an hourly GitHub Actions cadence rather than continuous ingestion.
-- The frontend is now live on the shared VPS at `https://wait-time.ca`; the backend scheduler path remains on GitHub Actions because the Ontario source is not reachable from this VPS.
+- Scraper freshness reflects scheduled ingestion rather than continuous real-time monitoring.
 - Provincial methodology labels are inferred from public documentation and can lag unannounced reporting changes by source organizations.
 - Reported wait times and occupancy values are limited to what provinces publish; the platform cannot surface unreported overcrowding or internal flow constraints.
 - The equity layer is currently implemented for Ontario only and should not be generalized to other provinces without province-specific source and tract validation.
-- The direct-VPS frontend now uses short-lived in-process response caching for repeated anonymous reads; this reduces Neon public transfer without changing scraper cadence, raw retention, or aggregate storage policy.
+
+## Public Documentation Boundary
+
+This repository contains public project documentation and reproducible development information. Deployment details, credentials, monitoring configuration, private operational notes, and environment-specific production paths are intentionally excluded from public documentation.
 
 ---
 
@@ -73,10 +75,10 @@ These are methodology and operations findings, not performance rankings. They de
 - **Comparability Matrix:** Visual display of cross-province methodology alignment
 - **Deep Linking:** Share specific hospital comparisons with methodology context
 
-### 📈 Data Quality & Monitoring
+### 📈 Data Quality & Freshness
 - **Anomaly Detection:** Automated flagging of suspicious measurements
 - **Data Quality Dashboard:** Real-time visibility into scraper health, measurement counts, staleness
-- **Heartbeat Monitoring:** Dead Man's Switch alerts via Pushover if data becomes stale
+- **Freshness Monitoring:** Heartbeat checks flag stale or failed source updates
 - **Methodology Change Detection:** Tracks when provincial reporting methods change
 
 ### 🚑 Public Health Resources
@@ -133,12 +135,12 @@ graph TD
         BC[BC PHSA<br/>JSON/__NEXT_DATA__]
     end
 
-    subgraph "Current Scheduler (GitHub Actions)"
-        CRON[Hourly Cron<br/>Scrapers]
-        HB[120-Minute Threshold<br/>Heartbeat Monitor]
+    subgraph "Scheduled Collection"
+        CRON[Provincial Scrapers]
+        HB[Freshness Checks]
     end
 
-    subgraph "Database (Neon PostgreSQL)"
+    subgraph "PostgreSQL Database"
         SOURCES[(sources)]
         HOSPITALS[(hospitals)]
         MEASUREMENTS[(measurements)]
@@ -170,7 +172,7 @@ graph TD
     DB_SVC --> STATUS
 
     HB --> STATUS
-    HB -->|Alert if stale| PUSHOVER[Pushover Notifications]
+    HB -->|State changes| DQ_SVC
 
     MEASUREMENTS --> AGG_SVC
     AGG_SVC --> AGGREGATES
@@ -194,7 +196,6 @@ graph TD
     style BC fill:#4A90E2
     style CRON fill:#F5A623
     style HB fill:#F5A623
-    style PUSHOVER fill:#D0021B
     style MAP fill:#50E3C2
 ```
 
@@ -202,7 +203,7 @@ graph TD
 - **Language:** Python 3.12+
 - **Testing:** pytest with broad unit coverage plus database-backed integration tests; some backend integration and smoke checks require `DATABASE_URL`, and the local pipeline smoke path also expects a frontend server on `localhost:3000`
 - **Scrapers:** 4 provincial scrapers (BeautifulSoup, HTTP/HTML parsing, Playwright, JSON extraction)
-- **Database:** Neon PostgreSQL 17 with 15 tables, including the public-health-hub source/resource/alert/system-context lane
+- **Database:** PostgreSQL with 15 tables, including the public-health-hub source/resource/alert/system-context lane
 - **Services:**
   - DatabaseService, AggregationService, DataQualityService
   - AnomalyDetectionService, MethodologyChangeDetector
@@ -221,8 +222,8 @@ graph TD
 - `sources` - Provincial data source metadata
 - `hospitals` - Facility metadata with verification workflow
 - `measurements` - Audit log with ontology tags (payload hashing, not full HTML)
-- `scraper_status` - Heartbeat monitoring
-- `scraper_alert_state` - Stateful alert incident tracking and recovery suppression
+- `scraper_status` - Scraper freshness state
+- `scraper_alert_state` - Stateful source-health tracking and recovery suppression
 - `measurement_aggregates` - Permanent statistical summaries (hourly/daily/weekly/monthly)
 - `data_quality_snapshots` - Daily scraper reliability metrics
 - `methodology_change_events` - Detected methodology shifts
@@ -232,82 +233,57 @@ graph TD
 - `resource_locations` - Normalized facilities and AED locations for `/resources`
 - `public_health_alerts` - Health Canada recall and safety alert records
 - `public_health_system_metrics` - Ontario EMS system-context records for analytics-only `/resources` context cards
-- `public_health_source_alert_state` - Stateful alerting for public-health ingest incidents
+- `public_health_source_alert_state` - Stateful public-health ingest status tracking
 
 ### Automation
-- **GitHub Actions:** Scrapers run hourly, heartbeat checks every 30 minutes
+- **Scheduled Workflows:** Scrapers, freshness checks, quality snapshots, and bounded retention cleanup
 - **Playwright Browsers:** Automated for Alberta and browser-based verification flows
-- **Failure Alerting:** Pushover notifications for scraper/heartbeat failures
-- **Operational Posture:** Hourly scraper cadence + 30-minute heartbeat checks on GitHub Actions with state-change alerting and a 120-minute stale threshold
-- **Frontend Transfer Guardrails:** `/api/health`, `/api/status`, `/api/hospitals`, `/api/hospitals/[slug]/trends`, and the main analytics routes use shared cache headers plus short-lived in-process server caching on the shared VPS runtime
+- **Health Tracking:** Source status is reconciled through state-change-aware checks
+- **Cache Guardrails:** Shared anonymous read-heavy routes use short cache windows; user-specific and export routes use `no-store`
 
 ---
 
-## 🎓 Portfolio Narrative
+## Project Impact
 
-This project demonstrates multiple CanMEDS competencies for medical school applications:
+Wait Time Canada demonstrates public-interest software development, health-systems thinking, documentation, and responsible handling of health-adjacent information.
 
-### Scholar
-- Sophisticated metric ontology system for research validity
-- Statistical aggregation pipeline (percentiles, rolling averages)
-- Methodology change detection and documentation
-- Citation-ready data export with full provenance tracking
+The project is designed to:
 
-### Professional
-- Clinical defensibility through methodology transparency
-- Divergence warnings prevent misleading comparisons
-- Data quality monitoring ensures operational trust
-- Peer benchmarking enables evidence-based decisions
+- make provincial wait-time methodology differences visible instead of masking them through unsafe normalization
+- preserve provenance and source semantics for every measurement
+- help users understand when direct hospital or province comparisons are invalid
+- support research, journalism, policy analysis, and public understanding with transparent caveats
+- provide public-health resource discovery while clearly labeling source freshness, scope, and limitations
 
-### Health Advocate
-- Access Burden Estimator helps vulnerable populations make informed decisions
-- Transparency around ED capacity constraints (occupancy data)
-- Equity layer foundation for income-based analysis
-- Provincial gas price awareness for financial planning
-
-### Leader
-- Multi-province scaling demonstrates systems architecture
-- Regional analytics dashboards for health authority insights
-- Automated data collection reduces manual burden
-- Comprehensive operational documentation
-
-### Collaborator
-- Province-aware telehealth routing (811 variations by province)
-- Attribution to official provincial sources
-- Methodology timeline preserves institutional knowledge
+This is a non-clinical observatory. It does not provide medical advice, diagnose conditions, recommend care sites, or replace emergency services.
 
 ---
 
 ## 🚀 Quick Start (Local Development)
 
-This section is for local development. The current production baseline is
-split: the public frontend runs on the shared VPS at `https://wait-time.ca`,
-while the authoritative backend scheduler and heartbeat path remain on GitHub
-Actions because the Ontario source is still not reliably reachable from that
-VPS. Use `docs/operations/direct-vps-frontend.md`,
-`docs/operations/direct-vps-backend.md`, and
-`docs/operations/scraper-scheduling.md` for the live deployment/runtime
-baseline.
+This section is for reproducible local development. Production deployment
+details and environment-specific operations notes are intentionally excluded
+from public documentation.
 
 ### Prerequisites
 
 - Python 3.12+
 - Node.js 22+
-- PostgreSQL (Neon account recommended)
+- PostgreSQL
 - Mapbox account (free tier sufficient)
 
-### Recommended Database Path: Neon
+### Recommended Database Path: PostgreSQL
 
 Wait Time Canada uses standard PostgreSQL and can be run against any compatible
-database, but the default documented path is Neon:
+database:
 
-1. create a Neon project
-2. copy the pooled `DATABASE_URL`
+1. create or provision a PostgreSQL database
+2. copy the connection string
 3. export it into your shell before running backend commands
 4. run the repo migrations and analytics bootstrap commands below
 
-This keeps local setup lightweight while preserving a fully portable Postgres
-schema and migration workflow.
+This keeps local setup portable while preserving a reproducible schema and
+migration workflow.
 
 ### 1. Clone and Setup Environment
 
@@ -425,7 +401,6 @@ npm run test:unit    # Vitest unit tests
 
 ### Essential Reading
 - [`docs/planning/roadmap.md`](docs/planning/roadmap.md) - **Active roadmap and milestone status**
-- [`docs/operations/scraper-scheduling.md`](docs/operations/scraper-scheduling.md) - Production operations guide
 - [`AGENTS.md`](AGENTS.md) - repository agent instructions and project architecture
 
 ### Deep Dives
@@ -481,9 +456,8 @@ waittimecanada/
 ## 🎯 Operational Workflows
 
 ### Production Automation
-- **Scraper Cron:** Runs hourly via GitHub Actions
-- **Heartbeat Monitor:** Checks scraper health every 30 minutes
-- **Failure Alerts:** Pushover notifications for stale data or errors
+- **Scraper Runs:** Scheduled collection from public provincial sources
+- **Freshness Checks:** Source health is tracked from scraper status records
 - **Database Cleanup:** Manual cleanup keeps a 30-day raw-measurement window; the GitHub Actions maintenance path uses bounded batched deletes and reports storage growth
 
 ### CI/CD Pipelines
@@ -493,15 +467,10 @@ waittimecanada/
 - **Docs CI:** Documentation quality checks
 
 ### Deployment Configuration
-- **Frontend:** Shared VPS via host Caddy + loopback Docker container
-- **Backend:** GitHub Actions runners remain live; VPS backend cutover is deferred on Ontario reachability from this host
-- **Database:** Managed Neon PostgreSQL (Launch active in production; free tier is acceptable for local evaluation only)
-- **Secrets Management:** GitHub Secrets for `DATABASE_URL`, `PUSHOVER_*`, `MAPBOX_TOKEN`
 
-**Quick Production Check:**
-```bash
-./scripts/verify-production-ops.sh yourusername/waittimecanada
-```
+Public documentation covers reproducible local development, architecture, and
+data methodology. Production deployment details, monitoring configuration, and
+environment-specific paths are kept outside public documentation.
 
 ---
 
@@ -537,7 +506,7 @@ waittimecanada/
 ### Milestones Completed
 - ✅ M1-M4: Database foundation, Ontario/Quebec scrapers, methodology warnings, PWA setup
 - ✅ M7-M8: UX polish, SEO, landing page optimization
-- ✅ M9: Portfolio launch artifacts (About section, testimonial governance)
+- ✅ M9: Public launch foundations (About section, testimonial governance)
 - ✅ M10-M11: Multi-province expansion, Access Burden Estimator
 - ✅ M12: Research infrastructure (citation export, Dead Man's Switch alerts)
 - ✅ M13: Aggregation pipeline (hourly/daily/weekly/monthly)
@@ -564,9 +533,9 @@ waittimecanada/
   snapshot here
 
 ### Data Freshness
-- **Update Frequency:** Hourly via GitHub Actions
-- **Heartbeat Threshold:** 120 minutes (alerts if exceeded)
-- **Current Status:** All 4 scrapers operational ✅
+- **Update Frequency:** Scheduled source refreshes
+- **Freshness Thresholds:** Source-health checks flag stale or failed updates
+- **Current Status:** See the public status and data-quality pages for current source state
 
 ---
 
@@ -575,9 +544,8 @@ waittimecanada/
 ### Planned Enhancements
 - [ ] Additional provinces (Nova Scotia, New Brunswick)
 - [ ] Multi-province equity layer beyond Ontario
-- [ ] Public-facing credibility artifacts (mission/equity/stewardship section, real Zenodo DOI, case study, quantified findings)
-- [ ] Privacy-safe usage analytics and launch follow-through artifacts
-- [ ] Prometheus/Grafana monitoring dashboard
+- [ ] Public research artifacts, including case studies and quantified methodology findings
+- [ ] Privacy-safe usage analytics where compatible with the project privacy posture
 - [ ] Smart scheduling (reduce frequency during overnight hours)
 - [ ] Occupancy-based hospital recommendations
 

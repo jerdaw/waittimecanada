@@ -1,6 +1,6 @@
 # Screenshot Guide for Wait Time Canada
 
-> This guide explains what screenshots to capture for portfolio presentations, social media posts, and documentation.
+> This guide explains what screenshots to capture for public project documentation, demos, and release notes.
 
 ---
 
@@ -131,7 +131,7 @@
 **What to capture:**
 - Full about section text visible
 - Mission / equity / stewardship section
-- Social links (GitHub, LinkedIn, Email)
+- Contact and source links
 
 **Filename:** `06-about-section.png`
 
@@ -197,7 +197,7 @@
 
 ### Automated Baseline (CI)
 
-Use GitHub Actions workflow `Portfolio Screenshots` to generate a baseline pack automatically.
+Use GitHub Actions workflow `Demo Screenshots` to generate a baseline pack automatically.
 
 Outputs:
 - `01-landing-page.png`
@@ -208,7 +208,7 @@ Outputs:
 - `06-mobile-home.png`
 - `manifest.json`
 
-Artifact name: `portfolio-screenshots`
+Artifact name: `demo-screenshots`
 
 Use these as base assets, then add curated manual captures for comparison-modal divergence and map popup storytelling.
 
@@ -254,10 +254,10 @@ Before publishing, ensure you have:
 
 ## Usage by Platform
 
-### LinkedIn Post
+### Social Preview
 **Recommended:** Screenshots #2, #3, #4
 - Lead with divergence warning (most impactful)
-- Follow with methods page (shows scholarly approach)
+- Follow with methods page (shows methodology transparency)
 - Include hospital popup (shows transparency)
 
 ### GitHub README
@@ -266,17 +266,11 @@ Before publishing, ensure you have:
 - Show interactive map (demonstrates functionality)
 - Include divergence warning (core differentiator)
 
-### Portfolio Website
+### Project Website or Release Notes
 **Recommended:** All priority screenshots (1-5)
-- Create carousel or grid layout
+- Create a carousel or grid layout
 - Add captions explaining each feature
-- Link to live demo
-
-### Medical School Application
-**Recommended:** Screenshots #3, #2, #4
-- Focus on methodology and clinical thinking
-- Emphasize scholarship and professionalism
-- Include methods page (shows rigor)
+- Link to the live demo or relevant documentation
 
 ---
 
@@ -304,7 +298,7 @@ For more engaging social media posts, consider creating short GIFs:
 
 | Platform | Optimal Size | Aspect Ratio | Max File Size |
 |----------|-------------|--------------|---------------|
-| LinkedIn Post | 1200x627 | 1.91:1 | 5 MB |
+| Social feed preview | 1200x627 | 1.91:1 | 5 MB |
 | Twitter Card | 1200x675 | 16:9 | 5 MB |
 | GitHub Social Preview | 1280x640 | 2:1 | 1 MB |
 | Open Graph | 1200x630 | 1.91:1 | 8 MB |
@@ -337,9 +331,9 @@ docs/
 
 1. **Add to README:** Update main README with screenshot carousel
 2. **GitHub Social Preview:** Upload to Settings → Social Preview
-3. **LinkedIn Post:** Attach 2-3 screenshots to launch post
-4. **Portfolio Site:** Create project showcase page
-5. **Application Materials:** Include in supplemental documents
+3. **Social Preview:** Attach 2-3 screenshots to public project updates
+4. **Project Website:** Include concise project context
+5. **Release Notes:** Include updated visuals when major UI flows change
 
 ---
 

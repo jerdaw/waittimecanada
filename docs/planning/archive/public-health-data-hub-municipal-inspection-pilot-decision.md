@@ -4,7 +4,7 @@
 **Status:** Archived decision (closed 2026-04-24)
 **Scope:** Whether Wait Time Canada should pursue a Toronto-first municipal
 inspection/compliance pilot as the next public-health-hub expansion step
-**Related:** `../roadmap.md`, `../post-launch-growth-strategy.md`
+**Related:** `../roadmap.md`
 
 ## Summary
 

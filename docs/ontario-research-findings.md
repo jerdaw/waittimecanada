@@ -68,7 +68,7 @@
 **Rationale:**
 1. **Authoritative** - Official government data
 2. **Reliable** - Won't disappear like third-party sites
-3. **Portfolio value** - Using official sources shows professionalism
+3. **Project value** - Using official sources shows professionalism
 4. **Methodology clear** - Well-documented for ontology tagging
 
 **Implementation Strategy:**

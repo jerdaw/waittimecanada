@@ -303,6 +303,4 @@ def test_bc_scraper_live():
 
 ## Approval
 
-**Author:** Development Team
-**Reviewers:** N/A (Educational/Portfolio Project)
 **Status:** Accepted and Implemented

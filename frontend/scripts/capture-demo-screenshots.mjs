@@ -7,7 +7,7 @@ import path from "node:path";
 const BASE_URL = process.env.BASE_URL ?? "http://127.0.0.1:3000";
 const OUTPUT_DIR =
   process.env.SCREENSHOT_OUTPUT_DIR ??
-  path.resolve(process.cwd(), ".artifacts", "portfolio-screenshots");
+  path.resolve(process.cwd(), ".artifacts", "demo-screenshots");
 
 async function ensureOutputDir() {
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
@@ -80,7 +80,7 @@ async function run() {
 
   await browser.close();
   // eslint-disable-next-line no-console
-  console.log(`Portfolio screenshots saved to ${OUTPUT_DIR}`);
+  console.log(`Demo screenshots saved to ${OUTPUT_DIR}`);
 }
 
 run().catch((error) => {

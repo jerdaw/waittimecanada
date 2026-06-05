@@ -34,8 +34,9 @@ jobs:
       - name: Validate required/recommended secrets
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PUSHOVER_USER_KEY: ${{ secrets.PUSHOVER_USER_KEY }}
-          PUSHOVER_API_TOKEN: ${{ secrets.PUSHOVER_API_TOKEN }}
+          ALERT_API_URL: ${{ secrets.ALERT_API_URL }}
+          ALERT_USER_KEY: ${{ secrets.ALERT_USER_KEY }}
+          ALERT_API_TOKEN: ${{ secrets.ALERT_API_TOKEN }}
           PRODUCTION_BASE_URL: ${{ secrets.PRODUCTION_BASE_URL }}
         run: |
           set -euo pipefail
@@ -48,10 +49,10 @@ jobs:
             echo "OK: DATABASE_URL is configured."
           fi
 
-          if [ -z "${PUSHOVER_USER_KEY}" ] || [ -z "${PUSHOVER_API_TOKEN}" ]; then
-            echo "WARN: Pushover alert secrets are not fully configured (optional)."
+          if [ -z "${ALERT_API_URL}" ] || [ -z "${ALERT_USER_KEY}" ] || [ -z "${ALERT_API_TOKEN}" ]; then
+            echo "WARN: Alert provider secrets are not fully configured (optional)."
           else
-            echo "OK: Pushover alert secrets are configured."
+            echo "OK: Alert provider secrets are configured."
           fi
 
           if [ -z "${PRODUCTION_BASE_URL}" ]; then

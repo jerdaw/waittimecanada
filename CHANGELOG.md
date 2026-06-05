@@ -63,7 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Strategic Documentation: Data dictionary, data flow architecture, property-based testing (M26)
 - Reliability & Verification Phase 2: 80% backend coverage, API integration tests (M25)
 - Quality & Standardization: `mypy strict`, axe-core, mobile responsive tests, rate limiting (M23)
-- Portfolio Documentation: OpenAPI spec, MkDocs deployment (M22)
+- Public documentation: OpenAPI spec and MkDocs site (M22)
 - French Language Support (`next-intl` bilingual routing) (M21)
 - Reliability & Verification: API response time tracking, E2E pipeline, visual regression (M20)
 - Governance & Quality: LICENSE, SECURITY.md, CODE_OF_CONDUCT, CITATION.cff, issue templates (M19)
@@ -71,7 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Quebec parser zero-value guard (`ge=0`)
 - Cache & polling audit (tight TTLs, `no-store` on user-specific routes)
-- Netlify release gate hardening
+- Legacy deploy gate hardening
 
 ## [1.0.0] - 2026-02-11
 
@@ -87,7 +87,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 15 health regions mapped with analytics segmentation
 
 ### Changed
-- Netlify deploys now release-gated for cost control
+- Legacy deploy path now release-gated for cost control
 - Frontend hosting intentionally offline pending production release
 - Production smoke workflow made optional in offline mode
 
@@ -99,7 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.9.0] - 2026-02-08
 
 ### Added
-- Dead Man's Switch alerts with Pushover integration (M12)
+- Dead Man's Switch alerts with state-change notifications (M12)
 - Citation-ready data export with methodology tags and granularity control (M12)
 - Occupancy availability contract and API endpoints (M12)
 - Access Burden Estimator with fuel and parking cost calculations (M11)
@@ -109,9 +109,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.8.0] - 2026-02-07
 
 ### Added
-- Portfolio launch artifacts: About section, application summary (M9)
+- Public launch artifacts: About section and governance updates (M9)
 - Production readiness automation and smoke tests (M9)
-- Screenshot automation workflow for portfolio documentation (M9)
+- Screenshot automation workflow for public documentation (M9)
 - FAQ page with JSON-LD structured data (M8)
 - Expandable hospital cards with quick actions (M8)
 - Schema.org structured data for SEO (M7)
@@ -128,7 +128,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nominatim geocoding service (M2)
 - Mapbox frontend with interactive map (M2)
 - Quebec BeautifulSoup scraper (M1)
-- Neon PostgreSQL schema with 9 tables (M1)
+- PostgreSQL schema with 9 tables (M1)
 - Ontology enums for metric comparability (M1)
 - Heartbeat monitoring system (M1)
 

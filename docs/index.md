@@ -5,21 +5,23 @@ Wait Time Canada is a clinically defensible Health Systems Observatory for audit
 ## Start Here
 
 - Project overview: `README.md` (repo root)
-- Live runtime baseline: `docs/operations/direct-vps-frontend.md`,
-  `docs/operations/direct-vps-backend.md`, `docs/operations/scraper-scheduling.md`
+- Public source-freshness notes: `docs/operations/scraper-scheduling.md`
 - Roadmap (source of truth): `docs/planning/roadmap.md`
 - API reference: `docs/API.md`
 - Architecture overview: `docs/architecture/index.md`
 
-## Deployment Status
+## Public Documentation Boundary
 
-As of **2026-04-17**, the frontend is live on the shared VPS at `https://wait-time.ca`, `https://www.wait-time.ca` redirects to the canonical host, and the backend scheduler path remains on GitHub Actions. Live verification on 2026-04-17 showed `/api/health` returning `healthy: true` with the database connected, DB-backed routes such as `/api/hospitals` and `/api/resources` responding normally, and the hardened `/api/status` plus aggregate `/api/data-quality` summaries no longer exposing the legacy public source IDs `manitoba-shared-health` or `on-health`. See `docs/planning/roadmap.md` and `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`.
+This repository contains public project documentation and reproducible
+development information. Deployment details, credentials, monitoring
+configuration, private operational notes, and environment-specific production
+paths are intentionally excluded from public documentation.
 
-## Current Operations Artifacts
+## Current Public Operations Artifacts
 
-- Monthly operations review: `docs/operations/reports/2026-03-operational-report.md`
-- Latest incident report: `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`
-- Latest maintenance log: `docs/planning/archive/maintenance-2026-04-15.md`
+- Local operations quick start: `docs/operations/QUICK_START.md`
+- Source-freshness model: `docs/operations/scraper-scheduling.md`
+- Public operational status: `docs/operations/OPERATIONAL_STATUS.md`
 
 ## Safety
 

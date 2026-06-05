@@ -97,7 +97,7 @@ source .venv/bin/activate
 python run_migrations.py
 ```
 
-### Production (Neon PostgreSQL)
+### Production or Hosted PostgreSQL
 
 1. **Backup first:**
    ```bash

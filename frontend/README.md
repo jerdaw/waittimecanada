@@ -85,31 +85,13 @@ API routes (selected):
 - Occupancy and equity routes include explicit availability states when source data is not ready.
 - The equity layer now ships a real Ontario StatsCan-based geometry/metadata path; other provinces remain explicitly unavailable until equivalent source work is completed.
 - `/resources` now keeps Ontario public-health access data provenance-first, including source-catalog metadata, analytics-only EMS context, and Ontario reserve-system water advisories.
-- The direct-VPS frontend packaging path is `frontend/Dockerfile`; service-local deploy and rollback steps live in `docs/operations/direct-vps-frontend.md`.
-- The backend worker/timer migration path is documented separately in `docs/operations/direct-vps-backend.md`.
-- The live production runtime is intentionally split: the frontend runs on the shared VPS at `https://wait-time.ca`, while backend scheduling and heartbeat checks remain on GitHub Actions because the Ontario source is still unreachable from that VPS.
-
-## Netlify Deploy Guard
-
-This repo is configured to avoid accidental Netlify credit burn:
-
-- `frontend/netlify.toml` uses `frontend/scripts/netlify-ignore.sh` as the build ignore rule.
-- Non-production branches are skipped by default.
-- Production branch builds require explicit release intent via commit message containing `[release]` or `[deploy]`.
-- This prevents new accidental usage while keeping the old Netlify path available as rollback-only infrastructure rather than the primary production baseline.
-
-Example release commit:
-
-```bash
-git commit -m "[release] deploy milestone 15 analytics update"
-git push origin main
-```
+- Production deployment details, rollback runbooks, monitoring configuration, and environment-specific host paths are intentionally excluded from public documentation.
 
 ## Runtime Usage Controls
 
 - `SystemStatus` polls `/api/health` every 5 minutes (not every minute) and only while the browser tab is visible.
 - Read-heavy API routes use shared cache headers from `frontend/utils/cache.ts`.
-- The direct-VPS runtime also applies short-lived in-process response caching via `frontend/utils/server-cache.ts` for repeated anonymous reads.
+- Server-side routes can also use short-lived in-process response caching via `frontend/utils/server-cache.ts` for repeated anonymous reads.
 - Typical cache windows:
   - `120s` for `/api/health`
   - `300s` for hospitals, resources, data-quality, anomalies, compare, and analytics endpoints

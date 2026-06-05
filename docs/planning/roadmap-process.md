@@ -22,9 +22,10 @@ The roadmap is the "source of truth" for project progress and strategic directio
 - Once a milestone is "Delivered" and "Closed", relevant documents in `docs/planning/` should be archived if they are no longer living documents.
 - `docs/planning/roadmap.md` should be kept as the single entry point for project status.
 
-## Narrative Alignment
+## Public Alignment
 
-The roadmap should demonstrate:
-- **Leader Role**: Strategic planning and execution.
-- **Professional Role**: Ethical risk management.
-- **Scholar Role**: Methodological rigor.
+The roadmap should make these priorities easy to verify:
+
+- Strategic planning and execution
+- Ethical risk management
+- Methodological rigor

@@ -12,8 +12,6 @@ exclude_docs: |
 
   # Historical snapshots (retain in repo, exclude from site build).
   REPO_STRUCTURE_PLAN.md
-  final-documentation-review.md
-
   # Archived planning/implementation artifacts are retained for context only.
   planning/archive/*
   planning/implementation/archived/*
@@ -24,7 +22,6 @@ exclude_docs: |
   planning/deployment-blockers.md
   planning/expansion-roadmap.md
   planning/scraper-status-2026-02-04.md
-  planning/strategic-plan.md
   planning/ux-seo-implementation-plan.md
 
   # Templates should not fail strict builds.
@@ -130,8 +127,6 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/YOUR_USERNAME
-    - icon: fontawesome/brands/linkedin
-      link: https://linkedin.com/in/YOUR_PROFILE
 
 nav:
   - Home: index.md
@@ -153,11 +148,8 @@ nav:
   - Operations:
     - Operations Quick Start: operations/QUICK_START.md
     - operations/OPERATIONAL_STATUS.md
-    - Direct VPS Backend: operations/direct-vps-backend.md
     - operations/scraper-scheduling.md
     - operations/zenodo-integration.md
-    - Direct VPS Frontend: operations/direct-vps-frontend.md
-    - Historical Netlify Deployment Plan: production-deployment-plan.md
 
   - Development:
     - development/setup.md
@@ -178,6 +170,7 @@ nav:
     - "0009: Data Quality & Anomaly Detection": adr/0009-data-quality-anomaly-detection.md
     - "0016: Equity Academic Rigor Hardening": adr/0016-equity-academic-rigor-hardening-ontario.md
     - "0017: Domain Rebrand (wait-time.ca)": adr/0017-domain-rebrand-wait-time-ca.md
+    - "0026: Public Documentation Boundary": adr/0026-public-documentation-boundary.md
 
   - Planning:
     - planning/roadmap.md

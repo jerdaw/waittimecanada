@@ -24,7 +24,7 @@ How do we store heterogeneous wait time data in a way that enables transparency 
 * **Data Integrity** - Never misrepresent or artificially normalize provincial data
 * **Scientific Rigor** - Enable researchers to understand exact methodology
 * **User Safety** - Prevent misinterpretation that could lead to poor healthcare decisions
-* **Portfolio Value** - Demonstrate understanding of research methodology ("Scholar" narrative)
+* **Public-Interest Value** - Demonstrate transparent research methodology
 * **Maintainability** - Clear schema that prevents future drift
 
 ## Considered Options
@@ -40,7 +40,7 @@ Chosen option: "Strict Metric Ontology", because:
 - Only option that maintains data integrity while enabling comparability analysis
 - Provides scientific rigor required for research use
 - Enables automatic generation of "divergence briefs" when data is incomparable
-- Demonstrates deep understanding of research methodology (key portfolio value)
+- Demonstrates transparent research methodology
 - Scales to new provinces without schema changes
 
 ### Positive Consequences
@@ -50,7 +50,7 @@ Chosen option: "Strict Metric Ontology", because:
 * **Database-Level Enforcement** - PostgreSQL enums prevent invalid ontology values
 * **Research-Grade Data** - Researchers can query by exact methodology
 * **Future-Proof** - Adding new provinces/metrics doesn't require schema changes
-* **Portfolio Differentiation** - Showcases "Physician-Innovator" competency
+* **Project Differentiation** - Distinguishes the observatory from a simple wait-time display
 
 ### Negative Consequences
 

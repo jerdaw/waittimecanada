@@ -143,7 +143,7 @@ DROP TABLE IF EXISTS sources;
 #### 003_create_rls_policies.sql.skip
 **Purpose:** Row-Level Security policies (SKIPPED)
 **Status:** Intentionally excluded (`.sql.skip` extension)
-**Rationale:** RLS policies deferred; Neon free tier uses connection pooling which may conflict with RLS session variables
+**Rationale:** RLS policies deferred; some hosted PostgreSQL pooling modes may conflict with RLS session variables
 
 **Note:** This file will not be executed by `run_migrations.py`. If RLS is needed in future, rename to `.sql` and review policies.
 
@@ -821,7 +821,7 @@ Before deploying migrations to production:
 
 ## Resources
 
-- **Neon PostgreSQL Docs**: https://neon.tech/docs/
+- **PostgreSQL Documentation**: https://www.postgresql.org/docs/
 - **PostgreSQL Migration Best Practices**: https://www.postgresql.org/docs/current/ddl.html
 - **ADR-0002**: Ontology-based metric tagging rationale
 - **ADR-0008**: Permanent aggregates for retention policy
@@ -843,5 +843,5 @@ For migration questions or issues:
 
 **Last Updated:** 2026-04-16
 **Total Migrations:** 20
-**Database Provider:** Neon PostgreSQL 17
+**Database Engine:** PostgreSQL 17
 **Schema Version:** 020 (Active Source Definition Sync)

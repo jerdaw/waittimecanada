@@ -14,7 +14,7 @@ Base URL:
 - Most routes use JSON responses.
 - Many routes return `{ success, data }` for success and `{ success: false, error, message }` for errors.
 - Some older routes use payload-first contracts (kept for compatibility).
-- Shared anonymous read routes use short cache windows to reduce repeated Neon reads on the production VPS path.
+- Shared anonymous read routes use short cache windows to reduce repeated database reads on public routes.
 
 ## Endpoint Catalog
 
@@ -94,9 +94,7 @@ These routes are intentionally cache-friendly on the public frontend path:
 - `GET /api/methodology`: 1-minute shared cache window
 - `GET /api/hospitals/[slug]/trends`: 10-minute shared cache window
 
-Operational note:
-
-- On the shared VPS runtime, these same read-heavy routes also use short-lived in-process response caching to cut repeat public transfer from Neon without changing data collection or storage policy.
+- Read-heavy routes can also use short-lived in-process response caching without changing data collection or storage policy.
 - `GET /api/geolocation` and `GET /api/export` remain `Cache-Control: no-store`.
 - `GET /api/resources/aqhi` uses a 15-minute shared cache window with a live upstream fetch behind the server cache.
 - `GET /api/resources/water-advisories` uses a 1-hour shared cache window with a live upstream fetch behind the server cache.

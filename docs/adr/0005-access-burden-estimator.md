@@ -106,7 +106,7 @@ Total: $21-$31
 ### Positive
 
 1. **Transparency:** Makes invisible financial barriers visible
-2. **Advocacy:** Demonstrates "Health Advocate" CanMEDS competency
+2. **Access transparency:** Shows how logistical burdens can affect interpretation of public wait-time data
 3. **Differentiation:** No other ER wait time app includes this feature
 4. **Policy Impact:** Provides data for access barrier discussions
 5. **Trust:** Shows awareness that healthcare access involves more than clinical factors
@@ -139,7 +139,7 @@ Total: $21-$31
 
 **Cons:**
 - Misses opportunity to highlight access barriers
-- Fails to demonstrate "Health Advocate" competency
+- Misses an opportunity to surface access-barrier context
 - Perpetuates invisibility of financial barriers
 
 **Verdict:** Rejected. The educational and advocacy value outweighs the risks when properly disclaimed.
@@ -259,7 +259,7 @@ The "Why show this?" section explains the feature's purpose: making barriers vis
 
 ### Advocacy Impact
 
-- Include in medical school applications as "Health Advocate" feature
+- Include in public project documentation as an access-burden feature with clear safety caveats
 - Use in discussions about healthcare access barriers
 - Potential media coverage: "First ER app to highlight financial barriers"
 
@@ -304,13 +304,13 @@ The "Why show this?" section explains the feature's purpose: making barriers vis
 - **Gas Prices:** Natural Resources Canada Fuel Focus
 - **Fuel Economy:** Natural Resources Canada Vehicle Fuel Consumption Guide
 - **Parking Rates:** Informal survey of major Canadian hospitals
-- **CanMEDS Framework:** Health Advocate role description
+- **Public-interest framing:** Access-burden and health-system navigation context
 
 ---
 
 ## Approval
 
-**Rationale:** The Access Burden Estimator demonstrates healthcare systems thinking while maintaining patient safety through prominent disclaimers. It differentiates the project from competitors and showcases the "Health Advocate" CanMEDS competency.
+**Rationale:** The Access Burden Estimator demonstrates healthcare systems thinking while maintaining patient safety through prominent disclaimers. It differentiates the project from simple wait-time displays by showing non-clinical access burdens without recommending delayed care.
 
 **Trade-offs Accepted:** We accept the maintenance burden of updating gas prices in exchange for making financial access barriers visible.
 

@@ -8,7 +8,7 @@
 
 ## Overview
 
-The equity layer visualizes socioeconomic disparities in emergency department access by overlaying census tract income data on the hospital map. This demonstrates the "Health Advocate" narrative and makes geographic health inequities visible.
+The equity layer visualizes socioeconomic disparities in emergency department access by overlaying census tract income data on the hospital map. It makes geographic health inequities visible while preserving non-causal interpretation safeguards.
 
 **User Story:** _"As a health policy researcher, I want to see which emergency departments serve low-income census tracts, so I can identify access equity gaps."_
 
@@ -881,7 +881,7 @@ The equity layer is **ready for implementation** once census data is downloaded.
 
 **Value Delivered:**
 - Visual equity analysis for health policy research
-- Demonstrates "Health Advocate" competency
+- Surfaces access-barrier context for public-interest interpretation
 - Unique feature among ER wait time platforms
 - Foundation for future socioeconomic analyses
 

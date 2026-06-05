@@ -6,19 +6,19 @@ Status: Superseded
 
 Deciders: Jeremy Dawson
 
-Technical Story: `docs/planning/roadmap.md` ops maintenance follow-up after the VPS frontend cutover, alert storm cleanup, and historical-data retention hardening
+Technical Story: `docs/planning/roadmap.md` operations follow-up after alert storm cleanup and historical-data retention hardening
 
 Superseded on 2026-03-23 by `docs/adr/0021-bounded-retention-cleanup-operations.md`.
 
 ## Context and Problem Statement
 
-Wait Time Canada now needs to preserve raw measurements for long-term historical analysis, while still operating within a free-tier-aware GitHub Actions and Neon footprint. At the same time, the previous stateless heartbeat alerting model produced repeated stale/error notifications during disruption windows, and broad maintenance/backfill jobs were timing out.
+Wait Time Canada needs to preserve enough raw measurements for short-term debugging while keeping long-term storage bounded through permanent aggregates. At the same time, the previous stateless heartbeat alerting model produced repeated stale/error notifications during disruption windows, and broad maintenance/backfill jobs were timing out.
 
 ## Decision Drivers
 
 * Preserve the full raw audit trail for future historical analysis
 * Reduce operational noise from repeated stale/error alerts
-* Keep production operations reliable within GitHub Actions and Neon constraints
+* Keep production operations reliable within resource constraints
 * Avoid recomputing broad historical aggregates as part of routine maintenance
 
 ## Considered Options

@@ -22,5 +22,5 @@ Originally, the application followed a "Fixed Dashboard" pattern where the map a
   - Slightly more complex scroll logic in `page.tsx` to handle the transition between "scrolling landing page" and "fixed app view."
 
 ## Alternatives Considered
-- **Keep Fixed Layout**: Rejected as it felt "cold" and lacked narrative flow for a portfolio project.
+- **Keep Fixed Layout**: Rejected as it felt "cold" and lacked narrative flow for a public-interest project.
 - **Keep Sorting Toggle**: Rejected to align with the principle of "Opinionated UX" for emergency data.

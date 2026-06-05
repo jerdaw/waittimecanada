@@ -62,7 +62,7 @@ Our architecture includes several layers of security:
 If you're deploying this project:
 
 - **Never commit secrets:** Use `.env.local` for sensitive configuration (already in `.gitignore`)
-- **Rotate database credentials:** If you suspect credential exposure, rotate Neon PostgreSQL credentials immediately
+- **Rotate database credentials:** If you suspect credential exposure, rotate the affected PostgreSQL credentials immediately
 - **Review dependencies:** Run `npm audit` and `pip-audit` regularly
 - **Enable Dependabot:** Automated dependency updates are configured in `.github/dependabot.yml`
 
@@ -72,7 +72,7 @@ The following are explicitly **not** security issues for this project:
 
 - **Scraped data inaccuracies:** Report data quality issues via [GitHub Issues](https://github.com/jerdaw/waittimecanada/issues) instead
 - **Provincial source downtime:** We are not responsible for upstream data availability
-- **Rate limiting or abuse prevention:** This is a portfolio project, not a production service; DoS concerns are out of scope
+- **Rate limiting or abuse prevention:** This is an independent public-interest project; large-scale abuse and denial-of-service concerns are out of scope for public issue triage
 
 ## Contact
 

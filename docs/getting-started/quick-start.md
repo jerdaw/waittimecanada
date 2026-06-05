@@ -1,29 +1,25 @@
 # Quick Start
 
-This guide is for local development only. The live production baseline is
-split: the public frontend runs on the shared VPS at `https://wait-time.ca`,
-while backend scheduling and heartbeat checks remain on GitHub Actions because
-the Ontario source is still not reliably reachable from that VPS. For live
-deployment/runtime docs, use `docs/operations/direct-vps-frontend.md`,
-`docs/operations/direct-vps-backend.md`, and
-`docs/operations/scraper-scheduling.md`.
+This guide is for local development only. Production deployment details,
+credentials, monitoring configuration, and environment-specific host paths are
+intentionally excluded from public documentation.
 
 ## 1. Prerequisites
 
 - Python 3.12+
 - Node.js 22+
 - npm
-- Neon `DATABASE_URL`
+- PostgreSQL `DATABASE_URL`
 - Mapbox token (`NEXT_PUBLIC_MAPBOX_TOKEN`)
 
-## 2. Create a Neon Database
+## 2. Create a PostgreSQL Database
 
-1. Create a Neon project.
-2. Copy the project's pooled Postgres connection string.
+1. Create or provision a PostgreSQL database.
+2. Copy the connection string.
 3. Export that value in your shell as `DATABASE_URL`.
 
-Wait Time Canada uses standard PostgreSQL migrations, so Neon is the default
-hosted path, but the schema remains portable to other Postgres environments.
+Wait Time Canada uses standard PostgreSQL migrations, so the schema remains
+portable across compatible Postgres environments.
 
 ## 3. Initialize Local Environment
 

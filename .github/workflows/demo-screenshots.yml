@@ -1,4 +1,4 @@
-name: Portfolio Screenshots
+name: Demo Screenshots
 
 on:
   workflow_dispatch:
@@ -7,12 +7,12 @@ env:
   NODE_VERSION: "22"
 
 concurrency:
-  group: portfolio-screenshots
+  group: demo-screenshots
   cancel-in-progress: true
 
 jobs:
   capture:
-    name: Capture Portfolio Screenshots
+    name: Capture Demo Screenshots
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -48,7 +48,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXT_PUBLIC_MAPBOX_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }}
           BASE_URL: http://127.0.0.1:3000
-          SCREENSHOT_OUTPUT_DIR: ./.artifacts/portfolio-screenshots
+          SCREENSHOT_OUTPUT_DIR: ./.artifacts/demo-screenshots
         run: |
           set -euo pipefail
           npm run start -- --hostname 127.0.0.1 --port 3000 &
@@ -62,12 +62,12 @@ jobs:
             sleep 2
           done
 
-          npm run screenshots:portfolio
+          npm run screenshots:demo
 
       - name: Upload screenshot artifacts
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: portfolio-screenshots
-          path: frontend/.artifacts/portfolio-screenshots/
+          name: demo-screenshots
+          path: frontend/.artifacts/demo-screenshots/
           retention-days: 14

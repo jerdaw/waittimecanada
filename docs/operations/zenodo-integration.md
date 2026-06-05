@@ -251,7 +251,7 @@ Available: https://doi.org/10.5281/zenodo.XXXXXXX
 - [ ] Publish on Zenodo
 - [ ] Verify DOI badge displays correctly on GitHub
 - [ ] (Optional) Add DOI to CITATION.cff
-- [ ] (Optional) Add DOI to CV/portfolio materials
+- [ ] (Optional) Add DOI to public citation and project materials
 
 **Estimated Time:** 10 minutes
 

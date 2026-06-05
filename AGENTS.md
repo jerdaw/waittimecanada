@@ -41,25 +41,12 @@ This file provides guidance to automated developer tools when working with code 
 
 This is the **Wait Time Canada** project - a "Health Systems Observatory" designed to audit and standardize Canadian emergency room wait time data across provinces. This is **NOT a simple wait time app**, but rather a clinically defensible auditing platform that exposes methodological inconsistencies in healthcare reporting.
 
-**Current Status:** Milestone 33 (Historical Occupancy Trends) is complete and the Ontario-first **Public Health Hub Batch A** module is live. **Four-province breadth achieved** (ON, QC, AB, BC). Methodology documentation is complete for all provinces, occupancy trend aggregation is operational, the production domain `wait-time.ca` is live on the VPS via Caddy, `/resources` is live with facilities/AED fallback/alerts/AQHI, and raw measurements follow a 30-day retention policy with permanent aggregates for long-term analysis. As of **2026-04-15**, production Neon connectivity remains healthy, repo-side hardening for `/api/status` plus aggregate `/api/data-quality` is merged, data-quality coverage now uses distinct UTC hourly scrape windows, backend runtime bootstrap no longer probes secret env files directly, backend heartbeat defaults are aligned to the live 120-minute contract, and the repo-side Playwright stabilization pass is complete. The remaining live ops follow-up is still frontend release/verification on the shared VPS so `wait-time.ca` is confirmed to be serving the updated status/data-quality behavior. See `docs/planning/roadmap.md` and `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md` before treating the public status summary as fully re-verified in production.
+**Current Status:** Milestone 33 (Historical Occupancy Trends) is complete and the Ontario-first **Public Health Hub Batch A** module is live. **Four-province breadth achieved** (ON, QC, AB, BC). Methodology documentation is complete for all provinces, occupancy trend aggregation is operational, `/resources` is live with facilities/AED fallback/alerts/AQHI, and raw measurements follow a 30-day retention policy with permanent aggregates for long-term analysis. Repo-side hardening for `/api/status` plus aggregate `/api/data-quality` is merged, data-quality coverage uses distinct UTC hourly scrape windows, backend runtime bootstrap no longer probes secret env files directly, and the repo-side Playwright stabilization pass is complete. See `docs/planning/roadmap.md` for the current public project status.
 
-**Cross-Repo Runtime Contract Sync:** Shared-VPS facts that must stay aligned with
-`/home/jer/repos/vps/platform-ops` now also live in the repo-root
-`platform-ops-contract.yaml`. When changing the live frontend's canonical host,
-private bind, env-file path, release root, runtime owner, or shared health
-endpoint contract, update that manifest and the matching `platform-ops`
-inventory/current-state surfaces in the same change window.
-
-**Cross-project ops note:** Wait Time Canada app behavior belongs in this repo.
-Shared VPS standards, live service inventory, shared ingress ownership, shared
-host access posture, and cross-project migration/operations state belong in
-`/home/jer/repos/vps/platform-ops`. Use
-`/home/jer/repos/vps/platform-ops/docs/standards/PLAT-009-shared-vps-documentation-boundary.md`
-as the default ownership rule. Host-side paths under `/etc/projects-merge/...`
-remain intentionally unchanged.
+**Public documentation boundary:** Wait Time Canada app behavior, reproducible local development, methodology, limitations, and public source documentation belong in this repo. Deployment details, credentials, monitoring configuration, private operational notes, and environment-specific production paths are intentionally excluded from public documentation.
 
 **Current Architecture:**
-- **Database**: Neon PostgreSQL 17 (14 tables: sources, hospitals, measurements, scraper_status, scraper_alert_state, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions, public_data_sources, resource_locations, public_health_alerts, public_health_source_alert_state)
+- **Database**: PostgreSQL (sources, hospitals, measurements, scraper_status, scraper_alert_state, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions, public_data_sources, resource_locations, public_health_alerts, public_health_source_alert_state)
 - **Backend**: Python 3.12+ with psycopg2, pytest
   - **Tests**: 450+ passing backend tests (unit + integration)
   - Scrapers: Quebec (BeautifulSoup), Ontario (HTTP client), Alberta (Playwright), BC (JSON/__NEXT_DATA__)
@@ -80,11 +67,11 @@ remain intentionally unchanged.
 
 ### Technology Stack
 
-- **Backend:** Python 3.12+ scrapers via GitHub Actions (hourly scraper cadence, heartbeat checks every 30 minutes, state-change alerting)
-- **Database:** Neon PostgreSQL 17 with strict schema constraints
+- **Backend:** Python 3.12+ scrapers with scheduled or manually dispatched collection and state-change-aware source-health tracking
+- **Database:** PostgreSQL with strict schema constraints
 - **Frontend:** Next.js 14 App Router + TypeScript + Mapbox GL JS
 - **Testing:** pytest (backend), Vitest (frontend), Playwright (E2E in CI)
-- **Hosting:** Direct VPS via Caddy and Docker (frontend) + GitHub Actions (authoritative scraper scheduling)
+- **Hosting:** Production deployment details are intentionally kept outside public documentation
 
 ### The Metric Ontology System
 
@@ -147,7 +134,7 @@ Retention policy: Delete raw measurement rows older than 30 days; keep permanent
 
 ### 2. Silent Failure Detection
 
-**Heartbeat Monitor:** Every scraper run must write a status row with timestamp. Frontend displays "Last Audit: X mins ago". If heartbeat is >120 minutes old, GitHub Actions treats the source as stale and the heartbeat check emits a single incident alert until the state changes or recovers.
+**Heartbeat Monitor:** Every scraper run must write a status row with timestamp. Frontend displays "Last Audit: X mins ago". Freshness checks should emit source-health state changes without sending duplicate notifications for the same unresolved condition.
 
 Implementation pattern:
 ```python
@@ -206,7 +193,7 @@ Collapsible UI showing `(Distance × Gas Price) + Parking` with disclaimer:
 > "Logistical estimate only. Never delay care for cost."
 
 ### Feature C: Methods & Governance Page
-Dynamic table showing comparability matrix across provinces. This is the **Scholar** narrative - demonstrating understanding of research methodology.
+Dynamic table showing comparability matrix across provinces. This supports public-interest interpretation and research-methodology transparency.
 
 ## Critical Rules
 
@@ -220,12 +207,12 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 
 ## Deployment Guardrails (Cost Control)
 
-- Netlify production deploys are intentionally gated to explicit release commits.
-- `frontend/netlify.toml` uses `frontend/scripts/netlify-ignore.sh`.
-- A Netlify production build is allowed only when commit message contains `[release]` or `[deploy]`.
-- Non-production branches are skipped by default.
-- This guardrail keeps the old Netlify path available as rollback-only infrastructure without making it the active frontend runtime again.
-- `production-smoke.yml` currently runs every 6 hours and also supports manual dispatch; keep it lightweight and avoid adding more frequent production probes without a clear operational reason.
+- Production deploys should be gated to explicit release intent.
+- Non-production branches should avoid unnecessary production builds.
+- Production probes should remain lightweight; avoid increasing probe frequency without a clear operational reason.
+- Scheduled GitHub Actions operational workflows may be paused during free-tier
+  quota constraints; use manual dispatch and keep
+  `docs/planning/roadmap.md` current until cadence is restored.
 
 ## Runtime Usage Guardrails
 
@@ -243,6 +230,6 @@ Dynamic table showing comparability matrix across provinces. This is the **Schol
 
 ---
 
-Note: This project uses **Neon PostgreSQL** as its primary database.
+Note: This project uses **PostgreSQL** as its primary database.
 
-This is a **physician-innovator portfolio project** optimized for medical school admissions committee review. Every technical decision maps to a narrative competency (Scholar, Professional, Advocate, Leader).
+This is a public-interest health systems observatory. Every technical decision should preserve source provenance, methodology transparency, clinical safety boundaries, and responsible handling of health-adjacent information.

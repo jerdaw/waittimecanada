@@ -17,7 +17,7 @@ Wait Time Canada now has a validated planning package for an Ontario-first publi
 * Preserve the current observatory identity and methodological credibility
 * Avoid premature product sprawl and brand dilution
 * Keep implementation scope coherent for Batch A
-* Maintain strong portfolio and employer signal without overclaiming breadth
+* Maintain strong public-interest and technical signal without overclaiming breadth
 
 ## Considered Options
 

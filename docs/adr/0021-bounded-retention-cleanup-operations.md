@@ -6,15 +6,15 @@ Status: Accepted
 
 Deciders: Jeremy Dawson
 
-Technical Story: `docs/planning/roadmap.md` ops maintenance follow-up after the Neon storage alert, raw-retention rollback, and cleanup runtime investigation
+Technical Story: `docs/planning/roadmap.md` operations follow-up after a storage alert, raw-retention rollback, and cleanup runtime investigation
 
 ## Context and Problem Statement
 
-Wait Time Canada restored its 30-day raw-measurement retention policy after a production storage alert exposed the cost of preserving raw history indefinitely on the Neon free tier. The first corrective cleanup run succeeded, but it also showed that the GitHub Actions maintenance workflow was spending most of its runtime in a zero-yield aggregate refresh rather than in the actual delete path.
+Wait Time Canada restored its 30-day raw-measurement retention policy after a storage alert exposed the cost of preserving raw history indefinitely. The first corrective cleanup run succeeded, but it also showed that the maintenance workflow was spending most of its runtime in a zero-yield aggregate refresh rather than in the actual delete path.
 
 ## Decision Drivers
 
-* Keep storage growth bounded on the Neon free tier
+* Keep storage growth bounded
 * Preserve state-change-driven alerting and the current GitHub Actions production posture
 * Keep maintenance runs fast enough that CI remains helpful instead of blocking routine development
 * Avoid folding expensive, often-no-op aggregate work into every storage cleanup invocation
@@ -39,7 +39,7 @@ Chosen option: "Keep 30-day raw retention, delete in bounded batches, and make a
 ### Negative Consequences
 
 * Raw measurements older than 30 days are no longer available for future re-aggregation without backups
-* Table/index bloat and Neon storage accounting may still lag immediately after large deletes
+* Table/index bloat and storage accounting may still lag immediately after large deletes
 * Operators now need to think about aggregate refresh and retention cleanup as separate concerns
 
 ## Pros and Cons of the Options
@@ -78,4 +78,4 @@ Implementation artifacts:
 * Bounded cleanup runtime: `backend/src/waittime/services/database.py`
 * Cleanup CLI flags: `backend/src/waittime/cli/cleanup.py`
 * Manual cleanup workflow: `.github/workflows/database-cleanup.yml`
-* VPS cleanup timer template: `backend/systemd/waittime-backend-database-cleanup.service.template`
+* Private deployment timer templates are intentionally excluded from public documentation.

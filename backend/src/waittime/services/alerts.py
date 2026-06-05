@@ -13,16 +13,15 @@ logger = logging.getLogger(__name__)
 class AlertConfig:
     """Configuration for alert service."""
 
-    pushover_user_key: str
-    pushover_api_token: str
+    alert_user_key: str = ""
+    alert_api_token: str = ""
+    alert_api_url: str = ""
     enabled: bool = True
     reference_url: str = "https://github.com/jerdaw/waittimecanada/actions"
 
 
 class AlertService:
-    """Service for sending operational alerts via Pushover."""
-
-    PUSHOVER_API_URL = "https://api.pushover.net/1/messages.json"
+    """Service for sending operational alerts through a configured provider."""
 
     def __init__(self, config: AlertConfig | None = None):
         """
@@ -32,8 +31,9 @@ class AlertService:
             config: Optional AlertConfig. If not provided, reads from environment.
         """
         self.config = config or AlertConfig(
-            pushover_user_key=os.environ.get("PUSHOVER_USER_KEY", ""),
-            pushover_api_token=os.environ.get("PUSHOVER_API_TOKEN", ""),
+            alert_user_key=os.environ.get("ALERT_USER_KEY", ""),
+            alert_api_token=os.environ.get("ALERT_API_TOKEN", ""),
+            alert_api_url=os.environ.get("ALERT_API_URL", ""),
             enabled=bool(os.environ.get("ALERTS_ENABLED", "true").lower() == "true"),
             reference_url=os.environ.get(
                 "ALERTS_REFERENCE_URL",
@@ -49,7 +49,7 @@ class AlertService:
         url: str | None = None,
     ) -> bool:
         """
-        Send an alert via Pushover.
+        Send an alert through the configured alert provider.
 
         Args:
             title: Alert title
@@ -64,13 +64,17 @@ class AlertService:
             logger.info("[ALERT DISABLED] %s: %s", title, message)
             return True
 
-        if not self.config.pushover_user_key or not self.config.pushover_api_token:
+        if (
+            not self.config.alert_user_key
+            or not self.config.alert_api_token
+            or not self.config.alert_api_url
+        ):
             logger.warning("[ALERT NO CONFIG] %s: %s", title, message)
             return False
 
         payload = {
-            "token": self.config.pushover_api_token,
-            "user": self.config.pushover_user_key,
+            "token": self.config.alert_api_token,
+            "user": self.config.alert_user_key,
             "title": title,
             "message": message,
             "priority": priority,
@@ -80,7 +84,7 @@ class AlertService:
             payload["url_title"] = "View Details"
 
         try:
-            response = httpx.post(self.PUSHOVER_API_URL, data=payload, timeout=10.0)
+            response = httpx.post(self.config.alert_api_url, data=payload, timeout=10.0)
             response.raise_for_status()
             return True
         except Exception as e:

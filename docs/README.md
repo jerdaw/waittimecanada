@@ -5,8 +5,6 @@ This directory is the documentation control plane for Wait Time Canada.
 ## Start Here
 
 - Project overview and local setup: `README.md` (repo root)
-- Live split-runtime baseline: `docs/operations/direct-vps-frontend.md`,
-  `docs/operations/direct-vps-backend.md`, `docs/operations/scraper-scheduling.md`
 - Active roadmap and milestone status: `docs/planning/roadmap.md`
 - Human-intervention queue: `docs/planning/manual-tasks.md`
 
@@ -15,11 +13,9 @@ This directory is the documentation control plane for Wait Time Canada.
 - API contracts: `docs/API.md`
 - Architecture overview: `docs/architecture/index.md`
 - ADRs: `docs/adr/`
-- Current operational report: `docs/operations/reports/2026-03-operational-report.md`
-- Latest incident report: `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`
+- Public operations quick start: `docs/operations/QUICK_START.md`
+- Public source-freshness model: `docs/operations/scraper-scheduling.md`
 - Latest maintenance log: `docs/planning/archive/maintenance-2026-04-23.md`
-- Direct-VPS backend deploy path: `docs/operations/direct-vps-backend.md`
-- Direct-VPS frontend deploy path: `docs/operations/direct-vps-frontend.md`
 - Development setup: `docs/development/setup.md`
 - Testing standards: `docs/development/testing-guidelines.md`
 - Documentation standards: `docs/development/documentation-guidelines.md`
@@ -28,23 +24,24 @@ This directory is the documentation control plane for Wait Time Canada.
 
 - Planning hub: `docs/planning/README.md`
 - Roadmap lifecycle process: `docs/planning/roadmap-process.md`
-- Active milestone plans: `docs/planning/implementation/` (`admissions-strengthening-plan.md`)
+- Active milestone plans: `docs/planning/implementation/`
 - Archived plans: `docs/planning/archive/`
 
 ## Historical Snapshots
 
 - `docs/REPO_STRUCTURE_PLAN.md`
-- `docs/final-documentation-review.md`
-- `docs/planning/strategic-plan.md`
+- `docs/REPO_STRUCTURE_PLAN.md`
 
 These files are retained for historical context and may include superseded details.
 
-## Portfolio and Stakeholder Materials
+## Public Research and Stakeholder Materials
 
-- Application summary: `docs/application-summary.md`
-- LinkedIn launch post draft: `docs/linkedin-launch-post.md`
 - Screenshot guide: `docs/screenshot-guide.md`
 - Stakeholder toolkit: `docs/stakeholder-interviews/`
+
+## Public Documentation Boundary
+
+This repository contains public project documentation and reproducible development information. Deployment details, credentials, monitoring configuration, private operational notes, and environment-specific production paths are intentionally excluded from public documentation.
 
 ## Maintenance Rules
 

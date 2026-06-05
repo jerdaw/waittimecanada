@@ -1,4 +1,4 @@
-"""Database service layer for PostgreSQL (Neon).
+"""Database service layer for PostgreSQL.
 
 Handles all database operations including:
 - Writing measurements

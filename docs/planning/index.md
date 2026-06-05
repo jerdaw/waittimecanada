@@ -13,8 +13,13 @@ This section contains the project planning control plane.
 
 ## Active Planning Docs
 
-- `docs/planning/implementation/admissions-strengthening-plan.md`
-- `docs/planning/post-launch-growth-strategy.md`
+- `docs/planning/roadmap.md`
+- `docs/planning/public-health-data-hub-freshness-safety-rules.md`
+- `docs/planning/public-health-data-hub-metadata-contract.md`
+
+## Public Documentation Boundary
+
+This repository contains public project documentation and reproducible development information. Deployment details, credentials, monitoring configuration, private operational notes, and environment-specific production paths are intentionally excluded from public documentation.
 
 ## Historical Planning Baselines
 
@@ -24,9 +29,9 @@ This section contains the project planning control plane.
 
 ## Active Operational Artifacts
 
-- `docs/operations/reports/2026-03-operational-report.md`
-- `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`
-- `docs/operations/neon-production-upgrade.md`
+- `docs/operations/QUICK_START.md`
+- `docs/operations/OPERATIONAL_STATUS.md`
+- `docs/operations/scraper-scheduling.md`
 
 ## Archived Public Health Hub Batch A Planning Docs
 

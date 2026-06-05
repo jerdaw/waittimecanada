@@ -1,10 +1,8 @@
 name: Scraper Cron Job
 
-# Active production cadence:
-# hourly collection on GitHub Actions with a 120-minute stale threshold.
+# Scheduled trigger paused to conserve GitHub Actions free-tier minutes.
+# Use workflow_dispatch until the scheduled cadence is restored.
 on:
-  schedule:
-    - cron: "0 * * * *"
   workflow_dispatch: # Allow manual trigger
 
 env:
@@ -87,7 +85,8 @@ jobs:
         working-directory: ./backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PUSHOVER_USER_KEY: ${{ secrets.PUSHOVER_USER_KEY }}
-          PUSHOVER_API_TOKEN: ${{ secrets.PUSHOVER_API_TOKEN }}
+          ALERT_API_URL: ${{ secrets.ALERT_API_URL }}
+          ALERT_USER_KEY: ${{ secrets.ALERT_USER_KEY }}
+          ALERT_API_TOKEN: ${{ secrets.ALERT_API_TOKEN }}
         run: |
           python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1 || true

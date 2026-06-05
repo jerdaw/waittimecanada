@@ -7,13 +7,12 @@ This directory is the planning control plane for Wait Time Canada.
 - Roadmap: `docs/planning/roadmap.md`
 - Process: `docs/planning/roadmap-process.md`
 - Manual intervention queue: `docs/planning/manual-tasks.md`
-- Active backend migration path: `docs/operations/direct-vps-backend.md`
-- Active deployment migration path: `docs/operations/direct-vps-frontend.md`
 
 ## Active Planning Docs
 
-- `docs/planning/implementation/admissions-strengthening-plan.md`
-- `docs/planning/post-launch-growth-strategy.md`
+- `docs/planning/roadmap.md`
+- `docs/planning/public-health-data-hub-freshness-safety-rules.md`
+- `docs/planning/public-health-data-hub-metadata-contract.md`
 
 ## Historical Planning Baselines
 
@@ -23,9 +22,9 @@ This directory is the planning control plane for Wait Time Canada.
 
 ## Active Operational Artifacts
 
-- `docs/operations/reports/2026-03-operational-report.md`
-- `docs/operations/incident-reports/2026-03-28-neon-transfer-quota.md`
-- `docs/operations/neon-production-upgrade.md`
+- `docs/operations/QUICK_START.md`
+- `docs/operations/OPERATIONAL_STATUS.md`
+- `docs/operations/scraper-scheduling.md`
 
 ## Archived Milestone Plans
 
@@ -49,7 +48,6 @@ This directory is the planning control plane for Wait Time Canada.
 
 ## Historical Planning Snapshots
 
-- `docs/planning/strategic-plan.md`
 - `docs/planning/expansion-roadmap.md`
 - `docs/planning/competitor-design-analysis.md`
 - `docs/planning/archive/scraper-status-2026-02-04.md`
@@ -65,6 +63,10 @@ These documents are retained for context and may not match current implementatio
 4. Keep completed milestone details in archived files; keep roadmap focused on active next steps.
 
 Last Updated: 2026-04-24
+
+## Public Documentation Boundary
+
+This repository contains public project documentation and reproducible development information. Deployment details, credentials, monitoring configuration, private operational notes, and environment-specific production paths are intentionally excluded from public documentation.
 
 ## Latest Maintenance Log
 

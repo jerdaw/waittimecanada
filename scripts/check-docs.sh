@@ -11,8 +11,12 @@ echo "Running docs quality checks..."
 check_paths=(
   "README.md"
   "CONTRIBUTING.md"
+  "AGENTS.md"
+  "CHANGELOG.md"
+  "SECURITY.md"
   "backend/README.md"
   "backend/docs"
+  "backend/migrations/README.md"
   "frontend/README.md"
   "docs/README.md"
   "docs/API.md"
@@ -20,6 +24,10 @@ check_paths=(
   "docs/getting-started"
   "docs/architecture"
   "docs/development"
+  "docs/operations"
+  "docs/reference"
+  "docs/research"
+  "docs/screenshot-guide.md"
   "docs/planning/README.md"
   "docs/planning/manual-tasks.md"
   "docs/planning/roadmap-process.md"
@@ -33,12 +41,8 @@ mapfile -t all_md_files < <(
 
 exclude_files=(
   "docs/adr/template.md"
-  "docs/REPO_STRUCTURE_PLAN.md"
-  "docs/final-documentation-review.md"
-  "docs/planning/strategic-plan.md"
   "docs/planning/expansion-roadmap.md"
   "docs/planning/competitor-design-analysis.md"
-  "docs/planning/scraper-status-2026-02-04.md"
   "docs/planning/ux-seo-implementation-plan.md"
 )
 
@@ -63,15 +67,15 @@ if [[ ${#md_files[@]} -eq 0 ]]; then
 fi
 
 echo
-echo "[1/3] Checking for absolute file:// links..."
-if rg -n "\\]\\(file://" "${md_files[@]}"; then
+echo "[1/5] Checking for absolute file:// links..."
+if grep -nE "\\]\\(file://" "${md_files[@]}"; then
   failures=1
 else
   echo "OK: no file:// links found."
 fi
 
 echo
-echo "[2/3] Checking for non-human co-author trailers..."
+echo "[2/5] Checking for non-human co-author trailers..."
 mapfile -t text_files < <(
   git ls-files "*.md" "*.txt" "*.rst" | while IFS= read -r file; do
     if [[ -e "${file}" ]]; then
@@ -79,14 +83,23 @@ mapfile -t text_files < <(
     fi
   done
 )
-if rg -n -i "^Co-Authored-By:\\s*.*(claude|codex|gemini|chatgpt|ai assistant|automated tool)" "${text_files[@]}"; then
+if grep -nEi "^Co-Authored-By:[[:space:]]*.*(claude|codex|gemini|chatgpt|ai assistant|automated tool)" "${text_files[@]}"; then
   failures=1
 else
   echo "OK: no non-human co-author trailers found."
 fi
 
 echo
-echo "[3/4] Checking repository-relative markdown links..."
+echo
+echo "[3/5] Checking public documentation boundary terms..."
+if grep -nEi "(OMSAS|CanMEDS|medical school|physician-innovator|application committee|personal statement|Scholar narrative|Leader Role|Professional Role|Scholar Role|Automated Agent|Owner:.*(agent|tool)|Author:.*(agent|tool)|/home/jer|/mnt/|tailscale|direct-vps|direct VPS|shared VPS|platform-ops|/etc/projects-merge|Neon|Netlify|Caddy|systemd|Pushover|PUSHOVER|private ip)" "${md_files[@]}"; then
+  failures=1
+else
+  echo "OK: no public-boundary marker terms found."
+fi
+
+echo
+echo "[4/5] Checking repository-relative markdown links..."
 while IFS= read -r file; do
   file_dir="$(dirname "${file}")"
 
@@ -126,7 +139,7 @@ while IFS= read -r file; do
 done < <(printf "%s\n" "${md_files[@]}")
 
 echo
-echo "[4/4] Checking roadmap consistency..."
+echo "[5/5] Checking roadmap consistency..."
 if python3 backend/scripts/verify_roadmap_consistency.py; then
   echo "OK: roadmap consistency checks passed."
 else

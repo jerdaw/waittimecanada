@@ -26,10 +26,10 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-2xl font-semibold mb-4">Overview</h2>
             <p className="text-foreground/90 leading-relaxed">
-              Wait Time Canada is a health systems observatory and portfolio
-              project that collects publicly available emergency room wait time
-              data from official provincial health authority websites. We are
-              committed to transparency in our data handling practices.
+              Wait Time Canada is a health systems observatory that collects
+              publicly available emergency room wait time data from official
+              provincial health authority websites. We are committed to
+              transparency in our data handling practices.
             </p>
           </section>
 
@@ -196,10 +196,10 @@ export default function PrivacyPage() {
             </div>
           </section>
 
-          {/* PIPEDA and PHIPA Compliance */}
+          {/* Canadian privacy-law context */}
           <section>
             <h2 className="text-2xl font-semibold mb-4">
-              Canadian Privacy Law Compliance
+              Canadian Privacy-Law Context
             </h2>
             <div className="text-foreground/90 space-y-3">
               <p className="leading-relaxed">
@@ -282,7 +282,7 @@ export default function PrivacyPage() {
                   app can estimate a coarse location.
                 </li>
                 <li>
-                  <strong>Neon PostgreSQL:</strong> Database hosting for public
+                  <strong>PostgreSQL hosting:</strong> Database hosting for public
                   wait-time and resource data. Data is encrypted at rest and in
                   transit.
                 </li>
@@ -393,9 +393,9 @@ export default function PrivacyPage() {
                 Important Disclaimer
               </h3>
               <p className="text-amber-800 dark:text-amber-300 leading-relaxed">
-                This is a data observatory and portfolio project, not a medical
-                service. For medical emergencies, call 911. For health advice,
-                contact your provincial health line (811 in most provinces).
+                This is a data observatory, not a medical service. For medical
+                emergencies, call 911. For health advice, contact your
+                provincial health line (811 in most provinces).
               </p>
             </div>
           </section>

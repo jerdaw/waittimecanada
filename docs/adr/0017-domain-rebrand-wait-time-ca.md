@@ -10,14 +10,16 @@ Technical Story: `docs/planning/roadmap.md` (deployment posture) + rebrand imple
 
 ## Context and Problem Statement
 
-The project needs to align public-facing branding and canonical URLs with the new domain `wait-time.ca` while preserving existing repository identifiers and legacy inbound links. At the same time, public hosting is intermittently unavailable due to cost-control posture (Netlify project paused).
+The project needs to align public-facing branding and canonical URLs with the
+domain `wait-time.ca` while preserving existing repository identifiers and
+legacy inbound links.
 
 ## Decision Drivers
 
 * Canonical domain clarity for SEO, citations, and exports
 * Preserve continuity for existing links (legacy domains, GitHub repo slug)
 * Minimal operational risk (safe redirects, explicit deployment posture)
-* Cost control (public hosting can be intentionally offline)
+* Cost control for non-essential deployment activity
 
 ## Considered Options
 
@@ -38,7 +40,7 @@ Chosen option: "Keep the product name human-readable (Wait Time Canada), and tre
 ### Negative Consequences
 
 * Requires coordinated external configuration (DNS, hosting, secrets)
-* While public hosting is paused, the canonical domain cutover remains staged and must be treated as on hold
+* Canonical domain changes require deployment coordination outside this ADR
 
 ## Pros and Cons of the Options
 
@@ -64,4 +66,5 @@ Implementation includes:
 
 - Canonical base URL support via `NEXT_PUBLIC_BASE_URL` for metadata/sitemap/robots
 - Legacy host redirects at the edge (Next.js middleware) when hosting is active
-- Documentation/roadmap explicitly marking the Netlify paused posture and the March 9, 2026 target to re-enable public hosting
+- Documentation and roadmap updates that treat deployment coordination as
+  environment-specific maintainer work

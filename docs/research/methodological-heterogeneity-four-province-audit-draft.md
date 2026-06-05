@@ -146,7 +146,7 @@ This draft has several important limitations:
 - Provincial methodology labels are inferred from current public documentation and source behavior; undocumented source changes could alter the interpretation.
 - Coverage is limited to the four live provinces in the current platform.
 - The platform's own quality window metrics are operational snapshots, not long-horizon epidemiologic findings.
-- This draft has not yet had the external read-through called for in the admissions-strengthening plan.
+- This draft has not yet had an external public-interest methodology review.
 
 ## Conclusion
 

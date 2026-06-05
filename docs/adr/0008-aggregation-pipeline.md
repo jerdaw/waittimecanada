@@ -19,7 +19,7 @@ without forcing every analytics query to scan the full raw measurement table?
 ## Decision Drivers
 
 * Need efficient long-range analytics even when raw measurements are preserved
-* Need for long-range trend analysis (Scholar narrative)
+* Need for long-range trend analysis and methodology transparency
 * Research-grade data export requires extended date ranges
 * Must preserve ontology metadata for comparability analysis
 

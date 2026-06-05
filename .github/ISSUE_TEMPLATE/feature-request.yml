@@ -27,16 +27,16 @@ body:
       required: true
 
   - type: dropdown
-    id: competency
+    id: public_impact
     attributes:
-      label: CanMEDS Competency (Optional)
-      description: Which competency does this align with?
+      label: Public Impact (Optional)
+      description: Which public-interest goal does this align with?
       options:
-        - Scholar
-        - Professional
-        - Health Advocate
-        - Leader
-        - Collaborator
+        - Methodology transparency
+        - Data quality
+        - Access and equity
+        - Public health resources
+        - Developer experience
         - Not applicable
     validations:
       required: false

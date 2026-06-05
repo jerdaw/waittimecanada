@@ -3,7 +3,7 @@
 Wait Time Canada is structured as a data observatory pipeline:
 
 1. Provincial source pages are scraped by backend jobs.
-2. Measurements are stored with strict ontology metadata in Neon PostgreSQL.
+2. Measurements are stored with strict ontology metadata in PostgreSQL.
 3. Aggregation and quality services derive analytics-ready summaries.
 4. Next.js server routes expose read APIs for map, methods, data-quality, and analytics views.
 

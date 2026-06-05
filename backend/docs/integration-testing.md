@@ -19,9 +19,8 @@ Integration tests cover:
 ### Prerequisites
 
 1. **PostgreSQL Database**: You need access to a PostgreSQL database
-   - Can use your existing Neon database
    - Recommended: Create a separate test database
-   - Alternative: Use local PostgreSQL instance
+   - Alternative: Use a local PostgreSQL instance
 
 2. **Environment Variable**: Set `DATABASE_URL` with connection string
    ```bash
@@ -62,12 +61,11 @@ uv run pytest -m "not integration"
 
 ## Test Database Setup
 
-### Option 1: Use Neon Test Database (Recommended)
+### Option 1: Use Hosted PostgreSQL Test Database (Recommended)
 
-1. Go to [Neon Console](https://console.neon.tech)
-2. Create a new database called `waittimecanada_test`
-3. Copy the connection string
-4. Set environment variable:
+1. Create a dedicated hosted test database called `waittimecanada_test`
+2. Copy the connection string
+3. Set environment variable:
    ```bash
    export DATABASE_URL="postgresql://user@host/waittimecanada_test"
    ```
@@ -290,7 +288,7 @@ export DATABASE_URL="postgresql://user@host/database"
 **Solution:**
 - Use `db_transaction` fixture instead of `clean_database` for faster tests
 - Run fewer integration tests in development
-- Use local PostgreSQL instead of remote Neon database for faster network
+- Use local PostgreSQL instead of a remote database for faster network
 
 ## Best Practices
 

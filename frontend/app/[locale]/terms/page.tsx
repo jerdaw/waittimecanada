@@ -38,11 +38,10 @@ export default function TermsPage() {
             <div className="text-foreground/90 space-y-3">
               <p className="leading-relaxed">
                 Wait Time Canada is a{" "}
-                <strong>health systems observatory</strong> and portfolio
-                project developed for medical school application purposes. It
-                collects publicly available emergency room wait time data from
-                official provincial health authority websites and analyzes
-                methodology differences across provinces.
+                <strong>health systems observatory</strong> that collects
+                publicly available emergency room wait time data from official
+                provincial health authority websites and analyzes methodology
+                differences across provinces.
               </p>
               <p className="leading-relaxed font-medium text-amber-700 dark:text-amber-400">
                 This is an independent research project, not an official
@@ -307,7 +306,8 @@ export default function TermsPage() {
             </h2>
             <div className="text-foreground/90">
               <p className="leading-relaxed">
-                As a portfolio project, we reserve the right to:
+                As an independent public-interest project, we reserve the right
+                to:
               </p>
               <ul className="list-disc ml-6 space-y-1">
                 <li>Modify, suspend, or discontinue the service at any time</li>

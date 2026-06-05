@@ -2,7 +2,7 @@
 
 ## Overview
 
-- Engine: PostgreSQL (Neon)
+- Engine: PostgreSQL
 - Migration source: `backend/migrations/`
 - Core strategy: strict ontology metadata + verifiable provenance + 30-day raw retention + permanent aggregate summaries
 

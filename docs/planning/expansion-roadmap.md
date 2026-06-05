@@ -24,7 +24,7 @@ Before moving to the next province, the current province must have:
 1. **Largest population** - 15M people, most impact
 2. **Best data availability** - Health Ontario publishes structured data
 3. **Geographic proximity** - Ottawa-Gatineau comparison (vs Quebec)
-4. **Portfolio narrative** - "Started with home province"
+4. **Project narrative** - "Started with home province"
 
 **Target URL:**
 - https://www.ontariohealth.ca/our-work/programs/ontario-wait-times
@@ -204,4 +204,4 @@ Use this for each new province:
 - **Don't build all scrapers at once** - Risk of none working well
 - **Validate data quality early** - Better to catch issues with 1 province
 - **User feedback loop** - Get feedback on Ontario before expanding
-- **Portfolio narrative** - "Started local, expanded methodically" is stronger than "tried to do everything"
+- **Project narrative** - "Started local, expanded methodically" is stronger than "tried to do everything"

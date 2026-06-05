@@ -7,19 +7,19 @@ This guide documents the supported local development workflow for Wait Time Cana
 - Python 3.12+
 - Node.js 22+
 - npm
-- Neon PostgreSQL connection string (`DATABASE_URL`)
+- PostgreSQL connection string (`DATABASE_URL`)
 - Mapbox public token (`NEXT_PUBLIC_MAPBOX_TOKEN`)
 
-## Recommended Hosted Database
+## Recommended Database
 
-The default documented database path for this project is Neon PostgreSQL:
+The documented database path for this project is standard PostgreSQL:
 
-1. create a Neon project
-2. copy the pooled Postgres connection string
+1. create or choose a PostgreSQL database for development
+2. copy the connection string
 3. export it in your shell as `DATABASE_URL` before backend commands
 
-The application and migrations use standard Postgres, so this remains portable,
-but Neon is the supported quick-start path.
+The application and migrations use standard PostgreSQL features, so local and
+hosted development databases are both supported.
 
 ## 1. Clone and Configure Environment Files
 

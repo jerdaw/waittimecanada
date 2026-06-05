@@ -134,7 +134,7 @@ WHERE m.id = d.id;
 
 ## Best Practices
 
-1. **Keep cleanup running regularly** so storage stays within the Neon tier.
+1. **Keep cleanup running regularly** so storage stays within the configured database tier.
 2. **Monitor storage regularly**: use database size checks and measurement age stats.
 3. **Use explicit aggregation runs when needed** instead of forcing broad backfills into every storage-maintenance run.
 4. **Use `--dry-run` before changing the retention window**.
@@ -176,7 +176,7 @@ echo $DATABASE_URL
 
 If cleanup deletes data you needed:
 
-1. **Restore from database backup** (Neon provides point-in-time recovery)
+1. **Restore from database backup** (use the configured PostgreSQL provider's recovery tooling)
 2. **Re-run scrapers** to collect fresh data
 3. Historical raw rows older than the retention window are not recoverable without backup restore
 
@@ -195,7 +195,7 @@ python -m waittime.cli.cleanup --retention-days 60
 ```
 
 ```yaml
-# In GitHub Actions or systemd, run the cleanup CLI on a schedule
+# Run the cleanup CLI on an environment-appropriate schedule
 ```
 
 **Default policy**: retain raw measurements for 30 days

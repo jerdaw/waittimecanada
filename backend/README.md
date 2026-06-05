@@ -5,7 +5,7 @@ Python backend for scraping, ontology enforcement, aggregation, and operational 
 ## Stack
 
 - Python 3.12+
-- Neon PostgreSQL
+- PostgreSQL
 - `psycopg2-binary`, `pydantic`, `structlog`, `tenacity`
 - `pytest`, `ruff`, `mypy`
 
@@ -116,5 +116,5 @@ Migrations live in `backend/migrations/`.
 - `docs/architecture/api.md`
 - `docs/planning/roadmap.md`
 - `docs/adr/0002-metric-ontology.md`
-- `docs/operations/direct-vps-backend.md`
-- `backend/systemd/README.md`
+- `docs/operations/QUICK_START.md`
+- `docs/operations/scraper-scheduling.md`
