@@ -62,11 +62,15 @@ These documents are retained for context and may not match current implementatio
 3. Archive implementation plans once a milestone is delivered and no longer actively edited.
 4. Keep completed milestone details in archived files; keep roadmap focused on active next steps.
 
-Last Updated: 2026-04-24
+Last Updated: 2026-06-05
 
 ## Public Documentation Boundary
 
 This repository contains public project documentation and reproducible development information. Deployment details, credentials, monitoring configuration, private operational notes, and environment-specific production paths are intentionally excluded from public documentation.
+
+Durable private project and operations notes live in the private/shared
+operations source of truth. Ignored `private/` folders may be local working
+copies only and should not be treated as the durable record.
 
 ## Latest Maintenance Log
 

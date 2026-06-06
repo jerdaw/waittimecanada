@@ -11,13 +11,14 @@ Technical Story: Public repository cleanup and long-term documentation hygiene
 ## Context and Problem Statement
 
 Wait Time Canada is public, but some historical notes mixed public project
-documentation with private operating details, personal planning material, and
-environment-specific runbooks. That made the public documentation harder to
-maintain and increased the chance that future contributors would accidentally
-publish sensitive operational context or stale non-product planning notes.
+documentation with private/shared operations material, personal planning
+material, and environment-specific runbooks. That made the public documentation
+harder to maintain and increased the chance that future contributors would
+accidentally publish sensitive operational context or stale non-product
+planning notes.
 
 The repository needs a durable boundary between public, reproducible project
-documentation and private maintainer material.
+documentation and private/shared operations material.
 
 ## Decision Drivers
 
@@ -25,7 +26,8 @@ documentation and private maintainer material.
   public sources, and local development
 * Keep credentials, private runbooks, deployment paths, alerting setup, and
   personal planning material out of tracked public docs
-* Preserve historical/private material locally without committing it
+* Preserve historical/private material in the private/shared operations source
+  of truth without committing it to this public repo
 * Keep emergency disclaimers, source attribution, and methodology caveats
   visible and current
 * Ensure only human contributors are listed as authors or co-authors
@@ -34,15 +36,17 @@ documentation and private maintainer material.
 
 * Leave historical and operational notes in public docs with warning banners
 * Delete private or stale material outright
-* Move private or stale material under ignored local `private/` paths and keep
-  the public docs focused on reproducible project information
+* Move private or stale material to a durable private/shared operations source,
+  with ignored local `private/` folders allowed only as convenience copies, and
+  keep the public docs focused on reproducible project information
 
 ## Decision Outcome
 
-Chosen option: move private or stale material under ignored local `private/`
-paths and keep the public docs focused on reproducible project information.
-This preserves local historical context while reducing the public repository's
-operational exposure and maintenance burden.
+Chosen option: move private or stale material to the private/shared operations
+source of truth, keep ignored local `private/` folders only as optional
+convenience copies, and keep the public docs focused on reproducible project
+information. This preserves maintainer context while reducing the public
+repository's operational exposure and maintenance burden.
 
 ### Positive Consequences
 
@@ -50,16 +54,18 @@ operational exposure and maintenance burden.
   development, data limitations, and contributor guidance
 * Private runbooks, exact environment paths, and alerting configuration are not
   published as active project documentation
-* Historical notes remain available locally for the maintainer
+* Historical notes remain available through the private/shared operations
+  source of truth
 * The roadmap remains the single public status entry point
 * Human-only authorship policy is explicit in shared agent guidance
 
 ### Negative Consequences
 
 * Some historical implementation notes are no longer browsable in public docs
-* Maintainer-only recovery details require access to the ignored private copy
+* Maintainer-only recovery details require access to the private/shared
+  operations source of truth
 * Future documentation changes must check whether material belongs in public
-  docs or private maintainer notes
+  docs or private/shared operations material
 
 ## Public Documentation Rules
 

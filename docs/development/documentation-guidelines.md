@@ -23,6 +23,12 @@ Update docs in the same PR when changing:
 - Use repository-relative links (for example, `docs/planning/roadmap.md`).
 - Never use absolute local paths or `file://` links.
 - Prefer stable links to source-of-truth docs over duplicate explanations.
+- Keep private project and operations notes in the private/shared operations
+  source of truth. Ignored local `private/` folders may exist as convenience
+  copies only and are not durable documentation.
+- Do not commit actual secrets; credentials, API keys, webhook secrets,
+  database URLs with credentials, and private keys stay in Bitwarden or
+  deployment environments.
 
 ## Active vs Historical Docs
 

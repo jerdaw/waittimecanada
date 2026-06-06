@@ -24,7 +24,8 @@ Completed foundations:
 - Quebec stretcher-occupancy capture and historical occupancy trends
 - Ontario-first public-health resources module with source caveats
 - Privacy, terms, citation metadata, security policy, and contributor guidance
-- Public documentation boundary cleanup with private maintainer-note segregation
+- Public documentation boundary cleanup with private notes moved to the
+  private/shared operations source of truth
 
 ## Public Documentation Boundary
 

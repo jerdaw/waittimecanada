@@ -45,6 +45,8 @@ This is the **Wait Time Canada** project - a "Health Systems Observatory" design
 
 **Public documentation boundary:** Wait Time Canada app behavior, reproducible local development, methodology, limitations, and public source documentation belong in this repo. Deployment details, credentials, monitoring configuration, private operational notes, and environment-specific production paths are intentionally excluded from public documentation.
 
+**Private notes durability:** Durable private project and operations notes live in the private/shared operations source of truth, not this public repo. Ignored `private/` folders may exist as local convenience copies only and are not the durable record. Actual secrets remain in Bitwarden or deployment environments.
+
 **Current Architecture:**
 - **Database**: PostgreSQL (sources, hospitals, measurements, scraper_status, scraper_alert_state, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions, public_data_sources, resource_locations, public_health_alerts, public_health_source_alert_state)
 - **Backend**: Python 3.12+ with psycopg2, pytest

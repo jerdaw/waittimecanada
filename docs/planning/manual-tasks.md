@@ -27,5 +27,7 @@ from public documentation.
 - Public docs avoid private hostnames, paths, credentials, runbooks, and
   personal strategy notes.
 - Source attribution links point to official provincial or federal sources.
-- Any private maintainer notes remain under ignored `private/` paths or are
-  stored through an intentional encryption workflow.
+- Durable private project notes live in the private/shared operations source
+  of truth; ignored `private/` folders may exist locally only as convenience
+  copies.
+- Actual secrets remain in Bitwarden or deployment environments, not Git.
