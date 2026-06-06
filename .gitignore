@@ -97,6 +97,8 @@ secrets/
 key.txt
 
 # Local/private maintainer notes. Do not commit plaintext private notes.
+/private
+/.private-local-backups/
 private/**
 !private/**/
 private/**/*.md
