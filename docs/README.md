@@ -15,7 +15,7 @@ This directory is the documentation control plane for Wait Time Canada.
 - ADRs: `docs/adr/`
 - Public operations quick start: `docs/operations/QUICK_START.md`
 - Public source-freshness model: `docs/operations/scraper-scheduling.md`
-- Latest maintenance log: `docs/planning/archive/maintenance-2026-04-23.md`
+- Latest maintenance log: `docs/planning/archive/maintenance-2026-06-12-autonomous-stewardship.md`
 - Development setup: `docs/development/setup.md`
 - Testing standards: `docs/development/testing-guidelines.md`
 - Documentation standards: `docs/development/documentation-guidelines.md`
@@ -27,17 +27,13 @@ This directory is the documentation control plane for Wait Time Canada.
 - Active milestone plans: `docs/planning/implementation/`
 - Archived plans: `docs/planning/archive/`
 
-## Historical Snapshots
-
-- `docs/REPO_STRUCTURE_PLAN.md`
-- `docs/REPO_STRUCTURE_PLAN.md`
-
-These files are retained for historical context and may include superseded details.
-
 ## Public Research and Stakeholder Materials
 
 - Screenshot guide: `docs/screenshot-guide.md`
 - Stakeholder toolkit: `docs/stakeholder-interviews/`
+- Methodology research draft: `docs/research/methodological-heterogeneity-four-province-audit-draft.md`
+- Export methodology interpretation guide: `docs/research/export-methodology-interpretation-guide.md`
+- Divergence case study: `docs/case-studies/ottawa-gatineau-divergence.md`
 
 ## Public Documentation Boundary
 

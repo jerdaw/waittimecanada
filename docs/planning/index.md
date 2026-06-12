@@ -14,8 +14,7 @@ This section contains the project planning control plane.
 ## Active Planning Docs
 
 - `docs/planning/roadmap.md`
-- `docs/planning/public-health-data-hub-freshness-safety-rules.md`
-- `docs/planning/public-health-data-hub-metadata-contract.md`
+- `docs/planning/manual-tasks.md`
 
 ## Public Documentation Boundary
 
@@ -36,22 +35,12 @@ This repository contains public project documentation and reproducible developme
 ## Archived Public Health Hub Batch A Planning Docs
 
 - `docs/planning/implementation/archived/public-health-data-hub-batch-a-plan.md`
-- `docs/planning/archive/public-health-data-hub-preplan.md`
 - `docs/planning/archive/public-health-data-hub-decision-brief.md`
 - `docs/planning/archive/public-health-data-hub-identity-memo.md`
-- `docs/planning/archive/public-health-data-hub-batch-a-handoff.md`
-- `docs/planning/archive/public-health-data-hub-agent-execution-readiness.md`
-- `docs/planning/archive/public-health-data-hub-execution-order.md`
+- `docs/planning/archive/public-health-data-hub-municipal-inspection-pilot-decision.md`
 
 ## Maintenance Logs
 
+- `docs/planning/archive/maintenance-2026-06-12-autonomous-stewardship.md`
+- `docs/planning/archive/maintenance-2026-06-04-public-docs-cleanup.md`
 - `docs/planning/archive/maintenance-2026-04-24.md`
-- `docs/planning/archive/maintenance-2026-04-23.md`
-- `docs/planning/archive/maintenance-2026-04-18.md`
-- `docs/planning/archive/maintenance-2026-04-17.md`
-- `docs/planning/archive/maintenance-2026-04-15.md`
-- `docs/planning/archive/maintenance-2026-04-09.md`
-- `docs/planning/archive/maintenance-2026-04-01.md`
-- `docs/planning/archive/maintenance-2026-03-28.md`
-- `docs/planning/archive/maintenance-2026-03-27.md`
-- `docs/planning/archive/maintenance-2026-03-26.md`
