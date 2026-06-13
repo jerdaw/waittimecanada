@@ -17,7 +17,8 @@ from public documentation.
 - [ ] Restore scheduled operational workflows after GitHub Actions quota resets;
   use manual dispatch in the meantime.
 - [ ] Pilot ADR-0027 CI offload with heartbeat/status checks on a trusted
-  runner, keeping GitHub manual dispatch as fallback.
+  runner using `docs/operations/heartbeat-offload-pilot.md`, keeping GitHub
+  manual dispatch as fallback.
 - [ ] Before moving scraper cron or public-health ingest off GitHub, document
   runner isolation, secret handling, log retention, failure summaries, and
   rollback steps in the private/shared operations source of truth.
