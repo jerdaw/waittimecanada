@@ -224,6 +224,7 @@ Existing public historical plans retained for context:
 
 - `docs/planning/archive/maintenance-2026-06-04-public-docs-cleanup.md`
 - `docs/planning/archive/maintenance-2026-06-12-autonomous-stewardship.md`
+- `docs/planning/archive/heartbeat-offload-pilot-scaffold-2026-06-13.md`
 - `docs/planning/archive/milestone-17-quebec-occupancy.md`
 - `docs/planning/archive/milestone-18-occupancy-frontend.md`
 - `docs/planning/archive/milestone-23-quality-standardization.md`
