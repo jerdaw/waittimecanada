@@ -16,8 +16,11 @@ from public documentation.
   roadmap, and planning indexes keep the same current-state baseline.
 - [ ] Restore scheduled operational workflows after GitHub Actions quota resets;
   use manual dispatch in the meantime.
-- [ ] Evaluate GitHub Actions quota mitigation: external CI, self-hosted GitHub
-  runners, Forgejo Actions on the NAS, and narrower manual-dispatch lanes.
+- [ ] Pilot ADR-0027 CI offload with heartbeat/status checks on a trusted
+  runner, keeping GitHub manual dispatch as fallback.
+- [ ] Before moving scraper cron or public-health ingest off GitHub, document
+  runner isolation, secret handling, log retention, failure summaries, and
+  rollback steps in the private/shared operations source of truth.
 - [ ] Capture updated demo screenshots after major frontend changes.
 - [ ] Refresh public case studies when source methodology or displayed examples
   change.
