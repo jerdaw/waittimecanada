@@ -50,8 +50,9 @@ paths are intentionally excluded from public documentation.
   aggregates for long-term analysis.
 - Use manual-dispatch operational workflows while scheduled GitHub Actions
   triggers are paused for free-tier quota conservation.
-- Evaluate a CI/offload strategy that reduces GitHub Actions minute burn while
-  preserving GitHub as the public repository and keeping secrets/logs isolated.
+- Implement the ADR-0027 hybrid CI/offload strategy: keep public PR/push gates
+  on GitHub, offload trusted recurring operational jobs incrementally, and keep
+  manual GitHub dispatch as a rollback path.
 
 ### Next
 
@@ -82,13 +83,12 @@ paths are intentionally excluded from public documentation.
   end-event, and statistic-type matching as the direct-comparison rule.
 - [ ] **P1 / Maintain source freshness:** Keep source status and data-quality
   reporting explicit without exposing private monitoring configuration.
+- [ ] **P1 / Implement CI offload pilot:** Follow ADR-0027 by piloting
+  heartbeat/status checks on a trusted offloaded runner before moving scraper
+  cron, public-health ingest, quality snapshots, or smoke checks.
 - [ ] **P1 / Restore scheduled workflow cadence:** Re-enable scraper,
-  heartbeat, snapshot, public-health ingest, and smoke schedules when GitHub
-  Actions quota permits.
-- [ ] **P1 / Evaluate CI offload from GitHub Actions:** Compare keeping GitHub
-  with an external CI service, self-hosted GitHub runners, Forgejo Actions on
-  the NAS, and narrower manual GitHub Actions lanes before choosing a migration
-  path.
+  heartbeat, snapshot, public-health ingest, and smoke schedules through the
+  offloaded runner path, keeping GitHub manual dispatch as fallback.
 
 ### Next
 
@@ -96,6 +96,9 @@ paths are intentionally excluded from public documentation.
   export examples with complete source attribution and limitations.
 - [ ] **P1 / Select resource expansion carefully:** Add public-health resource
   sources only when official, reusable, and clearly caveated.
+- [ ] **P1 / Harden offloaded operations:** Document runner isolation, secret
+  handling, log retention, failure summaries, and rollback procedures before
+  moving each secret-bearing workflow.
 - [ ] **P2 / Maintain public docs boundary:** Keep local setup, API contracts,
   and methodology docs reproducible and free of private operational details.
 
@@ -105,9 +108,9 @@ paths are intentionally excluded from public documentation.
   source stability supports responsible ingestion.
 - [ ] **P2 / Explore smarter scheduling:** Reduce unnecessary upstream load
   while preserving public freshness expectations.
-- [ ] **P2 / Document CI migration decision:** If CI is moved or split, capture
-  the chosen runner/service model, threat model, secret handling, log retention,
-  cost expectations, and rollback path in an ADR or operations note.
+- [ ] **P2 / Reassess external CI or full Forgejo migration:** Revisit broader
+  CI migration only if the hybrid offload pilot does not meet cost, reliability,
+  or operational-safety expectations.
 
 ## Roadmap Operating Model
 
@@ -193,6 +196,7 @@ paths are intentionally excluded from public documentation.
 | [0024](../adr/0024-ontario-naloxone-link-out-posture.md) | Ontario naloxone link-out posture |
 | [0025](../adr/0025-data-quality-scrape-window-and-runtime-env-contracts.md) | Data-quality scrape-window and runtime env contracts |
 | [0026](../adr/0026-public-documentation-boundary.md) | Public documentation boundary and private maintainer-note handling |
+| [0027](../adr/0027-hybrid-ci-offload-strategy.md) | Hybrid CI/offload strategy for GitHub Actions quota pressure |
 
 ## Future Work
 
@@ -204,8 +208,8 @@ paths are intentionally excluded from public documentation.
   source-validated additions with clear caveats.
 - Research outputs: maintain case studies, export interpretation guidance, and
   exported datasets with complete methodology labels and source attribution.
-- CI/runtime cost control: evaluate alternatives to GitHub-hosted Actions for
-  heavy recurring workloads while preserving GitHub as the public collaboration
+- CI/runtime cost control: implement ADR-0027 by offloading trusted recurring
+  operations incrementally while preserving GitHub as the public collaboration
   surface.
 
 ## Implementation Plan References
