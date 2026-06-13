@@ -12,8 +12,12 @@ from public documentation.
 - [ ] Re-run public documentation boundary review before major releases.
 - [ ] Re-run methodology documentation review after any provincial reporting
   change.
+- [ ] Re-run public status alignment after each completed milestone so README,
+  roadmap, and planning indexes keep the same current-state baseline.
 - [ ] Restore scheduled operational workflows after GitHub Actions quota resets;
   use manual dispatch in the meantime.
+- [ ] Evaluate GitHub Actions quota mitigation: external CI, self-hosted GitHub
+  runners, Forgejo Actions on the NAS, and narrower manual-dispatch lanes.
 - [ ] Capture updated demo screenshots after major frontend changes.
 - [ ] Refresh public case studies when source methodology or displayed examples
   change.

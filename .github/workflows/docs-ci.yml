@@ -3,25 +3,49 @@ name: Docs CI
 on:
   pull_request:
     paths:
-      - "README.md"
-      - "CONTRIBUTING.md"
-      - "backend/README.md"
-      - "frontend/README.md"
+      - "**/*.md"
+      - "**/*.txt"
+      - "**/*.rst"
+      - "**/*.py"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.js"
+      - "**/*.jsx"
+      - "**/*.json"
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "**/*.sh"
+      - "**/*.sql"
+      - "**/*.css"
+      - "**/*.html"
+      - "**/*.csv"
+      - "**/*.toml"
+      - "**/*.ini"
+      - "**/*.cfg"
       - "docs/**"
-      - "scripts/check-docs.sh"
-      - "backend/scripts/verify_roadmap_consistency.py"
-      - ".github/workflows/docs-ci.yml"
   push:
     branches: [main]
     paths:
-      - "README.md"
-      - "CONTRIBUTING.md"
-      - "backend/README.md"
-      - "frontend/README.md"
+      - "**/*.md"
+      - "**/*.txt"
+      - "**/*.rst"
+      - "**/*.py"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.js"
+      - "**/*.jsx"
+      - "**/*.json"
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "**/*.sh"
+      - "**/*.sql"
+      - "**/*.css"
+      - "**/*.html"
+      - "**/*.csv"
+      - "**/*.toml"
+      - "**/*.ini"
+      - "**/*.cfg"
       - "docs/**"
-      - "scripts/check-docs.sh"
-      - "backend/scripts/verify_roadmap_consistency.py"
-      - ".github/workflows/docs-ci.yml"
   workflow_dispatch:
 
 concurrency:
@@ -33,5 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - name: Run docs quality checks
         run: bash scripts/check-docs.sh

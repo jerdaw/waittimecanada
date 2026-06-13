@@ -2,7 +2,7 @@
 
 **Created:** 2026-03-27
 **Status:** Historical planning baseline. Batch A is delivered and later Ontario additions are live; use `docs/API.md` and `docs/architecture/*` for the current shipped contract.
-**Related:** `docs/planning/archive/public-health-data-hub-batch-a-handoff.md`
+**Related:** [Batch A implementation plan](implementation/archived/public-health-data-hub-batch-a-plan.md), [decision brief](archive/public-health-data-hub-decision-brief.md)
 
 ---
 

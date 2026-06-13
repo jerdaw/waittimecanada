@@ -96,22 +96,27 @@ def check_implementation_plans(roadmap_path: Path, repo_root: Path) -> tuple[boo
     return True, f"✓ All {len(references)} referenced implementation plans exist"
 
 
-def check_milestone_completion_consistency(roadmap_path: Path) -> tuple[bool, str]:
-    """Verify completed milestones in table match milestone list."""
-    content = roadmap_path.read_text()
-
-    # Find the completed milestones table
+def _completed_milestones_table(content: str) -> str | None:
+    """Extract only the Completed Milestones table body."""
     table_section = re.search(
         r"## Completed Milestones\s*\n\s*\| Milestone \| Summary \|\s*\n\s*\|[-|]+\|\s*\n((?:\| \*\*M\d+:.*\n)+)",
         content,
         re.MULTILINE,
     )
-
     if not table_section:
+        return None
+    return table_section.group(1)
+
+
+def check_milestone_completion_consistency(roadmap_path: Path) -> tuple[bool, str]:
+    """Verify completed milestones in table match milestone list."""
+    content = roadmap_path.read_text()
+
+    table_content = _completed_milestones_table(content)
+    if not table_content:
         return False, "Could not find Completed Milestones table"
 
     # Extract milestone numbers from table
-    table_content = table_section.group(1)
     table_milestones = set(re.findall(r"\*\*M(\d+):", table_content))
 
     # Check if milestone descriptions exist (basic sanity check)
@@ -124,38 +129,138 @@ def check_milestone_completion_consistency(roadmap_path: Path) -> tuple[bool, st
     return True, f"✓ Found {len(table_milestones)} completed milestones"
 
 
-def check_status_summary_freshness(roadmap_path: Path) -> tuple[bool, str]:
-    """Verify Current Status section mentions latest completed work."""
-    content = roadmap_path.read_text()
-
-    # Find Current Status section
+def _extract_roadmap_status(content: str) -> tuple[str, str] | None:
+    """Extract roadmap Current Status date and progress text."""
     status_match = re.search(
-        r"## Current Status \(Updated ([\d-]+)\)\s*\n\s*\*\*Progress:\*\* (.+?)(?=\n\n|\*\*)",
+        r"## Current Status \(Updated ([^)]+)\)\s*\n\s*\*\*Progress:\*\* (.+?)(?=\n\n|\*\*|\Z)",
         content,
         re.DOTALL,
     )
 
     if not status_match:
-        return False, "Could not find 'Current Status' section"
+        return None
 
     update_date = status_match.group(1)
     progress_text = status_match.group(2)
+    return update_date, progress_text
+
+
+def _latest_completed_milestone(content: str) -> int | None:
+    """Return the highest completed milestone number from roadmap content."""
+    table_content = _completed_milestones_table(content)
+    if not table_content:
+        return None
+    completed_milestones = [int(value) for value in re.findall(r"\*\*M(\d+):", table_content)]
+    if not completed_milestones:
+        return None
+    return max(completed_milestones)
+
+
+def check_status_summary_freshness(roadmap_path: Path) -> tuple[bool, str]:
+    """Verify Current Status section mentions latest completed work."""
+    content = roadmap_path.read_text()
+
+    status = _extract_roadmap_status(content)
+    if not status:
+        return False, "Could not find 'Current Status' section"
+
+    update_date, progress_text = status
 
     # Verify date is in YYYY-MM-DD format
-    if not re.match(r"\d{4}-\d{2}-\d{2}", update_date):
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", update_date):
         return False, f"Current Status date '{update_date}' is not in YYYY-MM-DD format"
 
-    # Check that major completed milestones are mentioned
-    expected_keywords = ["Milestone 14", "Milestone 15"]
-    missing_keywords = [kw for kw in expected_keywords if kw not in progress_text]
+    latest_milestone = _latest_completed_milestone(content)
+    if latest_milestone is None:
+        return False, "Could not determine latest completed milestone"
 
-    if missing_keywords:
+    expected_keywords = [f"Milestone {latest_milestone}", f"M{latest_milestone}"]
+
+    if not any(keyword in progress_text for keyword in expected_keywords):
         return (
             False,
-            f"Current Status may be stale - doesn't mention: {', '.join(missing_keywords)}",
+            f"Current Status may be stale - doesn't mention latest completed milestone M{latest_milestone}",
         )
 
-    return True, f"✓ Current Status updated {update_date} and mentions recent milestones"
+    return True, f"✓ Current Status updated {update_date} and mentions latest completed milestone"
+
+
+def check_readme_status_alignment(roadmap_path: Path, repo_root: Path) -> tuple[bool, str]:
+    """Verify README public status dates and latest milestone align with roadmap."""
+    readme_path = repo_root / "README.md"
+    if not readme_path.exists():
+        return False, "README.md not found"
+
+    roadmap_content = roadmap_path.read_text()
+    readme_content = readme_path.read_text()
+
+    roadmap_status = _extract_roadmap_status(roadmap_content)
+    if not roadmap_status:
+        return False, "Could not find roadmap Current Status section"
+    roadmap_date, _progress_text = roadmap_status
+
+    latest_milestone = _latest_completed_milestone(roadmap_content)
+    if latest_milestone is None:
+        return False, "Could not determine latest completed milestone"
+
+    baseline_match = re.search(r"roadmap baseline on \*\*([^*]+)\*\*", readme_content)
+    status_heading_match = re.search(
+        r"^## .*Current Status \(as of ([^)]+)\)",
+        readme_content,
+        re.MULTILINE,
+    )
+
+    if not baseline_match:
+        return False, "README is missing the roadmap baseline date"
+    if not status_heading_match:
+        return False, "README is missing the Current Status date"
+
+    readme_dates = {
+        "baseline": baseline_match.group(1),
+        "current status": status_heading_match.group(1),
+    }
+    malformed_dates = {
+        label: date
+        for label, date in readme_dates.items()
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date)
+    }
+    if malformed_dates:
+        details = ", ".join(f"{label}='{date}'" for label, date in malformed_dates.items())
+        return (
+            False,
+            f"README status dates must use YYYY-MM-DD format: {details}",
+        )
+
+    stale_dates = {label: date for label, date in readme_dates.items() if date != roadmap_date}
+    if stale_dates:
+        details = ", ".join(f"{label}={date}" for label, date in stale_dates.items())
+        return (
+            False,
+            f"README status date mismatch: roadmap={roadmap_date}, {details}",
+        )
+
+    current_status_start = status_heading_match.start()
+    next_h2_match = re.search(
+        r"^## ",
+        readme_content[status_heading_match.end() :],
+        re.MULTILINE,
+    )
+    current_status_end = (
+        status_heading_match.end() + next_h2_match.start() if next_h2_match else len(readme_content)
+    )
+    current_status_section = readme_content[current_status_start:current_status_end]
+    expected_keywords = [f"Milestone {latest_milestone}", f"M{latest_milestone}"]
+
+    if not any(keyword in current_status_section for keyword in expected_keywords):
+        return (
+            False,
+            f"README Current Status may be stale - doesn't mention latest completed milestone M{latest_milestone}",
+        )
+
+    return (
+        True,
+        f"✓ README status dates match roadmap date {roadmap_date} and mention M{latest_milestone}",
+    )
 
 
 def check_roadmap_items_formatting(roadmap_path: Path) -> tuple[bool, str]:
@@ -213,6 +318,7 @@ def main() -> int:
             ("Implementation Plans", check_implementation_plans, (roadmap_path, repo_root)),
             ("Milestone Completion", check_milestone_completion_consistency, (roadmap_path,)),
             ("Status Summary", check_status_summary_freshness, (roadmap_path,)),
+            ("README Status Alignment", check_readme_status_alignment, (roadmap_path, repo_root)),
             ("Roadmap Item Formatting", check_roadmap_items_formatting, (roadmap_path,)),
         ]
 

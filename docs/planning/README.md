@@ -11,8 +11,7 @@ This directory is the planning control plane for Wait Time Canada.
 ## Active Planning Docs
 
 - `docs/planning/roadmap.md`
-- `docs/planning/public-health-data-hub-freshness-safety-rules.md`
-- `docs/planning/public-health-data-hub-metadata-contract.md`
+- `docs/planning/manual-tasks.md`
 
 ## Historical Planning Baselines
 
@@ -29,28 +28,23 @@ This directory is the planning control plane for Wait Time Canada.
 ## Archived Milestone Plans
 
 - `docs/planning/implementation/archived/public-health-data-hub-batch-a-plan.md` (closed, delivered)
-- `docs/planning/archive/public-health-data-hub-preplan.md` (closed, delivered)
 - `docs/planning/archive/public-health-data-hub-decision-brief.md` (closed, delivered)
 - `docs/planning/archive/public-health-data-hub-identity-memo.md` (closed, delivered)
-- `docs/planning/archive/public-health-data-hub-batch-a-handoff.md` (closed, delivered)
-- `docs/planning/archive/public-health-data-hub-agent-execution-readiness.md` (closed, delivered)
-- `docs/planning/archive/public-health-data-hub-execution-order.md` (closed, delivered)
-- `docs/planning/archive/milestone-15-analytics.md` (closed, delivered)
-- `docs/planning/archive/milestone-14-data-quality.md` (closed, delivered)
-- `docs/planning/archive/milestone-13-aggregation.md` (closed, delivered)
+- `docs/planning/archive/public-health-data-hub-municipal-inspection-pilot-decision.md` (closed, delivered)
+- `docs/planning/archive/milestone-17-quebec-occupancy.md` (closed, delivered)
+- `docs/planning/archive/milestone-18-occupancy-frontend.md` (closed, delivered)
+- `docs/planning/archive/milestone-20-reliability-verification.md` (closed, delivered)
+- `docs/planning/archive/milestone-23-quality-standardization.md` (closed, delivered)
+- `docs/planning/archive/milestone-25-reliability-verification.md` (closed, delivered)
+- `docs/planning/archive/milestone-27-operational-observability.md` (closed, delivered)
 - `docs/planning/archive/milestone-28-equity-real-data-ontario.md` (closed, delivered)
 - `docs/planning/archive/milestone-29-equity-academic-rigor-hardening.md` (closed, delivered)
-- `docs/planning/archive/milestone-30-scraper-visibility-reliability.md` (closed, delivered)
 - `docs/planning/archive/task-er-watch-features.md` (closed, delivered)
-- `docs/planning/archive/implementation-plan-m2-ontario.md`
-- `docs/planning/archive/IMPLEMENTATION_PLAN_SUMMARY.md`
-- `docs/planning/archive/REPO_MODERNIZATION_SUMMARY.md`
 
 ## Historical Planning Snapshots
 
 - `docs/planning/expansion-roadmap.md`
 - `docs/planning/competitor-design-analysis.md`
-- `docs/planning/archive/scraper-status-2026-02-04.md`
 - `docs/planning/ux-seo-implementation-plan.md`
 
 These documents are retained for context and may not match current implementation details.
@@ -62,7 +56,7 @@ These documents are retained for context and may not match current implementatio
 3. Archive implementation plans once a milestone is delivered and no longer actively edited.
 4. Keep completed milestone details in archived files; keep roadmap focused on active next steps.
 
-Last Updated: 2026-06-05
+Last Updated: 2026-06-12
 
 ## Public Documentation Boundary
 
@@ -74,8 +68,6 @@ copies only and should not be treated as the durable record.
 
 ## Latest Maintenance Log
 
+- `docs/planning/archive/maintenance-2026-06-12-autonomous-stewardship.md`
+- `docs/planning/archive/maintenance-2026-06-04-public-docs-cleanup.md`
 - `docs/planning/archive/maintenance-2026-04-24.md`
-- `docs/planning/archive/maintenance-2026-04-23.md`
-- `docs/planning/archive/maintenance-2026-04-18.md`
-- `docs/planning/archive/maintenance-2026-04-17.md`
-- `docs/planning/archive/maintenance-2026-04-15.md`

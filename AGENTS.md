@@ -50,12 +50,12 @@ This is the **Wait Time Canada** project - a "Health Systems Observatory" design
 **Current Architecture:**
 - **Database**: PostgreSQL (sources, hospitals, measurements, scraper_status, scraper_alert_state, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions, public_data_sources, resource_locations, public_health_alerts, public_health_source_alert_state)
 - **Backend**: Python 3.12+ with psycopg2, pytest
-  - **Tests**: 450+ passing backend tests (unit + integration)
+  - **Tests**: 538 passing backend unit tests in current local verification; DB-backed integration/smoke paths are prerequisite-dependent
   - Scrapers: Quebec (BeautifulSoup), Ontario (HTTP client), Alberta (Playwright), BC (JSON/__NEXT_DATA__)
   - Services: DatabaseService, AggregationService, DataQualityService, AnomalyDetectionService, MethodologyChangeDetector, GeocodingService, PublicHealthResourceService, PublicHealthAlertService
   - CLI tools: scraper runner, database cleanup, storage stats, seeding, aggregation, trusted hospital approval, region mapping, public health ingest/status/alerting
 - **Frontend**: Next.js 14 + TypeScript + Mapbox GL JS
-  - **Tests**: 390+ passing frontend tests (Vitest + React Testing Library)
+  - **Tests**: 419 passing frontend unit/component tests (Vitest + React Testing Library)
   - Map component with hospital markers and methodology display
   - Data quality dashboard (`/data-quality`)
   - Analytics & benchmarking dashboard (`/analytics`)
@@ -85,8 +85,8 @@ The fundamental architectural principle is the **Strict Metric Ontology** - neve
 METRIC_FAMILY = ["TIME_TO_PROVIDER", "TOTAL_LOS", "STRETCHER_OCCUPANCY"]
 START_EVENT = ["TRIAGE", "REGISTRATION", "DOOR", "UNKNOWN"]
 END_EVENT = ["PHYSICIAN", "PROVIDER", "DISCHARGE", "FIRST_ASSESSMENT"]
-STATISTIC_TYPE = ["POINT_ESTIMATE", "P90", "ALGORITHMIC", "ROLLING_AVG"]
-PATIENT_SCOPE = ["ALL", "MID_ACUITY", "NON_PRIORITY"]
+STATISTIC_TYPE = ["P90", "MEDIAN", "MEAN", "ROLLING_AVG", "ALGORITHMIC", "POINT_ESTIMATE"]
+PATIENT_SCOPE = ["ALL", "MID_ACUITY", "NON_PRIORITY", "HIGH_ACUITY"]
 ```
 
 **Comparability Logic:**

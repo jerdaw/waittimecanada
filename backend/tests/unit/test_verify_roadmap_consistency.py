@@ -1,0 +1,284 @@
+from pathlib import Path
+
+from scripts.verify_roadmap_consistency import (
+    check_readme_status_alignment,
+    check_status_summary_freshness,
+)
+
+
+def _write_roadmap(
+    tmp_path: Path,
+    progress: str,
+    status_date: str = "2026-06-12",
+    extra_content: str = "",
+) -> Path:
+    roadmap_path = tmp_path / "roadmap.md"
+    roadmap_path.write_text(
+        f"""# Implementation Roadmap
+
+## Current Status (Updated {status_date})
+
+**Progress:** {progress}
+
+## Completed Milestones
+
+| Milestone | Summary |
+|-----------|---------|
+| **M14: Data Quality and Anomaly Detection** | Data-quality service |
+| **M15: Analytics and Benchmarking** | Analytics dashboard |
+| **M33: Historical Occupancy Trends** | Occupancy aggregation |
+{extra_content}
+""",
+        encoding="utf-8",
+    )
+    return roadmap_path
+
+
+def _write_readme(
+    tmp_path: Path,
+    baseline_date: str = "2026-06-12",
+    status_date: str = "2026-06-12",
+    current_status: str = "M30-M33: Reliability and historical occupancy trends",
+) -> Path:
+    readme_path = tmp_path / "README.md"
+    readme_path.write_text(
+        f"""# Wait Time Canada
+
+As reflected in the current runtime and roadmap baseline on **{baseline_date}**:
+
+## Current Status (as of {status_date})
+
+### Milestones Completed
+
+- {current_status}
+""",
+        encoding="utf-8",
+    )
+    return readme_path
+
+
+def test_status_summary_accepts_latest_completed_milestone(tmp_path: Path) -> None:
+    roadmap_path = _write_roadmap(tmp_path, "Milestone 33 is complete.")
+
+    success, message = check_status_summary_freshness(roadmap_path)
+
+    assert success is True
+    assert "latest completed milestone" in message
+
+
+def test_status_summary_rejects_stale_milestone_reference(tmp_path: Path) -> None:
+    roadmap_path = _write_roadmap(
+        tmp_path,
+        "Milestone 14 and Milestone 15 are complete.",
+    )
+
+    success, message = check_status_summary_freshness(roadmap_path)
+
+    assert success is False
+    assert "M33" in message
+
+
+def test_status_summary_rejects_missing_current_status(tmp_path: Path) -> None:
+    roadmap_path = tmp_path / "roadmap.md"
+    roadmap_path.write_text(
+        """# Implementation Roadmap
+
+## Completed Milestones
+
+| Milestone | Summary |
+|-----------|---------|
+| **M33: Historical Occupancy Trends** | Occupancy aggregation |
+""",
+        encoding="utf-8",
+    )
+
+    success, message = check_status_summary_freshness(roadmap_path)
+
+    assert success is False
+    assert "Current Status" in message
+
+
+def test_status_summary_rejects_invalid_status_date(tmp_path: Path) -> None:
+    roadmap_path = tmp_path / "roadmap.md"
+    roadmap_path.write_text(
+        """# Implementation Roadmap
+
+## Current Status (Updated June 12, 2026)
+
+**Progress:** Milestone 33 is complete.
+
+## Completed Milestones
+
+| Milestone | Summary |
+|-----------|---------|
+| **M33: Historical Occupancy Trends** | Occupancy aggregation |
+""",
+        encoding="utf-8",
+    )
+
+    success, message = check_status_summary_freshness(roadmap_path)
+
+    assert success is False
+    assert "not in YYYY-MM-DD format" in message
+
+
+def test_status_summary_rejects_status_date_with_extra_text(
+    tmp_path: Path,
+) -> None:
+    roadmap_path = _write_roadmap(
+        tmp_path,
+        "Milestone 33 is complete.",
+        status_date="2026-06-12 extra",
+    )
+
+    success, message = check_status_summary_freshness(roadmap_path)
+
+    assert success is False
+    assert "not in YYYY-MM-DD format" in message
+
+
+def test_status_summary_rejects_missing_completed_milestones(tmp_path: Path) -> None:
+    roadmap_path = tmp_path / "roadmap.md"
+    roadmap_path.write_text(
+        """# Implementation Roadmap
+
+## Current Status (Updated 2026-06-12)
+
+**Progress:** Milestone 33 is complete.
+""",
+        encoding="utf-8",
+    )
+
+    success, message = check_status_summary_freshness(roadmap_path)
+
+    assert success is False
+    assert "latest completed milestone" in message
+
+
+def test_status_summary_ignores_future_milestone_references(tmp_path: Path) -> None:
+    roadmap_path = _write_roadmap(
+        tmp_path,
+        "Milestone 33 is complete.",
+        extra_content="""
+## Future Work
+
+- **M99: Future Candidate** remains only a planning placeholder.
+""",
+    )
+
+    success, message = check_status_summary_freshness(roadmap_path)
+
+    assert success is True
+    assert "latest completed milestone" in message
+
+
+def test_readme_status_alignment_accepts_matching_status(tmp_path: Path) -> None:
+    roadmap_path = _write_roadmap(tmp_path, "Milestone 33 is complete.")
+    _write_readme(tmp_path)
+
+    success, message = check_readme_status_alignment(roadmap_path, tmp_path)
+
+    assert success is True
+    assert "M33" in message
+
+
+def test_readme_status_alignment_ignores_future_milestone_references(
+    tmp_path: Path,
+) -> None:
+    roadmap_path = _write_roadmap(
+        tmp_path,
+        "Milestone 33 is complete.",
+        extra_content="""
+## Future Work
+
+- **M99: Future Candidate** remains only a planning placeholder.
+""",
+    )
+    _write_readme(tmp_path)
+
+    success, message = check_readme_status_alignment(roadmap_path, tmp_path)
+
+    assert success is True
+    assert "M33" in message
+
+
+def test_readme_status_alignment_rejects_stale_dates(tmp_path: Path) -> None:
+    roadmap_path = _write_roadmap(tmp_path, "Milestone 33 is complete.")
+    _write_readme(tmp_path, baseline_date="2026-06-11")
+
+    success, message = check_readme_status_alignment(roadmap_path, tmp_path)
+
+    assert success is False
+    assert "date mismatch" in message
+
+
+def test_readme_status_alignment_rejects_stale_milestone(tmp_path: Path) -> None:
+    roadmap_path = _write_roadmap(tmp_path, "Milestone 33 is complete.")
+    _write_readme(tmp_path, current_status="M30-M32: Reliability hardening")
+
+    success, message = check_readme_status_alignment(roadmap_path, tmp_path)
+
+    assert success is False
+    assert "M33" in message
+
+
+def test_readme_status_alignment_rejects_missing_baseline_date(tmp_path: Path) -> None:
+    roadmap_path = _write_roadmap(tmp_path, "Milestone 33 is complete.")
+    (tmp_path / "README.md").write_text(
+        """# Wait Time Canada
+
+## Current Status (as of 2026-06-12)
+
+- M33: Historical occupancy trends
+""",
+        encoding="utf-8",
+    )
+
+    success, message = check_readme_status_alignment(roadmap_path, tmp_path)
+
+    assert success is False
+    assert "baseline date" in message
+
+
+def test_readme_status_alignment_rejects_missing_status_date(tmp_path: Path) -> None:
+    roadmap_path = _write_roadmap(tmp_path, "Milestone 33 is complete.")
+    (tmp_path / "README.md").write_text(
+        """# Wait Time Canada
+
+As reflected in the current runtime and roadmap baseline on **2026-06-12**:
+
+- M33: Historical occupancy trends
+""",
+        encoding="utf-8",
+    )
+
+    success, message = check_readme_status_alignment(roadmap_path, tmp_path)
+
+    assert success is False
+    assert "Current Status date" in message
+
+
+def test_readme_status_alignment_rejects_malformed_baseline_date(
+    tmp_path: Path,
+) -> None:
+    roadmap_path = _write_roadmap(tmp_path, "Milestone 33 is complete.")
+    _write_readme(tmp_path, baseline_date="June 12, 2026")
+
+    success, message = check_readme_status_alignment(roadmap_path, tmp_path)
+
+    assert success is False
+    assert "YYYY-MM-DD" in message
+    assert "baseline" in message
+
+
+def test_readme_status_alignment_rejects_malformed_status_date(
+    tmp_path: Path,
+) -> None:
+    roadmap_path = _write_roadmap(tmp_path, "Milestone 33 is complete.")
+    _write_readme(tmp_path, status_date="June 12, 2026")
+
+    success, message = check_readme_status_alignment(roadmap_path, tmp_path)
+
+    assert success is False
+    assert "YYYY-MM-DD" in message
+    assert "current status" in message

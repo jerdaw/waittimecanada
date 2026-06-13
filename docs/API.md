@@ -65,6 +65,7 @@ silently falling back to the aggregate system view. In particular:
 
 - `GET /api/export?format=csv|json&granularity=raw|hourly|daily|weekly|monthly`
   - `granularity=hourly` is derived from raw measurements and limited to 30-day windows
+  - Methodology-aware export interpretation: [`docs/research/export-methodology-interpretation-guide.md`](research/export-methodology-interpretation-guide.md)
 
 Additional optional export params:
 

@@ -6,17 +6,29 @@ This directory contains operational and CI workflows for Wait Time Canada.
 
 ### 1. `docs-ci.yml` - Documentation Quality CI
 
-**Trigger:** push/PR affecting docs and README surfaces.
+**Trigger:** push/PR affecting tracked text/source/data-artifact files covered
+by public docs and authorship policy checks, plus the broader `docs/**` tree.
 
 **Purpose:** Prevent stale/broken markdown by enforcing documentation hygiene checks.
+It also keeps lightweight repository-policy checks active when source changes
+could introduce non-human attribution markers. The checkout fetches full Git
+history so the authorship metadata audit can inspect existing commits, not only
+the latest shallow commit.
 
 **Jobs:**
 - `docs-quality` (runs `scripts/check-docs.sh`)
 
 **Checks include:**
 - ban `file://` links
-- detect non-human co-author trailers
+- detect non-human authorship attribution markers in tracked public text/source/data-artifact files
+- detect non-human author, committer, or authorship-trailer metadata in available Git history
+- verify `CLAUDE.md` and `GEMINI.md` remain relative symlinks to `AGENTS.md`
+- verify `AGENTS.md` ontology constants match the implemented backend enums
+- verify Docs CI keeps path filters aligned with tracked text/source checks
+- block public-boundary marker terms for private operations or personal notes
 - validate repository-relative markdown links across active docs
+- preserve clinical-safety and ontology-comparability guardrail wording
+- verify roadmap consistency against the latest completed milestone
 - exclude designated historical snapshot docs from strict link checks
 
 ---

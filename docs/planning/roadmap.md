@@ -1,12 +1,14 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-06-05)
+## Current Status (Updated 2026-06-12)
 
-**Progress:** Milestone 14 and Milestone 15 are complete, and the public
-roadmap has been cleaned to emphasize methodology, limitations, local
-development, and safe public use. The public documentation boundary cleanup is
-complete and captured in ADR-0026. Roadmap wording now avoids hospital-choice
-recommendation framing and uses system-pressure terminology instead.
+**Progress:** Milestone 33 is complete. Wait Time Canada is now in a
+stewardship and selective-expansion phase: the public roadmap emphasizes
+methodology, limitations, local development, safe public use, source freshness,
+and careful public-health resource scope rather than broad feature churn. The
+public documentation boundary cleanup is complete and captured in ADR-0026.
+Roadmap wording avoids hospital-choice recommendation framing and uses
+system-pressure terminology instead.
 
 Wait Time Canada is a four-province health systems observatory covering Ontario,
 Quebec, Alberta, and British Columbia. The platform audits publicly reported
@@ -46,6 +48,8 @@ paths are intentionally excluded from public documentation.
   aggregates for long-term analysis.
 - Use manual-dispatch operational workflows while scheduled GitHub Actions
   triggers are paused for free-tier quota conservation.
+- Evaluate a CI/offload strategy that reduces GitHub Actions minute burn while
+  preserving GitHub as the public repository and keeping secrets/logs isolated.
 
 ### Next
 
@@ -79,6 +83,10 @@ paths are intentionally excluded from public documentation.
 - [ ] **P1 / Restore scheduled workflow cadence:** Re-enable scraper,
   heartbeat, snapshot, public-health ingest, and smoke schedules when GitHub
   Actions quota permits.
+- [ ] **P1 / Evaluate CI offload from GitHub Actions:** Compare keeping GitHub
+  with an external CI service, self-hosted GitHub runners, Forgejo Actions on
+  the NAS, and narrower manual GitHub Actions lanes before choosing a migration
+  path.
 
 ### Next
 
@@ -95,6 +103,9 @@ paths are intentionally excluded from public documentation.
   source stability supports responsible ingestion.
 - [ ] **P2 / Explore smarter scheduling:** Reduce unnecessary upstream load
   while preserving public freshness expectations.
+- [ ] **P2 / Document CI migration decision:** If CI is moved or split, capture
+  the chosen runner/service model, threat model, secret handling, log retention,
+  cost expectations, and rollback path in an ADR or operations note.
 
 ## Roadmap Operating Model
 
@@ -189,14 +200,18 @@ paths are intentionally excluded from public documentation.
   geographic linkage, and uncertainty communication can be province-specific.
 - Public-health resources: avoid broad batch expansion; prefer narrow,
   source-validated additions with clear caveats.
-- Research outputs: maintain case studies and exported datasets with complete
-  methodology labels and source attribution.
+- Research outputs: maintain case studies, export interpretation guidance, and
+  exported datasets with complete methodology labels and source attribution.
+- CI/runtime cost control: evaluate alternatives to GitHub-hosted Actions for
+  heavy recurring workloads while preserving GitHub as the public collaboration
+  surface.
 
 ## Implementation Plan References
 
 Existing public historical plans retained for context:
 
 - `docs/planning/archive/maintenance-2026-06-04-public-docs-cleanup.md`
+- `docs/planning/archive/maintenance-2026-06-12-autonomous-stewardship.md`
 - `docs/planning/archive/milestone-17-quebec-occupancy.md`
 - `docs/planning/archive/milestone-18-occupancy-frontend.md`
 - `docs/planning/archive/milestone-23-quality-standardization.md`

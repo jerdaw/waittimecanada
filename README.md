@@ -21,9 +21,9 @@
 ### Current Coverage
 
 - **4 Provinces:** Quebec, Ontario, Alberta, British Columbia
-- **380+ Hospitals:** Near-real-time monitoring across all regions
-- **Scheduled Updates:** Automated data collection from public provincial sources
-- **First-in-Canada:** Real-time ED stretcher occupancy visualization (Quebec)
+- **380+ Hospitals:** Public source monitoring across all regions
+- **Source Refreshes:** Scheduled or manually dispatched collection from public provincial sources, with the current cadence posture tracked in the public roadmap
+- **First-in-Canada:** ED stretcher occupancy visualization (Quebec)
 - **Ontario Public Resources Module:** `/resources` now serves facilities, OSM-backed AED fallback data, Health Canada recalls, AQHI, analytics-only Ontario EMS system context, Ontario reserve-system long-term drinking water advisories, and an official Ontario naloxone link-out with a first-class source catalog
 
 ### Why This Matters
@@ -38,7 +38,7 @@ Provincial health authorities report ER wait times using **fundamentally differe
 
 ### By the Numbers
 
-As reflected in the current runtime and roadmap baseline on **2026-04-23**:
+As reflected in the current runtime and roadmap baseline on **2026-06-12**:
 
 - **4 provinces** remain in the active audited source set: Quebec, Ontario,
   Alberta, and British Columbia
@@ -91,7 +91,7 @@ This repository contains public project documentation and reproducible developme
 - **AQHI Overlay:** Cached GeoMet air-quality snapshots with freshness-aware suppression when upstream data is stale
 - **Source Transparency:** Provenance links, last refresh timestamps, and domain-specific caveats on every public-health slice
 
-### 🏥 Real-Time Occupancy (Quebec)
+### 🏥 Live Occupancy (Quebec)
 - **First-in-Canada:** Stretcher occupancy percentage visualization
 - **Color-Coded Indicators:**
   - 🟢 Green (<90%): Below capacity
@@ -404,7 +404,7 @@ npm run test:unit    # Vitest unit tests
 - [`AGENTS.md`](AGENTS.md) - repository agent instructions and project architecture
 
 ### Deep Dives
-- [`docs/adr/`](docs/adr/) - Architecture Decision Records (16 ADRs)
+- [`docs/adr/`](docs/adr/) - Architecture Decision Records (25 ADRs)
 - [`backend/docs/methodologies/`](backend/docs/methodologies/) - Provincial methodology documentation
 - [`docs/case-studies/ottawa-gatineau-divergence.md`](docs/case-studies/ottawa-gatineau-divergence.md) - Cross-border methodology divergence case study
 - [`backend/README.md`](backend/README.md) - Backend architecture and testing
@@ -428,7 +428,7 @@ waittimecanada/
 │   │   ├── services/          # Business logic services
 │   │   ├── core/              # Models, enums, ontology
 │   │   └── cli/               # Command-line tools
-│   ├── tests/                 # 375+ tests (unit + integration)
+│   ├── tests/                 # broad pytest coverage (unit + integration)
 │   │                          # plus an opt-in local smoke/E2E path
 │   ├── migrations/            # Database schema migrations
 │   ├── seed_data/             # Hospital/region seed data
@@ -440,7 +440,7 @@ waittimecanada/
 │   │   ├── analytics/         # Analytics dashboard
 │   │   └── methods/           # Methodology documentation page
 │   ├── components/            # React components
-│   ├── tests/                 # 287 frontend tests
+│   ├── tests/                 # 419 Vitest unit/component tests
 │   └── utils/                 # Utilities (cache, distance, date)
 ├── docs/
 │   ├── planning/              # Roadmap, strategic plans
@@ -448,7 +448,7 @@ waittimecanada/
 │   ├── adr/                   # Architecture decisions
 │   ├── methodologies/         # Provincial methodology docs
 │   └── architecture/          # System architecture
-└── .github/workflows/         # CI/CD automation (10 workflows)
+└── .github/workflows/         # CI/CD automation (16 workflows)
 ```
 
 ---
@@ -456,7 +456,7 @@ waittimecanada/
 ## 🎯 Operational Workflows
 
 ### Production Automation
-- **Scraper Runs:** Scheduled collection from public provincial sources
+- **Scraper Runs:** Scheduled or manually dispatched collection from public provincial sources, depending on the current quota posture
 - **Freshness Checks:** Source health is tracked from scraper status records
 - **Database Cleanup:** Manual cleanup keeps a 30-day raw-measurement window; the GitHub Actions maintenance path uses bounded batched deletes and reports storage growth
 
@@ -501,14 +501,14 @@ environment-specific paths are kept outside public documentation.
 
 ---
 
-## 📊 Current Status (as of 2026-04-23)
+## 📊 Current Status (as of 2026-06-12)
 
 ### Milestones Completed
 - ✅ M1-M4: Database foundation, Ontario/Quebec scrapers, methodology warnings, PWA setup
 - ✅ M7-M8: UX polish, SEO, landing page optimization
 - ✅ M9: Public launch foundations (About section, testimonial governance)
 - ✅ M10-M11: Multi-province expansion, Access Burden Estimator
-- ✅ M12: Research infrastructure (citation export, Dead Man's Switch alerts)
+- ✅ M12: Research infrastructure (citation export and source-health state-change alerts)
 - ✅ M13: Aggregation pipeline (hourly/daily/weekly/monthly)
 - ✅ M14: Data quality & anomaly detection (3 new DB tables)
 - ✅ M15: Analytics & benchmarking (peer comparison, temporal patterns)
@@ -518,7 +518,7 @@ environment-specific paths are kept outside public documentation.
 - ✅ M28: Ontario real-data equity layer (StatsCan tract integration)
 - ✅ M29: Ontario equity academic rigor hardening (uncertainty + interpretation limits)
 - ✅ M30-M33: Reliability hardening, divergence briefs, deployment readiness, and historical occupancy trends
-- ✅ Operations: Production verification and comprehensive documentation
+- ✅ Operations: Public documentation boundary cleanup and comprehensive verification posture
 - ✅ Operations: CI coverage artifacts retained for both frontend and backend verification
 
 ### Validation Posture
@@ -533,7 +533,8 @@ environment-specific paths are kept outside public documentation.
   snapshot here
 
 ### Data Freshness
-- **Update Frequency:** Scheduled source refreshes
+- **Update Frequency:** Scheduled or manually dispatched source refreshes,
+  depending on the current GitHub Actions quota posture
 - **Freshness Thresholds:** Source-health checks flag stale or failed updates
 - **Current Status:** See the public status and data-quality pages for current source state
 
@@ -542,10 +543,10 @@ environment-specific paths are kept outside public documentation.
 ## 💡 Future Roadmap
 
 ### Planned Enhancements
-- [ ] Additional provinces (Nova Scotia, New Brunswick)
-- [ ] Multi-province equity layer beyond Ontario
+- [ ] Evaluate additional provinces only where public source stability supports responsible ingestion
+- [ ] Multi-province equity layer beyond Ontario when province-specific source and tract validation are available
 - [ ] Public research artifacts, including case studies and quantified methodology findings
-- [ ] Privacy-safe usage analytics where compatible with the project privacy posture
+- [ ] Privacy-safe usage analytics only after an explicit privacy-policy decision
 - [ ] Smart scheduling (reduce frequency during overnight hours)
 - [ ] Occupancy-based system-pressure indicators
 
