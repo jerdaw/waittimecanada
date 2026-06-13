@@ -149,6 +149,7 @@ nav:
     - Operations Quick Start: operations/QUICK_START.md
     - operations/OPERATIONAL_STATUS.md
     - operations/scraper-scheduling.md
+    - Heartbeat Offload Pilot: operations/heartbeat-offload-pilot.md
     - operations/zenodo-integration.md
 
   - Development:
