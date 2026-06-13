@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-06-12)
+## Current Status (Updated 2026-06-13)
 
 **Progress:** Milestone 33 is complete. Wait Time Canada is now in a
 stewardship and selective-expansion phase: the public roadmap emphasizes
@@ -28,6 +28,8 @@ Completed foundations:
 - Privacy, terms, citation metadata, security policy, and contributor guidance
 - Public documentation boundary cleanup with private notes moved to the
   private/shared operations source of truth
+- Documentation and CI guardrails for public-boundary checks, human-authorship
+  policy, roadmap freshness, ontology drift, and Docs CI path coverage
 
 ## Public Documentation Boundary
 
