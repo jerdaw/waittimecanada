@@ -57,9 +57,8 @@ triage signal and must not be presented as care guidance.
 - Prefer isolated container or disposable execution for jobs that run repository
   code.
 - Keep the GitHub `workflow_dispatch` version in
-  [heartbeat-monitor.yml](../../.github/workflows/heartbeat-monitor.yml) as the
-  fallback entry point until the offloaded job has completed one normal
-  operating cycle.
+  `.github/workflows/heartbeat-monitor.yml` as the fallback entry point until
+  the offloaded job has completed one normal operating cycle.
 - Keep public summaries concise and free of private paths, private hostnames,
   tokens, database URLs, and alert-route details.
 
