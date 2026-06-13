@@ -14,11 +14,11 @@ from public documentation.
   change.
 - [ ] Re-run public status alignment after each completed milestone so README,
   roadmap, and planning indexes keep the same current-state baseline.
-- [ ] Restore scheduled operational workflows after GitHub Actions quota resets;
-  use manual dispatch in the meantime.
 - [ ] Pilot ADR-0027 CI offload with heartbeat/status checks on a trusted
   runner using `docs/operations/heartbeat-offload-pilot.md`, keeping GitHub
   manual dispatch as fallback.
+- [ ] Restore scheduled operational workflows incrementally after the trusted
+  heartbeat/status offload pilot succeeds; use manual dispatch in the meantime.
 - [ ] Before moving scraper cron or public-health ingest off GitHub, document
   runner isolation, secret handling, log retention, failure summaries, and
   rollback steps in the private/shared operations source of truth.
