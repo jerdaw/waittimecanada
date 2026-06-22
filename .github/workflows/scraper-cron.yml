@@ -7,6 +7,7 @@ on:
 
 env:
   PYTHON_VERSION: "3.12"
+  UV_VERSION: "0.11.23"
 
 concurrency:
   group: scraper-cron
@@ -31,13 +32,13 @@ jobs:
       - name: Install dependencies
         working-directory: ./backend
         run: |
-          python -m pip install --upgrade pip
-          pip install -e .
+          python -m pip install "uv==${UV_VERSION}"
+          uv sync --locked --no-dev
 
       - name: Install Playwright browsers
         working-directory: ./backend
         run: |
-          playwright install chromium
+          uv run playwright install chromium
 
       - name: Run scrapers
         working-directory: ./backend
@@ -46,14 +47,14 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           ENVIRONMENT: production
         run: |
-          python -m waittime.cli.scraper --all
+          uv run python -m waittime.cli.scraper --all
 
       - name: Refresh current analytics aggregates
         working-directory: ./backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.aggregate --incremental
+          uv run python -m waittime.cli.aggregate --incremental
 
       - name: Summarize scraper operational status
         if: always()
@@ -61,7 +62,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.check_heartbeat --max-age 120 --dry-run --verbose || true
+          uv run python -m waittime.cli.check_heartbeat --max-age 120 --dry-run --verbose || true
 
       - name: Generate Freshness Badge
         if: always()
@@ -69,7 +70,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         working-directory: ./backend
         run: |
-          python scripts/generate_freshness_badge.py freshness.json
+          uv run python scripts/generate_freshness_badge.py freshness.json
           cat freshness.json
 
       - name: Upload Badge Artifact
@@ -89,4 +90,4 @@ jobs:
           ALERT_USER_KEY: ${{ secrets.ALERT_USER_KEY }}
           ALERT_API_TOKEN: ${{ secrets.ALERT_API_TOKEN }}
         run: |
-          python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1 || true
+          uv run python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1 || true

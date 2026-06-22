@@ -6,6 +6,9 @@ name: Database Cleanup
 on:
   workflow_dispatch:  # Allow manual triggering
 
+env:
+  UV_VERSION: "0.11.23"
+
 concurrency:
   group: database-cleanup
   cancel-in-progress: false
@@ -28,21 +31,22 @@ jobs:
       - name: Install dependencies
         working-directory: backend
         run: |
-          pip install -e .
+          python -m pip install "uv==${UV_VERSION}"
+          uv sync --locked --no-dev
 
       - name: Run database cleanup
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.cleanup --verbose --skip-aggregate-refresh --delete-batch-size 5000 --max-delete-batches 20
+          uv run python -m waittime.cli.cleanup --verbose --skip-aggregate-refresh --delete-batch-size 5000 --max-delete-batches 20
 
       - name: Report measurement storage footprint
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.storage_stats --relation measurements
+          uv run python -m waittime.cli.storage_stats --relation measurements
 
       - name: Report cleanup results
         if: success()

@@ -39,8 +39,14 @@ This repository contains public project documentation and reproducible developme
 - `docs/planning/archive/public-health-data-hub-identity-memo.md`
 - `docs/planning/archive/public-health-data-hub-municipal-inspection-pilot-decision.md`
 
+## Archived Maintenance Planning Docs
+
+- `docs/planning/archive/2026-04-23-repo-audit-follow-up-board.md`
+- `docs/planning/archive/2026-04-23-repo-audit-remediation-plan.md`
+
 ## Maintenance Logs
 
+- `docs/planning/archive/maintenance-2026-06-22-tooling-roadmap-maintenance.md`
 - `docs/planning/archive/maintenance-2026-06-12-autonomous-stewardship.md`
 - `docs/planning/archive/maintenance-2026-06-04-public-docs-cleanup.md`
 - `docs/planning/archive/maintenance-2026-04-24.md`

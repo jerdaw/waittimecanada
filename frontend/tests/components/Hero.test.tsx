@@ -15,6 +15,7 @@ describe("Hero Component", () => {
       longitude: 0,
       is_visible: true,
       is_verified: true,
+      source_id: "ontario-health",
       last_updated: new Date().toISOString(),
     },
     {
@@ -27,6 +28,7 @@ describe("Hero Component", () => {
       longitude: 0,
       is_visible: true,
       is_verified: true,
+      source_id: "ontario-health",
       last_updated: new Date().toISOString(),
     },
     {
@@ -39,6 +41,7 @@ describe("Hero Component", () => {
       longitude: 0,
       is_visible: true,
       is_verified: true,
+      source_id: "ontario-health",
       last_updated: new Date().toISOString(),
     },
   ];

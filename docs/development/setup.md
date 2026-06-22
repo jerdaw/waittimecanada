@@ -32,22 +32,24 @@ export DATABASE_URL="postgresql://user:pass@host:5432/dbname" # pragma: allowlis
 ```
 
 Populate required frontend values in `frontend/.env.local`. The backend runtime
-reads `DATABASE_URL` from the process environment directly; `backend/.env.local`
-is optional as a personal template only.
+reads `DATABASE_URL` from the process environment directly and does not
+auto-load local env files.
 
 ## 2. Python Environment and Backend Dependencies
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -e 'backend[dev]'
+cd backend
+python -m pip install "uv==0.11.23"
+uv sync --locked --extra dev
+cd ..
 ```
 
-If you are already inside `backend/`, use:
+For runtime-only installs, use:
 
 ```bash
-python -m pip install -e '.[dev]'
+cd backend
+uv sync --locked --no-dev
+cd ..
 ```
 
 ## 3. Frontend Dependencies
@@ -61,8 +63,10 @@ cd ..
 ## 4. Database Migrations and Analytics Bootstrap
 
 ```bash
-python backend/run_migrations.py
-python -m waittime.cli.bootstrap_analytics --days 180
+cd backend
+uv run python run_migrations.py
+uv run python -m waittime.cli.bootstrap_analytics --days 180
+cd ..
 ```
 
 ## 5. Run the App
@@ -78,16 +82,19 @@ Open `http://localhost:3000`.
 
 ```bash
 # Backend tests
-python -m pytest backend/tests
+cd backend
+uv run pytest tests
 
 # Backend quality
-ruff check backend/src backend/tests
-ruff format backend/src backend/tests
-mypy backend/src
+uv run ruff check src tests scripts
+uv run ruff format src tests scripts
+uv run mypy src
+uv run python scripts/check_migration_sequence.py
 
 # Frontend quality
 cd frontend
 npm run type-check
+npm run type-check:test
 npm run lint
 npm run test:unit
 
@@ -97,9 +104,9 @@ bash scripts/check-docs.sh
 
 ## Troubleshooting Notes
 
-- `zsh: no matches found: backend[dev]`:
-  use single quotes: `python -m pip install -e 'backend[dev]'`.
+- `uv sync --locked` fails after dependency edits:
+  refresh `backend/uv.lock` intentionally and include that lockfile change.
 - Analytics regions setup warnings on `/analytics`:
-  run `python -m waittime.cli.bootstrap_analytics --days 180`.
+  run `uv run python -m waittime.cli.bootstrap_analytics --days 180` from `backend/`.
 - Missing map rendering:
   confirm `NEXT_PUBLIC_MAPBOX_TOKEN` is set in `frontend/.env.local`.

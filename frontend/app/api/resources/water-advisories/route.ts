@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { publicCacheHeaders } from "@/utils/cache";
+import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
 import { logger } from "@/utils/logger";
 import {
   type FreshnessState,
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
           error: "Validation Error",
           details: validation.error.format(),
         },
-        { status: 400 },
+        { status: 400, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -197,7 +197,7 @@ export async function GET(request: NextRequest) {
         error: "Failed to fetch drinking water advisories",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 }

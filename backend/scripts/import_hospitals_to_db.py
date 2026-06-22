@@ -10,13 +10,6 @@ import os
 from pathlib import Path
 
 import psycopg2
-from dotenv import load_dotenv
-
-# Load environment variables from .env.local (preferred) or .env
-env_file = Path(__file__).parent.parent / ".env.local"
-if not env_file.exists():
-    env_file = Path(__file__).parent.parent / ".env"
-load_dotenv(env_file)
 
 
 def main():
@@ -25,7 +18,7 @@ def main():
     database_url = os.environ.get("DATABASE_URL")
     if not database_url:
         print("❌ DATABASE_URL environment variable not set")
-        print("   Set it in .env.local or .env")
+        print("   Export DATABASE_URL in the current shell before running this script")
         return
 
     # Load CSV

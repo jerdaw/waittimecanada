@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { publicCacheHeaders } from "@/utils/cache";
+import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
 import { getDb } from "@/utils/db";
 import { logger } from "@/utils/logger";
 import {
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
           error: "Validation Error",
           details: validation.error.format(),
         },
-        { status: 400 },
+        { status: 400, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -121,6 +121,7 @@ export async function GET(request: NextRequest) {
           searchFilter = `AND sm.geography_name ILIKE $${params.length}`;
         }
 
+        const dispatchParams: Array<string | number> = [...params, limit];
         const dispatchRows = (await sql.unsafe(
           `
           SELECT
@@ -142,9 +143,9 @@ export async function GET(request: NextRequest) {
             AND sm.series_key = 'cacc_average_response_times'
             ${searchFilter}
           ORDER BY sm.geography_name ASC, sm.reporting_year DESC
-          LIMIT ${limit}
+          LIMIT $${dispatchParams.length}
           `,
-          params,
+          dispatchParams,
         )) as SystemMetricRow[];
 
         const paramedicRows = (await sql.unsafe(
@@ -234,7 +235,7 @@ export async function GET(request: NextRequest) {
         error: "Failed to fetch system context",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 }

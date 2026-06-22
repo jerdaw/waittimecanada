@@ -10,6 +10,7 @@ on:
 
 env:
   PYTHON_VERSION: '3.12'
+  UV_VERSION: '0.11.23'
   ALERT_EMAIL_USER: ${{ secrets.ALERT_EMAIL_USER }}
   ALERT_EMAIL_PASSWORD: ${{ secrets.ALERT_EMAIL_PASSWORD }}
   ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
@@ -35,15 +36,15 @@ jobs:
       - name: Install dependencies
         working-directory: ./backend
         run: |
-          python -m pip install --upgrade pip
-          pip install -e .
+          python -m pip install "uv==${UV_VERSION}"
+          uv sync --locked --no-dev
 
       - name: Run migrations
         working-directory: ./backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python run_migrations.py
+          uv run python run_migrations.py
 
       - name: Notify on failure
         if: failure() && env.ALERT_EMAIL_TO != '' && env.ALERT_EMAIL_USER != '' && env.ALERT_EMAIL_PASSWORD != ''

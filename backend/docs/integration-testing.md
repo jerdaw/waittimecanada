@@ -250,12 +250,14 @@ jobs:
           python-version: '3.12'
 
       - name: Install uv
-        run: pip install uv
+        run: python -m pip install "uv==0.11.23"
 
       - name: Install dependencies
-        run: uv pip install -e ".[dev]"
+        working-directory: ./backend
+        run: uv sync --locked --extra dev
 
       - name: Run integration tests
+        working-directory: ./backend
         env:
           DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
         run: uv run pytest -m integration -v

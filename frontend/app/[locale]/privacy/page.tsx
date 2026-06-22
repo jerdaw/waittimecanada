@@ -282,9 +282,9 @@ export default function PrivacyPage() {
                   app can estimate a coarse location.
                 </li>
                 <li>
-                  <strong>PostgreSQL hosting:</strong> Database hosting for public
-                  wait-time and resource data. Data is encrypted at rest and in
-                  transit.
+                  <strong>PostgreSQL hosting:</strong> Database hosting for
+                  public wait-time and resource data. Data is encrypted at rest
+                  and in transit.
                 </li>
                 <li>
                   <strong>Official public-data upstreams:</strong> some resource

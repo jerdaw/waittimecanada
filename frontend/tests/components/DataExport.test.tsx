@@ -14,13 +14,18 @@ describe("DataExport", () => {
 
   beforeEach(() => {
     // Mock window.location.href
-    delete (window as any).location;
-    window.location = { ...originalLocation, href: "" } as Location;
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: { ...originalLocation, href: "" },
+    });
   });
 
   afterEach(() => {
     // Restore original window.location
-    window.location = originalLocation;
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: originalLocation,
+    });
   });
 
   it("renders with default state", () => {

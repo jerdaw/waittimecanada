@@ -68,6 +68,10 @@ the latest shallow commit.
 
 **Optimization controls:**
 - Branch-level concurrency cancellation.
+- Backend dependencies are installed with pinned `uv` plus `uv sync --locked`
+  so CI uses the checked-in lockfile instead of floating resolver output.
+- The lint job checks `backend/src`, `backend/scripts`, and the migration
+  filename/sequence guard.
 - Coverage is retained as a short-lived GitHub Actions artifact.
 - The security job runs Bandit directly on the runner and retains a JSON report
   artifact, avoiding the deprecated Node 20 path inside the old
@@ -149,7 +153,8 @@ the latest shallow commit.
 
 **Optimization controls:**
 - Serialized concurrency per ref.
-- Installs the editable backend package before running migrations so `waittime` imports resolve correctly in CI.
+- Installs locked backend dependencies before running migrations so `waittime`
+  imports resolve correctly in CI.
 - Failure email is best-effort and runs only when alert secrets are configured.
 
 ---

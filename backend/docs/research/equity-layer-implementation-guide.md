@@ -108,10 +108,7 @@ head -20 income/ontario/income_by_census_tract_ontario_2021.csv
 
 ```bash
 cd backend
-source .venv/bin/activate
-
-# Install geospatial libraries
-pip install geopandas pandas pyproj shapely fiona
+uv sync --locked --extra equity
 ```
 
 ### Step 2.2: Create Processing Script

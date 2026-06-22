@@ -1,16 +1,20 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-06-13)
+## Current Status (Updated 2026-06-22)
 
 **Progress:** Milestone 33 is complete. Wait Time Canada is now in a
 stewardship and selective-expansion phase: the public roadmap emphasizes
 methodology, limitations, local development, safe public use, source freshness,
-and careful public-health resource scope rather than broad feature churn. The
-public documentation boundary cleanup is complete and captured in ADR-0026.
-Roadmap wording avoids hospital-choice recommendation framing and uses
-system-pressure terminology instead. ADR-0027's public heartbeat offload
-scaffold is merged; remaining pilot work is private runner provisioning and
-manual validation outside this repository.
+careful public-health resource scope, and disciplined maintenance rather than
+broad feature churn. The public documentation boundary cleanup is complete and
+captured in ADR-0026. Roadmap wording avoids hospital-choice recommendation
+framing and uses system-pressure terminology instead. ADR-0027's public
+heartbeat offload scaffold is merged; remaining pilot work is private runner
+provisioning and manual validation outside this repository. The 2026-06-22
+maintenance pass aligned backend setup and CI with the checked-in `uv.lock`,
+added migration sequence guardrails, added frontend test-file type checking,
+and archived completed repo-audit planning stubs out of the active planning
+root.
 
 Wait Time Canada is a four-province health systems observatory covering Ontario,
 Quebec, Alberta, and British Columbia. The platform audits publicly reported
@@ -34,6 +38,8 @@ Completed foundations:
   policy, roadmap freshness, ontology drift, and Docs CI path coverage
 - ADR-0027 strategy, public heartbeat offload contract, and copy/adapt-only
   Forgejo example for trusted runner adoption
+- Backend `uv.lock` setup and CI alignment, migration sequence validation, and
+  frontend test-file type checking
 
 ## Public Documentation Boundary
 
@@ -58,6 +64,8 @@ paths are intentionally excluded from public documentation.
   provisioning and manual validation, using the public contract in
   `docs/operations/heartbeat-offload-pilot.md` and keeping GitHub manual
   dispatch as fallback.
+- Preserve locked backend dependency, migration sequence, and frontend
+  test-type-check guardrails during routine maintenance.
 
 ### Next
 
@@ -217,13 +225,19 @@ paths are intentionally excluded from public documentation.
 - CI/runtime cost control: complete the ADR-0027 private heartbeat pilot, then
   offload trusted recurring operations incrementally while preserving GitHub as
   the public collaboration surface.
+- Tooling maintenance: keep backend setup, GitHub Actions, and local
+  verification commands aligned with the checked-in lockfiles and testing
+  guidelines.
 
 ## Implementation Plan References
 
 Existing public historical plans retained for context:
 
+- `docs/planning/archive/maintenance-2026-06-22-tooling-roadmap-maintenance.md`
 - `docs/planning/archive/maintenance-2026-06-04-public-docs-cleanup.md`
 - `docs/planning/archive/maintenance-2026-06-12-autonomous-stewardship.md`
+- `docs/planning/archive/2026-04-23-repo-audit-follow-up-board.md`
+- `docs/planning/archive/2026-04-23-repo-audit-remediation-plan.md`
 - `docs/planning/archive/heartbeat-offload-pilot-scaffold-2026-06-13.md`
 - `docs/planning/archive/milestone-17-quebec-occupancy.md`
 - `docs/planning/archive/milestone-18-occupancy-frontend.md`

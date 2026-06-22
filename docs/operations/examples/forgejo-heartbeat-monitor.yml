@@ -32,10 +32,10 @@ jobs:
       - name: Install backend package
         run: |
           cd backend
-          python -m pip install --upgrade pip
-          python -m pip install -e .
+          python -m pip install "uv==0.11.23"
+          uv sync --locked --no-dev
 
       - name: Check heartbeats
         run: |
           cd backend
-          python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1
+          uv run python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1

@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
         error: "Validation Error",
         details: validation.error.format(),
       },
-      { status: 400 },
+      { status: 400, headers: NO_STORE_HEADERS },
     );
   }
 

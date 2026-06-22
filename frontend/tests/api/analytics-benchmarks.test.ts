@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 import { GET } from "@/app/api/analytics/benchmarks/route";
 
 const mockSql = vi.fn();
@@ -13,7 +14,9 @@ describe("Benchmarks API", () => {
   });
 
   it("returns 400 when province is missing", async () => {
-    const request = new Request("http://localhost/api/analytics/benchmarks");
+    const request = new NextRequest(
+      "http://localhost/api/analytics/benchmarks",
+    );
     const response = await GET(request);
     const json = await response.json();
 
@@ -50,7 +53,7 @@ describe("Benchmarks API", () => {
       },
     ]);
 
-    const request = new Request(
+    const request = new NextRequest(
       "http://localhost/api/analytics/benchmarks?province=ON&period=7d",
     );
     const response = await GET(request);
@@ -82,7 +85,7 @@ describe("Benchmarks API", () => {
       },
     ]);
 
-    const request = new Request(
+    const request = new NextRequest(
       "http://localhost/api/analytics/benchmarks?province=ON&hospital_id=missing",
     );
     const response = await GET(request);
@@ -96,7 +99,7 @@ describe("Benchmarks API", () => {
   it("handles database failures", async () => {
     mockSql.mockRejectedValue(new Error("DB failed"));
 
-    const request = new Request(
+    const request = new NextRequest(
       "http://localhost/api/analytics/benchmarks?province=ON",
     );
     const response = await GET(request);

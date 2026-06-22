@@ -68,7 +68,7 @@ def main():
     tables = soup.find_all("table")
     print(f"Number of tables: {len(tables)}")
     for i, table in enumerate(tables[:3]):  # First 3 tables
-        print(f"\nTable {i+1} snippet:")
+        print(f"\nTable {i + 1} snippet:")
         print(str(table)[:300])
 
     print("\n=== Divs with 'wait' in class ===")

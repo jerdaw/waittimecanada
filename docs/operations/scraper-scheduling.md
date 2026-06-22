@@ -28,11 +28,11 @@ configuration.
 
 ```bash
 cd backend
-source .venv/bin/activate
+uv sync --locked --no-dev
 
-python -m waittime.cli.scraper --all --dry-run
-python -m waittime.cli.scraper --source ontario-health --dry-run
-python -m waittime.cli.check_heartbeat --dry-run --verbose
+uv run python -m waittime.cli.scraper --all --dry-run
+uv run python -m waittime.cli.scraper --source ontario-health --dry-run
+uv run python -m waittime.cli.check_heartbeat --dry-run --verbose
 ```
 
 ## Interpretation Limits

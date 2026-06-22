@@ -15,7 +15,7 @@ Run the same heartbeat checker used by the GitHub manual fallback workflow:
 
 ```bash
 cd backend
-python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1
+uv run python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1
 ```
 
 The backend package must be installed in the runner environment before the
@@ -23,7 +23,8 @@ command runs:
 
 ```bash
 cd backend
-python -m pip install -e .
+python -m pip install "uv==0.11.23"
+uv sync --locked --no-dev
 ```
 
 Required environment variable names:

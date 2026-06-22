@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { publicCacheHeaders } from "@/utils/cache";
+import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
 import {
   isSupportedEquityProvince,
   loadEquityLayerForProvinceWithSource,
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
           "Update SUPPORTED_PROVINCES in equity-layer API route",
         ],
       },
-      { status: 404 },
+      { status: 404, headers: NO_STORE_HEADERS },
     );
   }
 
@@ -86,12 +86,12 @@ export async function GET(request: Request) {
             "Verify backend/data/layers/ontario-equity-layer.geojson exists",
           ],
         },
-        { status: 404 },
+        { status: 404, headers: NO_STORE_HEADERS },
       );
     }
     return NextResponse.json(
       { success: false, error: "Internal server error" },
-      { status: 500 },
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 }

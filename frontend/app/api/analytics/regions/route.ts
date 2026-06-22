@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
-import { publicCacheHeaders } from "@/utils/cache";
+import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 
 type RegionTrend = "improving" | "stable" | "worsening";
@@ -128,7 +128,7 @@ export async function GET(request: Request) {
           error: "Validation Error",
           details: validation.error.format(),
         },
-        { status: 400 },
+        { status: 400, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -138,7 +138,7 @@ export async function GET(request: Request) {
     if (!periodConfig) {
       return NextResponse.json(
         { success: false, error: "Invalid period config" },
-        { status: 500 },
+        { status: 500, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -336,11 +336,11 @@ export async function GET(request: Request) {
           message:
             "Missing regions tables. Run analytics bootstrap to apply migrations and seed Ontario region mappings.",
           setup_steps: [
-            "python backend/run_migrations.py",
-            "python -m waittime.cli.seed_regions --file backend/data/regions/ontario-regions.json",
+            "cd backend && uv run python run_migrations.py",
+            "cd backend && uv run python -m waittime.cli.seed_regions --file data/regions/ontario-regions.json",
           ],
         },
-        { status: 503 },
+        { status: 503, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -351,7 +351,7 @@ export async function GET(request: Request) {
         error: "Failed to compute regional analytics",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 }

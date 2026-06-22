@@ -29,7 +29,7 @@ Use project extras so local setup is reproducible:
 
 ```bash
 cd backend
-uv sync --extra dev --extra equity
+uv sync --locked --extra dev --extra equity
 ```
 
 Extras intent:
@@ -46,10 +46,10 @@ Current `equity` stack in `backend/pyproject.toml`:
 
 ### Troubleshooting geospatial installs
 
-- If `uv sync --extra equity` fails due platform wheel issues, try:
-  - `cd backend && .venv/bin/pip install --upgrade geopandas pyogrio pyproj shapely`
+- If `uv sync --locked --extra equity` fails due platform wheel issues, inspect
+  the resolver error and update the locked geospatial dependency set deliberately.
 - If shapefile loading fails, verify the Python environment is the backend venv:
-  - `cd backend && .venv/bin/python -c "import geopandas, pyogrio, shapely; print('ok')"`
+  - `cd backend && uv run python -c "import geopandas, pyogrio, shapely; print('ok')"`
 - Keep `uv.lock` updated after dependency changes:
   - `cd backend && uv lock`
 

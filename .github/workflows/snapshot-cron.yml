@@ -5,6 +5,9 @@ on:
   workflow_dispatch:
     # Allows manual trigger for testing or backfills
 
+env:
+  UV_VERSION: "0.11.23"
+
 jobs:
   snapshot:
     runs-on: ubuntu-latest
@@ -20,14 +23,14 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
+        working-directory: ./backend
         run: |
-          cd backend
-          python -m pip install --upgrade pip
-          pip install -e '.[dev]'
+          python -m pip install "uv==${UV_VERSION}"
+          uv sync --locked --no-dev
 
       - name: Run Snapshot Quality CLI
+        working-directory: ./backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          cd backend
-          python -m waittime.cli.snapshot_quality --verbose
+          uv run python -m waittime.cli.snapshot_quality --verbose

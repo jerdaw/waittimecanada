@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
-import { publicCacheHeaders } from "@/utils/cache";
+import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 import { HospitalTrendQuerySchema } from "@/utils/validations";
 
@@ -44,7 +44,7 @@ export async function GET(
           error: "Validation Error",
           details: validation.error.format(),
         },
-        { status: 400 },
+        { status: 400, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -140,7 +140,7 @@ export async function GET(
     console.error("Failed to fetch trends:", error);
     return NextResponse.json(
       { error: "Failed to fetch trends" },
-      { status: 500 },
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 }

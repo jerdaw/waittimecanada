@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
-import { publicCacheHeaders } from "@/utils/cache";
+import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
 import {
   EXPECTED_SCRAPER_RUNS_PER_DAY,
   LIVE_SCRAPER_CADENCE_LABEL,
@@ -163,7 +163,7 @@ export async function GET() {
     console.error("Failed to fetch system status:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 },
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 }

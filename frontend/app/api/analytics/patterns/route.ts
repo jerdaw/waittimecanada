@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
-import { publicCacheHeaders } from "@/utils/cache";
+import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 
 type PatternType = "hour_of_day" | "day_of_week" | "monthly";
@@ -91,7 +91,7 @@ export async function GET(request: Request) {
           error: "Validation Error",
           details: validation.error.format(),
         },
-        { status: 400 },
+        { status: 400, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -423,7 +423,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json(payload.body, {
       status: payload.status,
-      headers: publicCacheHeaders(300, 900),
+      headers:
+        payload.status === 200
+          ? publicCacheHeaders(300, 900)
+          : NO_STORE_HEADERS,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
@@ -435,7 +438,7 @@ export async function GET(request: Request) {
           message:
             "Lookback values must be positive integers within allowed limits",
         },
-        { status: 400 },
+        { status: 400, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -446,7 +449,7 @@ export async function GET(request: Request) {
         error: "Failed to compute temporal patterns",
         message,
       },
-      { status: 500 },
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 }

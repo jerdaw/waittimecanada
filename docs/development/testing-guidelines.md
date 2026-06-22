@@ -22,7 +22,8 @@ This project treats testing as a reliability control for clinical data interpret
 Use for isolated logic without network/database I/O.
 
 ```bash
-python -m pytest -m unit backend/tests
+cd backend
+uv run pytest -m unit tests
 ```
 
 ### Integration (`@pytest.mark.integration`)
@@ -32,13 +33,15 @@ These tests require `DATABASE_URL` and will skip when that prerequisite is not
 present.
 
 ```bash
-python -m pytest -m integration backend/tests
+cd backend
+uv run pytest -m integration tests
 ```
 
 ### Full backend suite
 
 ```bash
-python -m pytest backend/tests
+cd backend
+uv run pytest tests
 ```
 
 Note:
@@ -90,14 +93,17 @@ Use this as a minimal baseline before opening a PR:
 
 ```bash
 # Backend
-ruff check backend/src backend/tests
-mypy backend/src
-python -m pytest backend/tests
+cd backend
+uv run ruff check src tests scripts
+uv run mypy src
+uv run python scripts/check_migration_sequence.py
+uv run pytest tests
 
 # Frontend
 cd frontend
 npm run lint
 npm run type-check
+npm run type-check:test
 npm run test:unit
 ```
 

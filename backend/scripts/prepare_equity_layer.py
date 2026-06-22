@@ -261,8 +261,7 @@ def _load_shapefile_as_geojson(path: Path) -> dict[str, Any]:
         import geopandas as gpd
     except ImportError as exc:
         raise RuntimeError(
-            "Shapefile input requires geopandas. Install with: "
-            "cd backend && uv sync --extra equity"
+            "Shapefile input requires geopandas. Install with: cd backend && uv sync --locked --extra equity"
         ) from exc
 
     gdf = gpd.read_file(path)

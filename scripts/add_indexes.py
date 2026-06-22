@@ -1,20 +1,12 @@
 import logging
 import os
 import sys
-from pathlib import Path
 
 import psycopg2
-from dotenv import load_dotenv
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("add_indexes")
-
-# Load environment
-env_file = Path(__file__).parents[1] / "backend/.env.local"
-if not env_file.exists():
-    env_file = Path(__file__).parents[1] / "backend/.env"
-load_dotenv(env_file)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:

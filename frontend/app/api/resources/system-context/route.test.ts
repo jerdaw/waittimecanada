@@ -164,7 +164,7 @@ describe("API Route: Resource System Context", () => {
     expect(mockSql.unsafe).toHaveBeenNthCalledWith(
       1,
       expect.stringContaining("sm.geography_name ILIKE"),
-      ["ontario-land-ambulance-response-times", "%Toronto%"],
+      ["ontario-land-ambulance-response-times", "%Toronto%", 8],
     );
   });
 

@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/utils/db";
-import { publicCacheHeaders } from "@/utils/cache";
+import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 
 type TrendDirection = "improving" | "stable" | "worsening";
@@ -378,7 +378,7 @@ export async function GET(request: NextRequest) {
           error: "Validation Error",
           details: validation.error.format(),
         },
-        { status: 400 },
+        { status: 400, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -394,7 +394,7 @@ export async function GET(request: NextRequest) {
       // Should not happen if Zod schema is correct
       return NextResponse.json(
         { success: false, error: "Invalid lookback configuration" },
-        { status: 500 },
+        { status: 500, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -509,7 +509,7 @@ export async function GET(request: NextRequest) {
         error: "Failed to compute system trends",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 }

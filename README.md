@@ -38,7 +38,7 @@ Provincial health authorities report ER wait times using **fundamentally differe
 
 ### By the Numbers
 
-As reflected in the current runtime and roadmap baseline on **2026-06-13**:
+As reflected in the current runtime and roadmap baseline on **2026-06-22**:
 
 - **4 provinces** remain in the active audited source set: Quebec, Ontario,
   Alberta, and British Columbia
@@ -149,7 +149,7 @@ graph TD
         STATUS[(scraper_status)]
     end
 
-    subgraph "Next.js 14 Frontend"
+    subgraph "Next.js 15 Frontend"
         API[API Routes<br/>/api/hospitals<br/>/api/analytics<br/>/api/data-quality]
         PAGES[Pages<br/>Map View<br/>Analytics Dashboard<br/>Methods Page<br/>Resources]
         MAP[Mapbox GL JS<br/>380+ Hospital Markers]
@@ -211,7 +211,7 @@ graph TD
 - **CLI Tools:** Scraper runner, database cleanup, storage stats, seeding, aggregation, region mapping
 
 ### Frontend
-- **Framework:** Next.js 14 App Router + TypeScript
+- **Framework:** Next.js 15 App Router + TypeScript
 - **Testing:** Vitest + React Testing Library for unit/component coverage, with Playwright browser verification kept CI-first, manual-dispatch, and outside the default push/PR merge gate
 - **Mapping:** Mapbox GL JS
 - **Components:** 30+ React components with targeted coverage across major user-facing flows
@@ -299,31 +299,26 @@ cp frontend/.env.example frontend/.env.local
 export DATABASE_URL="postgresql://user:pass@host:5432/dbname" # pragma: allowlist secret
 ```
 
-`backend/.env.local` can still be kept as a human convenience template, but the
-backend runtime expects `DATABASE_URL` to already be present in the process
-environment.
+The backend runtime expects `DATABASE_URL` to already be present in the process
+environment and does not auto-load local env files.
 
 ### 2. Backend Setup
 
 ```bash
 cd backend
 
-# Create virtual environment
-python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# Install dependencies
-pip install --upgrade pip
-pip install -e '.[dev]'  # Note: use quotes in zsh
+# Install locked dependencies
+python -m pip install "uv==0.11.23"
+uv sync --locked --extra dev
 
 # Install Playwright browsers (required for Alberta scraper)
-playwright install chromium
+uv run playwright install chromium
 
 # Apply database migrations
-python run_migrations.py
+uv run python run_migrations.py
 
 # Seed sources and bootstrap analytics
-python -m waittime.cli.bootstrap_analytics --days 180
+uv run python -m waittime.cli.bootstrap_analytics --days 180
 ```
 
 ### 3. Frontend Setup
@@ -344,13 +339,12 @@ Open `http://localhost:3000` to view the app.
 
 ```bash
 cd backend
-source .venv/bin/activate
 
 # Run all scrapers
-python -m waittime.cli.scraper --all
+uv run python -m waittime.cli.scraper --all
 
 # Or run single province
-python -m waittime.cli.scraper --source quebec-msss
+uv run python -m waittime.cli.scraper --source quebec-msss
 ```
 
 ---
@@ -360,23 +354,21 @@ python -m waittime.cli.scraper --source quebec-msss
 ### Backend
 
 ```bash
-source .venv/bin/activate
-
 # Scrapers
-python -m waittime.cli.scraper --all              # Run all scrapers
-python -m waittime.cli.scraper --source ontario-health  # Single province
-python -m waittime.cli.scraper --dry-run --all    # Test without DB writes
+uv run python -m waittime.cli.scraper --all              # Run all scrapers
+uv run python -m waittime.cli.scraper --source ontario-health  # Single province
+uv run python -m waittime.cli.scraper --dry-run --all    # Test without DB writes
 
 # Maintenance
-python -m waittime.cli.check_heartbeat            # Verify scraper health
-python -m waittime.cli.aggregate --backfill       # Regenerate aggregates
-python -m waittime.cli.cleanup --dry-run          # Preview cleanup
-python -m waittime.cli.storage_stats              # Inspect measurements table growth
+uv run python -m waittime.cli.check_heartbeat            # Verify scraper health
+uv run python -m waittime.cli.aggregate --backfill       # Regenerate aggregates
+uv run python -m waittime.cli.cleanup --dry-run          # Preview cleanup
+uv run python -m waittime.cli.storage_stats              # Inspect measurements table growth
 
 # Testing
-pytest tests/unit                                  # Unit tests only
-pytest tests/integration                           # Integration tests (requires DATABASE_URL)
-pytest tests/ -v --cov=waittime                   # Full suite with coverage; backend smoke tests may skip without DATABASE_URL and a local frontend server
+uv run pytest tests/unit                           # Unit tests only
+uv run pytest tests/integration                    # Integration tests (requires DATABASE_URL)
+uv run pytest tests -v --cov=waittime              # Full suite with coverage; backend smoke tests may skip without DATABASE_URL and a local frontend server
 ```
 
 ### Frontend
@@ -434,7 +426,7 @@ waittimecanada/
 │   ├── seed_data/             # Hospital/region seed data
 │   └── docs/                  # Backend-specific documentation
 ├── frontend/
-│   ├── app/                   # Next.js 14 App Router
+│   ├── app/                   # Next.js 15 App Router
 │   │   ├── api/               # API routes
 │   │   ├── data-quality/      # Data quality dashboard
 │   │   ├── analytics/         # Analytics dashboard
@@ -501,7 +493,7 @@ environment-specific paths are kept outside public documentation.
 
 ---
 
-## 📊 Current Status (as of 2026-06-13)
+## 📊 Current Status (as of 2026-06-22)
 
 ### Milestones Completed
 - ✅ M1-M4: Database foundation, Ontario/Quebec scrapers, methodology warnings, PWA setup
@@ -520,6 +512,7 @@ environment-specific paths are kept outside public documentation.
 - ✅ M30-M33: Reliability hardening, divergence briefs, deployment readiness, and historical occupancy trends
 - ✅ Operations: Public documentation boundary cleanup and comprehensive verification posture
 - ✅ Operations: CI coverage artifacts retained for both frontend and backend verification
+- ✅ Operations: backend `uv.lock` setup/CI alignment, migration sequence guardrails, and frontend test-file type checking
 
 ### Validation Posture
 - **Backend:** broad unit coverage, plus opt-in database-backed integration and

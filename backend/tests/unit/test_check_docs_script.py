@@ -3,6 +3,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
@@ -96,6 +98,15 @@ def _required_executable(name: str) -> str:
     return executable
 
 
+def _symlink_or_skip(target: str, link_path: Path) -> None:
+    try:
+        os.symlink(target, link_path)
+    except (NotImplementedError, OSError) as exc:
+        if os.name == "nt":
+            pytest.skip(f"symlink creation is unavailable in this Windows test environment: {exc}")
+        raise
+
+
 def _docs_ci_yaml() -> str:
     pattern_lines = "\n".join(f'      - "{pattern}"' for pattern in DOCS_CI_PATTERNS)
     return f"""\
@@ -174,8 +185,8 @@ def _create_docs_fixture(tmp_path: Path) -> Path:
     )
     _write(root / "docs" / "stakeholder-interviews" / "README.md", "[ok]: ../README.md\n")
 
-    os.symlink("AGENTS.md", root / "CLAUDE.md")
-    os.symlink("AGENTS.md", root / "GEMINI.md")
+    _symlink_or_skip("AGENTS.md", root / "CLAUDE.md")
+    _symlink_or_skip("AGENTS.md", root / "GEMINI.md")
 
     git = _required_executable("git")
     subprocess.run(  # noqa: S603 - trusted fixture repo and resolved git path.

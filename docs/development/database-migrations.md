@@ -29,13 +29,20 @@ Create a migration whenever you need to:
 
 ```bash
 ls backend/migrations/*.sql | tail -1
-# e.g. backend/migrations/017_add_scraper_alert_state.sql → next is 018
+# e.g. backend/migrations/020_sync_active_source_definitions.sql -> next is 021
+```
+
+The repository also enforces this with:
+
+```bash
+cd backend
+uv run python scripts/check_migration_sequence.py
 ```
 
 ### 2. Create the migration file
 
 ```bash
-touch backend/migrations/018_your_descriptive_name.sql
+touch backend/migrations/021_your_descriptive_name.sql
 ```
 
 ### 3. Write the migration
@@ -43,7 +50,7 @@ touch backend/migrations/018_your_descriptive_name.sql
 Use idempotent SQL so migrations are safe to re-run:
 
 ```sql
--- 018_your_descriptive_name.sql
+-- 021_your_descriptive_name.sql
 -- Purpose: Brief description
 -- Depends on: 012_optimize_indexes.sql
 
@@ -67,8 +74,8 @@ $$;
 
 ```bash
 cd backend
-source .venv/bin/activate
-python run_migrations.py
+uv sync --locked --extra dev
+uv run python run_migrations.py
 ```
 
 Verify idempotency by running a second time — it should succeed without errors.
@@ -93,8 +100,7 @@ Add an entry to `backend/migrations/README.md` under the appropriate milestone s
 
 ```bash
 cd backend
-source .venv/bin/activate
-python run_migrations.py
+uv run python run_migrations.py
 ```
 
 ### Production or Hosted PostgreSQL
@@ -106,8 +112,9 @@ python run_migrations.py
 
 2. **Run migrations:**
    ```bash
+   cd backend
    export DATABASE_URL="$PRODUCTION_DATABASE_URL"
-   python run_migrations.py
+   uv run python run_migrations.py
    ```
 
 3. **Verify:**
@@ -148,8 +155,8 @@ Migrations are validated in two workflows:
 
 | Workflow | What it checks |
 |---|---|
-| `scraper-ci.yml` | Runs `run_migrations.py` + full pytest suite |
-| `production-readiness.yml` | Validates file naming convention and SQL syntax |
+| `scraper-ci.yml` | Runs the migration sequence guard plus backend quality checks/tests |
+| `database-migrate.yml` | Applies migrations with `uv run python run_migrations.py` |
 
 The `database-migrate.yml` workflow can be triggered manually to apply migrations to production via GitHub Actions.
 

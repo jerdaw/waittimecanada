@@ -24,7 +24,7 @@ For Ontario equity analytics and map serving:
    - descriptive/associational only,
    - no causal inference,
    - temporal mismatch warning (Census 2021 income vs recent wait aggregates).
-5. Harden reproducibility with explicit dependency groups (`dev`, `equity`) and documented setup (`uv sync --extra dev --extra equity`) using `pyogrio` path.
+5. Harden reproducibility with explicit dependency groups (`dev`, `equity`) and documented setup (`uv sync --locked --extra dev --extra equity`) using `pyogrio` path.
 6. Generate dual layer artifacts:
    - canonical output,
    - optimized geometry output,

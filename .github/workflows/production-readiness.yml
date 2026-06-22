@@ -16,6 +16,7 @@ on:
 
 env:
   PYTHON_VERSION: "3.12"
+  UV_VERSION: "0.11.23"
 
 concurrency:
   group: production-readiness-${{ github.ref }}
@@ -74,15 +75,15 @@ jobs:
       - name: Install backend dependencies
         working-directory: ./backend
         run: |
-          python -m pip install --upgrade pip
-          pip install -e .
+          python -m pip install "uv==${UV_VERSION}"
+          uv sync --locked --no-dev
 
       - name: Verify scraper heartbeat freshness
         working-directory: ./backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.check_heartbeat \
+          uv run python -m waittime.cli.check_heartbeat \
             --max-age "${{ inputs.heartbeat_max_age_minutes }}" \
             --dry-run
 

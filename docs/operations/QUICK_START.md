@@ -9,7 +9,8 @@ documentation.
 
 ```bash
 cd backend
-source .venv/bin/activate
+python -m pip install "uv==0.11.23"
+uv sync --locked --no-dev
 export DATABASE_URL="postgresql://localhost:5432/waittimecanada"
 ```
 
@@ -18,21 +19,21 @@ Use a local or disposable PostgreSQL database for development and testing.
 ## Run Scrapers
 
 ```bash
-python -m waittime.cli.scraper --all
-python -m waittime.cli.scraper --source quebec-msss
-python -m waittime.cli.scraper --source ontario-health
-python -m waittime.cli.scraper --source alberta-ahs
-python -m waittime.cli.scraper --source bc-phsa
-python -m waittime.cli.scraper --all --dry-run
-python -m waittime.cli.scraper --list
+uv run python -m waittime.cli.scraper --all
+uv run python -m waittime.cli.scraper --source quebec-msss
+uv run python -m waittime.cli.scraper --source ontario-health
+uv run python -m waittime.cli.scraper --source alberta-ahs
+uv run python -m waittime.cli.scraper --source bc-phsa
+uv run python -m waittime.cli.scraper --all --dry-run
+uv run python -m waittime.cli.scraper --list
 ```
 
 ## Check Source Freshness
 
 ```bash
-python -m waittime.cli.check_heartbeat --dry-run
-python -m waittime.cli.check_heartbeat --source quebec-msss --dry-run
-python -m waittime.cli.check_heartbeat --dry-run --verbose
+uv run python -m waittime.cli.check_heartbeat --dry-run
+uv run python -m waittime.cli.check_heartbeat --source quebec-msss --dry-run
+uv run python -m waittime.cli.check_heartbeat --dry-run --verbose
 ```
 
 ## Common Issues
@@ -41,7 +42,7 @@ python -m waittime.cli.check_heartbeat --dry-run --verbose
 
 ```bash
 cd backend
-pip install -e .
+uv sync --locked --no-dev
 ```
 
 ### `DATABASE_URL` is not set
@@ -52,7 +53,7 @@ commit database connection strings or local env files.
 ### Playwright browsers not found
 
 ```bash
-playwright install chromium
+uv run playwright install chromium
 ```
 
 ## See Also

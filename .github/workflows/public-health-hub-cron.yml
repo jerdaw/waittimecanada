@@ -7,6 +7,7 @@ on:
 
 env:
   PYTHON_VERSION: "3.12"
+  UV_VERSION: "0.11.23"
 
 concurrency:
   group: public-health-hub-cron
@@ -31,8 +32,8 @@ jobs:
       - name: Install dependencies
         working-directory: ./backend
         run: |
-          python -m pip install --upgrade pip
-          pip install -e .
+          python -m pip install "uv==${UV_VERSION}"
+          uv sync --locked --no-dev
 
       - name: Ingest live MOHSERLO resources
         id: ingest_mohserlo
@@ -40,7 +41,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.seed_public_health_resources \
+          uv run python -m waittime.cli.seed_public_health_resources \
             --fetch-mohserlo-live
 
       - name: Ingest live ODHF resources
@@ -49,7 +50,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.seed_public_health_resources \
+          uv run python -m waittime.cli.seed_public_health_resources \
             --fetch-odhf-live
 
       - name: Ingest live OSM AED fallback
@@ -59,7 +60,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           set +e
-          output="$(python -m waittime.cli.seed_public_health_resources \
+          output="$(uv run python -m waittime.cli.seed_public_health_resources \
             --fetch-osm-aed-live 2>&1)"
           exit_code=$?
 
@@ -87,7 +88,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.seed_public_health_alerts --fetch-live
+          uv run python -m waittime.cli.seed_public_health_alerts --fetch-live
 
       - name: Ingest Ontario EMS system context
         id: ingest_system_context
@@ -95,7 +96,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.seed_public_health_system_context --fetch-live
+          uv run python -m waittime.cli.seed_public_health_system_context --fetch-live
 
       - name: Write ingest step summary
         if: always()
@@ -121,7 +122,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python -m waittime.cli.public_health_hub_status \
+          uv run python -m waittime.cli.public_health_hub_status \
             --source mohserlo \
             --source odhf \
             --source osm-aed \
@@ -140,4 +141,4 @@ jobs:
           ALERT_USER_KEY: ${{ secrets.ALERT_USER_KEY }}
           ALERT_API_TOKEN: ${{ secrets.ALERT_API_TOKEN }}
         run: |
-          python -m waittime.cli.check_public_health_hub_ingest --verbose
+          uv run python -m waittime.cli.check_public_health_hub_ingest --verbose

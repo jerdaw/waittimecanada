@@ -9,6 +9,9 @@ concurrency:
   group: heartbeat-monitor
   cancel-in-progress: false
 
+env:
+  UV_VERSION: "0.11.23"
+
 jobs:
   check-heartbeat:
     name: Check Scraper Health
@@ -23,16 +26,17 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
+        working-directory: ./backend
         run: |
-          cd backend
-          pip install -e .
+          python -m pip install "uv==${UV_VERSION}"
+          uv sync --locked --no-dev
 
       - name: Check heartbeats
+        working-directory: ./backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           ALERT_API_URL: ${{ secrets.ALERT_API_URL }}
           ALERT_USER_KEY: ${{ secrets.ALERT_USER_KEY }}
           ALERT_API_TOKEN: ${{ secrets.ALERT_API_TOKEN }}
         run: |
-          cd backend
-          python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1
+          uv run python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1

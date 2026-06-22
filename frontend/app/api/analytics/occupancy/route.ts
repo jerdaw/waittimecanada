@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
-import { publicCacheHeaders } from "@/utils/cache";
+import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 
 type OccupancyStatus = "available" | "no_reporting_data" | "not_available_yet";
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
         error: "Validation Error",
         details: validation.error.format(),
       },
-      { status: 400 },
+      { status: 400, headers: NO_STORE_HEADERS },
     );
   }
 
@@ -238,7 +238,7 @@ export async function GET(request: Request) {
         success: false,
         error: "Failed to compute occupancy analytics",
       },
-      { status: 500 },
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 }

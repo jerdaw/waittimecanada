@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/utils/db";
-import { publicCacheHeaders } from "@/utils/cache";
+import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 
 type BenchmarkTrend = "improving" | "stable" | "worsening";
@@ -188,7 +188,7 @@ export async function GET(request: NextRequest) {
           error: "Validation Error",
           details: validation.error.format(),
         },
-        { status: 400 },
+        { status: 400, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -200,7 +200,7 @@ export async function GET(request: NextRequest) {
       // Should not happen given Zod schema
       return NextResponse.json(
         { success: false, error: "Invalid period config" },
-        { status: 500 },
+        { status: 500, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -338,7 +338,7 @@ export async function GET(request: NextRequest) {
           message:
             "The requested hospital has no benchmarkable aggregate data for this province and period",
         },
-        { status: 404 },
+        { status: 404, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -365,7 +365,7 @@ export async function GET(request: NextRequest) {
         error: "Failed to compute benchmarks",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 }

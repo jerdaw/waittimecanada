@@ -53,10 +53,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Handle CORS preflight requests for API routes
-  if (
-    request.method === "OPTIONS" &&
-    isApiRequest
-  ) {
+  if (request.method === "OPTIONS" && isApiRequest) {
     const response = new NextResponse(null, { status: 204 });
     applyPublicApiCorsHeaders(response);
     return response;

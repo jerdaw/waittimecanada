@@ -6,7 +6,7 @@ import {
   isDescriptiveEquityAssociation,
   type HospitalWaitPoint,
 } from "@/utils/equityInsights";
-import { publicCacheHeaders } from "@/utils/cache";
+import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 import { loadEquityLayerForProvince } from "@/utils/equityLayerData";
 import { RegionQuerySchema } from "@/utils/validations";
@@ -42,7 +42,7 @@ export async function GET(request: Request) {
         error: "Validation Error",
         details: validation.error.format(),
       },
-      { status: 400 },
+      { status: 400, headers: NO_STORE_HEADERS },
     );
   }
 
@@ -52,7 +52,7 @@ export async function GET(request: Request) {
   if (!periodConfig) {
     return NextResponse.json(
       { success: false, error: "Invalid period config" },
-      { status: 500 },
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 
@@ -201,7 +201,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json(payload.body, {
       status: payload.status,
-      headers: publicCacheHeaders(300, 900),
+      headers:
+        payload.status === 200
+          ? publicCacheHeaders(300, 900)
+          : NO_STORE_HEADERS,
     });
   } catch (error) {
     console.error("Failed to compute equity linkage summary:", error);
@@ -210,7 +213,7 @@ export async function GET(request: Request) {
         success: false,
         error: "Failed to compute equity linkage summary",
       },
-      { status: 500 },
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 }

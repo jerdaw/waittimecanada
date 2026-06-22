@@ -4,12 +4,8 @@ import sys
 from datetime import datetime
 
 import psycopg2
-from dotenv import load_dotenv
 from psycopg2.extensions import connection
 from psycopg2.extras import RealDictCursor
-
-# Load environment variables
-load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 

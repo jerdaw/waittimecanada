@@ -29,16 +29,16 @@ export DATABASE_URL="postgresql://user:pass@host:5432/dbname" # pragma: allowlis
 ```
 
 Populate required frontend values in `frontend/.env.local`. The backend runtime
-expects `DATABASE_URL` in the process environment; `backend/.env.local` is
-optional as a human-managed local template only.
+expects `DATABASE_URL` in the process environment and does not auto-load local
+env files.
 
 ## 4. Install Backend + Frontend Dependencies
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -e 'backend[dev]'
+cd backend
+python -m pip install "uv==0.11.23"
+uv sync --locked --extra dev
+cd ..
 
 cd frontend
 npm install
@@ -48,8 +48,10 @@ cd ..
 ## 5. Apply Migrations and Seed Analytics Prereqs
 
 ```bash
-python backend/run_migrations.py
-python -m waittime.cli.bootstrap_analytics --days 180
+cd backend
+uv run python run_migrations.py
+uv run python -m waittime.cli.bootstrap_analytics --days 180
+cd ..
 ```
 
 ## 6. Start the App
@@ -72,5 +74,6 @@ npm run test:unit
 
 # Backend
 cd ..
-python -m pytest backend/tests
+cd backend
+uv run pytest tests
 ```

@@ -54,7 +54,7 @@ This is the **Wait Time Canada** project - a "Health Systems Observatory" design
   - Scrapers: Quebec (BeautifulSoup), Ontario (HTTP client), Alberta (Playwright), BC (JSON/__NEXT_DATA__)
   - Services: DatabaseService, AggregationService, DataQualityService, AnomalyDetectionService, MethodologyChangeDetector, GeocodingService, PublicHealthResourceService, PublicHealthAlertService
   - CLI tools: scraper runner, database cleanup, storage stats, seeding, aggregation, trusted hospital approval, region mapping, public health ingest/status/alerting
-- **Frontend**: Next.js 14 + TypeScript + Mapbox GL JS
+- **Frontend**: Next.js 15 + TypeScript + Mapbox GL JS
   - **Tests**: 419 passing frontend unit/component tests (Vitest + React Testing Library)
   - Map component with hospital markers and methodology display
   - Data quality dashboard (`/data-quality`)
@@ -71,7 +71,7 @@ This is the **Wait Time Canada** project - a "Health Systems Observatory" design
 
 - **Backend:** Python 3.12+ scrapers with scheduled or manually dispatched collection and state-change-aware source-health tracking
 - **Database:** PostgreSQL with strict schema constraints
-- **Frontend:** Next.js 14 App Router + TypeScript + Mapbox GL JS
+- **Frontend:** Next.js 15 App Router + TypeScript + Mapbox GL JS
 - **Testing:** pytest (backend), Vitest (frontend), Playwright (E2E in CI)
 - **Hosting:** Production deployment details are intentionally kept outside public documentation
 

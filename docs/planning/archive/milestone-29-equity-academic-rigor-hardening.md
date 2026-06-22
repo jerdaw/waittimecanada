@@ -207,7 +207,7 @@ Make processing reproducible on dev machines without brittle geospatial dependen
   - Remove strict reliance on `fiona` where `pyogrio` path is sufficient.
 - **Modify** `backend/data/census/README.md`
   - Add environment matrix and exact install commands per workflow:
-    - `uv sync --extra dev --extra equity`
+    - `uv sync --locked --extra dev --extra equity`
   - Add troubleshooting section for GDAL/Fiona compatibility.
 - **Update** `backend/uv.lock` after dependency changes.
 

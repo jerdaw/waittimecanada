@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 import { GET } from "@/app/api/analytics/trends/route";
 
 const mockSql = vi.fn();
@@ -13,7 +14,7 @@ describe("System Trends API", () => {
   });
 
   it("returns 400 when province is missing", async () => {
-    const request = new Request("http://localhost/api/analytics/trends");
+    const request = new NextRequest("http://localhost/api/analytics/trends");
     const response = await GET(request);
     const json = await response.json();
 
@@ -23,7 +24,7 @@ describe("System Trends API", () => {
   });
 
   it("returns 400 for invalid period", async () => {
-    const request = new Request(
+    const request = new NextRequest(
       "http://localhost/api/analytics/trends?province=ON&period=daily",
     );
     const response = await GET(request);
@@ -81,7 +82,7 @@ describe("System Trends API", () => {
         },
       ]);
 
-    const request = new Request(
+    const request = new NextRequest(
       "http://localhost/api/analytics/trends?province=ON&period=monthly&lookback=6m",
     );
 
@@ -110,7 +111,7 @@ describe("System Trends API", () => {
   it("handles query failures", async () => {
     mockSql.mockRejectedValue(new Error("DB failure"));
 
-    const request = new Request(
+    const request = new NextRequest(
       "http://localhost/api/analytics/trends?province=ON",
     );
     const response = await GET(request);
@@ -172,7 +173,7 @@ describe("System Trends API", () => {
         },
       ]);
 
-    const request = new Request(
+    const request = new NextRequest(
       "http://localhost/api/analytics/trends?province=ON&period=monthly&lookback=6m",
     );
 

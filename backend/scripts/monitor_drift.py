@@ -16,19 +16,11 @@ from __future__ import annotations
 import argparse
 import os
 import sys
-from pathlib import Path
 
-# Add src to path so we can import the waittime package when running as a
-# standalone script (not installed as a package).
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+import structlog
 
-from dotenv import load_dotenv  # noqa: E402
-
-load_dotenv()
-
-import structlog  # noqa: E402
-from waittime.services.database import DatabaseService  # noqa: E402
-from waittime.services.methodology_change import MethodologyChangeDetector  # noqa: E402
+from waittime.services.database import DatabaseService
+from waittime.services.methodology_change import MethodologyChangeDetector
 
 logger = structlog.get_logger(__name__)
 

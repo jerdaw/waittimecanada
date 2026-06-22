@@ -1,10 +1,10 @@
 # Wait Time Canada Frontend
 
-Next.js 14 App Router frontend for map visualization, methodology transparency, and analytics dashboards.
+Next.js 15 App Router frontend for map visualization, methodology transparency, and analytics dashboards.
 
 ## Stack
 
-- Next.js 14 + TypeScript
+- Next.js 15 + TypeScript
 - Tailwind CSS
 - React Map GL / Mapbox GL
 - PostgreSQL client (`postgres`) for server routes
@@ -40,6 +40,7 @@ npm run start
 npm run type-check
 npm run lint
 npm run format:check
+npm run type-check:test
 npm run test:unit
 ```
 

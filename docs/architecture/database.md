@@ -93,8 +93,9 @@ metadata contract directly from the route layer.
 Primary commands:
 
 ```bash
-python backend/run_migrations.py
-python -m waittime.cli.bootstrap_analytics --days 180
+cd backend
+uv run python run_migrations.py
+uv run python -m waittime.cli.bootstrap_analytics --days 180
 ```
 
 `bootstrap_analytics` applies migrations (idempotent), seeds regional mappings, and backfills aggregates.

@@ -12,8 +12,9 @@ From the repository root:
 
 ```bash
 cd backend
-source .venv/bin/activate
-python run_migrations.py
+python -m pip install "uv==0.11.23"
+uv sync --locked --no-dev
+uv run python run_migrations.py
 ```
 
 **Output:**
@@ -33,7 +34,10 @@ Running: 002_create_tables.sql
 
 ### Idempotency
 
-Migrations use `DO $$ ... EXCEPTION WHEN duplicate_object THEN NULL; END $$;` blocks or similar patterns to be safely re-runnable. The migration runner (`run_migrations.py`) will skip migrations that have already been applied.
+Migrations use `DO $$ ... EXCEPTION WHEN duplicate_object THEN NULL; END $$;`
+blocks or similar patterns to be safely re-runnable. The migration runner
+does not maintain a `schema_migrations` ledger; it executes every `*.sql` file
+in order and only continues through known safe duplicate-object errors.
 
 ---
 
@@ -48,6 +52,17 @@ NNN_descriptive_name.sql
 - `NNN`: Zero-padded sequential number (001, 002, ..., 020)
 - `descriptive_name`: Action and target (e.g., `create_enums`, `add_occupancy_columns`)
 - **Always use `.sql` extension** (`.sql.skip` files are intentionally excluded)
+
+The historical duplicate `020_` prefix is preserved because those files may
+already be applied in deployed databases. Do not create new duplicate prefixes.
+The next migration number is `021`.
+
+Run the guard before adding or renaming migrations:
+
+```bash
+cd backend
+uv run python scripts/check_migration_sequence.py
+```
 
 ### Execution Order
 
@@ -401,7 +416,7 @@ ls backend/migrations/*.sql | tail -1
 ### Step 2: Create Migration File
 
 ```bash
-touch backend/migrations/018_your_descriptive_name.sql
+touch backend/migrations/021_your_descriptive_name.sql
 ```
 
 ### Step 3: Write Migration
@@ -437,10 +452,9 @@ $$;
 
 ```bash
 cd backend
-source .venv/bin/activate
 
 # Test on your local/dev database
-python run_migrations.py
+uv run python run_migrations.py
 
 # Verify schema changes
 psql $DATABASE_URL -c "\d your_table"
@@ -542,10 +556,11 @@ psql $DATABASE_URL < backend/migrations/010_rollback.sql
 
 Before committing a new migration:
 
-- [ ] **Idempotency**: Run `python run_migrations.py` twice - should succeed both times
+- [ ] **Sequence guard**: Run `uv run python scripts/check_migration_sequence.py`
+- [ ] **Idempotency**: Run `uv run python run_migrations.py` twice - should succeed both times
 - [ ] **Rollback**: Execute rollback commands, verify schema reverts
 - [ ] **Re-apply**: Run migration again after rollback, should succeed
-- [ ] **Unit Tests**: Ensure `pytest tests/` still passes
+- [ ] **Unit Tests**: Ensure `uv run pytest tests/` still passes
 - [ ] **Service Tests**: Test affected services (e.g., DatabaseService, scrapers)
 - [ ] **Manual Verification**: Connect to DB and inspect schema with `\d table_name`
 
@@ -568,7 +583,7 @@ createdb waittimecanada_test
 
 # Run all migrations
 cd backend
-python run_migrations.py
+uv run python run_migrations.py
 
 # Should output:
 # ✅ All migrations completed successfully!
@@ -639,7 +654,7 @@ GRANT CREATE ON SCHEMA public TO your_user;
 1. Check error message in console output
 2. Fix SQL in migration file
 3. Manually rollback any partially applied changes
-4. Re-run `python run_migrations.py`
+4. Re-run `uv run python run_migrations.py`
 
 **Prevention:** Always test migrations on dev database first
 
@@ -797,9 +812,8 @@ Before deploying migrations to production:
 2. **Run Migrations**
    ```bash
    cd backend
-   source .venv/bin/activate
    export DATABASE_URL="$PRODUCTION_DATABASE_URL"
-   python run_migrations.py
+   uv run python run_migrations.py
    ```
 
 3. **Verify Schema**
@@ -841,7 +855,7 @@ For migration questions or issues:
 
 ---
 
-**Last Updated:** 2026-04-16
+**Last Updated:** 2026-06-22
 **Total Migrations:** 20
 **Database Engine:** PostgreSQL 17
 **Schema Version:** 020 (Active Source Definition Sync)

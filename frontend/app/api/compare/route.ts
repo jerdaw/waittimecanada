@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/utils/db";
-import { publicCacheHeaders } from "@/utils/cache";
+import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 import {
   type Methodology,
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
           error: "Validation Error",
           details: validation.error.format(),
         },
-        { status: 400 },
+        { status: 400, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
           error: "Invalid comparison",
           message: "Cannot compare a hospital with itself",
         },
-        { status: 400 },
+        { status: 400, headers: NO_STORE_HEADERS },
       );
     }
 
@@ -184,7 +184,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(payload.body, {
       status: payload.status,
-      headers: publicCacheHeaders(300, 900),
+      headers:
+        payload.status === 200
+          ? publicCacheHeaders(300, 900)
+          : NO_STORE_HEADERS,
     });
   } catch (error) {
     console.error("Failed to compare hospitals:", error);
@@ -194,7 +197,7 @@ export async function GET(request: NextRequest) {
         error: "Comparison failed",
         message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500, headers: NO_STORE_HEADERS },
     );
   }
 }

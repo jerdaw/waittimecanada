@@ -27,6 +27,8 @@ This directory is the planning control plane for Wait Time Canada.
 
 ## Archived Milestone Plans
 
+- `docs/planning/archive/2026-04-23-repo-audit-follow-up-board.md` (closed, delivered)
+- `docs/planning/archive/2026-04-23-repo-audit-remediation-plan.md` (closed, delivered)
 - `docs/planning/implementation/archived/public-health-data-hub-batch-a-plan.md` (closed, delivered)
 - `docs/planning/archive/public-health-data-hub-decision-brief.md` (closed, delivered)
 - `docs/planning/archive/public-health-data-hub-identity-memo.md` (closed, delivered)
@@ -56,7 +58,7 @@ These documents are retained for context and may not match current implementatio
 3. Archive implementation plans once a milestone is delivered and no longer actively edited.
 4. Keep completed milestone details in archived files; keep roadmap focused on active next steps.
 
-Last Updated: 2026-06-13
+Last Updated: 2026-06-22
 
 ## Public Documentation Boundary
 
@@ -68,6 +70,7 @@ copies only and should not be treated as the durable record.
 
 ## Latest Maintenance Log
 
+- `docs/planning/archive/maintenance-2026-06-22-tooling-roadmap-maintenance.md`
 - `docs/planning/archive/maintenance-2026-06-12-autonomous-stewardship.md`
 - `docs/planning/archive/maintenance-2026-06-04-public-docs-cleanup.md`
 - `docs/planning/archive/maintenance-2026-04-24.md`

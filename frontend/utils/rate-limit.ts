@@ -14,8 +14,16 @@ const tokenCache = new LRUCache<string, number>({
 });
 
 function getClientIp(req: NextRequest): string {
-  const forwardedFor = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  return forwardedFor || req.headers.get("x-real-ip") || req.headers.get("cf-connecting-ip") || "127.0.0.1";
+  const forwardedFor = req.headers
+    .get("x-forwarded-for")
+    ?.split(",")[0]
+    ?.trim();
+  return (
+    forwardedFor ||
+    req.headers.get("x-real-ip") ||
+    req.headers.get("cf-connecting-ip") ||
+    "127.0.0.1"
+  );
 }
 
 /**

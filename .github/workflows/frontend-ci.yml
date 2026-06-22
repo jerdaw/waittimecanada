@@ -106,6 +106,10 @@ jobs:
         working-directory: ./frontend
         run: npm run type-check
 
+      - name: Run TypeScript compiler for tests
+        working-directory: ./frontend
+        run: npm run type-check:test
+
   test-unit:
     name: Unit Tests (Vitest)
     runs-on: ubuntu-latest

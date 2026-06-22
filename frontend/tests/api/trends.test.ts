@@ -27,7 +27,9 @@ describe("Trends API", () => {
     const request = new Request(
       "http://localhost/api/hospitals/test-hospital/trends",
     );
-    const response = await GET(request, { params: { slug: "test-hospital" } });
+    const response = await GET(request, {
+      params: Promise.resolve({ slug: "test-hospital" }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(200);
@@ -43,7 +45,9 @@ describe("Trends API", () => {
     const request = new Request(
       "http://localhost/api/hospitals/test-hospital/trends?period=7d",
     );
-    const response = await GET(request, { params: { slug: "test-hospital" } });
+    const response = await GET(request, {
+      params: Promise.resolve({ slug: "test-hospital" }),
+    });
     const json = await response.json();
 
     expect(json.period).toBe("7d");
@@ -56,7 +60,9 @@ describe("Trends API", () => {
     const request = new Request(
       "http://localhost/api/hospitals/test-hospital/trends",
     );
-    const response = await GET(request, { params: { slug: "test-hospital" } });
+    const response = await GET(request, {
+      params: Promise.resolve({ slug: "test-hospital" }),
+    });
     const json = await response.json();
 
     expect(response.status).toBe(500);
