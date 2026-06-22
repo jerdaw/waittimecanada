@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface DivergenceWarningProps {
   message: string;
   variant?: "inline" | "banner" | "compact";
@@ -48,7 +50,7 @@ export function DivergenceWarning({
               Methodology Divergence Warning
             </h4>
             <p className="text-amber-800 text-sm leading-relaxed">{message}</p>
-            <a
+            <Link
               href="/methods"
               className="inline-flex items-center gap-1 mt-2 text-sm text-amber-700 hover:text-amber-900 font-medium"
             >
@@ -66,7 +68,7 @@ export function DivergenceWarning({
                   d="M9 5l7 7-7 7"
                 />
               </svg>
-            </a>
+            </Link>
           </div>
         </div>
       </div>

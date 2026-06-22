@@ -28,9 +28,10 @@ const HOSPITAL_TRENDS_CACHE_TTL_MS = 600_000;
 
 export async function GET(
   request: Request,
-  { params }: { params: { slug: string } },
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
+    const { slug } = await params;
     const { searchParams } = new URL(request.url);
     const rawParams = Object.fromEntries(searchParams.entries());
 
@@ -50,7 +51,7 @@ export async function GET(
     const { period } = validation.data;
     const payload = await getOrSetServerCache(
       buildServerCacheKey("api:hospital-trends", {
-        hospital_id: params.slug,
+        hospital_id: slug,
         period,
       }),
       HOSPITAL_TRENDS_CACHE_TTL_MS,
@@ -77,14 +78,14 @@ export async function GET(
               date_trunc(${aggregation}, timestamp_utc) as timestamp,
               AVG(value)::integer as wait_time
             FROM measurements
-            WHERE hospital_id = (SELECT id FROM hospitals WHERE id = ${params.slug} OR name ILIKE ${params.slug})
+            WHERE hospital_id = (SELECT id FROM hospitals WHERE id = ${slug} OR name ILIKE ${slug})
               AND timestamp_utc >= ${start.toISOString()}
             GROUP BY 1
             ORDER BY 1 ASC
           `;
 
           return {
-            hospitalId: params.slug,
+            hospitalId: slug,
             period,
             dataPoints: data.map((point) => ({
               timestamp: point.timestamp,
@@ -110,14 +111,14 @@ export async function GET(
             max_value::integer as max_wait_time,
             sample_count
           FROM measurement_aggregates
-          WHERE hospital_id = (SELECT id FROM hospitals WHERE id = ${params.slug} OR name ILIKE ${params.slug})
+          WHERE hospital_id = (SELECT id FROM hospitals WHERE id = ${slug} OR name ILIKE ${slug})
             AND period_type = ${periodType}
             AND period_start >= ${start.toISOString()}
           ORDER BY period_start ASC
         `;
 
         return {
-          hospitalId: params.slug,
+          hospitalId: slug,
           period,
           dataPoints: data.map((point) => ({
             timestamp: point.timestamp,

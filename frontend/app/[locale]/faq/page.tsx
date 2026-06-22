@@ -3,6 +3,7 @@ import { Footer } from "@/components/Footer";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Frequently Asked Questions | Wait Time Canada",
@@ -69,12 +70,12 @@ export default async function FAQPage() {
           <p className="text-muted-foreground text-sm mb-4">
             {t("cta.subtitle")}
           </p>
-          <a
+          <Link
             href="/methods"
             className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
           >
             {t("cta.button")}
-          </a>
+          </Link>
         </div>
       </div>
 

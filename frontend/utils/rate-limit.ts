@@ -13,6 +13,11 @@ const tokenCache = new LRUCache<string, number>({
   allowStale: false,
 });
 
+function getClientIp(req: NextRequest): string {
+  const forwardedFor = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  return forwardedFor || req.headers.get("x-real-ip") || req.headers.get("cf-connecting-ip") || "127.0.0.1";
+}
+
 /**
  * Check if the request has exceeded the rate limit.
  * @param req NextRequest
@@ -23,7 +28,7 @@ export async function checkRateLimit(
   req: NextRequest,
   limit: number = 60,
 ): Promise<NextResponse | null> {
-  const ip = req.ip || req.headers.get("x-forwarded-for") || "127.0.0.1";
+  const ip = getClientIp(req);
   const token = ip.toString();
 
   const currentUsage = (tokenCache.get(token) || 0) + 1;

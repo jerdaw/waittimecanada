@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DivergenceWarning } from "./DivergenceWarning";
 
@@ -365,12 +366,12 @@ export function ComparisonModal({
 
         {/* Footer */}
         <div className="sticky bottom-0 bg-white border-t border-slate-200 px-6 py-4 flex justify-between items-center">
-          <a
+          <Link
             href="/methods"
             className="text-sm text-blue-600 hover:text-blue-700 font-medium"
           >
             Learn more about methodologies →
-          </a>
+          </Link>
           <button
             onClick={onClose}
             className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors"

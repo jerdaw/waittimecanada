@@ -6,6 +6,7 @@ import { MethodologyTimeline } from "@/components/methods/MethodologyTimeline";
 import { DataExport } from "@/components/DataExport";
 import { getDb } from "@/utils/db";
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 
 interface Source {
   id: string;
@@ -74,7 +75,7 @@ export default async function MethodsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <a
+              <Link
                 href="/"
                 className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium mb-2"
               >
@@ -92,7 +93,7 @@ export default async function MethodsPage() {
                   />
                 </svg>
                 {t("header.backToMap")}
-              </a>
+              </Link>
               <h1 className="text-3xl font-bold text-foreground mb-2">
                 {t("header.title")}
               </h1>
@@ -188,7 +189,7 @@ export default async function MethodsPage() {
               <p className="text-blue-100 mb-6 max-w-md">
                 {t("cta.description")}
               </p>
-              <a
+              <Link
                 href="/"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors"
               >
@@ -206,7 +207,7 @@ export default async function MethodsPage() {
                     d="M9 5l7 7-7 7"
                   />
                 </svg>
-              </a>
+              </Link>
             </div>
           </section>
         </div>

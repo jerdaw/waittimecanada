@@ -9,8 +9,25 @@ const i18nMiddleware = createMiddleware({
   defaultLocale: "en",
 });
 
+const PUBLIC_API_CORS_HEADERS = {
+  "Access-Control-Allow-Credentials": "false",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Max-Age": "86400",
+} as const;
+
+const PUBLIC_API_CORS_METHODS = new Set(["GET", "HEAD"]);
+
+function applyPublicApiCorsHeaders(response: NextResponse) {
+  Object.entries(PUBLIC_API_CORS_HEADERS).forEach(([key, value]) => {
+    response.headers.set(key, value);
+  });
+}
+
 export function middleware(request: NextRequest) {
   const start = performance.now();
+  const isApiRequest = request.nextUrl.pathname.startsWith("/api/");
 
   // Canonical host redirect (domain rebrand)
   const canonicalBaseUrl =
@@ -38,22 +55,15 @@ export function middleware(request: NextRequest) {
   // Handle CORS preflight requests for API routes
   if (
     request.method === "OPTIONS" &&
-    request.nextUrl.pathname.startsWith("/api/")
+    isApiRequest
   ) {
-    return new NextResponse(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Credentials": "false",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Max-Age": "86400",
-      },
-    });
+    const response = new NextResponse(null, { status: 204 });
+    applyPublicApiCorsHeaders(response);
+    return response;
   }
 
   // Handle actual API requests with timing
-  if (request.nextUrl.pathname.startsWith("/api/")) {
+  if (isApiRequest) {
     const response = NextResponse.next();
 
     // Calculate duration
@@ -62,6 +72,9 @@ export function middleware(request: NextRequest) {
     // Add timing header
     response.headers.set("X-Response-Time", `${duration.toFixed(2)}ms`); // X-Response-Time in ms
     response.headers.set("Server-Timing", `total;dur=${duration.toFixed(2)}`); // Standard Server-Timing header
+    if (PUBLIC_API_CORS_METHODS.has(request.method)) {
+      applyPublicApiCorsHeaders(response);
+    }
 
     // Log for observability via our structured logger
     // Note: Middleware runs in Edge Runtime, so this will use consoleLogger
