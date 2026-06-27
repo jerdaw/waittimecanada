@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-06-22)
+## Current Status (Updated 2026-06-27)
 
 **Progress:** Milestone 33 is complete. Wait Time Canada is now in a
 stewardship and selective-expansion phase: the public roadmap emphasizes
@@ -14,7 +14,10 @@ provisioning and manual validation outside this repository. The 2026-06-22
 maintenance pass aligned backend setup and CI with the checked-in `uv.lock`,
 added migration sequence guardrails, added frontend test-file type checking,
 and archived completed repo-audit planning stubs out of the active planning
-root.
+root. The 2026-06-27 follow-up added a practical local-build secret-handling
+policy, a checksum-backed migration ledger, disposable database verification,
+frontend audit remediation through the Vitest 4 toolchain upgrade, and a
+manual Playwright lane that no longer depends on production secrets.
 
 Wait Time Canada is a four-province health systems observatory covering Ontario,
 Quebec, Alberta, and British Columbia. The platform audits publicly reported
@@ -66,6 +69,8 @@ paths are intentionally excluded from public documentation.
   dispatch as fallback.
 - Preserve locked backend dependency, migration sequence, and frontend
   test-type-check guardrails during routine maintenance.
+- Keep frontend dependency audit remediation current; the 2026-06-27 pass
+  leaves `npm audit --audit-level=high` clean.
 
 ### Next
 

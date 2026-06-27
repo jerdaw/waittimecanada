@@ -38,13 +38,11 @@ function jsonResponse(body: unknown, init: ResponseInit = {}) {
 }
 
 describe("TemporalPatterns", () => {
-  let fetchMock: ReturnType<
-    typeof vi.fn<Parameters<typeof fetch>, ReturnType<typeof fetch>>
-  >;
+  let fetchMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    fetchMock = vi.fn<Parameters<typeof fetch>, ReturnType<typeof fetch>>();
-    global.fetch = fetchMock;
+    fetchMock = vi.fn();
+    global.fetch = fetchMock as unknown as typeof fetch;
   });
 
   it("renders hour-of-day chart and insight", async () => {

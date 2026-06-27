@@ -38,7 +38,7 @@ Provincial health authorities report ER wait times using **fundamentally differe
 
 ### By the Numbers
 
-As reflected in the current runtime and roadmap baseline on **2026-06-22**:
+As reflected in the current runtime and roadmap baseline on **2026-06-27**:
 
 - **4 provinces** remain in the active audited source set: Quebec, Ontario,
   Alberta, and British Columbia
@@ -493,7 +493,7 @@ environment-specific paths are kept outside public documentation.
 
 ---
 
-## 📊 Current Status (as of 2026-06-22)
+## 📊 Current Status (as of 2026-06-27)
 
 ### Milestones Completed
 - ✅ M1-M4: Database foundation, Ontario/Quebec scrapers, methodology warnings, PWA setup
@@ -512,7 +512,8 @@ environment-specific paths are kept outside public documentation.
 - ✅ M30-M33: Reliability hardening, divergence briefs, deployment readiness, and historical occupancy trends
 - ✅ Operations: Public documentation boundary cleanup and comprehensive verification posture
 - ✅ Operations: CI coverage artifacts retained for both frontend and backend verification
-- ✅ Operations: backend `uv.lock` setup/CI alignment, migration sequence guardrails, and frontend test-file type checking
+- ✅ Operations: backend `uv.lock` setup/CI alignment, checksum-backed migration ledger, migration sequence guardrails, and frontend test-file type checking
+- ✅ Operations: disposable database verification and frontend audit remediation through the Vitest 4 toolchain upgrade
 
 ### Validation Posture
 - **Backend:** broad unit coverage, plus opt-in database-backed integration and

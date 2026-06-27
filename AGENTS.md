@@ -4,16 +4,15 @@ This file provides guidance to automated developer tools when working with code 
 
 ## ⚠️ CRITICAL SECURITY RULES ⚠️
 
-**NEVER access `.env.local` files under ANY circumstances:**
+**Never directly inspect secret files:**
 
-- ❌ Do NOT use Read tool on any `.env.local` file
-- ❌ Do NOT use Bash commands (cat, grep, head, tail, etc.) on `.env.local` files
+- ❌ Do NOT use Read tool on any `.env`, `.env.local`, key, certificate, or private credential file
+- ❌ Do NOT use Bash commands (cat, grep, head, tail, etc.) on secret files
 - ❌ Do NOT try to "help" by reading credentials to automate setup
-- ❌ Do NOT access `.env.local` even if asked to debug environment issues
 - ✅ If you need credential info, ask the user - do NOT access files
 - ✅ Only create/modify `.env.example` files with placeholder values
 
-**Files I must NEVER access:**
+**Files I must NEVER directly inspect:**
 - `**/.env.local` (all .env.local files in any directory)
 - `**/.env` (production environment files)
 - `**/key.txt` (encryption keys)
@@ -21,7 +20,13 @@ This file provides guidance to automated developer tools when working with code 
 - `**/*.key` (private keys)
 - Any file containing secrets, tokens, passwords, or API keys
 
-**If I accidentally access these files:**
+**Practical local-build policy for solo development:**
+- Local framework/tooling auto-load of `.env.local` during trusted commands such as `next build` is not treated as credential exposure by itself.
+- If a command auto-loads `.env.local`, do not print, inspect, summarize, copy, or persist any loaded values.
+- Prefer placeholder environment variables or clean test shells for automated verification when practical.
+- Stop and recommend rotation only if secret values are printed, copied into shared artifacts, deployed, sent over the network unexpectedly, or exposed to untrusted code.
+
+**If I accidentally directly inspect secret values:**
 - Stop immediately
 - Inform the user
 - Do not use or store the information

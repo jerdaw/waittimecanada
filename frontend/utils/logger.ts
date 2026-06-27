@@ -61,7 +61,6 @@ let pinoLogger: any = null;
 if (!isEdgeRuntime && !isBrowser) {
   try {
     // Dynamic import might be tricky with Next.js bundling, so we use require
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const pino = require("pino");
 
     // Configure pino

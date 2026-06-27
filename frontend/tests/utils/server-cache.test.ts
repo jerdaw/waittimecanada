@@ -25,7 +25,7 @@ describe("server-cache", () => {
   it("bypasses the cache while running tests", async () => {
     vi.stubEnv("NODE_ENV", "test");
     const loader = vi
-      .fn<[], Promise<{ value: number }>>()
+      .fn<() => Promise<{ value: number }>>()
       .mockResolvedValueOnce({ value: 1 })
       .mockResolvedValueOnce({ value: 2 });
 
@@ -42,7 +42,7 @@ describe("server-cache", () => {
   it("reuses cached values outside the test environment", async () => {
     vi.stubEnv("NODE_ENV", "production");
     const loader = vi
-      .fn<[], Promise<{ value: number }>>()
+      .fn<() => Promise<{ value: number }>>()
       .mockResolvedValue({ value: 1 });
 
     await expect(getOrSetServerCache("key", 5_000, loader)).resolves.toEqual({

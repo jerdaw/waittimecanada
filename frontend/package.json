@@ -9,7 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --max-warnings=0",
     "test": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -58,7 +58,7 @@
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "@vitejs/plugin-react": "^4.2.0",
-    "@vitest/coverage-v8": "^1.1.0",
+    "@vitest/coverage-v8": "^4.1.9",
     "autoprefixer": "^10.5.0",
     "eslint": "^8.56.0",
     "eslint-config-next": "^15.5.19",
@@ -68,12 +68,16 @@
     "prettier": "^3.8.3",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.3.0",
-    "vitest": "^1.1.0"
+    "vitest": "^4.1.9"
   },
   "overrides": {
+    "esbuild": "0.28.1",
     "postcss": "8.5.15",
     "@parcel/watcher": {
       "picomatch": "4.0.4"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "9.0.7"
     },
     "resolve-protobuf-schema": {
       "protocol-buffers-schema": "3.6.1"

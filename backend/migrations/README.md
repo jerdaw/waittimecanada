@@ -35,9 +35,10 @@ Running: 002_create_tables.sql
 ### Idempotency
 
 Migrations use `DO $$ ... EXCEPTION WHEN duplicate_object THEN NULL; END $$;`
-blocks or similar patterns to be safely re-runnable. The migration runner
-does not maintain a `schema_migrations` ledger; it executes every `*.sql` file
-in order and only continues through known safe duplicate-object errors.
+blocks or similar patterns to support legacy re-runs. The migration runner also
+maintains a `schema_migrations` checksum ledger. Already-recorded migrations are
+skipped when the checksum matches, and changed migration files are rejected so
+applied history is not edited in place.
 
 ---
 
@@ -75,10 +76,13 @@ Migrations run in **lexicographic order** (alphabetical). The numeric prefix ens
 **Behavior:**
 - Reads all `*.sql` files from `backend/migrations/`
 - Sorts alphabetically (001 → 020)
-- Executes each in a transaction
+- Creates and uses the `schema_migrations` checksum ledger
+- Skips files already recorded with a matching checksum
+- Rejects files whose recorded checksum no longer matches the on-disk SQL
+- Executes unrecorded files and records their checksum after success
 - Stops on first error (unless safe duplicate)
-- Safe duplicate errors (already exists): ⚠ Warning, continues
-- Other errors: ❌ Fails, stops execution
+- Safe duplicate errors (already exists): records the file as a legacy adoption
+- Other errors: fails and stops execution
 
 **Safe Duplicate Error Codes:**
 - `42710`: Duplicate object (enum, type)
@@ -557,7 +561,7 @@ psql $DATABASE_URL < backend/migrations/010_rollback.sql
 Before committing a new migration:
 
 - [ ] **Sequence guard**: Run `uv run python scripts/check_migration_sequence.py`
-- [ ] **Idempotency**: Run `uv run python run_migrations.py` twice - should succeed both times
+- [ ] **Idempotency**: Run `uv run python run_migrations.py` twice - second run should skip already-recorded files
 - [ ] **Rollback**: Execute rollback commands, verify schema reverts
 - [ ] **Re-apply**: Run migration again after rollback, should succeed
 - [ ] **Unit Tests**: Ensure `uv run pytest tests/` still passes

@@ -37,6 +37,14 @@ cd backend
 uv run pytest -m integration tests
 ```
 
+For a disposable local PostgreSQL database, start the test compose service from
+the repository root and point backend commands at the exposed port:
+
+```bash
+docker compose -f docker-compose.test.yml up -d postgres-test
+export DATABASE_URL="postgresql://waittime:waittime@127.0.0.1:54329/waittimecanada_test" # pragma: allowlist secret
+```
+
 ### Full backend suite
 
 ```bash
@@ -70,6 +78,20 @@ browser-flow bug. Use GitHub Actions manual dispatch for routine browser
 verification; the suite was repo-side stabilized on 2026-04-09, but heavy
 browser coverage remains CI-first to conserve GitHub Actions free-tier minutes
 and is not the default merge-readiness gate.
+
+### Disposable DB verification
+
+Use the disposable Postgres helper when you need the database-backed integration
+lane plus browser and pipeline smoke checks without using production secrets:
+
+```bash
+bash scripts/run-disposable-db-checks.sh
+```
+
+The helper starts `postgres:17` on `127.0.0.1:54329`, exports a non-secret test
+`DATABASE_URL`, runs migrations, runs backend integration tests, runs Playwright
+Chromium, starts a local Next server on `localhost:3000`, and runs the backend
+pipeline smoke test.
 
 ## Coverage and Quality Expectations
 

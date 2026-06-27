@@ -51,6 +51,8 @@ the latest shallow commit.
 - Branch-level concurrency cancellation.
 - Changed-path gating for heavy E2E/build steps.
 - Playwright E2E remains manual-dispatch only to conserve free-tier minutes; the suite was repo-side stabilized on 2026-04-09, so routine push/PR CI continues to rely on lint, type-check, unit tests, and build.
+- Manual Playwright verification uses a disposable `postgres:17` service and
+  fake public Mapbox token, not production database or frontend secrets.
 - Explicit failures (no permissive "skip on error" fallbacks).
 - Unit-test coverage is retained as a short-lived GitHub Actions artifact.
 
@@ -204,8 +206,8 @@ the latest shallow commit.
 ## Secrets Matrix
 
 ### Core production/runtime
-- `DATABASE_URL` (required by scraper, readiness, cleanup, frontend build paths)
-- `NEXT_PUBLIC_MAPBOX_TOKEN` (required by frontend build/test/screenshot workflows)
+- `DATABASE_URL` (required by scraper, readiness, cleanup, and operational smoke paths)
+- `NEXT_PUBLIC_MAPBOX_TOKEN` (required by deployment/screenshot workflows; frontend CI uses a fake public token for validation)
 
 ### Alerting/observability
 - `ALERT_API_URL`, `ALERT_USER_KEY`, `ALERT_API_TOKEN` if operational alerting is enabled

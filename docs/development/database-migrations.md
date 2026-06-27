@@ -70,6 +70,10 @@ $$;
 -- ALTER TABLE your_table DROP COLUMN IF EXISTS your_column;
 ```
 
+Once a migration has been applied, do not edit that migration file. The runner
+records a SHA256 checksum in `schema_migrations` and rejects changed files. Add
+a new migration for follow-up schema changes.
+
 ### 4. Test locally
 
 ```bash
@@ -79,6 +83,7 @@ uv run python run_migrations.py
 ```
 
 Verify idempotency by running a second time — it should succeed without errors.
+The second run should skip migrations already recorded in the checksum ledger.
 
 ### 5. Document the migration
 
@@ -142,6 +147,12 @@ Migrations do not auto-rollback. Each migration file includes rollback SQL in co
    mv backend/migrations/018_your_descriptive_name.sql \
       backend/migrations/018_your_descriptive_name.sql.skip
    ```
+5. If the rollback is temporary and you intend to reapply the same migration,
+   remove its ledger row after the rollback:
+   ```sql
+   DELETE FROM schema_migrations
+   WHERE filename = '018_your_descriptive_name.sql';
+   ```
 
 > [!CAUTION]
 > Always rollback in **reverse order** (newest migration first).
@@ -156,7 +167,7 @@ Migrations are validated in two workflows:
 | Workflow | What it checks |
 |---|---|
 | `scraper-ci.yml` | Runs the migration sequence guard plus backend quality checks/tests |
-| `database-migrate.yml` | Applies migrations with `uv run python run_migrations.py` |
+| `database-migrate.yml` | Applies ledger-backed migrations with `uv run python run_migrations.py` |
 
 The `database-migrate.yml` workflow can be triggered manually to apply migrations to production via GitHub Actions.
 
