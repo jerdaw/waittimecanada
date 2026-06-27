@@ -28,12 +28,12 @@ function jsonResponse(body: unknown, init: ResponseInit = {}) {
 }
 
 describe("AnalyticsPage", () => {
-  let fetchMock: ReturnType<typeof vi.fn>;
+  let fetchMock: ReturnType<typeof vi.fn<typeof fetch>>;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    fetchMock = vi.fn();
-    global.fetch = fetchMock as unknown as typeof fetch;
+    fetchMock = vi.fn<typeof fetch>();
+    global.fetch = fetchMock;
   });
 
   it("renders all analytics sections and ranking rows", async () => {

@@ -91,7 +91,22 @@ bash scripts/run-disposable-db-checks.sh
 The helper starts `postgres:17` on `127.0.0.1:54329`, exports a non-secret test
 `DATABASE_URL`, runs migrations, runs backend integration tests, runs Playwright
 Chromium, starts a local Next server on `localhost:3000`, and runs the backend
-pipeline smoke test.
+pipeline smoke test. It uses `uv` from `PATH`, `UV_BIN`, or the default mise
+shim path.
+
+Lean WSL images may need browser system libraries before Playwright can launch:
+
+```bash
+cd frontend
+npx playwright install --with-deps chromium
+```
+
+If those system dependencies are not available and you only need to verify the
+database-backed backend and pipeline smoke portions, run:
+
+```bash
+SKIP_PLAYWRIGHT=1 bash scripts/run-disposable-db-checks.sh
+```
 
 ## Coverage and Quality Expectations
 

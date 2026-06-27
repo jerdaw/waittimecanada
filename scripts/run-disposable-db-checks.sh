@@ -61,6 +61,30 @@ use_project_node() {
   fi
 }
 
+resolve_uv() {
+  if [[ -n "${UV_BIN:-}" ]]; then
+    if [[ -x "${UV_BIN}" ]]; then
+      return 0
+    fi
+
+    echo "Configured UV_BIN is not executable: ${UV_BIN}" >&2
+    exit 1
+  fi
+
+  if command -v uv >/dev/null 2>&1; then
+    UV_BIN="$(command -v uv)"
+    return 0
+  fi
+
+  if [[ -x "${HOME}/.local/share/mise/shims/uv" ]]; then
+    UV_BIN="${HOME}/.local/share/mise/shims/uv"
+    return 0
+  fi
+
+  echo "uv is required for disposable DB checks." >&2
+  exit 1
+}
+
 trap cleanup EXIT
 
 if ! docker compose version >/dev/null 2>&1; then
@@ -72,16 +96,26 @@ docker compose -f "${COMPOSE_FILE}" up -d postgres-test
 wait_for_postgres
 
 cd "${BACKEND_DIR}"
-uv sync --locked --extra dev
-uv run python run_migrations.py
-uv run pytest tests/integration
+resolve_uv
+"${UV_BIN}" sync --locked --extra dev --python 3.12
+"${UV_BIN}" run python run_migrations.py
+"${UV_BIN}" run pytest tests/integration
 
 cd "${FRONTEND_DIR}"
 use_project_node
 rm -rf node_modules
 npm ci
-npx playwright install chromium
-CI=1 npm run test:e2e -- --project=chromium --reporter=line
+
+if [[ "${SKIP_PLAYWRIGHT:-0}" != "1" ]]; then
+  npx playwright install chromium
+  if ! CI=1 npm run test:e2e -- --project=chromium --reporter=line; then
+    echo "Playwright failed. If Chromium reported missing shared libraries, run:" >&2
+    echo "  cd frontend && npx playwright install --with-deps chromium" >&2
+    exit 1
+  fi
+else
+  echo "Skipping Playwright because SKIP_PLAYWRIGHT=1."
+fi
 
 (
   cd "${FRONTEND_DIR}"
@@ -92,4 +126,4 @@ NEXT_PID="$!"
 wait_for_url "http://127.0.0.1:3000/api/health"
 
 cd "${BACKEND_DIR}"
-uv run pytest tests/e2e/test_pipeline.py
+"${UV_BIN}" run pytest tests/e2e/test_pipeline.py
