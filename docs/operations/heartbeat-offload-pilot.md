@@ -15,7 +15,7 @@ Run the same heartbeat checker used by the GitHub manual fallback workflow:
 
 ```bash
 cd backend
-uv run python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1
+uv run python -m waittime.cli.check_heartbeat --max-age 720 --max-consecutive-failures 6
 ```
 
 The backend package must be installed in the runner environment before the
@@ -36,6 +36,7 @@ Optional alert environment variable names:
 - `ALERT_API_URL`
 - `ALERT_USER_KEY`
 - `ALERT_API_TOKEN`
+- `OPERATIONAL_NOTIFICATION_MODE` (`normal` or `critical_only`)
 
 Do not print environment values, connection strings, tokens, webhook URLs, or
 private runner details in logs.
@@ -72,7 +73,7 @@ triage signal and must not be presented as care guidance.
 
    ```bash
    cd backend
-   python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1 --dry-run --verbose
+   python -m waittime.cli.check_heartbeat --max-age 720 --max-consecutive-failures 6 --dry-run --verbose
    ```
 
 4. Confirm dry-run logs contain no secret values, private paths, private

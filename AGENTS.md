@@ -55,12 +55,12 @@ This is the **Wait Time Canada** project - a "Health Systems Observatory" design
 **Current Architecture:**
 - **Database**: PostgreSQL (sources, hospitals, measurements, scraper_status, scraper_alert_state, measurement_aggregates, data_quality_snapshots, methodology_change_events, regions, hospital_regions, public_data_sources, resource_locations, public_health_alerts, public_health_source_alert_state)
 - **Backend**: Python 3.12+ with psycopg2, pytest
-  - **Tests**: 538 passing backend unit tests in current local verification; DB-backed integration/smoke paths are prerequisite-dependent
+  - **Tests**: 553 passing backend tests in current local verification with 27 prerequisite-dependent skips; DB-backed integration/smoke paths are prerequisite-dependent
   - Scrapers: Quebec (BeautifulSoup), Ontario (HTTP client), Alberta (Playwright), BC (JSON/__NEXT_DATA__)
   - Services: DatabaseService, AggregationService, DataQualityService, AnomalyDetectionService, MethodologyChangeDetector, GeocodingService, PublicHealthResourceService, PublicHealthAlertService
   - CLI tools: scraper runner, database cleanup, storage stats, seeding, aggregation, trusted hospital approval, region mapping, public health ingest/status/alerting
 - **Frontend**: Next.js 15 + TypeScript + Mapbox GL JS
-  - **Tests**: 419 passing frontend unit/component tests (Vitest + React Testing Library)
+  - **Tests**: 422 passing frontend unit/component tests (Vitest + React Testing Library)
   - Map component with hospital markers and methodology display
   - Data quality dashboard (`/data-quality`)
   - Analytics & benchmarking dashboard (`/analytics`)
@@ -217,6 +217,7 @@ Dynamic table showing comparability matrix across provinces. This supports publi
 - Production deploys should be gated to explicit release intent.
 - Non-production branches should avoid unnecessary production builds.
 - Production probes should remain lightweight; avoid increasing probe frequency without a clear operational reason.
+- GitHub fallback operational workflows may use critical-only notification mode and wider heartbeat thresholds while scheduled cadence remains constrained.
 - Scheduled GitHub Actions operational workflows may be paused during free-tier
   quota constraints; use manual dispatch and keep
   `docs/planning/roadmap.md` current until cadence is restored.

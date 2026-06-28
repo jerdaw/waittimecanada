@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import httpx
 import pytest
 
-from waittime.services.alerts import AlertConfig, AlertService
+from waittime.services.alerts import AlertConfig, AlertService, NotificationPolicy
 
 
 @pytest.fixture
@@ -18,6 +18,7 @@ class TestAlertService:
         monkeypatch.setenv("ALERT_API_TOKEN", "api_token")
         monkeypatch.setenv("ALERT_API_URL", "https://example.com/notify")
         monkeypatch.setenv("ALERTS_REFERENCE_URL", "https://example.com/ops")
+        monkeypatch.setenv("OPERATIONAL_NOTIFICATION_MODE", "critical_only")
 
         service = AlertService()
         assert service.config.alert_user_key == "u_key"
@@ -25,6 +26,7 @@ class TestAlertService:
         assert service.config.alert_api_url == "https://example.com/notify"
         assert service.config.enabled is True
         assert service.config.reference_url == "https://example.com/ops"
+        assert service.config.operational_notification_mode == "critical_only"
 
     def test_send_alert_disabled(self):
         config = AlertConfig(
@@ -83,6 +85,48 @@ class TestAlertService:
 
         result = service.send_alert("Title", "Msg")
         assert result is False
+
+    def test_send_alert_suppresses_p2_in_critical_only(self):
+        config = AlertConfig(
+            alert_user_key="k",
+            alert_api_token="t",
+            alert_api_url="https://example.com/notify",
+            enabled=True,
+            operational_notification_mode="critical_only",
+        )
+        service = AlertService(config)
+
+        with patch("httpx.post") as mock_post:
+            result = service.send_alert(
+                "Title",
+                "Msg",
+                policy=NotificationPolicy(tier="P2", incident_key="scraper:test:stale"),
+            )
+            assert result is True
+            mock_post.assert_not_called()
+
+    def test_send_alert_allows_p1_in_critical_only(self, mock_httpx_post):
+        config = AlertConfig(
+            alert_user_key="k",
+            alert_api_token="t",
+            alert_api_url="https://example.com/notify",
+            enabled=True,
+            operational_notification_mode="critical_only",
+        )
+        service = AlertService(config)
+
+        mock_response = MagicMock()
+        mock_response.raise_for_status.return_value = None
+        mock_httpx_post.return_value = mock_response
+
+        result = service.send_alert(
+            "Title",
+            "Msg",
+            policy=NotificationPolicy(tier="P1", incident_key="public-outage"),
+        )
+
+        assert result is True
+        mock_httpx_post.assert_called_once()
 
     def test_alert_scraper_stale(self):
         service = AlertService(

@@ -38,5 +38,6 @@ jobs:
           ALERT_API_URL: ${{ secrets.ALERT_API_URL }}
           ALERT_USER_KEY: ${{ secrets.ALERT_USER_KEY }}
           ALERT_API_TOKEN: ${{ secrets.ALERT_API_TOKEN }}
+          OPERATIONAL_NOTIFICATION_MODE: critical_only
         run: |
-          uv run python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1
+          uv run python -m waittime.cli.check_heartbeat --max-age 720 --max-consecutive-failures 6

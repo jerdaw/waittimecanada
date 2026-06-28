@@ -9,8 +9,10 @@ from datetime import UTC, datetime
 from typing import TypedDict, cast
 
 from waittime.cli.scraper import SCRAPERS
-from waittime.services.alerts import AlertService
+from waittime.services.alerts import AlertService, NotificationPolicy
 from waittime.services.database import DatabaseService
+
+CRITICAL_NOTIFICATION_TIERS = {"P0", "P1"}
 
 
 def _get_sources_to_check(source: str | None) -> list[str]:
@@ -67,6 +69,8 @@ class AlertStateRow(TypedDict, total=False):
     active_incident_fingerprint: str | None
     opened_at: datetime | None
     last_notified_at: datetime | None
+    active_incident_notified_tier: str | None
+    active_incident_notified_at: datetime | None
     last_resolved_at: datetime | None
 
 
@@ -100,6 +104,17 @@ def _format_incident_duration(opened_at: datetime | None, now: datetime) -> str 
     if hours:
         return f"{hours}h"
     return f"{minutes}m"
+
+
+def _critical_only_enabled(alerts: AlertService) -> bool:
+    return getattr(alerts.config, "operational_notification_mode", "normal") == "critical_only"
+
+
+def _should_send_recovery(alert_state: AlertStateRow | None, alerts: AlertService) -> bool:
+    if not _critical_only_enabled(alerts):
+        return True
+    notified_tier = alert_state.get("active_incident_notified_tier") if alert_state else None
+    return notified_tier in CRITICAL_NOTIFICATION_TIERS
 
 
 def evaluate_source_status(
@@ -222,12 +237,13 @@ def reconcile_incident_state(
 
     if current is None:
         if active_kind and not dry_run:
-            alerts.alert_scraper_resolved(
-                source_id,
-                incident_kind=active_kind,
-                duration=_format_incident_duration(opened_at, now),
-                run_url=run_url,
-            )
+            if _should_send_recovery(alert_state, alerts):
+                alerts.alert_scraper_resolved(
+                    source_id,
+                    incident_kind=active_kind,
+                    duration=_format_incident_duration(opened_at, now),
+                    run_url=run_url,
+                )
             db.resolve_scraper_alert_incident(source_id)
         return
 
@@ -235,28 +251,39 @@ def reconcile_incident_state(
         return
 
     if active_kind and not dry_run:
-        alerts.alert_scraper_resolved(
-            source_id,
-            incident_kind=active_kind,
-            duration=_format_incident_duration(opened_at, now),
-            run_url=run_url,
-        )
+        if _should_send_recovery(alert_state, alerts):
+            alerts.alert_scraper_resolved(
+                source_id,
+                incident_kind=active_kind,
+                duration=_format_incident_duration(opened_at, now),
+                run_url=run_url,
+            )
 
     if dry_run:
         return
 
-    if current.kind == "stale":
-        alerts.alert_scraper_stale(source_id, age_minutes=current.age_minutes or 9999)
-    else:
-        alerts.alert_scraper_error(
-            source_id,
-            error=current.error_message or "Unknown error",
-            category=current.category,
-            stage=current.stage,
-            run_url=run_url,
-        )
+    policy = NotificationPolicy(
+        tier="P2",
+        incident_key=f"scraper:{source_id}:{current.kind}:{current.fingerprint}",
+    )
+    notified_tier = None
 
-    db.open_scraper_alert_incident(source_id, current.kind, current.fingerprint)
+    if current.kind == "stale":
+        if alerts.should_send_operational_notification(policy):
+            if alerts.alert_scraper_stale(source_id, age_minutes=current.age_minutes or 9999):
+                notified_tier = policy.tier
+    else:
+        if alerts.should_send_operational_notification(policy):
+            if alerts.alert_scraper_error(
+                source_id,
+                error=current.error_message or "Unknown error",
+                category=current.category,
+                stage=current.stage,
+                run_url=run_url,
+            ):
+                notified_tier = policy.tier
+
+    db.open_scraper_alert_incident(source_id, current.kind, current.fingerprint, notified_tier)
 
 
 def main() -> None:
@@ -265,8 +292,8 @@ def main() -> None:
     parser.add_argument(
         "--max-age",
         type=int,
-        default=120,
-        help="Max heartbeat age in minutes before alerting (default: 120)",
+        default=720,
+        help="Max heartbeat age in minutes before alerting (default: 720)",
     )
     parser.add_argument(
         "--source",
@@ -277,8 +304,8 @@ def main() -> None:
     parser.add_argument(
         "--max-consecutive-failures",
         type=int,
-        default=1,
-        help="Alert when consecutive failures are at or above this threshold (default: 1)",
+        default=6,
+        help="Alert when consecutive failures are at or above this threshold (default: 6)",
     )
     parser.add_argument(
         "--verbose",
@@ -336,6 +363,8 @@ def main() -> None:
                         active_incident_fingerprint,
                         opened_at,
                         last_notified_at,
+                        active_incident_notified_tier,
+                        active_incident_notified_at,
                         last_resolved_at
                     FROM scraper_alert_state
                     WHERE source_id = %s

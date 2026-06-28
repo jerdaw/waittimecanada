@@ -203,6 +203,21 @@ DELETE FROM sources WHERE id IN ('quebec-msss', 'ontario-health', 'alberta-ahs',
 
 ---
 
+#### 021_add_alert_notification_state.sql
+**Purpose:** Track whether active scraper/public-health incidents actually sent an operator notification
+**Created:** 2026-06-27
+**Milestone:** Critical-only notification mode
+
+**Columns Added:**
+- `scraper_alert_state.active_incident_notified_tier`
+- `scraper_alert_state.active_incident_notified_at`
+- `public_health_source_alert_state.active_incident_notified_tier`
+- `public_health_source_alert_state.active_incident_notified_at`
+
+**Behavior:** Allows critical-only mode to persist suppressed P2/P3 incidents while sending recovery notifications only for incidents that previously paged.
+
+---
+
 #### 005_create_functions.sql
 **Purpose:** Create PostgreSQL utility functions
 **Created:** 2026-01-29
@@ -859,7 +874,7 @@ For migration questions or issues:
 
 ---
 
-**Last Updated:** 2026-06-22
-**Total Migrations:** 20
+**Last Updated:** 2026-06-27
+**Total Migrations:** 21
 **Database Engine:** PostgreSQL 17
-**Schema Version:** 020 (Active Source Definition Sync)
+**Schema Version:** 021 (Alert Notification State)

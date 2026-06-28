@@ -1,4 +1,6 @@
 version: 2
+# Critical-only mode: version-update PRs are paused with
+# open-pull-requests-limit: 0; security updates can still use this config.
 updates:
   # Backend Python dependencies
   - package-ecosystem: "pip"
@@ -12,7 +14,7 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
 
   # Frontend npm dependencies
   - package-ecosystem: "npm"
@@ -37,7 +39,7 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
 
   # GitHub Actions workflow dependencies
   - package-ecosystem: "github-actions"
@@ -51,4 +53,4 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 0

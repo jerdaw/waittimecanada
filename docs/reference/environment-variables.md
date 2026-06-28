@@ -33,6 +33,9 @@ Optional:
 - `ALERT_API_TOKEN`: optional notification provider token
 - `ALERTS_ENABLED`: set to `false` to suppress outbound operational notifications
 - `ALERTS_REFERENCE_URL`: optional alert deep link override for operator-facing context
+- `OPERATIONAL_NOTIFICATION_MODE`: set to `critical_only` to persist P2/P3
+  operational incidents without sending outbound notifications; defaults to
+  `normal`
 - `PLAYWRIGHT_BROWSERS_PATH`: optional shared Chromium cache path for scheduled browser-based jobs
 
 ## Frontend

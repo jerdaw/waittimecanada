@@ -39,6 +39,7 @@ From `002_create_tables.sql`:
 - scraper observability metadata on `scraper_status` (`013_add_scraper_observability_columns.sql`)
 - public-health-hub tables (`018_create_public_health_hub_tables.sql`)
 - public-health-hub alert-state tracking (`019_add_public_health_source_alert_state.sql`)
+- alert notification state tracking (`021_add_alert_notification_state.sql`)
 
 ## Scraper observability fields (M30)
 
@@ -58,9 +59,14 @@ These fields support deterministic triage in `check_heartbeat --verbose`, workfl
 - `active_incident_fingerprint`
 - `opened_at`
 - `last_notified_at`
+- `active_incident_notified_tier`
+- `active_incident_notified_at`
 - `last_resolved_at`
 
 This lets the heartbeat monitor send one incident alert when a source becomes unhealthy and one recovery notice when it returns to healthy, instead of repeating the same alert every run.
+Critical-only notification mode uses the notified-tier fields to keep suppressed
+P2/P3 incidents in state while sending recovery notifications only for incidents
+that previously paged an operator.
 
 ## Public health hub tables
 

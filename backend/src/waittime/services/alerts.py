@@ -3,10 +3,25 @@
 import logging
 import os
 from dataclasses import dataclass
+from typing import Literal
 
 import httpx
 
 logger = logging.getLogger(__name__)
+
+NotificationTier = Literal["P0", "P1", "P2", "P3"]
+NotificationMode = Literal["normal", "critical_only"]
+
+
+@dataclass(frozen=True)
+class NotificationPolicy:
+    """Policy metadata for deciding whether an operational notification should send."""
+
+    tier: NotificationTier
+    incident_key: str
+    is_recovery: bool = False
+    channel: str = "pushover"
+    mode: NotificationMode | None = None
 
 
 @dataclass
@@ -18,6 +33,7 @@ class AlertConfig:
     alert_api_url: str = ""
     enabled: bool = True
     reference_url: str = "https://github.com/jerdaw/waittimecanada/actions"
+    operational_notification_mode: NotificationMode = "normal"
 
 
 class AlertService:
@@ -39,7 +55,17 @@ class AlertService:
                 "ALERTS_REFERENCE_URL",
                 "https://github.com/jerdaw/waittimecanada/actions",
             ),
+            operational_notification_mode=_normalize_notification_mode(
+                os.environ.get("OPERATIONAL_NOTIFICATION_MODE")
+            ),
         )
+
+    def should_send_operational_notification(self, policy: NotificationPolicy) -> bool:
+        """Return whether the policy can send under the current notification mode."""
+        mode = policy.mode or self.config.operational_notification_mode
+        if mode == "critical_only":
+            return policy.tier in {"P0", "P1"}
+        return True
 
     def send_alert(
         self,
@@ -47,6 +73,7 @@ class AlertService:
         message: str,
         priority: int = 0,
         url: str | None = None,
+        policy: NotificationPolicy | None = None,
     ) -> bool:
         """
         Send an alert through the configured alert provider.
@@ -60,6 +87,17 @@ class AlertService:
         Returns:
             True if sent successfully, False otherwise
         """
+        if policy and not self.should_send_operational_notification(policy):
+            logger.info(
+                "[ALERT SUPPRESSED] mode=%s tier=%s incident=%s recovery=%s title=%s",
+                policy.mode or self.config.operational_notification_mode,
+                policy.tier,
+                policy.incident_key,
+                policy.is_recovery,
+                title,
+            )
+            return True
+
         if not self.config.enabled:
             logger.info("[ALERT DISABLED] %s: %s", title, message)
             return True
@@ -107,6 +145,7 @@ class AlertService:
             message=f"No heartbeat for {age_minutes} minutes. Check the Wait Time Canada scraper runtime.",
             priority=1,  # High priority
             url=self.config.reference_url,
+            policy=NotificationPolicy(tier="P2", incident_key=f"scraper:{source_id}:stale"),
         )
 
     def alert_scraper_resolved(
@@ -126,6 +165,11 @@ class AlertService:
             message=message,
             priority=0,
             url=run_url or self.config.reference_url,
+            policy=NotificationPolicy(
+                tier="P3",
+                incident_key=f"scraper:{source_id}:{incident_kind}",
+                is_recovery=True,
+            ),
         )
 
     def alert_public_health_source_degraded(
@@ -143,6 +187,10 @@ class AlertService:
             message=f"Source {source_id} is degraded. Reasons: {reason_text}",
             priority=1,
             url=run_url or self.config.reference_url,
+            policy=NotificationPolicy(
+                tier="P2",
+                incident_key=f"public-health:{source_id}:degraded",
+            ),
         )
 
     def alert_public_health_source_resolved(
@@ -162,6 +210,11 @@ class AlertService:
             message=message,
             priority=0,
             url=run_url or self.config.reference_url,
+            policy=NotificationPolicy(
+                tier="P3",
+                incident_key=f"public-health:{source_id}:degraded",
+                is_recovery=True,
+            ),
         )
 
     def alert_scraper_error(
@@ -191,4 +244,9 @@ class AlertService:
             message=f"Classification: {classification} | Error: {error[:200]}",
             priority=1,  # High priority
             url=run_url or self.config.reference_url,
+            policy=NotificationPolicy(tier="P2", incident_key=f"scraper:{source_id}:error"),
         )
+
+
+def _normalize_notification_mode(value: str | None) -> NotificationMode:
+    return "critical_only" if value == "critical_only" else "normal"

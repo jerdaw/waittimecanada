@@ -342,6 +342,8 @@ class ScraperAlertState(BaseModel):
     active_incident_fingerprint: str | None = None
     opened_at: datetime | None = None
     last_notified_at: datetime | None = None
+    active_incident_notified_tier: str | None = Field(default=None, pattern="^P[0-3]$")
+    active_incident_notified_at: datetime | None = None
     last_resolved_at: datetime | None = None
     updated_at: datetime | None = None
 
@@ -354,6 +356,8 @@ class PublicHealthSourceAlertState(BaseModel):
     active_incident_fingerprint: str | None = None
     opened_at: datetime | None = None
     last_notified_at: datetime | None = None
+    active_incident_notified_tier: str | None = Field(default=None, pattern="^P[0-3]$")
+    active_incident_notified_at: datetime | None = None
     last_resolved_at: datetime | None = None
     updated_at: datetime | None = None
 

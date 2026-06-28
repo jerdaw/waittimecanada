@@ -297,12 +297,16 @@ class TestDatabaseService:
             "ontario-health",
             "error",
             "error:ontario-health:fetch:abc123",
+            "P2",
         )
 
         assert isinstance(result, ScraperAlertState)
         assert result.source_id == "ontario-health"
         assert result.active_incident_kind == "error"
-        assert "INSERT INTO scraper_alert_state" in mock_cursor.execute.call_args[0][0]
+        query, params = mock_cursor.execute.call_args[0]
+        assert "INSERT INTO scraper_alert_state" in query
+        assert "active_incident_notified_tier" in query
+        assert params[-1] == "P2"
 
     @patch("psycopg2.connect")
     def test_resolve_scraper_alert_incident(self, mock_connect, db_service):
@@ -349,12 +353,16 @@ class TestDatabaseService:
             "mohserlo",
             "degraded",
             "degraded:mohserlo:abc123",
+            "P2",
         )
 
         assert isinstance(result, PublicHealthSourceAlertState)
         assert result.source_id == "mohserlo"
         assert result.active_incident_kind == "degraded"
-        assert "INSERT INTO public_health_source_alert_state" in mock_cursor.execute.call_args[0][0]
+        query, params = mock_cursor.execute.call_args[0]
+        assert "INSERT INTO public_health_source_alert_state" in query
+        assert "active_incident_notified_tier" in query
+        assert params[-1] == "P2"
 
     @patch("psycopg2.connect")
     def test_resolve_public_health_source_alert_incident(self, mock_connect, db_service):

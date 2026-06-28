@@ -62,7 +62,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          uv run python -m waittime.cli.check_heartbeat --max-age 120 --dry-run --verbose || true
+          uv run python -m waittime.cli.check_heartbeat --max-age 720 --max-consecutive-failures 6 --dry-run --verbose || true
 
       - name: Generate Freshness Badge
         if: always()
@@ -89,5 +89,6 @@ jobs:
           ALERT_API_URL: ${{ secrets.ALERT_API_URL }}
           ALERT_USER_KEY: ${{ secrets.ALERT_USER_KEY }}
           ALERT_API_TOKEN: ${{ secrets.ALERT_API_TOKEN }}
+          OPERATIONAL_NOTIFICATION_MODE: critical_only
         run: |
-          uv run python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1 || true
+          uv run python -m waittime.cli.check_heartbeat --max-age 720 --max-consecutive-failures 6 || true

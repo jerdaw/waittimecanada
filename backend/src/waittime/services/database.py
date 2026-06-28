@@ -2210,6 +2210,7 @@ class DatabaseService:
         source_id: str,
         incident_kind: str,
         incident_fingerprint: str,
+        notified_tier: str | None = None,
     ) -> ScraperAlertState:
         """Persist a newly opened active alert incident."""
         with self.get_connection() as conn:
@@ -2221,19 +2222,33 @@ class DatabaseService:
                         active_incident_kind,
                         active_incident_fingerprint,
                         opened_at,
-                        last_notified_at
+                        last_notified_at,
+                        active_incident_notified_tier,
+                        active_incident_notified_at
                     ) VALUES (
-                        %s, %s, %s, NOW(), NOW()
+                        %s, %s, %s, NOW(),
+                        CASE WHEN %s IS NULL THEN NULL ELSE NOW() END,
+                        %s,
+                        CASE WHEN %s IS NULL THEN NULL ELSE NOW() END
                     )
                     ON CONFLICT (source_id) DO UPDATE SET
                         active_incident_kind = EXCLUDED.active_incident_kind,
                         active_incident_fingerprint = EXCLUDED.active_incident_fingerprint,
                         opened_at = NOW(),
-                        last_notified_at = NOW(),
+                        last_notified_at = EXCLUDED.last_notified_at,
+                        active_incident_notified_tier = EXCLUDED.active_incident_notified_tier,
+                        active_incident_notified_at = EXCLUDED.active_incident_notified_at,
                         updated_at = NOW()
                     RETURNING *
                     """,
-                    (source_id, incident_kind, incident_fingerprint),
+                    (
+                        source_id,
+                        incident_kind,
+                        incident_fingerprint,
+                        notified_tier,
+                        notified_tier,
+                        notified_tier,
+                    ),
                 )
                 row = cur.fetchone()
                 if row is None:
@@ -2259,6 +2274,8 @@ class DatabaseService:
                         active_incident_fingerprint = NULL,
                         opened_at = NULL,
                         last_notified_at = NULL,
+                        active_incident_notified_tier = NULL,
+                        active_incident_notified_at = NULL,
                         last_resolved_at = NOW(),
                         updated_at = NOW()
                     RETURNING *
@@ -2295,6 +2312,7 @@ class DatabaseService:
         source_id: str,
         incident_kind: str,
         incident_fingerprint: str,
+        notified_tier: str | None = None,
     ) -> PublicHealthSourceAlertState:
         """Persist a newly opened active public-health alert incident."""
         with self.get_connection() as conn:
@@ -2306,19 +2324,33 @@ class DatabaseService:
                         active_incident_kind,
                         active_incident_fingerprint,
                         opened_at,
-                        last_notified_at
+                        last_notified_at,
+                        active_incident_notified_tier,
+                        active_incident_notified_at
                     ) VALUES (
-                        %s, %s, %s, NOW(), NOW()
+                        %s, %s, %s, NOW(),
+                        CASE WHEN %s IS NULL THEN NULL ELSE NOW() END,
+                        %s,
+                        CASE WHEN %s IS NULL THEN NULL ELSE NOW() END
                     )
                     ON CONFLICT (source_id) DO UPDATE SET
                         active_incident_kind = EXCLUDED.active_incident_kind,
                         active_incident_fingerprint = EXCLUDED.active_incident_fingerprint,
                         opened_at = NOW(),
-                        last_notified_at = NOW(),
+                        last_notified_at = EXCLUDED.last_notified_at,
+                        active_incident_notified_tier = EXCLUDED.active_incident_notified_tier,
+                        active_incident_notified_at = EXCLUDED.active_incident_notified_at,
                         updated_at = NOW()
                     RETURNING *
                     """,
-                    (source_id, incident_kind, incident_fingerprint),
+                    (
+                        source_id,
+                        incident_kind,
+                        incident_fingerprint,
+                        notified_tier,
+                        notified_tier,
+                        notified_tier,
+                    ),
                 )
                 row = cur.fetchone()
                 if row is None:
@@ -2347,6 +2379,8 @@ class DatabaseService:
                         active_incident_fingerprint = NULL,
                         opened_at = NULL,
                         last_notified_at = NULL,
+                        active_incident_notified_tier = NULL,
+                        active_incident_notified_at = NULL,
                         last_resolved_at = NOW(),
                         updated_at = NOW()
                     RETURNING *
@@ -2487,6 +2521,8 @@ class DatabaseService:
             active_incident_fingerprint=row.get("active_incident_fingerprint"),
             opened_at=row.get("opened_at"),
             last_notified_at=row.get("last_notified_at"),
+            active_incident_notified_tier=row.get("active_incident_notified_tier"),
+            active_incident_notified_at=row.get("active_incident_notified_at"),
             last_resolved_at=row.get("last_resolved_at"),
             updated_at=row.get("updated_at"),
         )
@@ -2502,6 +2538,8 @@ class DatabaseService:
             active_incident_fingerprint=row.get("active_incident_fingerprint"),
             opened_at=row.get("opened_at"),
             last_notified_at=row.get("last_notified_at"),
+            active_incident_notified_tier=row.get("active_incident_notified_tier"),
+            active_incident_notified_at=row.get("active_incident_notified_at"),
             last_resolved_at=row.get("last_resolved_at"),
             updated_at=row.get("updated_at"),
         )

@@ -71,6 +71,8 @@ Persistent alert deduplication state for heartbeat incidents.
 | `active_incident_fingerprint` | TEXT | Stable fingerprint for the active incident. |
 | `opened_at` | TIMESTAMPTZ | When the current active incident began. |
 | `last_notified_at` | TIMESTAMPTZ | When the active incident last generated a notification attempt. |
+| `active_incident_notified_tier` | TEXT | Notification tier that actually paged for the active incident, or `NULL` when suppressed. |
+| `active_incident_notified_at` | TIMESTAMPTZ | Timestamp for the active incident notification represented by `active_incident_notified_tier`. |
 | `last_resolved_at` | TIMESTAMPTZ | When the most recent incident for this source was resolved. |
 | `updated_at` | TIMESTAMPTZ | Row update timestamp. |
 
@@ -158,6 +160,8 @@ Persistent alert deduplication state for hard-fail public-health-hub sources.
 | `active_incident_fingerprint` | TEXT | Stable fingerprint for the active incident reasons. |
 | `opened_at` | TIMESTAMPTZ | When the current public-health ingest incident began. |
 | `last_notified_at` | TIMESTAMPTZ | When the active incident last generated a notification attempt. |
+| `active_incident_notified_tier` | TEXT | Notification tier that actually paged for the active incident, or `NULL` when suppressed. |
+| `active_incident_notified_at` | TIMESTAMPTZ | Timestamp for the active incident notification represented by `active_incident_notified_tier`. |
 | `last_resolved_at` | TIMESTAMPTZ | When the most recent incident for this source was resolved. |
 | `updated_at` | TIMESTAMPTZ | Row update timestamp. |
 

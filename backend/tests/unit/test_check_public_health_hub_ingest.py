@@ -83,6 +83,8 @@ def test_evaluate_source_status_marks_degraded_assessment_as_incident():
 
 def test_reconcile_incident_state_opens_new_degraded_incident():
     alerts = MagicMock()
+    alerts.should_send_operational_notification.return_value = True
+    alerts.alert_public_health_source_degraded.return_value = True
     db = MagicMock()
     evaluation = evaluate_source_status(
         _make_assessment(
@@ -108,11 +110,17 @@ def test_reconcile_incident_state_opens_new_degraded_incident():
     )
 
     alerts.alert_public_health_source_degraded.assert_called_once()
-    db.open_public_health_source_alert_incident.assert_called_once()
+    db.open_public_health_source_alert_incident.assert_called_once_with(
+        "health-canada-recalls",
+        "degraded",
+        evaluation.incident.fingerprint,
+        "P2",
+    )
 
 
 def test_reconcile_incident_state_resolves_recovered_incident():
     alerts = MagicMock()
+    alerts.config.operational_notification_mode = "normal"
     db = MagicMock()
     evaluation = evaluate_source_status(
         _make_assessment(
@@ -139,6 +147,76 @@ def test_reconcile_incident_state_resolves_recovered_incident():
     )
 
     alerts.alert_public_health_source_resolved.assert_called_once()
+    db.resolve_public_health_source_alert_incident.assert_called_once_with("mohserlo")
+
+
+def test_reconcile_incident_state_tracks_suppressed_degraded_incident_in_critical_only():
+    alerts = MagicMock()
+    alerts.config.operational_notification_mode = "critical_only"
+    alerts.should_send_operational_notification.return_value = False
+    db = MagicMock()
+    evaluation = evaluate_source_status(
+        _make_assessment(
+            state="degraded",
+            reasons=["No normalized alert rows available"],
+            source_id="health-canada-recalls",
+            source_name="Health Canada Recalls and Safety Alerts",
+            domain="safety_alert",
+            alert_record_count=0,
+        )
+    )
+
+    reconcile_incident_state(
+        "health-canada-recalls",
+        "Health Canada Recalls and Safety Alerts",
+        evaluation,
+        None,
+        alerts=alerts,
+        db=db,
+        run_url="https://github.com/example/run",
+        dry_run=False,
+        now=datetime.now(UTC),
+    )
+
+    alerts.alert_public_health_source_degraded.assert_not_called()
+    db.open_public_health_source_alert_incident.assert_called_once_with(
+        "health-canada-recalls",
+        "degraded",
+        evaluation.incident.fingerprint,
+        None,
+    )
+
+
+def test_reconcile_incident_state_suppresses_recovery_without_prior_critical_page():
+    alerts = MagicMock()
+    alerts.config.operational_notification_mode = "critical_only"
+    db = MagicMock()
+    evaluation = evaluate_source_status(
+        _make_assessment(
+            state="healthy",
+            reasons=["Freshness and normalized row checks passed"],
+        )
+    )
+
+    reconcile_incident_state(
+        "mohserlo",
+        "MOHSERLO",
+        evaluation,
+        PublicHealthSourceAlertState(
+            source_id="mohserlo",
+            active_incident_kind="degraded",
+            active_incident_fingerprint="degraded:mohserlo:abc123",
+            opened_at=datetime.now(UTC) - timedelta(hours=2, minutes=5),
+            active_incident_notified_tier=None,
+        ),
+        alerts=alerts,
+        db=db,
+        run_url="https://github.com/example/run",
+        dry_run=False,
+        now=datetime.now(UTC),
+    )
+
+    alerts.alert_public_health_source_resolved.assert_not_called()
     db.resolve_public_health_source_alert_incident.assert_called_once_with("mohserlo")
 
 

@@ -4,6 +4,11 @@ Date: 2026-04-15
 
 Status: Accepted
 
+Supersession note: ADR-0028 later widens the GitHub fallback operational
+heartbeat notification threshold to 720 minutes / six consecutive failures
+during critical-only notification periods. The data-quality scrape-window and
+runtime environment decisions in this ADR remain active.
+
 Deciders: Jeremy Dawson
 
 Technical Story: `docs/planning/roadmap.md` repo-maintenance follow-up for data-quality correctness, runtime bootstrap hardening, and heartbeat threshold alignment

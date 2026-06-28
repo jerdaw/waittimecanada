@@ -299,12 +299,16 @@ class TestPublicHealthHubDatabase:
             "test-mohserlo",
             "degraded",
             "degraded:test-mohserlo:abc123",
+            "P2",
         )
         assert opened.active_incident_kind == "degraded"
+        assert opened.active_incident_notified_tier == "P2"
 
         fetched = public_health_hub_db.get_public_health_source_alert_state("test-mohserlo")
         assert fetched is not None
         assert fetched.active_incident_fingerprint == "degraded:test-mohserlo:abc123"
+        assert fetched.active_incident_notified_tier == "P2"
 
         resolved = public_health_hub_db.resolve_public_health_source_alert_incident("test-mohserlo")
         assert resolved.active_incident_kind is None
+        assert resolved.active_incident_notified_tier is None

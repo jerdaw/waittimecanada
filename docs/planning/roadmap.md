@@ -17,7 +17,10 @@ and archived completed repo-audit planning stubs out of the active planning
 root. The 2026-06-27 follow-up added a practical local-build secret-handling
 policy, a checksum-backed migration ledger, disposable database verification,
 frontend audit remediation through the Vitest 4 toolchain upgrade, and a
-manual Playwright lane that no longer depends on production secrets.
+manual Playwright lane that no longer depends on production secrets. The same
+operational-maintenance wave added ADR-0028 critical-only notification mode so
+noncritical source-health incidents can remain stateful without paging during
+cost-constrained periods.
 
 Wait Time Canada is a four-province health systems observatory covering Ontario,
 Quebec, Alberta, and British Columbia. The platform audits publicly reported
@@ -41,6 +44,8 @@ Completed foundations:
   policy, roadmap freshness, ontology drift, and Docs CI path coverage
 - ADR-0027 strategy, public heartbeat offload contract, and copy/adapt-only
   Forgejo example for trusted runner adoption
+- ADR-0028 critical-only operational notification mode with persisted
+  notified-tier state for scraper and public-health source incidents
 - Backend `uv.lock` setup and CI alignment, migration sequence validation, and
   frontend test-file type checking
 
@@ -63,6 +68,8 @@ paths are intentionally excluded from public documentation.
   aggregates for long-term analysis.
 - Use manual-dispatch operational workflows while scheduled GitHub Actions
   triggers are paused for free-tier quota conservation.
+- Keep critical-only operational notification mode active for GitHub fallback
+  workflows until the private heartbeat offload pilot is validated.
 - Complete the ADR-0027 heartbeat offload pilot with private runner
   provisioning and manual validation, using the public contract in
   `docs/operations/heartbeat-offload-pilot.md` and keeping GitHub manual

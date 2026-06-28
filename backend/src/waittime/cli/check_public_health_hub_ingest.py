@@ -9,7 +9,7 @@ from datetime import UTC, datetime
 
 from waittime.cli.public_health_hub_status import SourceOperationalAssessment, assess_source_status
 from waittime.core import PublicHealthSourceAlertState
-from waittime.services.alerts import AlertService
+from waittime.services.alerts import AlertService, NotificationPolicy
 from waittime.services.database import DatabaseService
 
 DEFAULT_HARD_FAIL_SOURCE_IDS = (
@@ -18,6 +18,7 @@ DEFAULT_HARD_FAIL_SOURCE_IDS = (
     "odhf",
     "ontario-land-ambulance-response-times",
 )
+CRITICAL_NOTIFICATION_TIERS = {"P0", "P1"}
 
 
 def _get_sources_to_check(source_ids: list[str]) -> list[str]:
@@ -68,6 +69,20 @@ def _format_incident_duration(opened_at: datetime | None, now: datetime) -> str 
     if hours:
         return f"{hours}h"
     return f"{minutes}m"
+
+
+def _critical_only_enabled(alerts: AlertService) -> bool:
+    return getattr(alerts.config, "operational_notification_mode", "normal") == "critical_only"
+
+
+def _should_send_recovery(
+    alert_state: PublicHealthSourceAlertState | None,
+    alerts: AlertService,
+) -> bool:
+    if not _critical_only_enabled(alerts):
+        return True
+    notified_tier = alert_state.active_incident_notified_tier if alert_state else None
+    return notified_tier in CRITICAL_NOTIFICATION_TIERS
 
 
 def evaluate_source_status(assessment: SourceOperationalAssessment) -> IngestEvaluation:
@@ -125,12 +140,13 @@ def reconcile_incident_state(
 
     if current is None:
         if active_kind and not dry_run:
-            alerts.alert_public_health_source_resolved(
-                source_id,
-                source_name=source_name,
-                duration=_format_incident_duration(opened_at, now),
-                run_url=run_url,
-            )
+            if _should_send_recovery(alert_state, alerts):
+                alerts.alert_public_health_source_resolved(
+                    source_id,
+                    source_name=source_name,
+                    duration=_format_incident_duration(opened_at, now),
+                    run_url=run_url,
+                )
             db.resolve_public_health_source_alert_incident(source_id)
         return
 
@@ -138,26 +154,36 @@ def reconcile_incident_state(
         return
 
     if active_kind and not dry_run:
-        alerts.alert_public_health_source_resolved(
-            source_id,
-            source_name=source_name,
-            duration=_format_incident_duration(opened_at, now),
-            run_url=run_url,
-        )
+        if _should_send_recovery(alert_state, alerts):
+            alerts.alert_public_health_source_resolved(
+                source_id,
+                source_name=source_name,
+                duration=_format_incident_duration(opened_at, now),
+                run_url=run_url,
+            )
 
     if dry_run:
         return
 
-    alerts.alert_public_health_source_degraded(
-        source_id,
-        source_name=source_name,
-        reasons=current.reasons,
-        run_url=run_url,
+    policy = NotificationPolicy(
+        tier="P2",
+        incident_key=f"public-health:{source_id}:{current.kind}:{current.fingerprint}",
     )
+    notified_tier = None
+    if alerts.should_send_operational_notification(policy):
+        if alerts.alert_public_health_source_degraded(
+            source_id,
+            source_name=source_name,
+            reasons=current.reasons,
+            run_url=run_url,
+        ):
+            notified_tier = policy.tier
+
     db.open_public_health_source_alert_incident(
         source_id,
         current.kind,
         current.fingerprint,
+        notified_tier,
     )
 
 

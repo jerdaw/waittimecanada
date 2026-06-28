@@ -6,7 +6,7 @@ on:
       heartbeat_max_age_minutes:
         description: "Maximum allowed scraper heartbeat age in minutes"
         required: false
-        default: "120"
+        default: "720"
         type: string
       run_smoke_check:
         description: "Run production smoke check in this workflow"

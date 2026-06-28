@@ -34,6 +34,7 @@ Add or update an ADR when changing:
 - `docs/adr/0025-data-quality-scrape-window-and-runtime-env-contracts.md`
 - `docs/adr/0026-public-documentation-boundary.md`
 - `docs/adr/0027-hybrid-ci-offload-strategy.md`
+- `docs/adr/0028-critical-only-operational-notification-mode.md`
 
 ## Template
 
