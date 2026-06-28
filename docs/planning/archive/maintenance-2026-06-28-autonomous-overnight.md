@@ -1,11 +1,14 @@
-# Autonomous Overnight Work Plan - 2026-06-28
+# Archived Autonomous Overnight Work Plan - 2026-06-28
 
-This is a planning artifact for a long unattended repository maintenance run.
-No product, source, or test files were changed while preparing it.
+This archived planning artifact records the completed unattended repository
+maintenance run from 2026-06-28. No product, source, or test files were changed
+while preparing the original plan.
 
 ## Chosen Artifact Path
 
-Path: `docs/planning/autonomous-overnight-plan-2026-06-28.md`
+Original path: `docs/planning/autonomous-overnight-plan-2026-06-28.md`
+
+Archived path: `docs/planning/archive/maintenance-2026-06-28-autonomous-overnight.md`
 
 Rationale: `docs/planning/` is the repository's documented planning control
 plane, with `docs/planning/README.md` listing roadmap, manual tasks, active
@@ -577,7 +580,8 @@ Extension queue validation cadence:
 
 ## 6. Implementation Status
 
-Status artifact path: `docs/planning/autonomous-overnight-plan-2026-06-28.md`
+Status artifact path:
+`docs/planning/archive/maintenance-2026-06-28-autonomous-overnight.md`
 
 Current baseline before implementation:
 

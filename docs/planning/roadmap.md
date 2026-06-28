@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-06-27)
+## Current Status (Updated 2026-06-28)
 
 **Progress:** Milestone 33 is complete. Wait Time Canada is now in a
 stewardship and selective-expansion phase: the public roadmap emphasizes
@@ -20,7 +20,10 @@ frontend audit remediation through the Vitest 4 toolchain upgrade, and a
 manual Playwright lane that no longer depends on production secrets. The same
 operational-maintenance wave added ADR-0028 critical-only notification mode so
 noncritical source-health incidents can remain stateful without paging during
-cost-constrained periods.
+cost-constrained periods. The 2026-06-28 autonomous overnight maintenance pass
+added focused regression coverage across frontend API/UI and backend
+operational helpers, archived the completed work queue, and added an active-doc
+guard against stale GitHub Actions cadence claims.
 
 Wait Time Canada is a four-province health systems observatory covering Ontario,
 Quebec, Alberta, and British Columbia. The platform audits publicly reported
