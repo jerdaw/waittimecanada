@@ -1,5 +1,19 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import {
+  act,
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+} from "@testing-library/react";
+import {
+  describe,
+  expect,
+  it,
+  vi,
+  beforeEach,
+  afterEach,
+  type Mock,
+} from "vitest";
 import { TrendChart } from "../../components/TrendChart";
 
 // Mock Recharts
@@ -23,9 +37,28 @@ vi.mock("recharts", () => {
   };
 });
 
+function mockFetchResponse(body: unknown) {
+  return {
+    json: () => Promise.resolve(body),
+  };
+}
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+
+  return { promise, resolve };
+}
+
 describe("TrendChart Component", () => {
   beforeEach(() => {
     global.fetch = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("renders loading state initially", () => {
@@ -59,6 +92,7 @@ describe("TrendChart Component", () => {
   });
 
   it("displays error message on failure", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     // @ts-ignore
     global.fetch.mockRejectedValue(new Error("Network error"));
 
@@ -69,6 +103,7 @@ describe("TrendChart Component", () => {
     });
 
     expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(errorSpy).toHaveBeenCalledWith(new Error("Network error"));
   });
 
   it("renders all six period buttons", async () => {
@@ -119,10 +154,11 @@ describe("TrendChart Component", () => {
 
     fireEvent.click(screen.getByText("7d"));
 
-    // API should be called with new period
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("period=7d"),
-    );
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining("period=7d"),
+      );
+    });
   });
 
   it("allows switching to long-range periods", async () => {
@@ -145,13 +181,100 @@ describe("TrendChart Component", () => {
     });
 
     fireEvent.click(screen.getByText("90d"));
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("period=90d"),
-    );
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining("period=90d"),
+      );
+    });
 
     fireEvent.click(screen.getByText("1y"));
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("period=1y"),
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining("period=1y"),
+      );
+    });
+  });
+
+  it("ignores stale period responses after a newer period resolves", async () => {
+    const initialResponse = {
+      period: "24h",
+      dataPoints: [{ timestamp: "2023-01-01", waitTime: 10 }],
+      aggregation: "hourly",
+      dataSource: "raw",
+    };
+    const slow7dResponse = {
+      period: "7d",
+      dataPoints: [{ timestamp: "2023-02-01", waitTime: 70 }],
+      aggregation: "daily",
+      dataSource: "raw",
+    };
+    const fast90dResponse = {
+      period: "90d",
+      dataPoints: [
+        {
+          timestamp: "2023-03-01",
+          waitTime: 90,
+          minWaitTime: 80,
+          maxWaitTime: 100,
+        },
+      ],
+      aggregation: "daily",
+      dataSource: "aggregated",
+    };
+    const slow7d = deferred<ReturnType<typeof mockFetchResponse>>();
+    const fast90d = deferred<ReturnType<typeof mockFetchResponse>>();
+    const fetchMock = global.fetch as Mock;
+
+    fetchMock
+      .mockResolvedValueOnce(mockFetchResponse(initialResponse))
+      .mockReturnValueOnce(slow7d.promise)
+      .mockReturnValueOnce(fast90d.promise);
+
+    render(<TrendChart hospitalId="test-id" />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("recharts-mock")).toHaveAttribute(
+        "data-data",
+        JSON.stringify(initialResponse.dataPoints),
+      );
+    });
+
+    fireEvent.click(screen.getByText("7d"));
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("period=7d"),
+      );
+    });
+
+    fireEvent.click(screen.getByText("90d"));
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("period=90d"),
+      );
+    });
+
+    await act(async () => {
+      fast90d.resolve(mockFetchResponse(fast90dResponse));
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(screen.getByText("Aggregated")).toBeInTheDocument();
+    expect(screen.getByTestId("recharts-mock")).toHaveAttribute(
+      "data-data",
+      JSON.stringify(fast90dResponse.dataPoints),
+    );
+
+    await act(async () => {
+      slow7d.resolve(mockFetchResponse(slow7dResponse));
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(screen.getByText("Aggregated")).toBeInTheDocument();
+    expect(screen.getByTestId("recharts-mock")).toHaveAttribute(
+      "data-data",
+      JSON.stringify(fast90dResponse.dataPoints),
     );
   });
 

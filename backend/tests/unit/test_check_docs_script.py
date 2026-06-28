@@ -333,6 +333,36 @@ def test_check_docs_requires_full_history_for_commit_audit(tmp_path: Path) -> No
     assert "Docs CI checkout must use fetch-depth: 0" in result.stdout
 
 
+def test_check_docs_rejects_active_hourly_github_actions_cadence_claim(
+    tmp_path: Path,
+) -> None:
+    root = _create_docs_fixture(tmp_path)
+    _write(
+        root / "docs" / "architecture" / "data-flow.md",
+        "The ingestion process currently runs hourly via GitHub Actions.\n",
+    )
+
+    result = _run_check_docs(root)
+
+    assert result.returncode == 1
+    assert "data-flow.md" in result.stdout
+    assert "current hourly GitHub Actions ingestion" in result.stdout
+
+
+def test_check_docs_allows_historical_archive_cadence_claim(
+    tmp_path: Path,
+) -> None:
+    root = _create_docs_fixture(tmp_path)
+    _write(
+        root / "docs" / "planning" / "archive" / "maintenance-2026-06-12.md",
+        "Historical note: the ingestion process currently runs hourly via GitHub Actions.\n",
+    )
+
+    result = _run_check_docs(root)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 def test_check_docs_rejects_file_url_in_public_csv(tmp_path: Path) -> None:
     root = _create_docs_fixture(tmp_path)
     _write(

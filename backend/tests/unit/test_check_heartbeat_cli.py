@@ -101,6 +101,46 @@ def test_reconcile_incident_state_opens_new_incident():
     )
 
 
+def test_reconcile_incident_state_dry_run_does_not_alert_or_open_incident():
+    alerts = MagicMock()
+    db = MagicMock()
+    evaluation = evaluate_source_status(
+        "ontario-health",
+        {
+            "last_run": datetime.now(UTC) - timedelta(minutes=140),
+            "status": "healthy",
+            "measurements_count": 1,
+            "consecutive_failures": 0,
+            "last_success_run": None,
+            "last_success_measurements_count": None,
+            "last_error_run": None,
+            "last_error_category": None,
+            "last_error_stage": None,
+        },
+        max_age=120,
+        max_consecutive_failures=1,
+        now=datetime.now(UTC),
+    )
+
+    reconcile_incident_state(
+        "ontario-health",
+        evaluation,
+        None,
+        alerts=alerts,
+        db=db,
+        run_url="https://github.com/example/run",
+        dry_run=True,
+        now=datetime.now(UTC),
+    )
+
+    alerts.should_send_operational_notification.assert_not_called()
+    alerts.alert_scraper_stale.assert_not_called()
+    alerts.alert_scraper_error.assert_not_called()
+    alerts.alert_scraper_resolved.assert_not_called()
+    db.open_scraper_alert_incident.assert_not_called()
+    db.resolve_scraper_alert_incident.assert_not_called()
+
+
 def test_reconcile_incident_state_suppresses_duplicate_incident():
     alerts = MagicMock()
     alerts.config.operational_notification_mode = "normal"
@@ -317,6 +357,54 @@ def test_reconcile_incident_state_suppresses_recovery_without_prior_critical_pag
     )
 
     alerts.alert_scraper_resolved.assert_not_called()
+    db.resolve_scraper_alert_incident.assert_called_once_with("ontario-health")
+
+
+def test_reconcile_incident_state_sends_recovery_after_prior_critical_page():
+    alerts = MagicMock()
+    alerts.config.operational_notification_mode = "critical_only"
+    db = MagicMock()
+    now = datetime.now(UTC)
+    evaluation = evaluate_source_status(
+        "ontario-health",
+        {
+            "last_run": now - timedelta(minutes=30),
+            "status": "healthy",
+            "measurements_count": 10,
+            "consecutive_failures": 0,
+            "last_success_run": now - timedelta(minutes=30),
+            "last_success_measurements_count": 10,
+            "last_error_run": None,
+            "last_error_category": None,
+            "last_error_stage": None,
+        },
+        max_age=720,
+        max_consecutive_failures=6,
+        now=now,
+    )
+
+    reconcile_incident_state(
+        "ontario-health",
+        evaluation,
+        {
+            "active_incident_kind": "stale",
+            "active_incident_fingerprint": "stale:ontario-health",
+            "opened_at": now - timedelta(hours=1, minutes=15),
+            "active_incident_notified_tier": "P1",
+        },
+        alerts=alerts,
+        db=db,
+        run_url="https://github.com/example/run",
+        dry_run=False,
+        now=now,
+    )
+
+    alerts.alert_scraper_resolved.assert_called_once_with(
+        "ontario-health",
+        incident_kind="stale",
+        duration="1h 15m",
+        run_url="https://github.com/example/run",
+    )
     db.resolve_scraper_alert_incident.assert_called_once_with("ontario-health")
 
 

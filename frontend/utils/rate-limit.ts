@@ -7,9 +7,16 @@ type RateLimitOptions = {
   interval?: number;
 };
 
-const tokenCache = new LRUCache<string, number>({
+type RateLimitEntry = {
+  usage: number;
+  resetAtMs: number;
+};
+
+const RATE_LIMIT_WINDOW_MS = 60000;
+
+const tokenCache = new LRUCache<string, RateLimitEntry>({
   max: 500, // Max 500 unique IPs per interval
-  ttl: 60000, // 1 minute
+  ttl: RATE_LIMIT_WINDOW_MS, // 1 minute
   allowStale: false,
 });
 
@@ -38,9 +45,16 @@ export async function checkRateLimit(
 ): Promise<NextResponse | null> {
   const ip = getClientIp(req);
   const token = ip.toString();
+  const now = Date.now();
+  const existing = tokenCache.get(token);
+  const existingUsage =
+    existing && existing.resetAtMs > now ? existing.usage : 0;
 
-  const currentUsage = (tokenCache.get(token) || 0) + 1;
-  tokenCache.set(token, currentUsage);
+  const currentUsage = existingUsage + 1;
+  tokenCache.set(token, {
+    usage: currentUsage,
+    resetAtMs: now + RATE_LIMIT_WINDOW_MS,
+  });
 
   const remaining = Math.max(0, limit - currentUsage);
 
@@ -60,4 +74,8 @@ export async function checkRateLimit(
   }
 
   return null;
+}
+
+export function resetRateLimitForTests() {
+  tokenCache.clear();
 }

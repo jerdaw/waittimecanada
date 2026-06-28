@@ -112,6 +112,87 @@ class TestQualityDiffService:
         assert diff["deltas"]["success_rate_delta"] == pytest.approx(-0.15)
         assert "Coverage degraded by 15.0%" in diff["summary"]
 
+    def test_get_source_diff_stable_when_success_delta_is_below_threshold(self, service, mock_conn):
+        cursor = mock_conn.cursor.return_value.__enter__.return_value
+        today = date(2026, 2, 19)
+        _mock_trend_rows(
+            cursor,
+            [
+                (today, "ontario-er", 100, 0.951, 0.8, 0, 120),  # Current
+                (
+                    today - timedelta(days=7),
+                    "ontario-er",
+                    100,
+                    0.95,
+                    0.8,
+                    0,
+                    120,
+                ),  # Baseline
+            ],
+        )
+
+        diff = service.get_source_diff("ontario-er", compare_days=7)
+
+        assert diff["has_baseline"] is True
+        assert diff["deltas"]["success_rate_delta"] == pytest.approx(0.001)
+        assert diff["deltas"]["hospitals_reporting_delta"] == 0
+        assert diff["deltas"]["worst_gap_delta"] == 0
+        assert "Coverage stable" in diff["summary"]
+
+    def test_get_source_diff_handles_null_gap_values(self, service, mock_conn):
+        cursor = mock_conn.cursor.return_value.__enter__.return_value
+        today = date(2026, 2, 19)
+        _mock_trend_rows(
+            cursor,
+            [
+                (today, "ontario-er", 100, 0.95, 0.8, 0, None),  # Current
+                (
+                    today - timedelta(days=7),
+                    "ontario-er",
+                    100,
+                    0.95,
+                    0.8,
+                    0,
+                    None,
+                ),  # Baseline
+            ],
+        )
+
+        diff = service.get_source_diff("ontario-er", compare_days=7)
+
+        assert diff["current_metrics"]["worst_gap_minutes"] == 0.0
+        assert diff["baseline_metrics"]["worst_gap_minutes"] == 0.0
+        assert diff["deltas"]["worst_gap_delta"] == 0.0
+        assert "Coverage stable" in diff["summary"]
+
+    def test_get_source_diff_handles_zero_baseline_values(self, service, mock_conn):
+        cursor = mock_conn.cursor.return_value.__enter__.return_value
+        today = date(2026, 2, 19)
+        _mock_trend_rows(
+            cursor,
+            [
+                (today, "ontario-er", 0, 0.0, 0.0, 0, 0),  # Current
+                (
+                    today - timedelta(days=7),
+                    "ontario-er",
+                    0,
+                    0.0,
+                    0.0,
+                    0,
+                    0,
+                ),  # Baseline
+            ],
+        )
+
+        diff = service.get_source_diff("ontario-er", compare_days=7)
+
+        assert diff["has_baseline"] is True
+        assert diff["baseline_metrics"]["avg_success_rate"] == 0.0
+        assert diff["current_metrics"]["avg_success_rate"] == 0.0
+        assert diff["deltas"]["success_rate_delta"] == 0.0
+        assert diff["deltas"]["hospitals_reporting_delta"] == 0
+        assert "Coverage stable" in diff["summary"]
+
     def test_get_source_diff_no_baseline(self, service, mock_conn):
         cursor = mock_conn.cursor.return_value.__enter__.return_value
         # Trend returns nothing

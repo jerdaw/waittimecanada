@@ -86,6 +86,36 @@ class TestAlertService:
         result = service.send_alert("Title", "Msg")
         assert result is False
 
+    @pytest.mark.parametrize("tier", ["P0", "P1", "P2", "P3"])
+    def test_should_send_operational_notification_allows_all_tiers_in_normal_mode(self, tier):
+        service = AlertService(AlertConfig(operational_notification_mode="normal"))
+
+        assert (
+            service.should_send_operational_notification(
+                NotificationPolicy(tier=tier, incident_key=f"incident:{tier}")
+            )
+            is True
+        )
+
+    @pytest.mark.parametrize(
+        ("tier", "expected"),
+        [
+            ("P0", True),
+            ("P1", True),
+            ("P2", False),
+            ("P3", False),
+        ],
+    )
+    def test_should_send_operational_notification_gates_critical_only_by_tier(self, tier, expected):
+        service = AlertService(AlertConfig(operational_notification_mode="critical_only"))
+
+        assert (
+            service.should_send_operational_notification(
+                NotificationPolicy(tier=tier, incident_key=f"incident:{tier}")
+            )
+            is expected
+        )
+
     def test_send_alert_suppresses_p2_in_critical_only(self):
         config = AlertConfig(
             alert_user_key="k",

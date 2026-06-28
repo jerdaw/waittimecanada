@@ -65,6 +65,9 @@ describe("/api/data-quality", () => {
     const data = await res.json();
 
     expect(res.status).toBe(200);
+    expect(res.headers.get("Cache-Control")).toBe(
+      "public, max-age=0, s-maxage=300, stale-while-revalidate=900",
+    );
     expect(data.sources).toHaveLength(2);
     expect(
       data.sources.map((source: { source_id: string }) => source.source_id),
@@ -172,6 +175,7 @@ describe("/api/data-quality", () => {
     const data = await res.json();
 
     expect(res.status).toBe(400);
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
     expect(data.error).toBe("Validation Error");
   });
 
@@ -189,8 +193,29 @@ describe("/api/data-quality", () => {
 
       expect(res.status).toBe(400);
       expect(data.error).toBe("Validation Error");
+      expect(res.headers.get("Cache-Control")).toBe("no-store");
     },
   );
+
+  it("returns no-store errors when data-quality queries fail", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    (getDb as Mock).mockImplementation(() => {
+      throw new Error("database unavailable");
+    });
+
+    const res = await GET(new Request("http://localhost/api/data-quality"));
+    const data = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
+    expect(data.error).toBe("database unavailable");
+    expect(errorSpy).toHaveBeenCalledWith(
+      "Failed to fetch data quality:",
+      expect.any(Error),
+    );
+
+    errorSpy.mockRestore();
+  });
 
   it("annotates source trend responses when snapshots span the cadence-model shift", async () => {
     const mockSql = vi.fn();

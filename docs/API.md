@@ -141,9 +141,8 @@ public KPI percentages against the active live scraper set only:
 
 Operational note:
 
-- these aggregate percentages now reflect the current hourly GitHub Actions
-  scraper cadence (`24` expected runs/day), not the older 15-minute expectation
-  model
+- these aggregate percentages now reflect the current hourly scraper expectation
+  model (`24` expected runs/day), not the older 15-minute expectation model
 - hospital-level scrape counts and success rates are computed from distinct UTC
   hourly scrape windows, not raw measurement-row counts
 - aggregate measurement counts are returned as actual counts, not reconstructed

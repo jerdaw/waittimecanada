@@ -2,12 +2,29 @@ import { render, screen, waitFor, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { SystemStatus } from "@/components/SystemStatus";
 
+function mockHealthyFetch() {
+  (global.fetch as any).mockImplementation(async () => ({
+    json: async () => ({
+      healthy: true,
+      last_update: new Date().toISOString(),
+      stale_threshold_minutes: 90,
+      sources: [{ source_id: "test", status: "healthy" }],
+    }),
+  }));
+}
+
+async function flushPromises() {
+  await Promise.resolve();
+  await Promise.resolve();
+}
+
 describe("SystemStatus", () => {
   beforeEach(() => {
     global.fetch = vi.fn();
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -65,13 +82,34 @@ describe("SystemStatus", () => {
     expect(screen.getByText(/updated 100m ago/i)).toBeInTheDocument();
   });
 
-  it("displays down status when data is very stale (>120 min)", async () => {
-    const veryStaleTime = new Date(Date.now() - 180 * 60 * 1000); // 3 hours ago
+  it("displays down status when data is older than twice the default stale threshold", async () => {
+    const veryStaleTime = new Date(Date.now() - 181 * 60 * 1000);
     (global.fetch as any).mockResolvedValue({
       json: async () => ({
-        healthy: false,
+        healthy: true,
         last_update: veryStaleTime.toISOString(),
-        sources: [{ source_id: "test", status: "error" }],
+        sources: [{ source_id: "test", status: "stale" }],
+      }),
+    });
+
+    render(<SystemStatus />);
+
+    await waitFor(
+      () => {
+        expect(screen.getByText("Data Unavailable")).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+  });
+
+  it("displays down status when data is older than twice a custom stale threshold", async () => {
+    const veryStaleTime = new Date(Date.now() - 91 * 60 * 1000);
+    (global.fetch as any).mockResolvedValue({
+      json: async () => ({
+        healthy: true,
+        last_update: veryStaleTime.toISOString(),
+        stale_threshold_minutes: 45,
+        sources: [{ source_id: "test", status: "stale" }],
       }),
     });
 
@@ -98,7 +136,7 @@ describe("SystemStatus", () => {
     );
   });
 
-  it("displays down status when API returns unhealthy", async () => {
+  it("displays down status when API returns unhealthy even if data is recent", async () => {
     (global.fetch as any).mockResolvedValue({
       json: async () => ({
         healthy: false,
@@ -135,5 +173,44 @@ describe("SystemStatus", () => {
       },
       { timeout: 3000 },
     );
+  });
+
+  it("polls every five minutes only when the tab is visible and refetches on visibility return", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-27T12:00:00.000Z"));
+    mockHealthyFetch();
+    let visibilityState = "visible";
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      get: () => visibilityState,
+    });
+
+    render(<SystemStatus />);
+
+    await act(async () => {
+      await flushPromises();
+    });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      vi.advanceTimersByTime(5 * 60 * 1000);
+      await flushPromises();
+    });
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+
+    visibilityState = "hidden";
+    await act(async () => {
+      vi.advanceTimersByTime(5 * 60 * 1000);
+      await flushPromises();
+    });
+
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+
+    visibilityState = "visible";
+    await act(async () => {
+      document.dispatchEvent(new Event("visibilitychange"));
+      await flushPromises();
+    });
+    expect(global.fetch).toHaveBeenCalledTimes(3);
   });
 });

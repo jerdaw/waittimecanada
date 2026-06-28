@@ -62,6 +62,7 @@ describe("ResourceList", () => {
         "Reference directory data. This is not a live operational status feed.",
       ),
     ).toBeInTheDocument();
+    expect(screen.getByText("Current source metadata")).toBeInTheDocument();
     expect(screen.getByText("Source: MOHSERLO")).toBeInTheDocument();
   });
 

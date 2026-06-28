@@ -375,6 +375,22 @@ describe("ResourcesPage", () => {
     expect(
       screen.getAllByText("Approved with conditions").length,
     ).toBeGreaterThan(0);
+    expect(screen.getByText("Health Canada Recalls")).toBeInTheDocument();
+    expect(screen.getByText("OpenStreetMap AED")).toBeInTheDocument();
+    expect(
+      screen.getByText("Ontario Land Ambulance Response Times"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("ISC Long-term Drinking Water Advisories"),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Current").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Last verified").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("View official source").length).toBeGreaterThan(
+      0,
+    );
+    expect(
+      screen.getAllByText("Visible official provenance required.").length,
+    ).toBeGreaterThan(0);
     expect(screen.getByText("Analytics only")).toBeInTheDocument();
     expect(screen.getAllByText("Scheduled ingest").length).toBeGreaterThan(0);
     expect(
@@ -403,6 +419,9 @@ describe("ResourcesPage", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Toronto General Hospital")).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(screen.getByText("MOHSERLO")).toBeInTheDocument();
     });
     expect(
       screen.getByText(
@@ -541,6 +560,7 @@ describe("ResourcesPage", () => {
         ).length,
       ).toBe(2);
     });
+    expect(screen.getAllByText("Hidden").length).toBeGreaterThan(0);
 
     await waitFor(() => {
       expect(

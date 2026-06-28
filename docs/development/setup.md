@@ -106,6 +106,13 @@ bash scripts/check-docs.sh
 
 - `uv sync --locked` fails after dependency edits:
   refresh `backend/uv.lock` intentionally and include that lockfile change.
+- `uv` is not on `PATH` during local troubleshooting:
+  first restore the documented `uv` install path above. If an already-created
+  `backend/.venv` is available, you may run repo-local tools directly with
+  `.venv/bin/python -m pytest ...`, `.venv/bin/ruff ...`, or
+  `.venv/bin/mypy ...` as a temporary local fallback. Do not use this fallback
+  to update dependencies, and do not inspect local env files while debugging
+  tool availability.
 - Analytics regions setup warnings on `/analytics`:
   run `uv run python -m waittime.cli.bootstrap_analytics --days 180` from `backend/`.
 - Missing map rendering:
