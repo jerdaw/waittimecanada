@@ -73,7 +73,7 @@ describe("Benchmarks API", () => {
     expect(json.data.hospitals[2].trend).toBe("stable");
   });
 
-  it("returns 404 when hospital_id has no benchmark data", async () => {
+  it("returns an empty benchmark list when hospital_id has no benchmark data", async () => {
     mockSql.mockResolvedValue([
       {
         hospital_id: "h1",
@@ -91,9 +91,11 @@ describe("Benchmarks API", () => {
     const response = await GET(request);
     const json = await response.json();
 
-    expect(response.status).toBe(404);
-    expect(json.success).toBe(false);
-    expect(json.error).toBe("Hospital not found in benchmark set");
+    expect(response.status).toBe(200);
+    expect(json.success).toBe(true);
+    expect(json.data.hospitals).toEqual([]);
+    expect(json.data.methodology_summary.distinct_groups).toBe(0);
+    expect(json.data.message).toContain("no benchmarkable aggregate data");
   });
 
   it("handles database failures", async () => {

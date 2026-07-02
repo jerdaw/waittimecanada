@@ -330,18 +330,6 @@ export async function GET(request: NextRequest) {
       ? hospitals.filter((hospital) => hospital.hospital_id === hospitalId)
       : hospitals;
 
-    if (hospitalId && selectedHospitals.length === 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Hospital not found in benchmark set",
-          message:
-            "The requested hospital has no benchmarkable aggregate data for this province and period",
-        },
-        { status: 404, headers: NO_STORE_HEADERS },
-      );
-    }
-
     return NextResponse.json(
       {
         success: true,
@@ -353,6 +341,12 @@ export async function GET(request: NextRequest) {
           methodology_summary: computeMethodologyHomogeneity(selectedHospitals),
           province_stats: cachedBenchmarks.province_stats,
           hospitals: selectedHospitals,
+          ...(hospitalId && selectedHospitals.length === 0
+            ? {
+                message:
+                  "The requested hospital has no benchmarkable aggregate data for this province and period",
+              }
+            : {}),
         },
       },
       { headers: publicCacheHeaders(300, 900) },
