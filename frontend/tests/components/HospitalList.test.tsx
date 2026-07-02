@@ -11,6 +11,12 @@ vi.mock("@/components/TemporalPatterns", () => ({
   TemporalPatterns: () => null,
 }));
 
+vi.mock("@/components/ExpandedCardDetails", () => ({
+  ExpandedCardDetails: ({ hospital }: { hospital: { id: string } }) => (
+    <div data-testid={`expanded-${hospital.id}`}>Expanded details</div>
+  ),
+}));
+
 // Mock scrollIntoView since it's not implemented in JSDOM
 // Element.prototype.scrollIntoView = vi.fn();
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
@@ -136,6 +142,25 @@ describe("HospitalList", () => {
     // We should verify the STATE change triggers CSS class change.
     // but in unit test we can't easily check computed styles of grid expansion in JSDOM reliably.
     // We can check if the `grid-rows-[1fr]` class is applied.
+  });
+
+  it("does not mount expanded details for collapsed rows", () => {
+    render(
+      <HospitalList
+        hospitals={mockHospitals}
+        selectedId={null}
+        onSelect={() => {}}
+      />,
+    );
+
+    expect(screen.queryByTestId("expanded-h1")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("expanded-h2")).not.toBeInTheDocument();
+
+    const button1 = screen.getByText("General Hospital").closest("button");
+    fireEvent.click(button1!);
+
+    expect(screen.getByTestId("expanded-h1")).toBeInTheDocument();
+    expect(screen.queryByTestId("expanded-h2")).not.toBeInTheDocument();
   });
 
   it("toggles expansion state independently", () => {

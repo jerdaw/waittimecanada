@@ -310,10 +310,12 @@ export function HospitalList({
                     )}
                   >
                     <div className="overflow-hidden px-3 pb-3">
-                      <ExpandedCardDetails
-                        hospital={hospital}
-                        userLocation={userLocation}
-                      />
+                      {isExpanded && (
+                        <ExpandedCardDetails
+                          hospital={hospital}
+                          userLocation={userLocation}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
