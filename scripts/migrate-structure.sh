@@ -33,7 +33,7 @@ if [ ! -f "mkdocs.yml" ]; then
     exit 1
 fi
 
-echo "This script will migrate your repository to the modern structure."
+echo "This script migrates this repository to the modern structure."
 echo "It will:"
 echo "  - Rename scrapers/ → backend/"
 echo "  - Reorganize documentation"
@@ -109,7 +109,7 @@ echo "🧪 Phase 3: Reorganizing tests..."
 if [ -d "backend/tests" ]; then
     mkdir -p backend/tests/{unit,integration,e2e,fixtures}
 
-    # Move existing tests (you'll need to categorize manually)
+    # Existing tests require manual categorization.
     print_warning "Tests directory exists but needs manual categorization"
     print_warning "Please organize tests into unit/, integration/, e2e/"
 else

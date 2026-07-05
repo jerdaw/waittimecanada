@@ -13,8 +13,8 @@ Validate whether methodology transparency and divergence warnings are useful, un
 ## Intro Script
 
 Thanks for taking the time.
-I am validating a wait-time transparency tool that flags invalid comparisons when provinces use different measurement methods.
-I want to understand whether the framing is useful and what should be changed before broader launch.
+This interview is validating a wait-time transparency tool that flags invalid comparisons when provinces use different measurement methods.
+The goal is to understand whether the framing is useful and what should be changed before broader launch.
 
 ## Core Questions
 
@@ -32,8 +32,8 @@ I want to understand whether the framing is useful and what should be changed be
 
 ## Wrap-Up Script
 
-Thank you. I will summarize your feedback and track any resulting product changes.
-Would you be open to a quick follow-up after updates are implemented?
+Thank you. Feedback will be summarized and any resulting product changes will be tracked.
+Would you be open to a brief follow-up after updates are implemented?
 
 ## Capture Notes
 

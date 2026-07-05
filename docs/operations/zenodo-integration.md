@@ -1,20 +1,20 @@
 # Zenodo DOI Integration Guide
 
-> **⏸️ Status: Repo Prepared, External Activation Parked**
+> **Status: Repo Prepared, External Activation Parked**
 >
-> The repository and release side are prepared, but the real DOI does **not** exist yet. The remaining Zenodo activation and publication steps are intentionally parked until explicit user go-ahead.
+> The repository and release side are prepared, but the real DOI does **not** exist yet. The remaining Zenodo activation and publication steps are intentionally parked until explicit maintainer approval.
 
 ## Overview
 
-This guide walks you through linking your GitHub repository to Zenodo to generate a permanent Digital Object Identifier (DOI) for academic citations.
+This guide documents how to link the GitHub repository to Zenodo to generate a permanent Digital Object Identifier (DOI) for academic citations.
 
 **Current Status:**
-- ✅ Repository prepared with `.zenodo.json` metadata
-- ✅ `CITATION.cff` updated for the current public release
-- ✅ Current public release prepared on GitHub
-- ⏸️ Zenodo activation and publication still require human account access
+- Repository prepared with `.zenodo.json` metadata
+- `CITATION.cff` updated for the current public release
+- Current public release prepared on GitHub
+- Zenodo activation and publication still require human account access
 
-**What's Left:** 🔄 Human action required in Zenodo (about 10 minutes) once this track is explicitly activated
+**Remaining work:** Human action is required in Zenodo after this track is explicitly activated.
 
 ---
 
@@ -31,11 +31,11 @@ This guide walks you through linking your GitHub repository to Zenodo to generat
 
 ## Prerequisites
 
-- ✅ GitHub repository with releases
-- ✅ `.zenodo.json` metadata file (created)
-- ✅ CITATION.cff file (created)
-- ⏸️ README DOI badge will be added only after a real DOI exists
-- 🔄 Zenodo account (you'll create this)
+- GitHub repository with releases
+- `.zenodo.json` metadata file
+- `CITATION.cff` file
+- README DOI badge will be added only after a real DOI exists
+- Zenodo account access
 
 ---
 
@@ -46,17 +46,17 @@ This guide walks you through linking your GitHub repository to Zenodo to generat
 1. Go to **[https://zenodo.org](https://zenodo.org)**
 2. Click **"Log in"** in the top-right corner
 3. Click **"Log in with GitHub"**
-4. Authorize Zenodo to access your GitHub account
-5. You'll be redirected to your Zenodo dashboard
+4. Authorize Zenodo to access the GitHub account
+5. Zenodo redirects to the Zenodo dashboard
 
-**Why GitHub login?** This automatically links your GitHub account for repository syncing.
+**Why GitHub login?** This links the GitHub account for repository syncing.
 
 ---
 
 ### Step 2: Enable GitHub Integration (3 minutes)
 
 1. In Zenodo, click your **username** (top-right) → **"GitHub"**
-2. You'll see the GitHub integration page with a list of your repositories
+2. Zenodo shows the GitHub integration page with a list of repositories
 3. Find **"jerdaw/waittimecanada"** in the list
 4. Click the **"On"** toggle switch to enable syncing
 5. The switch should turn green, indicating the repository is now linked
@@ -96,29 +96,29 @@ Zenodo will automatically detect the new release within minutes.
 ### Step 4: Publish on Zenodo (2 minutes)
 
 1. Go to [https://zenodo.org/me/uploads](https://zenodo.org/me/uploads)
-2. You'll see your repository listed (may say "In progress")
+2. Confirm the repository is listed (it may say "In progress")
 3. Click on the repository entry
 4. Review the metadata (pre-filled from `.zenodo.json`):
-   - ✅ Title
-   - ✅ Authors
-   - ✅ Description
-   - ✅ Keywords
-   - ✅ License (MIT)
-   - ✅ Related identifiers
+   - Title
+   - Authors
+   - Description
+   - Keywords
+   - License (MIT)
+   - Related identifiers
 5. Click **"Publish"** button
-6. Your DOI is now live! 🎉
+6. The DOI is live after publication.
 
 ---
 
 ### Step 5: Verify DOI Badge (1 minute)
 
-1. Go to your GitHub repository: https://github.com/jerdaw/waittimecanada
+1. Go to the GitHub repository: https://github.com/jerdaw/waittimecanada
 2. Check the README after the badge is added in a follow-up commit
 3. Click the badge to verify it links to your Zenodo record
 
 **Badge URL Format:** Zenodo will provide both the badge image URL and the latest DOI link after publication.
 
-The badge automatically updates when you create new releases!
+The badge automatically updates when new releases are created.
 
 ---
 
@@ -128,7 +128,7 @@ Zenodo creates **two types of DOIs**:
 
 ### 1. Concept DOI (Permanent)
 - Example: `10.5281/zenodo.1234567`
-- Points to **all versions** of your repository
+- Points to **all versions** of the repository
 - Use this in your CV, applications, and general citations
 - Never changes, even with new releases
 
@@ -144,7 +144,7 @@ Zenodo creates **two types of DOIs**:
 
 ## Updating CITATION.cff (Optional)
 
-After getting your DOI, you can add it to `CITATION.cff`:
+After a DOI exists, add it to `CITATION.cff`:
 
 ```yaml
 cff-version: 1.2.0
@@ -152,7 +152,7 @@ title: "Wait Time Canada"
 message: "If you use this software, please cite it as below."
 type: software
 authors:
-  - family-names: "Daw"
+  - family-names: "Dawson"
     given-names: "Jeremy"
 repository-code: "https://github.com/jerdaw/waittimecanada"
 url: "https://github.com/jerdaw/waittimecanada"
@@ -195,7 +195,7 @@ doi: 10.5281/zenodo.XXXXXXX  # ← Add your concept DOI here
 
 ## For Future Releases
 
-Once Zenodo is linked, **no additional action needed!**
+Once Zenodo is linked, routine releases require no additional manual Zenodo action.
 
 Every time you create a GitHub release:
 1. Zenodo automatically detects it
@@ -255,4 +255,4 @@ Available: https://doi.org/10.5281/zenodo.XXXXXXX
 
 **Estimated Time:** 10 minutes
 
-**Once complete:** Your repository will have a permanent, citable DOI recognized by academic institutions worldwide! 🎓
+**Once complete:** The repository will have a permanent, citable DOI recognized by academic institutions worldwide.

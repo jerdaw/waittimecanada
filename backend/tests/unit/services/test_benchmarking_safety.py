@@ -56,13 +56,6 @@ class TestBenchmarkingOntologySafety:
 
         benchmark_rows = []  # empty is fine, we care about the query params
 
-        # We use side_effect to return different things for different calls
-        # checks based on query string presence? Or just order.
-        # Order: 1. get_prov (maybe), 2. get_dominant, 3. get_rows
-        # Actually compute_benchmarks calls:
-        # 1. _get_dominant_ontology
-        # 2. _query_benchmark_rows
-
         mock_cursor.fetchone.side_effect = [
             dominant_ontology_row,  # for _get_dominant_ontology
         ]
@@ -71,22 +64,15 @@ class TestBenchmarkingOntologySafety:
             benchmark_rows,  # for _query_benchmark_rows
         ]
 
-        # Execute
         result = bs.compute_benchmarks("ON", period_days=7)
-
-        # Verification
-        # Check that execute was called with correct params
-        # We expect at least 2 execute calls.
 
         calls = mock_cursor.execute.call_args_list
 
-        # First call: Dominant Ontology Query
         assert len(calls) >= 2
         dominant_query_call = calls[0]
         assert "SELECT" in dominant_query_call[0][0]
         assert "COUNT(*)" in dominant_query_call[0][0]  # ensure it's the counting query
 
-        # Second call: Benchmark Query
         benchmark_query_call = calls[1]
         query_sql = benchmark_query_call[0][0]
         query_params = benchmark_query_call[0][1]
@@ -94,11 +80,8 @@ class TestBenchmarkingOntologySafety:
         # The query SQL should contain the ontology filter placeholders
         assert "AND metric_family = %s" in query_sql
 
-        # The params should include the dominant ontology values
-        # logic: 2 timestamps + 4 ontology params + 2 timestamps + 4 ontology params + 3 ontology (measurements) + province
-        # We just check existence of "nurse_seen" in params
+        # Dominant ontology values must be threaded into the benchmark query params.
         assert "nurse_seen" in query_params
         assert "wait_time" in query_params
 
-        # Verify result contains ontology info
         assert result["ontology"] == dominant_ontology_row

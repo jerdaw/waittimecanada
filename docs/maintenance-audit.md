@@ -924,3 +924,156 @@ At pre-commit review time:
 - Ignored local dependency/cache/env/private trees were not inspected.
 - Generated verification artifacts were cleaned; ignored env, dependency, and
   private trees remain untouched.
+
+## Professionalization Pass Addendum (2026-07-05)
+
+### Metadata
+
+- Audit date: 2026-07-05.
+- Pass: code-adjacent writing professionalization.
+- Prompt-pack root: external v6 professionalization prompt pack located outside
+  the repository; exact local filesystem path intentionally omitted from this
+  public report.
+- Branch/status at start: `main...origin/main` with no uncommitted tracked
+  changes.
+- Report location: appended to existing `docs/maintenance-audit.md` to avoid
+  creating a new reporting structure.
+
+### Audience And Maturity Assessment
+
+Wait Time Canada is a public, health-adjacent observatory for emergency
+department wait-time methodology, provenance, data quality, and public-health
+resource context. The appropriate writing style is factual, durable, modest,
+and explicit about clinical-safety and comparability limits. The repo should be
+shareable with reviewers, maintainers, contributors, and public-interest
+readers without sounding promotional, apologetic, private, or session-bound.
+
+### Coverage Tier And Inventory
+
+Coverage tier: medium, risk-based. The repository has 581 tracked files. The
+professionalization inventory counted 558 reviewable text files and about
+93,892 reviewable lines after excluding dependency/cache/build artifacts,
+binary assets, lockfile line-by-line review, ignored local private trees, and
+secret-pattern files.
+
+Surfaces inspected:
+
+- Top-level docs and metadata: `README.md`, `CONTRIBUTING.md`, `SECURITY.md`,
+  `CHANGELOG.md`, `CITATION.cff`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`.
+- Documentation hubs and active public docs: `docs/README.md`,
+  `docs/index.md`, `docs/API.md`, `docs/openapi.yaml`,
+  `docs/planning/roadmap.md`, `docs/planning/README.md`,
+  `docs/planning/index.md`, `docs/development/*`,
+  `docs/operations/*`, `docs/reference/*`.
+- Research and stakeholder materials: `docs/geocoding-research-plan.md`,
+  `docs/stakeholder-interviews/*`, `docs/research/*`,
+  `docs/case-studies/ottawa-gatineau-divergence.md`.
+- ADR and planning samples: `docs/adr/*`, `docs/planning/archive/*`,
+  `docs/planning/implementation/archived/*`.
+- Source comments and user-visible strings in representative frontend/backend
+  surfaces: `frontend/components/Map.tsx`, `frontend/middleware.ts`,
+  `frontend/i18n/request.ts`, selected API/page/component tests,
+  `backend/src/waittime/cli/seed_sources.py`,
+  `backend/src/waittime/services/benchmarking.py`, selected backend tests.
+- Scripts and automation docs: `scripts/check-docs.sh`,
+  `scripts/migrate-structure.sh`, `.github/ISSUE_TEMPLATE/*`,
+  `.github/PULL_REQUEST_TEMPLATE.md`, `.github/workflows/README.md`.
+
+### Searches And Probes Run
+
+- `git status --short`, `git rev-parse --show-toplevel`, `git ls-files`, and a
+  reviewable-file classification over tracked files.
+- Filename discovery for the two required prompt-pack contract files, followed
+  by read-only inspection of those files.
+- Broad wording probes for chatty, apologetic, profanity, joke, temporary,
+  vague TODO, and session-style language across tracked non-secret text.
+- Automated-tool and non-human attribution probes, manually filtered for
+  intentional docs-check fixtures, robot opt-out user-agent strings, and
+  repo-local authorship guardrails.
+- TODO/FIXME/HACK/XXX and temporary-wording probes across docs, source, tests,
+  scripts, and workflow text.
+- Personal/private-context probes across public docs and code-adjacent writing,
+  manually filtered for legitimate citation authorship, ADR deciders, public
+  privacy terminology, and user-facing copy.
+- Emoji/status-marker probe, manually filtered for established README and CLI
+  output conventions; edited only the parked Zenodo guide where the tone was
+  unnecessarily celebratory.
+- Manual inspection of high-signal hits rather than completing from search
+  output alone.
+
+### Candidate Wording Ledger
+
+| Candidate | Status | Decision rationale |
+| --- | --- | --- |
+| Stakeholder outreach/interview scripts used avoidable first-person project rationale and scheduling language | Fixed | Templates remain usable, but wording is more durable and less personally framed. |
+| `docs/geocoding-research-plan.md` presented a copied request as an ad hoc first-person prompt | Fixed | Reframed as a reusable request template without changing the hospital input list. |
+| `docs/operations/zenodo-integration.md` used parked external-action wording, checkmark/status emoji, celebratory language, and a citation example typo | Fixed | DOI activation posture is unchanged; wording is calmer and citation metadata is corrected. |
+| Source/test comments contained implementation-diary phrasing such as uncertainty notes and self-dialogue | Fixed | Removed or replaced with concise technical intent; no behavior or assertions changed. |
+| `scripts/migrate-structure.sh` had user-directed script wording | Fixed | Output/comment now refer to this repository and required manual categorization. |
+| README status icons and milestone checklist emoji | Left unchanged | They are established public presentation conventions in the repo and not misleading by themselves. |
+| ADR user stories using first person | Left unchanged | User-story format is intentional architecture documentation, not personal diary language. |
+| Research note saying the naloxone link-out posture applies "for now" | Left unchanged | The phrase captures a current legal/reuse posture and changing it could weaken the decision record. |
+| Archived maintenance/planning history with older wording | Left unchanged | Historical context is useful; no active doc points to it as current behavior. |
+| Docs-check tests and guardrails containing automated-tool names | Left unchanged | They are intentional negative fixtures and policy checks, not attribution. |
+| Exact private prompt-pack path | Omitted from report | Public documentation boundary forbids local environment-specific paths. |
+
+### Safe Changes Made
+
+- Rewrote stakeholder templates to describe the project and interview purpose
+  neutrally while preserving the workflow.
+- Reframed the geocoding research prompt as a reusable request template.
+- Cleaned the Zenodo guide by replacing transient approval wording, removing
+  decorative status markers, reducing second-person claims, and fixing the
+  `family-names` example.
+- Replaced frontend/backend source and test comment residue with concise
+  technical comments or removed comments that added no durable value.
+- Removed a stale E2E comment claiming `ThemeToggle` had not been added even
+  though `frontend/components/Header.tsx` now renders it.
+- Appended this addendum to the existing audit report.
+- Updated `docs/planning/roadmap.md` with a narrow status/follow-up note for
+  the professionalization pass.
+
+### Rewrite Patterns Applied
+
+- Personal rationale to project rationale.
+- Prompt/session wording to reusable template wording.
+- Self-dialogue test comments to technical assertions or no comment.
+- Celebration and owner-specific wording to neutral operational wording.
+- Stale planning note to deletion when the code already disproved it.
+
+### Verification
+
+Passed:
+
+- `bash scripts/check-docs.sh`
+- `cd backend && <local-uv> run ruff check src tests scripts`
+- `cd backend && <local-uv> run ruff format --check src tests scripts`
+- `cd backend && TMPDIR=/tmp TMP=/tmp TEMP=/tmp <local-uv> run pytest tests/unit/test_benchmarking_coverage.py tests/unit/services/test_benchmarking_safety.py tests/unit/test_source_consistency.py`
+  - Result: 16 passed.
+- `cd frontend && PATH=<node22-bin>:$PATH npm run lint`
+- `cd frontend && PATH=<node22-bin>:$PATH npm run type-check`
+- `cd frontend && PATH=<node22-bin>:$PATH npm run type-check:test`
+- `cd frontend && PATH=<node22-bin>:$PATH npm run test:unit -- tests/components/HospitalList.test.tsx app/api/compare/route.test.ts tests/api/hospitals.test.ts`
+  - Result: 3 test files passed, 15 tests passed.
+- `cd frontend && PATH=<node22-bin>:$PATH npm run format:check`
+- `git diff --check`
+
+Initial direct `uv` and `npm` invocations failed because those executables were
+not on `PATH` in this shell. Verification was rerun with explicit existing local
+tool paths, redacted here to preserve the public documentation boundary, and
+the frontend's Node 22 runtime.
+
+### Risks, Assumptions, And Follow-Ups
+
+- No secret files, ignored private trees, production systems, deploys, or
+  production data were inspected or touched.
+- The pass did not mass-rewrite README/ADR emoji/status conventions because
+  that would create broad style churn without clear value.
+- The pass did not rewrite archived planning documents except where searches
+  were needed to classify false positives.
+- Full backend and frontend suites were not rerun because edits were limited to
+  docs and comments; targeted checks plus lint/type/docs verification covered
+  the changed surfaces.
+- A future focused pass could review old historical scripts such as
+  `scripts/migrate-structure.sh` for continued usefulness, but that would be a
+  maintenance/ownership decision rather than a wording-only change.

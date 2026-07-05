@@ -27,7 +27,10 @@ guard against stale GitHub Actions cadence claims. The 2026-07-05
 deep-evidence maintenance audit corrected hospital API pagination behavior,
 removed noisy/sensitive success logging, removed broken backend package script
 metadata, refreshed setup/API/environment/migration documentation, and recorded
-remaining nonessential findings in `docs/maintenance-audit.md`.
+remaining nonessential findings in `docs/maintenance-audit.md`. The follow-up
+2026-07-05 professionalization pass neutralized code-adjacent writing in
+templates, source comments, test comments, scripts, and parked operations docs
+without changing runtime behavior.
 
 Wait Time Canada is a four-province health systems observatory covering Ontario,
 Quebec, Alberta, and British Columbia. The platform audits publicly reported
@@ -85,9 +88,10 @@ paths are intentionally excluded from public documentation.
   test-type-check guardrails during routine maintenance.
 - Keep frontend dependency audit remediation current; the 2026-06-27 pass
   leaves `npm audit --audit-level=high` clean.
-- Keep the 2026-07-05 maintenance audit follow-ups focused and separate from
-  routine stewardship work; defer broad API-error normalization, backend service
-  splitting, and dependency freshness to dedicated passes.
+- Keep the 2026-07-05 maintenance audit and professionalization follow-ups
+  focused and separate from routine stewardship work; defer broad API-error
+  normalization, backend service splitting, dependency freshness, and
+  historical-script ownership decisions to dedicated passes.
 
 ### Next
 
@@ -251,9 +255,9 @@ paths are intentionally excluded from public documentation.
   verification commands aligned with the checked-in lockfiles and testing
   guidelines.
 - Maintenance follow-ups: use `docs/maintenance-audit.md` as the current
-  follow-up ledger for the July 2026 repo-health pass, especially API error
-  response hardening, docs toolchain availability, and focused backend service
-  maintainability work.
+  follow-up ledger for the July 2026 repo-health and professionalization
+  passes, especially API error response hardening, docs toolchain availability,
+  historical-script ownership, and focused backend service maintainability work.
 
 ## Implementation Plan References
 

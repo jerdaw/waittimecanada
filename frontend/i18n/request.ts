@@ -1,9 +1,8 @@
 import { getRequestConfig } from "next-intl/server";
 
 export default getRequestConfig(async () => {
-  // Provide a static locale, fetch a user setting,
-  // read from `cookies()`, `headers()`, etc.
-  const locale = "en"; // Default to 'en' for now until routing is active
+  // Locale routing is handled at the app route level; request config defaults to English.
+  const locale = "en";
 
   return {
     locale,

@@ -63,8 +63,6 @@ describe("API Route Integration: Compare", () => {
   });
 
   test("returns 400 if a and b are same", async () => {
-    // This logic check happens INSIDE the handler, so we can verify if validation passes but logic fails
-    // Actually, simple string check.
     const req = new NextRequest("http://localhost/api/compare?a=same&b=same");
     const res = await GET(req);
     expect(res.status).toBe(400);

@@ -107,7 +107,7 @@ class TestBenchmarkingServiceCoverage:
         # Then selected_ontology is None.
         # _query_benchmark_rows called with ontology=None.
 
-        mock_cursor.fetchone.side_effect = [None, None]  # For get_dominant and then... wait
+        mock_cursor.fetchone.side_effect = [None, None]
         mock_cursor.fetchall.return_value = []
 
         result = service.compute_benchmarks("ON")
@@ -118,7 +118,7 @@ class TestBenchmarkingServiceCoverage:
         """Test that _query_benchmark_rows constructs SQL correctly (coverage)."""
         from datetime import datetime
 
-        # We just run it with an ontology to hit the branches
+        # Exercise the dynamic SQL branch that applies ontology filters.
         ontology = {
             "metric_family": "MF",
             "start_event": "SE",

@@ -100,10 +100,9 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - api (API routes - handled manually in middleware function but exclusion here prevents double processing if we wanted, but we WANT processing for API timing)
-     * Actually, we want to match everything so we can handle API timing.
-     * But i18nMiddleware only wants to match pages.
-     * The logic above handles API separately, so it's fine.
+     * API routes are matched here so the middleware can record request timing.
+     * The middleware body handles API routes before delegating page requests to
+     * the i18n middleware.
      */
     "/((?!_next/static|_next/image|favicon.ico).*)",
   ],

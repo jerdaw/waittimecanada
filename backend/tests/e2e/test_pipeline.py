@@ -76,10 +76,7 @@ def test_pipeline_flow(db_service: DatabaseService) -> None:
 
     logger.info(f"\n[Setup] Inserting test measurement for {test_hospital_id}...")
 
-    # 2. Action: Simulate Scrape (DB Insert)
-    # We need to ensure the hospital exists first, or the foreign key constraint will fail.
-    # For this test, we'll assume the hospital might not exist, so let's try to upsert it or use a known one.
-    # Actually, let's just insert a dummy hospital row first to be safe.
+    # 2. Action: simulate scrape output by inserting a hospital and measurement.
     try:
         with db_service.get_connection() as conn:
             with conn.cursor() as cur:
@@ -130,10 +127,7 @@ def test_pipeline_flow(db_service: DatabaseService) -> None:
                 target_hospital = next((h for h in hospitals if h["id"] == test_hospital_id), None)
 
                 if target_hospital:
-                    # Check if we have wait time data
-                    # The API returns 'current_wait_time' (snake_case) or camelCase depending on serialization.
-                    # Looking at route.ts, it returns raw SQL results which are usually snake_case,
-                    # but let's check both to be safe or debug.
+                    # The API returns raw SQL rows with snake_case keys.
                     logger.debug(f"[Debug] Found hospital: {target_hospital}")
 
                     wait_time = target_hospital.get("current_wait_time")

@@ -99,7 +99,7 @@ function getWaitTimeColor(minutes: number | undefined): string {
   return colors.busy;
 }
 
-// Get status label - Refactored to use t function passed in
+// Get translated status label for popup display.
 function getWaitTimeStatus(minutes: number | undefined, t: Translator): string {
   if (!minutes && minutes !== 0) return t("popup.noData");
   if (minutes < 60) return t("popup.shortWait");
@@ -107,22 +107,22 @@ function getWaitTimeStatus(minutes: number | undefined, t: Translator): string {
   return t("popup.longWait");
 }
 
-// Format relative time - Refactored
+// Format relative timestamps for compact popup display.
 function formatRelativeTime(dateString: string | undefined): string {
-  if (!dateString) return "Unknown"; // Fallback, usually handled by caller with t
+  if (!dateString) return "Unknown";
   const date = new Date(dateString);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
 
-  if (diffMins < 1) return "Just now"; // Caller should translate this if possible, or we return raw code
+  if (diffMins < 1) return "Just now";
   if (diffMins < 60) return `${diffMins}m ago`;
   const diffHours = Math.floor(diffMins / 60);
   if (diffHours < 24) return `${diffHours}h ago`;
   return date.toLocaleDateString();
 }
 
-// Format methodology for display - Refactored
+// Format methodology ontology tags for display.
 function formatMethodology(hospital: Hospital, t: Translator): string {
   if (!hospital.metric_family) return "";
 
@@ -159,7 +159,7 @@ function formatMethodology(hospital: Hospital, t: Translator): string {
   return parts.join(" ");
 }
 
-// Format statistic type for display - Refactored
+// Format statistic type for display.
 function formatStatistic(statType: string | undefined, t: Translator): string {
   if (!statType) return "";
 
@@ -345,9 +345,6 @@ function HospitalPopup({
     hospital.current_wait_time !== undefined &&
     hospital.current_wait_time !== null;
 
-  // Helper for relative time in popup (simplified)
-  // Real implementation of relative time localization is complex, usually handled by a library or custom hook
-  // For now, we will use the raw string or a simple placeholder
   const timeStr = formatRelativeTime(hospital.last_updated);
 
   return (

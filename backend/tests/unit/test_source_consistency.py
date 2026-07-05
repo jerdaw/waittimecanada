@@ -107,8 +107,7 @@ class TestSourceConsistency:
         for field in ontology_fields:
             json_val = getattr(json_source, field)
             code_val = getattr(code_source, field)
-            # Enum comparison (strings vs Enums works in Pydantic v2 usually, but let's be safe)
-            # Actually, `Source` model converts them to Enum. So direct equality should work.
+            # Source model validation converts ontology fields to comparable enum values.
             if json_val != code_val:
                 errors.append(f"{field} mismatch: JSON={json_val}, Code={code_val}")
 

@@ -2,9 +2,9 @@
 
 ---
 
-## PROMPT TO COPY:
+## Request Template
 
-I need help creating a CSV dataset of Ontario, Canada hospital locations.
+Create a CSV dataset of Ontario, Canada hospital locations.
 
 **Output format required (CSV with header):**
 ```
@@ -18,7 +18,7 @@ CHEO,Ottawa,401 Smyth Road,45.4014,-75.6515,613-737-7600
 Toronto General Hospital,Toronto,200 Elizabeth Street,43.6591,-79.3886,416-340-4800
 ```
 
-**Here are the 154 Ontario hospitals I need data for:**
+**Use these 154 Ontario hospitals as the input list:**
 
 1. Alexandra Hospital
 2. Alexandra Marine and General Hospital

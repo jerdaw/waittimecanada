@@ -107,41 +107,8 @@ describe("HospitalList", () => {
     const card = screen.getByText("General Hospital").closest("button");
     expect(card).toBeDefined();
 
-    // Initial state: Expanded details hidden (or not rendered if leveraging lazy render, but in our code it is rendered but hidden/grid-rows-0)
-    // Actually our code uses `ExpandedCardDetails` which renders text "Directions", "Website" etc.
-    // Those texts might be hidden via CSS but available in DOM or not rendered if conditional
-    // Our implementation: always renders ExpandedCardDetails if `isExpanded` ? No.
-    // Let's check implementation:
-    // clsx(..., isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]")
-    // Content is inside. So it is in the DOM but hidden?
-    // Wait, screen.getByText finds hidden elements too unless configured otherwise?
-    // By default getAllByText ignores hidden? No, generic getByText finds implementation.
-    // However, if the container has `visibility: hidden` or `display: none` it might not.
-    // Grid rows 0fr wraps overflow hidden.
-
-    // Let's rely on class verification or existence if content is always rendered.
-    // But testing library recommends testing "user visible" changes.
-    // Since we use CSS transition, it's hard to test "visibility" in JSDOM easily without checking styles.
-
     fireEvent.click(card!); // Expand
     expect(onSelect).toHaveBeenCalledWith("h1");
-
-    // We can check if the row container has the expanded styles
-    const rowContainer = card!.closest("div")?.parentElement; // div > button is the structure?
-    // Structure: div.rounded-xl > button ...
-    // div.rounded-xl also has Expanded Content sibling.
-    // Wait, the button is INSIDE the div.
-    // let's inspect the `div` wrapper.
-
-    // A simpler way: Check if "Directions" is visible or present.
-    // Since we didn't conditionally render the children of ExpandedCardDetails based on expansion state in the list logic (we just hid it with CSS),
-    // it IS always present in the DOM?
-    // Check code: <ExpandedCardDetails hospital={hospital} /> is ALWAYS rendered inside the grid div.
-    // So expect(screen.getAllByText("Directions").length).toBe(2); (for 2 hospitals)
-
-    // We should verify the STATE change triggers CSS class change.
-    // but in unit test we can't easily check computed styles of grid expansion in JSDOM reliably.
-    // We can check if the `grid-rows-[1fr]` class is applied.
   });
 
   it("does not mount expanded details for collapsed rows", () => {

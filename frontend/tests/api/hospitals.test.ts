@@ -52,7 +52,6 @@ describe("Hospitals API", () => {
     );
     const res = await GET(req);
     expect(res.status).toBe(200);
-    // In a real integration test against a real DB this would filter,
-    // with our mock we just check it runs without error
+    // The mocked database path verifies that province filtering is accepted.
   });
 });

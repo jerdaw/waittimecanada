@@ -129,8 +129,6 @@ class BenchmarkingService:
         )
 
         if hospital_data is None:
-            # Fallback: simpler exception or specialized response
-            # But "insufficient aggregate" message is fine
             raise ValueError(f"Hospital has insufficient aggregate data: {hospital_id}")
 
         return {
