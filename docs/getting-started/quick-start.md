@@ -41,7 +41,7 @@ uv sync --locked --extra dev
 cd ..
 
 cd frontend
-npm install
+npm ci
 cd ..
 ```
 

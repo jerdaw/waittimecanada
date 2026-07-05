@@ -29,7 +29,7 @@ Create a migration whenever you need to:
 
 ```bash
 ls backend/migrations/*.sql | tail -1
-# e.g. backend/migrations/020_sync_active_source_definitions.sql -> next is 021
+# e.g. backend/migrations/021_add_alert_notification_state.sql -> next is 022
 ```
 
 The repository also enforces this with:
@@ -42,7 +42,7 @@ uv run python scripts/check_migration_sequence.py
 ### 2. Create the migration file
 
 ```bash
-touch backend/migrations/021_your_descriptive_name.sql
+touch backend/migrations/022_your_descriptive_name.sql
 ```
 
 ### 3. Write the migration
@@ -50,7 +50,7 @@ touch backend/migrations/021_your_descriptive_name.sql
 Use idempotent SQL so migrations are safe to re-run:
 
 ```sql
--- 021_your_descriptive_name.sql
+-- 022_your_descriptive_name.sql
 -- Purpose: Brief description
 -- Depends on: 012_optimize_indexes.sql
 

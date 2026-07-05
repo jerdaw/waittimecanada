@@ -27,13 +27,13 @@ When contributing, please:
 From repository root:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -e 'backend[dev]'
+cd backend
+python -m pip install "uv==0.11.23"
+uv sync --locked --extra dev
+cd ..
 
 cd frontend
-npm install
+npm ci
 cd ..
 
 pre-commit install
@@ -70,10 +70,11 @@ Run only the checks relevant to the files you changed.
 ### Backend
 
 ```bash
-ruff check backend/src backend/tests
-ruff format --check backend/src backend/tests
-mypy backend/src
-python -m pytest backend/tests
+cd backend
+uv run ruff check src tests scripts
+uv run ruff format --check src tests scripts
+uv run mypy src
+TMPDIR=/tmp TMP=/tmp TEMP=/tmp uv run pytest tests
 ```
 
 ### Frontend

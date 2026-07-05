@@ -38,7 +38,7 @@ Provincial health authorities report ER wait times using **fundamentally differe
 
 ### By the Numbers
 
-As reflected in the current runtime and roadmap baseline on **2026-06-28**:
+As reflected in the current runtime and roadmap baseline on **2026-07-05**:
 
 - **4 provinces** remain in the active audited source set: Quebec, Ontario,
   Alberta, and British Columbia
@@ -327,7 +327,7 @@ uv run python -m waittime.cli.bootstrap_analytics --days 180
 cd frontend
 
 # Install dependencies
-npm install
+npm ci
 
 # Run development server
 npm run dev
@@ -396,7 +396,7 @@ npm run test:unit    # Vitest unit tests
 - [`AGENTS.md`](AGENTS.md) - repository agent instructions and project architecture
 
 ### Deep Dives
-- [`docs/adr/`](docs/adr/) - Architecture Decision Records (25 ADRs)
+- [`docs/adr/`](docs/adr/) - Architecture Decision Records
 - [`backend/docs/methodologies/`](backend/docs/methodologies/) - Provincial methodology documentation
 - [`docs/case-studies/ottawa-gatineau-divergence.md`](docs/case-studies/ottawa-gatineau-divergence.md) - Cross-border methodology divergence case study
 - [`backend/README.md`](backend/README.md) - Backend architecture and testing
@@ -493,7 +493,7 @@ environment-specific paths are kept outside public documentation.
 
 ---
 
-## 📊 Current Status (as of 2026-06-28)
+## 📊 Current Status (as of 2026-07-05)
 
 ### Milestones Completed
 - ✅ M1-M4: Database foundation, Ontario/Quebec scrapers, methodology warnings, PWA setup

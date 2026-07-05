@@ -1,6 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { checkRateLimit, resetRateLimitForTests } from "./rate-limit";
 import { NextRequest } from "next/server";
+import { logger } from "@/utils/logger";
+
+vi.mock("@/utils/logger", () => ({
+  logger: {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+  },
+}));
 
 function requestFromIp(ip: string) {
   return new NextRequest("http://localhost", {
@@ -11,6 +20,7 @@ function requestFromIp(ip: string) {
 describe("Rate Limiting", () => {
   beforeEach(() => {
     resetRateLimitForTests();
+    vi.clearAllMocks();
     vi.useFakeTimers({
       toFake: ["Date", "setTimeout", "clearTimeout", "performance"],
     });
@@ -58,5 +68,17 @@ describe("Rate Limiting", () => {
     vi.advanceTimersByTime(61000);
 
     expect(await checkRateLimit(req, 1)).toBeNull();
+  });
+
+  it("does not log raw client IPs when requests are rate limited", async () => {
+    const req = requestFromIp("203.0.113.53");
+
+    await checkRateLimit(req, 1);
+    await checkRateLimit(req, 1);
+
+    expect(logger.warn).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(vi.mocked(logger.warn).mock.calls)).not.toContain(
+      "203.0.113.53",
+    );
   });
 });

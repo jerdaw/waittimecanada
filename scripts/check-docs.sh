@@ -29,6 +29,7 @@ check_paths=(
   "docs/architecture"
   "docs/development"
   "docs/index.md"
+  "docs/maintenance-audit.md"
   "docs/ontario-methodology.md"
   "docs/ontario-research-findings.md"
   "docs/operations"

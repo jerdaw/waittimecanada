@@ -14,7 +14,7 @@ Next.js 15 App Router frontend for map visualization, methodology transparency, 
 
 ```bash
 cd frontend
-npm install
+npm ci
 cp .env.example .env.local
 ```
 
@@ -22,6 +22,11 @@ Required environment variables:
 
 - `DATABASE_URL`
 - `NEXT_PUBLIC_MAPBOX_TOKEN`
+
+Optional:
+
+- `NEXT_PUBLIC_BASE_URL`
+- `DATABASE_SSL_MODE` (`require`, `disable`, `false`, `off`, or `0`)
 
 Run local app:
 

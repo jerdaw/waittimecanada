@@ -83,12 +83,6 @@ export default function Home() {
           lat: data.location.lat,
           lon: data.location.lon,
         });
-        // sortByDistance is already true
-        console.log(
-          "Using IP-based location:",
-          data.location.city,
-          data.location.region,
-        );
       }
     } catch (err) {
       console.warn("IP geolocation failed:", err);

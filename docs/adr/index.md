@@ -18,10 +18,19 @@ Add or update an ADR when changing:
 ## Index
 
 - `docs/adr/0002-metric-ontology.md`
+- `docs/adr/0003-manual-geocoding-overrides.md`
+- `docs/adr/0004-landing-page-ux-optimization.md`
+- `docs/adr/0005-access-burden-estimator.md`
 - `docs/adr/0006-dead-mans-switch-monitoring.md`
 - `docs/adr/0007-bc-scraper-implementation.md`
 - `docs/adr/0008-aggregation-pipeline.md`
 - `docs/adr/0009-data-quality-anomaly-detection.md`
+- `docs/adr/0010-region-mapping-coverage-heuristics.md`
+- `docs/adr/0011-equity-layer-scaffold.md`
+- `docs/adr/0012-occupancy-availability-contract.md`
+- `docs/adr/0013-testimonial-governance-guardrails.md`
+- `docs/adr/0014-unified-scraper-runtime-pipeline.md`
+- `docs/adr/0015-real-equity-layer-ontario.md`
 - `docs/adr/0016-equity-academic-rigor-hardening-ontario.md`
 - `docs/adr/0017-domain-rebrand-wait-time-ca.md`
 - `docs/adr/0018-scraper-observability-and-reliability-hardening.md`

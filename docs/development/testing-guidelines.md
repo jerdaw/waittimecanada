@@ -52,6 +52,14 @@ cd backend
 uv run pytest tests
 ```
 
+If pytest reports `FileNotFoundError` from capture cleanup or unexpectedly
+collects zero tests in a WSL-based shell, check whether `TMP` or `TEMP` points
+at a Windows-mounted temp directory. Use Linux temp paths for that run:
+
+```bash
+TMPDIR=/tmp TMP=/tmp TEMP=/tmp uv run pytest tests
+```
+
 Note:
 `backend/tests/e2e/test_pipeline.py` is an opt-in local smoke path layered into
 the pytest tree. It also expects `DATABASE_URL` plus a local frontend server on
@@ -134,7 +142,7 @@ cd backend
 uv run ruff check src tests scripts
 uv run mypy src
 uv run python scripts/check_migration_sequence.py
-uv run pytest tests
+TMPDIR=/tmp TMP=/tmp TEMP=/tmp uv run pytest tests
 
 # Frontend
 cd frontend

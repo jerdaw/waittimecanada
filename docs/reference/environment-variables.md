@@ -49,6 +49,9 @@ Recommended:
 
 - `NEXT_PUBLIC_BASE_URL`: canonical base URL for sitemap/robots/metadata (for example, `https://wait-time.ca`)
 - `HEARTBEAT_STALE_THRESHOLD_MINUTES`: health endpoint stale threshold override
+- `DATABASE_SSL_MODE`: optional server-side API database SSL override. Set to
+  `require` to force SSL, or `disable` / `false` / `off` / `0` to disable it.
+  When unset, local database hosts disable SSL and non-local hosts require SSL.
 
 Deployment notes:
 

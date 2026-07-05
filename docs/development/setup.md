@@ -56,7 +56,7 @@ cd ..
 
 ```bash
 cd frontend
-npm install
+npm ci
 cd ..
 ```
 

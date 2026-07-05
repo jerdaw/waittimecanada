@@ -51,5 +51,26 @@ describe("API Route Integration: Hospitals", () => {
     const req = new NextRequest("http://localhost/api/hospitals");
     const res = await GET(req);
     expect(res.status).toBe(200);
+
+    const [query, params] = mockSql.unsafe.mock.calls[0] as [string, unknown[]];
+    expect(query).toMatch(/ORDER BY h\.name\s*$/);
+    expect(query).not.toContain("OFFSET");
+    expect(params).toEqual([]);
+  });
+
+  test("applies explicit pagination without changing the default all-hospitals response", async () => {
+    const req = new NextRequest(
+      "http://localhost/api/hospitals?province=ON&page=2&limit=25",
+    );
+
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    expect(mockSql.unsafe).toHaveBeenCalledTimes(1);
+
+    const [query, params] = mockSql.unsafe.mock.calls[0] as [string, unknown[]];
+    expect(query).toContain("AND h.province = $1");
+    expect(query).toContain("LIMIT $2 OFFSET $3");
+    expect(params).toEqual(["ON", 25, 25]);
   });
 });

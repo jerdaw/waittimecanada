@@ -60,12 +60,24 @@ describe("Validation Schemas", () => {
   });
 
   describe("HospitalQuerySchema", () => {
-    it("applies pagination defaults", () => {
+    it("keeps pagination optional when absent", () => {
       const result = HospitalQuerySchema.safeParse({});
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.page).toBe(1);
-        expect(result.data.limit).toBe(20);
+        expect(result.data.page).toBeUndefined();
+        expect(result.data.limit).toBeUndefined();
+      }
+    });
+
+    it("coerces explicit pagination", () => {
+      const result = HospitalQuerySchema.safeParse({
+        page: "2",
+        limit: "25",
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.page).toBe(2);
+        expect(result.data.limit).toBe(25);
       }
     });
 

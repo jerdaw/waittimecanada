@@ -2,7 +2,9 @@ import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/utils/db";
 import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
 import { logger } from "@/utils/logger";
+import { checkRateLimit } from "@/utils/rate-limit";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
+import { HospitalQuerySchema } from "@/utils/validations";
 
 export interface Hospital {
   id: string;
@@ -30,10 +32,6 @@ export interface Hospital {
   occupancy_updated?: string; // Timestamp of occupancy measurement
 }
 
-import { HospitalQuerySchema } from "@/utils/validations";
-
-import { checkRateLimit } from "@/utils/rate-limit";
-
 const HOSPITALS_CACHE_TTL_MS = 300_000;
 
 export async function GET(request: NextRequest) {
@@ -59,9 +57,15 @@ export async function GET(request: NextRequest) {
     }
 
     const { province } = validation.data;
+    const page = validation.data.page ?? 1;
+    const limit = validation.data.limit ?? 20;
+    const hasPagination = searchParams.has("page") || searchParams.has("limit");
+
     const payload = await getOrSetServerCache(
       buildServerCacheKey("api:hospitals", {
         province: province ?? "all",
+        page: hasPagination ? page : undefined,
+        limit: hasPagination ? limit : undefined,
       }),
       HOSPITALS_CACHE_TTL_MS,
       async () => {
@@ -119,13 +123,21 @@ export async function GET(request: NextRequest) {
           WHERE h.is_visible = true AND h.is_verified = true
         `;
 
-        const params: string[] = [];
+        const params: Array<string | number> = [];
         if (province) {
-          query += ` AND h.province = $1`;
           params.push(province);
+          query += ` AND h.province = $${params.length}`;
         }
 
         query += ` ORDER BY h.name`;
+
+        if (hasPagination) {
+          params.push(limit);
+          const limitPlaceholder = `$${params.length}`;
+          params.push((page - 1) * limit);
+          const offsetPlaceholder = `$${params.length}`;
+          query += ` LIMIT ${limitPlaceholder} OFFSET ${offsetPlaceholder}`;
+        }
 
         const hospitals = await sql.unsafe(query, params);
 

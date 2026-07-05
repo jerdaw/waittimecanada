@@ -35,6 +35,11 @@ export const PaginationSchema = z.object({
   limit: z.coerce.number().int().positive().max(100).default(20),
 });
 
+export const OptionalPaginationSchema = z.object({
+  page: z.coerce.number().int().positive().optional(),
+  limit: z.coerce.number().int().positive().max(100).optional(),
+});
+
 // Specific Enums (Must be defined before use)
 export const BenchmarkPeriodSchema = z.enum(["24h", "7d", "30d"]);
 export const HospitalTrendPeriodSchema = z.enum([
@@ -56,7 +61,7 @@ export const TrendsQuerySchema = z.object({
 
 export const HospitalQuerySchema = z.object({
   province: OptionalProvinceSchema,
-  ...PaginationSchema.shape,
+  ...OptionalPaginationSchema.shape,
 });
 
 export const RegionQuerySchema = z.object({

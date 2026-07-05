@@ -20,7 +20,7 @@ Base URL:
 
 ## Hospitals and comparability
 
-- `GET /api/hospitals?province=ON`
+- `GET /api/hospitals?province=ON[&page=1&limit=50]`
 - `GET /api/hospitals/[slug]/trends?period=24h|7d|30d|90d|6m|1y`
 - `GET /api/compare?a=<hospital_id>&b=<hospital_id>`
 
@@ -39,6 +39,13 @@ silently falling back to the aggregate system view. In particular:
 - `view=hospital` requires `hospital_id`
 - `hospital_id` and `source_id` cannot be combined
 - bare `source_id` without `view=trend|diff` is rejected
+
+Hospital listing note:
+
+- `GET /api/hospitals` returns all verified and visible hospitals by default so
+  the map can render the full current inventory.
+- `page` and `limit` are optional opt-in pagination controls; `limit` is capped
+  at `100`.
 
 ## Analytics
 

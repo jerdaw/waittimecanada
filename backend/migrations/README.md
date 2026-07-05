@@ -19,7 +19,7 @@ uv run python run_migrations.py
 
 **Output:**
 ```
-Found 20 migration files:
+Found 21 migration files:
 
 Running: 001_create_enums.sql
   ✓ Success
@@ -29,7 +29,7 @@ Running: 002_create_tables.sql
 
 ...
 
-✅ All migrations completed successfully!
+All migrations completed successfully!
 ```
 
 ### Idempotency
@@ -50,13 +50,13 @@ applied history is not edited in place.
 NNN_descriptive_name.sql
 ```
 
-- `NNN`: Zero-padded sequential number (001, 002, ..., 020)
+- `NNN`: Zero-padded sequential number (001, 002, ..., 021)
 - `descriptive_name`: Action and target (e.g., `create_enums`, `add_occupancy_columns`)
 - **Always use `.sql` extension** (`.sql.skip` files are intentionally excluded)
 
 The historical duplicate `020_` prefix is preserved because those files may
 already be applied in deployed databases. Do not create new duplicate prefixes.
-The next migration number is `021`.
+The next migration number is `022`.
 
 Run the guard before adding or renaming migrations:
 
@@ -75,7 +75,7 @@ Migrations run in **lexicographic order** (alphabetical). The numeric prefix ens
 
 **Behavior:**
 - Reads all `*.sql` files from `backend/migrations/`
-- Sorts alphabetically (001 → 020)
+- Sorts alphabetically (001 → 021)
 - Creates and uses the `schema_migrations` checksum ledger
 - Skips files already recorded with a matching checksum
 - Rejects files whose recorded checksum no longer matches the on-disk SQL
@@ -428,14 +428,14 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 
 ```bash
 ls backend/migrations/*.sql | tail -1
-# Output: backend/migrations/020_sync_active_source_definitions.sql
-# Next: 021
+# Output: backend/migrations/021_add_alert_notification_state.sql
+# Next: 022
 ```
 
 ### Step 2: Create Migration File
 
 ```bash
-touch backend/migrations/021_your_descriptive_name.sql
+touch backend/migrations/022_your_descriptive_name.sql
 ```
 
 ### Step 3: Write Migration
@@ -443,7 +443,7 @@ touch backend/migrations/021_your_descriptive_name.sql
 **Template:**
 
 ```sql
--- 014_your_descriptive_name.sql
+-- 022_your_descriptive_name.sql
 -- Brief description of what this migration does
 -- Depends on: NNN_previous_migration.sql (if applicable)
 

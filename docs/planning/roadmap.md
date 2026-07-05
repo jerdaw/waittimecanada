@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-06-28)
+## Current Status (Updated 2026-07-05)
 
 **Progress:** Milestone 33 is complete. Wait Time Canada is now in a
 stewardship and selective-expansion phase: the public roadmap emphasizes
@@ -23,7 +23,11 @@ noncritical source-health incidents can remain stateful without paging during
 cost-constrained periods. The 2026-06-28 autonomous overnight maintenance pass
 added focused regression coverage across frontend API/UI and backend
 operational helpers, archived the completed work queue, and added an active-doc
-guard against stale GitHub Actions cadence claims.
+guard against stale GitHub Actions cadence claims. The 2026-07-05
+deep-evidence maintenance audit corrected hospital API pagination behavior,
+removed noisy/sensitive success logging, removed broken backend package script
+metadata, refreshed setup/API/environment/migration documentation, and recorded
+remaining nonessential findings in `docs/maintenance-audit.md`.
 
 Wait Time Canada is a four-province health systems observatory covering Ontario,
 Quebec, Alberta, and British Columbia. The platform audits publicly reported
@@ -81,6 +85,9 @@ paths are intentionally excluded from public documentation.
   test-type-check guardrails during routine maintenance.
 - Keep frontend dependency audit remediation current; the 2026-06-27 pass
   leaves `npm audit --audit-level=high` clean.
+- Keep the 2026-07-05 maintenance audit follow-ups focused and separate from
+  routine stewardship work; defer broad API-error normalization, backend service
+  splitting, and dependency freshness to dedicated passes.
 
 ### Next
 
@@ -243,6 +250,10 @@ paths are intentionally excluded from public documentation.
 - Tooling maintenance: keep backend setup, GitHub Actions, and local
   verification commands aligned with the checked-in lockfiles and testing
   guidelines.
+- Maintenance follow-ups: use `docs/maintenance-audit.md` as the current
+  follow-up ledger for the July 2026 repo-health pass, especially API error
+  response hardening, docs toolchain availability, and focused backend service
+  maintainability work.
 
 ## Implementation Plan References
 

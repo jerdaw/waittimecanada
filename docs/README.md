@@ -16,7 +16,7 @@ This directory is the documentation control plane for Wait Time Canada.
 - Public operations quick start: `docs/operations/QUICK_START.md`
 - Public source-freshness model: `docs/operations/scraper-scheduling.md`
 - Heartbeat offload pilot contract: `docs/operations/heartbeat-offload-pilot.md`
-- Latest maintenance log: `docs/planning/archive/maintenance-2026-06-12-autonomous-stewardship.md`
+- Latest maintenance audit: `docs/maintenance-audit.md`
 - Development setup: `docs/development/setup.md`
 - Testing standards: `docs/development/testing-guidelines.md`
 - Documentation standards: `docs/development/documentation-guidelines.md`

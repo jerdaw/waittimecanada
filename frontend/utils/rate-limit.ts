@@ -56,10 +56,8 @@ export async function checkRateLimit(
     resetAtMs: now + RATE_LIMIT_WINDOW_MS,
   });
 
-  const remaining = Math.max(0, limit - currentUsage);
-
   if (currentUsage > limit) {
-    logger.warn(`Rate limit exceeded for IP: ${ip}`);
+    logger.warn("Rate limit exceeded", { source: "api-rate-limit" });
     return NextResponse.json(
       { error: "Too Many Requests" },
       {

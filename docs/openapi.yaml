@@ -26,7 +26,7 @@ paths:
   /hospitals:
     get:
       summary: List hospitals
-      description: Retrieve a list of hospitals, optionally filtered by province.
+      description: Retrieve verified and visible hospitals, optionally filtered by province and paginated.
       parameters:
         - name: province
           in: query
@@ -34,6 +34,19 @@ paths:
           schema:
             type: string
             enum: [ON, QC, AB, BC]
+        - name: page
+          in: query
+          description: Optional page number. Pagination is applied only when page or limit is supplied.
+          schema:
+            type: integer
+            minimum: 1
+        - name: limit
+          in: query
+          description: Optional page size for opt-in pagination.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
       responses:
         '200':
           description: Successful response
