@@ -214,6 +214,29 @@ DELETE FROM sources WHERE id IN ('quebec-msss', 'ontario-health', 'alberta-ahs',
 - `public_health_source_alert_state.active_incident_notified_tier`
 - `public_health_source_alert_state.active_incident_notified_at`
 
+---
+
+#### 022_update_ontario_health_source_url.sql
+**Purpose:** Update the active Ontario source URL to the current Ontario Health reporting path without rewriting applied migration history
+**Created:** 2026-07-08
+**Milestone:** Production health remediation
+
+**Rows Updated:**
+- `sources.url` for `ontario-health`
+
+**Rationale:**
+- The old HQOntario URL now redirects through Ontario Health.
+- The migration runner rejects checksum changes to already-applied migrations, so this URL correction is applied as a new idempotent migration.
+
+**Rollback:**
+```sql
+UPDATE sources
+SET
+    url = 'https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments',
+    updated_at = NOW()
+WHERE id = 'ontario-health';
+```
+
 **Behavior:** Allows critical-only mode to persist suppressed P2/P3 incidents while sending recovery notifications only for incidents that previously paged.
 
 ---
@@ -428,8 +451,8 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 
 ```bash
 ls backend/migrations/*.sql | tail -1
-# Output: backend/migrations/021_add_alert_notification_state.sql
-# Next: 022
+# Output: backend/migrations/022_update_ontario_health_source_url.sql
+# Next: 023
 ```
 
 ### Step 2: Create Migration File
@@ -874,7 +897,7 @@ For migration questions or issues:
 
 ---
 
-**Last Updated:** 2026-06-27
-**Total Migrations:** 21
+**Last Updated:** 2026-07-08
+**Total Migrations:** 22
 **Database Engine:** PostgreSQL 17
-**Schema Version:** 021 (Alert Notification State)
+**Schema Version:** 022 (Ontario Health Source URL)

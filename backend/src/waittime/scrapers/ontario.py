@@ -1,7 +1,7 @@
-"""Ontario HQOntario wait time scraper.
+"""Ontario Health wait time scraper.
 
-Source: Health Quality Ontario (HQO)
-URL: https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments
+Source: Ontario Health
+URL: https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments
 
 Methodology (per ontario-methodology.md):
 - metric_family: TIME_TO_PROVIDER
@@ -42,12 +42,12 @@ logger = logging.getLogger(__name__)
 
 
 class OntarioScraper(BaseScraper):
-    """Scraper for Ontario HQOntario emergency wait times.
+    """Scraper for Ontario Health emergency wait times.
 
-    Fetches the HQOntario page directly over HTTP and parses the embedded HTML tables.
+    Fetches the Ontario Health page directly over HTTP and parses the embedded HTML tables.
     """
 
-    # Hospital ID mapping: HQOntario name → standardized ID
+    # Hospital ID mapping: Ontario Health name → standardized ID
     # Format: ca-on-{slug}
     HOSPITAL_MAPPING: dict[str, str] = {
         # Ottawa Hospitals
@@ -120,15 +120,16 @@ class OntarioScraper(BaseScraper):
                 write=DEFAULT_HTTP_WRITE_TIMEOUT_SECONDS,
                 pool=DEFAULT_HTTP_POOL_TIMEOUT_SECONDS,
             ),
+            follow_redirects=True,
         )
         response.raise_for_status()
         return response.text
 
     def parse(self, html: str) -> list[Measurement]:
-        """Parse HQOntario HTML into measurements.
+        """Parse Ontario Health HTML into measurements.
 
         Args:
-            html: HTML fetched from HQOntario over HTTP
+            html: HTML fetched from Ontario Health over HTTP
 
         Returns:
             List of Measurement objects tagged with Ontario methodology
@@ -210,7 +211,7 @@ class OntarioScraper(BaseScraper):
     def _extract_wait_time_hours(self, text: str) -> float | None:
         """Extract wait time from text in hours.
 
-        HQOntario reports in hours (e.g., "2.5", "0.5", "1.0").
+        Ontario Health reports in hours (e.g., "2.5", "0.5", "1.0").
 
         Args:
             text: Text containing wait time
@@ -234,7 +235,7 @@ class OntarioScraper(BaseScraper):
         """Convert hospital name to standardized ID.
 
         Args:
-            name: Hospital name from HQOntario
+            name: Hospital name from Ontario Health
 
         Returns:
             Standardized ID (ca-on-{slug}) or None if not recognized
@@ -299,7 +300,10 @@ def create_ontario_source() -> Source:
         id="ontario-health",
         name="Health Quality Ontario",
         province="ON",
-        url="https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments",
+        url=(
+            "https://ontariohealth.ca/system/reporting/performance/"
+            "time-spent-in-emergency-departments"
+        ),
         methodology_url="https://www.hqontario.ca/System-Performance/Emergency-Department-Performance",
         telehealth_name="Health811",
         telehealth_number="811",

@@ -45,8 +45,9 @@ class TestOntarioScraper:
 
         captured_timeouts: list[httpx.Timeout] = []
 
-        def side_effect(url, timeout):
+        def side_effect(url, timeout, follow_redirects):
             captured_timeouts.append(timeout)
+            assert follow_redirects is True
             if len(captured_timeouts) == 1:
                 raise httpx.ReadTimeout("The read operation timed out")
             return mock_response
@@ -68,6 +69,65 @@ class TestOntarioScraper:
         ):
             with pytest.raises(RetryError):
                 scraper.fetch()
+
+    def test_fetch_follows_current_ontario_redirect_chain(self, scraper):
+        """Ontario fetch should tolerate the public source URL redirect chain."""
+        final_html = "<html><table><tr><td>CHEO</td><td>0.5</td></tr></table></html>"
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            request_url = str(request.url)
+            if (
+                request_url
+                == "https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments"
+            ):
+                return httpx.Response(
+                    301,
+                    headers={
+                        "Location": (
+                            "https://ontariohealth.ca/system-performance/"
+                            "time-spent-in-emergency-departments"
+                        )
+                    },
+                    request=request,
+                )
+            if (
+                request_url
+                == "https://ontariohealth.ca/system-performance/time-spent-in-emergency-departments"
+            ):
+                return httpx.Response(
+                    301,
+                    headers={
+                        "Location": (
+                            "/system/reporting/performance/time-spent-in-emergency-departments.html"
+                        )
+                    },
+                    request=request,
+                )
+            if (
+                request_url == "https://ontariohealth.ca/system/reporting/performance/"
+                "time-spent-in-emergency-departments.html"
+            ):
+                return httpx.Response(
+                    301,
+                    headers={
+                        "Location": (
+                            "https://ontariohealth.ca/system/reporting/performance/"
+                            "time-spent-in-emergency-departments"
+                        )
+                    },
+                    request=request,
+                )
+            if (
+                request_url == "https://ontariohealth.ca/system/reporting/performance/"
+                "time-spent-in-emergency-departments"
+            ):
+                return httpx.Response(200, text=final_html, request=request)
+            return httpx.Response(404, request=request)
+
+        scraper.client.close()
+        scraper.client = httpx.Client(transport=httpx.MockTransport(handler))
+
+        assert scraper.fetch() == final_html
 
     def test_normalize_hospital_id_exact_match(self, scraper):
         """Normalize hospital name to ID (exact match)."""
@@ -211,6 +271,10 @@ class TestOntarioScraper:
         assert source.id == "ontario-health"
         assert source.name == "Health Quality Ontario"
         assert source.province == "ON"
+        assert (
+            source.url == "https://ontariohealth.ca/system/reporting/performance/"
+            "time-spent-in-emergency-departments"
+        )
         assert source.telehealth_name == "Health811"
         assert source.telehealth_number == "811"
         assert source.default_metric_family == MetricFamily.TIME_TO_PROVIDER
