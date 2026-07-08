@@ -83,7 +83,7 @@ the latest shallow commit.
 
 ### 4. `scraper-cron.yml` - Scraper Execution
 
-**Trigger:** hourly schedule plus manual dispatch.
+**Trigger:** hourly schedule at minute 29 plus manual dispatch.
 
 **Purpose:** Run all provincial scrapers against the configured database and emit classified source-health state.
 
@@ -94,7 +94,7 @@ the latest shallow commit.
 
 ### 5. `heartbeat-monitor.yml` - Dead Man's Switch
 
-**Trigger:** every 30 minutes plus manual dispatch.
+**Trigger:** every 30 minutes at minutes 14 and 44 plus manual dispatch.
 
 **Purpose:** Ensure scraper heartbeat freshness remains within threshold and report consecutive/classified failures.
 

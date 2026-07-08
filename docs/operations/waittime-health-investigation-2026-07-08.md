@@ -12,7 +12,7 @@ Recovery status after the 2026-07-08 fix:
 
 - Scraper source behavior: all four sources collect current data locally and in the production scraper workflow after the Ontario redirect fix.
 - Production database freshness: `/api/health` is healthy with all four source heartbeats refreshed at `2026-07-08T20:58Z`.
-- Recurrence: `scraper-cron.yml` is restored to hourly schedule plus manual dispatch; `heartbeat-monitor.yml` is restored to a 30-minute schedule plus manual dispatch.
+- Recurrence: `scraper-cron.yml` is restored to hourly schedule plus manual dispatch; `heartbeat-monitor.yml` is restored to a 30-minute schedule plus manual dispatch. On 2026-07-08, the schedules were staggered away from common `:00` and `:30` GitHub Actions boundaries after the first restored schedule window did not create a run within the observed lag window.
 - Residual public status: `/api/status` and `/api/data-quality` still report `critical` immediately after one successful run because their 24-hour uptime calculation expects 24 hourly windows. They should recover as successful hourly runs accumulate.
 
 ## Root-Cause Table
@@ -48,7 +48,7 @@ Captured at: 2026-07-08T21:13Z
 | --- | --- | --- |
 | Redirect/source fix | Commit `3a3f63b` | Ontario scraper follows redirects and source metadata points to the current Ontario Health URL |
 | Investigation record | Commit `c0e229d` | Baseline, dry-run, migration, and production action evidence recorded |
-| Recurrence fix | Commit `6ad2fa2` | Scraper schedule restored to hourly; heartbeat schedule restored to every 30 minutes |
+| Recurrence fix | Commit `6ad2fa2` plus the cadence-staggering follow-up | Scraper schedule restored to hourly; heartbeat schedule restored to every 30 minutes; schedule minutes staggered away from common GitHub Actions boundaries |
 | Migration workflow | Run `28975179871`, <https://github.com/jerdaw/waittimecanada/actions/runs/28975179871> | success |
 | Production scraper workflow | Run `28975214976`, <https://github.com/jerdaw/waittimecanada/actions/runs/28975214976> | success; 403 did not recur; all four source heartbeats refreshed |
 | Heartbeat workflow | Run `28976114340`, <https://github.com/jerdaw/waittimecanada/actions/runs/28976114340> | success on restored workflow definition |

@@ -1,10 +1,10 @@
 name: Heartbeat Monitor (Dead Man's Switch)
 
 # Monitor between hourly scraper runs and page only on classified critical
-# failures.
+# failures. Stagger checks away from common :00/:30 schedule boundaries.
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "14,44 * * * *"
   workflow_dispatch:
 
 concurrency:

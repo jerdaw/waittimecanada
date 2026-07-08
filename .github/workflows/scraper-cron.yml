@@ -1,10 +1,11 @@
 name: Scraper Cron Job
 
 # Keep public source status aligned with hourly collection and a 120-minute
-# freshness threshold.
+# freshness threshold. Run away from the top of the hour to reduce GitHub
+# scheduled-workflow delay/drop risk.
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "29 * * * *"
   workflow_dispatch: # Allow manual trigger
 
 env:
