@@ -19,7 +19,7 @@ patient_scope = PatientScope.ALL
 
 - Source ID: `ontario-health`
 - Source name: Health Quality Ontario
-- Public URL: `https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments`
+- Public URL: `https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments`
 - Methodology URL: `https://www.hqontario.ca/System-Performance/Emergency-Department-Performance`
 
 ## What This Means

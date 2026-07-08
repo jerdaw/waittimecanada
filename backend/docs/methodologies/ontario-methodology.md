@@ -17,7 +17,7 @@ measure, not as a point estimate and not as a percentile metric.
 
 - Source ID: `ontario-health`
 - Display name: Health Quality Ontario
-- URL: `https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments`
+- URL: `https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments`
 - Methodology URL: `https://www.hqontario.ca/System-Performance/Emergency-Department-Performance`
 - Telehealth routing: `Health811` (`811`)
 
@@ -101,7 +101,7 @@ SOURCE = Source(
     id="ontario-health",
     name="Health Quality Ontario",
     province="ON",
-    url="https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments",
+    url="https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments",
     methodology_url="https://www.hqontario.ca/System-Performance/Emergency-Department-Performance",
     telehealth_name="Health811",
     telehealth_number="811",

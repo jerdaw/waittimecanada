@@ -1,13 +1,13 @@
 {
   "province": "Ontario",
   "province_code": "ON",
-  "last_updated": "2026-04-16",
+  "last_updated": "2026-07-08",
   "sources": [
     {
       "id": "ontario-health",
       "name": "Health Quality Ontario",
       "type": "historical_reporting",
-      "url": "https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments",
+      "url": "https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments",
       "coverage": "Ontario hospitals in public performance reporting",
       "update_frequency": "Quarterly public reporting",
       "methodology": {
@@ -111,8 +111,8 @@
   ],
   "references": [
     {
-      "title": "Health Quality Ontario - Time Spent in Emergency Departments",
-      "url": "https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments",
+      "title": "Ontario Health - Time Spent in Emergency Departments",
+      "url": "https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments",
       "type": "official"
     },
     {

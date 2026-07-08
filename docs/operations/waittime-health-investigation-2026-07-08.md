@@ -91,9 +91,9 @@ Quebec production state at baseline:
 | `consecutive_failures` | `1` |
 | `error_message` | Quebec endpoint returned `403 Forbidden` on the last production scraper run |
 
-## Scheduler Evidence
+## Baseline Scheduler Evidence
 
-| Workflow | Current trigger | Latest run | Conclusion |
+| Workflow | Baseline trigger | Latest pre-fix run | Conclusion |
 | --- | --- | --- | --- |
 | `scraper-cron.yml` | `workflow_dispatch` only; local and remote YAML both say the scheduled trigger is paused to conserve GitHub Actions free-tier minutes | success, created `2026-06-04T23:32:34Z`, updated `2026-06-04T23:39:14Z`, run `26985924241`, <https://github.com/jerdaw/waittimecanada/actions/runs/26985924241> | stale production data is expected unless an operator manually dispatches the workflow |
 | `heartbeat-monitor.yml` | `workflow_dispatch` only; local and remote YAML both say the scheduled trigger is paused to conserve GitHub Actions free-tier minutes | failure, created `2026-06-04T23:55:21Z`, updated `2026-06-04T23:55:38Z`, run `26986732670`, <https://github.com/jerdaw/waittimecanada/actions/runs/26986732670> | dead man's switch is also manual-only, so it stopped producing recurring freshness evidence after June 4 |

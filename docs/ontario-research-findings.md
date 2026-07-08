@@ -4,18 +4,18 @@
 **Phase:** 0 - Research & Discovery
 **Researcher:** Implementation of M2 Plan v1.0.0
 
-> Implementation note (2026-03-21): the production Ontario scraper no longer uses Playwright. The current runtime fetches the HQOntario page directly over HTTP and parses the embedded HTML tables because the needed table content is available server-side.
+> Implementation note (2026-07-08): the production Ontario scraper no longer uses Playwright. The current runtime fetches the Ontario Health reporting page directly over HTTP, follows the former HQOntario redirect chain, and parses the embedded HTML tables because the needed table content is available server-side.
 
 ---
 
 ## Data Source Options
 
-### Option 1: HQOntario (Official - Recommended)
+### Option 1: Ontario Health (Official - Recommended)
 
-**URL:** https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments
+**URL:** https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments
 
 **Pros:**
-- ✅ Official government source (Health Quality Ontario)
+- ✅ Official government source (Ontario Health)
 - ✅ 100+ Ontario hospitals covered
 - ✅ Data visible in HTML table
 - ✅ Authoritative, trustworthy
@@ -27,7 +27,7 @@
 - ⚠️ Average wait times (not real-time)
 
 **Technical Requirements:**
-- Direct HTTP fetch of the HQOntario page
+- Direct HTTP fetch of the Ontario Health reporting page
 - Parse HTML table structure
 
 **Data Structure:**
@@ -56,14 +56,14 @@
 
 **Status:** ❌ Not a data source
 - Informational page only
-- Redirects to HQOntario for actual data
+- Redirects to Ontario Health for actual data
 - No scrapeable content
 
 ---
 
 ## Recommendation
 
-### Primary: HQOntario (Official Source)
+### Primary: Ontario Health (Official Source)
 
 **Rationale:**
 1. **Authoritative** - Official government data
@@ -72,12 +72,12 @@
 4. **Methodology clear** - Well-documented for ontology tagging
 
 **Implementation Strategy:**
-1. Fetch the HQOntario page directly over HTTP
+1. Fetch the Ontario Health reporting page directly over HTTP
 2. Parse the hospital comparison table
 3. Extract hospital rows
 4. Parse wait times (convert hours → minutes)
 
-**Sample Hospitals (from HQOntario):**
+**Sample Hospitals (from Ontario Health):**
 - The Ottawa Hospital - Civic Campus
 - The Ottawa Hospital - General Campus
 - Queensway Carleton Hospital
@@ -90,7 +90,7 @@
 
 ## Methodology Documentation
 
-Based on HQOntario methodology page:
+Based on the Health Quality Ontario methodology page:
 
 **Metric Family:** `TIME_TO_PROVIDER`
 - Measures wait time until first assessment by doctor
@@ -104,7 +104,7 @@ Based on HQOntario methodology page:
 - Not NP/PA - must be MD
 
 **Statistic Type:** `MEAN`
-- "Average (Hours)" per HQOntario
+- "Average (Hours)" per Ontario Health reporting
 - NOT P90 (unlike Alberta)
 - Important distinction for comparability
 
@@ -157,7 +157,8 @@ Based on HQOntario methodology page:
 **Implementation Pattern:**
 ```python
 response = client.get(
-    "https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments"
+    "https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments",
+    follow_redirects=True,
 )
 response.raise_for_status()
 html = response.text
@@ -170,7 +171,7 @@ html = response.text
 
 | Risk | Probability | Impact | Mitigation |
 |------|-------------|--------|------------|
-| HQOntario changes HTML structure | Medium | High | Version parser, add structure detection |
+| Ontario Health changes HTML structure | Medium | High | Version parser, add structure detection |
 | Upstream read timeouts | Medium | Medium | Retry with an extended HTTP read timeout before surfacing failure |
 | Data not updated regularly | Low | Low | Check timestamps, alert if stale |
 | Hospital names don't match mapping | High | Low | Fuzzy matching (already have from Quebec) |
@@ -180,7 +181,7 @@ html = response.text
 ## Sources
 
 - [Ontario Government - Emergency Department Wait Times](https://www.ontario.ca/page/time-spent-emergency-department)
-- [Health Quality Ontario - Time Spent in Emergency Departments](https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments)
+- [Ontario Health - Time Spent in Emergency Departments](https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments)
 
 - [Hamilton Emergency Wait Times](https://www.hamiltonemergencywaittimes.ca/)
 - [Niagara Health - Emergency Department Wait Times](https://www.niagarahealth.on.ca/site/waiting-times)
@@ -191,7 +192,7 @@ html = response.text
 ## Next Steps (Phase 1)
 
 1. Create `ontario.py` scraper
-2. Implement HQOntario HTML table parsing over HTTP
+2. Implement Ontario Health HTML table parsing over HTTP
 3. Add hospital ID normalization
 4. Test with dry-run mode
 

@@ -28,7 +28,7 @@ Create a JSON file in `data/sources/` with the following structure:
   "id": "ontario-health",
   "name": "Health Quality Ontario",
   "province": "ON",
-  "url": "https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments",
+  "url": "https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments",
   "methodology_url": "https://www.hqontario.ca/System-Performance/Emergency-Department-Performance",
   "telehealth_number": "811",
   "telehealth_name": "Health811",

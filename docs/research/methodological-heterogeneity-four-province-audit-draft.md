@@ -166,7 +166,7 @@ That is exactly why a system like Wait Time Canada should audit methodology firs
 ## External Source URLs
 
 - Ontario emergency department wait-time context: <https://www.ontario.ca/page/time-spent-emergency-department>
-- Health Quality Ontario public wait-time reporting: <https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments>
+- Ontario Health public wait-time reporting: <https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments>
 - Quebec emergency room situation portal: <https://www.quebec.ca/en/health/health-system-and-services/service-organization/quebec-health-system-and-its-services/situation-in-emergency-rooms-in-quebec>
 - Alberta Health Services wait-times portal: <https://www.albertahealthservices.ca/waittimes/Page14230.aspx>
 - BC emergency department wait-times portal: <https://edwaittimes.ca/>
