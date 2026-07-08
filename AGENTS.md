@@ -217,10 +217,11 @@ Dynamic table showing comparability matrix across provinces. This supports publi
 - Production deploys should be gated to explicit release intent.
 - Non-production branches should avoid unnecessary production builds.
 - Production probes should remain lightweight; avoid increasing probe frequency without a clear operational reason.
-- GitHub fallback operational workflows may use critical-only notification mode and wider heartbeat thresholds while scheduled cadence remains constrained.
-- Scheduled GitHub Actions operational workflows may be paused during free-tier
-  quota constraints; use manual dispatch and keep
-  `docs/planning/roadmap.md` current until cadence is restored.
+- GitHub fallback operational workflows may use critical-only notification mode
+  when they carry production alerts.
+- Keep the scraper and heartbeat workflows aligned with the public freshness
+  contract; use manual dispatch as fallback and keep
+  `docs/planning/roadmap.md` current when cadence changes.
 
 ## Runtime Usage Guardrails
 

@@ -76,8 +76,8 @@ paths are intentionally excluded from public documentation.
   scope and freshness.
 - Preserve the 30-day raw-measurement retention policy while keeping permanent
   aggregates for long-term analysis.
-- Use manual-dispatch operational workflows while scheduled GitHub Actions
-  triggers are paused for free-tier quota conservation.
+- Keep the scraper and heartbeat workflows aligned with the public freshness
+  contract, using manual dispatch as the fallback path.
 - Keep critical-only operational notification mode active for GitHub fallback
   workflows until the private heartbeat offload pilot is validated.
 - Complete the ADR-0027 heartbeat offload pilot with private runner
@@ -125,10 +125,10 @@ paths are intentionally excluded from public documentation.
 - [ ] **P1 / Complete private heartbeat offload pilot:** Use the public
   contract in `docs/operations/heartbeat-offload-pilot.md` to validate a
   trusted offloaded runner manually before enabling a private schedule.
-- [ ] **P1 / Restore scheduled workflow cadence:** Re-enable scraper,
-  heartbeat, snapshot, public-health ingest, and smoke schedules incrementally
-  after the heartbeat pilot succeeds, keeping GitHub manual dispatch as
-  fallback.
+- [ ] **P1 / Restore remaining scheduled workflow cadence:** Keep scraper and
+  heartbeat recurrence aligned with public freshness, and re-enable snapshot,
+  public-health ingest, and smoke schedules incrementally after the heartbeat
+  pilot succeeds.
 
 ### Next
 

@@ -1,8 +1,10 @@
 name: Heartbeat Monitor (Dead Man's Switch)
 
-# Scheduled trigger paused to conserve GitHub Actions free-tier minutes.
-# Use workflow_dispatch until the scheduled cadence is restored.
+# Monitor between hourly scraper runs and page only on classified critical
+# failures.
 on:
+  schedule:
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 
 concurrency:
@@ -40,4 +42,4 @@ jobs:
           ALERT_API_TOKEN: ${{ secrets.ALERT_API_TOKEN }}
           OPERATIONAL_NOTIFICATION_MODE: critical_only
         run: |
-          uv run python -m waittime.cli.check_heartbeat --max-age 720 --max-consecutive-failures 6
+          uv run python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1

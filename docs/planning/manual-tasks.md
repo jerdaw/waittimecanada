@@ -17,8 +17,9 @@ from public documentation.
 - [ ] Pilot ADR-0027 CI offload with heartbeat/status checks on a trusted
   runner using `docs/operations/heartbeat-offload-pilot.md`, keeping GitHub
   manual dispatch as fallback.
-- [ ] Restore scheduled operational workflows incrementally after the trusted
-  heartbeat/status offload pilot succeeds; use manual dispatch in the meantime.
+- [ ] Restore remaining scheduled operational workflows incrementally after the
+  trusted heartbeat/status offload pilot succeeds; keep manual dispatch as the
+  fallback path.
 - [ ] Before moving scraper cron or public-health ingest off GitHub, document
   runner isolation, secret handling, log retention, failure summaries, and
   rollback steps in the private/shared operations source of truth.

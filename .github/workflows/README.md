@@ -83,7 +83,7 @@ the latest shallow commit.
 
 ### 4. `scraper-cron.yml` - Scraper Execution
 
-**Trigger:** manual dispatch. Scheduled trigger is temporarily paused to conserve GitHub Actions free-tier minutes.
+**Trigger:** hourly schedule plus manual dispatch.
 
 **Purpose:** Run all provincial scrapers against the configured database and emit classified source-health state.
 
@@ -94,7 +94,7 @@ the latest shallow commit.
 
 ### 5. `heartbeat-monitor.yml` - Dead Man's Switch
 
-**Trigger:** manual dispatch. Scheduled trigger is temporarily paused to conserve GitHub Actions free-tier minutes.
+**Trigger:** every 30 minutes plus manual dispatch.
 
 **Purpose:** Ensure scraper heartbeat freshness remains within threshold and report consecutive/classified failures.
 
@@ -222,10 +222,9 @@ the latest shallow commit.
 ## Operational Notes
 
 - Playwright E2E is GitHub-CI-only and manual-dispatch to conserve free-tier minutes, even though the current suite has been repo-side stabilized.
-- Scheduled operational workflows are temporarily paused to conserve GitHub
-  Actions free-tier minutes. Use manual dispatch for scraper, heartbeat,
-  snapshot, public-health ingest, and smoke checks until the quota reset allows
-  restoring cadence.
+- The scraper and heartbeat workflows run on the public source-freshness
+  cadence. Snapshot, public-health ingest, and smoke checks remain
+  manual-dispatch while broader operational offload work continues.
 - `frontend-ci.yml` keeps strict quality gates while avoiding heavy jobs when changes do not affect user-facing frontend runtime behavior.
 - `production-readiness.yml` and `production-smoke.yml` are lightweight operational preflight/postflight checks.
 - Production smoke now exercises `/api/status` and aggregate `/api/data-quality` directly and fails if dormant legacy source IDs such as `manitoba-shared-health` or `on-health` leak into the public payload.

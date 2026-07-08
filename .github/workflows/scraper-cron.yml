@@ -1,8 +1,10 @@
 name: Scraper Cron Job
 
-# Scheduled trigger paused to conserve GitHub Actions free-tier minutes.
-# Use workflow_dispatch until the scheduled cadence is restored.
+# Keep public source status aligned with hourly collection and a 120-minute
+# freshness threshold.
 on:
+  schedule:
+    - cron: "0 * * * *"
   workflow_dispatch: # Allow manual trigger
 
 env:
@@ -62,7 +64,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          uv run python -m waittime.cli.check_heartbeat --max-age 720 --max-consecutive-failures 6 --dry-run --verbose || true
+          uv run python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1 --dry-run --verbose || true
 
       - name: Generate Freshness Badge
         if: always()
@@ -91,4 +93,4 @@ jobs:
           ALERT_API_TOKEN: ${{ secrets.ALERT_API_TOKEN }}
           OPERATIONAL_NOTIFICATION_MODE: critical_only
         run: |
-          uv run python -m waittime.cli.check_heartbeat --max-age 720 --max-consecutive-failures 6 || true
+          uv run python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1 || true

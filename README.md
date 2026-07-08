@@ -527,9 +527,10 @@ environment-specific paths are kept outside public documentation.
   snapshot here
 
 ### Data Freshness
-- **Update Frequency:** Scheduled or manually dispatched source refreshes,
-  depending on the current GitHub Actions quota posture
+- **Update Frequency:** Hourly scheduled source refreshes, with manual dispatch
+  available as an operator fallback
 - **Freshness Thresholds:** Source-health checks flag stale or failed updates
+  when source heartbeats exceed the public freshness threshold
 - **Current Status:** See the public status and data-quality pages for current source state
 
 ---
