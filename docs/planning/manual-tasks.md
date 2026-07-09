@@ -17,10 +17,9 @@ from public documentation.
 - [ ] Pilot ADR-0027 CI offload with heartbeat/status checks on a trusted
   runner using `docs/operations/heartbeat-offload-pilot.md`, keeping GitHub
   manual dispatch as fallback.
-- [ ] Confirm a new GitHub `event=schedule` run for `scraper-cron.yml` after
-  the 2026-07-08 recovery; heartbeat schedule creation has recovered, but keep
-  manual scraper dispatch or a trusted external scheduler fallback active until
-  scraper schedule evidence exists.
+- [ ] Review scraper and heartbeat scheduled-run history after the first full
+  24-hour recovery window so `/api/status` and `/api/data-quality` can be
+  checked against sustained cadence rather than one-off recovery evidence.
 - [ ] Restore remaining scheduled operational workflows incrementally after the
   trusted heartbeat/status offload pilot succeeds; keep manual dispatch as the
   fallback path.
