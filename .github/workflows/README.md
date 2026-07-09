@@ -232,8 +232,10 @@ the latest shallow commit.
   manual-dispatch while broader operational offload work continues.
 - The scraper and heartbeat cron definitions are present on `main`. Both
   workflows produced successful post-recovery `event=schedule` runs on
-  2026-07-09. Keep manual dispatch available as the fallback path while the
-  24-hour public status window repopulates.
+  2026-07-09, but GitHub schedule creation was intermittent enough to breach
+  the public freshness threshold. Heartbeat now dispatches a freshness-only
+  scraper recovery when its stale check fails and no scraper run is already
+  queued or running. Keep manual dispatch available as the operator fallback.
 - `frontend-ci.yml` keeps strict quality gates while avoiding heavy jobs when changes do not affect user-facing frontend runtime behavior.
 - `production-readiness.yml` and `production-smoke.yml` are lightweight operational preflight/postflight checks.
 - Production smoke now exercises `/api/status` and aggregate `/api/data-quality` directly and fails if dormant legacy source IDs such as `manitoba-shared-health` or `on-health` leak into the public payload.

@@ -7,6 +7,10 @@ on:
     - cron: "14,44 * * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  actions: write
+
 concurrency:
   group: heartbeat-monitor
   cancel-in-progress: false
@@ -34,6 +38,7 @@ jobs:
           uv sync --locked --no-dev
 
       - name: Check heartbeats
+        id: check_heartbeats
         working-directory: ./backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -43,3 +48,33 @@ jobs:
           OPERATIONAL_NOTIFICATION_MODE: critical_only
         run: |
           uv run python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1
+
+      - name: Dispatch freshness-only scraper recovery
+        if: ${{ failure() && steps.check_heartbeats.outcome == 'failure' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          in_progress_runs="$(gh run list \
+            --repo "$GITHUB_REPOSITORY" \
+            --workflow "Scraper Cron Job" \
+            --status in_progress \
+            --json databaseId \
+            --jq 'length')"
+          queued_runs="$(gh run list \
+            --repo "$GITHUB_REPOSITORY" \
+            --workflow "Scraper Cron Job" \
+            --status queued \
+            --json databaseId \
+            --jq 'length')"
+
+          if [ "$in_progress_runs" != "0" ] || [ "$queued_runs" != "0" ]; then
+            echo "Scraper workflow already queued or running; skipping recovery dispatch."
+            exit 0
+          fi
+
+          gh workflow run scraper-cron.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref "$GITHUB_REF_NAME" \
+            -f refresh_analytics=false

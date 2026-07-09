@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the production scraper workflow's operational guardrails."""
+"""Validate production scraper freshness workflow guardrails."""
 
 from __future__ import annotations
 
@@ -9,7 +9,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-WORKFLOW = ROOT / ".github" / "workflows" / "scraper-cron.yml"
+SCRAPER_WORKFLOW = ROOT / ".github" / "workflows" / "scraper-cron.yml"
+HEARTBEAT_WORKFLOW = ROOT / ".github" / "workflows" / "heartbeat-monitor.yml"
 
 
 def _step_block(text: str, step_name: str) -> str:
@@ -29,8 +30,19 @@ def _job_timeout_minutes(text: str) -> int:
     return int(match.group(1))
 
 
+def _has_permission(text: str, permission: str, level: str) -> bool:
+    return bool(
+        re.search(
+            rf"^permissions:\n(?:\s{{2}}\w[\w-]*:\s*\w+\n)*\s{{2}}{permission}:\s*{level}\s*$",
+            text,
+            re.MULTILINE,
+        )
+    )
+
+
 def _main() -> int:
-    text = WORKFLOW.read_text(encoding="utf-8")
+    text = SCRAPER_WORKFLOW.read_text(encoding="utf-8")
+    heartbeat_text = HEARTBEAT_WORKFLOW.read_text(encoding="utf-8")
 
     failures: list[str] = []
 
@@ -82,6 +94,48 @@ def _main() -> int:
             failures.append(
                 "scheduled post-scrape aggregate refresh must be limited to daily"
             )
+
+    if not _has_permission(heartbeat_text, "contents", "read"):
+        failures.append("heartbeat workflow must grant contents: read")
+    if not _has_permission(heartbeat_text, "actions", "write"):
+        failures.append(
+            "heartbeat workflow must grant actions: write for recovery dispatch"
+        )
+
+    try:
+        check_step = _step_block(heartbeat_text, "Check heartbeats")
+    except AssertionError as exc:
+        failures.append(str(exc))
+        check_step = ""
+
+    if check_step and "id: check_heartbeats" not in check_step:
+        failures.append("heartbeat check step must expose id: check_heartbeats")
+
+    try:
+        recovery_step = _step_block(
+            heartbeat_text, "Dispatch freshness-only scraper recovery"
+        )
+    except AssertionError as exc:
+        failures.append(str(exc))
+        recovery_step = ""
+
+    if recovery_step:
+        if "steps.check_heartbeats.outcome == 'failure'" not in recovery_step:
+            failures.append(
+                "heartbeat recovery dispatch must only run after heartbeat check failure"
+            )
+        if "GH_TOKEN: ${{ github.token }}" not in recovery_step:
+            failures.append("heartbeat recovery dispatch must use github.token")
+        if "gh workflow run scraper-cron.yml" not in recovery_step:
+            failures.append("heartbeat recovery dispatch must run scraper-cron.yml")
+        if "refresh_analytics=false" not in recovery_step:
+            failures.append(
+                "heartbeat recovery dispatch must skip analytics aggregation"
+            )
+        if "--status in_progress" not in recovery_step:
+            failures.append("heartbeat recovery dispatch must check in-progress runs")
+        if "--status queued" not in recovery_step:
+            failures.append("heartbeat recovery dispatch must check queued runs")
 
     if failures:
         print("Scraper workflow guardrail check failed:")
