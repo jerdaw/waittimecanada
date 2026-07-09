@@ -6,7 +6,13 @@ name: Scraper Cron Job
 on:
   schedule:
     - cron: "29 * * * *"
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      refresh_analytics:
+        description: "Run post-scrape daily analytics aggregate refresh"
+        required: false
+        type: boolean
+        default: true
 
 env:
   PYTHON_VERSION: "3.12"
@@ -20,7 +26,7 @@ jobs:
   run-scrapers:
     name: Run All Scrapers
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
 
     steps:
       - name: Checkout code
@@ -52,13 +58,6 @@ jobs:
         run: |
           uv run python -m waittime.cli.scraper --all
 
-      - name: Refresh current analytics aggregates
-        working-directory: ./backend
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          uv run python -m waittime.cli.aggregate --incremental
-
       - name: Summarize scraper operational status
         if: always()
         working-directory: ./backend
@@ -83,6 +82,15 @@ jobs:
           name: freshness-badge
           path: backend/freshness.json
           retention-days: 1
+
+      - name: Refresh current analytics aggregates
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.refresh_analytics }}
+        timeout-minutes: 15
+        working-directory: ./backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          uv run python -m waittime.cli.aggregate --incremental --period daily
 
       - name: Send classified scraper alerts on failure
         if: failure()

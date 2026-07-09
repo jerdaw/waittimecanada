@@ -331,6 +331,14 @@ else
 fi
 
 echo
+echo "[6b/11] Checking scraper workflow guardrails..."
+if python3 scripts/check-scraper-workflow.py; then
+  :
+else
+  failures=1
+fi
+
+echo
 echo "[7/11] Checking public documentation boundary terms..."
 if grep -nEi "${public_boundary_pattern}" "${public_text_files[@]}"; then
   failures=1
