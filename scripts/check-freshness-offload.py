@@ -33,8 +33,7 @@ SYSTEMD_FILES = {
         "waittime-freshness-runner.py aggregate",
     ],
     "waittime-freshness-aggregate.timer": [
-        "OnCalendar=*-*-* 06:10:00",
-        "Timezone=UTC",
+        "OnCalendar=*-*-* 06:10:00 UTC",
     ],
 }
 

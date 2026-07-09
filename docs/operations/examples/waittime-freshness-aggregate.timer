@@ -4,8 +4,7 @@
 Description=Refresh Wait Time Canada daily analytics aggregates
 
 [Timer]
-OnCalendar=*-*-* 06:10:00
-Timezone=UTC
+OnCalendar=*-*-* 06:10:00 UTC
 Persistent=true
 Unit=waittime-freshness-aggregate.service
 
