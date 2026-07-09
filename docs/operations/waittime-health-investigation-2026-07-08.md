@@ -11,9 +11,10 @@ Production health was critical because:
 Recovery status after the 2026-07-08 fix:
 
 - Scraper source behavior: all four sources collect current data locally and in the production scraper workflow after the Ontario redirect fix.
-- Production database freshness: `/api/health` is healthy with all four source heartbeats refreshed at `2026-07-08T20:58Z`.
-- Recurrence: `scraper-cron.yml` is restored to hourly schedule plus manual dispatch; `heartbeat-monitor.yml` is restored to a 30-minute schedule plus manual dispatch. On 2026-07-08, the schedules were staggered away from common `:00` and `:30` GitHub Actions boundaries after the first restored schedule window did not create a run within the observed lag window.
-- Residual public status: `/api/status` and `/api/data-quality` still report `critical` immediately after one successful run because their 24-hour uptime calculation expects 24 hourly windows. They should recover as successful hourly runs accumulate.
+- Production database freshness: `/api/health` is healthy with all four source heartbeats refreshed at `2026-07-09T00:37Z` after the second manual fallback scraper run.
+- Recurrence configuration: `scraper-cron.yml` is restored to hourly schedule plus manual dispatch; `heartbeat-monitor.yml` is restored to a 30-minute schedule plus manual dispatch. On 2026-07-08, the schedules were staggered away from common `:00` and `:30` GitHub Actions boundaries.
+- Recurrence verification: GitHub Actions had not created a new `schedule` event for the observed 2026-07-08/09 UTC windows through `2026-07-09T00:51Z`, even though both workflows reported `active` and were explicitly toggled off/on. Manual dispatch remains the live fallback until a new `event=schedule` run is observed.
+- Residual public status: `/api/status` and `/api/data-quality` still report `critical` because their 24-hour uptime calculation expects 24 hourly windows. They should recover as successful hourly runs accumulate.
 
 ## Root-Cause Table
 
@@ -21,6 +22,7 @@ Recovery status after the 2026-07-08 fix:
 | --- | --- | --- | --- | --- |
 | Scheduled scraper paused | Local and remote workflow YAML showed `workflow_dispatch` only; latest scraper run before recovery was `2026-06-04T23:32:34Z` | fixed | high | hourly schedule restored in `6ad2fa2`; manual dispatch remains available |
 | Heartbeat monitor paused | Local and remote workflow YAML showed `workflow_dispatch` only; latest heartbeat run before recovery was `2026-06-04T23:55:21Z` | fixed | high | 30-minute schedule restored in `6ad2fa2`; manual dispatch run `28976114340` passed |
+| Scheduled event creation after restore | Workflows report `active`, Actions permissions are enabled, and cron syntax is present on `main`, but no new `event=schedule` runs appeared for observed restored windows through `2026-07-09T00:51Z` | current | high | keep manual dispatch fallback active; confirm the first new schedule-created run or move the cadence to a trusted external runner/scheduler |
 | Ontario redirect handling | Old source URL redirects through Ontario Health before returning 200; original fetch path did not follow redirects | fixed | high | redirect-following fix merged in `3a3f63b` and used by production scraper run `28975214976` |
 | Quebec 403 | Production last error is from `2026-06-04T23:33:38.599Z`; current endpoint probe returns 200 and local dry-run collects data | stale | medium | no scraper fix needed unless production run reproduces |
 | DB source URL metadata | Migration runner rejects checksum changes to applied migrations; source URL update requires a new migration | fixed | medium | migration workflow run `28975179871` applied `022_update_ontario_health_source_url.sql` |
@@ -42,26 +44,43 @@ Invoke-RestMethod -Uri 'https://wait-time.ca/api/status' -TimeoutSec 20
 
 ## Recovery Evidence
 
-Captured at: 2026-07-08T21:13Z
+Captured at: 2026-07-09T00:55Z
 
 | Item | Evidence | Result |
 | --- | --- | --- |
 | Redirect/source fix | Commit `3a3f63b` | Ontario scraper follows redirects and source metadata points to the current Ontario Health URL |
 | Investigation record | Commit `c0e229d` | Baseline, dry-run, migration, and production action evidence recorded |
-| Recurrence fix | Commit `6ad2fa2` plus the cadence-staggering follow-up | Scraper schedule restored to hourly; heartbeat schedule restored to every 30 minutes; schedule minutes staggered away from common GitHub Actions boundaries |
+| Recurrence fix | Commits `6ad2fa2` and `a662a55` | Scraper schedule restored to hourly at minute 29; heartbeat schedule restored to minutes 14 and 44 |
+| Workflow state | GitHub API check at `2026-07-08T23:31:54Z` | `scraper-cron.yml` and `heartbeat-monitor.yml` both reported `active` after an explicit off/on toggle |
 | Migration workflow | Run `28975179871`, <https://github.com/jerdaw/waittimecanada/actions/runs/28975179871> | success |
 | Production scraper workflow | Run `28975214976`, <https://github.com/jerdaw/waittimecanada/actions/runs/28975214976> | success; 403 did not recur; all four source heartbeats refreshed |
+| Manual fallback scraper workflow | Run `28981235847`, <https://github.com/jerdaw/waittimecanada/actions/runs/28981235847> | success; refreshed production at `2026-07-08T22:52:40.371Z` |
+| Manual threshold-protection scraper workflow | Run `28985629245`, <https://github.com/jerdaw/waittimecanada/actions/runs/28985629245> | success; refreshed production at `2026-07-09T00:37:35.818Z` before the 120-minute freshness threshold was breached |
 | Heartbeat workflow | Run `28976114340`, <https://github.com/jerdaw/waittimecanada/actions/runs/28976114340> | success on restored workflow definition |
+| Manual fallback heartbeat workflow | Run `28981626628`, <https://github.com/jerdaw/waittimecanada/actions/runs/28981626628> | success on commit `a662a55` |
+| Manual final heartbeat fallback | Run `28986301737`, <https://github.com/jerdaw/waittimecanada/actions/runs/28986301737> | success after the latest manual scraper refresh |
 | Production smoke workflow | Run `28976114348`, <https://github.com/jerdaw/waittimecanada/actions/runs/28976114348> | success against `https://wait-time.ca` |
+| Local production smoke | `PRODUCTION_BASE_URL=https://wait-time.ca bash scripts/production-smoke.sh` at `2026-07-09T00:44Z` | passed all public route/API checks and found no dormant legacy source IDs |
 | Docs CI | Run `28976106659`, <https://github.com/jerdaw/waittimecanada/actions/runs/28976106659> | success after recurrence docs update |
 
-Post-refresh API state:
+### Scheduled-Event Observation
+
+| Workflow | Expected UTC slot | Observation |
+| --- | --- | --- |
+| `heartbeat-monitor.yml` | `2026-07-08T23:14Z` | no new `event=schedule` run by `2026-07-08T23:23Z` |
+| `scraper-cron.yml` | `2026-07-08T23:29Z` | no new `event=schedule` run by `2026-07-08T23:31Z` |
+| `heartbeat-monitor.yml` | `2026-07-08T23:44Z` | no new `event=schedule` run by `2026-07-08T23:48Z` |
+| `heartbeat-monitor.yml` | `2026-07-09T00:14Z` | no new `event=schedule` run by `2026-07-09T00:21Z` |
+| `scraper-cron.yml` | `2026-07-09T00:29Z` | no new `event=schedule` run by `2026-07-09T00:36Z`; manual fallback dispatched |
+| `heartbeat-monitor.yml` | `2026-07-09T00:44Z` | no new `event=schedule` run by `2026-07-09T00:51Z` |
+
+Latest post-refresh API state:
 
 | Endpoint | Observed status | Key evidence | Interpretation |
 | --- | --- | --- | --- |
-| `/api/health` | 200, healthy | `last_update=2026-07-08T20:58:43.455Z`; source ages about 14-15 minutes at the 21:13Z check; source counts: AB 22, BC 11, ON 166, QC 204 | current scraper freshness recovered |
-| `/api/status` | 200, critical | `system_uptime_24h=0.042`; `scheduler_cadence=hourly`; `expected_runs_24h=24`; all source heartbeats healthy | current freshness is healthy, but the 24-hour success-rate window contains only one successful hourly run after a month-long gap |
-| `/api/data-quality` | 200, critical | `system_uptime_24h=0.042`; `total_measurements_24h=403`; all source heartbeats healthy | measurements are flowing again, but the 24-hour data-quality success-rate window needs recurring hourly runs to recover |
+| `/api/health` | 200, healthy | `last_update=2026-07-09T00:37:35.818Z`; source ages about 6-7 minutes at the `2026-07-09T00:43Z` check; source counts: AB 22, BC 12, ON 166, QC 203 | current scraper freshness recovered |
+| `/api/status` | 200, critical | `system_uptime_24h=0.125`; `scheduler_cadence=hourly`; `expected_runs_24h=24`; all source heartbeats healthy | current freshness is healthy, but the 24-hour success-rate window contains only three successful hourly windows after a month-long gap |
+| `/api/data-quality` | 200, critical | `system_uptime_24h=0.125`; `total_measurements_24h=1210`; all source heartbeats healthy | measurements are flowing again, but the 24-hour data-quality success-rate window needs recurring hourly runs to recover |
 
 ## Baseline
 

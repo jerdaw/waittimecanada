@@ -225,6 +225,10 @@ the latest shallow commit.
 - The scraper and heartbeat workflows run on the public source-freshness
   cadence. Snapshot, public-health ingest, and smoke checks remain
   manual-dispatch while broader operational offload work continues.
+- The scraper and heartbeat cron definitions are present on `main`, but on
+  2026-07-08/09 GitHub had not emitted new `event=schedule` runs for the
+  observed restored windows. Keep manual dispatch or a trusted external
+  scheduler fallback active until a new schedule-created run is observed.
 - `frontend-ci.yml` keeps strict quality gates while avoiding heavy jobs when changes do not affect user-facing frontend runtime behavior.
 - `production-readiness.yml` and `production-smoke.yml` are lightweight operational preflight/postflight checks.
 - Production smoke now exercises `/api/status` and aggregate `/api/data-quality` directly and fails if dormant legacy source IDs such as `manitoba-shared-health` or `on-health` leak into the public payload.
