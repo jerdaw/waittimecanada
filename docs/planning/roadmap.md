@@ -9,8 +9,9 @@ careful public-health resource scope, and disciplined maintenance rather than
 broad feature churn. The public documentation boundary cleanup is complete and
 captured in ADR-0026. Roadmap wording avoids hospital-choice recommendation
 framing and uses system-pressure terminology instead. ADR-0027's public
-heartbeat offload scaffold is merged; remaining pilot work is private runner
-provisioning and manual validation outside this repository. The 2026-06-22
+source-freshness offload scaffold is merged; remaining pilot work is trusted
+runner provisioning and manual validation outside this repository. The
+2026-06-22
 maintenance pass aligned backend setup and CI with the checked-in `uv.lock`,
 added migration sequence guardrails, added frontend test-file type checking,
 and archived completed repo-audit planning stubs out of the active planning
@@ -52,8 +53,9 @@ Completed foundations:
   private/shared operations source of truth
 - Documentation and CI guardrails for public-boundary checks, human-authorship
   policy, roadmap freshness, ontology drift, and Docs CI path coverage
-- ADR-0027 strategy, public heartbeat offload contract, and copy/adapt-only
-  Forgejo example for trusted runner adoption
+- ADR-0027 strategy, public source-freshness offload contract, and
+  copy/adapt-only trusted-runner examples for scraper, watchdog, and aggregate
+  adoption
 - ADR-0028 critical-only operational notification mode with persisted
   notified-tier state for scraper and public-health source incidents
 - Backend `uv.lock` setup and CI alignment, migration sequence validation, and
@@ -79,8 +81,8 @@ paths are intentionally excluded from public documentation.
 - Keep the scraper and heartbeat workflows aligned with the public freshness
   contract, using manual dispatch as the fallback path.
 - Keep critical-only operational notification mode active for GitHub fallback
-  workflows until the private heartbeat offload pilot is validated.
-- Complete the ADR-0027 heartbeat offload pilot with private runner
+  workflows until the trusted source-freshness offload pilot is validated.
+- Complete the ADR-0027 source-freshness offload pilot with trusted runner
   provisioning and manual validation, using the public contract in
   `docs/operations/heartbeat-offload-pilot.md` and keeping GitHub manual
   dispatch as fallback.
@@ -122,13 +124,14 @@ paths are intentionally excluded from public documentation.
   end-event, and statistic-type matching as the direct-comparison rule.
 - [ ] **P1 / Maintain source freshness:** Keep source status and data-quality
   reporting explicit without exposing private monitoring configuration.
-- [ ] **P1 / Complete private heartbeat offload pilot:** Use the public
-  contract in `docs/operations/heartbeat-offload-pilot.md` to validate a
-  trusted offloaded runner manually before enabling a private schedule.
-- [ ] **P1 / Restore remaining scheduled workflow cadence:** Keep scraper and
-  heartbeat recurrence aligned with public freshness, and re-enable snapshot,
-  public-health ingest, and smoke schedules incrementally after the heartbeat
-  pilot succeeds.
+- [ ] **P1 / Complete source-freshness offload pilot:** Use the public contract
+  in `docs/operations/heartbeat-offload-pilot.md` to validate trusted scraper,
+  watchdog, aggregate, and smoke commands manually before enabling trusted
+  schedules.
+- [ ] **P1 / Restore remaining scheduled workflow cadence:** Keep GitHub manual
+  dispatch as the fallback path, and remove scraper and heartbeat scheduled
+  triggers only after the source-freshness offload pilot completes a clean
+  proof window.
 
 ### Next
 
@@ -248,7 +251,7 @@ paths are intentionally excluded from public documentation.
   source-validated additions with clear caveats.
 - Research outputs: maintain case studies, export interpretation guidance, and
   exported datasets with complete methodology labels and source attribution.
-- CI/runtime cost control: complete the ADR-0027 private heartbeat pilot, then
+- CI/runtime cost control: complete the ADR-0027 source-freshness pilot, then
   offload trusted recurring operations incrementally while preserving GitHub as
   the public collaboration surface.
 - Tooling maintenance: keep backend setup, GitHub Actions, and local

@@ -143,6 +143,18 @@ def _create_docs_fixture(tmp_path: Path) -> Path:
         (REPO_ROOT / "scripts" / "check-docs.sh").read_text(encoding="utf-8"),
     )
     _write(
+        root / "scripts" / "check-scraper-workflow.py",
+        (REPO_ROOT / "scripts" / "check-scraper-workflow.py").read_text(encoding="utf-8"),
+    )
+    _write(
+        root / "scripts" / "check-freshness-offload.py",
+        (REPO_ROOT / "scripts" / "check-freshness-offload.py").read_text(encoding="utf-8"),
+    )
+    _write(
+        root / "scripts" / "waittime-freshness-runner.py",
+        (REPO_ROOT / "scripts" / "waittime-freshness-runner.py").read_text(encoding="utf-8"),
+    )
+    _write(
         root / "README.md",
         "does not provide medical advice\nCall 911 for emergencies\ndirectly comparable\n",
     )
@@ -162,6 +174,42 @@ def _create_docs_fixture(tmp_path: Path) -> Path:
     _write(root / ".github" / "workflows" / "README.md")
 
     _write(root / "docs" / "README.md")
+    _write(
+        root / "docs" / "operations" / "heartbeat-offload-pilot.md",
+        (REPO_ROOT / "docs" / "operations" / "heartbeat-offload-pilot.md").read_text(
+            encoding="utf-8"
+        ),
+    )
+    for example_path in (REPO_ROOT / "docs" / "operations" / "examples").glob(
+        "waittime-freshness-*"
+    ):
+        _write(
+            root / "docs" / "operations" / "examples" / example_path.name,
+            example_path.read_text(encoding="utf-8"),
+        )
+    _write(
+        root / "docs" / "operations" / "examples" / "forgejo-heartbeat-monitor.yml",
+        (
+            REPO_ROOT / "docs" / "operations" / "examples" / "forgejo-heartbeat-monitor.yml"
+        ).read_text(encoding="utf-8"),
+    )
+    _write(
+        root / "docs" / "operations" / "scraper-scheduling.md",
+        "Scraper scheduling fixture\n",
+    )
+    _write(
+        root / "docs" / "adr" / "0027-hybrid-ci-offload-strategy.md",
+        "ADR-0027 fixture\n",
+    )
+    _write(root / "docs" / "planning" / "manual-tasks.md", "Manual tasks fixture\n")
+    _write(
+        root / ".github" / "workflows" / "scraper-cron.yml",
+        (REPO_ROOT / ".github" / "workflows" / "scraper-cron.yml").read_text(encoding="utf-8"),
+    )
+    _write(
+        root / ".github" / "workflows" / "heartbeat-monitor.yml",
+        (REPO_ROOT / ".github" / "workflows" / "heartbeat-monitor.yml").read_text(encoding="utf-8"),
+    )
     _write(
         root / "docs" / "API.md",
         "not a triage or medical advice service\nontology dimensions match\n",

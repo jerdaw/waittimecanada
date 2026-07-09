@@ -35,6 +35,23 @@ uv run python -m waittime.cli.scraper --source ontario-health --dry-run
 uv run python -m waittime.cli.check_heartbeat --dry-run --verbose
 ```
 
+## Trusted Runner Commands
+
+The public source-freshness offload wrapper is `scripts/waittime-freshness-runner.py`.
+It is intended for a trusted runner with production secrets supplied outside
+this repository:
+
+```bash
+python3 scripts/waittime-freshness-runner.py check
+python3 scripts/waittime-freshness-runner.py watchdog --dry-run
+python3 scripts/waittime-freshness-runner.py scrape
+python3 scripts/waittime-freshness-runner.py aggregate
+python3 scripts/waittime-freshness-runner.py smoke
+```
+
+The wrapper treats age 90 minutes or greater as unsafe so recovery can run
+before the public 120-minute stale threshold is crossed.
+
 ## Interpretation Limits
 
 - Provincial sources can change methodology or page structure without notice.

@@ -14,15 +14,16 @@ from public documentation.
   change.
 - [ ] Re-run public status alignment after each completed milestone so README,
   roadmap, and planning indexes keep the same current-state baseline.
-- [ ] Pilot ADR-0027 CI offload with heartbeat/status checks on a trusted
-  runner using `docs/operations/heartbeat-offload-pilot.md`, keeping GitHub
-  manual dispatch as fallback.
+- [ ] Pilot ADR-0027 source-freshness offload with scraper, watchdog, aggregate,
+  and smoke commands on a trusted runner using
+  `docs/operations/heartbeat-offload-pilot.md`, keeping GitHub manual dispatch
+  as fallback.
 - [ ] Review scraper, heartbeat, and heartbeat-triggered scraper recovery
   history after the first full 24-hour recovery window so `/api/status` and
   `/api/data-quality` can be checked against sustained cadence rather than
   one-off recovery evidence.
 - [ ] Restore remaining scheduled operational workflows incrementally after the
-  trusted heartbeat/status offload pilot succeeds; keep manual dispatch as the
+  trusted source-freshness offload pilot succeeds; keep manual dispatch as the
   fallback path.
 - [ ] Before moving scraper cron or public-health ingest off GitHub, document
   runner isolation, secret handling, log retention, failure summaries, and

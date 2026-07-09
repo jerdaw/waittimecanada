@@ -339,6 +339,14 @@ else
 fi
 
 echo
+echo "[6c/11] Checking freshness offload guardrails..."
+if python3 scripts/check-freshness-offload.py; then
+  :
+else
+  failures=1
+fi
+
+echo
 echo "[7/11] Checking public documentation boundary terms..."
 if grep -nEi "${public_boundary_pattern}" "${public_text_files[@]}"; then
   failures=1

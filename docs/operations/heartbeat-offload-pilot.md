@@ -1,9 +1,9 @@
-# Heartbeat Offload Pilot
+# Source Freshness Offload Pilot
 
-This guide is the public, repo-side contract for the first ADR-0027 offload
-pilot. It documents how a trusted non-GitHub runner should invoke the existing
-heartbeat checker without exposing private infrastructure, credentials, or
-monitoring configuration.
+This guide is the public, repo-side contract for the ADR-0027 source-freshness
+offload pilot. It documents how a trusted non-GitHub runner should invoke the
+existing scraper, heartbeat checker, aggregate refresh, and smoke checks without
+exposing private infrastructure, credentials, or monitoring configuration.
 
 This is not a private deployment runbook. Runner registration, secret values,
 alert routing, private log retention, and service scheduling belong in the
@@ -11,41 +11,52 @@ private/shared operations source of truth.
 
 ## Command Contract
 
-Run the same heartbeat checker used by the GitHub manual fallback workflow:
+Use a generic trusted timer service runner for the durable target. The public
+wrapper is intentionally repo-safe and prints only environment variable
+presence, never values:
 
 ```bash
-cd backend
-uv run python -m waittime.cli.check_heartbeat --max-age 720 --max-consecutive-failures 6
+python3 scripts/waittime-freshness-runner.py check
+python3 scripts/waittime-freshness-runner.py watchdog --dry-run
+python3 scripts/waittime-freshness-runner.py scrape
+python3 scripts/waittime-freshness-runner.py aggregate
+python3 scripts/waittime-freshness-runner.py smoke
 ```
 
-The backend package must be installed in the runner environment before the
-command runs:
+The runner uses these public-safe defaults:
 
-```bash
-cd backend
-python -m pip install "uv==0.11.23"
-uv sync --locked --no-dev
-```
+- unsafe recovery threshold: 90 minutes
+- hard stale threshold: 120 minutes
+- freshness scraper timer: hourly at minute 17
+- freshness watchdog timer: minutes 07 and 37 every hour
+- daily aggregate timer: 06:10 UTC
+- lock file: `/tmp/waittime-freshness-runner.lock`
+
+The backend package must be installed in the private runner environment before
+operational commands run:
 
 Required environment variable names:
 
 - `DATABASE_URL`
 
-Optional alert environment variable names:
+Optional environment variable names:
 
+- `SENTRY_DSN`
 - `ALERT_API_URL`
 - `ALERT_USER_KEY`
 - `ALERT_API_TOKEN`
-- `OPERATIONAL_NOTIFICATION_MODE` (`normal` or `critical_only`)
+- `OPERATIONAL_NOTIFICATION_MODE` (`critical_only` for offloaded freshness
+  monitoring)
 
 Do not print environment values, connection strings, tokens, webhook URLs, or
 private runner details in logs.
 
 ## Exit Codes
 
-- `0`: all checked scraper heartbeats are healthy.
-- Non-zero: at least one source is stale, at least one source has crossed the
-  consecutive-failure threshold, or the command failed before completing.
+- `0`: freshness is safe, or an idempotent command completed successfully.
+- `1`: health check or command execution failed before a safe/unsafe decision.
+- `2`: `/api/health` is unhealthy or source freshness age is at least 90
+  minutes.
 
 Treat non-zero as an operational signal for review. It is not a clinical or
 triage signal and must not be presented as care guidance.
@@ -59,42 +70,67 @@ triage signal and must not be presented as care guidance.
 - Prefer isolated container or disposable execution for jobs that run repository
   code.
 - Keep the GitHub `workflow_dispatch` version in
-  `.github/workflows/heartbeat-monitor.yml` as the fallback entry point until
-  the offloaded job has completed one normal operating cycle.
+  `.github/workflows/scraper-cron.yml` and `.github/workflows/heartbeat-monitor.yml`
+  as fallback entry points until the offloaded job has completed one normal
+  operating cycle.
 - Keep public summaries concise and free of private paths, private hostnames,
   tokens, database URLs, and alert-route details.
 
 ## Pilot Checklist
 
 1. Provision the trusted runner outside this public repository.
-2. Configure the required `DATABASE_URL` secret and optional alert secrets in
-   the private runner environment.
-3. Run a dry-run check first:
+2. Clone or update this repository on the trusted runner.
+3. Configure the required `DATABASE_URL` secret and optional secrets in the
+   private runner environment file referenced by the local timer units.
+4. Install backend dependencies:
 
    ```bash
    cd backend
-   python -m waittime.cli.check_heartbeat --max-age 720 --max-consecutive-failures 6 --dry-run --verbose
+   python -m pip install "uv==0.11.23"
+   uv sync --locked --no-dev
    ```
 
-4. Confirm dry-run logs contain no secret values, private paths, private
+5. Run the public-safe checks:
+
+   ```bash
+   python3 scripts/waittime-freshness-runner.py check
+   python3 scripts/waittime-freshness-runner.py watchdog --dry-run
+   ```
+
+6. Confirm dry-run logs contain no secret values, private paths, private
    hostnames, tokens, database URLs, or alert-route details.
-5. Run one real heartbeat check manually with the command contract above.
-6. Compare the output and exit code with the GitHub manual fallback workflow.
-7. Enable a private schedule only after the manual offloaded run behaves as
-   expected.
-8. Keep the GitHub manual fallback available until the offloaded schedule has
-   completed one normal operating cycle.
+7. Run one real private scrape:
 
-## Copy/Adapt Example
+   ```bash
+   python3 scripts/waittime-freshness-runner.py scrape
+   python3 scripts/waittime-freshness-runner.py smoke
+   ```
 
-A copy/adapt Forgejo-style example is available at
-[examples/forgejo-heartbeat-monitor.yml](examples/forgejo-heartbeat-monitor.yml).
-It is intentionally stored under `docs/operations/examples/`, not under
-`.forgejo/workflows/`, so merging this repository change cannot start a private
-runner job.
+8. Enable the trusted-runner timers only after the manual offloaded run
+   behaves as expected.
+9. Complete a 24-hour soak with no stale breach and no temporary Codex monitor
+   intervention.
+10. Remove GitHub scheduled triggers only after the private runner completes
+    the 24-hour soak. Keep GitHub `workflow_dispatch` fallback available.
 
-If the private runner uses a self-hosted GitHub runner instead of Forgejo
-Actions, keep the same command contract and safety rules.
+## Copy/Adapt Examples
+
+Generic trusted-timer examples are available under `docs/operations/examples/`:
+
+- `waittime-freshness-scraper.service`
+- `waittime-freshness-scraper.timer`
+- `waittime-freshness-watchdog.service`
+- `waittime-freshness-watchdog.timer`
+- `waittime-freshness-aggregate.service`
+- `waittime-freshness-aggregate.timer`
+
+They are intentionally stored under `docs/operations/examples/`, so merging this
+repository change cannot start a private runner job.
+
+The older copy/adapt Forgejo-style heartbeat example remains at
+[examples/forgejo-heartbeat-monitor.yml](examples/forgejo-heartbeat-monitor.yml)
+for ADR-0027 historical context only. The durable source-freshness target is the
+trusted timer runner described above.
 
 ## Related Documents
 
