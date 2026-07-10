@@ -7,8 +7,14 @@ on:
     paths:
       - "docs/**"
       - "mkdocs.yml"
+      - "backend/pyproject.toml"
+      - "backend/uv.lock"
       - ".github/workflows/deploy-docs.yml"
   workflow_dispatch:
+
+env:
+  UV_VERSION: "0.11.23"
+  UV_PROJECT_ENVIRONMENT: ".venv-docs"
 
 permissions:
   contents: write
@@ -27,11 +33,14 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
-          python-version: 3.x
+          python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install locked documentation dependencies
         run: |
-          pip install "mkdocs<2" mkdocs-material mkdocs-minify-plugin
+          python -m pip install "uv==${UV_VERSION}"
+          uv sync --project backend --locked --only-group docs
 
       - name: Build and Deploy
-        run: mkdocs gh-deploy --force
+        run: >-
+          uv run --project backend --no-sync mkdocs gh-deploy --strict --force
+          --config-file mkdocs.yml

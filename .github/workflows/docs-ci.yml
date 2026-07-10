@@ -23,6 +23,7 @@ on:
       - "**/*.ini"
       - "**/*.cfg"
       - "docs/**"
+      - "backend/uv.lock"
   push:
     branches: [main]
     paths:
@@ -46,7 +47,12 @@ on:
       - "**/*.ini"
       - "**/*.cfg"
       - "docs/**"
+      - "backend/uv.lock"
   workflow_dispatch:
+
+env:
+  UV_VERSION: "0.11.23"
+  UV_PROJECT_ENVIRONMENT: ".venv-docs"
 
 concurrency:
   group: docs-ci-${{ github.ref }}
@@ -61,3 +67,15 @@ jobs:
           fetch-depth: 0
       - name: Run docs quality checks
         run: bash scripts/check-docs.sh
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.12"
+      - name: Install locked documentation dependencies
+        run: |
+          python -m pip install "uv==${UV_VERSION}"
+          uv sync --project backend --locked --only-group docs
+      - name: Build documentation in strict mode
+        run: >-
+          uv run --project backend --no-sync mkdocs build --strict
+          --config-file mkdocs.yml

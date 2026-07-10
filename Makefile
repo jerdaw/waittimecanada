@@ -8,3 +8,8 @@ test-visual: ## Run visual regression tests
 
 test-visual-update: ## Run visual regression tests and update snapshots
 	cd frontend && npx playwright test tests/e2e/visual.spec.ts --update-snapshots
+
+.PHONY: docs-build
+docs-build: ## Install the locked docs toolchain separately and run a strict site build
+	UV_PROJECT_ENVIRONMENT=.venv-docs uv sync --project backend --locked --only-group docs
+	UV_PROJECT_ENVIRONMENT=.venv-docs uv run --project backend --no-sync mkdocs build --strict --config-file mkdocs.yml

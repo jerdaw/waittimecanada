@@ -30,6 +30,7 @@ wheels/
 *.egg
 MANIFEST
 .venv/
+.venv-docs/
 venv/
 ENV/
 env/
