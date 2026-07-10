@@ -60,7 +60,7 @@ This is the **Wait Time Canada** project - a "Health Systems Observatory" design
   - Services: DatabaseService, AggregationService, DataQualityService, AnomalyDetectionService, MethodologyChangeDetector, GeocodingService, PublicHealthResourceService, PublicHealthAlertService
   - CLI tools: scraper runner, database cleanup, storage stats, seeding, aggregation, trusted hospital approval, region mapping, public health ingest/status/alerting
 - **Frontend**: Next.js 15 + TypeScript + Mapbox GL JS
-  - **Tests**: 441 passing frontend unit/component tests (Vitest + React Testing Library)
+  - **Tests**: 454 passing frontend unit/component tests (Vitest + React Testing Library)
   - Map component with hospital markers and methodology display
   - Data quality dashboard (`/data-quality`)
   - Analytics & benchmarking dashboard (`/analytics`)

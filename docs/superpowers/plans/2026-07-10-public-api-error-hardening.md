@@ -10,7 +10,8 @@
 
 **Status:** Complete on 2026-07-10. All 17 affected route handlers use the
 shared redaction invariant, all planned regression coverage is present, and the
-validation commands below passed.
+validation commands below passed. The full Vitest run completed 80 test files
+and 454 tests.
 
 ## Global Constraints
 
