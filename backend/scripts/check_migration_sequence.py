@@ -5,11 +5,16 @@ from __future__ import annotations
 
 import re
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 MIGRATIONS_DIR = Path(__file__).resolve().parents[1] / "migrations"
+MIGRATIONS_README = MIGRATIONS_DIR / "README.md"
 MIGRATION_NAME_RE = re.compile(r"^(?P<prefix>\d{3})_[a-z0-9][a-z0-9_]*\.sql(?P<skip>\.skip)?$")
+MIGRATION_HEADING_RE = re.compile(
+    r"^#### (?P<name>\d{3}_[a-z0-9][a-z0-9_]*\.sql(?:\.skip)?)$",
+    re.MULTILINE,
+)
 
 # Two 020 migrations were created before this guard existed. They may already be
 # applied in deployed databases, so preserve the filenames and reject only new
@@ -31,6 +36,35 @@ def migration_files(migrations_dir: Path = MIGRATIONS_DIR) -> list[Path]:
         for path in migrations_dir.iterdir()
         if path.is_file() and (path.name.endswith(".sql") or path.name.endswith(".sql.skip"))
     )
+
+
+def validate_migration_documentation(
+    migrations_dir: Path = MIGRATIONS_DIR,
+    readme_path: Path = MIGRATIONS_README,
+) -> list[str]:
+    """Return disk-derived migration README consistency errors."""
+    try:
+        readme = readme_path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return [f"migration README not found: {readme_path}"]
+    except OSError as exc:
+        return [f"could not read migration README {readme_path}: {exc}"]
+
+    names = [path.name for path in migration_files(migrations_dir)]
+    expected_names = set(names)
+    heading_counts = Counter(MIGRATION_HEADING_RE.findall(readme))
+    documented_names = set(heading_counts)
+    errors: list[str] = []
+
+    for name in sorted(expected_names - documented_names):
+        errors.append(f"README is missing migration heading: {name}")
+    for name in sorted(documented_names - expected_names):
+        errors.append(f"README has migration heading without a file: {name}")
+    for name, count in sorted(heading_counts.items()):
+        if count > 1:
+            errors.append(f"README has duplicate migration heading: {name}")
+
+    return errors
 
 
 def validate_migrations(migrations_dir: Path = MIGRATIONS_DIR) -> list[str]:
