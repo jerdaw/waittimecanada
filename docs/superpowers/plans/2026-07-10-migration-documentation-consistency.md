@@ -4,7 +4,7 @@
 
 **Goal:** Reconcile the canonical migration README with the files on disk and extend the existing migration guard so inventory, count, next-prefix, and placeholder drift fails CI.
 
-**Status:** Implementation and independent review complete; delivery pending
+**Status:** Complete; PR #84 is open, ready, and intentionally unmerged
 
 **Architecture:** Keep filename validation in `validate_migrations()` and add an independently callable `validate_migration_documentation()` beside it. The new validator derives facts from migration filenames, parses only exact migration history headings and two canonical README statements, and returns actionable errors without modifying files. The existing CLI aggregates both validation groups.
 
@@ -625,7 +625,7 @@ Review the complete range from `main` to `HEAD` for correctness, security,
 test coverage, documentation accuracy, scope control, and preservation of the
 legacy duplicate-`020` behavior. Re-run affected checks after any correction.
 
-- [ ] **Step 6: Push and open a ready PR without merging**
+- [x] **Step 6: Push and open a ready PR without merging**
 
 ```bash
 git push -u origin codex/migration-docs-consistency
@@ -654,7 +654,7 @@ The PR body must summarize the guard, README reconciliation, tests, and
 non-deployment boundary. Do not merge because `docs/**` changes trigger the
 documentation deployment workflow on `main`.
 
-- [ ] **Step 7: Verify the exact pushed head and PR checks**
+- [x] **Step 7: Verify the exact pushed head and PR checks**
 
 Use `gh pr view` and `gh pr checks` to confirm the PR head SHA equals local
 `HEAD`, all required checks pass, and the PR remains open and unmerged.
@@ -665,6 +665,9 @@ Use `gh pr view` and `gh pr checks` to confirm the PR head SHA equals local
 
 - Worktree: `/home/jer/repos/vps/waittimecanada/.worktrees/migration-docs-consistency`
 - Branch base: `main` at `18dbcfef4e3c44695c2433b763d7f48e15deb124`
+- Pull request: [#84](https://github.com/jerdaw/waittimecanada/pull/84),
+  open and ready; merge intentionally deferred because documentation changes
+  trigger deployment on `main`
 - Toolchain: uv 0.11.25 with CPython 3.14.6; the project requires Python 3.12+
 - Locked setup: `uv sync --locked --extra dev` completed successfully
 - Existing focused baseline: 5 tests passed in 0.36 seconds
@@ -712,6 +715,19 @@ Use `gh pr view` and `gh pr checks` to confirm the PR head SHA equals local
 - `git diff --check main...HEAD`: passed.
 - Intended implementation files were clean after the implementation commits;
   only this delivery-plan update remained to commit.
+
+### GitHub Actions Verification
+
+- Exact reviewed implementation head:
+  `e6c1f18bd4f540f2af75ce61687aed2fd2af369e`.
+- Scraper CI run `29116301077`: Ruff formatting/lint and migration guard,
+  mypy, Bandit, and pytest all passed; pytest reported 595 passed and 27
+  prerequisite-dependent skips in 31.59 seconds.
+- Docs CI run `29116301477`: `docs-quality` passed.
+- PR #84 was confirmed open, non-draft, mergeable, and unmerged at that exact
+  head. The final plan-record commit will receive a fresh exact-head CI rerun;
+  its run identifiers and outcome belong in the PR delivery record so recording
+  them does not create an endless plan-only CI cycle.
 
 The recurring `/home/jer/.profile` warning about a missing temporary Codex uv
 environment file did not affect uv discovery, dependency sync, or command exit
