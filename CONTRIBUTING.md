@@ -93,6 +93,7 @@ Do not run Playwright locally unless debugging a specific E2E failure. E2E runs 
 
 ```bash
 bash scripts/check-docs.sh
+make docs-build
 ```
 
 ## Testing Expectations

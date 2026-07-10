@@ -8,6 +8,11 @@
 
 **Tech Stack:** Python 3.12, uv 0.11.23, MkDocs 1.6.x, Material for MkDocs 9.7.x, mkdocs-minify-plugin 0.8.x, pytest, GitHub Actions, GNU Make.
 
+**Status:** In progress. Task 1 is complete: the four contract tests pass,
+`uv lock --check` passes, both workflow files parse as YAML, and manual Docs CI
+run `29096472950` passed the locked sync plus strict MkDocs build on commit
+`5c4bf1d6a32c618e25b589681e3a513eb9a06072` without invoking deployment.
+
 ## Global Constraints
 
 - Never inspect or print `.env*`, credentials, keys, certificates, or private maintainer notes.
@@ -37,7 +42,7 @@
 - Consumes: uv project metadata in `backend/pyproject.toml`, `mkdocs.yml`, and the existing GitHub Actions checkout/authentication steps.
 - Produces: dependency group `docs`; generated environment `backend/.venv-docs`; Make target `docs-build`; locked workflow commands shared by validation and deployment.
 
-- [ ] **Step 1: Add failing workflow and dependency contract tests**
+- [x] **Step 1: Add failing workflow and dependency contract tests**
 
 Create `backend/tests/unit/test_docs_toolchain.py`:
 
@@ -127,7 +132,7 @@ def test_make_target_preserves_the_backend_environment() -> None:
     assert ".venv-docs/" in backend_ignore.splitlines()
 ```
 
-- [ ] **Step 2: Run the tests and verify the current contract fails**
+- [x] **Step 2: Run the tests and verify the current contract fails**
 
 Run:
 
@@ -139,7 +144,7 @@ TMPDIR=/tmp TMP=/tmp TEMP=/tmp .venv/bin/python -m pytest \
 
 Expected: four tests fail because the dependency group, lock entries, workflow commands, Make target, and ignore entry do not exist.
 
-- [ ] **Step 3: Declare the docs dependency group and isolated environment**
+- [x] **Step 3: Declare the docs dependency group and isolated environment**
 
 Append to `backend/pyproject.toml` after the optional dependencies:
 
@@ -169,7 +174,7 @@ uv lock --check
 
 Expected: `backend/uv.lock` contains the three direct documentation packages and their resolved transitive dependencies; `uv lock --check` exits 0.
 
-- [ ] **Step 4: Add the local strict-build target**
+- [x] **Step 4: Add the local strict-build target**
 
 Append to `Makefile`:
 
@@ -180,7 +185,7 @@ docs-build: ## Install the locked docs toolchain separately and run a strict sit
 	UV_PROJECT_ENVIRONMENT=.venv-docs uv run --project backend --no-sync mkdocs build --strict --config-file mkdocs.yml
 ```
 
-- [ ] **Step 5: Make Docs CI install and exercise the locked toolchain**
+- [x] **Step 5: Make Docs CI install and exercise the locked toolchain**
 
 Add `backend/uv.lock` to both path-filter lists in `.github/workflows/docs-ci.yml`, then add the workflow environment:
 
@@ -207,7 +212,7 @@ After checkout, retain the existing docs-quality step and append:
           --config-file mkdocs.yml
 ```
 
-- [ ] **Step 6: Make deployment use the identical locked environment**
+- [x] **Step 6: Make deployment use the identical locked environment**
 
 Add `backend/pyproject.toml` and `backend/uv.lock` to the push paths in `.github/workflows/deploy-docs.yml`. Add the same workflow environment used by Docs CI:
 
@@ -233,7 +238,7 @@ Set the existing Python action to `python-version: "3.12"`. Replace the install 
 
 Do not run or dispatch the deploy workflow during implementation.
 
-- [ ] **Step 7: Run focused red/green and toolchain validation**
+- [x] **Step 7: Run focused red/green and toolchain validation**
 
 Run:
 
@@ -252,7 +257,7 @@ git diff --check
 
 Expected: four focused tests pass; the lock check, isolated sync, strict build, and whitespace check exit 0. No deployment command is invoked.
 
-- [ ] **Step 8: Commit the locked tooling contract**
+- [x] **Step 8: Commit the locked tooling contract**
 
 ```bash
 git add backend/tests/unit/test_docs_toolchain.py backend/pyproject.toml \
@@ -264,6 +269,7 @@ git commit -m "build: lock MkDocs validation toolchain"
 ### Task 2: Contributor Guidance And Completion Evidence
 
 **Files:**
+- Modify: `README.md`
 - Modify: `CONTRIBUTING.md`
 - Modify: `docs/development/documentation-guidelines.md`
 - Modify: `docs/maintenance-audit.md`
@@ -275,7 +281,7 @@ git commit -m "build: lock MkDocs validation toolchain"
 - Consumes: `make docs-build` and the locked workflow contract delivered by Task 1.
 - Produces: one documented contributor command, durable completion evidence, and removal of the finished maintenance item from active selection.
 
-- [ ] **Step 1: Document the supported contributor command**
+- [x] **Step 1: Document the supported contributor command**
 
 In `CONTRIBUTING.md`, add the strict documentation build after `bash scripts/check-docs.sh`:
 
@@ -299,7 +305,7 @@ make docs-build
 backend development environment.
 ````
 
-- [ ] **Step 2: Close the maintenance and roadmap item**
+- [x] **Step 2: Close the maintenance and roadmap item**
 
 Apply these exact status changes in `docs/maintenance-audit.md`:
 
@@ -350,6 +356,10 @@ In Future Work, change the maintenance-follow-up list so it names only
 `historical-script ownership` and `focused backend service maintainability
 work`, removing the completed docs-toolchain item.
 
+Change the roadmap current-status date and both README current-baseline dates
+from `2026-07-05` to `2026-07-10` so the existing status-alignment guard remains
+green.
+
 Add this plan to `docs/planning/README.md` under closed delivered artifacts:
 
 ```markdown
@@ -381,7 +391,7 @@ Expected: the lock is current; the complete backend unit suite, strict site buil
 Mark every checkbox in this plan complete and add a status paragraph containing the exact successful commands and test counts from Step 3. Then commit:
 
 ```bash
-git add CONTRIBUTING.md docs/development/documentation-guidelines.md \
+git add README.md CONTRIBUTING.md docs/development/documentation-guidelines.md \
   docs/maintenance-audit.md docs/planning/roadmap.md \
   docs/planning/README.md \
   docs/superpowers/plans/2026-07-10-reproducible-mkdocs-toolchain.md

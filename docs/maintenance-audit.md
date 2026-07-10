@@ -141,7 +141,7 @@ The required sequence was followed without reordering:
 | `npm run test:unit -- utils/rate-limit.test.ts` | Failed then passed | Expected red/green cycle for raw-IP logging regression. |
 | `TMPDIR=/tmp TMP=/tmp TEMP=/tmp uv run pytest tests/unit/test_pyproject_scripts.py` | Failed then passed | Expected red/green cycle for broken package script metadata. |
 | Plain `uv run pytest ...` without temp override | Failed locally | Known pytest capture cleanup issue when local temp vars point outside Linux temp. |
-| `mkdocs build --strict` | Could not run | `mkdocs` not installed in this shell. |
+| `make docs-build` (`mkdocs build --strict`) | Passed | Locked docs-only uv environment; strict site build completed without warnings. |
 
 ## Baseline Verification
 
@@ -151,15 +151,15 @@ verification set:
 - Backend: Ruff lint/format, mypy, migration sequence, Bandit, pytest.
 - Frontend: ESLint, Prettier, TypeScript app/test projects, Vitest, Next build,
   npm audit, npm dependency tree.
-- Docs/tooling: docs script, markdown/public-boundary/static guards, diff
-  whitespace check, migration docs/search probes.
+- Docs/tooling: docs script, strict MkDocs site build,
+  markdown/public-boundary/static guards, diff whitespace check, migration
+  docs/search probes.
 
 The known prerequisite-dependent lanes remain out of default local scope:
 
 - Database-backed integration and E2E tests skip without a test `DATABASE_URL`.
 - Frontend Playwright E2E is CI/manual-dispatch oriented.
 - Production smoke/deployment workflows were not run.
-- `mkdocs build --strict` needs the docs toolchain installed.
 
 ## Pass Completion Table
 
@@ -715,7 +715,7 @@ Release-readiness checklist:
 | Backend package metadata | Fixed | Broken console scripts removed; metadata test added. |
 | Frontend build | Ready for local verification | Next build passed with placeholders. |
 | Tests/lint/type checks | Ready for local verification | Full feasible checks passed. |
-| Docs site strict build | Blocked locally | `mkdocs` not installed. |
+| Docs site strict build | Ready for local verification | `make docs-build` passed with the locked docs-only environment. |
 | DB-backed smoke/E2E | Prerequisite-dependent | Requires test DB/front-end server or CI/manual-dispatch lane. |
 | Production deploy/release | Owner decision | Not run or changed. |
 
@@ -861,8 +861,6 @@ Failed or unavailable:
 - Plain backend pytest without the documented temp override failed locally during
   pytest capture cleanup. The documented `TMPDIR=/tmp TMP=/tmp TEMP=/tmp`
   invocation passed.
-- `mkdocs build --strict` could not run because `mkdocs` is not installed in
-  this shell.
 
 Expected red/green failures during fixes:
 
@@ -888,14 +886,12 @@ Expected red/green failures during fixes:
 
 ## Remaining Recommendations
 
-1. Install the docs toolchain locally if `mkdocs build --strict` should be a
-   routine local check.
-2. Run the disposable database verification helper before a release when
+1. Run the disposable database verification helper before a release when
    database-backed integration, migrations-on-fresh-DB, pipeline smoke, and
    Playwright coverage are required.
-3. Consider a focused backend service maintainability pass for the largest
+2. Consider a focused backend service maintainability pass for the largest
    database service surfaces.
-4. Keep dependency upgrades separate unless required by security, compatibility,
+3. Keep dependency upgrades separate unless required by security, compatibility,
    or owner-directed maintenance.
 
 ## Final Diff Summary
@@ -917,8 +913,6 @@ At pre-commit review time:
   pagination remains a future API decision.
 - DB-backed integration, smoke, and E2E lanes are prerequisite-dependent and
   were not forced locally.
-- `mkdocs build --strict` remains unavailable until the docs toolchain is
-  installed.
 - Ignored local dependency/cache/env/private trees were not inspected.
 - Generated verification artifacts were cleaned; ignored env, dependency, and
   private trees remain untouched.
