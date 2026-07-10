@@ -56,7 +56,7 @@ def validate_migration_documentation(
         readme = readme_path.read_text(encoding="utf-8")
     except FileNotFoundError:
         return [f"migration README not found: {readme_path}"]
-    except OSError as exc:
+    except (OSError, UnicodeError) as exc:
         return [f"could not read migration README {readme_path}: {exc}"]
 
     names = [path.name for path in migration_files(migrations_dir)]

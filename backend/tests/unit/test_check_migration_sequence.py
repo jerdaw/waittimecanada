@@ -77,6 +77,17 @@ def test_missing_migration_readme_is_rejected(tmp_path: Path) -> None:
     ]
 
 
+def test_invalid_utf8_migration_readme_is_rejected(tmp_path: Path) -> None:
+    _touch(tmp_path, "001_create_tables.sql")
+    readme = tmp_path / "README.md"
+    readme.write_bytes(b"\xff")
+
+    errors = check_migration_sequence.validate_migration_documentation(tmp_path, readme)
+
+    assert len(errors) == 1
+    assert errors[0].startswith(f"could not read migration README {readme}:")
+
+
 def test_missing_migration_heading_is_rejected(tmp_path: Path) -> None:
     names = ["001_create_tables.sql", "002_add_index.sql"]
     _touch(tmp_path, *names)
