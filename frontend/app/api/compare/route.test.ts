@@ -75,9 +75,7 @@ describe("API Route Integration: Compare", () => {
       new Error("PRIVATE_MARKER comparison database"),
     );
 
-    const req = new NextRequest(
-      "http://localhost/api/compare?a=hosp1&b=hosp2",
-    );
+    const req = new NextRequest("http://localhost/api/compare?a=hosp1&b=hosp2");
     const res = await GET(req);
     const data = await res.json();
 
