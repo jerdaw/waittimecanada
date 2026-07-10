@@ -191,6 +191,24 @@ def test_duplicate_next_migration_statement_is_rejected(tmp_path: Path) -> None:
     assert "README must contain exactly one canonical next migration statement; found 2" in errors
 
 
+def test_invalid_migration_name_does_not_crash_documentation_validation(
+    tmp_path: Path,
+) -> None:
+    names = ["001_create_tables.sql", "invalid_name.sql"]
+    _touch(tmp_path, *names)
+    readme = tmp_path / "README.md"
+    _write_readme(
+        readme,
+        names[:1],
+        executable_count=2,
+        next_number=2,
+    )
+
+    errors = check_migration_sequence.validate_migration_documentation(tmp_path, readme)
+
+    assert errors == ["README is missing migration heading: invalid_name.sql"]
+
+
 def test_readme_placeholder_reports_line_number(tmp_path: Path) -> None:
     names = ["001_create_tables.sql"]
     _touch(tmp_path, *names)

@@ -90,8 +90,13 @@ def validate_migration_documentation(
                 f"expected {executable_count}"
             )
 
-    if names:
-        expected_next = max(int(name[:3]) for name in names) + 1
+    valid_prefixes = [
+        int(match.group("prefix"))
+        for name in names
+        if (match := MIGRATION_NAME_RE.fullmatch(name)) is not None
+    ]
+    if valid_prefixes:
+        expected_next = max(valid_prefixes) + 1
         next_matches = list(NEXT_MIGRATION_RE.finditer(readme))
         if not next_matches:
             errors.append("README is missing the canonical next migration statement")
