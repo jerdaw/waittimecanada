@@ -12,6 +12,7 @@ This directory is the planning control plane for Wait Time Canada.
 
 - `docs/planning/roadmap.md`
 - `docs/planning/manual-tasks.md`
+- `docs/superpowers/plans/2026-07-10-public-api-error-hardening.md`
 
 ## Historical Planning Baselines
 
