@@ -4,7 +4,7 @@
 
 **Goal:** Reconcile the canonical migration README with the files on disk and extend the existing migration guard so inventory, count, next-prefix, and placeholder drift fails CI.
 
-**Status:** Implementation verified; independent review and delivery pending
+**Status:** Implementation and independent review complete; delivery pending
 
 **Architecture:** Keep filename validation in `validate_migrations()` and add an independently callable `validate_migration_documentation()` beside it. The new validator derives facts from migration filenames, parses only exact migration history headings and two canonical README statements, and returns actionable errors without modifying files. The existing CLI aggregates both validation groups.
 
@@ -619,7 +619,7 @@ git add docs/superpowers/plans/2026-07-10-migration-documentation-consistency.md
 git commit -m "docs: close migration consistency plan"
 ```
 
-- [ ] **Step 5: Request independent code review and address findings**
+- [x] **Step 5: Request independent code review and address findings**
 
 Review the complete range from `main` to `HEAD` for correctness, security,
 test coverage, documentation accuracy, scope control, and preservation of the
@@ -685,6 +685,19 @@ Use `gh pr view` and `gh pr checks` to confirm the PR head SHA equals local
   `Migration validation passed.`; committed as `a62d6402`.
 - Disk audit: 23 executable/skipped migration files have 23 exact README
   headings in matching lexicographic order.
+- Review hardening RED: an invalid `*.sql` filename raised `ValueError` while
+  the documentation validator calculated the next prefix.
+- Review hardening GREEN: prefix calculation now uses names accepted by
+  `MIGRATION_NAME_RE`; 20 focused tests passed on Python 3.12.13 and Ruff
+  0.14.14 passed. The fix is committed as `c58a99b0`.
+- Independent review found no critical or important issues. Its one minor
+  finding was that invalid UTF-8 contradicted the documented unreadable-README
+  behavior.
+- Review finding RED: a one-byte invalid UTF-8 README raised
+  `UnicodeDecodeError` instead of returning a validation error.
+- Review finding GREEN: the read boundary now handles `UnicodeError`; all 21
+  focused tests, Ruff format/check, and the migration CLI guard passed on
+  Python 3.12.13. The fix is committed as `02404ba6`.
 
 ### Full Verification
 
@@ -697,9 +710,15 @@ Use `gh pr view` and `gh pr checks` to confirm the PR head SHA equals local
 - `bash scripts/check-docs.sh`: all 11 documentation/roadmap guard groups
   passed.
 - `git diff --check main...HEAD`: passed.
-- Worktree status after implementation commits: clean.
+- Intended implementation files were clean after the implementation commits;
+  only this delivery-plan update remained to commit.
 
 The recurring `/home/jer/.profile` warning about a missing temporary Codex uv
 environment file did not affect uv discovery, dependency sync, or command exit
-status. No database operation, deployment, release, secret access, or
-production write occurred.
+status. After full verification, WSL process startup became intermittently
+unavailable. The two final review-hardening commits therefore used the existing
+isolated Windows Python 3.12 environment for focused tests and exact-file
+Windows Git staging; hooks were bypassed for those commits only. Fresh CI on
+the pushed final head is required before delivery is considered verified. No
+database operation, deployment, release, secret access, or production write
+occurred.
