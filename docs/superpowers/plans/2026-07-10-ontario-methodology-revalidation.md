@@ -5,7 +5,7 @@ repository's legacy Ontario ontology tags as an exact transcription of the
 current official indicator, while preserving the existing runtime and data
 model until an explicit ontology and historical-data decision is made.
 
-**Status:** Implementation and independent review complete; delivery pending
+**Status:** Complete; PR #85 is open, ready, and intentionally unmerged
 
 **Base:** `main` at `18dbcfef4e3c44695c2433b763d7f48e15deb124`
 
@@ -138,9 +138,10 @@ uv run pytest tests/unit/test_methodology_docs.py -q
   files changed.
 - [x] Request independent review and address critical or important findings.
 - [x] Commit in reviewable steps.
-- [ ] Push `codex/ontario-methodology-revalidation` and open a ready PR.
+- [x] Push `codex/ontario-methodology-revalidation` and open a ready PR.
 - [ ] Do not merge: changed documentation paths trigger deployment on `main`.
-- [ ] Verify all GitHub checks on the exact final PR head.
+- [x] Verify all GitHub checks on the exact pushed implementation head; verify
+  the final plan-record head again before handoff.
 
 ## Baseline Evidence
 
@@ -201,4 +202,17 @@ endpoint, historical migration or versioning, source metadata, divergence
 briefs, and frontend labels must be handled together rather than through a
 partial tag change.
 
-PR details, final head SHA, and CI run IDs remain to be recorded.
+### Delivery And GitHub Actions
+
+- Pull request: [#85](https://github.com/jerdaw/waittimecanada/pull/85),
+  open, ready, mergeable, and intentionally unmerged because documentation
+  changes trigger deployment on `main`.
+- Exact reviewed implementation head:
+  `d5ce74a8a769fd9b37755fff05b03f6afbd5db0b`.
+- Scraper CI run `29118956742`: Ruff, migration guard, mypy, Bandit, and pytest
+  passed; pytest reported 589 passed and 27 prerequisite-dependent skips in
+  32.39 seconds.
+- Docs CI run `29118956654`: `docs-quality` passed.
+- The final plan-record commit will receive a fresh exact-head CI rerun. Its
+  immutable run IDs belong in the PR delivery record so recording them does not
+  create an endless plan-only CI cycle.
