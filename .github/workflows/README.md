@@ -9,14 +9,16 @@ This directory contains operational and CI workflows for Wait Time Canada.
 **Trigger:** push/PR affecting tracked text/source/data-artifact files covered
 by public docs and authorship policy checks, plus the broader `docs/**` tree.
 
-**Purpose:** Prevent stale/broken markdown by enforcing documentation hygiene checks.
-It also keeps lightweight repository-policy checks active when source changes
-could introduce non-human attribution markers. The checkout fetches full Git
-history so the authorship metadata audit can inspect existing commits, not only
-the latest shallow commit.
+**Purpose:** Prevent stale/broken markdown by enforcing documentation hygiene
+checks and building the MkDocs site in strict mode from the locked docs-only uv
+environment. It also keeps lightweight repository-policy checks active when
+source changes could introduce non-human attribution markers. The checkout
+fetches full Git history so the authorship metadata audit can inspect existing
+commits, not only the latest shallow commit.
 
 **Jobs:**
-- `docs-quality` (runs `scripts/check-docs.sh`)
+- `docs-quality` (runs `scripts/check-docs.sh`, installs the locked `docs`
+  dependency group into `.venv-docs`, and runs `mkdocs build --strict`)
 
 **Checks include:**
 - ban `file://` links
@@ -30,6 +32,8 @@ the latest shallow commit.
 - preserve clinical-safety and ontology-comparability guardrail wording
 - verify roadmap consistency against the latest completed milestone
 - exclude designated historical snapshot docs from strict link checks
+- verify the complete MkDocs site builds in strict mode with the checked-in
+  dependency lock
 
 ---
 
@@ -201,7 +205,13 @@ the latest shallow commit.
 
 **Trigger:** push to `main` affecting docs surfaces + manual dispatch.
 
-**Purpose:** Publish the MkDocs site to the `gh-pages` branch.
+**Purpose:** Publish the MkDocs site to the `gh-pages` branch using the same
+locked docs-only uv environment exercised by Docs CI.
+
+**Toolchain rule:**
+- Python 3.12 and uv 0.11.23 install only the `docs` dependency group into
+  `.venv-docs`; `mkdocs gh-deploy --strict --force` runs with `--no-sync` so
+  publication cannot silently resolve a different toolchain.
 
 **Authorship rule:**
 - The workflow is configured to write docs-publish commits with the human repo

@@ -8,10 +8,17 @@
 
 **Tech Stack:** Python 3.12, uv 0.11.23, MkDocs 1.6.x, Material for MkDocs 9.7.x, mkdocs-minify-plugin 0.8.x, pytest, GitHub Actions, GNU Make.
 
-**Status:** In progress. Task 1 is complete: the four contract tests pass,
-`uv lock --check` passes, both workflow files parse as YAML, and manual Docs CI
-run `29096472950` passed the locked sync plus strict MkDocs build on commit
-`5c4bf1d6a32c618e25b589681e3a513eb9a06072` without invoking deployment.
+**Status:** Complete on 2026-07-10. The four contract tests pass, `uv lock
+--check` passes, and both workflow files parse as YAML. Manual Docs CI run
+`29096472950` passed the locked sync plus strict MkDocs build on commit
+`5c4bf1d6a32c618e25b589681e3a513eb9a06072`. Pull-request runs `29096718367`
+and `29096718451` then passed Ruff, mypy over 49 source files, Bandit, 583
+pytest tests with 27 prerequisite-dependent skips, repository docs checks, and
+the strict MkDocs build on commit
+`eaaca85c15455f18f1a44b6ee482a7dfc1e01d9b`. Independent review found no
+technical or security defect; its completion-record consistency finding is
+resolved here. PR #83 is ready and remains open and unmerged. No deployment
+workflow was dispatched.
 
 ## Global Constraints
 
@@ -269,6 +276,8 @@ git commit -m "build: lock MkDocs validation toolchain"
 ### Task 2: Contributor Guidance And Completion Evidence
 
 **Files:**
+- Modify: `AGENTS.md`
+- Modify: `.github/workflows/README.md`
 - Modify: `README.md`
 - Modify: `CONTRIBUTING.md`
 - Modify: `docs/development/documentation-guidelines.md`
@@ -304,6 +313,14 @@ make docs-build
 `backend/uv.lock` and keeps it in `backend/.venv-docs`, separate from the
 backend development environment.
 ````
+
+Update `.github/workflows/README.md` so the Docs CI catalog lists both
+`scripts/check-docs.sh` and the locked strict MkDocs build, and the deployment
+catalog states that publication uses the same docs-only uv environment.
+
+Update the current backend verification count in `AGENTS.md` to the exact
+pull-request result: `583 passing backend tests` with `27`
+prerequisite-dependent skips.
 
 - [x] **Step 2: Close the maintenance and roadmap item**
 
@@ -366,7 +383,7 @@ Add this plan to `docs/planning/README.md` under closed delivered artifacts:
 - `docs/superpowers/plans/2026-07-10-reproducible-mkdocs-toolchain.md` (closed, delivered)
 ```
 
-- [ ] **Step 3: Run complete feasible verification**
+- [x] **Step 3: Run complete feasible verification**
 
 Run:
 
@@ -386,19 +403,20 @@ git status --short --branch
 
 Expected: the lock is current; the complete backend unit suite, strict site build, and repository docs checks pass; the diff has no whitespace errors; only planned branch changes remain. Record exact test counts and any prerequisite-dependent skips in this plan.
 
-- [ ] **Step 4: Mark the plan complete and commit documentation**
+- [x] **Step 4: Mark the plan complete and commit documentation**
 
 Mark every checkbox in this plan complete and add a status paragraph containing the exact successful commands and test counts from Step 3. Then commit:
 
 ```bash
-git add README.md CONTRIBUTING.md docs/development/documentation-guidelines.md \
+git add AGENTS.md .github/workflows/README.md README.md CONTRIBUTING.md \
+  docs/development/documentation-guidelines.md \
   docs/maintenance-audit.md docs/planning/roadmap.md \
   docs/planning/README.md \
   docs/superpowers/plans/2026-07-10-reproducible-mkdocs-toolchain.md
 git commit -m "docs: record reproducible MkDocs validation"
 ```
 
-- [ ] **Step 5: Review, push, and open a non-merged pull request**
+- [x] **Step 5: Review, push, and open a non-merged pull request**
 
 Run a read-only review of `origin/main...HEAD`, fix all Critical and Important
 issues, rerun affected verification, then push and create a ready pull request:

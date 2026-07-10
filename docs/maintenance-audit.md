@@ -141,7 +141,7 @@ The required sequence was followed without reordering:
 | `npm run test:unit -- utils/rate-limit.test.ts` | Failed then passed | Expected red/green cycle for raw-IP logging regression. |
 | `TMPDIR=/tmp TMP=/tmp TEMP=/tmp uv run pytest tests/unit/test_pyproject_scripts.py` | Failed then passed | Expected red/green cycle for broken package script metadata. |
 | Plain `uv run pytest ...` without temp override | Failed locally | Known pytest capture cleanup issue when local temp vars point outside Linux temp. |
-| `make docs-build` (`mkdocs build --strict`) | Passed | Locked docs-only uv environment; strict site build completed without warnings. |
+| `make docs-build` (`mkdocs build --strict`) | Passed | Locked docs-only uv environment; strict site build completed successfully. |
 
 ## Baseline Verification
 
