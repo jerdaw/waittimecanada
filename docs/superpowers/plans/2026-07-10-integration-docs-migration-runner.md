@@ -5,7 +5,7 @@
 checksum-backed migration runner and prevent the stale instruction from
 returning.
 
-**Status:** Implementation verified; independent review and delivery pending
+**Status:** Implementation and independent review complete; delivery pending
 
 **Base:** `main` at `18dbcfef4e3c44695c2433b763d7f48e15deb124`
 
@@ -67,7 +67,7 @@ uv run pytest tests/unit/test_integration_testing_docs.py -q
 - [x] Run the full backend suite.
 - [x] Run `bash scripts/check-docs.sh`.
 - [x] Run `git diff --check` and confirm only the planned surfaces changed.
-- [ ] Request independent review and address critical or important findings.
+- [x] Request independent review and address critical or important findings.
 - [x] Commit the plan and RED/GREEN implementation in
   reviewable steps.
 - [ ] Push `codex/integration-docs-migration-runner` and open a ready PR.
@@ -98,6 +98,9 @@ uv run pytest tests/unit/test_integration_testing_docs.py -q
 - `git diff --check main...HEAD`: passed.
 - Pre-commit hooks passed, including Ruff, secret scanning, and authorship
   guardrails.
+- Independent review approved the correction with no critical or important
+  issues. Its only minor note was to close the plan state; the verification
+  record commit `828073df` and this update resolve that housekeeping item.
 
 ### Scope Boundary
 
