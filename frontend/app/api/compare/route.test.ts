@@ -70,6 +70,24 @@ describe("API Route Integration: Compare", () => {
     expect(data.error).toBe("Invalid comparison");
   });
 
+  test("redacts server details when comparison queries fail", async () => {
+    mockSql.mockRejectedValueOnce(
+      new Error("PRIVATE_MARKER comparison database"),
+    );
+
+    const req = new NextRequest(
+      "http://localhost/api/compare?a=hosp1&b=hosp2",
+    );
+    const res = await GET(req);
+    const data = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe("Comparison failed");
+    expect(data.message).toBe("Internal server error");
+    expect(JSON.stringify(data)).not.toContain("PRIVATE_MARKER");
+  });
+
   test("returns divergence based on wait-time methodology, not another latest metric", async () => {
     const req = new NextRequest(
       "http://localhost/api/compare?a=ottawa&b=gatineau",

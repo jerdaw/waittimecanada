@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { NO_STORE_HEADERS } from "@/utils/cache";
+import { getPublicApiErrorMessage } from "@/utils/apiErrors";
 
 import { ExportQuerySchema } from "@/utils/validations";
 
@@ -495,7 +496,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         error: "Failed to export data",
-        message: error instanceof Error ? error.message : "Unknown error",
+        message: getPublicApiErrorMessage(error),
       },
       { status: 500, headers: NO_STORE_HEADERS },
     );

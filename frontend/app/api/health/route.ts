@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/utils/db";
 import { NO_STORE_HEADERS } from "@/utils/cache";
+import { getPublicApiErrorMessage } from "@/utils/apiErrors";
 import { checkRateLimit } from "@/utils/rate-limit";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 import { filterActiveLiveSourceRows } from "@/utils/live-scraper-sources";
@@ -213,7 +214,7 @@ export async function GET(req: NextRequest) {
         last_update: null,
         stale_threshold_minutes: STALE_THRESHOLD_MINUTES,
         sources: [],
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: getPublicApiErrorMessage(error),
       },
       { status: 500, headers: NO_STORE_HEADERS },
     );

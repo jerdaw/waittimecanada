@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/utils/db";
 import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
+import { getPublicApiErrorMessage } from "@/utils/apiErrors";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 import {
   type Methodology,
@@ -195,7 +196,7 @@ export async function GET(request: NextRequest) {
       {
         success: false,
         error: "Comparison failed",
-        message: error instanceof Error ? error.message : "Unknown error",
+        message: getPublicApiErrorMessage(error),
       },
       { status: 500, headers: NO_STORE_HEADERS },
     );

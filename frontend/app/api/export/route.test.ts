@@ -250,4 +250,18 @@ describe("GET /api/export", () => {
     expect(json.metadata.data_type).toBe("aggregated");
     expect(json.data).toHaveLength(1);
   });
+
+  it("redacts server details when export queries fail", async () => {
+    (getDb as any).mockImplementationOnce(() => {
+      throw new Error("PRIVATE_MARKER export database detail");
+    });
+
+    const res = await GET(createRequest("/api/export?format=json"));
+    const json = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(json.error).toBe("Failed to export data");
+    expect(json.message).toBe("Internal server error");
+    expect(JSON.stringify(json)).not.toContain("PRIVATE_MARKER");
+  });
 });

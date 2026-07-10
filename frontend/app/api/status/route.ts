@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
+import { getPublicApiErrorMessage } from "@/utils/apiErrors";
 import {
   EXPECTED_SCRAPER_RUNS_PER_DAY,
   LIVE_SCRAPER_CADENCE_LABEL,
@@ -162,7 +163,7 @@ export async function GET() {
   } catch (error) {
     console.error("Failed to fetch system status:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unknown error" },
+      { error: getPublicApiErrorMessage(error) },
       { status: 500, headers: NO_STORE_HEADERS },
     );
   }

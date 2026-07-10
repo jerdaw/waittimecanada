@@ -83,7 +83,9 @@ describe("/api/methodology", () => {
 
   it("returns no-store errors when methodology queries fail", async () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    const mockSql = vi.fn().mockRejectedValueOnce(new Error("DB offline"));
+    const mockSql = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("PRIVATE_MARKER methodology database"));
     (getDb as Mock).mockReturnValue(mockSql);
 
     const res = await GET(new Request("http://localhost/api/methodology"));
@@ -91,7 +93,8 @@ describe("/api/methodology", () => {
 
     expect(res.status).toBe(500);
     expect(res.headers.get("Cache-Control")).toBe("no-store");
-    expect(data).toEqual({ error: "DB offline" });
+    expect(data).toEqual({ error: "Internal server error" });
+    expect(JSON.stringify(data)).not.toContain("PRIVATE_MARKER");
 
     errorSpy.mockRestore();
   });

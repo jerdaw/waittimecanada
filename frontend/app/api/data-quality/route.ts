@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
+import { getPublicApiErrorMessage } from "@/utils/apiErrors";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 import {
   EXPECTED_SCRAPER_RUNS_PER_DAY,
@@ -102,7 +103,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("Failed to fetch data quality:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unknown error" },
+      { error: getPublicApiErrorMessage(error) },
       { status: 500, headers: NO_STORE_HEADERS },
     );
   }

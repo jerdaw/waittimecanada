@@ -61,6 +61,22 @@ describe("API Route Integration: Health", () => {
     expect(data.sources).toEqual([]);
   });
 
+  test("redacts server details when source health queries fail", async () => {
+    mockSqlFn
+      .mockResolvedValueOnce([])
+      .mockRejectedValueOnce(new Error("PRIVATE_MARKER health database"));
+
+    const res = await GET(new NextRequest("http://localhost"));
+    const data = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(data.healthy).toBe(false);
+    expect(data.database).toEqual({ status: "unknown", latency_ms: null });
+    expect(data.sources).toEqual([]);
+    expect(data.error).toBe("Internal server error");
+    expect(JSON.stringify(data)).not.toContain("PRIVATE_MARKER");
+  });
+
   test("surfaces classified scraper error details", async () => {
     mockSqlFn.mockResolvedValueOnce([]);
     mockSqlFn.mockResolvedValueOnce([

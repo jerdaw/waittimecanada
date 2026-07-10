@@ -58,6 +58,23 @@ describe("API Route Integration: Hospitals", () => {
     expect(params).toEqual([]);
   });
 
+  test("redacts server details when hospital queries fail", async () => {
+    mockSql.unsafe.mockRejectedValueOnce(
+      new Error("PRIVATE_MARKER hospitals database"),
+    );
+
+    const res = await GET(
+      new NextRequest("http://localhost/api/hospitals?province=ON"),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe("Failed to fetch hospitals");
+    expect(data.message).toBe("Internal server error");
+    expect(JSON.stringify(data)).not.toContain("PRIVATE_MARKER");
+  });
+
   test("applies explicit pagination without changing the default all-hospitals response", async () => {
     const req = new NextRequest(
       "http://localhost/api/hospitals?province=ON&page=2&limit=25",

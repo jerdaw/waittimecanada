@@ -219,13 +219,14 @@ describe("/api/status", () => {
   it("should handle database errors gracefully", async () => {
     const mockSql = vi
       .fn()
-      .mockRejectedValue(new Error("Database disconnected"));
+      .mockRejectedValue(new Error("PRIVATE_MARKER status database"));
     (getDb as Mock).mockReturnValue(mockSql);
 
     const res = await GET();
     const data = await res.json();
 
     expect(res.status).toBe(500);
-    expect(data.error).toBe("Database disconnected");
+    expect(data.error).toBe("Internal server error");
+    expect(JSON.stringify(data)).not.toContain("PRIVATE_MARKER");
   });
 });
