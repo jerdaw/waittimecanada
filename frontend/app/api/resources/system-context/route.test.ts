@@ -280,4 +280,23 @@ describe("API Route: Resource System Context", () => {
       freshness_state: "suppress",
     });
   });
+
+  test("redacts server details when system-context queries fail", async () => {
+    mockSql.unsafe.mockRejectedValueOnce(
+      new Error("PRIVATE_MARKER system-context database"),
+    );
+
+    const res = await GET(
+      new NextRequest(
+        "http://localhost/api/resources/system-context?province=ON&limit=8",
+      ),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe("Failed to fetch system context");
+    expect(data.message).toBe("Internal server error");
+    expect(JSON.stringify(data)).not.toContain("PRIVATE_MARKER");
+  });
 });

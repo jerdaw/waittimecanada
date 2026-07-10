@@ -70,4 +70,24 @@ describe("API Route: AQHI", () => {
       freshness_state: "show",
     });
   });
+
+  test("redacts server details when the AQHI request fails", async () => {
+    // @ts-ignore
+    global.fetch.mockRejectedValueOnce(
+      new Error("PRIVATE_MARKER AQHI upstream detail"),
+    );
+
+    const res = await GET(
+      new NextRequest(
+        "http://localhost/api/resources/aqhi?latitude=43.65&longitude=-79.38",
+      ),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe("Failed to fetch AQHI");
+    expect(data.message).toBe("Internal server error");
+    expect(JSON.stringify(data)).not.toContain("PRIVATE_MARKER");
+  });
 });

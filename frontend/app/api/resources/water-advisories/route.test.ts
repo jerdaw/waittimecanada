@@ -245,4 +245,24 @@ describe("API Route: Water Advisories", () => {
     });
     expect(global.fetch).not.toHaveBeenCalled();
   });
+
+  test("redacts server details when the advisory request fails", async () => {
+    // @ts-ignore
+    global.fetch.mockRejectedValueOnce(
+      new Error("PRIVATE_MARKER advisory upstream detail"),
+    );
+
+    const res = await GET(
+      new NextRequest(
+        "http://localhost/api/resources/water-advisories?province=ON&limit=5",
+      ),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe("Failed to fetch drinking water advisories");
+    expect(data.message).toBe("Internal server error");
+    expect(JSON.stringify(data)).not.toContain("PRIVATE_MARKER");
+  });
 });
