@@ -5,7 +5,7 @@ repository's legacy Ontario ontology tags as an exact transcription of the
 current official indicator, while preserving the existing runtime and data
 model until an explicit ontology and historical-data decision is made.
 
-**Status:** In progress
+**Status:** Implementation verified; independent review and delivery pending
 
 **Base:** `main` at `18dbcfef4e3c44695c2433b763d7f48e15deb124`
 
@@ -86,15 +86,15 @@ tests, public documentation, and validation against the official indicator.
 
 ## Task 1: Add Failing Documentation-Contract Tests
 
-- [ ] Add assertions that the structured Ontario reference records:
+- [x] Add assertions that the structured Ontario reference records:
   - revalidation status;
   - the official composite start and provider endpoint;
   - that the repository tags are implementation tags pending resolution; and
   - the current official Ontario Health URL.
-- [ ] Add assertions that the maintained Ontario methodology Markdown, public
+- [x] Add assertions that the maintained Ontario methodology Markdown, public
   mirror, research draft, and Ottawa-Gatineau case study visibly state that
   Ontario revalidation is required.
-- [ ] Run the focused tests and record the expected failures before editing the
+- [x] Run the focused tests and record the expected failures before editing the
   documents.
 
 Focused command:
@@ -106,38 +106,38 @@ uv run pytest tests/unit/test_methodology_docs.py -q
 
 ## Task 2: Correct The Canonical Ontario Methodology Records
 
-- [ ] Update `ontario-reference.json` to separate `repository_mapping` from the
+- [x] Update `ontario-reference.json` to separate `repository_mapping` from the
   official indicator definition without changing the repository mapping.
-- [ ] Replace the stale HQOntario methodology reference with the current
+- [x] Replace the stale HQOntario methodology reference with the current
   Ontario Health indicator URL.
-- [ ] Update the maintained Markdown and its public mirror with a prominent
+- [x] Update the maintained Markdown and its public mirror with a prominent
   revalidation notice and exact official definition.
-- [ ] Qualify within- and cross-province statements as descriptions of current
+- [x] Qualify within- and cross-province statements as descriptions of current
   repository tags, not source-faithful official event boundaries.
 
 ## Task 3: Contain Research Claims And Record The Decision
 
-- [ ] Mark the four-province audit draft as paused for Ontario methodology
+- [x] Mark the four-province audit draft as paused for Ontario methodology
   revalidation.
-- [ ] Mark the Ottawa-Gatineau case study as requiring revalidation; retain its
+- [x] Mark the Ottawa-Gatineau case study as requiring revalidation; retain its
   non-comparability conclusion while removing the unsupported claim that the
   current official Ontario clock starts only at triage and ends only at a
   physician.
-- [ ] Add a correction note to the historical Ontario research findings.
-- [ ] Add one manual task pointing to this plan and listing the ontology,
+- [x] Add a correction note to the historical Ontario research findings.
+- [x] Add one manual task pointing to this plan and listing the ontology,
   historical-data, UI, and migration decisions needed for full resolution.
 
 ## Task 4: Verify, Review, And Deliver
 
-- [ ] Run focused methodology documentation tests.
-- [ ] Run Ruff formatting and lint for the changed test.
-- [ ] Run `bash scripts/check-docs.sh`.
-- [ ] Run the full backend test suite because a canonical structured methodology
+- [x] Run focused methodology documentation tests.
+- [x] Run Ruff formatting and lint for the changed test.
+- [x] Run `bash scripts/check-docs.sh`.
+- [x] Run the full backend test suite because a canonical structured methodology
   artifact and its tests changed.
-- [ ] Run `git diff --check` and confirm no runtime/source/migration/frontend
+- [x] Run `git diff --check` and confirm no runtime/source/migration/frontend
   files changed.
 - [ ] Request independent review and address critical or important findings.
-- [ ] Commit in reviewable steps.
+- [x] Commit in reviewable steps.
 - [ ] Push `codex/ontario-methodology-revalidation` and open a ready PR.
 - [ ] Do not merge: changed documentation paths trigger deployment on `main`.
 - [ ] Verify all GitHub checks on the exact final PR head.
@@ -153,7 +153,41 @@ uv run pytest tests/unit/test_methodology_docs.py -q
 
 ## Completion Record
 
-Update this section with RED/GREEN results, exact command output, commit SHAs,
-review findings, PR URL, final head SHA, and CI run IDs. If full remediation is
-still blocked, retain the manual task and state the precise owner decision
-required rather than repeatedly retrying a partial mapping change.
+### TDD And Implementation
+
+- RED: the focused methodology module collected 21 tests with 6 expected
+  failures: missing structured revalidation metadata plus missing visible
+  notices in the five affected public artifacts.
+- GREEN: `test_methodology_docs.py` passed all 21 tests after the containment
+  update.
+- Combined focused verification:
+  `test_methodology_docs.py` plus `test_source_consistency.py` passed all 25
+  tests.
+- Plan commit: `5200345d`.
+- Containment implementation commit: `ad5394f7`.
+
+### Full Local Verification
+
+- `bash scripts/check-docs.sh`: all 11 groups passed.
+- `uv run ruff format --check tests/unit/test_methodology_docs.py`: passed.
+- `uv run ruff check tests/unit/test_methodology_docs.py`: passed.
+- `uv run pytest -q`: 585 passed and 27 prerequisite-dependent skips in 26.30
+  seconds.
+- `git diff --check`: passed.
+- Exact changed surfaces: methodology/reference documentation, the historical
+  research artifacts, manual task ledger, one methodology-doc test, and this
+  plan. No runtime source catalog, scraper, migration, frontend, schema, or data
+  file changed.
+- Pre-commit hooks passed, including JSON validation, Ruff, secret scanning,
+  and authorship guardrails.
+
+### Remaining Boundary
+
+Full ontology remediation remains intentionally unresolved. The manual task
+retains the exact owner decision required: composite start, qualifying-provider
+endpoint, historical migration or versioning, source metadata, divergence
+briefs, and frontend labels must be handled together rather than through a
+partial tag change.
+
+Independent review, PR details, final head SHA, and CI run IDs remain to be
+recorded.
