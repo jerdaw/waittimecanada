@@ -104,6 +104,116 @@ def test_duplicate_migration_heading_is_rejected(tmp_path: Path) -> None:
     assert "README has duplicate migration heading: 001_create_tables.sql" in errors
 
 
+def test_stale_executable_count_is_rejected(tmp_path: Path) -> None:
+    names = ["001_create_tables.sql", "002_add_index.sql", "003_policy.sql.skip"]
+    _touch(tmp_path, *names)
+    readme = tmp_path / "README.md"
+    _write_readme(readme, names, executable_count=1)
+
+    errors = check_migration_sequence.validate_migration_documentation(tmp_path, readme)
+
+    assert "README executable migration count is 1; expected 2" in errors
+
+
+def test_missing_executable_count_is_rejected(tmp_path: Path) -> None:
+    names = ["001_create_tables.sql"]
+    _touch(tmp_path, *names)
+    readme = tmp_path / "README.md"
+    _write_readme(readme, names)
+    readme.write_text(
+        readme.read_text(encoding="utf-8").replace("Found 1 migration files:\n", ""),
+        encoding="utf-8",
+    )
+
+    errors = check_migration_sequence.validate_migration_documentation(tmp_path, readme)
+
+    assert "README is missing the canonical executable migration count" in errors
+
+
+def test_duplicate_executable_count_is_rejected(tmp_path: Path) -> None:
+    names = ["001_create_tables.sql"]
+    _touch(tmp_path, *names)
+    readme = tmp_path / "README.md"
+    _write_readme(readme, names, extra_lines=["Found 1 migration files:"])
+
+    errors = check_migration_sequence.validate_migration_documentation(tmp_path, readme)
+
+    assert "README must contain exactly one canonical executable migration count; found 2" in errors
+
+
+def test_stale_next_migration_number_is_rejected(tmp_path: Path) -> None:
+    names = ["001_create_tables.sql", "002_add_index.sql"]
+    _touch(tmp_path, *names)
+    readme = tmp_path / "README.md"
+    _write_readme(readme, names, next_number=2)
+
+    errors = check_migration_sequence.validate_migration_documentation(tmp_path, readme)
+
+    assert "README next migration number is 002; expected 003" in errors
+
+
+def test_missing_next_migration_statement_is_rejected(tmp_path: Path) -> None:
+    names = ["001_create_tables.sql"]
+    _touch(tmp_path, *names)
+    readme = tmp_path / "README.md"
+    _write_readme(readme, names)
+    readme.write_text(
+        readme.read_text(encoding="utf-8").replace(
+            "The next migration number is `002`.\n",
+            "",
+        ),
+        encoding="utf-8",
+    )
+
+    errors = check_migration_sequence.validate_migration_documentation(tmp_path, readme)
+
+    assert "README is missing the canonical next migration statement" in errors
+
+
+def test_duplicate_next_migration_statement_is_rejected(tmp_path: Path) -> None:
+    names = ["001_create_tables.sql"]
+    _touch(tmp_path, *names)
+    readme = tmp_path / "README.md"
+    _write_readme(
+        readme,
+        names,
+        extra_lines=["The next migration number is `001`."],
+    )
+
+    errors = check_migration_sequence.validate_migration_documentation(tmp_path, readme)
+
+    assert "README must contain exactly one canonical next migration statement; found 2" in errors
+
+
+def test_readme_placeholder_reports_line_number(tmp_path: Path) -> None:
+    names = ["001_create_tables.sql"]
+    _touch(tmp_path, *names)
+    readme = tmp_path / "README.md"
+    _write_readme(readme, names, extra_lines=["Details: TBD after review"])
+
+    errors = check_migration_sequence.validate_migration_documentation(tmp_path, readme)
+
+    assert "README contains unresolved placeholder 'TBD' at line 9" in errors
+
+
+def test_main_aggregates_sequence_and_documentation_errors(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(
+        check_migration_sequence,
+        "validate_migrations",
+        lambda: ["sequence defect"],
+    )
+    monkeypatch.setattr(
+        check_migration_sequence,
+        "validate_migration_documentation",
+        lambda: ["documentation defect"],
+    )
+
+    assert check_migration_sequence.main() == 1
+    assert capsys.readouterr().out == (
+        "Migration validation failed:\n- sequence defect\n- documentation defect\n"
+    )
+
+
 def test_missing_migration_number_is_rejected(tmp_path: Path) -> None:
     _touch(tmp_path, "001_create_tables.sql", "003_add_index.sql")
 

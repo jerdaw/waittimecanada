@@ -15,6 +15,15 @@ MIGRATION_HEADING_RE = re.compile(
     r"^#### (?P<name>\d{3}_[a-z0-9][a-z0-9_]*\.sql(?:\.skip)?)$",
     re.MULTILINE,
 )
+EXECUTABLE_COUNT_RE = re.compile(
+    r"^Found (?P<count>\d+) migration files:$",
+    re.MULTILINE,
+)
+NEXT_MIGRATION_RE = re.compile(
+    r"^The next migration number is `(?P<number>\d{3})`\.$",
+    re.MULTILINE,
+)
+PLACEHOLDER_RE = re.compile(r"\b(?:TODO|TBD)\b")
 
 # Two 020 migrations were created before this guard existed. They may already be
 # applied in deployed databases, so preserve the filenames and reject only new
@@ -64,6 +73,47 @@ def validate_migration_documentation(
         if count > 1:
             errors.append(f"README has duplicate migration heading: {name}")
 
+    executable_count = sum(name.endswith(".sql") for name in names)
+    count_matches = list(EXECUTABLE_COUNT_RE.finditer(readme))
+    if not count_matches:
+        errors.append("README is missing the canonical executable migration count")
+    elif len(count_matches) > 1:
+        errors.append(
+            "README must contain exactly one canonical executable migration count; "
+            f"found {len(count_matches)}"
+        )
+    else:
+        documented_count = int(count_matches[0].group("count"))
+        if documented_count != executable_count:
+            errors.append(
+                f"README executable migration count is {documented_count}; "
+                f"expected {executable_count}"
+            )
+
+    if names:
+        expected_next = max(int(name[:3]) for name in names) + 1
+        next_matches = list(NEXT_MIGRATION_RE.finditer(readme))
+        if not next_matches:
+            errors.append("README is missing the canonical next migration statement")
+        elif len(next_matches) > 1:
+            errors.append(
+                "README must contain exactly one canonical next migration statement; "
+                f"found {len(next_matches)}"
+            )
+        else:
+            documented_next = int(next_matches[0].group("number"))
+            if documented_next != expected_next:
+                errors.append(
+                    f"README next migration number is {documented_next:03d}; "
+                    f"expected {expected_next:03d}"
+                )
+
+    for line_number, line in enumerate(readme.splitlines(), start=1):
+        for match in PLACEHOLDER_RE.finditer(line):
+            errors.append(
+                f"README contains unresolved placeholder {match.group(0)!r} at line {line_number}"
+            )
+
     return errors
 
 
@@ -112,14 +162,14 @@ def validate_migrations(migrations_dir: Path = MIGRATIONS_DIR) -> list[str]:
 
 
 def main() -> int:
-    errors = validate_migrations()
+    errors = [*validate_migrations(), *validate_migration_documentation()]
     if errors:
-        print("Migration sequence check failed:")
+        print("Migration validation failed:")
         for error in errors:
             print(f"- {error}")
         return 1
 
-    print("Migration sequence check passed.")
+    print("Migration validation passed.")
     return 0
 
 
