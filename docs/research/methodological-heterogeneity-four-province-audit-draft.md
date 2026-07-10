@@ -1,16 +1,38 @@
 # Methodological Heterogeneity in Canadian Emergency Department Wait-Time Reporting: A Four-Province Audit
 
-**Status:** Draft for external review
+**Status:** Paused for Ontario methodology revalidation; not ready for external review
 **Date:** 2026-03-28
 **Scope:** Ontario, Quebec, Alberta, British Columbia
 
 > This draft is intended to support informed review before the report is treated as a finalized public scholarly artifact. It summarizes methodology differences already documented in the live platform and repository.
 
+> [!WARNING]
+> **Ontario methodology revalidation required.** Ontario Health currently
+> defines its indicator from triage or registration, whichever is earlier, to
+> the first qualifying provider assessment. The repository's
+> `TRIAGE -> PHYSICIAN` values are legacy implementation tags and cannot be
+> treated as an exact official definition. Source-level Ontario conclusions in
+> this draft are paused until the ontology and historical-data treatment are
+> resolved together.
+>
+> Official definition:
+> <https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments>
+
 ## Executive Summary
 
-Wait Time Canada audits publicly reported emergency department wait-time data across four Canadian provinces: Ontario, Quebec, Alberta, and British Columbia. The central finding is simple: these provinces do not currently publish directly comparable emergency wait-time measures, even when the values appear to describe the same operational question.
+Wait Time Canada audits publicly reported emergency department wait-time data
+across four Canadian provinces: Ontario, Quebec, Alberta, and British Columbia.
+The current platform blocks direct cross-province comparisons. This draft must
+not elevate that implementation result into a fully source-validated
+four-province methodology conclusion until Ontario is revalidated.
 
-Across the four live provincial source inventories, the platform currently observes four distinct statistic types for public emergency department reporting: `MEAN`, `ROLLING_AVG`, `POINT_ESTIMATE`, and `P90`. Quebec also remains the only live province in the platform that currently publishes stretcher occupancy as a public metric. As of **2026-03-28**, all **6 of 6** cross-province source pairs fail direct comparability on the platform's current ontology tags.
+Across the four live provincial source inventories, the platform currently
+observes four distinct statistic tags: `MEAN`, `ROLLING_AVG`, `POINT_ESTIMATE`,
+and `P90`. Quebec also remains the only live province in the platform that
+publishes stretcher occupancy as a public metric. As of **2026-03-28**, all
+**6 of 6** cross-province source pairs fail direct comparability on the
+platform's current ontology tags. The Ontario event tags require revalidation,
+so this is a platform-state result rather than a final source-level finding.
 
 The practical implication is that a public wait number is not meaningful in isolation. Interpretation requires source-specific context about where the clock starts, where it stops, how the reported value is summarized, and how frequently it is updated.
 
@@ -57,12 +79,15 @@ As of **2026-03-28**, the repository documents **393 hospital records** across t
 
 | Province | Primary public metric in live platform | Start event | End event | Statistic type | Operational posture |
 | --- | --- | --- | --- | --- | --- |
-| Ontario | `TIME_TO_PROVIDER` | `TRIAGE` | `PHYSICIAN` | `MEAN` | Publicly reported average |
+| Ontario | `TIME_TO_PROVIDER` | `TRIAGE`* | `PHYSICIAN`* | `MEAN` | Repository event tags pending official-source revalidation |
 | Quebec | `TIME_TO_PROVIDER` | `REGISTRATION` | `PHYSICIAN` | `ROLLING_AVG` | Rolling average estimate |
 | Alberta | `TIME_TO_PROVIDER` | `TRIAGE` | `PHYSICIAN` | `POINT_ESTIMATE` | Real-time current estimate |
 | British Columbia | `TIME_TO_PROVIDER` | `TRIAGE` | `PHYSICIAN` | `P90` | Percentile-based public wait metric |
 
-This table shows why the platform currently reports full cross-province divergence. Even when the metric family matches, the statistic type and, in Quebec's case, the start event do not.
+This table describes current platform tags. The asterisked Ontario event values
+do not exactly represent the official composite start and qualifying-provider
+endpoint. The table can explain current platform divergence, but not a final
+source-level Ontario comparison.
 
 ## Findings
 
@@ -70,11 +95,17 @@ This table shows why the platform currently reports full cross-province divergen
 
 As verified in the current platform state on **2026-03-28**, all **6 of 6** cross-province source pairs fail direct comparability on the current ontology tags.
 
-This is the strongest top-line finding of the audit. The platform is not discovering a few exceptional mismatches. It is observing a structural problem across the four-province set.
+This remains a strong platform-safety finding: the application does not permit
+any cross-province pair to be treated as directly comparable. External
+methodology claims must wait for Ontario revalidation.
 
-### 2. Quebec is methodologically distinct on two important dimensions
+### 2. Current repository tags distinguish Quebec on two dimensions
 
-Quebec is the only live province in the platform that starts the public wait-time clock at `REGISTRATION` rather than `TRIAGE`. That means Quebec's published number includes a pre-triage interval that Ontario, Alberta, and British Columbia exclude.
+Quebec is the only live province currently tagged with `REGISTRATION` rather
+than `TRIAGE`. That implementation difference contributes to platform
+divergence. It must not be read as proof that Ontario's official indicator
+excludes registration: Ontario uses triage or registration, whichever is
+earlier.
 
 Quebec also reports a `ROLLING_AVG`, while the other provinces currently expose `MEAN`, `POINT_ESTIMATE`, or `P90`. This makes Quebec the clearest case of double divergence:
 
@@ -97,12 +128,14 @@ This is not a flaw to be hidden. It is part of the public reporting landscape be
 
 The Ottawa-Gatineau pair remains the most intuitive demonstration of the platform's core thesis. Users could reasonably expect two hospitals across a provincial border in the same functional urban corridor to be comparable. They are not.
 
-For the verified production pair used in the linked case study:
+For the production pair used in the linked case study, the current repository
+tags are:
 
 - Ottawa reports `TRIAGE` to `PHYSICIAN` with `MEAN`
 - Gatineau reports `REGISTRATION` to `PHYSICIAN` with `ROLLING_AVG`
 
-The numbers may look superficially similar, but they are answering different operational questions.
+The platform correctly prevents a direct comparison. A final explanation of
+the event-boundary difference requires the Ontario revalidation decision.
 
 ## Equity Layer Interpretation
 
@@ -144,6 +177,9 @@ This draft has several important limitations:
 
 - It is an audit of publicly reported measures, not an audit of internal hospital operations.
 - Provincial methodology labels are inferred from current public documentation and source behavior; undocumented source changes could alter the interpretation.
+- The Ontario event tags do not exactly encode the current official composite
+  definition; Ontario-specific source-level findings are paused pending an
+  ontology and historical-data decision.
 - Coverage is limited to the four live provinces in the current platform.
 - The platform's own quality window metrics are operational snapshots, not long-horizon epidemiologic findings.
 - This draft has not yet had an external public-interest methodology review.

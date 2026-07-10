@@ -12,6 +12,12 @@ from public documentation.
 - [ ] Re-run public documentation boundary review before major releases.
 - [ ] Re-run methodology documentation review after any provincial reporting
   change.
+- [ ] Resolve the Ontario methodology revalidation in
+  `docs/superpowers/plans/2026-07-10-ontario-methodology-revalidation.md` before
+  changing runtime tags or treating the paused research artifacts as current.
+  Decide the composite start, qualifying-provider endpoint, historical
+  migration or versioning, source metadata, divergence briefs, and frontend
+  labels together.
 - [ ] Re-run public status alignment after each completed milestone so README,
   roadmap, and planning indexes keep the same current-state baseline.
 - [ ] Pilot ADR-0027 source-freshness offload with scraper, watchdog, aggregate,

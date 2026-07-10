@@ -5,6 +5,11 @@ from pathlib import Path
 
 import pytest
 
+REPO_ROOT = Path(__file__).parents[3]
+ONTARIO_HEALTH_URL = (
+    "https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments"
+)
+
 
 class TestOntarioMethodologyJSON:
     """Validate Ontario methodology reference JSON structure."""
@@ -22,6 +27,7 @@ class TestOntarioMethodologyJSON:
             "province",
             "province_code",
             "sources",
+            "methodology_revalidation",
             "telehealth",
             "triage_system",
             "comparability",
@@ -56,8 +62,8 @@ class TestOntarioMethodologyJSON:
             assert "statistic_type" in methodology
             assert "patient_scope" in methodology
 
-    def test_current_source_is_mean(self, ontario_json):
-        """Ontario should currently be documented as MEAN TRIAGE -> PHYSICIAN."""
+    def test_current_repository_mapping_is_documented(self, ontario_json):
+        """The structured reference should preserve current implementation tags."""
         ontario_source = next(s for s in ontario_json["sources"] if s["id"] == "ontario-health")
 
         assert ontario_source["methodology"]["statistic_type"] == "MEAN"
@@ -65,8 +71,8 @@ class TestOntarioMethodologyJSON:
         assert ontario_source["methodology"]["end_event"] == "PHYSICIAN"
         assert ontario_source["type"] == "historical_reporting"
 
-    def test_both_use_time_to_provider(self, ontario_json):
-        """Both sources should use TIME_TO_PROVIDER metric."""
+    def test_source_uses_current_repository_event_tags(self, ontario_json):
+        """The maintained source should preserve current implementation tags."""
         for source in ontario_json["sources"]:
             assert source["methodology"]["metric_family"] == "TIME_TO_PROVIDER"
             assert source["methodology"]["start_event"] == "TRIAGE"
@@ -129,6 +135,24 @@ class TestOntarioMethodologyJSON:
             assert "title" in ref
             assert ref["url"].startswith("http")
 
+    def test_official_definition_is_distinct_from_repository_mapping(self, ontario_json):
+        """The legacy tags must not be presented as the exact official definition."""
+        revalidation = ontario_json["methodology_revalidation"]
+
+        assert revalidation["status"] == "required"
+        assert revalidation["official_source_url"] == ONTARIO_HEALTH_URL
+        assert revalidation["official_indicator_definition"] == {
+            "start": "TRIAGE_OR_REGISTRATION_WHICHEVER_IS_EARLIER",
+            "end": "FIRST_QUALIFYING_PROVIDER_ASSESSMENT",
+            "statistic_type": "MEAN",
+        }
+        assert revalidation["repository_mapping"] == {
+            "start_event": "TRIAGE",
+            "end_event": "PHYSICIAN",
+            "status": "LEGACY_IMPLEMENTATION_TAGS_PENDING_REVALIDATION",
+        }
+        assert "historical" in revalidation["resolution_required"].lower()
+
     def test_json_structure_is_valid(self, ontario_json):
         """JSON should be parseable and well-formed."""
         # If we got here, JSON is valid (loaded successfully in fixture)
@@ -157,3 +181,20 @@ class TestMethodologyDocumentationExists:
         """Ontario JSON reference should exist."""
         json_path = Path(__file__).parents[2] / "docs" / "methodologies" / "ontario-reference.json"
         assert json_path.exists(), "ontario-reference.json not found"
+
+    @pytest.mark.parametrize(
+        "relative_path",
+        [
+            "backend/docs/methodologies/ontario-methodology.md",
+            "docs/ontario-methodology.md",
+            "docs/ontario-research-findings.md",
+            "docs/case-studies/ottawa-gatineau-divergence.md",
+            "docs/research/methodological-heterogeneity-four-province-audit-draft.md",
+        ],
+    )
+    def test_ontario_revalidation_notice_is_visible(self, relative_path):
+        """Affected public artifacts must expose the unresolved fidelity gap."""
+        contents = (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+
+        assert "Ontario methodology revalidation required" in contents
+        assert ONTARIO_HEALTH_URL in contents
