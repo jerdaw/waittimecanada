@@ -53,6 +53,12 @@ def test_repository_migrations_pass_sequence_check() -> None:
     assert errors == []
 
 
+def test_repository_migration_documentation_is_current() -> None:
+    errors = check_migration_sequence.validate_migration_documentation()
+
+    assert errors == []
+
+
 def test_complete_migration_documentation_passes(tmp_path: Path) -> None:
     names = ["001_create_tables.sql", "002_deferred_policy.sql.skip"]
     _touch(tmp_path, *names)
