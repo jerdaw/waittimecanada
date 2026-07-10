@@ -99,7 +99,7 @@ describe("Benchmarks API", () => {
   });
 
   it("handles database failures", async () => {
-    mockSql.mockRejectedValue(new Error("DB failed"));
+    mockSql.mockRejectedValue(new Error("PRIVATE_MARKER benchmark database"));
 
     const request = new NextRequest(
       "http://localhost/api/analytics/benchmarks?province=ON",
@@ -110,5 +110,7 @@ describe("Benchmarks API", () => {
     expect(response.status).toBe(500);
     expect(json.success).toBe(false);
     expect(json.error).toBe("Failed to compute benchmarks");
+    expect(json.message).toBe("Internal server error");
+    expect(JSON.stringify(json)).not.toContain("PRIVATE_MARKER");
   });
 });

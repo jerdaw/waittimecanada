@@ -109,7 +109,7 @@ describe("System Trends API", () => {
   });
 
   it("handles query failures", async () => {
-    mockSql.mockRejectedValue(new Error("DB failure"));
+    mockSql.mockRejectedValue(new Error("PRIVATE_MARKER trends database"));
 
     const request = new NextRequest(
       "http://localhost/api/analytics/trends?province=ON",
@@ -120,6 +120,8 @@ describe("System Trends API", () => {
     expect(response.status).toBe(500);
     expect(json.success).toBe(false);
     expect(json.error).toBe("Failed to compute system trends");
+    expect(json.message).toBe("Internal server error");
+    expect(JSON.stringify(json)).not.toContain("PRIVATE_MARKER");
   });
 
   it("falls back to daily rollups when requested period has no rows", async () => {

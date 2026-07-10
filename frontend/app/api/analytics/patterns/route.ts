@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
+import { getPublicApiErrorMessage } from "@/utils/apiErrors";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 
 type PatternType = "hour_of_day" | "day_of_week" | "monthly";
@@ -447,7 +448,7 @@ export async function GET(request: Request) {
       {
         success: false,
         error: "Failed to compute temporal patterns",
-        message,
+        message: getPublicApiErrorMessage(error),
       },
       { status: 500, headers: NO_STORE_HEADERS },
     );
