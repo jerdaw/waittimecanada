@@ -962,4 +962,23 @@ describe("API Route: Resources", () => {
       "Clinic Management & Technical Services",
     ]);
   });
+
+  test("redacts server details when resource queries fail", async () => {
+    mockSql.unsafe.mockRejectedValueOnce(
+      new Error("PRIVATE_MARKER resources database"),
+    );
+
+    const res = await GET(
+      new NextRequest(
+        "http://localhost/api/resources?kind=facility&province=ON&limit=5",
+      ),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe("Failed to fetch resources");
+    expect(data.message).toBe("Internal server error");
+    expect(JSON.stringify(data)).not.toContain("PRIVATE_MARKER");
+  });
 });

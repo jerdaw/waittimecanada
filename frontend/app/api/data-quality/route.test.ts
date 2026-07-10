@@ -200,7 +200,7 @@ describe("/api/data-quality", () => {
   it("returns no-store errors when data-quality queries fail", async () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     (getDb as Mock).mockImplementation(() => {
-      throw new Error("database unavailable");
+      throw new Error("PRIVATE_MARKER data-quality database");
     });
 
     const res = await GET(new Request("http://localhost/api/data-quality"));
@@ -208,7 +208,8 @@ describe("/api/data-quality", () => {
 
     expect(res.status).toBe(500);
     expect(res.headers.get("Cache-Control")).toBe("no-store");
-    expect(data.error).toBe("database unavailable");
+    expect(data.error).toBe("Internal server error");
+    expect(JSON.stringify(data)).not.toContain("PRIVATE_MARKER");
     expect(errorSpy).toHaveBeenCalledWith(
       "Failed to fetch data quality:",
       expect.any(Error),

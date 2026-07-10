@@ -97,7 +97,7 @@ describe("Regions Analytics API", () => {
   });
 
   it("handles query failures", async () => {
-    mockSql.mockRejectedValue(new Error("DB failure"));
+    mockSql.mockRejectedValue(new Error("PRIVATE_MARKER regions database"));
 
     const request = new Request(
       "http://localhost/api/analytics/regions?province=ON",
@@ -108,6 +108,8 @@ describe("Regions Analytics API", () => {
     expect(response.status).toBe(500);
     expect(json.success).toBe(false);
     expect(json.error).toBe("Failed to compute regional analytics");
+    expect(json.message).toBe("Internal server error");
+    expect(JSON.stringify(json)).not.toContain("PRIVATE_MARKER");
   });
 
   it("returns setup instructions when regions schema is missing", async () => {

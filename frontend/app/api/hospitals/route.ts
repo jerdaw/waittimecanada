@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/utils/db";
 import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
+import { getPublicApiErrorMessage } from "@/utils/apiErrors";
 import { logger } from "@/utils/logger";
 import { checkRateLimit } from "@/utils/rate-limit";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
@@ -158,7 +159,7 @@ export async function GET(request: NextRequest) {
       {
         success: false,
         error: "Failed to fetch hospitals",
-        message: error instanceof Error ? error.message : "Unknown error",
+        message: getPublicApiErrorMessage(error),
       },
       { status: 500, headers: NO_STORE_HEADERS },
     );

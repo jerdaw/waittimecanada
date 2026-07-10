@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
+import { getPublicApiErrorMessage } from "@/utils/apiErrors";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 
 /**
@@ -93,7 +94,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("Failed to fetch anomalies:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unknown error" },
+      { error: getPublicApiErrorMessage(error) },
       { status: 500, headers: NO_STORE_HEADERS },
     );
   }

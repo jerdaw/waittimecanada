@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
 import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
+import { getPublicApiErrorMessage } from "@/utils/apiErrors";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 
 type RegionTrend = "improving" | "stable" | "worsening";
@@ -349,7 +350,7 @@ export async function GET(request: Request) {
       {
         success: false,
         error: "Failed to compute regional analytics",
-        message: error instanceof Error ? error.message : "Unknown error",
+        message: getPublicApiErrorMessage(error),
       },
       { status: 500, headers: NO_STORE_HEADERS },
     );

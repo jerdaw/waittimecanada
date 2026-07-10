@@ -86,7 +86,9 @@ describe("/api/anomalies", () => {
 
   it("returns no-store errors when anomaly queries fail", async () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    const mockSql = vi.fn().mockRejectedValueOnce(new Error("DB offline"));
+    const mockSql = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("PRIVATE_MARKER anomalies database"));
     (getDb as Mock).mockReturnValue(mockSql);
 
     const res = await GET(new Request("http://localhost/api/anomalies"));
@@ -94,7 +96,8 @@ describe("/api/anomalies", () => {
 
     expect(res.status).toBe(500);
     expect(res.headers.get("Cache-Control")).toBe("no-store");
-    expect(data).toEqual({ error: "DB offline" });
+    expect(data).toEqual({ error: "Internal server error" });
+    expect(JSON.stringify(data)).not.toContain("PRIVATE_MARKER");
 
     errorSpy.mockRestore();
   });

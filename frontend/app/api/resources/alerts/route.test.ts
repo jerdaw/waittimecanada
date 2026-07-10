@@ -226,4 +226,21 @@ describe("API Route: Resource Alerts", () => {
       ]),
     );
   });
+
+  test("redacts server details when alert queries fail", async () => {
+    mockSql.unsafe.mockRejectedValueOnce(
+      new Error("PRIVATE_MARKER alerts database"),
+    );
+
+    const res = await GET(
+      new NextRequest("http://localhost/api/resources/alerts?limit=10"),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe("Failed to fetch alerts");
+    expect(data.message).toBe("Internal server error");
+    expect(JSON.stringify(data)).not.toContain("PRIVATE_MARKER");
+  });
 });

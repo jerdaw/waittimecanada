@@ -75,7 +75,7 @@ describe("Temporal Patterns API", () => {
   });
 
   it("handles query failures", async () => {
-    mockSql.mockRejectedValue(new Error("DB failure"));
+    mockSql.mockRejectedValue(new Error("PRIVATE_MARKER patterns database"));
 
     const request = new Request(
       "http://localhost/api/analytics/patterns?hospital_id=ca-on-test&type=monthly",
@@ -86,5 +86,7 @@ describe("Temporal Patterns API", () => {
     expect(response.status).toBe(500);
     expect(json.success).toBe(false);
     expect(json.error).toBe("Failed to compute temporal patterns");
+    expect(json.message).toBe("Internal server error");
+    expect(JSON.stringify(json)).not.toContain("PRIVATE_MARKER");
   });
 });
