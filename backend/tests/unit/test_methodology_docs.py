@@ -142,8 +142,10 @@ class TestOntarioMethodologyJSON:
         assert revalidation["status"] == "required"
         assert revalidation["official_source_url"] == ONTARIO_HEALTH_URL
         assert revalidation["official_indicator_definition"] == {
-            "start": "TRIAGE_OR_REGISTRATION_WHICHEVER_IS_EARLIER",
-            "end": "FIRST_QUALIFYING_PROVIDER_ASSESSMENT",
+            "start": "triage or registration, whichever is earlier",
+            "end": (
+                "first assessment by a doctor, nurse practitioner, physician assistant, or dentist"
+            ),
             "statistic_type": "MEAN",
         }
         assert revalidation["repository_mapping"] == {

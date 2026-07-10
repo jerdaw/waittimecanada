@@ -36,8 +36,8 @@
     "verified_on": "2026-07-10",
     "official_source_url": "https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments",
     "official_indicator_definition": {
-      "start": "TRIAGE_OR_REGISTRATION_WHICHEVER_IS_EARLIER",
-      "end": "FIRST_QUALIFYING_PROVIDER_ASSESSMENT",
+      "start": "triage or registration, whichever is earlier",
+      "end": "first assessment by a doctor, nurse practitioner, physician assistant, or dentist",
       "statistic_type": "MEAN"
     },
     "repository_mapping": {
