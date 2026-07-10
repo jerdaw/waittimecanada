@@ -6,8 +6,9 @@
 > **Ontario methodology revalidation required.** The production behavior below
 > was verified on 2026-03-28, but the Ontario event-boundary interpretation is
 > not current source-faithful evidence. Ontario Health defines the indicator
-> from triage or registration, whichever is earlier, to the first qualifying
-> provider assessment. The repository still uses `TRIAGE -> PHYSICIAN` as
+> from triage or registration, whichever is earlier, to the first assessment
+> by a doctor, nurse practitioner, physician assistant, or dentist. The
+> repository still uses `TRIAGE -> PHYSICIAN` as
 > legacy implementation tags.
 >
 > Official definition:
@@ -57,6 +58,8 @@ earlier, through the first qualifying provider assessment. The present ontology
 does not encode that composite start exactly.
 
 ## Why Direct Comparison Is Invalid
+
+Direct cross-province comparison remains invalid.
 
 Two independent safeguards prevent a direct performance conclusion:
 

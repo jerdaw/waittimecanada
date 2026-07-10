@@ -4,7 +4,8 @@
 > **Ontario methodology revalidation required.** The repository currently uses
 > `TRIAGE -> PHYSICIAN` as legacy implementation tags. The official Ontario
 > Health indicator instead starts at triage or registration, whichever is
-> earlier, and ends at the first qualifying provider assessment. The current
+> earlier, and ends at the first assessment by a doctor, nurse practitioner,
+> physician assistant, or dentist. The current
 > ontology cannot represent that composite start exactly. Until the ontology
 > and historical-data treatment are resolved together, do not treat the
 > repository event tags as an exact transcription of the official definition.
@@ -33,7 +34,7 @@ revalidation, not source-faithful definitions.
 Ontario Health currently defines the average time to first assessment as:
 
 - **Start:** triage or registration, whichever is earlier.
-- **End:** the first qualifying assessment by a doctor, nurse practitioner,
+- **End:** the first assessment by a doctor, nurse practitioner,
   physician assistant, or dentist.
 - **Statistic:** average time, calculated from total wait time divided by the
   count of eligible emergency department visits.
@@ -81,6 +82,8 @@ methodology URL. Those runtime/data changes are intentionally outside this
 containment pass because they require a migration and compatibility decision.
 
 ## Comparability Notes
+
+Direct cross-province comparison remains invalid.
 
 ### Within Ontario
 

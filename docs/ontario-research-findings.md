@@ -10,7 +10,8 @@
 > **Ontario methodology revalidation required.** The event-boundary conclusions
 > in this historical discovery note predate the current official definition.
 > Ontario Health defines the indicator from triage or registration, whichever
-> is earlier, to the first qualifying provider assessment. The repository still
+> is earlier, to the first assessment by a doctor, nurse practitioner,
+> physician assistant, or dentist. The repository still
 > uses `TRIAGE -> PHYSICIAN` as legacy implementation tags pending an ontology
 > and historical-data decision.
 >
@@ -111,7 +112,7 @@ The official indicator currently specifies:
 
 - **Metric family:** time to first qualifying provider assessment.
 - **Start:** triage or registration, whichever is earlier.
-- **End:** first qualifying assessment by a doctor, nurse practitioner,
+- **End:** first assessment by a doctor, nurse practitioner,
   physician assistant, or dentist.
 - **Statistic:** arithmetic average (`MEAN`).
 - **Reporting cadence:** monthly.

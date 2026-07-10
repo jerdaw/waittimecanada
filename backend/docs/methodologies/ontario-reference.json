@@ -9,7 +9,7 @@
       "type": "historical_reporting",
       "url": "https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments",
       "coverage": "Ontario hospitals in public performance reporting",
-      "update_frequency": "Quarterly public reporting",
+      "update_frequency": "Monthly public reporting",
       "methodology": {
         "metric_family": "TIME_TO_PROVIDER",
         "start_event": "TRIAGE",

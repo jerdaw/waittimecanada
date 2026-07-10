@@ -9,6 +9,11 @@ REPO_ROOT = Path(__file__).parents[3]
 ONTARIO_HEALTH_URL = (
     "https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments"
 )
+OFFICIAL_START_TEXT = "triage or registration, whichever is earlier"
+OFFICIAL_END_TEXT = (
+    "first assessment by a doctor, nurse practitioner, physician assistant, or dentist"
+)
+COMPARISON_SAFETY_TEXT = "Direct cross-province comparison remains invalid."
 
 
 class TestOntarioMethodologyJSON:
@@ -50,6 +55,7 @@ class TestOntarioMethodologyJSON:
 
         source_ids = {s["id"] for s in sources}
         assert "ontario-health" in source_ids
+        assert sources[0]["update_frequency"] == "Monthly public reporting"
 
     def test_source_has_methodology(self, ontario_json):
         """Each source should have complete methodology specification."""
@@ -197,6 +203,25 @@ class TestMethodologyDocumentationExists:
     def test_ontario_revalidation_notice_is_visible(self, relative_path):
         """Affected public artifacts must expose the unresolved fidelity gap."""
         contents = (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+        normalized = " ".join(contents.replace(">", " ").split())
 
         assert "Ontario methodology revalidation required" in contents
         assert ONTARIO_HEALTH_URL in contents
+        assert OFFICIAL_START_TEXT in normalized
+        assert OFFICIAL_END_TEXT in normalized
+        assert "`TRIAGE -> PHYSICIAN`" in contents
+
+    @pytest.mark.parametrize(
+        "relative_path",
+        [
+            "backend/docs/methodologies/ontario-methodology.md",
+            "docs/ontario-methodology.md",
+            "docs/case-studies/ottawa-gatineau-divergence.md",
+            "docs/research/methodological-heterogeneity-four-province-audit-draft.md",
+        ],
+    )
+    def test_comparative_artifacts_preserve_non_comparability(self, relative_path):
+        """Comparative artifacts must retain the safe direct-comparison boundary."""
+        contents = (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+
+        assert COMPARISON_SAFETY_TEXT in contents

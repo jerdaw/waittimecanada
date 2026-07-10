@@ -4,8 +4,8 @@
 > **Ontario methodology revalidation required.** Wait Time Canada currently
 > uses `TRIAGE -> PHYSICIAN` as legacy implementation tags. Ontario Health now
 > defines the indicator from triage or registration, whichever is earlier, to
-> the first qualifying provider assessment. The current ontology cannot encode
-> the composite start exactly.
+> the first assessment by a doctor, nurse practitioner, physician assistant,
+> or dentist. The current ontology cannot encode the composite start exactly.
 >
 > Official definition:
 > <https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments>
@@ -30,12 +30,14 @@ are not an exact official definition.
 ## Official Definition
 
 - Start: triage or registration, whichever is earlier.
-- End: first qualifying assessment by a doctor, nurse practitioner, physician
+- End: first assessment by a doctor, nurse practitioner, physician
   assistant, or dentist.
 - Statistic: average.
 - Reporting cadence: monthly.
 
 ## Comparability Consequences
+
+Direct cross-province comparison remains invalid.
 
 No active cross-province pair should be treated as directly comparable. The
 current platform's divergence behavior remains the safe outcome, but its legacy

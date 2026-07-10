@@ -9,7 +9,8 @@
 > [!WARNING]
 > **Ontario methodology revalidation required.** Ontario Health currently
 > defines its indicator from triage or registration, whichever is earlier, to
-> the first qualifying provider assessment. The repository's
+> the first assessment by a doctor, nurse practitioner, physician assistant,
+> or dentist. The repository's
 > `TRIAGE -> PHYSICIAN` values are legacy implementation tags and cannot be
 > treated as an exact official definition. Source-level Ontario conclusions in
 > this draft are paused until the ontology and historical-data treatment are
@@ -90,6 +91,8 @@ endpoint. The table can explain current platform divergence, but not a final
 source-level Ontario comparison.
 
 ## Findings
+
+Direct cross-province comparison remains invalid.
 
 ### 1. Cross-province direct comparability currently fails in every live source pair
 
