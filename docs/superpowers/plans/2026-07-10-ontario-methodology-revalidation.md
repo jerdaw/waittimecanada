@@ -5,7 +5,7 @@ repository's legacy Ontario ontology tags as an exact transcription of the
 current official indicator, while preserving the existing runtime and data
 model until an explicit ontology and historical-data decision is made.
 
-**Status:** Implementation verified; independent review and delivery pending
+**Status:** Implementation and independent review complete; delivery pending
 
 **Base:** `main` at `18dbcfef4e3c44695c2433b763d7f48e15deb124`
 
@@ -136,7 +136,7 @@ uv run pytest tests/unit/test_methodology_docs.py -q
   artifact and its tests changed.
 - [x] Run `git diff --check` and confirm no runtime/source/migration/frontend
   files changed.
-- [ ] Request independent review and address critical or important findings.
+- [x] Request independent review and address critical or important findings.
 - [x] Commit in reviewable steps.
 - [ ] Push `codex/ontario-methodology-revalidation` and open a ready PR.
 - [ ] Do not merge: changed documentation paths trigger deployment on `main`.
@@ -165,14 +165,26 @@ uv run pytest tests/unit/test_methodology_docs.py -q
   tests.
 - Plan commit: `5200345d`.
 - Containment implementation commit: `ad5394f7`.
+- Own-review descriptive-source-text hardening commit: `ce79c7d0`.
+- Independent review found no critical issues. Its important finding was that
+  the Markdown contract test protected only the warning and URL, not the
+  substantive composite definition, legacy-tag distinction, or comparison
+  boundary. Its minor finding was a stale quarterly cadence in the structured
+  reference.
+- Review RED: 10 focused tests failed on the stale cadence, missing exact
+  qualifying-provider wording, and missing canonical comparison-safety text.
+- Review GREEN: 29 combined methodology/source-consistency tests passed after
+  the contract and documents were aligned; committed as `12e49110`.
 
 ### Full Local Verification
 
 - `bash scripts/check-docs.sh`: all 11 groups passed.
-- `uv run ruff format --check tests/unit/test_methodology_docs.py`: passed.
-- `uv run ruff check tests/unit/test_methodology_docs.py`: passed.
-- `uv run pytest -q`: 585 passed and 27 prerequisite-dependent skips in 26.30
-  seconds.
+- `uv run ruff format --check .`: passed; 130 files already formatted.
+- `uv run ruff check .`: passed.
+- `uv run mypy src`: passed with no issues in 49 source files.
+- `uv run bandit -r src -ll`: passed with zero issues at every severity.
+- `uv run pytest -q`: 589 passed and 27 prerequisite-dependent skips in 25.13
+  seconds on the final review-hardened implementation.
 - `git diff --check`: passed.
 - Exact changed surfaces: methodology/reference documentation, the historical
   research artifacts, manual task ledger, one methodology-doc test, and this
@@ -189,5 +201,4 @@ endpoint, historical migration or versioning, source metadata, divergence
 briefs, and frontend labels must be handled together rather than through a
 partial tag change.
 
-Independent review, PR details, final head SHA, and CI run IDs remain to be
-recorded.
+PR details, final head SHA, and CI run IDs remain to be recorded.
