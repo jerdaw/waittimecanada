@@ -5,7 +5,7 @@
 checksum-backed migration runner and prevent the stale instruction from
 returning.
 
-**Status:** Implementation and independent review complete; delivery pending
+**Status:** Complete; PR #86 is open, ready, and intentionally unmerged
 
 **Base:** `main` at `18dbcfef4e3c44695c2433b763d7f48e15deb124`
 
@@ -70,9 +70,10 @@ uv run pytest tests/unit/test_integration_testing_docs.py -q
 - [x] Request independent review and address critical or important findings.
 - [x] Commit the plan and RED/GREEN implementation in
   reviewable steps.
-- [ ] Push `codex/integration-docs-migration-runner` and open a ready PR.
+- [x] Push `codex/integration-docs-migration-runner` and open a ready PR.
 - [ ] Do not merge because documentation paths trigger deployment on `main`.
-- [ ] Verify GitHub checks on the exact final PR head.
+- [x] Verify GitHub checks on the exact pushed implementation head; verify the
+  final plan-record head again before handoff.
 
 ## Completion Record
 
@@ -109,4 +110,17 @@ migration SQL, migration runner, schema, data, production system, secret,
 deployment, or release action occurred. Ownership of the obsolete root
 `scripts/migrate-structure.sh` remains intentionally unchanged.
 
-Independent review, PR URL, final SHA, and CI run IDs remain to be recorded.
+### Delivery And GitHub Actions
+
+- Pull request: [#86](https://github.com/jerdaw/waittimecanada/pull/86),
+  open, ready, mergeable, and intentionally unmerged because documentation
+  changes trigger deployment on `main`.
+- Exact reviewed implementation head:
+  `d77109dd127762f1afddb29362d4ae2fcaa8e990`.
+- Scraper CI run `29120060224`: Ruff, migration guard, mypy, Bandit, and pytest
+  passed; pytest reported 580 passed and 27 prerequisite-dependent skips in
+  31.07 seconds.
+- Docs CI run `29120063211`: `docs-quality` passed.
+- The final plan-record commit will receive a fresh exact-head CI rerun. Its
+  immutable run IDs belong in the PR delivery record so recording them does not
+  create an endless plan-only CI cycle.
