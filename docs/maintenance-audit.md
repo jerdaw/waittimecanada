@@ -120,7 +120,7 @@ The required sequence was followed without reordering:
 | Reviewable inventory script | Passed | 569 reviewable text files, about 93k lines. |
 | `rg "TODO|FIXME|HACK|XXX|debugger|console\\.log|console\\.debug"` with secret/private/cache exclusions | Passed | Remaining app-source `console.log` is the shared logger fallback; test/demo/doc examples are intentional. |
 | Env-var search over code/docs/config | Passed | Drove updates for `DATABASE_SSL_MODE` and `OPERATIONAL_NOTIFICATION_MODE`. |
-| Error/query/security sink search over backend/frontend/scripts | Passed | Identified raw error-message response pattern as deferred API-hardening follow-up; reviewed `sql.unsafe`/psycopg2 parameterization surfaces. |
+| Error/query/security sink search over backend/frontend/scripts | Passed | Identified raw error-message response pattern; the focused API-hardening follow-up was completed on 2026-07-10. Reviewed `sql.unsafe`/psycopg2 parameterization surfaces. |
 | Tracked secret-pattern scan with `git grep` and secret/lock exclusions | Passed | No tracked high-signal secret patterns matched. |
 | `uv lock --check` | Passed | Pyproject metadata change did not require lockfile update. |
 | `uv tree --depth 1` | Passed | Dependency tree inspected; no upgrades made. |
@@ -167,7 +167,7 @@ The known prerequisite-dependent lanes remain out of default local scope:
 | --- | --- | --- |
 | 1. General code quality/docs/maintenance | Fixed changes | Hospital pagination/cache mismatch fixed; stale migration docs and dead package entrypoints fixed; noisy logs reduced. |
 | 2. Test coverage/regression | Fixed changes | Added hospital pagination, validation, rate-limit privacy, and package-script metadata regression coverage. |
-| 3. Security/privacy/secrets | Fixed changes + deferred follow-up | Removed browser coarse-location/service-worker success logs; removed raw client-IP rate-limit warning; scans passed; broader API error response hardening deferred. |
+| 3. Security/privacy/secrets | Fixed changes + follow-up completed | Removed browser coarse-location/service-worker success logs; removed raw client-IP rate-limit warning; scans passed; API error response hardening completed on 2026-07-10. |
 | 4. CI/automation/workflow | Fixed changes | CONTRIBUTING, setup docs, `Makefile`, docs index, and backend metadata aligned with existing locked workflows. |
 | 5. Dependency/package hygiene | Fixed changes | Removed broken package console scripts; no dependency upgrades or lockfile churn. |
 | 6. Documentation/onboarding | Fixed changes | Active setup, env, ADR, API/OpenAPI, migration, testing, and maintenance-audit docs updated. |
@@ -219,8 +219,8 @@ Candidate findings considered:
 - Fixed: raw IP warning log in rate limiter.
 - Not an issue: shared `frontend/utils/logger.ts` console fallback is expected
   for browser/edge environments.
-- Deferred: many public API 500 responses include raw error messages; changing
-  all response contracts is a focused API-hardening pass.
+- Resolved in the 2026-07-10 focused follow-up: exception-derived public API
+  500 response values are centrally redacted without changing response shapes.
 
 Change gate:
 
@@ -322,8 +322,8 @@ Candidate findings considered:
   found no high-signal tracked matches.
 - Already satisfied: database query code inspected uses parameter binding for
   dynamic user values in reviewed surfaces.
-- Deferred: standardize public API 500 responses to avoid returning raw server
-  error details.
+- Resolved in the 2026-07-10 focused follow-up: public API 500 responses retain
+  internal logging while returning a generic exception-derived message.
 - Deferred: install/use a Python dependency vulnerability scanner if owners want
   a routine local advisory check; current CI/dependency posture uses Bandit and
   Dependabot.
@@ -558,8 +558,8 @@ Candidate findings considered:
   docs script check.
 - Deferred: `DatabaseService` is large; splitting it would be a broad refactor
   requiring a focused design pass.
-- Deferred: public API error response normalization should be done consistently
-  across route modules.
+- Resolved in the 2026-07-10 focused follow-up: all 17 route handlers that
+  exposed exception-derived values now share the same redaction utility.
 
 Change gate:
 
@@ -821,7 +821,7 @@ Verification:
 
 | Candidate | Decision | Rationale |
 | --- | --- | --- |
-| Normalize every public API 500 response to hide raw server error details | Deferred | Clear value, but touches many routes and response contracts; better as focused API-hardening pass with route-by-route tests. |
+| Normalize every public API 500 response to hide raw server error details | Delivered 2026-07-10 | A focused compatibility-preserving pass added centralized redaction and route-by-route tests for all 17 affected handlers. |
 | Convert hospital pagination to cursor/keyset pagination | Deferred | Stronger deep-page performance, but changes API contract. Current opt-in offset pagination is bounded and low-risk. |
 | Split `DatabaseService` into smaller modules | Deferred | Maintainability value, but large refactor with broad review cost. |
 | Add indexes/migrations for speculative query improvements | Rejected for this pass | Existing indexes cover reviewed hot paths; no live EXPLAIN evidence gathered. |
@@ -883,8 +883,8 @@ Expected red/green failures during fixes:
 - Rate-limit warnings no longer include raw client IPs.
 - Public docs did not gain private operations paths, credentials, or production
   environment details.
-- Remaining security recommendation: standardize public API 500 responses so
-  server error details are logged internally but not returned to clients.
+- Completed security recommendation: the 2026-07-10 follow-up keeps server
+  details in internal logs and removes them from public 500 responses.
 
 ## Remaining Recommendations
 
@@ -893,11 +893,9 @@ Expected red/green failures during fixes:
 2. Run the disposable database verification helper before a release when
    database-backed integration, migrations-on-fresh-DB, pipeline smoke, and
    Playwright coverage are required.
-3. Do a focused public API hardening pass to standardize error responses and
-   tests across all API routes.
-4. Consider a focused backend service maintainability pass for the largest
+3. Consider a focused backend service maintainability pass for the largest
    database service surfaces.
-5. Keep dependency upgrades separate unless required by security, compatibility,
+4. Keep dependency upgrades separate unless required by security, compatibility,
    or owner-directed maintenance.
 
 ## Final Diff Summary

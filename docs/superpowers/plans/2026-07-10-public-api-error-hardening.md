@@ -8,6 +8,10 @@
 
 **Tech Stack:** Next.js 15 route handlers, TypeScript 5, Vitest 4, Node.js 22.13.1, ESLint, Prettier.
 
+**Status:** Complete on 2026-07-10. All 17 affected route handlers use the
+shared redaction invariant, all planned regression coverage is present, and the
+validation commands below passed.
+
 ## Global Constraints
 
 - Never inspect or print `.env*`, credentials, keys, certificates, or private maintainer notes.
@@ -30,7 +34,7 @@
 - Consumes: any caught value as `unknown`
 - Produces: `getPublicApiErrorMessage(error: unknown): string`
 
-- [ ] **Step 1: Write the failing utility test**
+- [x] **Step 1: Write the failing utility test**
 
 ```ts
 import { describe, expect, it } from "vitest";
@@ -51,7 +55,7 @@ describe("getPublicApiErrorMessage", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify the missing module failure**
+- [x] **Step 2: Run the test and verify the missing module failure**
 
 Run:
 
@@ -62,7 +66,7 @@ npx vitest run utils/apiErrors.test.ts
 
 Expected: FAIL because `./apiErrors` does not exist.
 
-- [ ] **Step 3: Add the minimal utility**
+- [x] **Step 3: Add the minimal utility**
 
 ```ts
 export function getPublicApiErrorMessage(error: unknown): string {
@@ -71,13 +75,13 @@ export function getPublicApiErrorMessage(error: unknown): string {
 }
 ```
 
-- [ ] **Step 4: Run the utility test**
+- [x] **Step 4: Run the utility test**
 
 Run: `cd frontend && npx vitest run utils/apiErrors.test.ts`
 
 Expected: 1 test file passes with 4 table cases.
 
-- [ ] **Step 5: Commit the invariant**
+- [x] **Step 5: Commit the invariant**
 
 ```bash
 git add frontend/utils/apiErrors.ts frontend/utils/apiErrors.test.ts
@@ -100,7 +104,7 @@ git commit -m "test: define public API error redaction invariant"
 - Consumes: `getPublicApiErrorMessage(error)` from Task 1
 - Produces: unchanged analytics envelopes whose `message` is generic on 500
 
-- [ ] **Step 1: Tighten all four database-failure tests**
+- [x] **Step 1: Tighten all four database-failure tests**
 
 In each existing failure test, inject `new Error("PRIVATE_MARKER ...")` and add:
 
@@ -114,7 +118,7 @@ Retain each existing route-specific `json.error` assertion. In the patterns
 suite, retain the existing invalid-lookback test to protect the classified 400
 response.
 
-- [ ] **Step 2: Run the four test files and verify they fail on leaked messages**
+- [x] **Step 2: Run the four test files and verify they fail on leaked messages**
 
 ```bash
 cd frontend
@@ -127,7 +131,7 @@ npx vitest run \
 
 Expected: the new generic-message assertions fail.
 
-- [ ] **Step 3: Redact only the true 500 values**
+- [x] **Step 3: Redact only the true 500 values**
 
 Add this import to each route:
 
@@ -148,13 +152,13 @@ but its final 500 envelope must use:
 message: getPublicApiErrorMessage(error),
 ```
 
-- [ ] **Step 4: Re-run analytics tests**
+- [x] **Step 4: Re-run analytics tests**
 
 Run the Step 2 command.
 
 Expected: all four files pass, including the existing 400 classification test.
 
-- [ ] **Step 5: Commit analytics routes**
+- [x] **Step 5: Commit analytics routes**
 
 ```bash
 git add frontend/app/api/analytics frontend/tests/api/analytics-*.test.ts
@@ -171,7 +175,7 @@ git commit -m "fix: redact analytics API server errors"
 - Consumes: `getPublicApiErrorMessage(error)` from Task 1
 - Produces: unchanged core route envelopes with generic exception-derived fields
 
-- [ ] **Step 1: Add a private marker to each failure path**
+- [x] **Step 1: Add a private marker to each failure path**
 
 Extend the existing rejected-database tests, or add an equivalent test using
 the file's existing mocked `getDb`, with these exact assertions:
@@ -199,7 +203,7 @@ For health, retain all existing degraded-health metadata assertions and add:
 expect(data.error).toBe("Internal server error");
 ```
 
-- [ ] **Step 2: Run the eight route suites and verify failure**
+- [x] **Step 2: Run the eight route suites and verify failure**
 
 ```bash
 cd frontend
@@ -216,7 +220,7 @@ npx vitest run \
 
 Expected: newly added generic-message assertions fail.
 
-- [ ] **Step 3: Replace each exception-derived response field**
+- [x] **Step 3: Replace each exception-derived response field**
 
 Import the Task 1 utility in all eight routes. Replace each direct conditional
 serialization with:
@@ -228,13 +232,13 @@ getPublicApiErrorMessage(error)
 Keep the surrounding `error:` or `message:` property name and all other body
 fields unchanged.
 
-- [ ] **Step 4: Re-run core route tests**
+- [x] **Step 4: Re-run core route tests**
 
 Run the Step 2 command.
 
 Expected: all eight files pass.
 
-- [ ] **Step 5: Commit core routes**
+- [x] **Step 5: Commit core routes**
 
 ```bash
 git add frontend/app/api/anomalies frontend/app/api/compare \
@@ -254,7 +258,7 @@ git commit -m "fix: redact core API server errors"
 - Consumes: `getPublicApiErrorMessage(error)` from Task 1
 - Produces: unchanged resource error envelopes with a generic `message` on 500
 
-- [ ] **Step 1: Add one database-failure assertion per route**
+- [x] **Step 1: Add one database-failure assertion per route**
 
 Use each suite's existing database mock to reject with
 `new Error("PRIVATE_MARKER resource database detail")`, call the route with a
@@ -269,7 +273,7 @@ expect(JSON.stringify(data)).not.toContain("PRIVATE_MARKER");
 
 Retain each route-specific static `data.error` summary.
 
-- [ ] **Step 2: Run resource tests and verify failure**
+- [x] **Step 2: Run resource tests and verify failure**
 
 ```bash
 cd frontend
@@ -283,7 +287,7 @@ npx vitest run \
 
 Expected: the new generic-message assertions fail.
 
-- [ ] **Step 3: Redact resource 500 response messages**
+- [x] **Step 3: Redact resource 500 response messages**
 
 Import `getPublicApiErrorMessage` and set each top-level catch envelope to:
 
@@ -294,13 +298,13 @@ message: getPublicApiErrorMessage(error),
 Do not change the alerts DPD-enrichment warning; it is internal logging and not
 a public response.
 
-- [ ] **Step 4: Re-run resource tests**
+- [x] **Step 4: Re-run resource tests**
 
 Run the Step 2 command.
 
 Expected: all five files pass, including the DPD graceful-degradation test.
 
-- [ ] **Step 5: Commit resource routes**
+- [x] **Step 5: Commit resource routes**
 
 ```bash
 git add frontend/app/api/resources
@@ -318,7 +322,7 @@ git commit -m "fix: redact resource API server errors"
 - Consumes: passing route behavior from Tasks 1-4
 - Produces: durable completion evidence and no remaining actionable audit item
 
-- [ ] **Step 1: Run a source-level leak audit**
+- [x] **Step 1: Run a source-level leak audit**
 
 ```bash
 git grep -n -E 'error instanceof Error \? error\.message|error\.message' -- frontend/app/api
@@ -329,7 +333,7 @@ Expected: remaining raw-message occurrences are limited to equity-summary 404
 classification, equity-layer 404 classification, patterns 400 classification,
 and alerts internal logging; no 500 response contains one.
 
-- [ ] **Step 2: Run targeted and full frontend validation**
+- [x] **Step 2: Run targeted and full frontend validation**
 
 ```bash
 cd frontend
@@ -343,7 +347,7 @@ npm run build
 
 Expected: every command exits 0 under Node 22.13.1.
 
-- [ ] **Step 3: Run repository documentation checks**
+- [x] **Step 3: Run repository documentation checks**
 
 ```bash
 bash scripts/check-docs.sh
@@ -352,7 +356,7 @@ git diff --check
 
 Expected: both commands exit 0.
 
-- [ ] **Step 4: Record completion**
+- [x] **Step 4: Record completion**
 
 Update the maintenance-audit deferred findings and final recommendations to
 state that the 2026-07-10 focused pass delivered centralized redaction and
@@ -360,7 +364,7 @@ route-by-route regression coverage. Mark every checkbox in this plan complete,
 record the exact verification totals, and list this plan as a closed delivered
 artifact in `docs/planning/README.md`.
 
-- [ ] **Step 5: Commit completion evidence**
+- [x] **Step 5: Commit completion evidence**
 
 ```bash
 git add docs/maintenance-audit.md docs/planning/README.md \
@@ -368,7 +372,7 @@ git add docs/maintenance-audit.md docs/planning/README.md \
 git commit -m "docs: record API error hardening completion"
 ```
 
-- [ ] **Step 6: Verify the clean committed tree**
+- [x] **Step 6: Verify the clean committed tree**
 
 Re-run the commands from Steps 1-3, then run:
 

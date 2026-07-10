@@ -91,9 +91,9 @@ paths are intentionally excluded from public documentation.
 - Keep frontend dependency audit remediation current; the 2026-06-27 pass
   leaves `npm audit --audit-level=high` clean.
 - Keep the 2026-07-05 maintenance audit and professionalization follow-ups
-  focused and separate from routine stewardship work; defer broad API-error
-  normalization, backend service splitting, dependency freshness, and
-  historical-script ownership decisions to dedicated passes.
+  focused and separate from routine stewardship work. The dedicated public API
+  error-redaction pass was completed on 2026-07-10; backend service splitting,
+  dependency freshness, and historical-script ownership remain separate work.
 
 ### Next
 
@@ -259,13 +259,14 @@ paths are intentionally excluded from public documentation.
   guidelines.
 - Maintenance follow-ups: use `docs/maintenance-audit.md` as the current
   follow-up ledger for the July 2026 repo-health and professionalization
-  passes, especially API error response hardening, docs toolchain availability,
-  historical-script ownership, and focused backend service maintainability work.
+  passes, especially docs toolchain availability, historical-script ownership,
+  and focused backend service maintainability work.
 
 ## Implementation Plan References
 
 Existing public historical plans retained for context:
 
+- `docs/superpowers/plans/2026-07-10-public-api-error-hardening.md`
 - `docs/planning/archive/maintenance-2026-06-22-tooling-roadmap-maintenance.md`
 - `docs/planning/archive/maintenance-2026-06-04-public-docs-cleanup.md`
 - `docs/planning/archive/maintenance-2026-06-12-autonomous-stewardship.md`
