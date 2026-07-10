@@ -4,6 +4,8 @@
 
 **Goal:** Reconcile the canonical migration README with the files on disk and extend the existing migration guard so inventory, count, next-prefix, and placeholder drift fails CI.
 
+**Status:** Implementation verified; independent review and delivery pending
+
 **Architecture:** Keep filename validation in `validate_migrations()` and add an independently callable `validate_migration_documentation()` beside it. The new validator derives facts from migration filenames, parses only exact migration history headings and two canonical README statements, and returns actionable errors without modifying files. The existing CLI aggregates both validation groups.
 
 **Tech Stack:** Python 3.12+, pathlib, regular expressions, collections.Counter, pytest, Markdown, uv
@@ -41,7 +43,7 @@
 - Produces: `validate_migration_documentation(migrations_dir: Path = MIGRATIONS_DIR, readme_path: Path = MIGRATIONS_README) -> list[str]`
 - Produces: `MIGRATIONS_README: Path`
 
-- [ ] **Step 1: Add a synthetic README helper and failing inventory tests**
+- [x] **Step 1: Add a synthetic README helper and failing inventory tests**
 
 Add this helper and tests to `backend/tests/unit/test_check_migration_sequence.py`:
 
@@ -125,7 +127,7 @@ def test_duplicate_migration_heading_is_rejected(tmp_path: Path) -> None:
     assert "README has duplicate migration heading: 001_create_tables.sql" in errors
 ```
 
-- [ ] **Step 2: Run the new tests and verify RED**
+- [x] **Step 2: Run the new tests and verify RED**
 
 Run:
 
@@ -137,7 +139,7 @@ uv run pytest tests/unit/test_check_migration_sequence.py \
 
 Expected: fail because `validate_migration_documentation` does not exist.
 
-- [ ] **Step 3: Implement exact-heading inventory validation**
+- [x] **Step 3: Implement exact-heading inventory validation**
 
 Add imports, constants, and the new function in `backend/scripts/check_migration_sequence.py`:
 
@@ -181,7 +183,7 @@ def validate_migration_documentation(
     return errors
 ```
 
-- [ ] **Step 4: Run inventory and existing sequence tests and verify GREEN**
+- [x] **Step 4: Run inventory and existing sequence tests and verify GREEN**
 
 Run:
 
@@ -193,7 +195,7 @@ uv run pytest tests/unit/test_check_migration_sequence.py \
 
 Expected: all selected tests pass.
 
-- [ ] **Step 5: Commit Task 1**
+- [x] **Step 5: Commit Task 1**
 
 ```bash
 git add backend/scripts/check_migration_sequence.py \
@@ -212,7 +214,7 @@ git commit -m "test: validate migration history inventory"
 - Produces: one error per canonical count/next-number defect and per placeholder line
 - Produces: `main() -> int` aggregating sequence and documentation validation
 
-- [ ] **Step 1: Add failing derived-fact and CLI tests**
+- [x] **Step 1: Add failing derived-fact and CLI tests**
 
 Add tests covering missing and stale count, stale and duplicate next-number
 statements, placeholder line reporting, and CLI aggregation. Use exact assertions:
@@ -333,7 +335,7 @@ def test_main_aggregates_sequence_and_documentation_errors(monkeypatch, capsys) 
     )
 ```
 
-- [ ] **Step 2: Run the new tests and verify RED**
+- [x] **Step 2: Run the new tests and verify RED**
 
 Run:
 
@@ -346,7 +348,7 @@ uv run pytest tests/unit/test_check_migration_sequence.py \
 Expected: failures because the validator does not yet inspect these facts and
 `main()` does not aggregate documentation errors.
 
-- [ ] **Step 3: Implement derived-fact validation and aggregate CLI output**
+- [x] **Step 3: Implement derived-fact validation and aggregate CLI output**
 
 Add these regex constants:
 
@@ -424,7 +426,7 @@ def main() -> int:
     return 0
 ```
 
-- [ ] **Step 4: Run all synthetic checker tests and verify GREEN**
+- [x] **Step 4: Run all synthetic checker tests and verify GREEN**
 
 Run:
 
@@ -436,7 +438,7 @@ uv run pytest tests/unit/test_check_migration_sequence.py \
 
 Expected: all selected tests pass.
 
-- [ ] **Step 5: Commit Task 2**
+- [x] **Step 5: Commit Task 2**
 
 ```bash
 git add backend/scripts/check_migration_sequence.py \
@@ -455,7 +457,7 @@ git commit -m "build: guard migration README consistency"
 - Consumes: all validation behavior implemented in Tasks 1 and 2
 - Produces: a repository-level contract proving the real migration inventory and README agree
 
-- [ ] **Step 1: Add the repository documentation contract test**
+- [x] **Step 1: Add the repository documentation contract test**
 
 Add beside the existing repository sequence test:
 
@@ -466,7 +468,7 @@ def test_repository_migration_documentation_is_current() -> None:
     assert errors == []
 ```
 
-- [ ] **Step 2: Run the repository contract and verify RED with the known drift**
+- [x] **Step 2: Run the repository contract and verify RED with the known drift**
 
 Run:
 
@@ -481,7 +483,7 @@ Expected: fail with missing headings for `014`, `015`, `018`, `019`, and
 `020_add_public_health_system_metrics.sql`, stale count `21`, stale next prefix
 `022`, and the unresolved `TBD` line.
 
-- [ ] **Step 3: Correct top-level counts, ranges, and examples**
+- [x] **Step 3: Correct top-level counts, ranges, and examples**
 
 In `backend/migrations/README.md`:
 
@@ -493,7 +495,7 @@ In `backend/migrations/README.md`:
 - change the SQL template comment from `022_your_descriptive_name.sql` to
   `023_your_descriptive_name.sql`.
 
-- [ ] **Step 4: Restore chronological migration history and complete `005`**
+- [x] **Step 4: Restore chronological migration history and complete `005`**
 
 Move the existing `020_sync_active_source_definitions.sql`,
 `021_add_alert_notification_state.sql`, and
@@ -515,7 +517,7 @@ replace its placeholder with:
 - `scraper_status_updated_at`
 ```
 
-- [ ] **Step 5: Add the five missing migration history entries**
+- [x] **Step 5: Add the five missing migration history entries**
 
 Add concise, SQL-backed sections in chronological order:
 
@@ -535,7 +537,7 @@ Place the preserved `020_sync_active_source_definitions.sql` entry after the
 other `020` entry, followed by `021` and `022`. Do not edit either SQL file or
 imply that duplicate `020` ordering can be changed.
 
-- [ ] **Step 6: Record the completed follow-up in the maintenance audit**
+- [x] **Step 6: Record the completed follow-up in the maintenance audit**
 
 Amend the migration-health finding and migration-docs summary in
 `docs/maintenance-audit.md` to state that the 2026-07-10 follow-up reconciled
@@ -543,7 +545,7 @@ all migration history headings and added CI-enforced count, next-prefix,
 inventory, and placeholder validation. Preserve the audit's statement that no
 schema or data operation occurred.
 
-- [ ] **Step 7: Run the repository contract, checker, and full checker module**
+- [x] **Step 7: Run the repository contract, checker, and full checker module**
 
 Run:
 
@@ -556,7 +558,7 @@ uv run python scripts/check_migration_sequence.py
 Expected: all tests pass and the command prints
 `Migration validation passed.`
 
-- [ ] **Step 8: Commit Task 3**
+- [x] **Step 8: Commit Task 3**
 
 ```bash
 git add backend/migrations/README.md \
@@ -574,7 +576,7 @@ git commit -m "docs: reconcile migration history"
 - Consumes: completed checker, tests, README, and maintenance note
 - Produces: exact verification evidence and a ready unmerged pull request
 
-- [ ] **Step 1: Run backend quality and test gates**
+- [x] **Step 1: Run backend quality and test gates**
 
 Run:
 
@@ -590,7 +592,7 @@ uv run pytest -q
 Expected: every command exits zero. Record actual pytest counts rather than
 copying historical counts.
 
-- [ ] **Step 2: Run documentation and diff validation**
+- [x] **Step 2: Run documentation and diff validation**
 
 From the repository root, run:
 
@@ -603,14 +605,14 @@ git -c core.filemode=false status --short --branch
 Expected: documentation checks and diff check exit zero; status contains only
 the intended plan update before its final commit.
 
-- [ ] **Step 3: Update this plan with exact evidence**
+- [x] **Step 3: Update this plan with exact evidence**
 
 Mark completed checkboxes, add a `## Verification Evidence` section containing
 the exact commands, pass/fail outcomes, test counts, commit SHAs, and any
 prerequisite-dependent skips. State explicitly that no database operation,
 deployment, release, or secret access occurred.
 
-- [ ] **Step 4: Commit plan closure**
+- [x] **Step 4: Commit plan closure**
 
 ```bash
 git add docs/superpowers/plans/2026-07-10-migration-documentation-consistency.md
@@ -656,3 +658,48 @@ documentation deployment workflow on `main`.
 
 Use `gh pr view` and `gh pr checks` to confirm the PR head SHA equals local
 `HEAD`, all required checks pass, and the PR remains open and unmerged.
+
+## Verification Evidence
+
+### Baseline
+
+- Worktree: `/home/jer/repos/vps/waittimecanada/.worktrees/migration-docs-consistency`
+- Branch base: `main` at `18dbcfef4e3c44695c2433b763d7f48e15deb124`
+- Toolchain: uv 0.11.25 with CPython 3.14.6; the project requires Python 3.12+
+- Locked setup: `uv sync --locked --extra dev` completed successfully
+- Existing focused baseline: 5 tests passed in 0.36 seconds
+
+### TDD Cycles
+
+- Task 1 RED: 5 selected tests failed because
+  `validate_migration_documentation` did not exist.
+- Task 1 GREEN: 10 checker tests passed; committed as `9756cfcc`.
+- Task 2 RED: 8 selected tests failed on missing count, next-prefix,
+  placeholder, and CLI aggregation behavior.
+- Task 2 GREEN: 18 checker tests passed; committed as `fe690ad8`.
+- Task 3 RED: the repository contract failed with the expected 8 README
+  defects: five missing headings, stale count, stale next prefix, and the
+  unresolved `TBD` placeholder.
+- Task 3 GREEN: 19 checker tests passed and
+  `uv run python scripts/check_migration_sequence.py` printed
+  `Migration validation passed.`; committed as `a62d6402`.
+- Disk audit: 23 executable/skipped migration files have 23 exact README
+  headings in matching lexicographic order.
+
+### Full Verification
+
+- `uv run ruff format --check .`: passed; 130 files already formatted.
+- `uv run ruff check .`: passed.
+- `uv run mypy src`: passed with no issues in 49 source files.
+- `uv run bandit -r src -ll`: passed with zero low, medium, or high issues.
+- `uv run pytest -q`: 593 passed, 27 prerequisite-dependent tests skipped in
+  27.99 seconds.
+- `bash scripts/check-docs.sh`: all 11 documentation/roadmap guard groups
+  passed.
+- `git diff --check main...HEAD`: passed.
+- Worktree status after implementation commits: clean.
+
+The recurring `/home/jer/.profile` warning about a missing temporary Codex uv
+environment file did not affect uv discovery, dependency sync, or command exit
+status. No database operation, deployment, release, secret access, or
+production write occurred.
