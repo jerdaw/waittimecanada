@@ -55,6 +55,9 @@ Completed foundations:
   private/shared operations source of truth
 - Documentation and CI guardrails for public-boundary checks, human-authorship
   policy, roadmap freshness, ontology drift, and Docs CI path coverage
+- Public offloaded-operations acceptance controls for runner isolation, secret
+  handling, log retention, bounded failure summaries, and schedule-level
+  rollback, paired with a private operator procedure
 - ADR-0027 strategy, public source-freshness offload contract, and
   copy/adapt-only trusted-runner examples for scraper, watchdog, and aggregate
   adoption
@@ -143,9 +146,6 @@ paths are intentionally excluded from public documentation.
   export examples with complete source attribution and limitations.
 - [ ] **P1 / Select resource expansion carefully:** Add public-health resource
   sources only when official, reusable, and clearly caveated.
-- [ ] **P1 / Harden offloaded operations:** Document runner isolation, secret
-  handling, log retention, failure summaries, and rollback procedures before
-  moving each secret-bearing workflow.
 - [ ] **P2 / Maintain public docs boundary:** Keep local setup, API contracts,
   and methodology docs reproducible and free of private operational details.
 
