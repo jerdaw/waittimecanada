@@ -62,3 +62,16 @@ def test_recovered_incident_plan_is_closed_as_historical() -> None:
     assert "docs/planning/roadmap.md" in plan
     assert "docs/planning/manual-tasks.md" in plan
     assert "Do not execute the unchecked steps" in normalized_plan
+
+
+def test_reconciliation_plan_is_closed_after_delivery() -> None:
+    plan = _read_plan("2026-07-10-post-merge-plan-reconciliation.md")
+    status_line = next(line for line in plan.splitlines() if line.startswith("**Status:**"))
+
+    assert "Complete" in status_line
+    assert "- [ ]" not in plan
+    assert "PR #87" in plan
+    assert "a8ea31945a98d97b78f9bb53ccbe742a0e9185e7" in plan  # pragma: allowlist secret
+    for run_id in ("29136002101", "29136002086", "29136002079"):
+        assert run_id in plan
+    assert "No further autonomous implementation candidate remains" in plan

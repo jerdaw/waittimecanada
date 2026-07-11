@@ -1,6 +1,6 @@
 # Post-Merge Plan Status Reconciliation
 
-**Status:** Ready for delivery; implementation, verification, and review complete
+**Status:** Complete on 2026-07-10
 
 ## Goal
 
@@ -27,9 +27,9 @@ plan without misrepresenting its historical unchecked steps as completed.
 - [x] Run focused tests, the full backend suite, and the strict documentation
   build.
 - [x] Review the diff independently and address actionable findings.
-- [ ] Commit, publish a reviewable PR, merge with the user's authorization, and
+- [x] Commit, publish a reviewable PR, merge with the user's authorization, and
   verify all triggered post-merge checks.
-- [ ] Run the final repository-wide autonomous-work audit.
+- [x] Run the final repository-wide autonomous-work audit.
 
 ## Safety Boundaries
 
@@ -62,3 +62,22 @@ plan without misrepresenting its historical unchecked steps as completed.
   historical bodies retained contradictory present-tense pre-merge language.
   Both were corrected; re-review found no remaining Critical or Important
   issues.
+
+## Delivery And Final Audit
+
+- [PR #87](https://github.com/jerdaw/waittimecanada/pull/87) was squash-merged
+  as `a8ea31945a98d97b78f9bb53ccbe742a0e9185e7` after all pull-request checks
+  passed.
+- Post-merge Scraper CI run `29136002101`, Docs CI run `29136002086`, and
+  authorized Deploy Docs run `29136002079` all completed successfully on the
+  exact merge commit.
+- Local `main` was cleanly fast-forwarded to the merge commit. Remote branches
+  and registered worktrees were preserved.
+- The final recursive audit found one actual repository. Linked worktrees are
+  views of that repository; the unregistered `public-api-error-hardening`
+  marker remains untouched.
+- No further autonomous implementation candidate remains. Active work is now
+  limited to owner decisions, credentials and trusted-runner provisioning,
+  external or release actions, recurring safeguards, source availability, and
+  conditional future-change checklists documented in the roadmap and manual
+  task ledger.
