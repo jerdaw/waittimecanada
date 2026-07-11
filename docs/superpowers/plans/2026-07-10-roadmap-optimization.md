@@ -602,6 +602,8 @@ Expected: pre-commit checks pass and the commit contains no secret or non-human 
 
 ### Task 3: Full Verification, Review, And Stacked Delivery
 
+**Status:** Implementation verified; awaiting broad review.
+
 **Files:**
 - Modify: `docs/superpowers/plans/2026-07-10-roadmap-optimization.md`
 
@@ -609,7 +611,7 @@ Expected: pre-commit checks pass and the commit contains no secret or non-human 
 - Consumes: the complete Task 1 and Task 2 diff stacked on PR #89.
 - Produces: exact validation evidence, independent review results, and a ready stacked pull request targeting `docs/waittime-offload-operations-hardening`.
 
-- [ ] **Step 1: Run the full backend quality suite**
+- [x] **Step 1: Run the full backend quality suite**
 
 ```bash
 cd backend
@@ -622,7 +624,7 @@ uv run --locked --extra dev pytest -q
 
 Expected: formatting, lint, type checking, security scanning, and all prerequisite-independent tests pass; record the exact pass and skip counts.
 
-- [ ] **Step 2: Re-run repository documentation gates**
+- [x] **Step 2: Re-run repository documentation gates**
 
 ```bash
 cd ..
@@ -634,6 +636,30 @@ git status --short --branch
 
 Expected: docs checks and strict build pass, the diff has no whitespace errors,
 and only this plan's final evidence update remains uncommitted.
+
+**Pre-review verification evidence (2026-07-10):**
+
+- Full `ruff format --check .` reproduced the unchanged stacked-base exception:
+  `tests/unit/test_docs_toolchain.py` would be reformatted and 132 files were
+  already formatted on both `HEAD` and
+  `3c2f363c12965bd2b5cb28d2c14610176483f904`. The scoped check for the two
+  changed Python files passed with `2 files already formatted`; no unrelated
+  file was rewritten.
+- Full `ruff check .` likewise reproduced the same unchanged base-file `I001`
+  import-order issue on both `HEAD` and the stacked base. The scoped check for
+  `scripts/verify_roadmap_consistency.py` and
+  `tests/unit/test_verify_roadmap_consistency.py` passed with
+  `All checks passed!`.
+- `mypy src` passed with no issues in 49 source files. `bandit -r src -ll`
+  reported no issues across 11,435 lines. `pytest -q` collected 650 tests and
+  finished with **623 passed, 27 skipped in 32.11s**.
+- `bash scripts/check-docs.sh` passed all 11 documentation gates, including
+  roadmap consistency. The locked strict MkDocs build completed in 2.20s.
+  `git diff --check
+  3c2f363c12965bd2b5cb28d2c14610176483f904...HEAD` produced no output, and
+  the pre-update status was clean on `codex/roadmap-optimization`.
+- Independent review, plan closure, push, PR creation, exact-head remote
+  verification, rebase, merge, and post-merge verification remain pending.
 
 - [ ] **Step 3: Request independent review**
 
