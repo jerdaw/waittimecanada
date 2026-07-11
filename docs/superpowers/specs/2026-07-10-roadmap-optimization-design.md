@@ -189,6 +189,14 @@ the live pilot task.
 - keep recurring and operator-dependent work in the manual ledger; and
 - update README status dates only when the roadmap's public baseline changes.
 
+## README Alignment
+
+README's checkbox-based `Future Roadmap` section will be replaced with a short
+non-checkbox summary of the finite outcome categories plus a direct link to the
+canonical execution queue. README will continue to state the latest completed
+milestone and matching roadmap baseline date, but it will no longer act as a
+second backlog that can drift from `docs/planning/roadmap.md`.
+
 ## Validation Design
 
 `backend/scripts/verify_roadmap_consistency.py` will gain pure validation for the
