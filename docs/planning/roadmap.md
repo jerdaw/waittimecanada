@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-## Current Status (Updated 2026-07-05)
+## Current Status (Updated 2026-07-10)
 
 **Progress:** Milestone 33 is complete. Wait Time Canada is now in a
 stewardship and selective-expansion phase: the public roadmap emphasizes
@@ -31,7 +31,9 @@ metadata, refreshed setup/API/environment/migration documentation, and recorded
 remaining nonessential findings in `docs/maintenance-audit.md`. The follow-up
 2026-07-05 professionalization pass neutralized code-adjacent writing in
 templates, source comments, test comments, scripts, and parked operations docs
-without changing runtime behavior.
+without changing runtime behavior. The 2026-07-10 documentation-toolchain
+follow-up added a locked, isolated MkDocs 1.x environment and strict
+pull-request site build without changing the publication mechanism.
 
 Wait Time Canada is a four-province health systems observatory covering Ontario,
 Quebec, Alberta, and British Columbia. The platform audits publicly reported
@@ -90,6 +92,8 @@ paths are intentionally excluded from public documentation.
   test-type-check guardrails during routine maintenance.
 - Keep frontend dependency audit remediation current; the 2026-06-27 pass
   leaves `npm audit --audit-level=high` clean.
+- Keep the locked docs-only uv environment and strict MkDocs pull-request build
+  aligned with the existing GitHub Pages publication workflow.
 - Keep the 2026-07-05 maintenance audit and professionalization follow-ups
   focused and separate from routine stewardship work. The dedicated public API
   error-redaction pass was completed on 2026-07-10; backend service splitting,
@@ -259,8 +263,8 @@ paths are intentionally excluded from public documentation.
   guidelines.
 - Maintenance follow-ups: use `docs/maintenance-audit.md` as the current
   follow-up ledger for the July 2026 repo-health and professionalization
-  passes, especially docs toolchain availability, historical-script ownership,
-  and focused backend service maintainability work.
+  passes, especially historical-script ownership and focused backend service
+  maintainability work.
 
 ## Implementation Plan References
 

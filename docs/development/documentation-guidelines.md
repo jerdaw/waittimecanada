@@ -46,13 +46,17 @@ Update docs in the same PR when changing:
 
 ## Documentation Quality Check
 
-Run before opening a PR:
+Run both documentation gates before opening a docs-heavy PR:
 
 ```bash
 bash scripts/check-docs.sh
+make docs-build
 ```
 
-This check enforces high-signal documentation hygiene rules used by CI.
+`bash scripts/check-docs.sh` enforces high-signal documentation hygiene rules
+used by CI. `make docs-build` uses the locked `docs` dependency group in
+`backend/uv.lock` and keeps it in `backend/.venv-docs`, separate from the
+backend development environment.
 
 The docs platform remains on MkDocs 1.x in the current wave. Do not swap this repo to Zensical or replace the `mkdocs gh-deploy` publishing path until the shared Wave 3 migration gate is explicitly opened in `docs/planning/roadmap.md`.
 
