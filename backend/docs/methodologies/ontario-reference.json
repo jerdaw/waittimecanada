@@ -1,7 +1,7 @@
 {
   "province": "Ontario",
   "province_code": "ON",
-  "last_updated": "2026-07-08",
+  "last_updated": "2026-07-10",
   "sources": [
     {
       "id": "ontario-health",
@@ -9,7 +9,7 @@
       "type": "historical_reporting",
       "url": "https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments",
       "coverage": "Ontario hospitals in public performance reporting",
-      "update_frequency": "Quarterly public reporting",
+      "update_frequency": "Monthly public reporting",
       "methodology": {
         "metric_family": "TIME_TO_PROVIDER",
         "start_event": "TRIAGE",
@@ -17,8 +17,9 @@
         "statistic_type": "MEAN",
         "patient_scope": "ALL"
       },
-      "description": "Published average wait times from triage to first physician assessment.",
+      "description": "Published average wait times currently represented by legacy repository event tags pending revalidation against the official composite indicator definition.",
       "limitations": [
+        "Repository event tags are legacy implementation tags pending Ontario methodology revalidation",
         "Not a live operational feed",
         "Public reporting cadence is slower than real-time dashboards",
         "Should not be mixed with point-estimate or percentile reporting"
@@ -26,10 +27,26 @@
       "best_for": [
         "Methodology documentation",
         "System-level interpretation",
-        "Cross-province ontology comparison"
+        "Repository mapping audit; not source-faithful cross-province comparison until revalidation"
       ]
     }
   ],
+  "methodology_revalidation": {
+    "status": "required",
+    "verified_on": "2026-07-10",
+    "official_source_url": "https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments",
+    "official_indicator_definition": {
+      "start": "triage or registration, whichever is earlier",
+      "end": "first assessment by a doctor, nurse practitioner, physician assistant, or dentist",
+      "statistic_type": "MEAN"
+    },
+    "repository_mapping": {
+      "start_event": "TRIAGE",
+      "end_event": "PHYSICIAN",
+      "status": "LEGACY_IMPLEMENTATION_TAGS_PENDING_REVALIDATION"
+    },
+    "resolution_required": "Owner-reviewed ontology and historical measurement migration or versioning decision"
+  },
   "telehealth": {
     "name": "Health811",
     "phone": "811",
@@ -70,35 +87,36 @@
         "description": "Condition may be treated elsewhere"
       }
     ],
-    "note": "Ontario wait-time reporting in this repository is mapped to TRIAGE -> PHYSICIAN."
+    "note": "Ontario wait-time reporting is currently mapped to TRIAGE -> PHYSICIAN as legacy implementation tags; the official composite event boundaries require revalidation."
   },
   "comparability": {
     "within_province": {
       "ontario_vs_ontario": {
         "compatible": true,
-        "reason": "Same maintained source and ontology definition (MEAN TRIAGE -> PHYSICIAN)."
+        "reason": "Current repository tags match within the maintained source, but fidelity to the official composite event boundaries remains unresolved."
       }
     },
     "cross_province_examples": {
       "ontario_vs_alberta": {
         "compatible": false,
-        "reason": "Same metric and event boundaries, but statistic_type differs (MEAN vs POINT_ESTIMATE).",
+        "reason": "Current repository tags share metric and event values, but statistic_type differs (MEAN vs POINT_ESTIMATE) and Ontario event fidelity remains under revalidation.",
         "severity": "partial"
       },
       "ontario_vs_bc": {
         "compatible": false,
-        "reason": "Same metric and event boundaries, but statistic_type differs (MEAN vs P90).",
+        "reason": "Current repository tags share metric and event values, but statistic_type differs (MEAN vs P90) and Ontario event fidelity remains under revalidation.",
         "severity": "partial"
       },
       "ontario_vs_quebec": {
         "compatible": false,
-        "reason": "Different start_event and statistic_type (TRIAGE/MEAN vs REGISTRATION/ROLLING_AVG).",
+        "reason": "Current repository tags differ on start_event and statistic_type, while the official Ontario composite start and provider endpoint are not yet represented exactly.",
         "severity": "partial",
-        "divergence_brief": "Methodology Divergence: Direct comparison is scientifically invalid. Different start points: TRIAGE vs REGISTRATION. Different statistics: MEAN vs ROLLING_AVG."
+        "divergence_brief": "Methodology Divergence: Direct comparison is scientifically invalid. Ontario event tags require source-fidelity revalidation, and the reported statistics differ (MEAN vs ROLLING_AVG)."
       }
     }
   },
   "validation_checklist": [
+    "Treat Ontario event tags as legacy implementation values until methodology revalidation is resolved",
     "Hospital ID follows format ca-on-{city}-{hospital-slug}",
     "source_id is ontario-health",
     "metric_family is TIME_TO_PROVIDER",
@@ -116,8 +134,8 @@
       "type": "official"
     },
     {
-      "title": "Health Quality Ontario - Emergency Department Performance Methodology",
-      "url": "https://www.hqontario.ca/System-Performance/Emergency-Department-Performance",
+      "title": "Ontario - Time Spent in the Emergency Department",
+      "url": "https://www.ontario.ca/page/time-spent-emergency-department",
       "type": "official"
     },
     {

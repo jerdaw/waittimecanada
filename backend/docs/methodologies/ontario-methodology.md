@@ -1,27 +1,51 @@
 # Ontario Emergency Department Wait Time Methodology
 
+> [!WARNING]
+> **Ontario methodology revalidation required.** The repository currently uses
+> `TRIAGE -> PHYSICIAN` as legacy implementation tags. The official Ontario
+> Health indicator instead starts at triage or registration, whichever is
+> earlier, and ends at the first assessment by a doctor, nurse practitioner,
+> physician assistant, or dentist. The current
+> ontology cannot represent that composite start exactly. Until the ontology
+> and historical-data treatment are resolved together, do not treat the
+> repository event tags as an exact transcription of the official definition.
+>
+> Official definition:
+> <https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments>
+
 ## Executive Summary
 
-Wait Time Canada currently models Ontario from the maintained
-`ontario-health` source definition and the live Ontario scraper:
+Wait Time Canada currently implements the maintained `ontario-health` source
+with these tags:
 
-- source: Health Quality Ontario
-- ontology: `TIME_TO_PROVIDER`, `TRIAGE -> PHYSICIAN`, `MEAN`
+- metric family: `TIME_TO_PROVIDER`
+- start event: `TRIAGE`
+- end event: `PHYSICIAN`
+- statistic type: `MEAN`
 - patient scope: `ALL`
 - refresh posture: historical public reporting, not a live operational feed
 
-This means Ontario should be interpreted as a published average wait-time
-measure, not as a point estimate and not as a percentile metric.
+The `MEAN` statistic and `TIME_TO_PROVIDER` family remain consistent with the
+current official indicator. The event tags are implementation values pending
+revalidation, not source-faithful definitions.
 
-## Source Definition
+## Official Indicator Definition
 
-- Source ID: `ontario-health`
-- Display name: Health Quality Ontario
-- URL: `https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments`
-- Methodology URL: `https://www.hqontario.ca/System-Performance/Emergency-Department-Performance`
-- Telehealth routing: `Health811` (`811`)
+Ontario Health currently defines the average time to first assessment as:
 
-## Ontology Mapping
+- **Start:** triage or registration, whichever is earlier.
+- **End:** the first assessment by a doctor, nurse practitioner,
+  physician assistant, or dentist.
+- **Statistic:** average time, calculated from total wait time divided by the
+  count of eligible emergency department visits.
+- **Scope:** all eligible unscheduled emergency department visits, subject to
+  the published inclusion and exclusion rules.
+- **Refresh:** monthly.
+
+This definition was revalidated against the official indicator page on
+2026-07-10.
+
+## Current Repository Mapping
 
 ```text
 metric_family: TIME_TO_PROVIDER
@@ -29,119 +53,96 @@ start_event: TRIAGE
 end_event: PHYSICIAN
 statistic_type: MEAN
 patient_scope: ALL
+mapping_status: LEGACY_IMPLEMENTATION_TAGS_PENDING_REVALIDATION
 ```
 
-### Interpretation
+This block documents current behavior only. It is not the recommended target
+mapping for the official composite indicator.
 
-#### Metric Family: `TIME_TO_PROVIDER`
+### Fidelity Gap
 
-Ontario reports the time until a patient is first seen by a physician in the
-emergency department. This is not a total length-of-stay metric.
+The existing `StartEvent` values can represent `TRIAGE` or `REGISTRATION`, but
+not "whichever is earlier." The existing `EndEvent.PROVIDER` may be closer to
+the official endpoint than `PHYSICIAN`, but changing only that field would not
+resolve the composite start, historical measurements, or versioning. A partial
+tag change would create a misleading split in one source's measurement history.
 
-#### Start Event: `TRIAGE`
+## Source Definition
 
-The reporting clock begins after triage assessment, not at registration and not
-at the front door.
+- Source ID: `ontario-health`
+- Current display name: `Health Quality Ontario`
+- Public data and methodology URL:
+  <https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments>
+- Public context:
+  <https://www.ontario.ca/page/time-spent-emergency-department>
+- Telehealth routing: `Health811` (`811`)
 
-#### End Event: `PHYSICIAN`
-
-The reporting clock stops at first physician assessment.
-
-#### Statistic Type: `MEAN`
-
-Ontario is currently documented in this repository as an arithmetic mean of the
-relevant wait-time observations for the reporting period. This is distinct from:
-
-- Alberta's `POINT_ESTIMATE`
-- British Columbia's `P90`
-- Quebec's `ROLLING_AVG`
-
-#### Patient Scope: `ALL`
-
-Ontario measurements in this repository are tagged to the full reporting cohort
-rather than a narrowed acuity subset.
+The source catalog still contains the legacy display name, event tags, and
+methodology URL. Those runtime/data changes are intentionally outside this
+containment pass because they require a migration and compatibility decision.
 
 ## Comparability Notes
 
+Direct cross-province comparison remains invalid.
+
 ### Within Ontario
 
-Ontario-to-Ontario comparisons are directly comparable when they come from the
-same maintained source definition because all four ontology dimensions match.
+Ontario records using the same current repository tags are implementation-tag
+compatible with one another. That does not prove that the event fields exactly
+describe the current official indicator.
 
-### Ontario vs Alberta
+### Cross-Province Comparisons
 
-- shared dimensions: `TIME_TO_PROVIDER`, `TRIAGE`, `PHYSICIAN`
-- divergence: `MEAN` vs `POINT_ESTIMATE`
-- verdict: partial alignment only, not directly comparable
+No direct cross-province performance conclusion is valid while:
 
-### Ontario vs British Columbia
+1. the provincial statistic types differ; or
+2. the Ontario event mapping does not faithfully encode its official source.
 
-- shared dimensions: `TIME_TO_PROVIDER`, `TRIAGE`, `PHYSICIAN`
-- divergence: `MEAN` vs `P90`
-- verdict: partial alignment only, not directly comparable
+The current platform still produces divergence for Ontario versus Alberta,
+British Columbia, and Quebec. That safety outcome must be preserved. Public
+documents must not claim exact event-boundary alignment or mismatch from the
+legacy Ontario tags until revalidation is complete.
 
-### Ontario vs Quebec
+### Safe Divergence Brief
 
-- shared dimensions: `TIME_TO_PROVIDER`, `PHYSICIAN`
-- divergence: `TRIAGE` vs `REGISTRATION`, `MEAN` vs `ROLLING_AVG`
-- verdict: partial alignment only, not directly comparable
-
-### Example Divergence Brief
-
-> Methodology Divergence: Direct comparison is scientifically invalid. Different
-> start points: TRIAGE vs REGISTRATION. Different statistics: MEAN vs
-> ROLLING_AVG.
+> Methodology Divergence: Direct comparison is invalid. Ontario event tags
+> require source-fidelity revalidation, and the provincial reporting statistics
+> or event definitions are not fully aligned.
 
 ## Implementation Reference
 
-The Ontario scraper and source factory are the canonical implementation points.
+Current behavior is defined by:
 
-```python
-SOURCE = Source(
-    id="ontario-health",
-    name="Health Quality Ontario",
-    province="ON",
-    url="https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments",
-    methodology_url="https://www.hqontario.ca/System-Performance/Emergency-Department-Performance",
-    telehealth_name="Health811",
-    telehealth_number="811",
-    default_metric_family=MetricFamily.TIME_TO_PROVIDER,
-    default_start_event=StartEvent.TRIAGE,
-    default_end_event=EndEvent.PHYSICIAN,
-    default_statistic_type=StatisticType.MEAN,
-)
-```
+- `backend/data/sources/ontario-health.json`
+- `backend/src/waittime/scrapers/ontario.py`
+- source seeding and existing database rows
 
-Ontario measurements should be created with the same ontology values:
+The current implementation continues to emit `TRIAGE`, `PHYSICIAN`, and
+`MEAN`. Do not change one surface in isolation. The follow-up must address:
 
-```python
-measurement = Measurement(
-    hospital_id="ca-on-example",
-    value=180,
-    metric_family=MetricFamily.TIME_TO_PROVIDER,
-    start_event=StartEvent.TRIAGE,
-    end_event=EndEvent.PHYSICIAN,
-    statistic_type=StatisticType.MEAN,
-    patient_scope=PatientScope.ALL,
-    source_id="ontario-health",
-    raw_payload_hash="...",
-)
-```
+- the composite start representation;
+- the broader provider endpoint;
+- existing source rows and historical measurements;
+- parser/source versioning;
+- comparability and divergence text; and
+- frontend methodology labels.
 
 ## Validation Checklist
 
-- source ID is `ontario-health`
-- `metric_family` is `TIME_TO_PROVIDER`
-- `start_event` is `TRIAGE`
-- `end_event` is `PHYSICIAN`
-- `statistic_type` is `MEAN`
-- `patient_scope` is `ALL`
-- telehealth routing remains `Health811` / `811`
+- The documentation distinguishes official methodology from repository tags.
+- The official Ontario Health definition and URL are current.
+- Current runtime tags remain unchanged during containment.
+- Cross-province direct comparison remains blocked.
+- A migration/versioning plan exists before any runtime mapping change.
+- Telehealth routing remains `Health811` / `811`.
 
 ## References
 
-1. Health Quality Ontario ED performance reporting
-2. Ontario emergency department performance methodology page
-3. Wait Time Canada source catalog: `backend/data/sources/ontario-health.json`
+1. [Ontario Health — Time Spent in Emergency Departments](https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments)
+2. [Ontario — Time Spent in the Emergency Department](https://www.ontario.ca/page/time-spent-emergency-department)
+3. Wait Time Canada structured reference:
+   `backend/docs/methodologies/ontario-reference.json`
+4. Wait Time Canada source catalog:
+   `backend/data/sources/ontario-health.json`
 
-Last updated: 2026-04-16
+Last revalidated: 2026-07-10

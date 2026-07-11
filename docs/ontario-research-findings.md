@@ -6,6 +6,18 @@
 
 > Implementation note (2026-07-08): the production Ontario scraper no longer uses Playwright. The current runtime fetches the Ontario Health reporting page directly over HTTP, follows the former HQOntario redirect chain, and parses the embedded HTML tables because the needed table content is available server-side.
 
+> [!WARNING]
+> **Ontario methodology revalidation required.** The event-boundary conclusions
+> in this historical discovery note predate the current official definition.
+> Ontario Health defines the indicator from triage or registration, whichever
+> is earlier, to the first assessment by a doctor, nurse practitioner,
+> physician assistant, or dentist. The repository still
+> uses `TRIAGE -> PHYSICIAN` as legacy implementation tags pending an ontology
+> and historical-data decision.
+>
+> Official definition:
+> <https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments>
+
 ---
 
 ## Data Source Options
@@ -90,31 +102,26 @@
 
 ## Methodology Documentation
 
-Based on the Health Quality Ontario methodology page:
+### Correction (2026-07-10)
 
-**Metric Family:** `TIME_TO_PROVIDER`
-- Measures wait time until first assessment by doctor
+The original discovery conclusion that the official clock is strictly
+`TRIAGE -> PHYSICIAN` is no longer supported by the current Ontario Health
+indicator definition.
 
-**Start Event:** `TRIAGE`
-- Clock starts after triage assessment
-- Per CIHI NACRS definition
+The official indicator currently specifies:
 
-**End Event:** `PHYSICIAN`
-- Clock stops at first physician assessment
-- Not NP/PA - must be MD
+- **Metric family:** time to first qualifying provider assessment.
+- **Start:** triage or registration, whichever is earlier.
+- **End:** first assessment by a doctor, nurse practitioner,
+  physician assistant, or dentist.
+- **Statistic:** arithmetic average (`MEAN`).
+- **Reporting cadence:** monthly.
 
-**Statistic Type:** `MEAN`
-- "Average (Hours)" per Ontario Health reporting
-- NOT P90 (unlike Alberta)
-- Important distinction for comparability
-
-**Patient Scope:** `ALL`
-- All patients regardless of CTAS level
-- Includes 1-5 acuity levels
-
-**Data Freshness:**
-- Updated monthly (not real-time)
-- Shows average over previous month
+The repository continues to emit `TIME_TO_PROVIDER`, `TRIAGE`, `PHYSICIAN`,
+`MEAN`, and `ALL` as its current implementation mapping. Those event values are
+legacy tags pending a combined ontology, historical-data, source-versioning,
+and UI decision; they must not be presented as an exact transcription of the
+official source.
 
 ---
 
