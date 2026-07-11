@@ -298,7 +298,6 @@ Expected: commit succeeds with no non-human attribution trailer.
 - Modify: `docs/planning/manual-tasks.md`
 - Modify: `docs/planning/roadmap-process.md`
 - Modify: `README.md`
-- Modify: `docs/superpowers/specs/2026-07-10-roadmap-optimization-design.md`
 
 **Interfaces:**
 - Consumes: the checker and allowed values introduced in Task 1.
@@ -332,7 +331,27 @@ Expected: the focused tests fail because the current roadmap still contains lega
 
 In `docs/planning/roadmap.md`:
 
-1. Rename `## Current Status` to `## Current Snapshot` and replace its chronology with a concise snapshot that mentions Milestone 33, four-province scope, Ontario-first resources, stewardship/selective expansion, and the trusted source-freshness pilot.
+1. Replace the current status chronology with this exact snapshot:
+
+```markdown
+## Current Snapshot (Updated 2026-07-10)
+
+**Progress:** Milestone 33 is complete. Wait Time Canada is in a stewardship
+and selective-expansion phase.
+
+The observatory covers Ontario, Quebec, Alberta, and British Columbia while
+preserving each source's methodology and exposing invalid direct comparisons.
+Historical occupancy aggregation and the Ontario-first public-health resources
+module are live. Repository-side reliability, documentation, migration, and
+offloaded-operations contracts are implemented.
+
+The immediate delivery focus is the trusted source-freshness offload pilot.
+Runner provisioning, protected credential configuration, live command
+validation, schedule cutover, and the 24-hour proof window remain external
+operator work. GitHub manual dispatch remains the fallback until that evidence
+is accepted.
+```
+
 2. Promote the existing completed-foundations list to `## Completed Foundations`, retaining PR #89's offloaded-operations acceptance-control bullet.
 3. Remove `## Public Documentation Boundary`, `## Active Priorities`, `## Active Roadmap`, `## Roadmap Operating Model`, and `## Future Work` as separate duplicate sections.
 4. Insert these canonical sections before `## Completed Milestones`:
@@ -437,25 +456,89 @@ existing safety review checklist:
 
 - [ ] **Step 5: Align the roadmap process document**
 
-Replace `docs/planning/roadmap-process.md` with concise rules covering:
-
-- the six-section structure from the approved design;
-- continuous guardrails as non-checkbox invariants;
-- the exact execution-table columns and allowed state values;
-- typed manual tasks and trigger wording;
-- snapshot updates only for public state changes rather than session logs;
-- moving completed outcomes into foundations, milestones, or durable records;
-- README baseline-date alignment; and
-- public safety, methodology, and documentation boundaries.
-
-Include this exact execution-state definition:
+Replace `docs/planning/roadmap-process.md` with:
 
 ```markdown
+# Roadmap Process
+
+`docs/planning/roadmap.md` is the single public source of truth for project
+status and strategic direction. `docs/planning/manual-tasks.md` is its companion
+for human decisions, external operations, recurring reviews, and conditional
+follow-ups.
+
+## Canonical Structure
+
+Keep roadmap sections in this order:
+
+1. `Current Snapshot`
+2. `Completed Foundations`
+3. `Continuous Guardrails`
+4. `Execution Queue`
+5. `Completed Milestones`
+6. architecture, ADR, schema, and historical implementation references
+
+Do not add a second active-priority list or repeat the execution queue in
+README. Historical session chronology belongs in maintenance records, closed
+plans, and Git history.
+
+## Current Snapshot
+
+Update the snapshot only when public project state changes. Keep it concise,
+mention the latest completed milestone, and align its `YYYY-MM-DD` date with
+README's roadmap baseline and Current Status dates. Do not append session logs.
+
+## Continuous Guardrails
+
+Guardrails are permanent invariants, not finite tasks. Use ordinary bullets,
+never task-list checkboxes. Preserve clinical safety, ontology comparability,
+source provenance, freshness visibility, retention, cost controls, and the
+public/private documentation boundary.
+
+## Execution Queue
+
+Use one Markdown table with columns in this exact order:
+
+| Priority | Outcome | State | Gate | Done when |
+| --- | --- | --- | --- | --- |
+
+Allowed priorities are `P0`, `P1`, and `P2`. Every row must name a finite
+outcome, its current state, the dependency or decision gate, and an observable
+completion condition.
+
+Allowed states:
+
 - `Ready`: repository work can start without a missing decision or external prerequisite.
 - `Decision required`: an owner-approved product, methodology, legal, or data decision is missing.
 - `External prerequisite`: credentials, infrastructure, an official source, or another external state is missing.
 - `In validation`: implementation exists and an observation or acceptance window is active.
 - `Later`: the trigger for reconsideration has not occurred.
+
+Do not invent owner names or dates when work is gated. Use state and gate to
+make the dependency explicit.
+
+## Manual Task Ledger
+
+Group manual tasks under `Decision Required`, `External Operations`, `Recurring
+Reviews`, `Conditional Follow-Ups`, or `Completed Repository Prerequisites`.
+State the trigger for recurring and conditional work. Link to the roadmap
+outcome or public contract rather than restating a competing backlog.
+
+## Lifecycle
+
+- When a finite outcome is completed, move its durable result to Completed
+  Foundations, Completed Milestones, or the appropriate historical record.
+- Keep operator work open until its observable acceptance evidence exists.
+- Archive closed implementation plans that are no longer living records.
+- Update README status dates only when the roadmap's public baseline changes.
+- Run `backend/scripts/verify_roadmap_consistency.py` and
+  `scripts/check-docs.sh` for every roadmap change.
+
+## Public Alignment
+
+Every roadmap update must preserve non-medical-advice and non-triage boundaries,
+the four-field direct-comparison rule, official-source attribution, methodology
+limitations, and separation of public reproducible guidance from private
+operations detail.
 ```
 
 - [ ] **Step 6: Remove README's duplicate backlog**
@@ -503,8 +586,7 @@ git add README.md \
   backend/tests/unit/test_verify_roadmap_consistency.py \
   docs/planning/roadmap.md \
   docs/planning/manual-tasks.md \
-  docs/planning/roadmap-process.md \
-  docs/superpowers/specs/2026-07-10-roadmap-optimization-design.md
+  docs/planning/roadmap-process.md
 git commit -m "docs: optimize roadmap execution model"
 ```
 
