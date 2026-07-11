@@ -309,9 +309,18 @@ def check_execution_roadmap_structure(roadmap_path: Path) -> tuple[bool, str]:
     if len(queue_sections) != 1:
         issues.append("expected exactly one '## Execution Queue' section")
     else:
-        table_lines = [
-            line.strip() for line in queue_sections[0].splitlines() if line.strip().startswith("|")
-        ]
+        section_lines = queue_sections[0].splitlines()
+        table_start = next(
+            (index for index, line in enumerate(section_lines) if line.strip().startswith("|")),
+            None,
+        )
+        table_lines: list[str] = []
+        if table_start is not None:
+            for line in section_lines[table_start:]:
+                stripped_line = line.strip()
+                if not stripped_line:
+                    break
+                table_lines.append(stripped_line)
         if len(table_lines) < 3:
             issues.append("Execution Queue must contain a header, separator, and row")
         elif tuple(_table_cells(table_lines[0])) != EXECUTION_COLUMNS:
@@ -320,6 +329,9 @@ def check_execution_roadmap_structure(roadmap_path: Path) -> tuple[bool, str]:
             issues.append("Execution Queue must use a valid Markdown separator row")
         else:
             for row_number, line in enumerate(table_lines[2:], start=1):
+                if not line.startswith("|") or not line.endswith("|"):
+                    issues.append(f"Execution Queue row {row_number} must start and end with '|'")
+                    continue
                 cells = _table_cells(line)
                 if len(cells) != len(EXECUTION_COLUMNS):
                     issues.append(f"Execution Queue row {row_number} has the wrong column count")

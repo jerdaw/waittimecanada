@@ -331,6 +331,19 @@ def test_execution_structure_rejects_wrong_columns(tmp_path: Path) -> None:
     assert "columns" in message
 
 
+def test_execution_structure_rejects_row_without_leading_pipe(tmp_path: Path) -> None:
+    content = VALID_EXECUTION_ROADMAP.replace(
+        "| P2 | Evaluate expansion | Decision required | Official source selected | Provenance and tests are merged |",
+        "P2 | Evaluate expansion | Decision required | Official source selected | Provenance and tests are merged |",
+    )
+    roadmap_path = _write_execution_roadmap(tmp_path, content)
+
+    success, message = check_execution_roadmap_structure(roadmap_path)
+
+    assert success is False
+    assert "must start and end with '|'" in message
+
+
 def test_execution_structure_rejects_invalid_separator(tmp_path: Path) -> None:
     content = VALID_EXECUTION_ROADMAP.replace(
         "| --- | --- | --- | --- | --- |",
