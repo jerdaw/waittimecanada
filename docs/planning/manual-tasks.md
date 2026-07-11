@@ -31,9 +31,11 @@ from public documentation.
 - [ ] Restore remaining scheduled operational workflows incrementally after the
   trusted source-freshness offload pilot succeeds; keep manual dispatch as the
   fallback path.
-- [ ] Before moving scraper cron or public-health ingest off GitHub, document
-  runner isolation, secret handling, log retention, failure summaries, and
-  rollback steps in the private/shared operations source of truth.
+- [x] Runner isolation, secret handling, log retention, failure-summary, and
+  rollback requirements are documented in
+  `docs/operations/heartbeat-offload-pilot.md`, with the concrete operator
+  procedure in the private/shared operations source of truth. Live runner
+  selection, validation, and cutover remain open in the pilot task above.
 - [ ] Capture updated demo screenshots after major frontend changes.
 - [ ] Refresh public case studies when source methodology or displayed examples
   change.

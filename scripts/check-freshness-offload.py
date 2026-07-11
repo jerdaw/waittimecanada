@@ -136,6 +136,15 @@ def validate(root: Path) -> list[str]:
             "GitHub `workflow_dispatch`",
             "Remove GitHub scheduled triggers only after",
             "24-hour soak",
+            "## Runner Isolation",
+            "## Secret Handling",
+            "## Log Retention",
+            "## Failure Summaries",
+            "## Rollback Procedure",
+            "approved revision",
+            "job name, approved revision, exit code",
+            "Rollback is schedule-level, not data repair.",
+            "private/shared operations source of truth",
         ]:
             _require(offload_doc, required_phrase, str(OFFLOAD_DOC), failures)
 
