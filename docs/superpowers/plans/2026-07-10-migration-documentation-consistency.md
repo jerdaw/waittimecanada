@@ -4,7 +4,7 @@
 
 **Goal:** Reconcile the canonical migration README with the files on disk and extend the existing migration guard so inventory, count, next-prefix, and placeholder drift fails CI.
 
-**Status:** Complete; PR #84 is open, ready, and intentionally unmerged
+**Status:** Complete; PR #84 merged on 2026-07-10
 
 **Architecture:** Keep filename validation in `validate_migrations()` and add an independently callable `validate_migration_documentation()` beside it. The new validator derives facts from migration filenames, parses only exact migration history headings and two canonical README statements, and returns actionable errors without modifying files. The existing CLI aggregates both validation groups.
 
@@ -20,7 +20,9 @@
 - Reject whole-word `TODO` and `TBD` placeholders in `backend/migrations/README.md`; Markdown task-list checkboxes remain valid.
 - Keep `validate_migrations()` independently callable without implicit README validation.
 - Keep the Ontario methodology and ontology decision out of scope.
-- Do not merge the resulting PR because its documentation paths trigger deployment on `main`.
+- During implementation, hold the PR at the pre-approval boundary because its
+  documentation paths trigger deployment on `main`. The user's later explicit
+  merge and deployment approval superseded that boundary.
 
 ---
 
@@ -574,7 +576,8 @@ git commit -m "docs: reconcile migration history"
 
 **Interfaces:**
 - Consumes: completed checker, tests, README, and maintenance note
-- Produces: exact verification evidence and a ready unmerged pull request
+- Produces: exact verification evidence and a ready pull request held at the
+  pre-approval boundary
 
 - [x] **Step 1: Run backend quality and test gates**
 
@@ -625,7 +628,7 @@ Review the complete range from `main` to `HEAD` for correctness, security,
 test coverage, documentation accuracy, scope control, and preservation of the
 legacy duplicate-`020` behavior. Re-run affected checks after any correction.
 
-- [x] **Step 6: Push and open a ready PR without merging**
+- [x] **Step 6: Push and open a ready PR at the pre-approval boundary**
 
 ```bash
 git push -u origin codex/migration-docs-consistency
@@ -646,18 +649,19 @@ gh pr create \
 - documentation quality checks
 
 ## Delivery boundary
-This PR is ready for review but intentionally unmerged because its documentation paths trigger deployment on `main`.
+This PR was held for review at the pre-approval boundary because its
+documentation paths trigger deployment on `main`.
 EOF
 ```
 
-The PR body must summarize the guard, README reconciliation, tests, and
-non-deployment boundary. Do not merge because `docs/**` changes trigger the
-documentation deployment workflow on `main`.
+The PR body had to summarize the guard, README reconciliation, tests, and
+non-deployment boundary. At this stage, the PR was held because `docs/**`
+changes trigger the documentation deployment workflow on `main`.
 
 - [x] **Step 7: Verify the exact pushed head and PR checks**
 
 Use `gh pr view` and `gh pr checks` to confirm the PR head SHA equals local
-`HEAD`, all required checks pass, and the PR remains open and unmerged.
+`HEAD`, all required checks pass, and record its pre-approval delivery state.
 
 ## Verification Evidence
 
@@ -737,4 +741,13 @@ isolated Windows Python 3.12 environment for focused tests and exact-file
 Windows Git staging; hooks were bypassed for those commits only. Fresh CI on
 the pushed final head is required before delivery is considered verified. No
 database operation, deployment, release, secret access, or production write
-occurred.
+occurred during implementation.
+
+## Post-Merge Verification
+
+After explicit user authorization, PR #84 was squash-merged as
+`2a88939c8ac744179e840c240f542bc0bd8cbc5c`. Post-merge Scraper CI run
+`29135462236`, Deploy Docs run `29135462245`, Database Migrations run
+`29135462251`, and Docs CI run `29135462281` all completed successfully. The
+database workflow reported migration `022_update_ontario_health_source_url.sql`
+as already applied and made no new schema change.
