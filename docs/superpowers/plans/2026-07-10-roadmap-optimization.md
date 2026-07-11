@@ -602,7 +602,7 @@ Expected: pre-commit checks pass and the commit contains no secret or non-human 
 
 ### Task 3: Full Verification, Review, And Stacked Delivery
 
-**Status:** Implementation verified; awaiting broad review.
+**Status:** Ready for stacked delivery.
 
 **Files:**
 - Modify: `docs/superpowers/plans/2026-07-10-roadmap-optimization.md`
@@ -658,10 +658,10 @@ and only this plan's final evidence update remains uncommitted.
   `git diff --check
   3c2f363c12965bd2b5cb28d2c14610176483f904...HEAD` produced no output, and
   the pre-update status was clean on `codex/roadmap-optimization`.
-- Independent review, plan closure, push, PR creation, exact-head remote
-  verification, rebase, merge, and post-merge verification remain pending.
+- Push, PR creation, exact-head remote verification, rebase, merge, and
+  post-merge verification remain pending.
 
-- [ ] **Step 3: Request independent review**
+- [x] **Step 3: Request independent review**
 
 Review the complete base-to-head diff for:
 
@@ -677,14 +677,41 @@ Review the complete base-to-head diff for:
 Fix every Critical or Important finding, rerun affected checks, and record the
 review result in this plan.
 
-- [ ] **Step 4: Close the plan record**
+**Final review and fix evidence (2026-07-10):**
+
+- The complete stacked diff received a clean broad re-review with no Critical,
+  Important, or Minor findings. The review assessed the branch as ready for
+  stacked delivery and found no loss of PR #89 hardening, private operational
+  detail leakage, misleading dependencies, duplicated backlog, validator gap,
+  clinical-safety weakening, ontology weakening, or scope/test omission.
+- Review follow-up commit `3b82dca3` tightened indented/list-marker guardrail
+  detection, rejected multiple execution-queue tables, corrected the unstarted
+  offload pilot to `External prerequisite`, and linked manual tasks to their
+  canonical queue or public contract. Its changed surface is two Python files
+  plus `docs/planning/roadmap.md` and `docs/planning/manual-tasks.md`.
+- RED covered six missing validator cases: four additional indented checkbox
+  list-marker forms and two placements of a second queue table. GREEN and the
+  final fresh focused run collected 30 tests and passed all 30 in 0.12s.
+- Changed-file Ruff verification reported `2 files already formatted` and
+  `All checks passed!`; the roadmap CLI passed all seven registered checks.
+  All 11 documentation gates passed, the locked strict MkDocs build completed
+  in 2.19s, and the base-to-head whitespace check produced no output.
+- README's hourly source-refresh statement was retained after confirming the
+  checked-in enabled scraper schedule runs at `29 * * * *` and retains manual
+  dispatch. This verifies repository configuration, not production run history.
+- The earlier full backend verification remains **623 passed, 27 skipped**,
+  with mypy clean across 49 source files and Bandit reporting no issues across
+  11,435 lines. The unchanged stacked-base Ruff exception remains documented
+  above; all changed Python files pass scoped format and lint checks.
+
+- [x] **Step 4: Close the plan record**
 
 Mark all completed implementation and verification boxes, set status to
 `Ready for stacked delivery`, and add exact RED/GREEN, full-suite, docs-build,
 review, and changed-surface evidence. Keep merge/post-merge actions unchecked
 until they actually occur.
 
-- [ ] **Step 5: Commit the plan record**
+- [x] **Step 5: Commit the plan record**
 
 ```bash
 git add docs/superpowers/plans/2026-07-10-roadmap-optimization.md
