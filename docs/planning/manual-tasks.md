@@ -8,18 +8,20 @@ from public documentation.
 ## Decision Required
 
 - [ ] Resolve the Ontario methodology representation before changing runtime
-  tags or treating paused Ontario research artifacts as current. Use the exact
-  decision scope in the roadmap execution queue.
+  tags or treating paused Ontario research artifacts as current. Apply the
+  decision scope and gate in the [roadmap execution queue](roadmap.md#execution-queue).
 
 ## External Operations
 
 - [ ] Complete the trusted source-freshness offload pilot using
-  `docs/operations/heartbeat-offload-pilot.md`; keep GitHub manual dispatch as
-  fallback.
+  the [public offload contract](../operations/heartbeat-offload-pilot.md); keep
+  GitHub manual dispatch as fallback.
 - [ ] After the first complete 24-hour proof window, compare workflow history,
-  `/api/status`, and `/api/data-quality` with the accepted cadence.
+  `/api/status`, and `/api/data-quality` with the acceptance checks in the
+  [public offload contract](../operations/heartbeat-offload-pilot.md).
 - [ ] Restore remaining scheduled workflows only after the proof window and
-  rollback evidence are accepted.
+  rollback evidence satisfy the gate in the
+  [roadmap execution queue](roadmap.md#execution-queue).
 
 ## Recurring Reviews
 

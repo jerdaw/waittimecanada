@@ -63,7 +63,7 @@ is accepted.
 
 | Priority | Outcome | State | Gate | Done when |
 | --- | --- | --- | --- | --- |
-| P1 | Complete the trusted source-freshness offload pilot | In validation | Merge the public contract and private companion, provision a trusted runner, and configure protected credentials outside this repository | Manual scraper, watchdog, aggregate, and smoke checks pass; timers complete a clean 24-hour soak with fallback retained |
+| P1 | Complete the trusted source-freshness offload pilot | External prerequisite | Merge the public contract and private companion, provision a trusted runner, and configure protected credentials outside this repository | Manual scraper, watchdog, aggregate, and smoke checks pass; timers complete a clean 24-hour soak with fallback retained |
 | P1 | Restore remaining scheduled workflow cadence | External prerequisite | Accept the offload proof window and value-free rollback evidence | Reviewed schedules run at the intended cadence and GitHub `workflow_dispatch` remains available |
 | P1 | Resolve Ontario methodology representation | Decision required | Decide the composite start, qualifying-provider endpoint, historical migration or versioning, source metadata, divergence behavior, and frontend labels together | Runtime tags, historical treatment, public methodology text, and regression tests implement one reviewed decision |
 | P1 | Extend public methodology artifacts | Decision required | Complete Ontario revalidation or verify another official methodology change | Case studies and export examples carry current definitions, provenance, limitations, and comparison warnings |

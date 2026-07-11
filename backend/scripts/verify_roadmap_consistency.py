@@ -290,6 +290,22 @@ def _is_table_separator(line: str) -> bool:
     )
 
 
+def _markdown_table_blocks(section: str) -> list[list[str]]:
+    """Return every block of consecutive pipe-delimited lines in a section."""
+    blocks: list[list[str]] = []
+    current_block: list[str] = []
+    for line in section.splitlines():
+        stripped_line = line.strip()
+        if stripped_line.startswith("|"):
+            current_block.append(stripped_line)
+        elif current_block:
+            blocks.append(current_block)
+            current_block = []
+    if current_block:
+        blocks.append(current_block)
+    return blocks
+
+
 def check_execution_roadmap_structure(roadmap_path: Path) -> tuple[bool, str]:
     """Validate permanent guardrails and the finite execution queue."""
     content = roadmap_path.read_text(encoding="utf-8")
@@ -302,7 +318,11 @@ def check_execution_roadmap_structure(roadmap_path: Path) -> tuple[bool, str]:
     guardrail_sections = _section_bodies(content, "Continuous Guardrails")
     if len(guardrail_sections) != 1:
         issues.append("expected exactly one '## Continuous Guardrails' section")
-    elif re.search(r"^- \[[ xX]\] ", guardrail_sections[0], re.MULTILINE):
+    elif re.search(
+        r"^[ \t]*(?:[-*+]|\d+[.)])[ \t]+\[[ xX]\][ \t]+",
+        guardrail_sections[0],
+        re.MULTILINE,
+    ):
         issues.append("Continuous Guardrails must not contain task-list checkboxes")
 
     queue_sections = _section_bodies(content, "Execution Queue")
@@ -310,6 +330,11 @@ def check_execution_roadmap_structure(roadmap_path: Path) -> tuple[bool, str]:
         issues.append("expected exactly one '## Execution Queue' section")
     else:
         section_lines = queue_sections[0].splitlines()
+        table_blocks = _markdown_table_blocks(queue_sections[0])
+        if len(table_blocks) != 1:
+            issues.append(
+                f"Execution Queue must contain exactly one table; found {len(table_blocks)}"
+            )
         table_start = next(
             (index for index, line in enumerate(section_lines) if line.strip().startswith("|")),
             None,

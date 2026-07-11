@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from scripts.verify_roadmap_consistency import (
     check_execution_roadmap_structure,
     check_readme_status_alignment,
@@ -302,10 +304,18 @@ def test_execution_structure_rejects_legacy_active_sections(tmp_path: Path) -> N
     assert "legacy section" in message
 
 
-def test_execution_structure_rejects_guardrail_checkboxes(tmp_path: Path) -> None:
-    content = VALID_EXECUTION_ROADMAP.replace(
-        "- Preserve clinical safety.", "- [ ] Preserve clinical safety."
-    )
+@pytest.mark.parametrize(
+    "task_item",
+    (
+        "- [ ] Preserve clinical safety.",
+        "  * [x] Preserve clinical safety.",
+        "    + [X] Preserve clinical safety.",
+        "1. [ ] Preserve clinical safety.",
+        "  1) [x] Preserve clinical safety.",
+    ),
+)
+def test_execution_structure_rejects_guardrail_checkboxes(tmp_path: Path, task_item: str) -> None:
+    content = VALID_EXECUTION_ROADMAP.replace("- Preserve clinical safety.", task_item)
     roadmap_path = _write_execution_roadmap(tmp_path, content)
 
     success, message = check_execution_roadmap_structure(roadmap_path)
@@ -313,6 +323,29 @@ def test_execution_structure_rejects_guardrail_checkboxes(tmp_path: Path) -> Non
     assert success is False
     assert "Continuous Guardrails" in message
     assert "checkbox" in message
+
+
+@pytest.mark.parametrize(
+    "intervening_content",
+    (
+        "",
+        "Operators review this supplemental table separately.\n\n",
+    ),
+)
+def test_execution_structure_rejects_second_queue_table(
+    tmp_path: Path, intervening_content: str
+) -> None:
+    second_table = """| Owner | Trigger |
+| --- | --- |
+| Operator | Proof window ends |
+"""
+    content = VALID_EXECUTION_ROADMAP + "\n" + intervening_content + second_table
+    roadmap_path = _write_execution_roadmap(tmp_path, content)
+
+    success, message = check_execution_roadmap_structure(roadmap_path)
+
+    assert success is False
+    assert "exactly one table" in message
 
 
 def test_execution_structure_rejects_wrong_columns(tmp_path: Path) -> None:
