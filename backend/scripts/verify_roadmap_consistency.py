@@ -297,6 +297,88 @@ def check_roadmap_items_formatting(roadmap_path: Path) -> tuple[bool, str]:
     return True, "✓ All roadmap items use consistent checkbox formatting"
 
 
+EXECUTION_COLUMNS = ("Priority", "Outcome", "State", "Gate", "Done when")
+ALLOWED_PRIORITIES = {"P0", "P1", "P2"}
+ALLOWED_STATES = {
+    "Ready",
+    "Decision required",
+    "External prerequisite",
+    "In validation",
+    "Later",
+}
+
+
+def _section_bodies(content: str, heading: str) -> list[str]:
+    pattern = rf"^## {re.escape(heading)}\s*$\n(.*?)(?=^## |\Z)"
+    return re.findall(pattern, content, re.MULTILINE | re.DOTALL)
+
+
+def _table_cells(line: str) -> list[str]:
+    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+
+
+def _is_table_separator(line: str) -> bool:
+    cells = _table_cells(line)
+    return len(cells) == len(EXECUTION_COLUMNS) and all(
+        re.fullmatch(r":?-{3,}:?", cell) for cell in cells
+    )
+
+
+def check_execution_roadmap_structure(roadmap_path: Path) -> tuple[bool, str]:
+    """Validate permanent guardrails and the finite execution queue."""
+    content = roadmap_path.read_text(encoding="utf-8")
+    issues: list[str] = []
+
+    for legacy_heading in ("Active Priorities", "Active Roadmap"):
+        if re.search(rf"^## {re.escape(legacy_heading)}\s*$", content, re.MULTILINE):
+            issues.append(f"legacy section '## {legacy_heading}' must be removed")
+
+    guardrail_sections = _section_bodies(content, "Continuous Guardrails")
+    if len(guardrail_sections) != 1:
+        issues.append("expected exactly one '## Continuous Guardrails' section")
+    elif re.search(r"^- \[[ xX]\] ", guardrail_sections[0], re.MULTILINE):
+        issues.append("Continuous Guardrails must not contain task-list checkboxes")
+
+    queue_sections = _section_bodies(content, "Execution Queue")
+    if len(queue_sections) != 1:
+        issues.append("expected exactly one '## Execution Queue' section")
+    else:
+        table_lines = [
+            line.strip() for line in queue_sections[0].splitlines() if line.strip().startswith("|")
+        ]
+        if len(table_lines) < 3:
+            issues.append("Execution Queue must contain a header, separator, and row")
+        elif tuple(_table_cells(table_lines[0])) != EXECUTION_COLUMNS:
+            issues.append("Execution Queue columns must be: " + ", ".join(EXECUTION_COLUMNS))
+        elif not _is_table_separator(table_lines[1]):
+            issues.append("Execution Queue must use a valid Markdown separator row")
+        else:
+            for row_number, line in enumerate(table_lines[2:], start=1):
+                cells = _table_cells(line)
+                if len(cells) != len(EXECUTION_COLUMNS):
+                    issues.append(f"Execution Queue row {row_number} has the wrong column count")
+                    continue
+                priority, outcome, state, gate, done_when = cells
+                if priority not in ALLOWED_PRIORITIES:
+                    issues.append(
+                        f"Execution Queue row {row_number} has invalid priority '{priority}'"
+                    )
+                if state not in ALLOWED_STATES:
+                    issues.append(f"Execution Queue row {row_number} has invalid state '{state}'")
+                if not outcome:
+                    issues.append(f"Execution Queue row {row_number} requires a non-empty outcome")
+                if not gate:
+                    issues.append(f"Execution Queue row {row_number} requires a non-empty gate")
+                if not done_when:
+                    issues.append(
+                        f"Execution Queue row {row_number} requires a non-empty done-when value"
+                    )
+
+    if issues:
+        return False, "Roadmap execution structure issues:\n  " + "\n  ".join(issues)
+    return True, "✓ Roadmap execution structure is complete"
+
+
 def main() -> int:
     """Run all consistency checks."""
     print("🔍 Roadmap Consistency Checker\n")
