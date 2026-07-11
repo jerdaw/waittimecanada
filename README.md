@@ -537,20 +537,13 @@ environment-specific paths are kept outside public documentation.
 
 ## 💡 Future Roadmap
 
-### Planned Enhancements
-- [ ] Evaluate additional provinces only where public source stability supports responsible ingestion
-- [ ] Multi-province equity layer beyond Ontario when province-specific source and tract validation are available
-- [ ] Public research artifacts, including case studies and quantified methodology findings
-- [ ] Privacy-safe usage analytics only after an explicit privacy-policy decision
-- [ ] Smart scheduling (reduce frequency during overnight hours)
-- [ ] Occupancy-based system-pressure indicators
+Wait Time Canada is in a stewardship and selective-expansion phase. Finite
+outcomes currently cover source-freshness offload validation, Ontario
+methodology resolution, carefully selected research/resource expansion,
+evidence-bounded scheduling, and conditional province or CI expansion.
 
-### Deferred / Research
-- [ ] Manitoba scraper (data source unclear)
-- [ ] Saskatchewan scraper (no public data available)
-- [ ] Territories expansion (limited data availability)
-
-See [`docs/planning/roadmap.md`](docs/planning/roadmap.md) for detailed status and next steps.
+The canonical dependency, state, and completion criteria for this work live in
+the [`docs/planning/roadmap.md`](docs/planning/roadmap.md) execution queue.
 
 ---
 

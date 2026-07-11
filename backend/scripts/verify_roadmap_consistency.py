@@ -130,9 +130,9 @@ def check_milestone_completion_consistency(roadmap_path: Path) -> tuple[bool, st
 
 
 def _extract_roadmap_status(content: str) -> tuple[str, str] | None:
-    """Extract roadmap Current Status date and progress text."""
+    """Extract roadmap Current Snapshot date and progress text."""
     status_match = re.search(
-        r"## Current Status \(Updated ([^)]+)\)\s*\n\s*\*\*Progress:\*\* (.+?)(?=\n\n|\*\*|\Z)",
+        r"## Current Snapshot \(Updated ([^)]+)\)\s*\n\s*\*\*Progress:\*\* (.+?)(?=\n\n|\*\*|\Z)",
         content,
         re.DOTALL,
     )
@@ -157,18 +157,18 @@ def _latest_completed_milestone(content: str) -> int | None:
 
 
 def check_status_summary_freshness(roadmap_path: Path) -> tuple[bool, str]:
-    """Verify Current Status section mentions latest completed work."""
+    """Verify Current Snapshot section mentions latest completed work."""
     content = roadmap_path.read_text()
 
     status = _extract_roadmap_status(content)
     if not status:
-        return False, "Could not find 'Current Status' section"
+        return False, "Could not find 'Current Snapshot' section"
 
     update_date, progress_text = status
 
     # Verify date is in YYYY-MM-DD format
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", update_date):
-        return False, f"Current Status date '{update_date}' is not in YYYY-MM-DD format"
+        return False, f"Current Snapshot date '{update_date}' is not in YYYY-MM-DD format"
 
     latest_milestone = _latest_completed_milestone(content)
     if latest_milestone is None:
@@ -179,10 +179,10 @@ def check_status_summary_freshness(roadmap_path: Path) -> tuple[bool, str]:
     if not any(keyword in progress_text for keyword in expected_keywords):
         return (
             False,
-            f"Current Status may be stale - doesn't mention latest completed milestone M{latest_milestone}",
+            f"Current Snapshot may be stale - doesn't mention latest completed milestone M{latest_milestone}",
         )
 
-    return True, f"✓ Current Status updated {update_date} and mentions latest completed milestone"
+    return True, f"✓ Current Snapshot updated {update_date} and mentions latest completed milestone"
 
 
 def check_readme_status_alignment(roadmap_path: Path, repo_root: Path) -> tuple[bool, str]:
@@ -196,7 +196,7 @@ def check_readme_status_alignment(roadmap_path: Path, repo_root: Path) -> tuple[
 
     roadmap_status = _extract_roadmap_status(roadmap_content)
     if not roadmap_status:
-        return False, "Could not find roadmap Current Status section"
+        return False, "Could not find roadmap Current Snapshot section"
     roadmap_date, _progress_text = roadmap_status
 
     latest_milestone = _latest_completed_milestone(roadmap_content)
@@ -261,40 +261,6 @@ def check_readme_status_alignment(roadmap_path: Path, repo_root: Path) -> tuple[
         True,
         f"✓ README status dates match roadmap date {roadmap_date} and mention M{latest_milestone}",
     )
-
-
-def check_roadmap_items_formatting(roadmap_path: Path) -> tuple[bool, str]:
-    """Verify roadmap items use consistent checkbox formatting."""
-    content = roadmap_path.read_text()
-
-    active_roadmap_match = re.search(
-        r"## Active Roadmap.*?\n(.*?)(?=\n## |\Z)",
-        content,
-        re.DOTALL,
-    )
-    if not active_roadmap_match:
-        return False, "Could not find Active Roadmap section"
-
-    active_roadmap = active_roadmap_match.group(1)
-    section_pattern = r"### ([^\n]+)\n(.*?)(?=### |\Z)"
-    sections = re.findall(section_pattern, active_roadmap, re.DOTALL)
-    if not sections:
-        return False, "Could not find roadmap subsections under Active Roadmap"
-
-    issues = []
-    for section_name, section_content in sections:
-        # Extract only lines that are checkbox items (start with "- [")
-        lines = [line for line in section_content.split("\n") if line.strip().startswith("- [")]
-        for line in lines:
-            # Allow strikethrough for removed items: ~~**P1 / Name:**~~
-            # Allow "Deferred" prefix for deprioritized items
-            if not re.match(r"^- \[[x ]\] (?:~~)?\*\*(?:P\d+|Deferred) / ", line):
-                issues.append(f"Malformed item in '{section_name}': {line[:60]}")
-
-    if issues:
-        return False, "Roadmap item formatting issues:\n  " + "\n  ".join(issues[:5])
-
-    return True, "✓ All roadmap items use consistent checkbox formatting"
 
 
 EXECUTION_COLUMNS = ("Priority", "Outcome", "State", "Gate", "Done when")
@@ -399,9 +365,9 @@ def main() -> int:
             ("ADR File References", check_adr_files, (roadmap_path, repo_root)),
             ("Implementation Plans", check_implementation_plans, (roadmap_path, repo_root)),
             ("Milestone Completion", check_milestone_completion_consistency, (roadmap_path,)),
-            ("Status Summary", check_status_summary_freshness, (roadmap_path,)),
+            ("Snapshot Summary", check_status_summary_freshness, (roadmap_path,)),
             ("README Status Alignment", check_readme_status_alignment, (roadmap_path, repo_root)),
-            ("Roadmap Item Formatting", check_roadmap_items_formatting, (roadmap_path,)),
+            ("Roadmap Execution Structure", check_execution_roadmap_structure, (roadmap_path,)),
         ]
 
         results = []

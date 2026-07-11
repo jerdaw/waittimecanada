@@ -5,42 +5,45 @@ contributors and maintainers. Private deployment runbooks, credentials,
 monitoring configuration, and personal planning notes are intentionally excluded
 from public documentation.
 
-## Public Follow-Ups
+## Decision Required
 
-- [ ] Review public data-source links quarterly and update stale provenance
-  URLs.
-- [ ] Re-run public documentation boundary review before major releases.
-- [ ] Re-run methodology documentation review after any provincial reporting
-  change.
-- [ ] Resolve the Ontario methodology revalidation in
-  `docs/superpowers/plans/2026-07-10-ontario-methodology-revalidation.md` before
-  changing runtime tags or treating the paused research artifacts as current.
-  Decide the composite start, qualifying-provider endpoint, historical
-  migration or versioning, source metadata, divergence briefs, and frontend
-  labels together.
-- [ ] Re-run public status alignment after each completed milestone so README,
-  roadmap, and planning indexes keep the same current-state baseline.
-- [ ] Pilot ADR-0027 source-freshness offload with scraper, watchdog, aggregate,
-  and smoke commands on a trusted runner using
-  `docs/operations/heartbeat-offload-pilot.md`, keeping GitHub manual dispatch
-  as fallback.
-- [ ] Review scraper, heartbeat, and heartbeat-triggered scraper recovery
-  history after the first full 24-hour recovery window so `/api/status` and
-  `/api/data-quality` can be checked against sustained cadence rather than
-  one-off recovery evidence.
-- [ ] Restore remaining scheduled operational workflows incrementally after the
-  trusted source-freshness offload pilot succeeds; keep manual dispatch as the
-  fallback path.
+- [ ] Resolve the Ontario methodology representation before changing runtime
+  tags or treating paused Ontario research artifacts as current. Use the exact
+  decision scope in the roadmap execution queue.
+
+## External Operations
+
+- [ ] Complete the trusted source-freshness offload pilot using
+  `docs/operations/heartbeat-offload-pilot.md`; keep GitHub manual dispatch as
+  fallback.
+- [ ] After the first complete 24-hour proof window, compare workflow history,
+  `/api/status`, and `/api/data-quality` with the accepted cadence.
+- [ ] Restore remaining scheduled workflows only after the proof window and
+  rollback evidence are accepted.
+
+## Recurring Reviews
+
+- [ ] Quarterly: review public source links and update stale provenance URLs.
+- [ ] After each completed milestone: align README, roadmap, and planning
+  indexes.
+
+## Conditional Follow-Ups
+
+- [ ] Before a major release: re-run the public documentation boundary review.
+- [ ] After a provincial reporting change: re-run methodology documentation
+  review and update affected artifacts.
+- [ ] After a major frontend change: capture updated demo screenshots.
+- [ ] After source methodology or displayed examples change: refresh affected
+  public case studies.
+- [ ] After a new data flow or third-party service is introduced: review
+  `/privacy` and `/terms`.
+
+## Completed Repository Prerequisites
+
 - [x] Runner isolation, secret handling, log retention, failure-summary, and
-  rollback requirements are documented in
-  `docs/operations/heartbeat-offload-pilot.md`, with the concrete operator
-  procedure in the private/shared operations source of truth. Live runner
-  selection, validation, and cutover remain open in the pilot task above.
-- [ ] Capture updated demo screenshots after major frontend changes.
-- [ ] Refresh public case studies when source methodology or displayed examples
-  change.
-- [ ] Review `/privacy` and `/terms` after any new data flow or third-party
-  service is introduced.
+  rollback requirements are documented in the public offload contract, with
+  the concrete value-free operator procedure retained in the private/shared
+  operations source of truth.
 
 ## Review Checklist
 
