@@ -276,7 +276,15 @@ export DATABASE_URL="postgresql://user@host/database"
 
 ### Issue: "relation 'hospitals' does not exist"
 
-**Solution:** Run database migrations to create tables. See `/backend/scripts/migrate-structure.sh`
+**Solution:** From `backend/`, run the maintained
+[checksum-backed migration runner](../run_migrations.py):
+
+```bash
+uv run python run_migrations.py
+```
+
+The runner records applied files in `schema_migrations`, skips files with the
+same recorded checksum, and rejects an applied file whose contents changed.
 
 ### Issue: Tests fail with "duplicate key value violates unique constraint"
 
@@ -326,5 +334,5 @@ Potential enhancements:
 
 ---
 
-*Last Updated: February 1, 2026*
+*Last reviewed: July 10, 2026*
 *Part of Task #8 - Integration Tests Implementation*
