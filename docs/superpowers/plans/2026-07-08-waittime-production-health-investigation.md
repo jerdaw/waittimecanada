@@ -1,5 +1,14 @@
 # WaitTime Production Health Investigation Implementation Plan
 
+**Status:** Historical execution plan; closed on 2026-07-10
+
+This checklist is retained as incident history. Do not execute the unchecked
+steps as an active plan. Recovery evidence and the resulting conclusions are
+recorded in
+`docs/operations/waittime-health-investigation-2026-07-08.md`. Remaining
+trusted-runner, observation, and operator-dependent work is tracked only in
+`docs/planning/roadmap.md` and `docs/planning/manual-tasks.md`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Determine why Wait Time Canada production health is critical, prove which failures are current versus stale, identify the exact recovery path, and leave durable evidence for scheduler/source/metadata follow-up.

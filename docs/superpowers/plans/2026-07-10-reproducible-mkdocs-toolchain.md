@@ -8,17 +8,11 @@
 
 **Tech Stack:** Python 3.12, uv 0.11.23, MkDocs 1.6.x, Material for MkDocs 9.7.x, mkdocs-minify-plugin 0.8.x, pytest, GitHub Actions, GNU Make.
 
-**Status:** Complete on 2026-07-10. The four contract tests pass, `uv lock
---check` passes, and both workflow files parse as YAML. Manual Docs CI run
-`29096472950` passed the locked sync plus strict MkDocs build on commit
-`5c4bf1d6a32c618e25b589681e3a513eb9a06072`. Pull-request runs `29096718367`
-and `29096718451` then passed Ruff, mypy over 49 source files, Bandit, 583
-pytest tests with 27 prerequisite-dependent skips, repository docs checks, and
-the strict MkDocs build on commit
-`eaaca85c15455f18f1a44b6ee482a7dfc1e01d9b`. Independent review found no
-technical or security defect; its completion-record consistency finding is
-resolved here. PR #83 is ready and remains open and unmerged. No deployment
-workflow was dispatched.
+**Status:** Complete; PR #83 merged on 2026-07-10
+
+The four contract tests pass, `uv lock --check` passes, and both workflow files
+parse as YAML. The pre-merge implementation and review evidence remains below;
+post-merge evidence is recorded at the end of this plan.
 
 ## Global Constraints
 
@@ -416,7 +410,7 @@ git add AGENTS.md .github/workflows/README.md README.md CONTRIBUTING.md \
 git commit -m "docs: record reproducible MkDocs validation"
 ```
 
-- [x] **Step 5: Review, push, and open a non-merged pull request**
+- [x] **Step 5: Review, push, and open a pull request at the pre-approval boundary**
 
 Run a read-only review of `origin/main...HEAD`, fix all Critical and Important
 issues, rerun affected verification, then push and create a ready pull request:
@@ -430,8 +424,16 @@ gh pr create \
   --body-file /tmp/waittimecanada-mkdocs-pr.md
 ```
 
-The PR body must summarize the locked docs group, isolated environment, strict
-Docs CI lane, deployment parity, verification evidence, and explicit no-deploy
-boundary. Wait for required GitHub checks on the exact head. Do not merge the
-PR because its changed documentation paths trigger the existing deployment
-workflow on main.
+The PR body had to summarize the locked docs group, isolated environment,
+strict Docs CI lane, deployment parity, verification evidence, and explicit
+no-deploy boundary. At this pre-approval stage, the PR was held for required
+checks because merging its documentation paths would trigger the existing
+deployment workflow on `main`.
+
+## Post-Merge Verification
+
+The implementation boundary above was observed until the user explicitly
+authorized the merge and its automatic documentation deployment. PR #83 was
+squash-merged as `a14460e304288f13fe5daa159f0b2d9d014a6d30`. Post-merge
+Scraper CI run `29135426720`, Deploy Docs run `29135426736`, and Docs CI run
+`29135426753` all completed successfully.

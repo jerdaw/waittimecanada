@@ -5,7 +5,7 @@ repository's legacy Ontario ontology tags as an exact transcription of the
 current official indicator, while preserving the existing runtime and data
 model until an explicit ontology and historical-data decision is made.
 
-**Status:** Complete; PR #85 is open, ready, and intentionally unmerged
+**Status:** Complete; PR #85 merged on 2026-07-10
 
 **Base:** `main` at `18dbcfef4e3c44695c2433b763d7f48e15deb124`
 
@@ -139,7 +139,8 @@ uv run pytest tests/unit/test_methodology_docs.py -q
 - [x] Request independent review and address critical or important findings.
 - [x] Commit in reviewable steps.
 - [x] Push `codex/ontario-methodology-revalidation` and open a ready PR.
-- [ ] Do not merge: changed documentation paths trigger deployment on `main`.
+- [x] Preserve the no-merge boundary until explicit authorization. The user
+  later authorized the merge and automatic documentation deployment.
 - [x] Verify all GitHub checks on the exact pushed implementation head; verify
   the final plan-record head again before handoff.
 
@@ -204,9 +205,8 @@ partial tag change.
 
 ### Delivery And GitHub Actions
 
-- Pull request: [#85](https://github.com/jerdaw/waittimecanada/pull/85),
-  open, ready, mergeable, and intentionally unmerged because documentation
-  changes trigger deployment on `main`.
+- Pre-merge pull-request evidence: [#85](https://github.com/jerdaw/waittimecanada/pull/85)
+  was open, ready, and mergeable while awaiting deployment authorization.
 - Exact reviewed implementation head:
   `d5ce74a8a769fd9b37755fff05b03f6afbd5db0b`.
 - Scraper CI run `29118956742`: Ruff, migration guard, mypy, Bandit, and pytest
@@ -216,3 +216,11 @@ partial tag change.
 - The final plan-record commit will receive a fresh exact-head CI rerun. Its
   immutable run IDs belong in the PR delivery record so recording them does not
   create an endless plan-only CI cycle.
+
+## Post-Merge Verification
+
+After explicit user authorization, PR #85 was squash-merged as
+`cda6344ee4cc2cb1bafba461b93a1f4580da5521`. Post-merge Scraper CI run
+`29135499643`, Deploy Docs run `29135499634`, and Docs CI run `29135499638`
+all completed successfully. The ontology and historical-data decision remains
+intentionally unresolved and tracked in the manual task ledger.

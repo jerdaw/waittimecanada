@@ -5,7 +5,7 @@
 checksum-backed migration runner and prevent the stale instruction from
 returning.
 
-**Status:** Complete; PR #86 is open, ready, and intentionally unmerged
+**Status:** Complete; PR #86 merged on 2026-07-10
 
 **Base:** `main` at `18dbcfef4e3c44695c2433b763d7f48e15deb124`
 
@@ -71,7 +71,8 @@ uv run pytest tests/unit/test_integration_testing_docs.py -q
 - [x] Commit the plan and RED/GREEN implementation in
   reviewable steps.
 - [x] Push `codex/integration-docs-migration-runner` and open a ready PR.
-- [ ] Do not merge because documentation paths trigger deployment on `main`.
+- [x] Preserve the no-merge boundary until explicit authorization. The user
+  later authorized the merge and automatic documentation deployment.
 - [x] Verify GitHub checks on the exact pushed implementation head; verify the
   final plan-record head again before handoff.
 
@@ -112,9 +113,8 @@ deployment, or release action occurred. Ownership of the obsolete root
 
 ### Delivery And GitHub Actions
 
-- Pull request: [#86](https://github.com/jerdaw/waittimecanada/pull/86),
-  open, ready, mergeable, and intentionally unmerged because documentation
-  changes trigger deployment on `main`.
+- Pre-merge pull-request evidence: [#86](https://github.com/jerdaw/waittimecanada/pull/86)
+  was open, ready, and mergeable while awaiting deployment authorization.
 - Exact reviewed implementation head:
   `d77109dd127762f1afddb29362d4ae2fcaa8e990`.
 - Scraper CI run `29120060224`: Ruff, migration guard, mypy, Bandit, and pytest
@@ -124,3 +124,10 @@ deployment, or release action occurred. Ownership of the obsolete root
 - The final plan-record commit will receive a fresh exact-head CI rerun. Its
   immutable run IDs belong in the PR delivery record so recording them does not
   create an endless plan-only CI cycle.
+
+## Post-Merge Verification
+
+After explicit user authorization, PR #86 was squash-merged as
+`7c0473832e9cf27e838b0144b0c2a63dc2840235`. Post-merge Scraper CI run
+`29135530184`, Deploy Docs run `29135530183`, and Docs CI run `29135530181`
+all completed successfully.
