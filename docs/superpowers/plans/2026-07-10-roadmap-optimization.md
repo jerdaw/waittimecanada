@@ -658,8 +658,8 @@ and only this plan's final evidence update remains uncommitted.
   `git diff --check
   3c2f363c12965bd2b5cb28d2c14610176483f904...HEAD` produced no output, and
   the pre-update status was clean on `codex/roadmap-optimization`.
-- Push, PR creation, exact-head remote verification, rebase, merge, and
-  post-merge verification remain pending.
+- Rebase, merge, and post-merge verification remain pending while PR #89 is
+  open.
 
 - [x] **Step 3: Request independent review**
 
@@ -718,7 +718,7 @@ git add docs/superpowers/plans/2026-07-10-roadmap-optimization.md
 git commit -m "docs: record roadmap optimization verification"
 ```
 
-- [ ] **Step 6: Push and open the stacked pull request**
+- [x] **Step 6: Push and open the stacked pull request**
 
 ```bash
 git push -u origin codex/roadmap-optimization
@@ -732,10 +732,23 @@ gh pr create \
 
 Expected: a ready, mergeable stacked PR is created against PR #89's branch.
 
-- [ ] **Step 7: Verify the exact stacked head**
+- [x] **Step 7: Verify the exact stacked head**
 
 Use `gh pr view` and `gh pr checks` to confirm the remote head equals local
 `HEAD` and every required check passes. Do not merge while PR #89 remains open.
+
+**Stacked delivery record:**
+
+- Ready PR: <https://github.com/jerdaw/waittimecanada/pull/90>, targeting
+  `docs/waittime-offload-operations-hardening` from
+  `codex/roadmap-optimization`.
+- The PR was created from `980377e2`; the exact final plan-record head is the
+  commit containing this delivery record. After its push, local `HEAD`,
+  `origin/codex/roadmap-optimization`, and PR #90's head OID must be identical,
+  and every required check must complete successfully on that same OID. Check
+  run IDs are intentionally not persisted because they are ephemeral.
+- PR #89 remains open. Steps 8-9 remain blocked on its merge and subsequent
+  final-base verification; no merge was attempted.
 
 - [ ] **Step 8: Rebase after PR #89 merges**
 
