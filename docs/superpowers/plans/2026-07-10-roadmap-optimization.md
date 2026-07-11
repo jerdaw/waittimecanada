@@ -45,7 +45,7 @@
 - Produces: `check_execution_roadmap_structure(roadmap_path: Path) -> tuple[bool, str]`.
 - Produces constants `EXECUTION_COLUMNS`, `ALLOWED_PRIORITIES`, and `ALLOWED_STATES` for the exact public roadmap contract.
 
-- [ ] **Step 1: Add the failing validator unit tests**
+- [x] **Step 1: Add the failing validator unit tests**
 
 Add `check_execution_roadmap_structure` to the existing import list and append these tests:
 
@@ -163,7 +163,7 @@ def test_execution_structure_rejects_empty_gate_and_done_when(tmp_path: Path) ->
     assert "non-empty done-when" in message
 ```
 
-- [ ] **Step 2: Run the new tests and verify RED**
+- [x] **Step 2: Run the new tests and verify RED**
 
 Run:
 
@@ -174,9 +174,11 @@ uv run --locked --extra dev pytest tests/unit/test_verify_roadmap_consistency.py
 
 Expected: collection fails because `check_execution_roadmap_structure` does not yet exist.
 
-- [ ] **Step 3: Implement the pure structural checker**
+- [x] **Step 3: Implement the pure structural checker**
 
-Replace `check_roadmap_items_formatting` with this contract:
+Add this contract alongside the existing `check_roadmap_items_formatting`.
+Keep the legacy function and its CLI registration unchanged during Task 1 so
+the unconverted repository roadmap remains valid until Task 2:
 
 ```python
 EXECUTION_COLUMNS = ("Priority", "Outcome", "State", "Gate", "Done when")
@@ -261,13 +263,13 @@ def check_execution_roadmap_structure(roadmap_path: Path) -> tuple[bool, str]:
     return True, "✓ Roadmap execution structure is complete"
 ```
 
-- [ ] **Step 4: Run focused tests and verify GREEN**
+- [x] **Step 4: Run focused tests and verify GREEN**
 
 Run the focused command from Step 2.
 
 Expected: 22 tests pass: the existing 15 plus the 7 new structural tests.
 
-- [ ] **Step 5: Run Ruff for changed Python files**
+- [x] **Step 5: Run Ruff for changed Python files**
 
 ```bash
 cd backend
@@ -277,7 +279,7 @@ uv run --locked --extra dev ruff check scripts/verify_roadmap_consistency.py tes
 
 Expected: both commands pass.
 
-- [ ] **Step 6: Commit the validator**
+- [x] **Step 6: Commit the validator**
 
 ```bash
 git add backend/scripts/verify_roadmap_consistency.py \
@@ -304,7 +306,7 @@ Expected: commit succeeds with no non-human attribution trailer.
 - Produces: a canonical `## Execution Queue` with columns `Priority`, `Outcome`, `State`, `Gate`, and `Done when`.
 - Produces: typed manual sections `Decision Required`, `External Operations`, `Recurring Reviews`, `Conditional Follow-Ups`, and `Completed Repository Prerequisites`.
 
-- [ ] **Step 1: Add the repository-level failing contract and CLI registration**
+- [x] **Step 1: Add the repository-level failing contract and CLI registration**
 
 Append this test:
 
@@ -325,9 +327,13 @@ Replace the final CLI check tuple with:
 ("Roadmap Execution Structure", check_execution_roadmap_structure, (roadmap_path,)),
 ```
 
+Then remove the now-unused `check_roadmap_items_formatting` function. The
+roadmap conversion and CLI switch belong in the same task so no committed
+intermediate state applies the new contract to the legacy document.
+
 Expected: the focused tests fail because the current roadmap still contains legacy active sections and has no new guardrail/queue sections.
 
-- [ ] **Step 2: Replace the current status and duplicate priority sections**
+- [x] **Step 2: Replace the current status and duplicate priority sections**
 
 In `docs/planning/roadmap.md`:
 
@@ -394,7 +400,7 @@ Roadmap lifecycle and formatting rules are defined in
 tracked in [`manual-tasks.md`](manual-tasks.md).
 ```
 
-- [ ] **Step 3: Update status parsing for the new snapshot heading**
+- [x] **Step 3: Update status parsing for the new snapshot heading**
 
 Change `_extract_roadmap_status` to match:
 
@@ -407,7 +413,7 @@ Update synthetic test roadmaps from `## Current Status` to
 “snapshot” where they describe the roadmap heading, and keep README's own
 `Current Status` heading unchanged.
 
-- [ ] **Step 4: Type the manual task ledger**
+- [x] **Step 4: Type the manual task ledger**
 
 Rewrite `docs/planning/manual-tasks.md` using these headings and retain the
 existing safety review checklist:
@@ -454,7 +460,7 @@ existing safety review checklist:
   operations source of truth.
 ```
 
-- [ ] **Step 5: Align the roadmap process document**
+- [x] **Step 5: Align the roadmap process document**
 
 Replace `docs/planning/roadmap-process.md` with:
 
@@ -541,7 +547,7 @@ limitations, and separation of public reproducible guidance from private
 operations detail.
 ```
 
-- [ ] **Step 6: Remove README's duplicate backlog**
+- [x] **Step 6: Remove README's duplicate backlog**
 
 Replace README's `## 💡 Future Roadmap` checkbox lists with:
 
@@ -557,7 +563,7 @@ The canonical dependency, state, and completion criteria for this work live in
 the [`docs/planning/roadmap.md`](docs/planning/roadmap.md) execution queue.
 ```
 
-- [ ] **Step 7: Run focused RED/GREEN verification**
+- [x] **Step 7: Run focused RED/GREEN verification**
 
 ```bash
 cd backend
@@ -567,7 +573,7 @@ uv run --locked --extra dev python scripts/verify_roadmap_consistency.py
 
 Expected: 23 focused tests pass and the CLI prints `All roadmap consistency checks passed!`.
 
-- [ ] **Step 8: Run documentation verification**
+- [x] **Step 8: Run documentation verification**
 
 ```bash
 cd ..
@@ -578,7 +584,7 @@ git diff --check
 
 Expected: all 11 documentation gates, the locked strict MkDocs build, and the whitespace check pass.
 
-- [ ] **Step 9: Commit the optimized planning surfaces**
+- [x] **Step 9: Commit the optimized planning surfaces**
 
 ```bash
 git add README.md \
