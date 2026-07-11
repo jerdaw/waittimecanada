@@ -173,7 +173,7 @@ The known prerequisite-dependent lanes remain out of default local scope:
 | 6. Documentation/onboarding | Fixed changes | Active setup, env, ADR, API/OpenAPI, migration, testing, and maintenance-audit docs updated. |
 | 7. Architecture/maintainability | Fixed local mismatch | Preserved architecture; localized hospital query validation/cache/data-access alignment; no broad refactor. |
 | 8. Performance/scalability | Fixed local issue + deferred follow-up | Added opt-in bounded hospital API pagination and cache-key distinction; cursor pagination deferred as API contract work. |
-| 9. Database/data/migration health | Fixed docs/tests only | Migration docs/examples fixed; sequence guard/test passed; no schema or data changes. |
+| 9. Database/data/migration health | Fixed docs/tests only | Migration docs/examples fixed; the 2026-07-10 follow-up reconciled every history heading and added CI-enforced inventory/count/next-prefix/placeholder checks; no schema or data changes. |
 | 10. Release readiness | No deploy/release; verification passed | Full feasible local checks passed; release/deploy owner actions deferred. |
 | 11. Public repo presentation | Fixed docs clarity | Public docs index/report/API/setup presentation improved without adding private operations details. |
 
@@ -484,7 +484,9 @@ Searches/probes:
 
 Candidate findings considered:
 
-- Fixed: migration count/next-number docs and examples were stale.
+- Fixed: migration count/next-number docs and examples were stale; the
+  2026-07-10 follow-up also reconciled missing history entries and extended the
+  existing sequence guard to prevent repeat drift.
 - Fixed: ADR index omitted existing ADRs.
 - Fixed: root README hard-coded stale ADR count.
 - Fixed: `DATABASE_SSL_MODE` and `OPERATIONAL_NOTIFICATION_MODE` docs/examples
@@ -798,7 +800,7 @@ Verification:
 | Backend package metadata | `backend/pyproject.toml`, `backend/tests/unit/test_pyproject_scripts.py` | Removed two broken console scripts and added an importability/callability metadata test. |
 | Workflow docs | `CONTRIBUTING.md`, `Makefile`, setup/testing docs | Aligned local commands with `uv`, `npm ci`, and pytest temp workaround. |
 | API/docs | `docs/API.md`, `docs/openapi.yaml`, env docs/examples | Documented optional hospital pagination and missing env settings. |
-| Migration docs | `backend/migrations/README.md`, `docs/development/database-migrations.md` | Corrected migration count, current latest migration, and next-migration examples. |
+| Migration docs | `backend/migrations/README.md`, `docs/development/database-migrations.md` | Corrected migration count, current latest migration, next-migration examples, and missing history entries; added CI-enforced README consistency checks on 2026-07-10. |
 | Docs navigation | `docs/README.md`, `docs/adr/index.md`, `README.md` | Updated ADR/docs index and removed stale count/link drift. |
 | Active instructions/roadmap | `AGENTS.md`, `docs/planning/roadmap.md` | Refreshed local verification counts, session status, and focused follow-up ledger references. |
 | Docs checks | `scripts/check-docs.sh` | Included this report in docs quality checks. |

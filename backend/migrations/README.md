@@ -19,7 +19,7 @@ uv run python run_migrations.py
 
 **Output:**
 ```
-Found 21 migration files:
+Found 22 migration files:
 
 Running: 001_create_enums.sql
   ✓ Success
@@ -50,13 +50,13 @@ applied history is not edited in place.
 NNN_descriptive_name.sql
 ```
 
-- `NNN`: Zero-padded sequential number (001, 002, ..., 021)
+- `NNN`: Zero-padded sequential number (001, 002, ..., 022)
 - `descriptive_name`: Action and target (e.g., `create_enums`, `add_occupancy_columns`)
 - **Always use `.sql` extension** (`.sql.skip` files are intentionally excluded)
 
 The historical duplicate `020_` prefix is preserved because those files may
 already be applied in deployed databases. Do not create new duplicate prefixes.
-The next migration number is `022`.
+The next migration number is `023`.
 
 Run the guard before adding or renaming migrations:
 
@@ -75,7 +75,7 @@ Migrations run in **lexicographic order** (alphabetical). The numeric prefix ens
 
 **Behavior:**
 - Reads all `*.sql` files from `backend/migrations/`
-- Sorts alphabetically (001 → 021)
+- Sorts alphabetically (001 → 022)
 - Creates and uses the `schema_migrations` checksum ledger
 - Skips files already recorded with a matching checksum
 - Rejects files whose recorded checksum no longer matches the on-disk SQL
@@ -190,61 +190,23 @@ DROP TABLE IF EXISTS sources;
 DELETE FROM sources WHERE id IN ('quebec-msss', 'ontario-health', 'alberta-ahs', 'bc-phsa');
 ```
 
-#### 020_sync_active_source_definitions.sql
-**Purpose:** Re-align active source rows to the canonical source catalog in
-`backend/data/sources/*.json`
-**Created:** 2026-04-16
-**Milestone:** Ontario completion / source-metadata sync
-
-**Key Corrections Applied:**
-- `ontario-health`: Health Quality Ontario, current HQO URLs, `MEAN`
-- `alberta-ahs`: `POINT_ESTIMATE`
-- active source URLs and telehealth metadata re-synced without changing source IDs
-
----
-
-#### 021_add_alert_notification_state.sql
-**Purpose:** Track whether active scraper/public-health incidents actually sent an operator notification
-**Created:** 2026-06-27
-**Milestone:** Critical-only notification mode
-
-**Columns Added:**
-- `scraper_alert_state.active_incident_notified_tier`
-- `scraper_alert_state.active_incident_notified_at`
-- `public_health_source_alert_state.active_incident_notified_tier`
-- `public_health_source_alert_state.active_incident_notified_at`
-
----
-
-#### 022_update_ontario_health_source_url.sql
-**Purpose:** Update the active Ontario source URL to the current Ontario Health reporting path without rewriting applied migration history
-**Created:** 2026-07-08
-**Milestone:** Production health remediation
-
-**Rows Updated:**
-- `sources.url` for `ontario-health`
-
-**Rationale:**
-- The old HQOntario URL now redirects through Ontario Health.
-- The migration runner rejects checksum changes to already-applied migrations, so this URL correction is applied as a new idempotent migration.
-
-**Rollback:**
-```sql
-UPDATE sources
-SET
-    url = 'https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments',
-    updated_at = NOW()
-WHERE id = 'ontario-health';
-```
-
-**Behavior:** Allows critical-only mode to persist suppressed P2/P3 incidents while sending recovery notifications only for incidents that previously paged.
-
 ---
 
 #### 005_create_functions.sql
 **Purpose:** Create PostgreSQL utility functions
 **Created:** 2026-01-29
-**Functions:** (Content TBD - check file for specific functions)
+
+**Functions Created:**
+- `are_measurements_comparable(BIGINT, BIGINT)`
+- `get_latest_measurement(TEXT)`
+- `update_scraper_heartbeat(TEXT, scraper_status_enum, TEXT, INTEGER)`
+- `get_stale_scrapers(INTEGER)`
+- `update_updated_at()`
+
+**Triggers Created:**
+- `sources_updated_at`
+- `hospitals_updated_at`
+- `scraper_status_updated_at`
 
 ---
 
@@ -407,6 +369,32 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 
 ---
 
+### M33: Historical Occupancy Trends (014-015)
+
+#### 014_relax_value_constraint.sql
+**Purpose:** Allow zero-valued wait-time and occupancy measurements
+**Created:** 2026-02-19
+
+**Constraint Updated:**
+- Replaces the positive-only `measurements_value_check` with `value >= 0`
+
+**Rationale:** Supports valid zero-percent occupancy observations and occasional zero-minute wait-time observations without weakening the non-negative data contract.
+
+---
+
+#### 015_add_metric_family_to_aggregates.sql
+**Purpose:** Keep aggregate uniqueness distinct across metric families
+**Created:** 2026-02-19
+**Milestone:** M33 (Historical Occupancy Trends)
+**Rationale:** ADR-0019 (Occupancy Trend Aggregation)
+
+**Constraint Updated:**
+- Replaces the prior hospital/period uniqueness key with `(hospital_id, period_type, period_start, metric_family)`
+
+**Behavior:** Allows wait-time and stretcher-occupancy aggregates for the same hospital and period to coexist.
+
+---
+
 ### M31: Raw Retention Efficiency Guards (016)
 
 #### 016_add_measurement_retention_efficiency_guards.sql
@@ -445,6 +433,107 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 
 ---
 
+### Public Health Hub Foundation and Operations (018-020)
+
+#### 018_create_public_health_hub_tables.sql
+**Purpose:** Create the Public Health Hub Batch A source, resource, and alert storage foundation
+**Created:** 2026-03-27
+
+**Tables Created:**
+- `public_data_sources`
+- `resource_locations`
+- `public_health_alerts`
+
+**Indexes Created:**
+- `idx_public_data_sources_domain`
+- `idx_public_data_sources_usage_mode`
+- `idx_resource_locations_kind_province`
+- `idx_resource_locations_source_id`
+- `idx_public_health_alerts_published_at`
+- `idx_public_health_alerts_source_id`
+
+**Behavior:** Stores public source governance metadata, normalized facility/AED locations, and attributed public-health alerts without mixing these domains into emergency wait-time measurements.
+
+---
+
+#### 019_add_public_health_source_alert_state.sql
+**Purpose:** Persist Public Health Hub source incidents so hard-fail alerting is state-change driven
+**Created:** 2026-03-27
+
+**Table Created:**
+- `public_health_source_alert_state`
+
+**Index Created:**
+- `idx_public_health_source_alert_state_active_incident` (partial index for active incidents)
+
+---
+
+#### 020_add_public_health_system_metrics.sql
+**Purpose:** Add an analytics-only storage lane for Ontario EMS and system-context metrics
+**Created:** 2026-04-23
+
+**Table Created:**
+- `public_health_system_metrics`
+
+**Indexes Created:**
+- `idx_public_health_system_metrics_source_series_year`
+- `idx_public_health_system_metrics_geography_name`
+
+---
+
+### Source Catalog and Alert Notification Hardening (020-022)
+
+#### 020_sync_active_source_definitions.sql
+**Purpose:** Re-align active source rows to the canonical source catalog in
+`backend/data/sources/*.json`
+**Created:** 2026-04-16
+**Milestone:** Ontario completion / source-metadata sync
+
+**Key Corrections Applied:**
+- `ontario-health`: Health Quality Ontario, current HQO URLs, `MEAN`
+- `alberta-ahs`: `POINT_ESTIMATE`
+- active source URLs and telehealth metadata re-synced without changing source IDs
+
+---
+
+#### 021_add_alert_notification_state.sql
+**Purpose:** Track whether active scraper/public-health incidents actually sent an operator notification
+**Created:** 2026-06-27
+**Milestone:** Critical-only notification mode
+
+**Columns Added:**
+- `scraper_alert_state.active_incident_notified_tier`
+- `scraper_alert_state.active_incident_notified_at`
+- `public_health_source_alert_state.active_incident_notified_tier`
+- `public_health_source_alert_state.active_incident_notified_at`
+
+**Behavior:** Allows critical-only mode to persist suppressed P2/P3 incidents while sending recovery notifications only for incidents that previously paged.
+
+---
+
+#### 022_update_ontario_health_source_url.sql
+**Purpose:** Update the active Ontario source URL to the current Ontario Health reporting path without rewriting applied migration history
+**Created:** 2026-07-08
+**Milestone:** Production health remediation
+
+**Rows Updated:**
+- `sources.url` for `ontario-health`
+
+**Rationale:**
+- The old HQOntario URL now redirects through Ontario Health.
+- The migration runner rejects checksum changes to already-applied migrations, so this URL correction is applied as a new idempotent migration.
+
+**Rollback:**
+```sql
+UPDATE sources
+SET
+    url = 'https://www.hqontario.ca/system-performance/time-spent-in-emergency-departments',
+    updated_at = NOW()
+WHERE id = 'ontario-health';
+```
+
+---
+
 ## Creating New Migrations
 
 ### Step 1: Determine Next Number
@@ -458,7 +547,7 @@ ls backend/migrations/*.sql | tail -1
 ### Step 2: Create Migration File
 
 ```bash
-touch backend/migrations/022_your_descriptive_name.sql
+touch backend/migrations/023_your_descriptive_name.sql
 ```
 
 ### Step 3: Write Migration
@@ -466,7 +555,7 @@ touch backend/migrations/022_your_descriptive_name.sql
 **Template:**
 
 ```sql
--- 022_your_descriptive_name.sql
+-- 023_your_descriptive_name.sql
 -- Brief description of what this migration does
 -- Depends on: NNN_previous_migration.sql (if applicable)
 
