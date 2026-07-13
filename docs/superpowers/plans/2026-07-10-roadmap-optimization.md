@@ -8,6 +8,8 @@
 
 **Tech Stack:** Markdown, Python 3.12+, regular expressions, pathlib, pytest, Ruff, MkDocs, repository documentation checks.
 
+**Status:** Complete (merged as PR #90 on 2026-07-13).
+
 ## Global Constraints
 
 - Preserve clinical-safety, non-triage, ontology-comparability, provenance, retention, cost-control, and public/private documentation boundaries.
@@ -776,9 +778,19 @@ Tasks 2 Step 7, Task 2 Step 8, and Task 3 Steps 1-3 on the final base.
   offload guardrail checks. The locked strict MkDocs build completed in 2.02s,
   and `git diff --check` passed.
 
-- [ ] **Step 9: Merge and verify only with authorization**
+- [x] **Step 9: Merge and verify only with authorization**
 
 After the final exact-head checks pass and explicit merge/publication
 authorization is available, merge without deleting any unmerged branch. Verify
 all triggered post-merge checks and documentation publication before marking
 the plan fully complete.
+
+**Post-merge evidence (2026-07-13):**
+
+- PR #90 was squash-merged to `main` as `1cad15f8` after the authorized exact
+  head (`1d1ad974`) passed Docs CI plus Ruff, mypy, pytest, and security checks.
+- The resulting `main` commit passed Scraper CI, Docs CI, and Deploy Docs in
+  runs `29248607209`, `29248607223`, and `29248607327`, respectively.
+- The roadmap, manual-task ledger, process guide, README links, structural
+  checker, and tests are therefore delivered together on the verified public
+  documentation baseline.
