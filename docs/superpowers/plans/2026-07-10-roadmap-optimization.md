@@ -750,12 +750,31 @@ Use `gh pr view` and `gh pr checks` to confirm the remote head equals local
 - PR #89 remains open. Steps 8-9 remain blocked on its merge and subsequent
   final-base verification; no merge was attempted.
 
-- [ ] **Step 8: Rebase after PR #89 merges**
+- [x] **Step 8: Update after PR #89 merges**
 
 After PR #89 is merged, update this branch onto the resulting `origin/main`
 without force-pushing unless the user explicitly authorizes it. If a history
 rewrite would be required, use a merge commit or ask for authorization. Rerun
 Tasks 2 Step 7, Task 2 Step 8, and Task 3 Steps 1-3 on the final base.
+
+**Final-base update evidence (2026-07-13):**
+
+- PR #89 was squash-merged to `origin/main` as `65bb9b81`. The roadmap branch
+  was updated with a merge commit so no remote history rewrite or force-push
+  was needed.
+- The squash merge conflicted only in `docs/planning/roadmap.md` and
+  `docs/planning/manual-tasks.md`, where #90 intentionally replaces #89's
+  duplicated planning lists. Both resolutions exactly match the previously
+  reviewed #90 blobs (`9f0c97db` and `f835c660`) while retaining #89's
+  completed offload contract in the optimized completed-foundation and manual
+  prerequisite records.
+- Changed-file Ruff format and lint passed. Mypy passed across 49 source files,
+  and Bandit reported no issues across 11,435 lines.
+- The final-base backend suite collected 656 tests and finished with **629
+  passed, 27 prerequisite-dependent skipped in 30.54s**.
+- All 11 documentation gates passed, including the roadmap consistency and
+  offload guardrail checks. The locked strict MkDocs build completed in 2.02s,
+  and `git diff --check` passed.
 
 - [ ] **Step 9: Merge and verify only with authorization**
 
