@@ -130,9 +130,9 @@ def check_milestone_completion_consistency(roadmap_path: Path) -> tuple[bool, st
 
 
 def _extract_roadmap_status(content: str) -> tuple[str, str] | None:
-    """Extract roadmap Current Status date and progress text."""
+    """Extract roadmap Current Snapshot date and progress text."""
     status_match = re.search(
-        r"## Current Status \(Updated ([^)]+)\)\s*\n\s*\*\*Progress:\*\* (.+?)(?=\n\n|\*\*|\Z)",
+        r"## Current Snapshot \(Updated ([^)]+)\)\s*\n\s*\*\*Progress:\*\* (.+?)(?=\n\n|\*\*|\Z)",
         content,
         re.DOTALL,
     )
@@ -157,18 +157,18 @@ def _latest_completed_milestone(content: str) -> int | None:
 
 
 def check_status_summary_freshness(roadmap_path: Path) -> tuple[bool, str]:
-    """Verify Current Status section mentions latest completed work."""
+    """Verify Current Snapshot section mentions latest completed work."""
     content = roadmap_path.read_text()
 
     status = _extract_roadmap_status(content)
     if not status:
-        return False, "Could not find 'Current Status' section"
+        return False, "Could not find 'Current Snapshot' section"
 
     update_date, progress_text = status
 
     # Verify date is in YYYY-MM-DD format
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", update_date):
-        return False, f"Current Status date '{update_date}' is not in YYYY-MM-DD format"
+        return False, f"Current Snapshot date '{update_date}' is not in YYYY-MM-DD format"
 
     latest_milestone = _latest_completed_milestone(content)
     if latest_milestone is None:
@@ -179,10 +179,10 @@ def check_status_summary_freshness(roadmap_path: Path) -> tuple[bool, str]:
     if not any(keyword in progress_text for keyword in expected_keywords):
         return (
             False,
-            f"Current Status may be stale - doesn't mention latest completed milestone M{latest_milestone}",
+            f"Current Snapshot may be stale - doesn't mention latest completed milestone M{latest_milestone}",
         )
 
-    return True, f"✓ Current Status updated {update_date} and mentions latest completed milestone"
+    return True, f"✓ Current Snapshot updated {update_date} and mentions latest completed milestone"
 
 
 def check_readme_status_alignment(roadmap_path: Path, repo_root: Path) -> tuple[bool, str]:
@@ -196,7 +196,7 @@ def check_readme_status_alignment(roadmap_path: Path, repo_root: Path) -> tuple[
 
     roadmap_status = _extract_roadmap_status(roadmap_content)
     if not roadmap_status:
-        return False, "Could not find roadmap Current Status section"
+        return False, "Could not find roadmap Current Snapshot section"
     roadmap_date, _progress_text = roadmap_status
 
     latest_milestone = _latest_completed_milestone(roadmap_content)
@@ -263,38 +263,123 @@ def check_readme_status_alignment(roadmap_path: Path, repo_root: Path) -> tuple[
     )
 
 
-def check_roadmap_items_formatting(roadmap_path: Path) -> tuple[bool, str]:
-    """Verify roadmap items use consistent checkbox formatting."""
-    content = roadmap_path.read_text()
+EXECUTION_COLUMNS = ("Priority", "Outcome", "State", "Gate", "Done when")
+ALLOWED_PRIORITIES = {"P0", "P1", "P2"}
+ALLOWED_STATES = {
+    "Ready",
+    "Decision required",
+    "External prerequisite",
+    "In validation",
+    "Later",
+}
 
-    active_roadmap_match = re.search(
-        r"## Active Roadmap.*?\n(.*?)(?=\n## |\Z)",
-        content,
-        re.DOTALL,
+
+def _section_bodies(content: str, heading: str) -> list[str]:
+    pattern = rf"^## {re.escape(heading)}\s*$\n(.*?)(?=^## |\Z)"
+    return re.findall(pattern, content, re.MULTILINE | re.DOTALL)
+
+
+def _table_cells(line: str) -> list[str]:
+    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+
+
+def _is_table_separator(line: str) -> bool:
+    cells = _table_cells(line)
+    return len(cells) == len(EXECUTION_COLUMNS) and all(
+        re.fullmatch(r":?-{3,}:?", cell) for cell in cells
     )
-    if not active_roadmap_match:
-        return False, "Could not find Active Roadmap section"
 
-    active_roadmap = active_roadmap_match.group(1)
-    section_pattern = r"### ([^\n]+)\n(.*?)(?=### |\Z)"
-    sections = re.findall(section_pattern, active_roadmap, re.DOTALL)
-    if not sections:
-        return False, "Could not find roadmap subsections under Active Roadmap"
 
-    issues = []
-    for section_name, section_content in sections:
-        # Extract only lines that are checkbox items (start with "- [")
-        lines = [line for line in section_content.split("\n") if line.strip().startswith("- [")]
-        for line in lines:
-            # Allow strikethrough for removed items: ~~**P1 / Name:**~~
-            # Allow "Deferred" prefix for deprioritized items
-            if not re.match(r"^- \[[x ]\] (?:~~)?\*\*(?:P\d+|Deferred) / ", line):
-                issues.append(f"Malformed item in '{section_name}': {line[:60]}")
+def _markdown_table_blocks(section: str) -> list[list[str]]:
+    """Return every block of consecutive pipe-delimited lines in a section."""
+    blocks: list[list[str]] = []
+    current_block: list[str] = []
+    for line in section.splitlines():
+        stripped_line = line.strip()
+        if stripped_line.startswith("|"):
+            current_block.append(stripped_line)
+        elif current_block:
+            blocks.append(current_block)
+            current_block = []
+    if current_block:
+        blocks.append(current_block)
+    return blocks
+
+
+def check_execution_roadmap_structure(roadmap_path: Path) -> tuple[bool, str]:
+    """Validate permanent guardrails and the finite execution queue."""
+    content = roadmap_path.read_text(encoding="utf-8")
+    issues: list[str] = []
+
+    for legacy_heading in ("Active Priorities", "Active Roadmap"):
+        if re.search(rf"^## {re.escape(legacy_heading)}\s*$", content, re.MULTILINE):
+            issues.append(f"legacy section '## {legacy_heading}' must be removed")
+
+    guardrail_sections = _section_bodies(content, "Continuous Guardrails")
+    if len(guardrail_sections) != 1:
+        issues.append("expected exactly one '## Continuous Guardrails' section")
+    elif re.search(
+        r"^[ \t]*(?:[-*+]|\d+[.)])[ \t]+\[[ xX]\][ \t]+",
+        guardrail_sections[0],
+        re.MULTILINE,
+    ):
+        issues.append("Continuous Guardrails must not contain task-list checkboxes")
+
+    queue_sections = _section_bodies(content, "Execution Queue")
+    if len(queue_sections) != 1:
+        issues.append("expected exactly one '## Execution Queue' section")
+    else:
+        section_lines = queue_sections[0].splitlines()
+        table_blocks = _markdown_table_blocks(queue_sections[0])
+        if len(table_blocks) != 1:
+            issues.append(
+                f"Execution Queue must contain exactly one table; found {len(table_blocks)}"
+            )
+        table_start = next(
+            (index for index, line in enumerate(section_lines) if line.strip().startswith("|")),
+            None,
+        )
+        table_lines: list[str] = []
+        if table_start is not None:
+            for line in section_lines[table_start:]:
+                stripped_line = line.strip()
+                if not stripped_line:
+                    break
+                table_lines.append(stripped_line)
+        if len(table_lines) < 3:
+            issues.append("Execution Queue must contain a header, separator, and row")
+        elif tuple(_table_cells(table_lines[0])) != EXECUTION_COLUMNS:
+            issues.append("Execution Queue columns must be: " + ", ".join(EXECUTION_COLUMNS))
+        elif not _is_table_separator(table_lines[1]):
+            issues.append("Execution Queue must use a valid Markdown separator row")
+        else:
+            for row_number, line in enumerate(table_lines[2:], start=1):
+                if not line.startswith("|") or not line.endswith("|"):
+                    issues.append(f"Execution Queue row {row_number} must start and end with '|'")
+                    continue
+                cells = _table_cells(line)
+                if len(cells) != len(EXECUTION_COLUMNS):
+                    issues.append(f"Execution Queue row {row_number} has the wrong column count")
+                    continue
+                priority, outcome, state, gate, done_when = cells
+                if priority not in ALLOWED_PRIORITIES:
+                    issues.append(
+                        f"Execution Queue row {row_number} has invalid priority '{priority}'"
+                    )
+                if state not in ALLOWED_STATES:
+                    issues.append(f"Execution Queue row {row_number} has invalid state '{state}'")
+                if not outcome:
+                    issues.append(f"Execution Queue row {row_number} requires a non-empty outcome")
+                if not gate:
+                    issues.append(f"Execution Queue row {row_number} requires a non-empty gate")
+                if not done_when:
+                    issues.append(
+                        f"Execution Queue row {row_number} requires a non-empty done-when value"
+                    )
 
     if issues:
-        return False, "Roadmap item formatting issues:\n  " + "\n  ".join(issues[:5])
-
-    return True, "✓ All roadmap items use consistent checkbox formatting"
+        return False, "Roadmap execution structure issues:\n  " + "\n  ".join(issues)
+    return True, "✓ Roadmap execution structure is complete"
 
 
 def main() -> int:
@@ -317,9 +402,9 @@ def main() -> int:
             ("ADR File References", check_adr_files, (roadmap_path, repo_root)),
             ("Implementation Plans", check_implementation_plans, (roadmap_path, repo_root)),
             ("Milestone Completion", check_milestone_completion_consistency, (roadmap_path,)),
-            ("Status Summary", check_status_summary_freshness, (roadmap_path,)),
+            ("Snapshot Summary", check_status_summary_freshness, (roadmap_path,)),
             ("README Status Alignment", check_readme_status_alignment, (roadmap_path, repo_root)),
-            ("Roadmap Item Formatting", check_roadmap_items_formatting, (roadmap_path,)),
+            ("Roadmap Execution Structure", check_execution_roadmap_structure, (roadmap_path,)),
         ]
 
         results = []
