@@ -38,7 +38,7 @@ Provincial health authorities report ER wait times using **fundamentally differe
 
 ### By the Numbers
 
-As reflected in the current runtime and roadmap baseline on **2026-07-10**:
+As reflected in the current runtime and roadmap baseline on **2026-07-13**:
 
 - **4 provinces** remain in the active audited source set: Quebec, Ontario,
   Alberta, and British Columbia
@@ -493,7 +493,7 @@ environment-specific paths are kept outside public documentation.
 
 ---
 
-## 📊 Current Status (as of 2026-07-10)
+## 📊 Current Status (as of 2026-07-13)
 
 ### Milestones Completed
 - ✅ M1-M4: Database foundation, Ontario/Quebec scrapers, methodology warnings, PWA setup

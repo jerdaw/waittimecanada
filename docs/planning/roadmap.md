@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-## Current Snapshot (Updated 2026-07-10)
+## Current Snapshot (Updated 2026-07-13)
 
 **Progress:** Milestone 33 is complete. Wait Time Canada is in a stewardship
 and selective-expansion phase.
@@ -15,7 +15,9 @@ The immediate delivery focus is the trusted source-freshness offload pilot.
 Runner provisioning, protected credential configuration, live command
 validation, schedule cutover, and the 24-hour proof window remain external
 operator work. GitHub manual dispatch remains the fallback until that evidence
-is accepted.
+is accepted. No repository-only implementation batch is currently ready: each
+P1 item below is either operator-gated or requires a methodology/product
+decision.
 
 ## Completed Foundations
 
@@ -71,6 +73,14 @@ is accepted.
 | P2 | Evaluate additional provinces | External prerequisite | Find a stable official public source with sufficient methodology documentation | The source is represented with ontology, provenance, clinical-safety boundaries, monitoring, and tests |
 | P2 | Explore smarter scheduling | Later | Establish safe low-activity bounds from sustained freshness evidence | Upstream requests decrease without breaching public freshness expectations and manual fallback remains available |
 | P2 | Reassess external CI or full Forgejo migration | Later | The hybrid offload pilot fails documented reliability or cost objectives | A reviewed ADR selects a bounded migration or explicitly retains the hybrid model |
+
+Queue interpretation:
+
+- Select work from this table only after its stated gate changes.
+- While every P1 gate is closed, accept only concrete reliability, security,
+  source-drift, dependency, or documentation-truth maintenance.
+- Do not substitute speculative implementation for missing operator evidence
+  or methodology decisions.
 
 Roadmap lifecycle and formatting rules are defined in
 [`roadmap-process.md`](roadmap-process.md); operator and recurring triggers are
@@ -151,6 +161,7 @@ tracked in [`manual-tasks.md`](manual-tasks.md).
 | [0025](../adr/0025-data-quality-scrape-window-and-runtime-env-contracts.md) | Data-quality scrape-window and runtime env contracts |
 | [0026](../adr/0026-public-documentation-boundary.md) | Public documentation boundary and private maintainer-note handling |
 | [0027](../adr/0027-hybrid-ci-offload-strategy.md) | Hybrid CI/offload strategy for GitHub Actions quota pressure |
+| [0028](../adr/0028-critical-only-operational-notification-mode.md) | Critical-only stateful operational notification mode |
 
 ## Implementation Plan References
 
