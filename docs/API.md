@@ -46,6 +46,10 @@ Hospital listing note:
   the map can render the full current inventory.
 - `page` and `limit` are optional opt-in pagination controls; `limit` is capped
   at `100`.
+- Every successful response includes a national `coverage` snapshot with
+  `hospital_count`, `province_count`, `generated_at`, and
+  `latest_measurement_at`. The top-level `count` remains the number of hospitals
+  in the filtered or paginated `data` array.
 
 ## Analytics
 
@@ -97,7 +101,8 @@ Additional optional export params:
 
 These routes are intentionally cache-friendly on the public frontend path:
 
-- `GET /api/health` and `GET /api/status`: 2-minute shared cache window
+- `GET /api/health`: 60-second in-process read cache with `Cache-Control: no-store`; browser status components poll every 5 minutes while visible
+- `GET /api/status`: 5-minute in-process and shared-cache window, with a 15-minute stale-while-revalidate allowance
 - `GET /api/hospitals`, `GET /api/resources`, `GET /api/resources/alerts`, `GET /api/resources/system-context`, `GET /api/data-quality`, `GET /api/anomalies`, `GET /api/compare`, `GET /api/analytics/benchmarks`, `GET /api/analytics/trends`, `GET /api/analytics/regions`, `GET /api/analytics/occupancy`, `GET /api/analytics/equity-summary`, and `GET /api/analytics/patterns`: 5-minute shared cache window
 - `GET /api/methodology`: 1-minute shared cache window
 - `GET /api/hospitals/[slug]/trends`: 10-minute shared cache window
@@ -150,6 +155,12 @@ Operational note:
 
 - these aggregate percentages now reflect the current hourly scraper expectation
   model (`24` expected runs/day), not the older 15-minute expectation model
+- `/api/status.overall_status` grades 24-hour measurement-hour completeness,
+  not current source freshness. The response makes this explicit with
+  `overall_status_basis=measurement_hour_completeness_24h` and
+  `measurement_window_timezone=UTC`; `/api/health.healthy` remains the
+  current database/heartbeat freshness signal. A fresh source can therefore
+  coexist with a critical 24-hour completeness grade after missed earlier hours.
 - hospital-level scrape counts and success rates are computed from distinct UTC
   hourly scrape windows, not raw measurement-row counts
 - aggregate measurement counts are returned as actual counts, not reconstructed

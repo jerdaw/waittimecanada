@@ -5,17 +5,19 @@ operational posture without exposing private deployment details.
 
 ## Public Coverage
 
-| Province | Source ID | Public Methodology Summary |
-|----------|-----------|----------------------------|
-| Quebec | `quebec-msss` | Registration-to-physician rolling average; stretcher occupancy where published |
-| Ontario | `ontario-health` | Triage-to-physician mean |
-| Alberta | `alberta-ahs` | Triage-to-physician point estimate |
-| British Columbia | `bc-phsa` | Triage-to-physician P90 |
+| Province         | Source ID        | Public Methodology Summary                                                     |
+| ---------------- | ---------------- | ------------------------------------------------------------------------------ |
+| Quebec           | `quebec-msss`    | Registration-to-physician rolling average; stretcher occupancy where published |
+| Ontario          | `ontario-health` | Triage-to-physician mean                                                       |
+| Alberta          | `alberta-ahs`    | Triage-to-physician point estimate                                             |
+| British Columbia | `bc-phsa`        | Triage-to-physician P90                                                        |
 
 ## Public Reliability Posture
 
+- The scraper workflow is configured to check sources hourly; scheduled starts can be delayed or skipped and provincial publication timing varies.
 - Scrapers write source status records after collection attempts.
-- Freshness checks use those records to identify stale or failed source updates.
+- Twice-hourly freshness checks use those records to identify stale or failed source updates and can request recovery when no scraper run is active.
+- The public stale threshold is 120 minutes; status timestamps, not the scheduler label, are the freshness evidence.
 - Data-quality snapshots and anomaly detection provide additional public context.
 - Raw measurement rows follow the project retention policy; aggregates are kept
   for long-term trend analysis.

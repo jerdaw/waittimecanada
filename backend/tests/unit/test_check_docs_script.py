@@ -170,6 +170,20 @@ def _create_docs_fixture(tmp_path: Path) -> Path:
         "print('roadmap consistency stub passed')\n",
     )
     _write(root / "frontend" / "README.md")
+    _write(
+        root / "frontend" / "utils" / "live-scraper-sources.ts",
+        (REPO_ROOT / "frontend" / "utils" / "live-scraper-sources.ts").read_text(
+            encoding="utf-8"
+        ),
+    )
+    _write(
+        root / "frontend" / "messages" / "en.json",
+        (REPO_ROOT / "frontend" / "messages" / "en.json").read_text(encoding="utf-8"),
+    )
+    _write(
+        root / "frontend" / "messages" / "fr.json",
+        (REPO_ROOT / "frontend" / "messages" / "fr.json").read_text(encoding="utf-8"),
+    )
     _write(root / ".github" / "workflows" / "docs-ci.yml", _docs_ci_yaml())
     _write(root / ".github" / "workflows" / "README.md")
 
@@ -381,20 +395,37 @@ def test_check_docs_requires_full_history_for_commit_audit(tmp_path: Path) -> No
     assert "Docs CI checkout must use fetch-depth: 0" in result.stdout
 
 
-def test_check_docs_rejects_active_hourly_github_actions_cadence_claim(
+def test_check_docs_rejects_four_hour_freshness_claim(
     tmp_path: Path,
 ) -> None:
     root = _create_docs_fixture(tmp_path)
     _write(
         root / "docs" / "architecture" / "data-flow.md",
-        "The ingestion process currently runs hourly via GitHub Actions.\n",
+        "Fresh Data Every 4 Hours.\n",
     )
 
     result = _run_check_docs(root)
 
     assert result.returncode == 1
     assert "data-flow.md" in result.stdout
-    assert "current hourly GitHub Actions ingestion" in result.stdout
+    assert "unsupported four-hour freshness" in result.stdout
+
+
+def test_check_docs_rejects_scheduler_cadence_drift(tmp_path: Path) -> None:
+    root = _create_docs_fixture(tmp_path)
+    workflow_path = root / ".github" / "workflows" / "scraper-cron.yml"
+    workflow_path.write_text(
+        workflow_path.read_text(encoding="utf-8").replace(
+            'cron: "29 * * * *"',
+            'cron: "29 */4 * * *"',
+        ),
+        encoding="utf-8",
+    )
+
+    result = _run_check_docs(root)
+
+    assert result.returncode == 1
+    assert "scraper schedule must be exactly hourly" in result.stdout
 
 
 def test_check_docs_allows_historical_archive_cadence_claim(

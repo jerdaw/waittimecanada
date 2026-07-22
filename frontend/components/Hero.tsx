@@ -6,12 +6,14 @@ import { useTranslations } from "next-intl";
 import { HeroStats } from "@/components/HeroStats";
 import { HeroHowItWorks } from "@/components/HeroHowItWorks";
 import { ProvinceCoverage } from "@/components/ProvinceCoverage";
+import type { PublicCoverage } from "@/types/coverage";
 
 const PROVINCES = ["ON", "QC", "AB", "BC"] as const;
 type ProvinceCode = (typeof PROVINCES)[number];
 
 interface HeroProps {
   hospitals: Hospital[];
+  coverage?: PublicCoverage | null;
   onExplore: () => void;
   className?: string;
   userLocation?: { lat: number; lon: number } | null;
@@ -23,6 +25,7 @@ interface HeroProps {
 
 export function Hero({
   hospitals,
+  coverage = null,
   onExplore,
   className,
   userLocation,
@@ -120,7 +123,7 @@ export function Hero({
           </div>
 
           {/* Stats bar */}
-          <HeroStats hospitalCount={hospitals.length} />
+          <HeroStats coverage={coverage} />
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground animate-in fade-in slide-in-from-bottom-5 duration-700 delay-100">
             {t("title")} <span className="text-primary">{t("subtitle")}</span>{" "}
