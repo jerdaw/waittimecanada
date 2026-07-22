@@ -95,11 +95,12 @@ API routes (selected):
 
 ## Runtime Usage Controls
 
-- `SystemStatus` polls `/api/health` every 5 minutes (not every minute) and only while the browser tab is visible.
+- `SystemStatus` polls `/api/health` every 5 minutes and only while the browser tab is visible.
+- The homepage server-renders database-derived national coverage, refreshes the selected province and coverage every 5 minutes while visible, and refreshes immediately when the tab becomes visible.
 - Read-heavy API routes use shared cache headers from `frontend/utils/cache.ts`.
 - Server-side routes can also use short-lived in-process response caching via `frontend/utils/server-cache.ts` for repeated anonymous reads.
 - Typical cache windows:
-  - `120s` for `/api/health`
+  - `60s` in-process and `no-store` for `/api/health`
   - `300s` for hospitals, resources, data-quality, anomalies, compare, and analytics endpoints
   - `60s` for methodology change events
   - `600s` for hospital trend timelines

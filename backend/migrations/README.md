@@ -18,6 +18,7 @@ uv run python run_migrations.py
 ```
 
 **Output:**
+
 ```
 Found 22 migration files:
 
@@ -74,6 +75,7 @@ Migrations run in **lexicographic order** (alphabetical). The numeric prefix ens
 **Location:** `backend/run_migrations.py`
 
 **Behavior:**
+
 - Reads all `*.sql` files from `backend/migrations/`
 - Sorts alphabetically (001 → 022)
 - Creates and uses the `schema_migrations` checksum ledger
@@ -85,6 +87,7 @@ Migrations run in **lexicographic order** (alphabetical). The numeric prefix ens
 - Other errors: fails and stops execution
 
 **Safe Duplicate Error Codes:**
+
 - `42710`: Duplicate object (enum, type)
 - `42P07`: Duplicate table/relation
 - `42723`: Duplicate function
@@ -96,11 +99,13 @@ Migrations run in **lexicographic order** (alphabetical). The numeric prefix ens
 ### M1: Foundation (001-005)
 
 #### 001_create_enums.sql
+
 **Purpose:** Define PostgreSQL enums for the metric ontology system
 **Created:** 2026-01-29
 **Milestone:** M1 (Database Foundation)
 
 **Enums Created:**
+
 - `metric_family_enum`: What is measured? (TIME_TO_PROVIDER, TOTAL_LOS, STRETCHER_OCCUPANCY)
 - `start_event_enum`: When does clock start? (TRIAGE, REGISTRATION, DOOR, UNKNOWN)
 - `end_event_enum`: When does clock stop? (PHYSICIAN, PROVIDER, DISCHARGE, FIRST_ASSESSMENT)
@@ -111,6 +116,7 @@ Migrations run in **lexicographic order** (alphabetical). The numeric prefix ens
 **Rationale:** See ADR-0002 (Ontology-based metric tagging)
 
 **Rollback:**
+
 ```sql
 DROP TYPE IF EXISTS scraper_status_enum;
 DROP TYPE IF EXISTS patient_scope_enum;
@@ -123,12 +129,14 @@ DROP TYPE IF EXISTS metric_family_enum;
 ---
 
 #### 002_create_tables.sql
+
 **Purpose:** Create core database tables
 **Created:** 2026-01-29
 **Milestone:** M1 (Database Foundation)
 **Depends on:** 001_create_enums.sql
 
 **Tables Created:**
+
 1. **sources** - Provincial data source metadata
    - Tracks official provincial URLs and methodology links
    - Stores default ontology mappings per source
@@ -150,6 +158,7 @@ DROP TYPE IF EXISTS metric_family_enum;
    - Status enum (healthy, error, stale)
 
 **Rollback:**
+
 ```sql
 DROP TABLE IF EXISTS scraper_status;
 DROP TABLE IF EXISTS measurements;
@@ -160,6 +169,7 @@ DROP TABLE IF EXISTS sources;
 ---
 
 #### 003_create_rls_policies.sql.skip
+
 **Purpose:** Row-Level Security policies (SKIPPED)
 **Status:** Intentionally excluded (`.sql.skip` extension)
 **Rationale:** RLS policies deferred; some hosted PostgreSQL pooling modes may conflict with RLS session variables
@@ -169,23 +179,27 @@ DROP TABLE IF EXISTS sources;
 ---
 
 #### 004_seed_sources.sql
+
 **Purpose:** Seed provincial data sources
 **Created:** 2026-02-11
 **Milestone:** M16 (Multi-Province Operationalization)
 
 **Sources Seeded:**
+
 - `quebec-msss`: Quebec MSSS (Ministère de la Santé)
 - `ontario-health`: historical seed later corrected to Health Quality Ontario semantics by `020_sync_active_source_definitions.sql`
 - `alberta-ahs`: Alberta Health Services
 - `bc-phsa`: BC Provincial Health Services Authority
 
 **Telehealth Routing:**
+
 - ON: Health Connect Ontario 811
 - QC: Info-Santé 811
 - AB: Health Link 811
 - BC: HealthLink BC 811
 
 **Rollback:**
+
 ```sql
 DELETE FROM sources WHERE id IN ('quebec-msss', 'ontario-health', 'alberta-ahs', 'bc-phsa');
 ```
@@ -193,10 +207,12 @@ DELETE FROM sources WHERE id IN ('quebec-msss', 'ontario-health', 'alberta-ahs',
 ---
 
 #### 005_create_functions.sql
+
 **Purpose:** Create PostgreSQL utility functions
 **Created:** 2026-01-29
 
 **Functions Created:**
+
 - `are_measurements_comparable(BIGINT, BIGINT)`
 - `get_latest_measurement(TEXT)`
 - `update_scraper_heartbeat(TEXT, scraper_status_enum, TEXT, INTEGER)`
@@ -204,6 +220,7 @@ DELETE FROM sources WHERE id IN ('quebec-msss', 'ontario-health', 'alberta-ahs',
 - `update_updated_at()`
 
 **Triggers Created:**
+
 - `sources_updated_at`
 - `hospitals_updated_at`
 - `scraper_status_updated_at`
@@ -213,18 +230,21 @@ DELETE FROM sources WHERE id IN ('quebec-msss', 'ontario-health', 'alberta-ahs',
 ### M13: Aggregation Pipeline (006)
 
 #### 006_create_measurement_aggregates.sql
+
 **Purpose:** Permanent statistical summary storage
 **Created:** 2026-02-06
 **Milestone:** M13 (Aggregation Pipeline)
 **Rationale:** ADR-0008 (Permanent aggregates for retention policy)
 
 **Table Created:** `measurement_aggregates`
+
 - Granularity: `hourly`, `daily`, `weekly`, `monthly`
 - Metrics: count, min, max, mean, median, p50, p75, p90, p95, p99
 - Purpose: Retain aggregates for efficient long-range analytics while raw measurements are also preserved
 - Indexes: Composite index on (hospital_id, granularity, window_start) for efficient querying
 
 **Rollback:**
+
 ```sql
 DROP TABLE IF EXISTS measurement_aggregates;
 ```
@@ -234,17 +254,20 @@ DROP TABLE IF EXISTS measurement_aggregates;
 ### M14: Data Quality & Anomaly Detection (007-009)
 
 #### 007_create_data_quality_snapshots.sql
+
 **Purpose:** Daily scraper reliability metrics
 **Created:** 2026-02-06
 **Milestone:** M14 (Data Quality & Anomaly Detection)
 **Rationale:** ADR-0009 (Data quality monitoring)
 
 **Table Created:** `data_quality_snapshots`
+
 - Daily snapshots of measurement counts, anomaly counts, scraper success rates
 - Per-source tracking for quality dashboard
 - Enables trend analysis of data quality over time
 
 **Rollback:**
+
 ```sql
 DROP TABLE IF EXISTS data_quality_snapshots;
 ```
@@ -252,15 +275,18 @@ DROP TABLE IF EXISTS data_quality_snapshots;
 ---
 
 #### 008_add_anomaly_columns.sql
+
 **Purpose:** Add anomaly detection flags to measurements
 **Created:** 2026-02-06
 **Milestone:** M14 (Data Quality & Anomaly Detection)
 
 **Columns Added to `measurements`:**
+
 - `is_anomaly`: Boolean flag for statistical outliers
 - `anomaly_reason`: TEXT description of why flagged (e.g., "Exceeds 3 sigma threshold")
 
 **Rollback:**
+
 ```sql
 ALTER TABLE measurements DROP COLUMN IF EXISTS anomaly_reason;
 ALTER TABLE measurements DROP COLUMN IF EXISTS is_anomaly;
@@ -269,16 +295,19 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS is_anomaly;
 ---
 
 #### 009_create_methodology_change_events.sql
+
 **Purpose:** Track provincial reporting methodology changes
 **Created:** 2026-02-06
 **Milestone:** M14 (Data Quality & Anomaly Detection)
 
 **Table Created:** `methodology_change_events`
+
 - Tracks when provinces change metric_family, start_event, end_event, statistic_type
 - Stores old/new ontology values for comparability impact analysis
 - Enables methodology timeline visualization
 
 **Rollback:**
+
 ```sql
 DROP TABLE IF EXISTS methodology_change_events;
 ```
@@ -288,11 +317,13 @@ DROP TABLE IF EXISTS methodology_change_events;
 ### M15: Analytics & Benchmarking (010)
 
 #### 010_create_regions_tables.sql
+
 **Purpose:** Add regional intelligence mapping
 **Created:** 2026-02-07
 **Milestone:** M15 (Analytics & Benchmarking)
 
 **Tables Created:**
+
 1. **regions** - Health region metadata (15 regions across 4 provinces)
    - Official region names and province associations
    - Enables regional benchmarking (hospital vs regional average)
@@ -302,6 +333,7 @@ DROP TABLE IF EXISTS methodology_change_events;
    - Foreign keys to both hospitals and regions tables
 
 **Rollback:**
+
 ```sql
 DROP TABLE IF EXISTS hospital_regions;
 DROP TABLE IF EXISTS regions;
@@ -312,11 +344,13 @@ DROP TABLE IF EXISTS regions;
 ### M17: Quebec Occupancy (011)
 
 #### 011_add_occupancy_columns.sql
+
 **Purpose:** Add stretcher occupancy metrics
 **Created:** 2026-02-08
 **Milestone:** M17 (Quebec Occupancy Implementation)
 
 **Columns Added to `measurements`:**
+
 - `patients_waiting`: Number of patients waiting for provider (INTEGER ≥ 0)
 - `patients_in_treatment`: Number of patients being treated (INTEGER ≥ 0)
 - `total_treatment_spaces`: ER capacity (INTEGER ≥ 0)
@@ -324,6 +358,7 @@ DROP TABLE IF EXISTS regions;
 **Usage:** Calculate occupancy percentage = (patients_in_treatment / total_treatment_spaces) × 100
 
 **Rollback:**
+
 ```sql
 ALTER TABLE measurements DROP COLUMN IF EXISTS total_treatment_spaces;
 ALTER TABLE measurements DROP COLUMN IF EXISTS patients_in_treatment;
@@ -335,11 +370,13 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 ### M23: Performance Optimization (012)
 
 #### 012_optimize_indexes.sql
+
 **Purpose:** Add composite indexes for common analytics and API query patterns
 **Created:** 2026-02-18
 **Milestone:** M23 (Quality & Standardization)
 
 **Highlights:**
+
 - Adds targeted indexes for high-frequency measurement queries
 - Improves trend, benchmark, and filtering performance
 - Leaves table contracts unchanged (index-only migration)
@@ -349,11 +386,13 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 ### M30: Scraper Observability (013)
 
 #### 013_add_scraper_observability_columns.sql
+
 **Purpose:** Add structured heartbeat metadata for failure visibility and reliability triage
 **Created:** 2026-02-19
 **Milestone:** M30 (Scraper Failure Visibility & Reliability Hardening)
 
 **Columns Added to `scraper_status`:**
+
 - `last_success_run`
 - `last_success_measurements_count`
 - `last_error_run`
@@ -363,6 +402,7 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 - `last_run_duration_ms`
 
 **Indexes Added:**
+
 - `idx_scraper_status_last_success_run`
 - `idx_scraper_status_last_error_run`
 - `idx_scraper_status_consecutive_failures`
@@ -372,10 +412,12 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 ### M33: Historical Occupancy Trends (014-015)
 
 #### 014_relax_value_constraint.sql
+
 **Purpose:** Allow zero-valued wait-time and occupancy measurements
 **Created:** 2026-02-19
 
 **Constraint Updated:**
+
 - Replaces the positive-only `measurements_value_check` with `value >= 0`
 
 **Rationale:** Supports valid zero-percent occupancy observations and occasional zero-minute wait-time observations without weakening the non-negative data contract.
@@ -383,12 +425,14 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 ---
 
 #### 015_add_metric_family_to_aggregates.sql
+
 **Purpose:** Keep aggregate uniqueness distinct across metric families
 **Created:** 2026-02-19
 **Milestone:** M33 (Historical Occupancy Trends)
 **Rationale:** ADR-0019 (Occupancy Trend Aggregation)
 
 **Constraint Updated:**
+
 - Replaces the prior hospital/period uniqueness key with `(hospital_id, period_type, period_start, metric_family)`
 
 **Behavior:** Allows wait-time and stretcher-occupancy aggregates for the same hospital and period to coexist.
@@ -398,11 +442,13 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 ### M31: Raw Retention Efficiency Guards (016)
 
 #### 016_add_measurement_retention_efficiency_guards.sql
+
 **Purpose:** Improve raw-measurement retention efficiency and suppress exact duplicates
 **Created:** 2026-03-13
 **Milestone:** M31 (Raw Retention Hardening)
 
 **Changes:**
+
 - Removes exact historical duplicate raw observations before constraints are added
 - Adds an exact-observation uniqueness guard on `measurements`
 - Adds a BRIN index on `measurements.timestamp_utc`
@@ -414,14 +460,17 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 ### M31: Alert State Deduplication (017)
 
 #### 017_add_scraper_alert_state.sql
+
 **Purpose:** Persist scraper incident state so heartbeat alerting only notifies on transitions
 **Created:** 2026-03-13
 **Milestone:** M31 (Alert Noise Reduction & Incident State Tracking)
 
 **Table Added:**
+
 - `scraper_alert_state`
 
 **Columns Added:**
+
 - `active_incident_kind`
 - `active_incident_fingerprint`
 - `opened_at`
@@ -429,6 +478,7 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 - `last_resolved_at`
 
 **Indexes Added:**
+
 - `idx_scraper_alert_state_active_incident`
 
 ---
@@ -436,15 +486,18 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 ### Public Health Hub Foundation and Operations (018-020)
 
 #### 018_create_public_health_hub_tables.sql
+
 **Purpose:** Create the Public Health Hub Batch A source, resource, and alert storage foundation
 **Created:** 2026-03-27
 
 **Tables Created:**
+
 - `public_data_sources`
 - `resource_locations`
 - `public_health_alerts`
 
 **Indexes Created:**
+
 - `idx_public_data_sources_domain`
 - `idx_public_data_sources_usage_mode`
 - `idx_resource_locations_kind_province`
@@ -457,25 +510,31 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 ---
 
 #### 019_add_public_health_source_alert_state.sql
+
 **Purpose:** Persist Public Health Hub source incidents so hard-fail alerting is state-change driven
 **Created:** 2026-03-27
 
 **Table Created:**
+
 - `public_health_source_alert_state`
 
 **Index Created:**
+
 - `idx_public_health_source_alert_state_active_incident` (partial index for active incidents)
 
 ---
 
 #### 020_add_public_health_system_metrics.sql
+
 **Purpose:** Add an analytics-only storage lane for Ontario EMS and system-context metrics
 **Created:** 2026-04-23
 
 **Table Created:**
+
 - `public_health_system_metrics`
 
 **Indexes Created:**
+
 - `idx_public_health_system_metrics_source_series_year`
 - `idx_public_health_system_metrics_geography_name`
 
@@ -484,12 +543,14 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 ### Source Catalog and Alert Notification Hardening (020-022)
 
 #### 020_sync_active_source_definitions.sql
+
 **Purpose:** Re-align active source rows to the canonical source catalog in
 `backend/data/sources/*.json`
 **Created:** 2026-04-16
 **Milestone:** Ontario completion / source-metadata sync
 
 **Key Corrections Applied:**
+
 - `ontario-health`: Health Quality Ontario, current HQO URLs, `MEAN`
 - `alberta-ahs`: `POINT_ESTIMATE`
 - active source URLs and telehealth metadata re-synced without changing source IDs
@@ -497,11 +558,13 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 ---
 
 #### 021_add_alert_notification_state.sql
+
 **Purpose:** Track whether active scraper/public-health incidents actually sent an operator notification
 **Created:** 2026-06-27
 **Milestone:** Critical-only notification mode
 
 **Columns Added:**
+
 - `scraper_alert_state.active_incident_notified_tier`
 - `scraper_alert_state.active_incident_notified_at`
 - `public_health_source_alert_state.active_incident_notified_tier`
@@ -512,18 +575,22 @@ ALTER TABLE measurements DROP COLUMN IF EXISTS patients_waiting;
 ---
 
 #### 022_update_ontario_health_source_url.sql
+
 **Purpose:** Update the active Ontario source URL to the current Ontario Health reporting path without rewriting applied migration history
 **Created:** 2026-07-08
 **Milestone:** Production health remediation
 
 **Rows Updated:**
+
 - `sources.url` for `ontario-health`
 
 **Rationale:**
+
 - The old HQOntario URL now redirects through Ontario Health.
 - The migration runner rejects checksum changes to already-applied migrations, so this URL correction is applied as a new idempotent migration.
 
 **Rollback:**
+
 ```sql
 UPDATE sources
 SET
@@ -594,6 +661,7 @@ psql $DATABASE_URL -c "\d your_table"
 ### Step 5: Document in This README
 
 Add entry to **Migration History** section above with:
+
 - Migration number and file name
 - Purpose and rationale
 - Milestone context
@@ -603,6 +671,7 @@ Add entry to **Migration History** section above with:
 ### Step 6: Update Related Docs
 
 If schema changes affect:
+
 - **API responses**: Update `docs/API.md`
 - **Services**: Update docstrings in `backend/src/waittime/services/`
 - **Models**: Update `backend/src/waittime/core/models.py`
@@ -782,6 +851,7 @@ GRANT CREATE ON SCHEMA public TO your_user;
 **Cause:** Syntax error or constraint violation
 
 **Steps:**
+
 1. Check error message in console output
 2. Fix SQL in migration file
 3. Manually rollback any partially applied changes
@@ -802,7 +872,7 @@ sources (4 rows)
   ├── url, methodology_url
   └── default_metric_family, default_start_event, default_end_event, default_statistic_type
 
-hospitals (380+ rows)
+hospitals (inventory-derived rows)
   ├── id (TEXT, PK)
   ├── source_id → sources(id)
   ├── province, city, latitude, longitude
@@ -849,7 +919,7 @@ regions (15 rows)
   ├── name, province
   └── created_at
 
-hospital_regions (380+ mappings)
+hospital_regions (inventory-derived mappings)
   ├── hospital_id → hospitals(id)
   └── region_id → regions(id)
 
@@ -897,6 +967,7 @@ public_health_source_alert_state (public-health incident state)
 ## Best Practices
 
 ### DO:
+
 - ✅ Add migrations for **all schema changes** (never modify schema manually in production)
 - ✅ Use **sequential numbering** (001, 002, ...)
 - ✅ Include **rollback instructions** in comments
@@ -909,6 +980,7 @@ public_health_source_alert_state (public-health incident state)
 - ✅ Include **COMMENT ON** for complex tables/columns
 
 ### DON'T:
+
 - ❌ Edit existing migrations after they've been applied to production
 - ❌ Skip migration numbering (e.g., 001, 005, 006 - missing 002-004)
 - ❌ Store full HTML/JSON in database (use hashing or external storage)
@@ -936,11 +1008,13 @@ Before deploying migrations to production:
 ### Deployment Steps
 
 1. **Backup Production Database**
+
    ```bash
    pg_dump $PRODUCTION_DATABASE_URL > backup_$(date +%Y%m%d_%H%M%S).sql
    ```
 
 2. **Run Migrations**
+
    ```bash
    cd backend
    export DATABASE_URL="$PRODUCTION_DATABASE_URL"
@@ -948,6 +1022,7 @@ Before deploying migrations to production:
    ```
 
 3. **Verify Schema**
+
    ```bash
    psql $PRODUCTION_DATABASE_URL -c "\d"
    ```
@@ -979,6 +1054,7 @@ Before deploying migrations to production:
 ## Questions?
 
 For migration questions or issues:
+
 - Check this README first
 - Review `backend/src/waittime/services/database.py` for service-level schema interactions
 - Consult ADRs in `docs/adr/` for architectural context

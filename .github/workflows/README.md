@@ -17,10 +17,12 @@ fetches full Git history so the authorship metadata audit can inspect existing
 commits, not only the latest shallow commit.
 
 **Jobs:**
+
 - `docs-quality` (runs `scripts/check-docs.sh`, installs the locked `docs`
   dependency group into `.venv-docs`, and runs `mkdocs build --strict`)
 
 **Checks include:**
+
 - ban `file://` links
 - detect non-human authorship attribution markers in tracked public text/source/data-artifact files
 - detect non-human author, committer, or authorship-trailer metadata in available Git history
@@ -44,6 +46,7 @@ commits, not only the latest shallow commit.
 **Purpose:** Keep frontend quality gates strict while reducing redundant runtime.
 
 **Jobs:**
+
 - `changes` (path-aware scope detection)
 - `lint` (ESLint + Prettier check)
 - `type-check` (TypeScript)
@@ -52,6 +55,7 @@ commits, not only the latest shallow commit.
 - `build` (Next.js production build, diff-gated)
 
 **Optimization controls:**
+
 - Branch-level concurrency cancellation.
 - Changed-path gating for heavy E2E/build steps.
 - Playwright E2E remains manual-dispatch only to conserve free-tier minutes; the suite was repo-side stabilized on 2026-04-09, so routine push/PR CI continues to rely on lint, type-check, unit tests, and build.
@@ -67,12 +71,14 @@ commits, not only the latest shallow commit.
 **Trigger:** push/PR affecting `backend/**`.
 
 **Jobs:**
+
 - `lint` (ruff)
 - `type-check` (mypy, advisory)
 - `test` (pytest + coverage)
 - `security` (Bandit, advisory)
 
 **Optimization controls:**
+
 - Branch-level concurrency cancellation.
 - Backend dependencies are installed with pinned `uv` plus `uv sync --locked`
   so CI uses the checked-in lockfile instead of floating resolver output.
@@ -92,6 +98,7 @@ commits, not only the latest shallow commit.
 **Purpose:** Run all provincial scrapers against the configured database and emit classified source-health state.
 
 **Optimization controls:**
+
 - Serialized concurrency group to avoid overlapping cron runs.
 - Source-health summary and freshness badge generation run immediately after
   scraper writes; daily analytics aggregate refresh runs afterward with a
@@ -108,6 +115,7 @@ commits, not only the latest shallow commit.
 **Purpose:** Ensure scraper heartbeat freshness remains within threshold and report consecutive/classified failures.
 
 **Optimization controls:**
+
 - Serialized concurrency group to avoid overlapping checks.
 
 ---
@@ -119,6 +127,7 @@ commits, not only the latest shallow commit.
 **Purpose:** Provide an operator-run retention cleanup entry point. The workflow skips aggregate refresh, deletes raw measurements older than 30 days in bounded batches, and reports `measurements` storage growth.
 
 **Optimization controls:**
+
 - Serialized concurrency group.
 
 ---
@@ -130,6 +139,7 @@ commits, not only the latest shallow commit.
 **Purpose:** Validate secrets + heartbeat, optionally run smoke checks.
 
 **Optimization controls:**
+
 - Branch-level concurrency cancellation.
 
 ---
@@ -141,6 +151,7 @@ commits, not only the latest shallow commit.
 **Purpose:** Verify public production routes respond with expected markers, including the public-health-hub `/resources` surface, the additive source-catalog contract, the Ontario EMS system-context API, and the Ontario water-advisories API.
 
 **Optimization controls:**
+
 - Single concurrency group with cancellation for stale overlapping runs.
 
 ---
@@ -152,6 +163,7 @@ commits, not only the latest shallow commit.
 **Purpose:** Build frontend, run scripted capture flow, upload screenshots artifact.
 
 **Optimization controls:**
+
 - Single concurrency group with cancellation.
 
 ---
@@ -163,6 +175,7 @@ commits, not only the latest shallow commit.
 **Purpose:** Apply database migrations to the configured PostgreSQL database using `backend/run_migrations.py`.
 
 **Optimization controls:**
+
 - Serialized concurrency per ref.
 - Installs locked backend dependencies before running migrations so `waittime`
   imports resolve correctly in CI.
@@ -175,6 +188,7 @@ commits, not only the latest shallow commit.
 **Trigger:** manual dispatch. Scheduled trigger is temporarily paused to conserve GitHub Actions free-tier minutes.
 
 **Purpose:** Refresh shipped public-health-hub datasets from approved live upstreams:
+
 - MOHSERLO via the Ontario ArcGIS feature service
 - Statistics Canada ODHF via the official zipped CSV archive
 - Ontario AED fallback via the approved Overpass query
@@ -182,6 +196,7 @@ commits, not only the latest shallow commit.
 - Ontario land ambulance response times via approved Ontario Data Catalogue CSV downloads
 
 **Optimization controls:**
+
 - Serialized concurrency group to avoid overlapping ingest runs.
 - Reuses the existing `DATABASE_URL` secret; no new secrets required.
 - MOHSERLO, ODHF, Health Canada alerts, and Ontario EMS system context remain
@@ -209,11 +224,13 @@ commits, not only the latest shallow commit.
 locked docs-only uv environment exercised by Docs CI.
 
 **Toolchain rule:**
+
 - Python 3.12 and uv 0.11.23 install only the `docs` dependency group into
   `.venv-docs`; `mkdocs gh-deploy --strict --force` runs with `--no-sync` so
   publication cannot silently resolve a different toolchain.
 
 **Authorship rule:**
+
 - The workflow is configured to write docs-publish commits with the human repo
   author identity rather than `github-actions[bot]`, so published branch
   history remains aligned with the repository's human-authorship policy.
@@ -221,24 +238,30 @@ locked docs-only uv environment exercised by Docs CI.
 ## Secrets Matrix
 
 ### Core production/runtime
+
 - `DATABASE_URL` (required by scraper, readiness, cleanup, and operational smoke paths)
 - `NEXT_PUBLIC_MAPBOX_TOKEN` (required by deployment/screenshot workflows; frontend CI uses a fake public token for validation)
 
 ### Alerting/observability
+
 - `ALERT_API_URL`, `ALERT_USER_KEY`, `ALERT_API_TOKEN` if operational alerting is enabled
 - `SENTRY_DSN` (optional)
 
 ### Production smoke
+
 - `PRODUCTION_BASE_URL` (required for smoke checks)
 
 ### Database migration workflow
+
 - Optional notification email credentials, if migration failure email is enabled
 
 ## Operational Notes
 
 - Playwright E2E is GitHub-CI-only and manual-dispatch to conserve free-tier minutes, even though the current suite has been repo-side stabilized.
-- The scraper and heartbeat workflows run on the public source-freshness
-  cadence. Snapshot, public-health ingest, and smoke checks remain
+- The scraper is configured hourly at minute 29, and the heartbeat monitor runs
+  at minutes 14 and 44. These are requested check times, not guarantees of
+  workflow start time or upstream publication freshness. Snapshot, public-health
+  ingest, and smoke checks remain
   manual-dispatch while broader operational offload work continues.
 - The scraper and heartbeat cron definitions are present on `main`. Both
   workflows produced successful post-recovery `event=schedule` runs on

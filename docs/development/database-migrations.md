@@ -91,11 +91,11 @@ Add an entry to `backend/migrations/README.md` under the appropriate milestone s
 
 ### 6. Update related docs
 
-| If you changed…      | Also update…                                         |
-|----------------------|------------------------------------------------------|
-| API response shape   | `docs/API.md`                                        |
-| Service layer        | Docstrings in `backend/src/waittime/services/`       |
-| Major design choice  | New ADR in `docs/adr/`                               |
+| If you changed…     | Also update…                                   |
+| ------------------- | ---------------------------------------------- |
+| API response shape  | `docs/API.md`                                  |
+| Service layer       | Docstrings in `backend/src/waittime/services/` |
+| Major design choice | New ADR in `docs/adr/`                         |
 
 ---
 
@@ -111,11 +111,13 @@ uv run python run_migrations.py
 ### Production or Hosted PostgreSQL
 
 1. **Backup first:**
+
    ```bash
    pg_dump $PRODUCTION_DATABASE_URL > backup_$(date +%Y%m%d_%H%M%S).sql
    ```
 
 2. **Run migrations:**
+
    ```bash
    cd backend
    export DATABASE_URL="$PRODUCTION_DATABASE_URL"
@@ -164,9 +166,9 @@ Migrations do not auto-rollback. Each migration file includes rollback SQL in co
 
 Migrations are validated in two workflows:
 
-| Workflow | What it checks |
-|---|---|
-| `scraper-ci.yml` | Runs the migration sequence guard plus backend quality checks/tests |
+| Workflow               | What it checks                                                          |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `scraper-ci.yml`       | Runs the migration sequence guard plus backend quality checks/tests     |
 | `database-migrate.yml` | Applies ledger-backed migrations with `uv run python run_migrations.py` |
 
 The `database-migrate.yml` workflow can be triggered manually to apply migrations to production via GitHub Actions.
@@ -175,17 +177,17 @@ The `database-migrate.yml` workflow can be triggered manually to apply migration
 
 ## Current Schema Summary
 
-| Table | Rows | Purpose |
-|---|---|---|
-| `sources` | 4 | Provincial data source metadata |
-| `hospitals` | 380+ | Facility metadata with geo-coordinates |
-| `measurements` | rolling 30-day window | Wait time audit log with ontology tags |
-| `measurement_aggregates` | permanent | Statistical summaries (hourly → monthly) |
-| `scraper_status` | 4 | Heartbeat monitoring per source |
-| `scraper_alert_state` | 4 | Current alert/incident state per source |
-| `data_quality_snapshots` | daily | Scraper reliability metrics |
-| `methodology_change_events` | historical | Drift detection audit log |
-| `regions` | 15 | Health region metadata |
-| `hospital_regions` | 380+ | Hospital-to-region mapping |
+| Table                       | Rows                  | Purpose                                  |
+| --------------------------- | --------------------- | ---------------------------------------- |
+| `sources`                   | 4                     | Provincial data source metadata          |
+| `hospitals`                 | Dataset-dependent     | Facility metadata with geo-coordinates   |
+| `measurements`              | rolling 30-day window | Wait time audit log with ontology tags   |
+| `measurement_aggregates`    | permanent             | Statistical summaries (hourly → monthly) |
+| `scraper_status`            | 4                     | Heartbeat monitoring per source          |
+| `scraper_alert_state`       | 4                     | Current alert/incident state per source  |
+| `data_quality_snapshots`    | daily                 | Scraper reliability metrics              |
+| `methodology_change_events` | historical            | Drift detection audit log                |
+| `regions`                   | 15                    | Health region metadata                   |
+| `hospital_regions`          | Dataset-dependent     | Hospital-to-region mapping               |
 
 For the full schema, see `backend/migrations/README.md`.

@@ -21,14 +21,15 @@
 ### Current Coverage
 
 - **4 Provinces:** Quebec, Ontario, Alberta, British Columbia
-- **380+ Hospitals:** Public source monitoring across all regions
-- **Source Refreshes:** Scheduled or manually dispatched collection from public provincial sources, with the current cadence posture tracked in the public roadmap
+- **Hospital Coverage:** Derived from verified, visible database rows and displayed with a dated snapshot
+- **Source Checks:** Configured hourly, with twice-hourly heartbeat monitoring and manual recovery; provincial publication timing and scheduler delivery can vary
 - **First-in-Canada:** ED stretcher occupancy visualization (Quebec)
 - **Ontario Public Resources Module:** `/resources` now serves facilities, OSM-backed AED fallback data, Health Canada recalls, AQHI, analytics-only Ontario EMS system context, Ontario reserve-system long-term drinking water advisories, and an official Ontario naloxone link-out with a first-class source catalog
 
 ### Why This Matters
 
 Provincial health authorities report ER wait times using **fundamentally different methodologies**:
+
 - Quebec starts the clock at **REGISTRATION** (administrative check-in)
 - Ontario starts at **TRIAGE** (clinical assessment)
 - Different statistical measures (P90 vs rolling averages)
@@ -38,11 +39,11 @@ Provincial health authorities report ER wait times using **fundamentally differe
 
 ### By the Numbers
 
-As reflected in the current runtime and roadmap baseline on **2026-07-13**:
+This reflects the roadmap baseline on **2026-07-13**. The hospital inventory below was observed from the public API on **2026-07-20** and is a dated snapshot, not a permanent inventory promise:
 
 - **4 provinces** remain in the active audited source set: Quebec, Ontario,
   Alberta, and British Columbia
-- **380+ hospitals** are represented across the current provincial inventories
+- **399 verified, visible hospitals** were represented across the current provincial inventories
 - **4 distinct statistic types** are still present across the active provinces:
   `MEAN`, `ROLLING_AVG`, `POINT_ESTIMATE`, and `P90`
 - **6 of 6 cross-province source pairs** still fail direct comparability on the
@@ -56,7 +57,7 @@ These are methodology and operations findings, not performance rankings. They de
 
 ## Limitations
 
-- Scraper freshness reflects scheduled ingestion rather than continuous real-time monitoring.
+- Sources are checked for updates hourly. Provincial publication timing varies, and scheduled checks can start late or be skipped; the schedule does not guarantee hourly freshness.
 - Provincial methodology labels are inferred from public documentation and can lag unannounced reporting changes by source organizations.
 - Reported wait times and occupancy values are limited to what provinces publish; the platform cannot surface unreported overcrowding or internal flow constraints.
 - The equity layer is currently implemented for Ontario only and should not be generalized to other provinces without province-specific source and tract validation.
@@ -70,18 +71,21 @@ This repository contains public project documentation and reproducible developme
 ## ✨ Key Features
 
 ### 🎯 Methodology Transparency
+
 - **Ontology-Based Architecture:** Every measurement tagged with start_event, end_event, statistic_type, patient_scope
 - **Divergence Warnings:** Automatic alerts when comparing incompatible metrics
 - **Comparability Matrix:** Visual display of cross-province methodology alignment
 - **Deep Linking:** Share specific hospital comparisons with methodology context
 
 ### 📈 Data Quality & Freshness
+
 - **Anomaly Detection:** Automated flagging of suspicious measurements
 - **Data Quality Dashboard:** Real-time visibility into scraper health, measurement counts, staleness
 - **Freshness Monitoring:** Heartbeat checks flag stale or failed source updates
 - **Methodology Change Detection:** Tracks when provincial reporting methods change
 
 ### 🚑 Public Health Resources
+
 - **Facilities & Services:** Ontario facility search grounded in MOHSERLO reference-directory data
 - **AED Fallback Map:** OpenStreetMap-based AED locations with explicit crowdsourced/incomplete labeling
 - **Safety Alerts:** Health Canada recalls and safety alerts with optional Drug Product Database enrichment
@@ -92,6 +96,7 @@ This repository contains public project documentation and reproducible developme
 - **Source Transparency:** Provenance links, last refresh timestamps, and domain-specific caveats on every public-health slice
 
 ### 🏥 Live Occupancy (Quebec)
+
 - **First-in-Canada:** Stretcher occupancy percentage visualization
 - **Color-Coded Indicators:**
   - 🟢 Green (<90%): Below capacity
@@ -100,23 +105,27 @@ This repository contains public project documentation and reproducible developme
 - **Clinical Context:** >100% indicates overcrowding and potential extended waits
 
 ### 📊 Analytics & Benchmarking
+
 - **Peer Benchmarking:** Hospital performance vs regional/provincial averages
 - **Temporal Patterns:** Hour-of-day, day-of-week, monthly trend analysis
 - **Regional Intelligence:** 15 health regions mapped with analytics segmentation
 - **System Trends:** Province-wide performance tracking with 90d/6m/1y views
 
 ### 🗺️ Interactive Map
-- **Mapbox Integration:** Geographic visualization of all hospitals
-- **Live Data Indicators:** Real-time updates highlighted
+
+- **Mapbox Integration:** Geographic visualization of verified, visible hospitals
+- **Freshness Indicators:** Latest stored timestamps and stale states highlighted
 - **Distance Calculation:** User location-based sorting
-- **Cluster Markers:** Efficient rendering of 380+ locations
+- **Cluster Markers:** Efficient rendering of the current database-derived inventory
 
 ### 📤 Data Export
+
 - **Citation-Ready:** CSV/JSON export with methodology metadata
 - **Granularity Control:** Raw measurements, hourly, daily, weekly, or monthly aggregates
 - **Research-Grade:** Full audit trail with payload hashing and parser versioning
 
 ### 🔍 Access & Equity Insights
+
 - **Access Burden Estimator:** Fuel + parking cost calculations for patient decision-making
 - **Provincial Gas Price Awareness:** ON $1.55/L, QC $1.60/L, BC $1.75/L
 - **Distance-Based Analysis:** Nearest hospital identification within radius
@@ -152,7 +161,7 @@ graph TD
     subgraph "Next.js 15 Frontend"
         API[API Routes<br/>/api/hospitals<br/>/api/analytics<br/>/api/data-quality]
         PAGES[Pages<br/>Map View<br/>Analytics Dashboard<br/>Methods Page<br/>Resources]
-        MAP[Mapbox GL JS<br/>380+ Hospital Markers]
+        MAP[Mapbox GL JS<br/>Database-derived Hospital Markers]
     end
 
     subgraph "Services"
@@ -200,6 +209,7 @@ graph TD
 ```
 
 ### Backend
+
 - **Language:** Python 3.12+
 - **Testing:** pytest with broad unit coverage plus database-backed integration tests; some backend integration and smoke checks require `DATABASE_URL`, and the local pipeline smoke path also expects a frontend server on `localhost:3000`
 - **Scrapers:** 4 provincial scrapers (BeautifulSoup, HTTP/HTML parsing, Playwright, JSON extraction)
@@ -211,6 +221,7 @@ graph TD
 - **CLI Tools:** Scraper runner, database cleanup, storage stats, seeding, aggregation, region mapping
 
 ### Frontend
+
 - **Framework:** Next.js 15 App Router + TypeScript
 - **Testing:** Vitest + React Testing Library for unit/component coverage, with Playwright browser verification kept CI-first, manual-dispatch, and outside the default push/PR merge gate
 - **Mapping:** Mapbox GL JS
@@ -219,6 +230,7 @@ graph TD
 - **Pages:** Home (map + list), /data-quality, /analytics, /methods, /resources, /about
 
 ### Database Schema (15 Tables)
+
 - `sources` - Provincial data source metadata
 - `hospitals` - Facility metadata with verification workflow
 - `measurements` - Audit log with ontology tags (payload hashing, not full HTML)
@@ -236,6 +248,7 @@ graph TD
 - `public_health_source_alert_state` - Stateful public-health ingest status tracking
 
 ### Automation
+
 - **Scheduled Workflows:** Scrapers, freshness checks, quality snapshots, and bounded retention cleanup
 - **Playwright Browsers:** Automated for Alberta and browser-based verification flows
 - **Health Tracking:** Source status is reconciled through state-change-aware checks
@@ -392,10 +405,12 @@ npm run test:unit    # Vitest unit tests
 ## 📖 Documentation
 
 ### Essential Reading
+
 - [`docs/planning/roadmap.md`](docs/planning/roadmap.md) - **Active roadmap and milestone status**
 - [`AGENTS.md`](AGENTS.md) - repository agent instructions and project architecture
 
 ### Deep Dives
+
 - [`docs/adr/`](docs/adr/) - Architecture Decision Records
 - [`backend/docs/methodologies/`](backend/docs/methodologies/) - Provincial methodology documentation
 - [`docs/case-studies/ottawa-gatineau-divergence.md`](docs/case-studies/ottawa-gatineau-divergence.md) - Cross-border methodology divergence case study
@@ -403,6 +418,7 @@ npm run test:unit    # Vitest unit tests
 - [`frontend/README.md`](frontend/README.md) - Frontend architecture and testing
 
 ### API Reference
+
 - [`docs/API.md`](docs/API.md) - API contracts and examples
 - [`docs/reference/data-dictionary.md`](docs/reference/data-dictionary.md) - **Data Dictionary & Schema**
 - [`docs/architecture/data-flow.md`](docs/architecture/data-flow.md) - **Data Flow Architecture**
@@ -448,11 +464,13 @@ waittimecanada/
 ## 🎯 Operational Workflows
 
 ### Production Automation
+
 - **Scraper Runs:** Scheduled or manually dispatched collection from public provincial sources, depending on the current quota posture
 - **Freshness Checks:** Source health is tracked from scraper status records
 - **Database Cleanup:** Manual cleanup keeps a 30-day raw-measurement window; the GitHub Actions maintenance path uses bounded batched deletes and reports storage growth
 
 ### CI/CD Pipelines
+
 - **Frontend CI:** Type checking, linting, unit tests
 - **Scraper CI:** Python tests, coverage reporting
 - **Production Readiness:** Pre-deployment validation
@@ -469,23 +487,27 @@ environment-specific paths are kept outside public documentation.
 ## 🛡️ Project Guardrails
 
 ### Clinical Safety
+
 - ✅ Never provide medical advice or triage recommendations
 - ✅ Always include emergency disclaimer: "Call 911 for emergencies"
 - ✅ Display telehealth routing (811 varies by province)
 
 ### Data Integrity
+
 - ✅ Preserve source semantics - never normalize incompatible metrics
 - ✅ Surface divergence warnings when comparisons are invalid
 - ✅ Hash payloads (SHA256) instead of storing full HTML
 - ✅ Tag every measurement with complete ontology metadata
 
 ### Verification & Quality
+
 - ✅ Government health authority sources are trusted and auto-approved
 - ✅ Quality enforced via anomaly detection and data quality monitoring
 - ✅ Heartbeat monitoring ensures data freshness
 - ✅ Methodology change detection tracks reporting shifts
 
 ### Attribution
+
 - ✅ Link back to official provincial sources
 - ✅ Display data provenance in all visualizations
 - ✅ Citation-ready export formats
@@ -496,6 +518,7 @@ environment-specific paths are kept outside public documentation.
 ## 📊 Current Status (as of 2026-07-13)
 
 ### Milestones Completed
+
 - ✅ M1-M4: Database foundation, Ontario/Quebec scrapers, methodology warnings, PWA setup
 - ✅ M7-M8: UX polish, SEO, landing page optimization
 - ✅ M9: Public launch foundations (About section, testimonial governance)
@@ -516,6 +539,7 @@ environment-specific paths are kept outside public documentation.
 - ✅ Operations: disposable database verification and frontend audit remediation through the Vitest 4 toolchain upgrade
 
 ### Validation Posture
+
 - **Backend:** broad unit coverage, plus opt-in database-backed integration and
   local pipeline smoke checks when `DATABASE_URL` and a local frontend server
   are available
@@ -527,6 +551,7 @@ environment-specific paths are kept outside public documentation.
   snapshot here
 
 ### Data Freshness
+
 - **Update Frequency:** Hourly scheduled source refreshes, with manual dispatch
   available as an operator fallback
 - **Freshness Thresholds:** Source-health checks flag stale or failed updates
@@ -564,6 +589,7 @@ Use GitHub issue templates for feature requests and data quality reports.
 MIT License - See [`LICENSE`](LICENSE) for details.
 
 **Data Sources:**
+
 - Quebec: Ministère de la Santé et des Services sociaux (MSSS)
 - Ontario: Health Ontario
 - Alberta: Alberta Health Services (AHS)

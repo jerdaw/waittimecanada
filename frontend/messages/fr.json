@@ -45,9 +45,12 @@
       "methodologies": "Notre Méthodologie"
     },
     "stats": {
-      "provinces": "4 Provinces",
-      "hospitals": "{count}+ Hôpitaux",
-      "cadence": "Données fraîches toutes les 4h"
+      "provinces": "{count} provinces",
+      "hospitals": "{count} hôpitaux",
+      "provincesUnavailable": "Nombre de provinces indisponible",
+      "hospitalsUnavailable": "Nombre d’hôpitaux indisponible",
+      "coverageAsOf": "Dénombrement généré à partir des données publiques actuelles le {date}.",
+      "cadence": "Sources vérifiées chaque heure"
     },
     "howItWorks": {
       "title": "Comment ça marche",
@@ -516,7 +519,7 @@
       "q2": "Pourquoi ne puis-je pas comparer directement les temps d'attente de l'Ontario et du Québec ?",
       "a2": "L'Ontario rapporte les temps moyens du triage au médecin, tandis que le Québec rapporte la moyenne mobile de l'inscription au médecin. Ces méthodologies différentes rendent la comparaison directe statistiquement invalide.",
       "q3": "À quel point ces données sont-elles à jour ?",
-      "a3": "Nous collectons les données des sources provinciales officielles selon un horaire automatisé. La cadence interprovinciale actuelle est horaire sur GitHub Actions, tandis que chaque province peut publier ses propres mises à jour à un rythme différent."
+      "a3": "Nous vérifions chaque heure les quatre sources provinciales. Le rythme de publication varie selon la province et les tâches planifiées peuvent être retardées ou omises : il s’agit d’une cadence de vérification, et non d’une garantie que chaque valeur est nouvelle ou date de moins d’une heure."
     },
     "medicalPage": {
       "desc": "Temps d'attente aux urgences publiés et audit méthodologique pour les hôpitaux canadiens."
@@ -539,24 +542,25 @@
   "Metadata": {
     "title": "Wait Time Canada | Temps d'attente aux urgences et audit méthodologique",
     "description": "Un Observatoire des Systèmes de Santé cliniquement défendable suivant les temps d'attente aux urgences à travers le Canada. Comparez les méthodologies, consultez les dernières données publiées et accédez aux analyses du système de santé.",
+    "coverageDescription": "Couverture publique actuelle : {hospitals} hôpitaux vérifiés et visibles dans {provinces} provinces, dénombrement généré le {date}. Wait Time Canada explique les différences méthodologiques et les dernières données publiées.",
     "keywords": "temps d'attente urgences, salles d'urgence Canada, méthodologie santé, temps d'attente hôpital, urgences Québec, urgences Ontario, urgences Alberta, urgences C-B"
   },
   "StatusPage": {
     "backToMap": "Back to live map",
     "title": "System Status",
-    "subtitle": "Santé opérationnelle de tous les scrapers provinciaux. Le taux de disponibilité compare les collectes réelles aux collectes attendues selon la cadence horaire actuelle.",
-    "overallHealth": "Overall Health",
-    "systemUptime24h": "System Uptime (24h)",
+    "subtitle": "Exhaustivité des collectes provinciales sur 24 heures. Elle est distincte de la fraîcheur actuelle : une source peut avoir un battement récent sain même si des fenêtres horaires antérieures sont absentes.",
+    "overallHealth": "Exhaustivité des collectes sur 24 h",
+    "systemUptime24h": "Heures avec mesures (24 h)",
     "activeProvinces": "Active Provinces",
     "hospitalsTracked": "Hospitals Tracked",
     "provincialScrapers": "Provincial Scrapers",
     "driftEvents": "Methodology Drift Events (Last 30 Days)",
     "driftEventsDesc": "Detected when a province-wide mean shifts by more than 20% week-over-week across at least 5 hospitals. May indicate a silent change in measurement methodology.",
     "noDriftEvents": "No drift events detected in the last 30 days.",
-    "dataFreshness": "Data freshness:",
+    "dataFreshness": "Heure de génération :",
     "statusGeneratedAt": "Status generated at {time}.",
     "uptimeCalc": "Uptime calculation:",
-    "uptimeCalcDesc": "Les scrapers s'exécutent actuellement chaque heure (24 collectes attendues par hôpital et par jour). Disponibilité = réel / attendu, plafonné à 100 %.",
+    "uptimeCalcDesc": "Pour chaque source active, le calcul compte les heures UTC distinctes contenant des mesures et divise ce total par 24. Une note critique sur 24 heures peut coexister avec des battements actuels sains; le point de terminaison de santé décrit la fraîcheur actuelle.",
     "detailedQuality": "For detailed data quality metrics, visit the",
     "dataQualityDashboard": "Data Quality dashboard",
     "uptime": {
@@ -596,7 +600,7 @@
       },
       "q4": {
         "question": "How often is data updated?",
-        "answer": "Most data sources are updated every 15-30 minutes. We fetch the latest data continuously. Check the 'Last updated' timestamp on each hospital card to be sure."
+        "answer": "Nous vérifions les quatre sources provinciales chaque heure. Le calendrier de publication provincial varie et les tâches planifiées peuvent être retardées ou omises. Il s'agit d'une fréquence de vérification, et non d'une garantie que chaque valeur change toutes les heures ou date de moins d'une heure; consultez chaque horodatage et l'état de la source."
       },
       "q5": {
         "question": "Why does my local hospital show 'No Data'?",
@@ -651,7 +655,7 @@
     "aboutMetrics": "About Data Quality Metrics",
     "metrics": {
       "successRate": "Success Rate:",
-      "successRateDesc": "Les scrapers s'exécutent actuellement chaque heure (24 collectes attendues par hôpital et par jour). Le taux de succès mesure les collectes réelles par rapport aux collectes attendues.",
+      "successRateDesc": "Le modèle prévoit 24 vérifications horaires par hôpital et par jour. Le taux de réussite compare les fenêtres de collecte horaires terminées aux fenêtres attendues.",
       "anomalyDetection": "Anomaly Detection:",
       "anomalyDetectionDesc": "Uses z-score (3 standard deviations) and IQR methods against a 7-day rolling baseline. Requires 20+ historical data points before flagging.",
       "whyTransparency": "Why Transparency Matters:",
@@ -857,7 +861,7 @@
         },
         "q4": {
           "question": "À quelle fréquence ces données sont-elles mises à jour ?",
-          "answer": "La fréquence de mise à jour varie selon la province et les organismes sources ne publient pas tous au même rythme. Notre workflow interprovincial s'exécute maintenant chaque heure via GitHub Actions, même si certaines sources provinciales peuvent se rafraîchir plus souvent en amont."
+          "answer": "Nous vérifions chaque heure les quatre sources provinciales. Le rythme de publication varie selon la province et les tâches planifiées peuvent être retardées ou omises. Il s’agit d’une cadence de vérification, et non d’une garantie que chaque valeur change chaque heure ou date de moins d’une heure."
         },
         "q5": {
           "question": "D'où viennent ces données ?",

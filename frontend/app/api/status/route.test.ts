@@ -52,6 +52,8 @@ describe("/api/status", () => {
     expect(mockSql).toHaveBeenCalledTimes(2);
     expect(res.status).toBe(200);
     expect(data.overall_status).toBe("healthy");
+    expect(data.overall_status_basis).toBe("measurement_hour_completeness_24h");
+    expect(data.measurement_window_timezone).toBe("UTC");
     expect(data.system_uptime_24h).toBe(1.0);
     expect(data.sources).toHaveLength(1);
     expect(data.sources[0].uptime_24h).toBe(1.0);
@@ -65,7 +67,7 @@ describe("/api/status", () => {
     expect(data.expected_runs_24h).toBe(24);
   });
 
-  it("should return critical status when uptime is < 80%", async () => {
+  it("keeps 24h completeness critical when the current heartbeat is healthy", async () => {
     const mockSql = vi.fn();
     (getDb as Mock).mockReturnValue(mockSql);
 
@@ -93,6 +95,9 @@ describe("/api/status", () => {
     expect(res.status).toBe(200);
     expect(data.overall_status).toBe("critical");
     expect(data.system_uptime_24h).toBeLessThan(0.8);
+    expect(data.sources[0].scraper_status).toBe("healthy");
+    expect(data.sources[0].last_heartbeat_age_minutes).toBe(10);
+    expect(data.overall_status_basis).toBe("measurement_hour_completeness_24h");
     expect(data.drift_events).toHaveLength(0);
   });
 
@@ -214,6 +219,8 @@ describe("/api/status", () => {
       ),
     ).toBe(false);
     expect(data.overall_status).toBe("healthy");
+    expect(data.overall_status_basis).toBe("measurement_hour_completeness_24h");
+    expect(data.measurement_window_timezone).toBe("UTC");
   });
 
   it("should handle database errors gracefully", async () => {

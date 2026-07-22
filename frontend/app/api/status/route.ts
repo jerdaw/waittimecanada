@@ -137,6 +137,8 @@ export async function GET() {
 
         return {
           overall_status: overallStatus,
+          overall_status_basis: "measurement_hour_completeness_24h",
+          measurement_window_timezone: "UTC",
           system_uptime_24h: Math.round(avgRate * 1000) / 1000,
           scheduler_cadence: LIVE_SCRAPER_CADENCE_LABEL,
           expected_runs_24h: EXPECTED_SCRAPER_RUNS_PER_DAY,

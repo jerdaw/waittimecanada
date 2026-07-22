@@ -29,11 +29,24 @@ describe("API Route Integration: Hospitals", () => {
     mockSql.unsafe.mockResolvedValueOnce([
       { id: 1, name: "Hospital A", province: "ON" },
     ]);
+    mockSql.mockResolvedValueOnce([
+      {
+        hospital_count: 399,
+        province_count: 4,
+        latest_measurement_at: new Date("2026-07-20T15:26:51.217Z"),
+      },
+    ]);
 
     const res = await GET(req);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
+    expect(data.coverage).toMatchObject({
+      hospital_count: 399,
+      province_count: 4,
+      latest_measurement_at: "2026-07-20T15:26:51.217Z",
+    });
+    expect(data.coverage.generated_at).toEqual(expect.any(String));
     // We expect the mocked data to be returned (or at least part of the logic flows through)
     // The route transforms the data, but if it returns 200 it means it passed validation.
   });

@@ -34,6 +34,8 @@ interface DriftEvent {
 
 interface SystemStatus {
   overall_status: "healthy" | "degraded" | "critical";
+  overall_status_basis: "measurement_hour_completeness_24h";
+  measurement_window_timezone: "UTC";
   system_uptime_24h: number;
   sources: SourceStatus[];
   drift_events: DriftEvent[];

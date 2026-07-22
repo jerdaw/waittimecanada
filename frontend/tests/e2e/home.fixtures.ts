@@ -119,6 +119,12 @@ export async function setupHomePageMocks(page: Page) {
         success: true,
         count: HOME_HOSPITALS.length,
         data: HOME_HOSPITALS,
+        coverage: {
+          hospital_count: 399,
+          province_count: 4,
+          generated_at: "2026-07-20T15:27:00.000Z",
+          latest_measurement_at: "2026-07-20T15:26:51.217Z",
+        },
       }),
     });
   });

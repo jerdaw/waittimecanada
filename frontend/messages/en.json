@@ -45,9 +45,12 @@
       "methodologies": "How We Measure This"
     },
     "stats": {
-      "provinces": "4 Provinces",
-      "hospitals": "{count}+ Hospitals",
-      "cadence": "Fresh Data Every 4 Hours"
+      "provinces": "{count} Provinces",
+      "hospitals": "{count} Hospitals",
+      "provincesUnavailable": "Province count unavailable",
+      "hospitalsUnavailable": "Hospital count unavailable",
+      "coverageAsOf": "Coverage counts generated from current public data on {date}.",
+      "cadence": "Sources Checked Hourly"
     },
     "howItWorks": {
       "title": "How It Works",
@@ -516,7 +519,7 @@
       "q2": "Why can't I compare Ontario and Quebec wait times directly?",
       "a2": "Ontario reports mean triage-to-physician times, while Quebec reports rolling-average registration-to-physician times. These different methodologies mean direct comparison is statistically invalid.",
       "q3": "How current is this data?",
-      "a3": "We collect from official provincial sources on an automated schedule. The current cross-province scrape cadence is hourly on GitHub Actions, while individual provinces may publish source updates on different intervals."
+      "a3": "We check all four provincial sources for updates on an hourly schedule. Provincial publication timing varies, and scheduled jobs can be delayed or skipped, so this is a polling cadence—not a guarantee that every value is new or less than an hour old."
     },
     "medicalPage": {
       "desc": "Published emergency room wait times and methodology auditing for Canadian hospitals."
@@ -539,24 +542,25 @@
   "Metadata": {
     "title": "Wait Time Canada | ER Wait Times & Methodology Audit",
     "description": "A clinically defensible Health Systems Observatory tracking emergency department wait times across Canada. Compare methodologies, view the latest published data, and access health system analytics.",
+    "coverageDescription": "Current public coverage: {hospitals} verified, visible hospitals across {provinces} provinces, generated {date}. Wait Time Canada explains methodology differences and the latest published data.",
     "keywords": "ER wait times, Canada emergency rooms, health methodology, hospital wait times, Quebec ER, Ontario ER, Alberta ER, BC ER"
   },
   "StatusPage": {
     "backToMap": "Back to live map",
     "title": "System Status",
-    "subtitle": "Operational health of all provincial scrapers. Uptime is measured as actual vs. expected collections under the current hourly scheduler cadence.",
-    "overallHealth": "Overall Health",
-    "systemUptime24h": "System Uptime (24h)",
+    "subtitle": "Twenty-four-hour collection completeness for the provincial sources. This is separate from current freshness: a source can have a healthy recent heartbeat while earlier hourly measurement windows are missing.",
+    "overallHealth": "24h Collection Completeness",
+    "systemUptime24h": "Measurement Hours Present (24h)",
     "activeProvinces": "Active Provinces",
     "hospitalsTracked": "Hospitals Tracked",
     "provincialScrapers": "Provincial Scrapers",
     "driftEvents": "Methodology Drift Events (Last 30 Days)",
     "driftEventsDesc": "Detected when a province-wide mean shifts by more than 20% week-over-week across at least 5 hospitals. May indicate a silent change in measurement methodology.",
     "noDriftEvents": "No drift events detected in the last 30 days.",
-    "dataFreshness": "Data freshness:",
+    "dataFreshness": "Snapshot time:",
     "statusGeneratedAt": "Status generated at {time}.",
     "uptimeCalc": "Uptime calculation:",
-    "uptimeCalcDesc": "Scrapers currently run hourly (24 expected collections per hospital per day). Uptime = actual / expected, capped at 100%.",
+    "uptimeCalcDesc": "For each active source, completeness counts distinct UTC hours containing measurements and divides by 24. A critical 24-hour grade can coexist with healthy current heartbeats; use the health endpoint for current freshness.",
     "detailedQuality": "For detailed data quality metrics, visit the",
     "dataQualityDashboard": "Data Quality dashboard",
     "uptime": {
@@ -596,7 +600,7 @@
       },
       "q4": {
         "question": "How often is data updated?",
-        "answer": "Most data sources are updated every 15-30 minutes. We fetch the latest data continuously. Check the 'Last updated' timestamp on each hospital card to be sure."
+        "answer": "We check all four provincial sources for updates on an hourly schedule. Provincial publication timing varies, and scheduled jobs can be delayed or skipped. This describes polling, not a guarantee that every value changes hourly or is less than an hour old; check each timestamp and source status."
       },
       "q5": {
         "question": "Why does my local hospital show 'No Data'?",
@@ -651,7 +655,7 @@
     "aboutMetrics": "About Data Quality Metrics",
     "metrics": {
       "successRate": "Success Rate:",
-      "successRateDesc": "Scrapers currently run hourly (24 expected collections per hospital per day). Success rate measures actual vs expected data collection.",
+      "successRateDesc": "The expectation model is 24 hourly scheduled checks per hospital per day. Success rate compares completed hourly collection windows with expected windows.",
       "anomalyDetection": "Anomaly Detection:",
       "anomalyDetectionDesc": "Uses z-score (3 standard deviations) and IQR methods against a 7-day rolling baseline. Requires 20+ historical data points before flagging.",
       "whyTransparency": "Why Transparency Matters:",
@@ -857,7 +861,7 @@
         },
         "q4": {
           "question": "How often is this data updated?",
-          "answer": "Update frequency varies by province, and source organizations do not all publish on the same cadence. Our cross-province scraper workflow now runs hourly via GitHub Actions, while some provincial sources may refresh more frequently upstream."
+          "answer": "We check all four provincial sources for updates on an hourly schedule. Provincial publication timing varies, and scheduled jobs can be delayed or skipped. This describes polling, not a guarantee that every value changes hourly or is less than an hour old."
         },
         "q5": {
           "question": "Where does this data come from?",

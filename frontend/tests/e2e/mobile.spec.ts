@@ -14,6 +14,15 @@ test.describe("Mobile Responsiveness", () => {
       page.getByRole("heading", { name: /Canada.*ER Wait Time/i }),
     ).toBeVisible();
 
+    await expect(page.getByText("4 Provinces", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("399 Hospitals", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Sources Checked Hourly", { exact: true }),
+    ).toBeVisible();
+    await expect(page.locator("body")).not.toContainText("...+ Hospitals");
+
     // Verify "Explore Hospitals" button is visible and click it to reveal search/app
     await page.getByRole("button", { name: /Explore Hospitals/i }).click();
 

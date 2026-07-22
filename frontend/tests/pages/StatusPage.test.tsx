@@ -34,6 +34,8 @@ const makeSource = (overrides = {}) => ({
 
 const makeStatus = (overrides = {}) => ({
   overall_status: "healthy" as const,
+  overall_status_basis: "measurement_hour_completeness_24h" as const,
+  measurement_window_timezone: "UTC" as const,
   system_uptime_24h: 0.97,
   sources: [makeSource()],
   drift_events: [],
@@ -64,7 +66,7 @@ describe("StatusPage", () => {
     await waitFor(() => {
       expect(screen.getByTestId("overall-status")).toBeInTheDocument();
     });
-    expect(screen.getByText("Overall Health")).toBeInTheDocument();
+    expect(screen.getByText("24h Collection Completeness")).toBeInTheDocument();
   });
 
   it("shows healthy status badge", async () => {
