@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-## Current Snapshot (Updated 2026-07-13)
+## Current Snapshot (Updated 2026-07-26)
 
 **Progress:** Milestone 33 is complete. Wait Time Canada is in a stewardship
 and selective-expansion phase.
@@ -9,7 +9,11 @@ The observatory covers Ontario, Quebec, Alberta, and British Columbia while
 preserving each source's methodology and exposing invalid direct comparisons.
 Historical occupancy aggregation and the Ontario-first public-health resources
 module are live. Repository-side reliability, documentation, migration, and
-offloaded-operations contracts are implemented.
+offloaded-operations contracts are implemented. The homepage now
+server-renders exact database-derived national coverage and preserves it through
+hydration, province changes, and refresh. Public status responses explicitly
+separate current 120-minute source freshness from 24-hour UTC
+measurement-hour completeness.
 
 The immediate delivery focus is the trusted source-freshness offload pilot.
 Runner provisioning, protected credential configuration, live command
@@ -44,6 +48,10 @@ decision.
   notified-tier state for scraper and public-health source incidents
 - Backend `uv.lock` setup and CI alignment, migration sequence validation, and
   frontend test-file type checking
+- Exact database-derived homepage coverage across server rendering, hydration,
+  province changes, and refresh, with no approximate hospital-count fallback
+- Explicit `/api/status` measurement-hour-completeness metadata kept separate
+  from the current-freshness contract exposed by `/api/health`
 
 ## Continuous Guardrails
 

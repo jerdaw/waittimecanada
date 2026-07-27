@@ -39,7 +39,7 @@ Provincial health authorities report ER wait times using **fundamentally differe
 
 ### By the Numbers
 
-This reflects the roadmap baseline on **2026-07-13**. The hospital inventory below was observed from the public API on **2026-07-20** and is a dated snapshot, not a permanent inventory promise:
+This reflects the roadmap baseline on **2026-07-26**. The hospital inventory below was observed from the public API on **2026-07-23** and is a dated snapshot, not a permanent inventory promise:
 
 - **4 provinces** remain in the active audited source set: Quebec, Ontario,
   Alberta, and British Columbia
@@ -515,7 +515,7 @@ environment-specific paths are kept outside public documentation.
 
 ---
 
-## 📊 Current Status (as of 2026-07-13)
+## 📊 Current Status (as of 2026-07-26)
 
 ### Milestones Completed
 
@@ -537,6 +537,7 @@ environment-specific paths are kept outside public documentation.
 - ✅ Operations: CI coverage artifacts retained for both frontend and backend verification
 - ✅ Operations: backend `uv.lock` setup/CI alignment, checksum-backed migration ledger, migration sequence guardrails, and frontend test-file type checking
 - ✅ Operations: disposable database verification and frontend audit remediation through the Vitest 4 toolchain upgrade
+- ✅ Operations: exact database-derived national coverage survives server rendering, hydration, province changes, and refresh; status responses distinguish current freshness from 24-hour UTC measurement-hour completeness
 
 ### Validation Posture
 
