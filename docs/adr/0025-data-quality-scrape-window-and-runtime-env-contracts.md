@@ -4,6 +4,15 @@ Date: 2026-04-15
 
 Status: Accepted
 
+Clarification recorded 2026-07-26: current freshness and 24-hour collection
+completeness are intentionally separate public signals. `/api/health.healthy`
+evaluates current database and source-heartbeat freshness against the exposed
+120-minute threshold. `/api/status.overall_status` grades distinct UTC
+measurement-hour completeness over 24 hours and declares that basis through
+`overall_status_basis=measurement_hour_completeness_24h` and
+`measurement_window_timezone=UTC`. Fresh sources can therefore coexist with a
+critical completeness grade after earlier delayed or skipped runs.
+
 Supersession note: ADR-0028 later widens the GitHub fallback operational
 heartbeat notification threshold to 720 minutes / six consecutive failures
 during critical-only notification periods. The data-quality scrape-window and
@@ -57,6 +66,8 @@ health/status behavior aligned across backend, frontend, workflows, and docs.
   posture
 * Heartbeat stale defaults now stay aligned with the live 120-minute
   operational threshold
+* Clients can distinguish current freshness from historical collection
+  completeness without inferring semantics from a shared status label
 
 ### Negative Consequences
 
@@ -66,6 +77,8 @@ health/status behavior aligned across backend, frontend, workflows, and docs.
   `DATABASE_URL` explicitly before backend runtime commands
 * Quality response fields keep legacy names such as `actual_scrapes`, so
   documentation must carry the semantic clarification
+* Operators must interpret `/api/health` and `/api/status` together; neither
+  signal alone describes both current freshness and recent scheduler delivery
 
 ## Pros and Cons of the Options
 
