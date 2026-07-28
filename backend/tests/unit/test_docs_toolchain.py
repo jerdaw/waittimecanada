@@ -3,7 +3,6 @@ from __future__ import annotations
 import tomllib
 from pathlib import Path
 
-
 REPO_ROOT = Path(__file__).resolve().parents[3]
 EXPECTED_DOCS_DEPENDENCIES = {
     "mkdocs>=1.6.1,<2",
@@ -39,10 +38,7 @@ def test_docs_ci_builds_strictly_from_the_locked_docs_group() -> None:
     assert 'python-version: "3.12"' in workflow
     assert 'python -m pip install "uv==${UV_VERSION}"' in workflow
     assert LOCKED_SYNC in workflow
-    assert (
-        f"{LOCKED_RUN} mkdocs build --strict --config-file mkdocs.yml"
-        in workflow
-    )
+    assert f"{LOCKED_RUN} mkdocs build --strict --config-file mkdocs.yml" in workflow
 
 
 def test_docs_deploy_uses_the_same_locked_toolchain() -> None:
@@ -56,11 +52,7 @@ def test_docs_deploy_uses_the_same_locked_toolchain() -> None:
     assert 'python-version: "3.12"' in workflow
     assert 'python -m pip install "uv==${UV_VERSION}"' in workflow
     assert LOCKED_SYNC in workflow
-    assert (
-        f"{LOCKED_RUN} mkdocs gh-deploy --strict --force "
-        "--config-file mkdocs.yml"
-        in workflow
-    )
+    assert f"{LOCKED_RUN} mkdocs gh-deploy --strict --force --config-file mkdocs.yml" in workflow
     assert 'pip install "mkdocs<2"' not in workflow_text
 
 
@@ -71,13 +63,11 @@ def test_make_target_preserves_the_backend_environment() -> None:
     assert "docs-build:" in makefile
     assert (
         "UV_PROJECT_ENVIRONMENT=.venv-docs "
-        "uv sync --project backend --locked --only-group docs"
-        in makefile
+        "uv sync --project backend --locked --only-group docs" in makefile
     )
     assert (
         "UV_PROJECT_ENVIRONMENT=.venv-docs "
         "uv run --project backend --no-sync mkdocs build --strict "
-        "--config-file mkdocs.yml"
-        in makefile
+        "--config-file mkdocs.yml" in makefile
     )
     assert ".venv-docs/" in backend_ignore.splitlines()

@@ -172,9 +172,7 @@ def _create_docs_fixture(tmp_path: Path) -> Path:
     _write(root / "frontend" / "README.md")
     _write(
         root / "frontend" / "utils" / "live-scraper-sources.ts",
-        (REPO_ROOT / "frontend" / "utils" / "live-scraper-sources.ts").read_text(
-            encoding="utf-8"
-        ),
+        (REPO_ROOT / "frontend" / "utils" / "live-scraper-sources.ts").read_text(encoding="utf-8"),
     )
     _write(
         root / "frontend" / "messages" / "en.json",

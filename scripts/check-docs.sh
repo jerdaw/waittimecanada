@@ -50,12 +50,20 @@ check_paths=(
   ".github/workflows/README.md"
 )
 
-mapfile -t maintenance_logs < <(
+maintenance_logs=()
+while IFS= read -r file; do
+  maintenance_logs+=("${file}")
+done < <(
   find "docs/planning/archive" -maxdepth 1 -type f -name "maintenance-*.md" 2>/dev/null | sort
 )
-check_paths+=("${maintenance_logs[@]}")
+if [[ ${#maintenance_logs[*]} -gt 0 ]]; then
+  check_paths+=("${maintenance_logs[@]}")
+fi
 
-mapfile -t all_md_files < <(
+all_md_files=()
+while IFS= read -r file; do
+  all_md_files+=("${file}")
+done < <(
   find "${check_paths[@]}" -type f -name "*.md" 2>/dev/null | sort
 )
 
@@ -86,11 +94,17 @@ if [[ ${#md_files[@]} -eq 0 ]]; then
   exit 1
 fi
 
-mapfile -t non_markdown_public_files < <(
+non_markdown_public_files=()
+while IFS= read -r file; do
+  non_markdown_public_files+=("${file}")
+done < <(
   find "${check_paths[@]}" -type f \( -name "*.html" -o -name "*.yaml" -o -name "*.yml" -o -name "*.json" -o -name "*.csv" \) 2>/dev/null | sort
 )
 
-mapfile -t public_text_files < <(
+public_text_files=()
+while IFS= read -r file; do
+  public_text_files+=("${file}")
+done < <(
   {
     printf '%s\n' "${md_files[@]}"
     printf '%s\n' "${non_markdown_public_files[@]}"
@@ -114,24 +128,26 @@ fi
 
 echo
 echo "[2/11] Checking for non-human authorship attribution markers..."
-mapfile -t tracked_attribution_files < <(
-  git ls-files | while IFS= read -r file; do
-    case "${file}" in
-      .env|.env.local|*/.env|*/.env.local|key.txt|*/key.txt|*.pem|*.key|private/*|*/private/*)
-        continue
-        ;;
-    esac
+tracked_attribution_files=()
+while IFS= read -r file; do
+  case "${file}" in
+    .env|.env.local|*/.env|*/.env.local|key.txt|*/key.txt|*.pem|*.key|private/*|*/private/*)
+      continue
+      ;;
+  esac
 
-    case "${file}" in
-      *.md|*.txt|*.rst|*.py|*.ts|*.tsx|*.js|*.jsx|*.json|*.yml|*.yaml|*.sh|*.sql|*.css|*.html|*.csv|*.toml|*.ini|*.cfg)
-        if [[ -e "${file}" ]]; then
-          printf '%s\n' "${file}"
-        fi
-        ;;
-    esac
-  done
-)
-mapfile -t attribution_files < <(
+  case "${file}" in
+    *.md|*.txt|*.rst|*.py|*.ts|*.tsx|*.js|*.jsx|*.json|*.yml|*.yaml|*.sh|*.sql|*.css|*.html|*.csv|*.toml|*.ini|*.cfg)
+      if [[ -e "${file}" ]]; then
+        tracked_attribution_files+=("${file}")
+      fi
+      ;;
+  esac
+done < <(git ls-files)
+attribution_files=()
+while IFS= read -r file; do
+  attribution_files+=("${file}")
+done < <(
   {
     printf '%s\n' "${tracked_attribution_files[@]}"
     printf '%s\n' "${public_text_files[@]}"
