@@ -99,11 +99,13 @@ Additional optional export params:
 
 ## Response caching and transfer guardrails
 
-These routes are intentionally cache-friendly on the public frontend path:
+These routes use endpoint-specific caching contracts on the public frontend path:
 
 - `GET /api/health`: 60-second in-process read cache with `Cache-Control: no-store`; browser status components poll every 5 minutes while visible
 - `GET /api/status`: 5-minute in-process and shared-cache window, with a 15-minute stale-while-revalidate allowance
-- `GET /api/hospitals`, `GET /api/resources`, `GET /api/resources/alerts`, `GET /api/resources/system-context`, `GET /api/data-quality`, `GET /api/anomalies`, `GET /api/compare`, `GET /api/analytics/benchmarks`, `GET /api/analytics/trends`, `GET /api/analytics/regions`, `GET /api/analytics/occupancy`, `GET /api/analytics/equity-summary`, and `GET /api/analytics/patterns`: 5-minute shared cache window
+- `GET /api/hospitals`: `Cache-Control: no-store`; the application may coalesce identical reads in-process for no more than 30 seconds
+- `GET /api/analytics/occupancy`: `Cache-Control: no-store`; the endpoint bypasses application response caching so source-health changes are reflected without an application cache window
+- `GET /api/resources`, `GET /api/resources/alerts`, `GET /api/resources/system-context`, `GET /api/data-quality`, `GET /api/anomalies`, `GET /api/compare`, `GET /api/analytics/benchmarks`, `GET /api/analytics/trends`, `GET /api/analytics/regions`, `GET /api/analytics/equity-summary`, and `GET /api/analytics/patterns`: 5-minute shared cache window
 - `GET /api/methodology`: 1-minute shared cache window
 - `GET /api/hospitals/[slug]/trends`: 10-minute shared cache window
 
@@ -274,6 +276,12 @@ Operational note:
 - `status: "not_available_yet"`
 
 This ensures missing source fields are explicit, not silently treated as zero.
+
+`status: "available"` requires both a fresh occupancy observation and a healthy,
+fresh heartbeat from the matching source. Sources with failed, stale,
+future-dated, or missing heartbeats are omitted independently. In provinces with
+more than one source, observations from all remaining eligible sources are still
+aggregated over the documented reporting window.
 
 ## Equity availability contract
 
