@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/utils/db";
-import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
+import { NO_STORE_HEADERS } from "@/utils/cache";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
+import { resolveHeartbeatStaleThresholdMinutes } from "@/utils/runtime-freshness";
 
 type OccupancyStatus = "available" | "no_reporting_data" | "not_available_yet";
 
@@ -12,7 +13,9 @@ interface OccupancyFieldsAvailability {
 
 import { OccupancyQuerySchema } from "@/utils/validations";
 
-const OCCUPANCY_CACHE_TTL_MS = 300_000;
+// Current occupancy must reflect source-health changes immediately. A zero TTL
+// bypasses the shared in-process response cache.
+const OCCUPANCY_CACHE_TTL_MS = 0;
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -32,10 +35,14 @@ export async function GET(request: Request) {
   }
 
   const { province } = validation.data;
+  const staleThresholdMinutes = resolveHeartbeatStaleThresholdMinutes();
 
   try {
     const payload = await getOrSetServerCache(
-      buildServerCacheKey("api:analytics:occupancy", { province }),
+      buildServerCacheKey("api:analytics:occupancy", {
+        province,
+        stale_threshold_minutes: staleThresholdMinutes,
+      }),
       OCCUPANCY_CACHE_TTL_MS,
       async () => {
         const sql = getDb();
@@ -47,7 +54,11 @@ export async function GET(request: Request) {
           WHERE h.province = ${province}
             AND h.is_visible = true
             AND h.is_verified = true
-            AND m.metric_family = 'STRETCHER_OCCUPANCY'
+            AND (
+              m.metric_family = 'STRETCHER_OCCUPANCY'
+              OR m.patients_waiting IS NOT NULL
+              OR m.patients_in_treatment IS NOT NULL
+            )
             AND m.timestamp_utc >= NOW() - INTERVAL '24 hours'
         `;
 
@@ -94,53 +105,107 @@ export async function GET(request: Request) {
           };
         }
 
-        const occupancyRows = await sql`
-          SELECT
-            COUNT(*)::int AS observations_24h,
-            COUNT(DISTINCT m.hospital_id)::int AS hospitals_reporting,
-            AVG(m.value)::float AS avg_occupancy_percentage,
-            MIN(m.value)::float AS min_occupancy_percentage,
-            MAX(m.value)::float AS max_occupancy_percentage,
-            MAX(m.timestamp_utc) AS latest_observation
-          FROM measurements m
-          JOIN hospitals h ON h.id = m.hospital_id
-          WHERE h.province = ${province}
-            AND h.is_visible = true
-            AND h.is_verified = true
-            AND m.metric_family = 'STRETCHER_OCCUPANCY'
-            AND m.timestamp_utc >= NOW() - INTERVAL '24 hours'
-        `;
-
-        const rawCountRows = await sql`
-          SELECT
-            COUNT(*)::int AS observations_24h,
-            COUNT(DISTINCT m.hospital_id)::int AS hospitals_reporting,
-            AVG(m.patients_waiting)::float AS avg_patients_waiting,
-            AVG(m.patients_in_treatment)::float AS avg_patients_in_treatment,
-            MAX(m.timestamp_utc) AS latest_observation
-          FROM measurements m
-          JOIN hospitals h ON h.id = m.hospital_id
-          WHERE h.province = ${province}
-            AND h.is_visible = true
-            AND h.is_verified = true
-            AND m.timestamp_utc >= NOW() - INTERVAL '24 hours'
-            AND (
-              m.patients_waiting IS NOT NULL
-              OR m.patients_in_treatment IS NOT NULL
+        const aggregateRows = await sql`
+          WITH relevant_measurements AS (
+            SELECT m.*
+            FROM measurements m
+            JOIN hospitals h ON h.id = m.hospital_id
+            WHERE h.province = ${province}
+              AND h.is_visible = true
+              AND h.is_verified = true
+              AND (
+                m.metric_family = 'STRETCHER_OCCUPANCY'
+                OR m.patients_waiting IS NOT NULL
+                OR m.patients_in_treatment IS NOT NULL
+              )
+              AND m.timestamp_utc >= NOW() - INTERVAL '24 hours'
+          ),
+          eligible_sources AS (
+            SELECT rm.source_id
+            FROM relevant_measurements rm
+            JOIN scraper_status ss ON ss.source_id = rm.source_id
+            WHERE ss.status = 'healthy'
+              AND COALESCE(ss.consecutive_failures, 0) = 0
+              AND ss.last_run >= NOW() - (
+                ${staleThresholdMinutes} * INTERVAL '1 minute'
+              )
+              AND ss.last_run <= NOW()
+            GROUP BY rm.source_id
+            HAVING MAX(rm.timestamp_utc) >= NOW() - (
+              ${staleThresholdMinutes} * INTERVAL '1 minute'
             )
+              AND MAX(rm.timestamp_utc) <= NOW()
+          )
+          SELECT
+            COUNT(*) FILTER (
+              WHERE rm.metric_family = 'STRETCHER_OCCUPANCY'
+            )::int AS occupancy_observations_24h,
+            COUNT(DISTINCT rm.hospital_id) FILTER (
+              WHERE rm.metric_family = 'STRETCHER_OCCUPANCY'
+            )::int AS occupancy_hospitals_reporting,
+            AVG(rm.value) FILTER (
+              WHERE rm.metric_family = 'STRETCHER_OCCUPANCY'
+            )::float AS avg_occupancy_percentage,
+            MIN(rm.value) FILTER (
+              WHERE rm.metric_family = 'STRETCHER_OCCUPANCY'
+            )::float AS min_occupancy_percentage,
+            MAX(rm.value) FILTER (
+              WHERE rm.metric_family = 'STRETCHER_OCCUPANCY'
+            )::float AS max_occupancy_percentage,
+            MAX(rm.timestamp_utc) FILTER (
+              WHERE rm.metric_family = 'STRETCHER_OCCUPANCY'
+            ) AS latest_occupancy_observation,
+            COUNT(*) FILTER (
+              WHERE rm.patients_waiting IS NOT NULL
+                OR rm.patients_in_treatment IS NOT NULL
+            )::int AS raw_count_observations_24h,
+            COUNT(DISTINCT rm.hospital_id) FILTER (
+              WHERE rm.patients_waiting IS NOT NULL
+                OR rm.patients_in_treatment IS NOT NULL
+            )::int AS raw_count_hospitals_reporting,
+            AVG(rm.patients_waiting) FILTER (
+              WHERE rm.patients_waiting IS NOT NULL
+                OR rm.patients_in_treatment IS NOT NULL
+            )::float AS avg_patients_waiting,
+            AVG(rm.patients_in_treatment) FILTER (
+              WHERE rm.patients_waiting IS NOT NULL
+                OR rm.patients_in_treatment IS NOT NULL
+            )::float AS avg_patients_in_treatment,
+            MAX(rm.timestamp_utc) FILTER (
+              WHERE rm.patients_waiting IS NOT NULL
+                OR rm.patients_in_treatment IS NOT NULL
+            ) AS latest_raw_count_observation
+          FROM relevant_measurements rm
+          JOIN eligible_sources es ON es.source_id = rm.source_id
         `;
 
-        const occupancyRow = occupancyRows[0] ?? null;
-        const rawCountRow = rawCountRows[0] ?? null;
-
+        const aggregateRow = aggregateRows[0] ?? null;
         const occupancyObservations = Number(
-          occupancyRow?.observations_24h ?? 0,
+          aggregateRow?.occupancy_observations_24h ?? 0,
         );
-        const rawCountObservations = Number(rawCountRow?.observations_24h ?? 0);
+        const rawCountObservations = Number(
+          aggregateRow?.raw_count_observations_24h ?? 0,
+        );
         const totalObservations = occupancyObservations + rawCountObservations;
+        const recentObservationCount = Number(
+          occupancyMeasurements[0]?.count ?? 0,
+        );
+        const currentDataAvailable = totalObservations > 0;
+        const latestObservationValues = [
+          aggregateRow?.latest_occupancy_observation,
+          aggregateRow?.latest_raw_count_observation,
+        ]
+          .filter((value) => value !== null && value !== undefined)
+          .map((value) => new Date(value).getTime())
+          .filter(Number.isFinite);
+        const latestObservation =
+          latestObservationValues.length > 0
+            ? new Date(Math.max(...latestObservationValues))
+            : null;
 
-        const status: OccupancyStatus =
-          totalObservations > 0 ? "available" : "no_reporting_data";
+        const status: OccupancyStatus = currentDataAvailable
+          ? "available"
+          : "no_reporting_data";
 
         interface OccupancyResponse {
           province: string;
@@ -150,6 +215,8 @@ export async function GET(request: Request) {
           message: string;
           fields: OccupancyFieldsAvailability;
           observations_24h: number;
+          latest_observation: string | null;
+          freshness_threshold_minutes: number;
           occupancy_percentage?: {
             hospitals_reporting: number;
             average: number | null;
@@ -170,53 +237,67 @@ export async function GET(request: Request) {
 
         const responseData: OccupancyResponse = {
           province,
-          available: true,
+          available: currentDataAvailable,
           status,
           generated_at: new Date().toISOString(),
           message:
             status === "available"
               ? "Occupancy data is available for reporting hospitals."
-              : "Occupancy fields exist but no recent reporting rows were found in the last 24 hours.",
+              : recentObservationCount === 0
+                ? "Occupancy fields exist but no reporting rows were found in the last 24 hours."
+                : `Current occupancy data are unavailable because source collection or freshness does not meet the ${staleThresholdMinutes}-minute public threshold.`,
           fields,
           observations_24h: totalObservations,
+          latest_observation: latestObservation?.toISOString() ?? null,
+          freshness_threshold_minutes: staleThresholdMinutes,
         };
 
-        if (occupancyObservations > 0) {
+        if (currentDataAvailable && occupancyObservations > 0) {
           responseData.occupancy_percentage = {
-            hospitals_reporting: Number(occupancyRow?.hospitals_reporting ?? 0),
-            average: occupancyRow?.avg_occupancy_percentage
-              ? Number(occupancyRow.avg_occupancy_percentage)
-              : null,
-            min: occupancyRow?.min_occupancy_percentage
-              ? Number(occupancyRow.min_occupancy_percentage)
-              : null,
-            max: occupancyRow?.max_occupancy_percentage
-              ? Number(occupancyRow.max_occupancy_percentage)
-              : null,
-            latest_observation: occupancyRow?.latest_observation
-              ? String(occupancyRow.latest_observation)
+            hospitals_reporting: Number(
+              aggregateRow?.occupancy_hospitals_reporting ?? 0,
+            ),
+            average:
+              aggregateRow?.avg_occupancy_percentage !== null &&
+              aggregateRow?.avg_occupancy_percentage !== undefined
+                ? Number(aggregateRow.avg_occupancy_percentage)
+                : null,
+            min:
+              aggregateRow?.min_occupancy_percentage !== null &&
+              aggregateRow?.min_occupancy_percentage !== undefined
+                ? Number(aggregateRow.min_occupancy_percentage)
+                : null,
+            max:
+              aggregateRow?.max_occupancy_percentage !== null &&
+              aggregateRow?.max_occupancy_percentage !== undefined
+                ? Number(aggregateRow.max_occupancy_percentage)
+                : null,
+            latest_observation: aggregateRow?.latest_occupancy_observation
+              ? String(aggregateRow.latest_occupancy_observation)
               : null,
             note: "Stretcher occupancy rate as percentage. >100% indicates overcrowding.",
           };
         }
 
-        if (rawCountObservations > 0) {
+        if (currentDataAvailable && rawCountObservations > 0) {
           responseData.raw_counts = {
-            hospitals_reporting: Number(rawCountRow?.hospitals_reporting ?? 0),
+            hospitals_reporting: Number(
+              aggregateRow?.raw_count_hospitals_reporting ?? 0,
+            ),
             averages: {
               patients_waiting:
-                rawCountRow?.avg_patients_waiting !== null &&
-                rawCountRow?.avg_patients_waiting !== undefined
-                  ? Number(rawCountRow.avg_patients_waiting)
+                aggregateRow?.avg_patients_waiting !== null &&
+                aggregateRow?.avg_patients_waiting !== undefined
+                  ? Number(aggregateRow.avg_patients_waiting)
                   : null,
               patients_in_treatment:
-                rawCountRow?.avg_patients_in_treatment !== null &&
-                rawCountRow?.avg_patients_in_treatment !== undefined
-                  ? Number(rawCountRow.avg_patients_in_treatment)
+                aggregateRow?.avg_patients_in_treatment !== null &&
+                aggregateRow?.avg_patients_in_treatment !== undefined
+                  ? Number(aggregateRow.avg_patients_in_treatment)
                   : null,
             },
-            latest_observation: rawCountRow?.latest_observation
-              ? String(rawCountRow.latest_observation)
+            latest_observation: aggregateRow?.latest_raw_count_observation
+              ? String(aggregateRow.latest_raw_count_observation)
               : null,
           };
         }
@@ -228,9 +309,7 @@ export async function GET(request: Request) {
       },
     );
 
-    return NextResponse.json(payload, {
-      headers: publicCacheHeaders(300, 900),
-    });
+    return NextResponse.json(payload, { headers: NO_STORE_HEADERS });
   } catch (error) {
     console.error("Failed to compute occupancy analytics:", error);
     return NextResponse.json(

@@ -1,6 +1,6 @@
 import { GET } from "./route";
 import { NextRequest } from "next/server";
-import { expect, test, vi, describe, beforeEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 // Mock the DB module
 type MockSql = {
@@ -15,11 +15,45 @@ vi.mock("@/utils/db", () => ({
   getDb: vi.fn(() => mockSql),
 }));
 
+function timestampMinutesAgo(minutes: number) {
+  return new Date(Date.now() - minutes * 60 * 1000).toISOString();
+}
+
+function hospitalRow(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 1,
+    name: "Hospital A",
+    province: "QC",
+    city: "Montreal",
+    latitude: 45.5,
+    longitude: -73.6,
+    is_verified: true,
+    is_visible: true,
+    source_id: "quebec-msss",
+    ...overrides,
+  };
+}
+
+function mockCoverage() {
+  mockSql.mockResolvedValueOnce([
+    {
+      hospital_count: 399,
+      province_count: 4,
+      latest_measurement_at: new Date("2026-07-20T15:26:51.217Z"),
+    },
+  ]);
+}
+
 describe("API Route Integration: Hospitals", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.unstubAllEnvs();
     mockSql.mockResolvedValue([]); // Default return empty array
     mockSql.unsafe.mockResolvedValue([]); // Default for unsafe
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   test("returns 200 for valid province", async () => {
@@ -39,6 +73,7 @@ describe("API Route Integration: Hospitals", () => {
 
     const res = await GET(req);
     expect(res.status).toBe(200);
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
     const data = await res.json();
     expect(data.success).toBe(true);
     expect(data.coverage).toMatchObject({
@@ -102,5 +137,109 @@ describe("API Route Integration: Hospitals", () => {
     expect(query).toContain("AND h.province = $1");
     expect(query).toContain("LIMIT $2 OFFSET $3");
     expect(params).toEqual(["ON", 25, 25]);
+  });
+
+  test("returns fresh occupancy from a healthy matching source", async () => {
+    mockSql.unsafe.mockResolvedValueOnce([
+      hospitalRow({
+        occupancy_percentage: 108,
+        occupancy_updated: timestampMinutesAgo(20),
+        occupancy_source_status: "healthy",
+        occupancy_source_last_run: timestampMinutesAgo(10),
+        occupancy_consecutive_failures: 0,
+      }),
+    ]);
+    mockCoverage();
+
+    const res = await GET(
+      new NextRequest("http://localhost/api/hospitals?province=QC"),
+    );
+    const data = await res.json();
+
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
+    expect(data.data[0].occupancy_percentage).toBe(108);
+    expect(data.data[0].occupancy_updated).toEqual(expect.any(String));
+  });
+
+  test("suppresses occupancy from an unhealthy source", async () => {
+    mockSql.unsafe.mockResolvedValueOnce([
+      hospitalRow({
+        occupancy_percentage: 108,
+        occupancy_updated: timestampMinutesAgo(20),
+        occupancy_source_status: "error",
+        occupancy_source_last_run: timestampMinutesAgo(10),
+        occupancy_consecutive_failures: 24,
+      }),
+    ]);
+    mockCoverage();
+
+    const res = await GET(
+      new NextRequest("http://localhost/api/hospitals?province=QC"),
+    );
+    const data = await res.json();
+
+    expect(data.data[0]).not.toHaveProperty("occupancy_percentage");
+    expect(data.data[0]).not.toHaveProperty("occupancy_updated");
+  });
+
+  test("suppresses occupancy when the matching source heartbeat is missing", async () => {
+    mockSql.unsafe.mockResolvedValueOnce([
+      hospitalRow({
+        occupancy_percentage: 108,
+        occupancy_updated: timestampMinutesAgo(20),
+        occupancy_source_status: null,
+        occupancy_source_last_run: null,
+        occupancy_consecutive_failures: null,
+      }),
+    ]);
+    mockCoverage();
+
+    const res = await GET(
+      new NextRequest("http://localhost/api/hospitals?province=QC"),
+    );
+    const data = await res.json();
+
+    expect(data.data[0]).not.toHaveProperty("occupancy_percentage");
+  });
+
+  test("suppresses occupancy when the matching source heartbeat is stale", async () => {
+    mockSql.unsafe.mockResolvedValueOnce([
+      hospitalRow({
+        occupancy_percentage: 108,
+        occupancy_updated: timestampMinutesAgo(20),
+        occupancy_source_status: "healthy",
+        occupancy_source_last_run: timestampMinutesAgo(121),
+        occupancy_consecutive_failures: 0,
+      }),
+    ]);
+    mockCoverage();
+
+    const res = await GET(
+      new NextRequest("http://localhost/api/hospitals?province=QC"),
+    );
+    const data = await res.json();
+
+    expect(data.data[0]).not.toHaveProperty("occupancy_percentage");
+  });
+
+  test("uses the runtime threshold when suppressing public-hospital occupancy", async () => {
+    vi.stubEnv("HEARTBEAT_STALE_THRESHOLD_MINUTES", "30");
+    mockSql.unsafe.mockResolvedValueOnce([
+      hospitalRow({
+        occupancy_percentage: 108,
+        occupancy_updated: timestampMinutesAgo(45),
+        occupancy_source_status: "healthy",
+        occupancy_source_last_run: timestampMinutesAgo(5),
+        occupancy_consecutive_failures: 0,
+      }),
+    ]);
+    mockCoverage();
+
+    const res = await GET(
+      new NextRequest("http://localhost/api/hospitals?province=QC"),
+    );
+    const data = await res.json();
+
+    expect(data.data[0]).not.toHaveProperty("occupancy_percentage");
   });
 });
