@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { NO_STORE_HEADERS, publicCacheHeaders } from "@/utils/cache";
+import { NO_STORE_HEADERS } from "@/utils/cache";
 import { getPublicApiErrorMessage } from "@/utils/apiErrors";
 import { logger } from "@/utils/logger";
 import { checkRateLimit } from "@/utils/rate-limit";
@@ -66,9 +66,7 @@ export async function GET(request: NextRequest) {
       hasPagination,
     });
 
-    return NextResponse.json(payload, {
-      headers: publicCacheHeaders(300, 900),
-    });
+    return NextResponse.json(payload, { headers: NO_STORE_HEADERS });
   } catch (error) {
     logger.error("Failed to fetch hospitals", error);
     return NextResponse.json(

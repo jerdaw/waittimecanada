@@ -1,6 +1,6 @@
 import { GET } from "./route";
 import { NextRequest } from "next/server";
-import { expect, test, vi, describe, beforeEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 const mockSql = vi.fn();
 // Mock for `await sql'...'` which actually calls the function
@@ -14,6 +14,11 @@ vi.mock("@/utils/db", () => ({
 describe("API Route Integration: Health", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.unstubAllEnvs();
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   test("returns healthy when DB and sources are healthy", async () => {
@@ -41,6 +46,30 @@ describe("API Route Integration: Health", () => {
     expect(data.database.latency_ms).toBeGreaterThanOrEqual(0);
     expect(data.sources).toHaveLength(1);
     expect(data.sources[0].status).toBe("healthy");
+  });
+
+  test("uses the resolved runtime staleness threshold", async () => {
+    vi.stubEnv("HEARTBEAT_STALE_THRESHOLD_MINUTES", "45");
+    mockSqlFn.mockResolvedValueOnce([]);
+    mockSqlFn.mockResolvedValueOnce([
+      {
+        source_id: "ontario-health",
+        source_name: "Health Quality Ontario",
+        last_run: new Date(Date.now() - 50 * 60 * 1000).toISOString(),
+        status: "healthy",
+        measurements_count: 100,
+        age_minutes: 50,
+        consecutive_failures: 0,
+      },
+    ]);
+
+    const res = await GET(new NextRequest("http://localhost"));
+    const data = await res.json();
+
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
+    expect(data.stale_threshold_minutes).toBe(45);
+    expect(data.sources[0].status).toBe("stale");
+    expect(data.healthy).toBe(false);
   });
 
   test("returns unhealthy when DB is down", async () => {

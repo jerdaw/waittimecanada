@@ -132,6 +132,58 @@ describe("AnalyticsPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("renders the nested raw-count API contract", async () => {
+    fetchMock
+      .mockResolvedValueOnce(
+        jsonResponse({
+          success: true,
+          data: { regions: [], province_mean: 0 },
+        }),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse({
+          success: true,
+          data: { hospitals: [] },
+        }),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse({
+          success: true,
+          data: {
+            province: "ON",
+            available: true,
+            status: "available",
+            generated_at: "2026-08-12T13:00:00.000Z",
+            message: "Occupancy data is available for reporting hospitals.",
+            fields: {
+              patients_waiting: true,
+              patients_in_treatment: true,
+            },
+            observations_24h: 48,
+            latest_observation: "2026-08-12T12:30:00.000Z",
+            raw_counts: {
+              hospitals_reporting: 12,
+              averages: {
+                patients_waiting: 22.4,
+                patients_in_treatment: 40.6,
+              },
+              latest_observation: "2026-08-12T12:30:00.000Z",
+            },
+          },
+        }),
+      );
+
+    render(<AnalyticsPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("22")).toBeInTheDocument();
+    });
+    expect(screen.getByText("41")).toBeInTheDocument();
+    expect(screen.getByText("Hospitals reporting: 12")).toBeInTheDocument();
+    expect(screen.getByText("Observations: 48")).toBeInTheDocument();
+    expect(screen.queryByText("n/a")).not.toBeInTheDocument();
+  });
+
   it("shows setup guidance when regional schema is not initialized", async () => {
     fetchMock
       .mockResolvedValueOnce(

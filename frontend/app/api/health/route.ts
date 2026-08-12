@@ -6,6 +6,7 @@ import { checkRateLimit } from "@/utils/rate-limit";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 import { filterActiveLiveSourceRows } from "@/utils/live-scraper-sources";
 import { logger } from "@/utils/logger";
+import { resolveHeartbeatStaleThresholdMinutes } from "@/utils/runtime-freshness";
 
 export interface SourceHealth {
   source_id: string;
@@ -45,19 +46,18 @@ export interface HealthResponse {
   sources: SourceHealth[];
 }
 
-const STALE_THRESHOLD_MINUTES = Number(
-  process.env.HEARTBEAT_STALE_THRESHOLD_MINUTES ?? "120",
-);
 const HEALTH_CACHE_TTL_MS = 60_000;
 
 export async function GET(req: NextRequest) {
   const rateLimitResponse = await checkRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
 
+  const staleThresholdMinutes = resolveHeartbeatStaleThresholdMinutes();
+
   try {
     const payload = await getOrSetServerCache(
       buildServerCacheKey("api:health", {
-        stale_threshold_minutes: STALE_THRESHOLD_MINUTES,
+        stale_threshold_minutes: staleThresholdMinutes,
       }),
       HEALTH_CACHE_TTL_MS,
       async () => {
@@ -138,7 +138,7 @@ export async function GET(req: NextRequest) {
                 status = "error";
               } else if (consecutiveFailures > 0) {
                 status = "error";
-              } else if (ageMinutes && ageMinutes > STALE_THRESHOLD_MINUTES) {
+              } else if (ageMinutes && ageMinutes > staleThresholdMinutes) {
                 status = "stale";
               } else {
                 status = "healthy";
@@ -199,7 +199,7 @@ export async function GET(req: NextRequest) {
         return {
           ...healthResponse,
           last_update: lastUpdate || null,
-          stale_threshold_minutes: STALE_THRESHOLD_MINUTES,
+          stale_threshold_minutes: staleThresholdMinutes,
         } as HealthResponse;
       },
     );
@@ -212,7 +212,7 @@ export async function GET(req: NextRequest) {
         healthy: false,
         database: { status: "unknown", latency_ms: null },
         last_update: null,
-        stale_threshold_minutes: STALE_THRESHOLD_MINUTES,
+        stale_threshold_minutes: staleThresholdMinutes,
         sources: [],
         error: getPublicApiErrorMessage(error),
       },

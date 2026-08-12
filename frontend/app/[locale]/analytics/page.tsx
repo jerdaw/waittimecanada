@@ -70,10 +70,13 @@ interface OccupancySnapshot {
   };
   setup_steps?: string[];
   observations_24h?: number;
-  hospitals_reporting?: number;
-  averages?: {
-    patients_waiting: number | null;
-    patients_in_treatment: number | null;
+  raw_counts?: {
+    hospitals_reporting: number;
+    averages: {
+      patients_waiting: number | null;
+      patients_in_treatment: number | null;
+    };
+    latest_observation: string | null;
   };
   latest_observation?: string | null;
   occupancy_percentage?: {
@@ -406,14 +409,16 @@ export default function AnalyticsPage() {
                   {t("occupancy.avgWaiting")}
                 </p>
                 <p className="mt-2 text-4xl font-bold text-foreground tabular-nums">
-                  {occupancy.averages?.patients_waiting === null ||
-                  occupancy.averages?.patients_waiting === undefined
+                  {occupancy.raw_counts?.averages.patients_waiting === null ||
+                  occupancy.raw_counts?.averages.patients_waiting === undefined
                     ? t("occupancy.na")
-                    : Math.round(occupancy.averages.patients_waiting)}
+                    : Math.round(
+                        occupancy.raw_counts.averages.patients_waiting,
+                      )}
                 </p>
                 <p className="mt-2 text-xs text-muted-foreground">
                   {t("occupancy.hospitalsReporting", {
-                    count: occupancy.hospitals_reporting ?? 0,
+                    count: occupancy.raw_counts?.hospitals_reporting ?? 0,
                   })}
                 </p>
               </div>
@@ -422,10 +427,14 @@ export default function AnalyticsPage() {
                   {t("occupancy.avgTreatment")}
                 </p>
                 <p className="mt-2 text-4xl font-bold text-foreground tabular-nums">
-                  {occupancy.averages?.patients_in_treatment === null ||
-                  occupancy.averages?.patients_in_treatment === undefined
+                  {occupancy.raw_counts?.averages.patients_in_treatment ===
+                    null ||
+                  occupancy.raw_counts?.averages.patients_in_treatment ===
+                    undefined
                     ? t("occupancy.na")
-                    : Math.round(occupancy.averages.patients_in_treatment)}
+                    : Math.round(
+                        occupancy.raw_counts.averages.patients_in_treatment,
+                      )}
                 </p>
                 <p className="mt-2 text-xs text-muted-foreground">
                   {t("occupancy.observations", {
