@@ -61,7 +61,7 @@ These documents are retained for context and may not match current implementatio
 3. Archive implementation plans once a milestone is delivered and no longer actively edited.
 4. Keep completed milestone details in archived files; keep roadmap focused on active next steps.
 
-Last Updated: 2026-07-26
+Last Updated: 2026-08-15
 
 ## Public Documentation Boundary
 
@@ -73,6 +73,7 @@ copies only and should not be treated as the durable record.
 
 ## Latest Maintenance Log
 
+- `docs/planning/archive/maintenance-2026-08-15-option-value-screen-closeout.md`
 - `docs/planning/archive/maintenance-2026-07-26-homepage-status-release-closeout.md`
 - `docs/planning/archive/maintenance-2026-06-28-autonomous-overnight.md`
 - `docs/planning/archive/maintenance-2026-06-22-tooling-roadmap-maintenance.md`

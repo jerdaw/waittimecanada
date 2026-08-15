@@ -31,7 +31,9 @@
 Provincial health authorities report ER wait times using **fundamentally different methodologies**:
 
 - Quebec starts the clock at **REGISTRATION** (administrative check-in)
-- Ontario starts at **TRIAGE** (clinical assessment)
+- Ontario's official indicator starts at **TRIAGE OR REGISTRATION, WHICHEVER
+  IS EARLIER**, and ends at the first assessment by a qualifying provider; the
+  platform's legacy event tags remain under revalidation
 - Different statistical measures (P90 vs rolling averages)
 - Different patient populations (all vs mid-acuity)
 
@@ -39,7 +41,7 @@ Provincial health authorities report ER wait times using **fundamentally differe
 
 ### By the Numbers
 
-This reflects the roadmap baseline on **2026-07-26**. The hospital inventory below was observed from the public API on **2026-07-23** and is a dated snapshot, not a permanent inventory promise:
+This reflects the roadmap baseline on **2026-08-15**. The hospital inventory below was observed from the public API on **2026-07-23** and is a dated snapshot, not a permanent inventory promise:
 
 - **4 provinces** remain in the active audited source set: Quebec, Ontario,
   Alberta, and British Columbia
@@ -515,7 +517,7 @@ environment-specific paths are kept outside public documentation.
 
 ---
 
-## 📊 Current Status (as of 2026-07-26)
+## 📊 Current Status (as of 2026-08-15)
 
 ### Milestones Completed
 
@@ -538,6 +540,9 @@ environment-specific paths are kept outside public documentation.
 - ✅ Operations: backend `uv.lock` setup/CI alignment, checksum-backed migration ledger, migration sequence guardrails, and frontend test-file type checking
 - ✅ Operations: disposable database verification and frontend audit remediation through the Vitest 4 toolchain upgrade
 - ✅ Operations: exact database-derived national coverage survives server rendering, hydration, province changes, and refresh; status responses distinguish current freshness from 24-hour UTC measurement-hour completeness
+- ✅ Operations: current occupancy fails closed for unhealthy matching sources;
+  affected public APIs use no-store response contracts while healthy sources
+  remain independently available
 
 ### Validation Posture
 
@@ -563,13 +568,16 @@ environment-specific paths are kept outside public documentation.
 
 ## 💡 Future Roadmap
 
-Wait Time Canada is in a stewardship and selective-expansion phase. Finite
-outcomes currently cover source-freshness offload validation, Ontario
-methodology resolution, carefully selected research/resource expansion,
-evidence-bounded scheduling, and conditional province or CI expansion.
+Wait Time Canada is in a stewardship phase. Finite outcomes currently cover
+source-freshness offload validation, public-methodology correctness, and
+evidence-bounded operations. Research conversion and discretionary product,
+resource, or province expansion are parked unless a concrete external need
+satisfies the roadmap gate.
 
 The canonical dependency, state, and completion criteria for this work live in
-the [`docs/planning/roadmap.md`](docs/planning/roadmap.md) execution queue.
+the [`docs/planning/roadmap.md`](docs/planning/roadmap.md) execution queue. The
+bounded research/evaluation screen is closed in its
+[decision record](docs/planning/archive/maintenance-2026-08-15-option-value-screen-closeout.md).
 
 ---
 
