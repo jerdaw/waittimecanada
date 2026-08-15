@@ -69,13 +69,16 @@ def _main() -> int:
         )
     if 'LIVE_SCRAPER_CADENCE_LABEL = "hourly"' not in live_source_text:
         failures.append("frontend live scraper cadence label must remain hourly")
-    if 'HEARTBEAT_STALE_THRESHOLD_MINUTES = 120' not in live_source_text:
+    if "HEARTBEAT_STALE_THRESHOLD_MINUTES = 120" not in live_source_text:
         failures.append("frontend heartbeat stale threshold must remain 120 minutes")
     if '"cadence": "Sources Checked Hourly"' not in en_messages:
         failures.append("English hero cadence must say Sources Checked Hourly")
     if '"cadence": "Sources vérifiées chaque heure"' not in fr_messages:
         failures.append("French hero cadence must describe hourly source checks")
-    if "Fresh Data Every 4 Hours" in en_messages or "Données fraîches toutes les 4h" in fr_messages:
+    if (
+        "Fresh Data Every 4 Hours" in en_messages
+        or "Données fraîches toutes les 4h" in fr_messages
+    ):
         failures.append("locale files must not claim fresh data every four hours")
 
     if _job_timeout_minutes(text) < 35:
@@ -155,6 +158,13 @@ def _main() -> int:
         if "steps.check_heartbeats.outcome == 'failure'" not in recovery_step:
             failures.append(
                 "heartbeat recovery dispatch must only run after heartbeat check failure"
+            )
+        if (
+            "steps.check_heartbeats.outputs.recovery_required == 'true'"
+            not in recovery_step
+        ):
+            failures.append(
+                "heartbeat recovery dispatch must require a new or changed incident"
             )
         if "GH_TOKEN: ${{ github.token }}" not in recovery_step:
             failures.append("heartbeat recovery dispatch must use github.token")

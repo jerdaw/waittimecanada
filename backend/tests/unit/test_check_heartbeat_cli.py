@@ -5,6 +5,7 @@ from waittime.cli.check_heartbeat import (
     _build_error_fingerprint,
     _format_incident_duration,
     _get_sources_to_check,
+    _write_recovery_required_output,
     evaluate_source_status,
     reconcile_incident_state,
 )
@@ -81,7 +82,7 @@ def test_reconcile_incident_state_opens_new_incident():
         now=datetime.now(UTC),
     )
 
-    reconcile_incident_state(
+    recovery_required = reconcile_incident_state(
         "ontario-health",
         evaluation,
         None,
@@ -99,6 +100,7 @@ def test_reconcile_incident_state_opens_new_incident():
         "stale:ontario-health",
         "P2",
     )
+    assert recovery_required is True
 
 
 def test_reconcile_incident_state_dry_run_does_not_alert_or_open_incident():
@@ -122,7 +124,7 @@ def test_reconcile_incident_state_dry_run_does_not_alert_or_open_incident():
         now=datetime.now(UTC),
     )
 
-    reconcile_incident_state(
+    recovery_required = reconcile_incident_state(
         "ontario-health",
         evaluation,
         None,
@@ -139,6 +141,7 @@ def test_reconcile_incident_state_dry_run_does_not_alert_or_open_incident():
     alerts.alert_scraper_resolved.assert_not_called()
     db.open_scraper_alert_incident.assert_not_called()
     db.resolve_scraper_alert_incident.assert_not_called()
+    assert recovery_required is False
 
 
 def test_reconcile_incident_state_suppresses_duplicate_incident():
@@ -163,7 +166,7 @@ def test_reconcile_incident_state_suppresses_duplicate_incident():
         now=datetime.now(UTC),
     )
 
-    reconcile_incident_state(
+    recovery_required = reconcile_incident_state(
         "ontario-health",
         evaluation,
         {
@@ -182,6 +185,7 @@ def test_reconcile_incident_state_suppresses_duplicate_incident():
     alerts.alert_scraper_resolved.assert_not_called()
     db.open_scraper_alert_incident.assert_not_called()
     db.resolve_scraper_alert_incident.assert_not_called()
+    assert recovery_required is False
 
 
 def test_reconcile_incident_state_resolves_on_recovery():
@@ -206,7 +210,7 @@ def test_reconcile_incident_state_resolves_on_recovery():
         now=datetime.now(UTC),
     )
 
-    reconcile_incident_state(
+    recovery_required = reconcile_incident_state(
         "ontario-health",
         evaluation,
         {
@@ -223,6 +227,7 @@ def test_reconcile_incident_state_resolves_on_recovery():
 
     alerts.alert_scraper_resolved.assert_called_once()
     db.resolve_scraper_alert_incident.assert_called_once_with("ontario-health")
+    assert recovery_required is False
 
 
 def test_reconcile_incident_state_switches_between_incident_types():
@@ -250,7 +255,7 @@ def test_reconcile_incident_state_switches_between_incident_types():
         now=datetime.now(UTC),
     )
 
-    reconcile_incident_state(
+    recovery_required = reconcile_incident_state(
         "ontario-health",
         evaluation,
         {
@@ -269,6 +274,58 @@ def test_reconcile_incident_state_switches_between_incident_types():
     alerts.alert_scraper_error.assert_called_once()
     db.open_scraper_alert_incident.assert_called_once_with(
         "ontario-health",
+        "error",
+        evaluation.incident.fingerprint,
+        "P2",
+    )
+    assert recovery_required is True
+
+
+def test_reconcile_incident_state_allows_changed_error_fingerprint_recovery():
+    alerts = MagicMock()
+    alerts.config.operational_notification_mode = "normal"
+    alerts.should_send_operational_notification.return_value = True
+    alerts.alert_scraper_error.return_value = True
+    db = MagicMock()
+    now = datetime.now(UTC)
+    evaluation = evaluate_source_status(
+        "quebec-msss",
+        {
+            "last_run": now - timedelta(minutes=3),
+            "status": "error",
+            "error_message": "new parser failure",
+            "measurements_count": 0,
+            "consecutive_failures": 2,
+            "last_success_run": now - timedelta(hours=3),
+            "last_success_measurements_count": 10,
+            "last_error_run": now - timedelta(minutes=3),
+            "last_error_category": "parse_error",
+            "last_error_stage": "parse",
+        },
+        max_age=120,
+        max_consecutive_failures=1,
+        now=now,
+    )
+
+    recovery_required = reconcile_incident_state(
+        "quebec-msss",
+        evaluation,
+        {
+            "active_incident_kind": "error",
+            "active_incident_fingerprint": "error:quebec-msss:old:fingerprint",
+            "opened_at": now - timedelta(hours=1),
+        },
+        alerts=alerts,
+        db=db,
+        run_url=None,
+        dry_run=False,
+        now=now,
+    )
+
+    assert recovery_required is True
+    alerts.alert_scraper_resolved.assert_called_once()
+    db.open_scraper_alert_incident.assert_called_once_with(
+        "quebec-msss",
         "error",
         evaluation.incident.fingerprint,
         "P2",
@@ -413,3 +470,15 @@ def test_format_incident_duration_compacts_elapsed_time():
     assert _format_incident_duration(now - timedelta(minutes=5), now) == "5m"
     assert _format_incident_duration(now - timedelta(hours=2), now) == "2h"
     assert _format_incident_duration(now - timedelta(hours=2, minutes=5), now) == "2h 5m"
+
+
+def test_write_recovery_required_output_uses_boolean_action_contract(tmp_path):
+    output_path = tmp_path / "github-output"
+
+    _write_recovery_required_output(True, str(output_path))
+    _write_recovery_required_output(False, str(output_path))
+
+    assert output_path.read_text(encoding="utf-8").splitlines() == [
+        "recovery_required=true",
+        "recovery_required=false",
+    ]

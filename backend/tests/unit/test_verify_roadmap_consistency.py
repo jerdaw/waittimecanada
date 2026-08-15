@@ -6,6 +6,7 @@ from scripts.verify_roadmap_consistency import (
     check_execution_roadmap_structure,
     check_readme_status_alignment,
     check_status_summary_freshness,
+    check_stewardship_trigger_reference,
 )
 
 
@@ -261,19 +262,21 @@ As reflected in the current runtime and roadmap baseline on **2026-06-12**:
     assert "Current Status date" in message
 
 
-VALID_EXECUTION_ROADMAP = """# Implementation Roadmap
+VALID_STEWARDSHIP_ROADMAP = """# Implementation Roadmap
 
 ## Continuous Guardrails
 
 - Preserve clinical safety.
 - Preserve ontology comparability.
 
-## Execution Queue
+## Event-Triggered Stewardship
 
-| Priority | Outcome | State | Gate | Done when |
-| --- | --- | --- | --- | --- |
-| P1 | Complete the pilot | In validation | Trusted runner available | A clean 24-hour soak completes |
-| P2 | Evaluate expansion | Decision required | Official source selected | Provenance and tests are merged |
+There is no standing implementation or manual-review queue.
+
+| Trigger | Bounded response | Stop condition |
+| --- | --- | --- |
+| Public freshness defect | Fail closed for the affected source | Public claims are truthful or the source is suspended |
+| Security incident | Follow the incident process | The concrete risk is contained |
 """
 
 
@@ -283,25 +286,31 @@ def _write_execution_roadmap(tmp_path: Path, content: str) -> Path:
     return path
 
 
-def test_execution_structure_accepts_guardrails_and_complete_queue(tmp_path: Path) -> None:
-    roadmap_path = _write_execution_roadmap(tmp_path, VALID_EXECUTION_ROADMAP)
+def test_execution_structure_accepts_guardrails_and_dormant_stewardship(
+    tmp_path: Path,
+) -> None:
+    roadmap_path = _write_execution_roadmap(tmp_path, VALID_STEWARDSHIP_ROADMAP)
 
     success, message = check_execution_roadmap_structure(roadmap_path)
 
     assert success is True
-    assert "execution structure" in message
+    assert "dormant stewardship" in message
 
 
-def test_execution_structure_rejects_legacy_active_sections(tmp_path: Path) -> None:
+@pytest.mark.parametrize("heading", ("Active Roadmap", "Execution Queue"))
+def test_execution_structure_rejects_active_queue_sections(
+    tmp_path: Path,
+    heading: str,
+) -> None:
     roadmap_path = _write_execution_roadmap(
         tmp_path,
-        VALID_EXECUTION_ROADMAP + "\n## Active Roadmap\n\n- [ ] Old item\n",
+        VALID_STEWARDSHIP_ROADMAP + f"\n## {heading}\n\n- [ ] Old item\n",
     )
 
     success, message = check_execution_roadmap_structure(roadmap_path)
 
     assert success is False
-    assert "legacy section" in message
+    assert "active queue section" in message
 
 
 @pytest.mark.parametrize(
@@ -315,7 +324,7 @@ def test_execution_structure_rejects_legacy_active_sections(tmp_path: Path) -> N
     ),
 )
 def test_execution_structure_rejects_guardrail_checkboxes(tmp_path: Path, task_item: str) -> None:
-    content = VALID_EXECUTION_ROADMAP.replace("- Preserve clinical safety.", task_item)
+    content = VALID_STEWARDSHIP_ROADMAP.replace("- Preserve clinical safety.", task_item)
     roadmap_path = _write_execution_roadmap(tmp_path, content)
 
     success, message = check_execution_roadmap_structure(roadmap_path)
@@ -325,6 +334,32 @@ def test_execution_structure_rejects_guardrail_checkboxes(tmp_path: Path, task_i
     assert "checkbox" in message
 
 
+def test_execution_structure_requires_explicit_dormant_queue_marker(tmp_path: Path) -> None:
+    content = VALID_STEWARDSHIP_ROADMAP.replace(
+        "There is no standing implementation or manual-review queue.\n\n",
+        "",
+    )
+    roadmap_path = _write_execution_roadmap(tmp_path, content)
+
+    success, message = check_execution_roadmap_structure(roadmap_path)
+
+    assert success is False
+    assert "explicitly reject a standing queue" in message
+
+
+def test_execution_structure_rejects_calendar_work_in_stewardship(tmp_path: Path) -> None:
+    content = VALID_STEWARDSHIP_ROADMAP.replace(
+        "There is no standing implementation or manual-review queue.",
+        "There is no standing implementation or manual-review queue.\n\n- Quarterly review",
+    )
+    roadmap_path = _write_execution_roadmap(tmp_path, content)
+
+    success, message = check_execution_roadmap_structure(roadmap_path)
+
+    assert success is False
+    assert "calendar-based work" in message
+
+
 @pytest.mark.parametrize(
     "intervening_content",
     (
@@ -332,14 +367,14 @@ def test_execution_structure_rejects_guardrail_checkboxes(tmp_path: Path, task_i
         "Operators review this supplemental table separately.\n\n",
     ),
 )
-def test_execution_structure_rejects_second_queue_table(
+def test_execution_structure_rejects_second_stewardship_table(
     tmp_path: Path, intervening_content: str
 ) -> None:
-    second_table = """| Owner | Trigger |
+    second_table = """| Trigger | Response |
 | --- | --- |
-| Operator | Proof window ends |
+| Operator event | Inspect it |
 """
-    content = VALID_EXECUTION_ROADMAP + "\n" + intervening_content + second_table
+    content = VALID_STEWARDSHIP_ROADMAP + "\n" + intervening_content + second_table
     roadmap_path = _write_execution_roadmap(tmp_path, content)
 
     success, message = check_execution_roadmap_structure(roadmap_path)
@@ -349,12 +384,12 @@ def test_execution_structure_rejects_second_queue_table(
 
 
 def test_execution_structure_rejects_wrong_columns(tmp_path: Path) -> None:
-    content = VALID_EXECUTION_ROADMAP.replace(
-        "| Priority | Outcome | State | Gate | Done when |",
-        "| Priority | Outcome | State | Done when |",
+    content = VALID_STEWARDSHIP_ROADMAP.replace(
+        "| Trigger | Bounded response | Stop condition |",
+        "| Trigger | Response |",
     ).replace(
-        "| --- | --- | --- | --- | --- |",
-        "| --- | --- | --- | --- |",
+        "| --- | --- | --- |",
+        "| --- | --- |",
     )
     roadmap_path = _write_execution_roadmap(tmp_path, content)
 
@@ -365,9 +400,9 @@ def test_execution_structure_rejects_wrong_columns(tmp_path: Path) -> None:
 
 
 def test_execution_structure_rejects_row_without_leading_pipe(tmp_path: Path) -> None:
-    content = VALID_EXECUTION_ROADMAP.replace(
-        "| P2 | Evaluate expansion | Decision required | Official source selected | Provenance and tests are merged |",
-        "P2 | Evaluate expansion | Decision required | Official source selected | Provenance and tests are merged |",
+    content = VALID_STEWARDSHIP_ROADMAP.replace(
+        "| Security incident | Follow the incident process | The concrete risk is contained |",
+        "Security incident | Follow the incident process | The concrete risk is contained |",
     )
     roadmap_path = _write_execution_roadmap(tmp_path, content)
 
@@ -378,9 +413,9 @@ def test_execution_structure_rejects_row_without_leading_pipe(tmp_path: Path) ->
 
 
 def test_execution_structure_rejects_invalid_separator(tmp_path: Path) -> None:
-    content = VALID_EXECUTION_ROADMAP.replace(
-        "| --- | --- | --- | --- | --- |",
-        "| Priority | Outcome | State | Gate | Done when |",
+    content = VALID_STEWARDSHIP_ROADMAP.replace(
+        "| --- | --- | --- |",
+        "| Trigger | Bounded response | Stop condition |",
     )
     roadmap_path = _write_execution_roadmap(tmp_path, content)
 
@@ -390,32 +425,20 @@ def test_execution_structure_rejects_invalid_separator(tmp_path: Path) -> None:
     assert "separator" in message
 
 
-def test_execution_structure_rejects_invalid_priority_and_state(tmp_path: Path) -> None:
-    content = VALID_EXECUTION_ROADMAP.replace(
-        "| P1 | Complete the pilot | In validation |",
-        "| P9 | Complete the pilot | Blocked |",
+def test_execution_structure_rejects_empty_response_and_stop_condition(
+    tmp_path: Path,
+) -> None:
+    content = VALID_STEWARDSHIP_ROADMAP.replace(
+        "| Security incident | Follow the incident process | The concrete risk is contained |",
+        "| Security incident | | |",
     )
     roadmap_path = _write_execution_roadmap(tmp_path, content)
 
     success, message = check_execution_roadmap_structure(roadmap_path)
 
     assert success is False
-    assert "priority 'P9'" in message
-    assert "state 'Blocked'" in message
-
-
-def test_execution_structure_rejects_empty_gate_and_done_when(tmp_path: Path) -> None:
-    content = VALID_EXECUTION_ROADMAP.replace(
-        "| P1 | Complete the pilot | In validation | Trusted runner available | A clean 24-hour soak completes |",
-        "| P1 | Complete the pilot | In validation | | |",
-    )
-    roadmap_path = _write_execution_roadmap(tmp_path, content)
-
-    success, message = check_execution_roadmap_structure(roadmap_path)
-
-    assert success is False
-    assert "non-empty gate" in message
-    assert "non-empty done-when" in message
+    assert "non-empty bounded response" in message
+    assert "non-empty stop condition" in message
 
 
 def test_readme_status_alignment_rejects_malformed_baseline_date(
@@ -444,9 +467,45 @@ def test_readme_status_alignment_rejects_malformed_status_date(
     assert "current status" in message
 
 
-def test_repository_roadmap_uses_optimized_execution_structure() -> None:
+def test_repository_roadmap_uses_dormant_stewardship_structure() -> None:
     repo_root = Path(__file__).resolve().parents[3]
 
     success, message = check_execution_roadmap_structure(repo_root / "docs/planning/roadmap.md")
+
+    assert success is True, message
+
+
+def test_stewardship_trigger_reference_rejects_standing_manual_queue(
+    tmp_path: Path,
+) -> None:
+    manual_tasks_path = tmp_path / "manual-tasks.md"
+    manual_tasks_path.write_text(
+        """# Manual Tasks
+
+## External Operations
+
+- [ ] Complete the pilot.
+
+## Recurring Reviews
+
+- [ ] Quarterly review source links.
+""",
+        encoding="utf-8",
+    )
+
+    success, message = check_stewardship_trigger_reference(manual_tasks_path)
+
+    assert success is False
+    assert "task-list checkboxes" in message
+    assert "External Operations" in message
+    assert "calendar-based" in message
+
+
+def test_repository_stewardship_trigger_reference_is_dormant() -> None:
+    repo_root = Path(__file__).resolve().parents[3]
+
+    success, message = check_stewardship_trigger_reference(
+        repo_root / "docs/planning/manual-tasks.md"
+    )
 
     assert success is True, message

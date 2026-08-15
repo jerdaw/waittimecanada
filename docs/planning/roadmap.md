@@ -27,13 +27,12 @@ heartbeat is failed, stale, future-dated, or missing. Current-value hospital and
 occupancy APIs use `Cache-Control: no-store`; healthy sources remain available
 independently in mixed-source results.
 
-The immediate delivery focus is the trusted source-freshness offload pilot.
-Runner provisioning, protected credential configuration, live command
-validation, schedule cutover, and the 24-hour proof window remain external
-operator work. GitHub manual dispatch remains the fallback until that evidence
-is accepted. No repository-only implementation batch is currently ready: each
-P1 item below is either operator-gated or requires a public-methodology
-decision. Discretionary research and product expansion remain parked.
+No delivery campaign or standing operator project is active. Scheduled
+collection and heartbeat checks provide the routine service posture; human work
+begins only after a concrete truthfulness, provenance, security, integrity, or
+source-change trigger. The prior trusted-runner pilot, Ontario representation
+decision, and expansion candidates remain preserved as inactive historical
+material, not an execution queue.
 
 ## Completed Foundations
 
@@ -81,38 +80,36 @@ decision. Discretionary research and product expansion remain parked.
   paths, monitoring routes, and environment-specific deployment details.
 - Preserve low-frequency health polling, bounded cache policies, and explicit
   production cost controls.
-- Keep GitHub manual dispatch available until an accepted offload proof window
-  and rollback review support schedule changes.
+- Keep GitHub manual dispatch available as an emergency operator control; its
+  availability does not create scheduled human work.
 - Do not represent the platform as a national performance comparison.
 - Treat research or evaluation as inactive unless an external supervisor or
   partner independently identifies a worthwhile question and the opportunity
   has a ready data/ethics route, bounded workload, and scheduled attributable
   output.
 
-## Execution Queue
+## Event-Triggered Stewardship
 
-| Priority | Outcome | State | Gate | Done when |
-| --- | --- | --- | --- | --- |
-| P1 | Complete the trusted source-freshness offload pilot | External prerequisite | Merge the public contract and private companion, provision a trusted runner, and configure protected credentials outside this repository | Manual scraper, watchdog, aggregate, and smoke checks pass; timers complete a clean 24-hour soak with fallback retained |
-| P1 | Restore remaining scheduled workflow cadence | External prerequisite | Accept the offload proof window and value-free rollback evidence | Reviewed schedules run at the intended cadence and GitHub `workflow_dispatch` remains available |
-| P1 | Resolve Ontario methodology representation | Decision required | Approve one public-truthfulness decision covering the composite start, qualifying-provider endpoint, historical migration or versioning, source metadata, divergence behavior, and frontend labels; do not perform this work merely to restart research | Runtime tags, historical treatment, public methodology text, and regression tests implement one reviewed decision |
-| P2 | Extend public methodology artifacts | Later | Resolve Ontario representation or verify another official methodology change, and approve a concrete project-facing need | Case studies and export examples carry current definitions, provenance, limitations, and comparison warnings |
-| P2 | Select public-health resource expansion | Later | Explicitly reprioritize expansion after stewardship capacity exists and identify an official, reusable, product-relevant source with documented caveats | The source catalog, ingest path, freshness behavior, public limitations, and tests are merged |
-| P2 | Evaluate additional provinces | Later | Explicitly reprioritize expansion and find a stable official public source with sufficient methodology documentation | The source is represented with ontology, provenance, clinical-safety boundaries, monitoring, and tests |
-| P2 | Explore smarter scheduling | Later | Establish safe low-activity bounds from sustained freshness evidence | Upstream requests decrease without breaching public freshness expectations and manual fallback remains available |
-| P2 | Reassess external CI or full Forgejo migration | Later | The hybrid offload pilot fails documented reliability or cost objectives | A reviewed ADR selects a bounded migration or explicitly retains the hybrid model |
+There is no standing implementation or manual-review queue. These triggers
+authorize only the smallest bounded response needed to restore a truthful and
+safe public service:
 
-Queue interpretation:
+| Trigger | Bounded response | Stop condition |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| Public freshness, provenance, or displayed-data defect | Fail closed, preserve healthy sources, and contain only the affected source or presentation path | Public claims are truthful again, or the affected source is narrowed or suspended |
+| Security, privacy, or data-integrity incident | Follow the applicable incident and disclosure process without expanding product scope | The concrete risk is contained and required evidence is preserved |
+| Verified official source or methodology change | Revalidate only the affected source representation and public documentation | The changed public contract is accurate, or the affected claim is withdrawn |
+| Dependency or scheduler failure that breaches the public service contract | Apply one bounded recovery or rollback using existing controls | The contract is restored, or the failing automation/source is suspended |
 
-- Select work from this table only after its stated gate changes.
-- While every P1 gate is closed, accept only concrete reliability, security,
-  source-drift, dependency, or documentation-truth maintenance.
-- Do not substitute speculative implementation for missing operator evidence
-  or methodology decisions.
+The trusted-runner pilot and alternative CI material are parked. Ontario
+ontology/history work is parked unless a concrete public-truthfulness trigger
+requires it. Methodology artifacts, public-health additions, new provinces, and
+other expansion ideas remain historical candidates and require an explicit new
+project decision; none is active stewardship work.
 
 Roadmap lifecycle and formatting rules are defined in
-[`roadmap-process.md`](roadmap-process.md); operator and recurring triggers are
-tracked in [`manual-tasks.md`](manual-tasks.md).
+[`roadmap-process.md`](roadmap-process.md); the dormant stewardship trigger
+contract is recorded in [`manual-tasks.md`](manual-tasks.md).
 
 ## Completed Milestones
 

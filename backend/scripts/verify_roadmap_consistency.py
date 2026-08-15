@@ -263,15 +263,7 @@ def check_readme_status_alignment(roadmap_path: Path, repo_root: Path) -> tuple[
     )
 
 
-EXECUTION_COLUMNS = ("Priority", "Outcome", "State", "Gate", "Done when")
-ALLOWED_PRIORITIES = {"P0", "P1", "P2"}
-ALLOWED_STATES = {
-    "Ready",
-    "Decision required",
-    "External prerequisite",
-    "In validation",
-    "Later",
-}
+STEWARDSHIP_COLUMNS = ("Trigger", "Bounded response", "Stop condition")
 
 
 def _section_bodies(content: str, heading: str) -> list[str]:
@@ -285,7 +277,7 @@ def _table_cells(line: str) -> list[str]:
 
 def _is_table_separator(line: str) -> bool:
     cells = _table_cells(line)
-    return len(cells) == len(EXECUTION_COLUMNS) and all(
+    return len(cells) == len(STEWARDSHIP_COLUMNS) and all(
         re.fullmatch(r":?-{3,}:?", cell) for cell in cells
     )
 
@@ -307,13 +299,13 @@ def _markdown_table_blocks(section: str) -> list[list[str]]:
 
 
 def check_execution_roadmap_structure(roadmap_path: Path) -> tuple[bool, str]:
-    """Validate permanent guardrails and the finite execution queue."""
+    """Validate permanent guardrails and dormant event-triggered stewardship."""
     content = roadmap_path.read_text(encoding="utf-8")
     issues: list[str] = []
 
-    for legacy_heading in ("Active Priorities", "Active Roadmap"):
+    for legacy_heading in ("Active Priorities", "Active Roadmap", "Execution Queue"):
         if re.search(rf"^## {re.escape(legacy_heading)}\s*$", content, re.MULTILINE):
-            issues.append(f"legacy section '## {legacy_heading}' must be removed")
+            issues.append(f"active queue section '## {legacy_heading}' must be removed")
 
     guardrail_sections = _section_bodies(content, "Continuous Guardrails")
     if len(guardrail_sections) != 1:
@@ -325,15 +317,31 @@ def check_execution_roadmap_structure(roadmap_path: Path) -> tuple[bool, str]:
     ):
         issues.append("Continuous Guardrails must not contain task-list checkboxes")
 
-    queue_sections = _section_bodies(content, "Execution Queue")
-    if len(queue_sections) != 1:
-        issues.append("expected exactly one '## Execution Queue' section")
+    stewardship_sections = _section_bodies(content, "Event-Triggered Stewardship")
+    if len(stewardship_sections) != 1:
+        issues.append("expected exactly one '## Event-Triggered Stewardship' section")
     else:
-        section_lines = queue_sections[0].splitlines()
-        table_blocks = _markdown_table_blocks(queue_sections[0])
+        stewardship_section = stewardship_sections[0]
+        section_lines = stewardship_section.splitlines()
+        table_blocks = _markdown_table_blocks(stewardship_section)
+        if "There is no standing implementation or manual-review queue" not in stewardship_section:
+            issues.append("Event-Triggered Stewardship must explicitly reject a standing queue")
+        if re.search(
+            r"^[ \t]*(?:[-*+]|\d+[.)])[ \t]+\[[ xX]\][ \t]+",
+            stewardship_section,
+            re.MULTILINE,
+        ):
+            issues.append("Event-Triggered Stewardship must not contain task-list checkboxes")
+        if re.search(
+            r"\b(?:daily|weekly|monthly|quarterly|annually)\b",
+            stewardship_section,
+            re.IGNORECASE,
+        ):
+            issues.append("Event-Triggered Stewardship must not create calendar-based work")
         if len(table_blocks) != 1:
             issues.append(
-                f"Execution Queue must contain exactly one table; found {len(table_blocks)}"
+                "Event-Triggered Stewardship must contain exactly one table; "
+                f"found {len(table_blocks)}"
             )
         table_start = next(
             (index for index, line in enumerate(section_lines) if line.strip().startswith("|")),
@@ -347,39 +355,82 @@ def check_execution_roadmap_structure(roadmap_path: Path) -> tuple[bool, str]:
                     break
                 table_lines.append(stripped_line)
         if len(table_lines) < 3:
-            issues.append("Execution Queue must contain a header, separator, and row")
-        elif tuple(_table_cells(table_lines[0])) != EXECUTION_COLUMNS:
-            issues.append("Execution Queue columns must be: " + ", ".join(EXECUTION_COLUMNS))
+            issues.append("Event-Triggered Stewardship must contain a header, separator, and row")
+        elif tuple(_table_cells(table_lines[0])) != STEWARDSHIP_COLUMNS:
+            issues.append(
+                "Event-Triggered Stewardship columns must be: " + ", ".join(STEWARDSHIP_COLUMNS)
+            )
         elif not _is_table_separator(table_lines[1]):
-            issues.append("Execution Queue must use a valid Markdown separator row")
+            issues.append("Event-Triggered Stewardship must use a valid Markdown separator row")
         else:
             for row_number, line in enumerate(table_lines[2:], start=1):
                 if not line.startswith("|") or not line.endswith("|"):
-                    issues.append(f"Execution Queue row {row_number} must start and end with '|'")
+                    issues.append(
+                        f"Event-Triggered Stewardship row {row_number} must start and end with '|'"
+                    )
                     continue
                 cells = _table_cells(line)
-                if len(cells) != len(EXECUTION_COLUMNS):
-                    issues.append(f"Execution Queue row {row_number} has the wrong column count")
-                    continue
-                priority, outcome, state, gate, done_when = cells
-                if priority not in ALLOWED_PRIORITIES:
+                if len(cells) != len(STEWARDSHIP_COLUMNS):
                     issues.append(
-                        f"Execution Queue row {row_number} has invalid priority '{priority}'"
+                        f"Event-Triggered Stewardship row {row_number} has the wrong column count"
                     )
-                if state not in ALLOWED_STATES:
-                    issues.append(f"Execution Queue row {row_number} has invalid state '{state}'")
-                if not outcome:
-                    issues.append(f"Execution Queue row {row_number} requires a non-empty outcome")
-                if not gate:
-                    issues.append(f"Execution Queue row {row_number} requires a non-empty gate")
-                if not done_when:
+                    continue
+                trigger, response, stop_condition = cells
+                if not trigger:
                     issues.append(
-                        f"Execution Queue row {row_number} requires a non-empty done-when value"
+                        f"Event-Triggered Stewardship row {row_number} requires a non-empty trigger"
+                    )
+                if not response:
+                    issues.append(
+                        f"Event-Triggered Stewardship row {row_number} "
+                        "requires a non-empty bounded response"
+                    )
+                if not stop_condition:
+                    issues.append(
+                        f"Event-Triggered Stewardship row {row_number} "
+                        "requires a non-empty stop condition"
                     )
 
     if issues:
-        return False, "Roadmap execution structure issues:\n  " + "\n  ".join(issues)
-    return True, "✓ Roadmap execution structure is complete"
+        return False, "Roadmap stewardship structure issues:\n  " + "\n  ".join(issues)
+    return True, "✓ Roadmap dormant stewardship structure is complete"
+
+
+def check_stewardship_trigger_reference(manual_tasks_path: Path) -> tuple[bool, str]:
+    """Reject standing or calendar-based human work in the stewardship reference."""
+    content = manual_tasks_path.read_text(encoding="utf-8")
+    issues: list[str] = []
+
+    if re.search(
+        r"^[ \t]*(?:[-*+]|\d+[.)])[ \t]+\[[ xX]\][ \t]+",
+        content,
+        re.MULTILINE,
+    ):
+        issues.append("stewardship trigger reference must not contain task-list checkboxes")
+
+    for forbidden_heading in (
+        "Decision Required",
+        "External Operations",
+        "Recurring Reviews",
+        "Conditional Follow-Ups",
+    ):
+        if re.search(rf"^## {re.escape(forbidden_heading)}\s*$", content, re.MULTILINE):
+            issues.append(f"standing work section '## {forbidden_heading}' must be removed")
+
+    if re.search(r"\b(?:daily|weekly|monthly|quarterly|annually)\b", content, re.IGNORECASE):
+        issues.append("calendar-based human review cadence must be removed")
+
+    for required_phrase in (
+        "This file is not an open task list",
+        "## Human-Action Triggers",
+        "## Parked Historical Material",
+    ):
+        if required_phrase not in content:
+            issues.append(f"missing dormant stewardship marker: {required_phrase}")
+
+    if issues:
+        return False, "Stewardship trigger reference issues:\n  " + "\n  ".join(issues)
+    return True, "✓ Stewardship trigger reference has no standing human queue"
 
 
 def main() -> int:
@@ -389,6 +440,7 @@ def main() -> int:
     try:
         repo_root = get_repo_root()
         roadmap_path = repo_root / "docs" / "planning" / "roadmap.md"
+        manual_tasks_path = repo_root / "docs" / "planning" / "manual-tasks.md"
 
         if not roadmap_path.exists():
             print(f"❌ Roadmap not found: {roadmap_path}")
@@ -404,7 +456,12 @@ def main() -> int:
             ("Milestone Completion", check_milestone_completion_consistency, (roadmap_path,)),
             ("Snapshot Summary", check_status_summary_freshness, (roadmap_path,)),
             ("README Status Alignment", check_readme_status_alignment, (roadmap_path, repo_root)),
-            ("Roadmap Execution Structure", check_execution_roadmap_structure, (roadmap_path,)),
+            ("Roadmap Stewardship Structure", check_execution_roadmap_structure, (roadmap_path,)),
+            (
+                "Stewardship Trigger Reference",
+                check_stewardship_trigger_reference,
+                (manual_tasks_path,),
+            ),
         ]
 
         results = []

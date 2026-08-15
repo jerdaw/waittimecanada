@@ -426,6 +426,23 @@ def test_check_docs_rejects_scheduler_cadence_drift(tmp_path: Path) -> None:
     assert "scraper schedule must be exactly hourly" in result.stdout
 
 
+def test_check_docs_rejects_unbounded_heartbeat_recovery(tmp_path: Path) -> None:
+    root = _create_docs_fixture(tmp_path)
+    workflow_path = root / ".github" / "workflows" / "heartbeat-monitor.yml"
+    workflow_path.write_text(
+        workflow_path.read_text(encoding="utf-8").replace(
+            "steps.check_heartbeats.outputs.recovery_required == 'true'",
+            "true",
+        ),
+        encoding="utf-8",
+    )
+
+    result = _run_check_docs(root)
+
+    assert result.returncode == 1
+    assert "new or changed incident" in result.stdout
+
+
 def test_check_docs_allows_historical_archive_cadence_claim(
     tmp_path: Path,
 ) -> None:

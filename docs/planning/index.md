@@ -7,11 +7,11 @@ This section contains the project planning control plane.
 - Roadmap: `docs/planning/roadmap.md`
 - Roadmap process: `docs/planning/roadmap-process.md`
 
-## Operational Queue
+## Dormant Stewardship Reference
 
-- Human intervention tasks: `docs/planning/manual-tasks.md`
+- Event-triggered human intervention: `docs/planning/manual-tasks.md`
 
-## Active Planning Docs
+## Current Planning Authority
 
 - `docs/planning/roadmap.md`
 - `docs/planning/manual-tasks.md`

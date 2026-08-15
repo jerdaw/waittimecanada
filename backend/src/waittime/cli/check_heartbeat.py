@@ -6,6 +6,7 @@ import os
 import sys
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import TypedDict, cast
 
 from waittime.cli.scraper import SCRAPERS
@@ -13,6 +14,19 @@ from waittime.services.alerts import AlertService, NotificationPolicy
 from waittime.services.database import DatabaseService
 
 CRITICAL_NOTIFICATION_TIERS = {"P0", "P1"}
+
+
+def _write_recovery_required_output(
+    recovery_required: bool,
+    output_path: str | None = None,
+) -> None:
+    """Expose whether this check opened a new incident to GitHub Actions."""
+    resolved_output_path = output_path or os.environ.get("GITHUB_OUTPUT")
+    if not resolved_output_path:
+        return
+
+    with Path(resolved_output_path).open("a", encoding="utf-8") as output:
+        output.write(f"recovery_required={'true' if recovery_required else 'false'}\n")
 
 
 def _get_sources_to_check(source: str | None) -> list[str]:
@@ -227,8 +241,8 @@ def reconcile_incident_state(
     run_url: str | None,
     dry_run: bool,
     now: datetime | None = None,
-) -> None:
-    """Send transition-aware alerts and persist alert incident state."""
+) -> bool:
+    """Persist incident state and report whether one bounded recovery is eligible."""
     now = now or datetime.now(UTC)
     active_kind = alert_state.get("active_incident_kind") if alert_state else None
     active_fingerprint = alert_state.get("active_incident_fingerprint") if alert_state else None
@@ -245,10 +259,10 @@ def reconcile_incident_state(
                     run_url=run_url,
                 )
             db.resolve_scraper_alert_incident(source_id)
-        return
+        return False
 
     if active_kind == current.kind and active_fingerprint == current.fingerprint:
-        return
+        return False
 
     if active_kind and not dry_run:
         if _should_send_recovery(alert_state, alerts):
@@ -260,7 +274,7 @@ def reconcile_incident_state(
             )
 
     if dry_run:
-        return
+        return False
 
     policy = NotificationPolicy(
         tier="P2",
@@ -284,6 +298,7 @@ def reconcile_incident_state(
                 notified_tier = policy.tier
 
     db.open_scraper_alert_incident(source_id, current.kind, current.fingerprint, notified_tier)
+    return True
 
 
 def main() -> None:
@@ -331,6 +346,7 @@ def main() -> None:
         run_url = f"https://github.com/{repo}/actions/runs/{run_id}"
 
     all_healthy = True
+    recovery_required = False
     now = datetime.now(UTC)
 
     with db.get_connection() as conn:
@@ -386,7 +402,7 @@ def main() -> None:
                     for detail in evaluation.details:
                         print(f"   {detail}")
 
-                reconcile_incident_state(
+                incident_requires_recovery = reconcile_incident_state(
                     source_id,
                     evaluation,
                     cast(AlertStateRow | None, alert_state),
@@ -396,8 +412,10 @@ def main() -> None:
                     dry_run=args.dry_run,
                     now=now,
                 )
+                recovery_required = recovery_required or incident_requires_recovery
                 all_healthy = all_healthy and evaluation.ok
 
+    _write_recovery_required_output(recovery_required)
     sys.exit(0 if all_healthy else 1)
 
 

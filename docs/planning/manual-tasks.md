@@ -1,53 +1,51 @@
-# Manual Tasks
+# Stewardship Triggers
 
-This file tracks public, non-secret manual follow-ups that are useful to
-contributors and maintainers. Private deployment runbooks, credentials,
-monitoring configuration, and personal planning notes are intentionally excluded
-from public documentation.
+This file is not an open task list. Wait Time Canada has no scheduled human
+maintenance cadence, external-operations campaign, methodology project, or
+expansion queue. Private deployment runbooks, credentials, monitoring
+configuration, and private operational notes remain outside public
+documentation.
 
-## Decision Required
+## Current State
 
-- [ ] Resolve the Ontario methodology representation before changing runtime
-  tags or treating paused Ontario research artifacts as current. Apply the
-  decision scope and gate in the [roadmap execution queue](roadmap.md#execution-queue).
+- Routine source collection and heartbeat checks are automated.
+- One newly opened or changed source-health incident may request one bounded
+  freshness-only recovery. An unchanged incident remains visible and failed but
+  does not repeatedly dispatch repair work.
+- Human action is event-triggered. A red workflow caused by a known unchanged
+  source incident is observability evidence, not a recurring manual assignment.
+- Manual workflow dispatch remains an emergency control, not a calendar task.
 
-## External Operations
+## Human-Action Triggers
 
-- [ ] Complete the trusted source-freshness offload pilot using
-  the [public offload contract](../operations/heartbeat-offload-pilot.md); keep
-  GitHub manual dispatch as fallback.
-- [ ] After the first complete 24-hour proof window, compare workflow history,
-  `/api/status`, and `/api/data-quality` with the acceptance checks in the
-  [public offload contract](../operations/heartbeat-offload-pilot.md).
-- [ ] Restore remaining scheduled workflows only after the proof window and
-  rollback evidence satisfy the gate in the
-  [roadmap execution queue](roadmap.md#execution-queue).
+Human review begins only when one of these concrete events occurs:
 
-## Recurring Reviews
+- a public surface cannot represent freshness, provenance, or availability
+  truthfully;
+- a security, privacy, or data-integrity incident is detected;
+- an official source or methodology changes in a way that affects a displayed
+  claim;
+- automation, dependency, or scheduler failure breaches the documented public
+  service contract;
+- an explicitly approved release or data-flow change requires its existing
+  release, privacy, documentation, or rollback checks.
 
-- [ ] Quarterly: review public source links and update stale provenance URLs.
-- [ ] After each completed milestone: align README, roadmap, and planning
-  indexes.
+Each response is limited to the affected contract. Stop when truthfulness is
+restored, the source is narrowed or suspended, or the concrete incident is
+otherwise contained.
 
-## Conditional Follow-Ups
+## Parked Historical Material
 
-- [ ] Before a major release: re-run the public documentation boundary review.
-- [ ] After a provincial reporting change: re-run methodology documentation
-  review and update affected artifacts.
-- [ ] After a major frontend change: capture updated demo screenshots.
-- [ ] After source methodology or displayed examples change: refresh affected
-  public case studies.
-- [ ] After a new data flow or third-party service is introduced: review
-  `/privacy` and `/terms`.
+- The [trusted source-freshness offload pilot](../operations/heartbeat-offload-pilot.md)
+  is an inactive reference, not an external-operations queue.
+- Ontario representation remains documented as a known limitation. It is not a
+  standing methods task and must not be used to restart research activity.
+- Public-health additions, new provinces, scheduling experiments, and other
+  expansion candidates remain inactive historical planning material.
+- The completed option-value screen and its reactivation gate are preserved in
+  the [closeout record](archive/maintenance-2026-08-15-option-value-screen-closeout.md).
 
-## Completed Repository Prerequisites
-
-- [x] Runner isolation, secret handling, log retention, failure-summary, and
-  rollback requirements are documented in the public offload contract, with
-  the concrete value-free operator procedure retained in the private/shared
-  operations source of truth.
-
-## Review Checklist
+## Triggered-Response Checklist
 
 - Emergency and non-triage disclaimers remain prominent.
 - Methodology caveats are not weakened.
