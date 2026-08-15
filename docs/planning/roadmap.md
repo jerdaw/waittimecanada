@@ -1,9 +1,9 @@
 # Implementation Roadmap
 
-## Current Snapshot (Updated 2026-07-26)
+## Current Snapshot (Updated 2026-08-15)
 
 **Progress:** Milestone 33 is complete. Wait Time Canada is in a stewardship
-and selective-expansion phase.
+phase; no research conversion or discretionary expansion is active.
 
 The observatory covers Ontario, Quebec, Alberta, and British Columbia while
 preserving each source's methodology and exposing invalid direct comparisons.
@@ -15,13 +15,25 @@ hydration, province changes, and refresh. Public status responses explicitly
 separate current 120-minute source freshness from 24-hour UTC
 measurement-hour completeness.
 
+The bounded research/evaluation option screen is closed. Existing methodology,
+quality, and longitudinal-data assets remain useful project evidence, but the
+screen did not establish a study-ready prospective lane, an independently
+worthwhile supervised question, or a feasible attributable output. The
+[closeout record](archive/maintenance-2026-08-15-option-value-screen-closeout.md)
+defines the evidence and any future external-pull gate.
+
+The frontend now fails closed for occupancy observations whose matching source
+heartbeat is failed, stale, future-dated, or missing. Current-value hospital and
+occupancy APIs use `Cache-Control: no-store`; healthy sources remain available
+independently in mixed-source results.
+
 The immediate delivery focus is the trusted source-freshness offload pilot.
 Runner provisioning, protected credential configuration, live command
 validation, schedule cutover, and the 24-hour proof window remain external
 operator work. GitHub manual dispatch remains the fallback until that evidence
 is accepted. No repository-only implementation batch is currently ready: each
-P1 item below is either operator-gated or requires a methodology/product
-decision.
+P1 item below is either operator-gated or requires a public-methodology
+decision. Discretionary research and product expansion remain parked.
 
 ## Completed Foundations
 
@@ -52,6 +64,9 @@ decision.
   province changes, and refresh, with no approximate hospital-count fallback
 - Explicit `/api/status` measurement-hour-completeness metadata kept separate
   from the current-freshness contract exposed by `/api/health`
+- Fail-closed current occupancy presentation based on each contributing
+  source's resolved heartbeat threshold, with no-store response contracts and
+  healthy mixed-source observations preserved
 
 ## Continuous Guardrails
 
@@ -68,6 +83,11 @@ decision.
   production cost controls.
 - Keep GitHub manual dispatch available until an accepted offload proof window
   and rollback review support schedule changes.
+- Do not represent the platform as a national performance comparison.
+- Treat research or evaluation as inactive unless an external supervisor or
+  partner independently identifies a worthwhile question and the opportunity
+  has a ready data/ethics route, bounded workload, and scheduled attributable
+  output.
 
 ## Execution Queue
 
@@ -75,10 +95,10 @@ decision.
 | --- | --- | --- | --- | --- |
 | P1 | Complete the trusted source-freshness offload pilot | External prerequisite | Merge the public contract and private companion, provision a trusted runner, and configure protected credentials outside this repository | Manual scraper, watchdog, aggregate, and smoke checks pass; timers complete a clean 24-hour soak with fallback retained |
 | P1 | Restore remaining scheduled workflow cadence | External prerequisite | Accept the offload proof window and value-free rollback evidence | Reviewed schedules run at the intended cadence and GitHub `workflow_dispatch` remains available |
-| P1 | Resolve Ontario methodology representation | Decision required | Decide the composite start, qualifying-provider endpoint, historical migration or versioning, source metadata, divergence behavior, and frontend labels together | Runtime tags, historical treatment, public methodology text, and regression tests implement one reviewed decision |
-| P1 | Extend public methodology artifacts | Decision required | Complete Ontario revalidation or verify another official methodology change | Case studies and export examples carry current definitions, provenance, limitations, and comparison warnings |
-| P1 | Select public-health resource expansion | Decision required | Identify an official, reusable, product-relevant source with documented caveats | The source catalog, ingest path, freshness behavior, public limitations, and tests are merged |
-| P2 | Evaluate additional provinces | External prerequisite | Find a stable official public source with sufficient methodology documentation | The source is represented with ontology, provenance, clinical-safety boundaries, monitoring, and tests |
+| P1 | Resolve Ontario methodology representation | Decision required | Approve one public-truthfulness decision covering the composite start, qualifying-provider endpoint, historical migration or versioning, source metadata, divergence behavior, and frontend labels; do not perform this work merely to restart research | Runtime tags, historical treatment, public methodology text, and regression tests implement one reviewed decision |
+| P2 | Extend public methodology artifacts | Later | Resolve Ontario representation or verify another official methodology change, and approve a concrete project-facing need | Case studies and export examples carry current definitions, provenance, limitations, and comparison warnings |
+| P2 | Select public-health resource expansion | Later | Explicitly reprioritize expansion after stewardship capacity exists and identify an official, reusable, product-relevant source with documented caveats | The source catalog, ingest path, freshness behavior, public limitations, and tests are merged |
+| P2 | Evaluate additional provinces | Later | Explicitly reprioritize expansion and find a stable official public source with sufficient methodology documentation | The source is represented with ontology, provenance, clinical-safety boundaries, monitoring, and tests |
 | P2 | Explore smarter scheduling | Later | Establish safe low-activity bounds from sustained freshness evidence | Upstream requests decrease without breaching public freshness expectations and manual fallback remains available |
 | P2 | Reassess external CI or full Forgejo migration | Later | The hybrid offload pilot fails documented reliability or cost objectives | A reviewed ADR selects a bounded migration or explicitly retains the hybrid model |
 

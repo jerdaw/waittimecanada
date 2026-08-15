@@ -8,7 +8,7 @@ operational posture without exposing private deployment details.
 | Province         | Source ID        | Public Methodology Summary                                                     |
 | ---------------- | ---------------- | ------------------------------------------------------------------------------ |
 | Quebec           | `quebec-msss`    | Registration-to-physician rolling average; stretcher occupancy where published |
-| Ontario          | `ontario-health` | Triage-to-physician mean                                                       |
+| Ontario          | `ontario-health` | Monthly mean from triage or registration, whichever is earlier, to first qualifying-provider assessment; legacy runtime event tags remain under revalidation |
 | Alberta          | `alberta-ahs`    | Triage-to-physician point estimate                                             |
 | British Columbia | `bc-phsa`        | Triage-to-physician P90                                                        |
 

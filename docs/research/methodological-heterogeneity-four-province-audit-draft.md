@@ -1,8 +1,13 @@
 # Methodological Heterogeneity in Canadian Emergency Department Wait-Time Reporting: A Four-Province Audit
 
-**Status:** Paused for Ontario methodology revalidation; not ready for external review
+**Status:** Inactive repository artifact; not an active study or ready for external review
 **Date:** 2026-03-28
 **Scope:** Ontario, Quebec, Alberta, British Columbia
+
+> The bounded research/evaluation option screen closed on 2026-08-15 without
+> advancement. This draft remains preserved as project evidence; it does not
+> authorize outreach, revalidation work, or publication activity. See the
+> [screen closeout](../planning/archive/maintenance-2026-08-15-option-value-screen-closeout.md).
 
 > This draft is intended to support informed review before the report is treated as a finalized public scholarly artifact. It summarizes methodology differences already documented in the live platform and repository.
 
