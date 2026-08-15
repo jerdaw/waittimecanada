@@ -50,7 +50,10 @@ jobs:
           uv run python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1
 
       - name: Dispatch freshness-only scraper recovery
-        if: ${{ failure() && steps.check_heartbeats.outcome == 'failure' }}
+        if: >-
+          ${{ failure() &&
+          steps.check_heartbeats.outcome == 'failure' &&
+          steps.check_heartbeats.outputs.recovery_required == 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

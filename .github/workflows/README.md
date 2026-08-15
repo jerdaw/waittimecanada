@@ -112,11 +112,16 @@ commits, not only the latest shallow commit.
 
 **Trigger:** every 30 minutes at minutes 14 and 44 plus manual dispatch.
 
-**Purpose:** Ensure scraper heartbeat freshness remains within threshold and report consecutive/classified failures.
+**Purpose:** Ensure scraper heartbeat freshness remains within threshold, report
+consecutive/classified failures, and request one freshness-only recovery when a
+source incident is newly opened or changes fingerprint.
 
 **Optimization controls:**
 
 - Serialized concurrency group to avoid overlapping checks.
+- Persisted source incident kind/fingerprint gates recovery dispatch. Repeated
+  checks of the same unchanged incident stay failed and observable without
+  dispatching recurring scraper work.
 
 ---
 
@@ -261,15 +266,17 @@ locked docs-only uv environment exercised by Docs CI.
 - The scraper is configured hourly at minute 29, and the heartbeat monitor runs
   at minutes 14 and 44. These are requested check times, not guarantees of
   workflow start time or upstream publication freshness. Snapshot, public-health
-  ingest, and smoke checks remain
-  manual-dispatch while broader operational offload work continues.
+  ingest, and smoke checks remain manual-dispatch emergency controls; they are
+  not a standing human work queue.
 - The scraper and heartbeat cron definitions are present on `main`. Both
   workflows produced successful post-recovery `event=schedule` runs on
   2026-07-09, but GitHub schedule creation was intermittent enough to breach
-  the public freshness threshold. Heartbeat now dispatches a freshness-only
-  scraper recovery when its stale check fails and no scraper run is already
-  queued or running. Keep manual dispatch available as the operator fallback
-  while ADR-0027 source-freshness offload is piloted on a trusted runner.
+  the public freshness threshold. Heartbeat dispatches one freshness-only
+  scraper recovery when a new or changed persisted incident is detected and no
+  scraper run is already queued or running. An unchanged incident remains a
+  failed, visible heartbeat run but does not dispatch again. Manual dispatch is
+  retained only as an emergency operator fallback; ADR-0027 offload material is
+  an inactive reference.
 - `frontend-ci.yml` keeps strict quality gates while avoiding heavy jobs when changes do not affect user-facing frontend runtime behavior.
 - `production-readiness.yml` and `production-smoke.yml` are lightweight operational preflight/postflight checks.
 - Production smoke now exercises `/api/status` and aggregate `/api/data-quality` directly and fails if dormant legacy source IDs such as `manitoba-shared-health` or `on-health` leak into the public payload.

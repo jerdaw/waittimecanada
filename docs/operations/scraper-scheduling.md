@@ -6,12 +6,12 @@ private operational procedures remain outside this repository.
 
 ## Verified Production Cadence
 
-| Layer                       | Repository configuration                                     | Public meaning                                                                           |
-| --------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| Provincial scraper workflow | `29 * * * *` in `.github/workflows/scraper-cron.yml`         | GitHub is asked to start one check each hour at minute 29                                |
-| Heartbeat monitor           | `14,44 * * * *` in `.github/workflows/heartbeat-monitor.yml` | Source status is checked twice hourly; stale state can dispatch a recovery scrape        |
-| Manual recovery             | `workflow_dispatch`                                          | An operator can request a source check when scheduled execution is delayed or missed     |
-| Trusted-runner pilot        | hourly scrape at minute 17; watchdog at minutes 07 and 37    | A documented alternative target, not proof that a particular production runner is active |
+| Layer                       | Repository configuration                                     | Public meaning                                                                                     |
+| --------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| Provincial scraper workflow | `29 * * * *` in `.github/workflows/scraper-cron.yml`         | GitHub is asked to start one check each hour at minute 29                                          |
+| Heartbeat monitor           | `14,44 * * * *` in `.github/workflows/heartbeat-monitor.yml` | Source status is checked twice hourly; one new or changed incident can request one recovery scrape |
+| Manual recovery             | `workflow_dispatch`                                          | Emergency operator control, not a scheduled human task                                             |
+| Trusted-runner pilot        | Inactive reference                                           | Historical alternative contract; no runner pilot or cutover is active                              |
 
 “Hourly” describes the configured check interval. GitHub scheduled workflows can
 start late or occasionally be skipped, scrapers take time to run, and provincial
@@ -33,6 +33,21 @@ workflow job is capped at 35 minutes. A run can be considered partially useful
 when at least one source produced data, while the heartbeat monitor still
 identifies stale or failed sources individually.
 
+## Bounded Automated Recovery
+
+The heartbeat checker persists each active incident by source, kind, and stable
+fingerprint. A newly opened incident, a changed error fingerprint, or a failure
+that recurs after a recorded recovery can request one freshness-only all-source
+recovery when no scraper run is already queued or active. The incident is
+recorded before the request is emitted.
+
+Later heartbeat checks for the same unchanged incident continue to fail and
+remain visible in workflow history and public source-health status, but they emit
+`recovery_required=false` and do not dispatch another recovery. A healthy check
+resolves the incident, so a later genuine recurrence can again request one
+bounded recovery. This transition gate does not mark failures healthy, suppress
+workflow evidence, or weaken per-source public fail-closed behavior.
+
 ## Provincial Publication Timing
 
 | Province         | Public source                                                                                                                                                                                   | Publisher timing documented by the source                                                         | Platform interpretation                                             |
@@ -52,9 +67,9 @@ source. Public surfaces then add bounded read delay:
 
 - `/api/health` uses a 60-second in-process read cache and returns `no-store` to
   clients. Its default public stale threshold is 120 minutes.
-- `/api/hospitals`, `/api/status`, and aggregate `/api/data-quality` use a
-  five-minute in-process cache and five-minute shared-cache response window,
-  with a 15-minute stale-while-revalidate allowance.
+- `/api/hospitals` returns `no-store` and may use only a bounded 30-second
+  in-process coalescing window. `/api/status` and aggregate `/api/data-quality`
+  retain their documented bounded shared-cache behavior.
 - The homepage server-renders a database-derived coverage snapshot. While the
   tab is visible, the browser requests the selected province and national
   coverage again every five minutes and immediately after the tab becomes
@@ -120,7 +135,9 @@ cd ..
 python3 scripts/check-scraper-workflow.py
 ```
 
-The trusted-runner wrapper remains available for a separately configured runner:
+The inactive trusted-runner reference wrapper remains available for a future
+explicitly approved reliability response; no runner provisioning or timer
+activation is current work:
 
 ```bash
 python3 scripts/waittime-freshness-runner.py check

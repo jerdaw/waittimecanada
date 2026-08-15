@@ -161,9 +161,10 @@ describe("API Route Integration: Hospitals", () => {
     expect(data.data[0].occupancy_updated).toEqual(expect.any(String));
   });
 
-  test("suppresses occupancy from an unhealthy source", async () => {
+  test("keeps wait data but suppresses occupancy from an unhealthy source", async () => {
     mockSql.unsafe.mockResolvedValueOnce([
       hospitalRow({
+        current_wait_time: 42,
         occupancy_percentage: 108,
         occupancy_updated: timestampMinutesAgo(20),
         occupancy_source_status: "error",
@@ -178,6 +179,8 @@ describe("API Route Integration: Hospitals", () => {
     );
     const data = await res.json();
 
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
+    expect(data.data[0].current_wait_time).toBe(42);
     expect(data.data[0]).not.toHaveProperty("occupancy_percentage");
     expect(data.data[0]).not.toHaveProperty("occupancy_updated");
   });

@@ -6,9 +6,9 @@ This directory is the planning control plane for Wait Time Canada.
 
 - Roadmap: `docs/planning/roadmap.md`
 - Process: `docs/planning/roadmap-process.md`
-- Manual intervention queue: `docs/planning/manual-tasks.md`
+- Dormant stewardship triggers: `docs/planning/manual-tasks.md`
 
-## Active Planning Docs
+## Current Governance Docs
 
 - `docs/planning/roadmap.md`
 - `docs/planning/manual-tasks.md`
@@ -56,10 +56,13 @@ These documents are retained for context and may not match current implementatio
 
 ## Lifecycle Rules
 
-1. Keep the roadmap current every session.
-2. Mark milestone tasks complete as implemented.
-3. Archive implementation plans once a milestone is delivered and no longer actively edited.
-4. Keep completed milestone details in archived files; keep roadmap focused on active next steps.
+1. Update current governance only after a concrete stewardship trigger or an
+   explicitly approved project decision.
+2. Mark bounded incident or release work complete when its stop condition is
+   met.
+3. Archive implementation plans once delivered or closed.
+4. Keep completed and parked material historical; do not turn it into a
+   standing maintenance queue.
 
 Last Updated: 2026-08-15
 

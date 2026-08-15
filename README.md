@@ -559,7 +559,7 @@ environment-specific paths are kept outside public documentation.
 ### Data Freshness
 
 - **Update Frequency:** Hourly scheduled source refreshes, with manual dispatch
-  available as an operator fallback
+  retained only as an emergency operator control
 - **Freshness Thresholds:** Source-health checks flag stale or failed updates
   when source heartbeats exceed the public freshness threshold
 - **Current Status:** See the public status and data-quality pages for current source state
@@ -568,15 +568,15 @@ environment-specific paths are kept outside public documentation.
 
 ## 💡 Future Roadmap
 
-Wait Time Canada is in a stewardship phase. Finite outcomes currently cover
-source-freshness offload validation, public-methodology correctness, and
-evidence-bounded operations. Research conversion and discretionary product,
-resource, or province expansion are parked unless a concrete external need
-satisfies the roadmap gate.
+Wait Time Canada is in a stewardship phase with no standing implementation or
+manual-review queue. Human work begins only after a concrete public
+truthfulness, provenance, security, integrity, source-change, or service-contract
+trigger. Research conversion and discretionary product, resource, or province
+expansion are inactive.
 
-The canonical dependency, state, and completion criteria for this work live in
-the [`docs/planning/roadmap.md`](docs/planning/roadmap.md) execution queue. The
-bounded research/evaluation screen is closed in its
+The canonical event-triggered stewardship and stop conditions live in the
+[`docs/planning/roadmap.md`](docs/planning/roadmap.md). The bounded
+research/evaluation screen is closed in its
 [decision record](docs/planning/archive/maintenance-2026-08-15-option-value-screen-closeout.md).
 
 ---

@@ -1,5 +1,9 @@
 # Source Freshness Offload Pilot
 
+**Status:** Inactive reference; no runner provisioning, cutover, proof window,
+or external-operations campaign is active. Reuse this contract only after a
+concrete reliability trigger and explicit project decision.
+
 This guide is the public, repo-side contract for the ADR-0027 source-freshness
 offload pilot. It documents how a trusted non-GitHub runner should invoke the
 existing scraper, heartbeat checker, aggregate refresh, and smoke checks without
@@ -184,7 +188,7 @@ blind retries require separate cause-specific procedures and authorization.
 9. Enable the trusted-runner timers only after the manual offloaded run
    behaves as expected.
 10. Complete a 24-hour soak with no stale breach and no temporary monitor
-   intervention.
+    intervention.
 11. Exercise or review the rollback path with value-free evidence before
     fallback removal.
 12. Remove GitHub scheduled triggers only after the private runner completes
