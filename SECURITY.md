@@ -63,8 +63,16 @@ If you're deploying this project:
 
 - **Never commit secrets:** Use `.env.local` for sensitive configuration (already in `.gitignore`)
 - **Rotate database credentials:** If you suspect credential exposure, rotate the affected PostgreSQL credentials immediately
-- **Review dependencies:** Run `npm audit` and `pip-audit` regularly
-- **Enable Dependabot:** Automated dependency updates are configured in `.github/dependabot.yml`
+- **Dependency alerts:** Keep Dependabot alerts enabled in repository settings.
+  `.github/dependabot.yml` does not enable vulnerability reporting.
+- **Update PRs:** Routine version-update PRs are paused with
+  `open-pull-requests-limit: 0`. Automatic security-fix PRs are a separate
+  repository setting and remain disabled unless explicitly activated for a
+  bounded remediation.
+- **Event-triggered assessment:** Assess new vulnerability alerts against the
+  locked dependencies and deployed release. Run targeted dependency checks for
+  an affected component or an approved release; no recurring manual audit is
+  required. Validate any fix before its approved release.
 
 ## Out of Scope
 
