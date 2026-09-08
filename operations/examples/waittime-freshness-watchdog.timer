@@ -1,0 +1,12 @@
+# Copy/adapt example only. Enable only on a trusted private runner.
+
+[Unit]
+Description=Check Wait Time Canada freshness twice hourly
+
+[Timer]
+OnCalendar=*-*-* *:07,37:00
+Persistent=true
+Unit=waittime-freshness-watchdog.service
+
+[Install]
+WantedBy=timers.target

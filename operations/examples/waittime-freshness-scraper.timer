@@ -1,0 +1,12 @@
+# Copy/adapt example only. Enable only on a trusted private runner.
+
+[Unit]
+Description=Run Wait Time Canada freshness scraper hourly
+
+[Timer]
+OnCalendar=*-*-* *:17:00
+Persistent=true
+Unit=waittime-freshness-scraper.service
+
+[Install]
+WantedBy=timers.target
