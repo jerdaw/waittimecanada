@@ -132,7 +132,7 @@ jobs:
 
       - name: Run unit tests
         working-directory: ./frontend
-        run: npm run test:unit --coverage
+        run: npm run test:unit -- --coverage
 
       - name: Upload coverage artifact
         if: hashFiles('frontend/coverage/**/*') != ''
