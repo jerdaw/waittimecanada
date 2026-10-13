@@ -5,7 +5,9 @@ import json
 import sys
 from typing import Any
 
-from waittime.services.database import DatabaseService
+import psycopg2
+
+from waittime.services.database import DatabaseService, PreservationInventorySchemaError
 
 
 def _format_bytes(num_bytes: int) -> str:
@@ -34,10 +36,19 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Report row-count and storage metadata for a PostgreSQL relation."
     )
-    parser.add_argument(
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
         "--relation",
         default="measurements",
         help="Relation name to inspect (default: measurements)",
+    )
+    mode.add_argument(
+        "--preservation-inventory",
+        action="store_true",
+        help=(
+            "Opt in to an exact, bounded full-table raw-measurement and aggregate metadata scan; "
+            "always emits value-free JSON"
+        ),
     )
     parser.add_argument(
         "--exact-count",
@@ -50,6 +61,36 @@ def main() -> int:
         help="Emit machine-readable JSON instead of text",
     )
     args = parser.parse_args()
+
+    if args.preservation_inventory:
+        if args.exact_count:
+            parser.error("--exact-count is not applicable to --preservation-inventory")
+        try:
+            inventory = DatabaseService().get_measurement_preservation_inventory()
+            print(json.dumps(inventory, sort_keys=True))
+            return 0
+        except Exception as exc:
+            # Database errors can contain connection details or SQL fragments.
+            # Return only a small fixed class, never the exception text.
+            error_class = "inventory_failed"
+            if isinstance(exc, psycopg2.Error):
+                if exc.pgcode == "57014":
+                    error_class = "statement_timeout"
+                elif exc.pgcode in {"42703", "42P01", "42704"}:
+                    error_class = "schema_mismatch"
+                elif isinstance(exc, psycopg2.OperationalError):
+                    error_class = "database_unavailable"
+                else:
+                    error_class = "database_query_failed"
+            elif isinstance(exc, PreservationInventorySchemaError):
+                error_class = "schema_mismatch"
+            elif isinstance(exc, ValueError):
+                error_class = "configuration_missing"
+            print(
+                json.dumps({"status": "error", "error_class": error_class}, sort_keys=True),
+                file=sys.stderr,
+            )
+            return 1
 
     try:
         db = DatabaseService()

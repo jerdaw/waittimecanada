@@ -35,6 +35,22 @@ from waittime.services.runtime_config import get_heartbeat_stale_threshold_minut
 
 logger = logging.getLogger(__name__)
 
+PRESERVATION_INVENTORY_RETENTION_DAYS = 30
+PRESERVATION_INVENTORY_STATEMENT_TIMEOUT = "5000ms"
+
+
+class PreservationInventorySchemaError(RuntimeError):
+    """Raised when the fixed inventory columns are unavailable."""
+
+
+def _utc_isoformat(value: datetime | None) -> str | None:
+    """Format a PostgreSQL timestamptz as an explicit UTC value."""
+    if value is None:
+        return None
+    if value.tzinfo is None:
+        raise ValueError("preservation inventory returned a timezone-naive timestamp")
+    return value.astimezone(UTC).isoformat().replace("+00:00", "Z")
+
 
 @dataclass(frozen=True)
 class PublicHealthSourceStatus:
@@ -1024,6 +1040,291 @@ class DatabaseService:
                     "total_measurements": row["total_measurements"],
                     "older_than_days_threshold": older_than_days,
                     "measurements_older_than_threshold": row["measurements_older_than_threshold"],
+                }
+
+    def get_measurement_preservation_inventory(
+        self, *, _as_of_utc: datetime | None = None
+    ) -> dict[str, Any]:
+        """Return a bounded, value-free raw/aggregate metadata inventory.
+
+        This exact inventory intentionally scans and groups all measurement and
+        aggregate rows. Callers must make that cost explicit. The private
+        ``_as_of_utc`` anchor is only for deterministic database tests; the
+        operator CLI never exposes it.
+        """
+        if _as_of_utc is not None:
+            if _as_of_utc.tzinfo is None:
+                raise ValueError("preservation inventory anchor must be timezone-aware")
+            _as_of_utc = _as_of_utc.astimezone(UTC)
+
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                # This must be the first command in the transaction. The
+                # existing connection context commits on success, but a
+                # read-only transaction makes accidental writes impossible.
+                cur.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
+                cur.execute("SET LOCAL TIME ZONE 'UTC'")
+                cur.execute(
+                    "SELECT set_config('statement_timeout', %s, true)",
+                    (PRESERVATION_INVENTORY_STATEMENT_TIMEOUT,),
+                )
+                cur.execute("SHOW transaction_read_only")
+                read_only_row = cur.fetchone()
+                if read_only_row is None:
+                    raise RuntimeError("preservation inventory transaction state unavailable")
+                read_only_state = read_only_row["transaction_read_only"]
+                if read_only_state != "on":
+                    raise RuntimeError("preservation inventory read-only transaction unavailable")
+
+                cur.execute("SHOW statement_timeout")
+                timeout_row = cur.fetchone()
+                if timeout_row is None:
+                    raise RuntimeError("preservation inventory timeout state unavailable")
+                timeout_setting = timeout_row["statement_timeout"]
+
+                cur.execute(
+                    """
+                    SELECT COALESCE(%s::timestamptz, transaction_timestamp()) AS snapshot_at_utc
+                    """,
+                    (_as_of_utc,),
+                )
+                snapshot_row = cur.fetchone()
+                if snapshot_row is None:
+                    raise RuntimeError("preservation inventory snapshot unavailable")
+                snapshot_at = snapshot_row["snapshot_at_utc"]
+                retention_cutoff = snapshot_at - timedelta(
+                    days=PRESERVATION_INVENTORY_RETENTION_DAYS
+                )
+
+                cur.execute(
+                    """
+                    SELECT table_name, column_name, is_nullable
+                    FROM information_schema.columns
+                    WHERE table_schema = current_schema()
+                      AND table_name = ANY(%s)
+                      AND column_name = ANY(%s)
+                    ORDER BY table_name, column_name
+                    """,
+                    (
+                        ["measurements", "measurement_aggregates"],
+                        [
+                            "source_id",
+                            "timestamp_utc",
+                            "metric_family",
+                            "start_event",
+                            "end_event",
+                            "statistic_type",
+                            "patient_scope",
+                            "raw_payload_hash",
+                            "raw_payload_snippet",
+                            "parser_version",
+                            "period_type",
+                            "period_start",
+                            "period_end",
+                            "sample_count",
+                            "created_at",
+                        ],
+                    ),
+                )
+                schema_rows = cur.fetchall()
+                schema_shape = {
+                    (row["table_name"], row["column_name"]): row["is_nullable"] == "YES"
+                    for row in schema_rows
+                }
+                expected_columns = {
+                    "measurements": {
+                        "source_id",
+                        "timestamp_utc",
+                        "metric_family",
+                        "start_event",
+                        "end_event",
+                        "statistic_type",
+                        "patient_scope",
+                        "raw_payload_hash",
+                        "raw_payload_snippet",
+                        "parser_version",
+                    },
+                    "measurement_aggregates": {
+                        "source_id",
+                        "period_type",
+                        "period_start",
+                        "period_end",
+                        "sample_count",
+                        "metric_family",
+                        "start_event",
+                        "end_event",
+                        "statistic_type",
+                        "created_at",
+                    },
+                }
+                missing_columns = [
+                    f"{table}.{column}"
+                    for table, columns in expected_columns.items()
+                    for column in columns
+                    if (table, column) not in schema_shape
+                ]
+                if missing_columns:
+                    # Do not include unexpected schema values in an operator
+                    # error packet; the CLI reports only the error class.
+                    raise PreservationInventorySchemaError("preservation inventory schema mismatch")
+
+                cur.execute(
+                    """
+                    SELECT
+                        source_id,
+                        metric_family::text AS metric_family,
+                        start_event::text AS start_event,
+                        end_event::text AS end_event,
+                        statistic_type::text AS statistic_type,
+                        patient_scope::text AS patient_scope,
+                        COUNT(*)::bigint AS row_count,
+                        MIN(timestamp_utc) AS oldest_timestamp_utc,
+                        MAX(timestamp_utc) AS newest_timestamp_utc,
+                        COUNT(*) FILTER (WHERE timestamp_utc < %s)::bigint
+                            AS rows_older_than_30_days,
+                        COUNT(*) FILTER (WHERE timestamp_utc > %s)::bigint
+                            AS future_timestamp_rows,
+                        COUNT(*) FILTER (
+                            WHERE source_id IS NULL OR BTRIM(source_id) = ''
+                        )::bigint AS missing_source_id_count,
+                        COUNT(*) FILTER (
+                            WHERE raw_payload_hash IS NULL OR BTRIM(raw_payload_hash) = ''
+                        )::bigint AS missing_payload_hash_count,
+                        COUNT(*) FILTER (
+                            WHERE parser_version IS NULL OR BTRIM(parser_version) = ''
+                        )::bigint AS missing_parser_version_count,
+                        COUNT(*) FILTER (
+                            WHERE raw_payload_snippet IS NULL OR BTRIM(raw_payload_snippet) = ''
+                        )::bigint AS absent_optional_payload_snippet_count
+                    FROM measurements
+                    GROUP BY
+                        source_id,
+                        metric_family,
+                        start_event,
+                        end_event,
+                        statistic_type,
+                        patient_scope
+                    ORDER BY
+                        source_id,
+                        metric_family::text,
+                        start_event::text,
+                        end_event::text,
+                        statistic_type::text,
+                        patient_scope::text
+                    """,
+                    (retention_cutoff, snapshot_at),
+                )
+                raw_groups = [
+                    {
+                        "source_id": row["source_id"],
+                        "metric_family": row["metric_family"],
+                        "start_event": row["start_event"],
+                        "end_event": row["end_event"],
+                        "statistic_type": row["statistic_type"],
+                        "patient_scope": row["patient_scope"],
+                        "row_count": int(row["row_count"]),
+                        "oldest_timestamp_utc": _utc_isoformat(row["oldest_timestamp_utc"]),
+                        "newest_timestamp_utc": _utc_isoformat(row["newest_timestamp_utc"]),
+                        "rows_older_than_30_days": int(row["rows_older_than_30_days"]),
+                        "future_timestamp_rows": int(row["future_timestamp_rows"]),
+                        "missing_source_id_count": int(row["missing_source_id_count"]),
+                        "missing_payload_hash_count": int(row["missing_payload_hash_count"]),
+                        "missing_parser_version_count": int(row["missing_parser_version_count"]),
+                        "absent_optional_payload_snippet_count": int(
+                            row["absent_optional_payload_snippet_count"]
+                        ),
+                    }
+                    for row in cur.fetchall()
+                ]
+
+                cur.execute(
+                    """
+                    SELECT
+                        source_id,
+                        period_type,
+                        metric_family,
+                        start_event,
+                        end_event,
+                        statistic_type,
+                        COUNT(*)::bigint AS aggregate_row_count,
+                        SUM(sample_count)::bigint AS aggregate_sample_count_sum,
+                        MIN(period_start) AS oldest_period_start_utc,
+                        MAX(period_end) AS newest_period_end_utc,
+                        MAX(created_at) AS newest_aggregate_created_at_utc
+                    FROM measurement_aggregates
+                    GROUP BY
+                        source_id,
+                        period_type,
+                        metric_family,
+                        start_event,
+                        end_event,
+                        statistic_type
+                    ORDER BY
+                        source_id,
+                        period_type,
+                        metric_family,
+                        start_event,
+                        end_event,
+                        statistic_type
+                    """
+                )
+                aggregate_groups = [
+                    {
+                        "source_id": row["source_id"],
+                        "period_type": row["period_type"],
+                        "metric_family": row["metric_family"],
+                        "start_event": row["start_event"],
+                        "end_event": row["end_event"],
+                        "statistic_type": row["statistic_type"],
+                        "aggregate_row_count": int(row["aggregate_row_count"]),
+                        "aggregate_sample_count_sum": int(row["aggregate_sample_count_sum"]),
+                        "oldest_period_start_utc": _utc_isoformat(row["oldest_period_start_utc"]),
+                        "newest_period_end_utc": _utc_isoformat(row["newest_period_end_utc"]),
+                        "newest_aggregate_created_at_utc": _utc_isoformat(
+                            row["newest_aggregate_created_at_utc"]
+                        ),
+                    }
+                    for row in cur.fetchall()
+                ]
+
+                cur.execute(
+                    """
+                    SELECT s.id AS source_id
+                    FROM sources s
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM measurements m WHERE m.source_id = s.id
+                    )
+                    ORDER BY s.id
+                    """
+                )
+                sources_without_measurements = [row["source_id"] for row in cur.fetchall()]
+
+                return {
+                    "status": "complete",
+                    "transaction_read_only": True,
+                    "statement_timeout": timeout_setting,
+                    "snapshot_at_utc": _utc_isoformat(snapshot_at),
+                    "retention_threshold_days": PRESERVATION_INVENTORY_RETENTION_DAYS,
+                    "retention_cutoff_utc": _utc_isoformat(retention_cutoff),
+                    "retention_threshold_basis": "30 elapsed 24-hour days from the UTC snapshot",
+                    "raw_measurements": {
+                        "groups": raw_groups,
+                        "sources_without_measurements": sources_without_measurements,
+                        "provenance_schema_nullable": {
+                            "source_id": schema_shape[("measurements", "source_id")],
+                            "raw_payload_hash": schema_shape[("measurements", "raw_payload_hash")],
+                            "parser_version": schema_shape[("measurements", "parser_version")],
+                            "raw_payload_snippet": schema_shape[
+                                ("measurements", "raw_payload_snippet")
+                            ],
+                        },
+                    },
+                    "aggregates": {
+                        "groups": aggregate_groups,
+                        "scope": "summary-row coverage only; not a raw-measurement backup",
+                    },
+                    "purge_execution_history": "not_assessed",
+                    "provider_backup_pitr_restore_evidence": "not_assessed",
                 }
 
     def get_relation_storage_stats(

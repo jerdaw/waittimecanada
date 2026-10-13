@@ -70,6 +70,40 @@ python -m waittime.cli.storage_stats --relation measurements
 
 ## Monitoring
 
+### Read-Only Preservation Inventory
+
+An already-authorized WaitTime backend runtime with its database connection
+provisioned may run the fixed metadata-only inventory:
+
+```bash
+python -m waittime.cli.storage_stats --preservation-inventory
+```
+
+This is an explicit opt-in exact scan, not a routine health check. It uses one
+repeatable-read, read-only transaction, sets the session timezone to UTC, and
+applies a five-second PostgreSQL statement timeout to each bounded query. The
+raw-measurement and aggregate tables are grouped separately by source and their
+stored metric dimensions; the report includes UTC timestamp bounds, row counts,
+the 30-day threshold count, and schema-aware missing-provenance counts. It emits
+no hospital names, measurement values, payload hashes/snippets, URLs, or
+credentials. Because exact counts and grouped bounds scan the tables, the query
+may time out on a large database; on timeout it returns only a fixed error
+classification and no partial report.
+
+The inventory defines the 30-day comparison as 30 elapsed 24-hour days from a
+UTC snapshot. It is not a purge preview or an audit of past cleanup runs. The
+aggregate section reports summary-row coverage only and is not a backup. The
+command does not inspect provider backup/PITR configuration, archive state, or
+restore evidence; it cannot establish that any purge ran, that a backup exists,
+or that a restore is possible. Keep those claims tied to separate provider and
+isolated-restore evidence. This command does not add a production queue route or
+change cleanup, retention, schedule, or backup behavior.
+
+The existing database-cleanup.yml workflow is not an inventory route. In this
+main revision it has no confirmation input and executes cleanup before
+reporting storage statistics. Do not dispatch it to inspect preservation or
+data age.
+
 ### Check Data Age Statistics
 
 ```python
