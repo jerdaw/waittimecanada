@@ -24,6 +24,11 @@ INVENTORY_COMMAND = (
 )
 DATABASE_SECRET = "$" + "{{ secrets.DATABASE_URL }}"
 EXACT_SHA_REF = "$" + "{{ github.sha }}"
+EXPECTED_JOB_GUARD = (
+    "$" + "{{ github.event_name == 'workflow_dispatch' && "
+    "github.ref == 'refs/heads/main' && "
+    "inputs.confirm_production_inventory == true }}"
+)
 
 
 def _step_block(text: str, step_name: str) -> str:
@@ -37,7 +42,7 @@ def _step_block(text: str, step_name: str) -> str:
 
 def _run_body(step: str) -> str | None:
     block = re.search(
-        r"(?ms)^        run: \|\n(?P<body>(?:^          .*\n)+)",
+        r"(?m)^        run: \|\n(?P<body>(?:^          [^\n]*\n)+)",
         step,
     )
     if block:
@@ -97,20 +102,15 @@ def _workflow_failures(
         failures.append("workflow must contain only its single inventory job")
 
     guard_match = re.search(
-        r"(?ms)^    if: >-\n(?P<guard>(?:^      .*\n)+)",
+        r"(?m)^    if: >-\n(?P<guard>(?:^      [^\n]*\n)+)",
         text,
     )
     normalized_guard = (
         " ".join(guard_match.group("guard").split()) if guard_match else ""
     )
-    guard_conditions = [
-        "github.event_name == 'workflow_dispatch'",
-        "github.ref == 'refs/heads/main'",
-        "inputs.confirm_production_inventory == true",
-    ]
-    if any(condition not in normalized_guard for condition in guard_conditions):
+    if normalized_guard != EXPECTED_JOB_GUARD:
         failures.append(
-            "job must require manual dispatch, main ref, and explicit confirmation"
+            "job guard must exactly require manual dispatch, main ref, and explicit confirmation"
         )
     if not re.search(r"(?m)^    timeout-minutes: 15$", text):
         failures.append("inventory job must have a 15-minute hard timeout")
@@ -187,6 +187,10 @@ def _workflow_failures(
         failures.append(
             "workflow must not assume an unverified protected GitHub environment"
         )
+    if re.search(r"(?m)^[ \t]*(?:defaults|shell):", text):
+        failures.append(
+            "workflow must not override the reviewed runner shell or run defaults"
+        )
     if 'PGCONNECT_TIMEOUT: "10"' not in inventory_step:
         failures.append(
             "database connection must have a finite ten-second connect timeout"
@@ -248,6 +252,16 @@ def _mutation_failures(
             "          false }}",
         ),
         (
+            "OR bypass in job guard",
+            "github.event_name == 'workflow_dispatch' &&",
+            "github.event_name == 'workflow_dispatch' ||",
+        ),
+        (
+            "extra OR condition in job guard",
+            "inputs.confirm_production_inventory == true }}",
+            "inputs.confirm_production_inventory == true || true }}",
+        ),
+        (
             "main-ref gate",
             "github.ref == 'refs/heads/main'",
             "github.ref == 'refs/heads/feature'",
@@ -305,6 +319,17 @@ def _mutation_failures(
             "          uv sync --locked --no-dev\n"
             "          python -m waittime.cli.cleanup --confirm-delete\n",
         ),
+        (
+            "custom inventory shell",
+            "        run: " + INVENTORY_COMMAND,
+            "        shell: bash -c 'echo extra; bash {0}'\n"
+            "        run: " + INVENTORY_COMMAND,
+        ),
+        (
+            "workflow default shell",
+            "jobs:\n",
+            "defaults:\n  run:\n    shell: bash\n\njobs:\n",
+        ),
     ]
     failures: list[str] = []
     for label, needle, replacement in mutations:
@@ -337,7 +362,7 @@ def _main() -> int:
         "OK: preservation inventory is manual, confirmed, read-only, bounded, and public-log disclosed."
     )
     print(
-        "OK: mutation tests reject missing gates, expanded triggers/inputs, and writes."
+        "OK: mutation tests reject bypassed gates, shell overrides, expanded triggers/inputs, and writes."
     )
     return 0
 

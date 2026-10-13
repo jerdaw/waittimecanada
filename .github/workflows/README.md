@@ -251,6 +251,17 @@ upload. See the [retention inventory guide](../../backend/docs/data-retention.md
 for scan cost, disclosure, and the separate production-approval and secret-
 target verification gate.
 
+The existing database-cleanup workflow is not an inventory route on this
+main revision: it has no confirmation input and runs cleanup before its
+storage report. Never dispatch it to inspect preservation or data age.
+
+Dispatch only in an approved quiet window after confirming there is no active
+or pending cleanup/inventory run. The shared GitHub concurrency group is not a
+FIFO queue: at most one run waits, and a newer pending run may replace an older
+one even with cancel-in-progress disabled. A dispatch is not evidence that a
+job started or completed. Do not retry automatically or repeatedly dispatch;
+verify the run's exact event SHA and terminal result before relying on it.
+
 ## Secrets Matrix
 
 ### Core production/runtime

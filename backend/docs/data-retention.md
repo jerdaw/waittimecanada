@@ -116,6 +116,14 @@ checkout/setup steps are capped at 2 minutes each, dependency installation at
 grouped scans can still consume database read capacity and may time out. The
 workflow adds no recurring scan or result artifact.
 
+The inventory shares the cleanup concurrency group. GitHub allows only one
+pending run in a concurrency group; a newer pending run can replace an older
+one even when cancel-in-progress is false, so the queue is not FIFO. Dispatch
+only in an approved quiet window after confirming there is no active or pending
+cleanup or inventory run. A dispatch is not proof that the job started; do not
+repeat or automatically retry it. Verify the exact event SHA and wait for the
+run's terminal result before using its output.
+
 Publishing or dispatching this workflow is not authorized by preparing its
 code. A project owner must separately approve the production scan and verify
 that the existing DATABASE_URL secret is present and points to the intended
