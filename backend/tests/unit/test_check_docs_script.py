@@ -147,6 +147,17 @@ def _create_docs_fixture(tmp_path: Path) -> Path:
         (REPO_ROOT / "scripts" / "check-scraper-workflow.py").read_text(encoding="utf-8"),
     )
     _write(
+        root / "scripts" / "check-preservation-inventory-workflow.py",
+        (REPO_ROOT / "scripts" / "check-preservation-inventory-workflow.py").read_text(
+            encoding="utf-8"
+        ),
+    )
+    for workflow_name in ("preservation-inventory.yml", "database-cleanup.yml"):
+        _write(
+            root / ".github" / "workflows" / workflow_name,
+            (REPO_ROOT / ".github" / "workflows" / workflow_name).read_text(encoding="utf-8"),
+        )
+    _write(
         root / "scripts" / "check-freshness-offload.py",
         (REPO_ROOT / "scripts" / "check-freshness-offload.py").read_text(encoding="utf-8"),
     )
@@ -164,6 +175,14 @@ def _create_docs_fixture(tmp_path: Path) -> Path:
     _write(root / "SECURITY.md")
     _write(root / "backend" / "README.md")
     _write(root / "backend" / "migrations" / "README.md")
+    for backend_path in (
+        "src/waittime/cli/storage_stats.py",
+        "src/waittime/services/database.py",
+    ):
+        _write(
+            root / "backend" / backend_path,
+            (REPO_ROOT / "backend" / backend_path).read_text(encoding="utf-8"),
+        )
     _write(root / "backend" / "src" / "waittime" / "core" / "enums.py", ENUMS_PY)
     _write(
         root / "backend" / "scripts" / "verify_roadmap_consistency.py",

@@ -1,0 +1,58 @@
+name: Read-only Preservation Inventory
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_production_inventory:
+        description: "I am authorized to run this production inventory and understand detailed per-source/metric counts and date ranges will appear in this repository's public Actions logs."
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: database-cleanup
+  cancel-in-progress: false
+
+jobs:
+  preservation-inventory:
+    name: Read-only preservation inventory
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' &&
+          github.ref == 'refs/heads/main' &&
+          inputs.confirm_production_inventory == true }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout reviewed dispatch SHA
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        timeout-minutes: 2
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        timeout-minutes: 2
+        with:
+          python-version: "3.12"
+
+      - name: Install locked backend dependencies
+        timeout-minutes: 8
+        working-directory: ./backend
+        run: |
+          python -m pip install "uv==0.11.23"
+          uv sync --locked --no-dev
+
+      - name: Run read-only preservation inventory
+        timeout-minutes: 2
+        working-directory: ./backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PGCONNECT_TIMEOUT: "10"
+          PGOPTIONS: "-c lock_timeout=2000ms"
+        run: uv run --no-sync python -m waittime.cli.storage_stats --preservation-inventory

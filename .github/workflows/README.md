@@ -240,6 +240,17 @@ locked docs-only uv environment exercised by Docs CI.
   author identity rather than `github-actions[bot]`, so published branch
   history remains aligned with the repository's human-authorship policy.
 
+## Read-only Preservation Inventory
+
+The preservation-inventory workflow is manual-only, guarded to main and the
+exact dispatch SHA, and requires a default-false confirmation before its
+single fixed inventory step can receive DATABASE_URL. Detailed source/metric
+counts and date ranges appear in public Actions logs after confirmation. It
+shares the database-cleanup concurrency lock and has no schedule or artifact
+upload. See the [retention inventory guide](../../backend/docs/data-retention.md)
+for scan cost, disclosure, and the separate production-approval and secret-
+target verification gate.
+
 ## Secrets Matrix
 
 ### Core production/runtime

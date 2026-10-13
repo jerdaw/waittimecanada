@@ -104,6 +104,23 @@ main revision it has no confirmation input and executes cleanup before
 reporting storage statistics. Do not dispatch it to inspect preservation or
 data age.
 
+The prepared GitHub Actions entry point is
+.github/workflows/preservation-inventory.yml. It is manual-only, runs only
+from main at the exact dispatch SHA, and skips the job by default. A run
+requires an explicit boolean confirmation that the operator is authorized and
+accepts that detailed per-source/metric counts and date ranges will appear in
+the public Actions logs. The database connect timeout is 10 seconds, lock wait
+is 2 seconds, and each SQL statement retains the CLI's 5-second timeout. The
+checkout/setup steps are capped at 2 minutes each, dependency installation at
+8 minutes, the inventory step at 2 minutes, and the job at 15 minutes. Exact
+grouped scans can still consume database read capacity and may time out. The
+workflow adds no recurring scan or result artifact.
+
+Publishing or dispatching this workflow is not authorized by preparing its
+code. A project owner must separately approve the production scan and verify
+that the existing DATABASE_URL secret is present and points to the intended
+database. Repository source cannot verify that secret's existence or target,
+and no protected GitHub environment is configured or assumed.
 ### Check Data Age Statistics
 
 ```python
