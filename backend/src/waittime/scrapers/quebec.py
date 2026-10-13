@@ -16,6 +16,7 @@ import time
 from collections.abc import Callable
 from datetime import UTC, datetime
 
+import structlog
 from bs4 import BeautifulSoup, Tag
 from tenacity import retry, stop_after_attempt
 
@@ -31,6 +32,18 @@ from waittime.scrapers.base import BaseScraper
 from waittime.scrapers.observability import HTTP_FETCH_ATTEMPTS, fetch_retry_wait
 
 logger = logging.getLogger(__name__)
+
+_ALLOWED_CONTENT_TYPES = frozenset({"text/html", "text/plain"})
+
+
+def _safe_content_type(value: str | None) -> str:
+    """Return an allowlisted media type without logging parameters."""
+    if not value:
+        return "missing"
+    media_type = value.split(";", maxsplit=1)[0].strip().lower()
+    if media_type not in _ALLOWED_CONTENT_TYPES:
+        return "other"
+    return media_type
 
 
 class QuebecScraper(BaseScraper):
@@ -212,8 +225,17 @@ class QuebecScraper(BaseScraper):
         }
 
         response = self.client.get(self.BASE_URL, params=params)
+        body = response.text
+        structlog.get_logger(__name__).info(
+            "Quebec page response metadata",
+            page=page_num,
+            status=response.status_code,
+            content_type=_safe_content_type(response.headers.get("content-type")),
+            body_bytes=len(response.content),
+            hospital_element_marker_count=body.count("hospital_element"),
+        )
         response.raise_for_status()
-        return response.text
+        return body
 
     def parse(self, html: str) -> list[Measurement]:
         """Parse Quebec health portal HTML fragments into measurements.

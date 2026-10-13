@@ -1,11 +1,19 @@
 """Unit tests for Quebec scraper."""
 
+import json
+import os
+import subprocess
+import sys
+import textwrap
+from pathlib import Path
 from unittest.mock import ANY, MagicMock, patch
 
+import httpx
 import pytest
+from tenacity import RetryError
 
 from waittime.core import EndEvent, MetricFamily, StartEvent, StatisticType
-from waittime.scrapers.quebec import QuebecScraper, create_quebec_source
+from waittime.scrapers.quebec import QuebecScraper, _safe_content_type, create_quebec_source
 
 
 @pytest.mark.unit
@@ -17,6 +25,125 @@ class TestQuebecScraper:
         """Create a Quebec scraper instance."""
         source = create_quebec_source()
         return QuebecScraper(source)
+
+    def test_fetch_page_logs_value_free_response_metadata(self, scraper, caplog):
+        body = (
+            '<div class="hospital_element"><strong>Fixture Hospital</strong><span>9876</span></div>'
+        )
+        response = httpx.Response(
+            200,
+            headers={"content-type": "text/plain; charset=UTF-8; token=secret-value"},
+            content=body.encode("utf-8"),
+            request=httpx.Request("GET", "https://example.invalid"),
+        )
+
+        metadata_logger = MagicMock()
+        with (
+            patch.object(scraper.client, "get", return_value=response),
+            patch("waittime.scrapers.quebec.structlog.get_logger", return_value=metadata_logger),
+        ):
+            assert scraper._fetch_page(1) == body
+
+        metadata_logger.info.assert_called_once_with(
+            "Quebec page response metadata",
+            page=1,
+            status=200,
+            content_type="text/plain",
+            body_bytes=len(body.encode("utf-8")),
+            hospital_element_marker_count=1,
+        )
+        assert "Fixture Hospital" not in repr(metadata_logger.info.call_args)
+        assert "9876" not in repr(metadata_logger.info.call_args)
+        assert "secret-value" not in repr(metadata_logger.info.call_args)
+        assert body not in repr(metadata_logger.info.call_args)
+
+    def test_fetch_page_logs_metadata_before_http_error_without_body(self, scraper):
+        body = "<html>synthetic private error hospital_element</html>"
+        response = httpx.Response(
+            503,
+            headers={"content-type": "text/html; charset=UTF-8"},
+            content=body.encode("utf-8"),
+            request=httpx.Request("GET", "https://example.invalid"),
+        )
+        get = MagicMock(return_value=response)
+        metadata_logger = MagicMock()
+
+        with (
+            patch.object(scraper.client, "get", get),
+            patch.object(QuebecScraper._fetch_page.retry, "wait", return_value=0),
+            patch("waittime.scrapers.quebec.structlog.get_logger", return_value=metadata_logger),
+        ):
+            with pytest.raises(RetryError):
+                scraper._fetch_page(1)
+
+        assert get.call_count == 3
+        assert metadata_logger.info.call_count == 3
+        for call in metadata_logger.info.call_args_list:
+            assert call.args == ("Quebec page response metadata",)
+            assert call.kwargs["status"] == 503
+            assert call.kwargs["content_type"] == "text/html"
+            assert call.kwargs["body_bytes"] == len(body.encode("utf-8"))
+            assert call.kwargs["hospital_element_marker_count"] == 1
+            assert "synthetic private error" not in repr(call)
+            assert body not in repr(call)
+
+    def test_safe_content_type_is_bounded_and_normalized(self):
+        assert _safe_content_type("text/plain; charset=UTF-8; token=secret-value") == "text/plain"
+        assert _safe_content_type(None) == "missing"
+        assert _safe_content_type("text/plain\r\nsecret=value") == "other"
+        assert _safe_content_type("application/x-secret-subtype; token=secret-value") == "other"
+
+    def test_cli_structured_logger_emits_safe_response_metadata_in_clean_subprocess(self):
+        body = '<div class="hospital_element">PRIVATE-FACILITY-VALUE</div>'
+        script = textwrap.dedent(
+            f"""
+            import httpx
+            import waittime.cli.scraper
+            from waittime.scrapers.quebec import QuebecScraper, create_quebec_source
+
+            body = {body!r}
+            response = httpx.Response(
+                200,
+                headers={{"content-type": "application/x-secret-subtype; token=secret-value"}},
+                content=body.encode("utf-8"),
+                request=httpx.Request("GET", "https://example.invalid"),
+            )
+            scraper = QuebecScraper(create_quebec_source())
+            scraper.client.get = lambda url, **kwargs: response
+            scraper._fetch_page(1)
+            """
+        )
+        backend_root = Path(__file__).resolve().parents[2]
+        environment = {
+            "PATH": os.environ.get("PATH", ""),
+            "PYTHONPATH": str(backend_root / "src"),
+            "PYTHONNOUSERSITE": "1",
+        }
+        # Fixed fixture code only; the fake response prevents network or DB access.
+        result = subprocess.run(  # noqa: S603
+            [sys.executable, "-c", script],
+            cwd=backend_root,
+            env=environment,
+            capture_output=True,
+            check=False,
+            text=True,
+            timeout=20,
+        )
+
+        assert result.returncode == 0, result.stderr
+        output = result.stdout + result.stderr
+        records = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
+        metadata = next(
+            record for record in records if record.get("event") == "Quebec page response metadata"
+        )
+        assert metadata["page"] == 1
+        assert metadata["status"] == 200
+        assert metadata["content_type"] == "other"
+        assert metadata["body_bytes"] == len(body.encode("utf-8"))
+        assert metadata["hospital_element_marker_count"] == 1
+        assert "PRIVATE-FACILITY-VALUE" not in output
+        assert "application/x-secret-subtype" not in output
+        assert "secret-value" not in output
 
     def test_extract_wait_time_minutes(self, scraper):
         """Extract wait time from text with minutes."""
