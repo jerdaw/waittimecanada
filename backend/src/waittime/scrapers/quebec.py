@@ -16,6 +16,7 @@ import time
 from collections.abc import Callable
 from datetime import UTC, datetime
 
+import structlog
 from bs4 import BeautifulSoup, Tag
 from tenacity import retry, stop_after_attempt
 
@@ -225,14 +226,13 @@ class QuebecScraper(BaseScraper):
 
         response = self.client.get(self.BASE_URL, params=params)
         body = response.text
-        logger.info(
-            "Quebec page response metadata: page=%s status=%s content_type=%s "
-            "body_bytes=%s hospital_element_marker_count=%s",
-            page_num,
-            response.status_code,
-            _safe_content_type(response.headers.get("content-type")),
-            len(response.content),
-            body.count("hospital_element"),
+        structlog.get_logger(__name__).info(
+            "Quebec page response metadata",
+            page=page_num,
+            status=response.status_code,
+            content_type=_safe_content_type(response.headers.get("content-type")),
+            body_bytes=len(response.content),
+            hospital_element_marker_count=body.count("hospital_element"),
         )
         response.raise_for_status()
         return body
