@@ -32,6 +32,21 @@ from waittime.scrapers.observability import HTTP_FETCH_ATTEMPTS, fetch_retry_wai
 
 logger = logging.getLogger(__name__)
 
+_CONTENT_TYPE_PATTERN = re.compile(
+    r"[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+"
+    r"(?:;[a-z0-9!#$&^_.+-]+=[a-z0-9!#$&^_.+-]+)*"
+)
+
+
+def _safe_content_type(value: str | None) -> str:
+    """Return a bounded, normalized media type suitable for operational logs."""
+    normalized = re.sub(r"\s+", "", value or "").lower()
+    if not normalized:
+        return "missing"
+    if len(normalized) > 120 or _CONTENT_TYPE_PATTERN.fullmatch(normalized) is None:
+        return "other"
+    return normalized
+
 
 class QuebecScraper(BaseScraper):
     """Scraper for Quebec MSSS emergency wait times.
@@ -212,8 +227,18 @@ class QuebecScraper(BaseScraper):
         }
 
         response = self.client.get(self.BASE_URL, params=params)
+        body = response.text
+        logger.info(
+            "Quebec page response metadata: page=%s status=%s content_type=%s "
+            "body_bytes=%s hospital_element_marker_count=%s",
+            page_num,
+            response.status_code,
+            _safe_content_type(response.headers.get("content-type")),
+            len(response.content),
+            body.count("hospital_element"),
+        )
         response.raise_for_status()
-        return response.text
+        return body
 
     def parse(self, html: str) -> list[Measurement]:
         """Parse Quebec health portal HTML fragments into measurements.
