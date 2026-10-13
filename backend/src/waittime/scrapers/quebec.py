@@ -32,20 +32,17 @@ from waittime.scrapers.observability import HTTP_FETCH_ATTEMPTS, fetch_retry_wai
 
 logger = logging.getLogger(__name__)
 
-_CONTENT_TYPE_PATTERN = re.compile(
-    r"[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+"
-    r"(?:;[a-z0-9!#$&^_.+-]+=[a-z0-9!#$&^_.+-]+)*"
-)
+_ALLOWED_CONTENT_TYPES = frozenset({"text/html", "text/plain"})
 
 
 def _safe_content_type(value: str | None) -> str:
-    """Return a bounded, normalized media type suitable for operational logs."""
-    normalized = re.sub(r"\s+", "", value or "").lower()
-    if not normalized:
+    """Return an allowlisted media type without logging parameters."""
+    if not value:
         return "missing"
-    if len(normalized) > 120 or _CONTENT_TYPE_PATTERN.fullmatch(normalized) is None:
+    media_type = value.split(";", maxsplit=1)[0].strip().lower()
+    if media_type not in _ALLOWED_CONTENT_TYPES:
         return "other"
-    return normalized
+    return media_type
 
 
 class QuebecScraper(BaseScraper):
