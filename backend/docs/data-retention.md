@@ -70,6 +70,65 @@ python -m waittime.cli.storage_stats --relation measurements
 
 ## Monitoring
 
+### Read-Only Preservation Inventory
+
+An already-authorized WaitTime backend runtime with its database connection
+provisioned may run the fixed metadata-only inventory:
+
+```bash
+python -m waittime.cli.storage_stats --preservation-inventory
+```
+
+This is an explicit opt-in exact scan, not a routine health check. It uses one
+repeatable-read, read-only transaction, sets the session timezone to UTC, and
+applies a five-second PostgreSQL statement timeout to each bounded query. The
+raw-measurement and aggregate tables are grouped separately by source and their
+stored metric dimensions; the report includes UTC timestamp bounds, row counts,
+the 30-day threshold count, and schema-aware missing-provenance counts. It emits
+no hospital names, measurement values, payload hashes/snippets, URLs, or
+credentials. Because exact counts and grouped bounds scan the tables, the query
+may time out on a large database; on timeout it returns only a fixed error
+classification and no partial report.
+
+The inventory defines the 30-day comparison as 30 elapsed 24-hour days from a
+UTC snapshot. It is not a purge preview or an audit of past cleanup runs. The
+aggregate section reports summary-row coverage only and is not a backup. The
+command does not inspect provider backup/PITR configuration, archive state, or
+restore evidence; it cannot establish that any purge ran, that a backup exists,
+or that a restore is possible. Keep those claims tied to separate provider and
+isolated-restore evidence. This command does not add a production queue route or
+change cleanup, retention, schedule, or backup behavior.
+
+The existing database-cleanup.yml workflow is not an inventory route. In this
+main revision it has no confirmation input and executes cleanup before
+reporting storage statistics. Do not dispatch it to inspect preservation or
+data age.
+
+The prepared GitHub Actions entry point is
+.github/workflows/preservation-inventory.yml. It is manual-only, runs only
+from main at the exact dispatch SHA, and skips the job by default. A run
+requires an explicit boolean confirmation that the operator is authorized and
+accepts that detailed per-source/metric counts and date ranges will appear in
+the public Actions logs. The database connect timeout is 10 seconds, lock wait
+is 2 seconds, and each SQL statement retains the CLI's 5-second timeout. The
+checkout/setup steps are capped at 2 minutes each, dependency installation at
+8 minutes, the inventory step at 2 minutes, and the job at 15 minutes. Exact
+grouped scans can still consume database read capacity and may time out. The
+workflow adds no recurring scan or result artifact.
+
+The inventory shares the cleanup concurrency group. GitHub allows only one
+pending run in a concurrency group; a newer pending run can replace an older
+one even when cancel-in-progress is false, so the queue is not FIFO. Dispatch
+only in an approved quiet window after confirming there is no active or pending
+cleanup or inventory run. A dispatch is not proof that the job started; do not
+repeat or automatically retry it. Verify the exact event SHA and wait for the
+run's terminal result before using its output.
+
+Publishing or dispatching this workflow is not authorized by preparing its
+code. A project owner must separately approve the production scan and verify
+that the existing DATABASE_URL secret is present and points to the intended
+database. Repository source cannot verify that secret's existence or target,
+and no protected GitHub environment is configured or assumed.
 ### Check Data Age Statistics
 
 ```python

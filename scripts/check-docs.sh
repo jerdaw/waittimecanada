@@ -355,7 +355,15 @@ else
 fi
 
 echo
-echo "[6c/11] Checking freshness offload guardrails..."
+echo "[6c/11] Checking preservation inventory workflow guardrails..."
+if python3 scripts/check-preservation-inventory-workflow.py; then
+  :
+else
+  failures=1
+fi
+
+echo
+echo "[6d/11] Checking freshness offload guardrails..."
 if python3 scripts/check-freshness-offload.py; then
   :
 else

@@ -240,6 +240,28 @@ locked docs-only uv environment exercised by Docs CI.
   author identity rather than `github-actions[bot]`, so published branch
   history remains aligned with the repository's human-authorship policy.
 
+## Read-only Preservation Inventory
+
+The preservation-inventory workflow is manual-only, guarded to main and the
+exact dispatch SHA, and requires a default-false confirmation before its
+single fixed inventory step can receive DATABASE_URL. Detailed source/metric
+counts and date ranges appear in public Actions logs after confirmation. It
+shares the database-cleanup concurrency lock and has no schedule or artifact
+upload. See the [retention inventory guide](../../backend/docs/data-retention.md)
+for scan cost, disclosure, and the separate production-approval and secret-
+target verification gate.
+
+The existing database-cleanup workflow is not an inventory route on this
+main revision: it has no confirmation input and runs cleanup before its
+storage report. Never dispatch it to inspect preservation or data age.
+
+Dispatch only in an approved quiet window after confirming there is no active
+or pending cleanup/inventory run. The shared GitHub concurrency group is not a
+FIFO queue: at most one run waits, and a newer pending run may replace an older
+one even with cancel-in-progress disabled. A dispatch is not evidence that a
+job started or completed. Do not retry automatically or repeatedly dispatch;
+verify the run's exact event SHA and terminal result before relying on it.
+
 ## Secrets Matrix
 
 ### Core production/runtime
