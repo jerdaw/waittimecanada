@@ -398,7 +398,7 @@ class TestDatabaseService:
 
         mock_cursor.rowcount = 100
 
-        deleted = db_service.cleanup_old_measurements(retention_days=30)
+        deleted = db_service.cleanup_old_measurements(retention_days=30, confirm_delete=True)
         assert deleted == 100
         assert "DELETE FROM measurements" in mock_cursor.execute.call_args[0][0]
         assert mock_cursor.execute.call_args[0][1][1] == 5000
@@ -423,6 +423,7 @@ class TestDatabaseService:
             retention_days=45,
             batch_size=2500,
             max_batches=2,
+            confirm_delete=True,
         )
 
         assert deleted == 50

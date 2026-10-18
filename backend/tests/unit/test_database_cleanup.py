@@ -53,7 +53,7 @@ class TestCleanupOldMeasurements:
         monkeypatch.setattr(mock_db_with_cleanup, "get_connection", mock_get_connection)
         monkeypatch.setattr(mock_db_with_cleanup, "get_cursor", lambda conn: conn.cursor())
 
-        deleted = mock_db_with_cleanup.cleanup_old_measurements()
+        deleted = mock_db_with_cleanup.cleanup_old_measurements(confirm_delete=True)
 
         # Should use default 30 days
         assert deleted == 42
@@ -75,7 +75,9 @@ class TestCleanupOldMeasurements:
         monkeypatch.setattr(mock_db_with_cleanup, "get_connection", mock_get_connection)
         monkeypatch.setattr(mock_db_with_cleanup, "get_cursor", lambda conn: conn.cursor())
 
-        deleted = mock_db_with_cleanup.cleanup_old_measurements(retention_days=60)
+        deleted = mock_db_with_cleanup.cleanup_old_measurements(
+            retention_days=60, confirm_delete=True
+        )
 
         assert deleted == 15
         params = cursors[0].execute.call_args[0][1]
@@ -92,7 +94,7 @@ class TestCleanupOldMeasurements:
         monkeypatch.setattr(mock_db_with_cleanup, "get_connection", mock_get_connection)
         monkeypatch.setattr(mock_db_with_cleanup, "get_cursor", lambda conn: mock_cursor)
 
-        deleted = mock_db_with_cleanup.cleanup_old_measurements()
+        deleted = mock_db_with_cleanup.cleanup_old_measurements(confirm_delete=True)
 
         assert deleted == 0
 
@@ -114,6 +116,7 @@ class TestCleanupOldMeasurements:
             retention_days=30,
             batch_size=10,
             max_batches=2,
+            confirm_delete=True,
         )
 
         assert deleted == 20
@@ -133,11 +136,24 @@ class TestCleanupOldMeasurements:
         monkeypatch.setattr(mock_db_with_cleanup, "get_connection", mock_get_connection)
         monkeypatch.setattr(mock_db_with_cleanup, "get_cursor", lambda conn: conn.cursor())
 
-        mock_db_with_cleanup.cleanup_old_measurements()
+        mock_db_with_cleanup.cleanup_old_measurements(confirm_delete=True)
 
         # The connection context manager should handle commit
         # Just verify execute was called
         assert cursors[0].execute.called
+
+    def test_requires_confirmation_before_database_connection(
+        self, mock_db_with_cleanup, monkeypatch
+    ):
+        """Reject a purge before opening a connection unless explicitly acknowledged."""
+        monkeypatch.setattr(
+            mock_db_with_cleanup,
+            "get_connection",
+            lambda: pytest.fail("database connection must not be opened without confirmation"),
+        )
+
+        with pytest.raises(ValueError, match="explicit confirmation"):
+            mock_db_with_cleanup.cleanup_old_measurements()
 
 
 class TestGetMeasurementAgeStats:
@@ -284,7 +300,7 @@ class TestCleanupIntegration:
 
         # Execute workflow
         stats1 = mock_db_with_cleanup.get_measurement_age_stats()
-        deleted = mock_db_with_cleanup.cleanup_old_measurements()
+        deleted = mock_db_with_cleanup.cleanup_old_measurements(confirm_delete=True)
         stats2 = mock_db_with_cleanup.get_measurement_age_stats()
 
         # Verify workflow results

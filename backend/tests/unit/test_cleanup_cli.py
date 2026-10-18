@@ -16,16 +16,23 @@ def mock_db_stats():
     }
 
 
+@pytest.mark.parametrize("confirm_delete", [False, True])
+@patch("waittime.cli.cleanup.AggregationService")
 @patch("waittime.cli.cleanup.DatabaseService")
-def test_cleanup_dry_run(mock_db, mock_db_stats):
-    """Verify that dry run doesn't call cleanup_old_measurements."""
+def test_cleanup_dry_run(mock_db, mock_aggregation, mock_db_stats, confirm_delete):
+    """Verify that dry run doesn't aggregate or delete, regardless of acknowledgement."""
     mock_db_instance = mock_db.return_value
     mock_db_instance.get_measurement_age_stats.return_value = mock_db_stats
 
-    with patch("sys.argv", ["cleanup.py", "--dry-run"]):
+    argv = ["cleanup.py", "--dry-run"]
+    if confirm_delete:
+        argv.append("--confirm-delete")
+
+    with patch("sys.argv", argv):
         exit_code = main()
         assert exit_code == 0
         mock_db_instance.cleanup_old_measurements.assert_not_called()
+        mock_aggregation.assert_not_called()
 
 
 @patch("waittime.cli.cleanup.AggregationService")
@@ -36,7 +43,7 @@ def test_cleanup_execution_default_retention(mock_db, mock_aggregation, mock_db_
     mock_db_instance.cleanup_old_measurements.return_value = 200
     mock_aggregation.return_value.backfill.return_value = {"daily": 1}
 
-    with patch("sys.argv", ["cleanup.py"]):
+    with patch("sys.argv", ["cleanup.py", "--confirm-delete"]):
         exit_code = main()
         assert exit_code == 0
         mock_db_instance.get_measurement_age_stats.assert_not_called()
@@ -44,6 +51,7 @@ def test_cleanup_execution_default_retention(mock_db, mock_aggregation, mock_db_
             retention_days=30,
             batch_size=5000,
             max_batches=None,
+            confirm_delete=True,
         )
 
 
@@ -55,7 +63,7 @@ def test_cleanup_execution_with_custom_retention(mock_db, mock_aggregation, mock
     mock_db_instance.cleanup_old_measurements.return_value = 200
     mock_aggregation.return_value.backfill.return_value = {"daily": 1}
 
-    with patch("sys.argv", ["cleanup.py", "--retention-days", "60"]):
+    with patch("sys.argv", ["cleanup.py", "--retention-days", "60", "--confirm-delete"]):
         exit_code = main()
         assert exit_code == 0
         mock_db_instance.get_measurement_age_stats.assert_not_called()
@@ -63,6 +71,7 @@ def test_cleanup_execution_with_custom_retention(mock_db, mock_aggregation, mock
             retention_days=60,
             batch_size=5000,
             max_batches=None,
+            confirm_delete=True,
         )
 
 
@@ -74,7 +83,7 @@ def test_cleanup_execution_uses_aggregation_backfill(mock_db, mock_aggregation, 
     mock_db_instance.cleanup_old_measurements.return_value = 200
     mock_aggregation.return_value.backfill.return_value = {"daily": 1}
 
-    with patch("sys.argv", ["cleanup.py"]):
+    with patch("sys.argv", ["cleanup.py", "--confirm-delete"]):
         exit_code = main()
         assert exit_code == 0
         mock_aggregation.return_value.backfill.assert_called_once()
@@ -91,7 +100,7 @@ def test_cleanup_with_stats_collects_measurement_age_stats(
     mock_db_instance.cleanup_old_measurements.return_value = 200
     mock_aggregation.return_value.backfill.return_value = {"daily": 1}
 
-    with patch("sys.argv", ["cleanup.py", "--with-stats"]):
+    with patch("sys.argv", ["cleanup.py", "--with-stats", "--confirm-delete"]):
         exit_code = main()
         assert exit_code == 0
         mock_db_instance.get_measurement_age_stats.assert_called()
@@ -99,6 +108,7 @@ def test_cleanup_with_stats_collects_measurement_age_stats(
             retention_days=30,
             batch_size=5000,
             max_batches=None,
+            confirm_delete=True,
         )
 
 
@@ -112,7 +122,14 @@ def test_cleanup_with_batch_controls(mock_db, mock_aggregation, mock_db_stats):
 
     with patch(
         "sys.argv",
-        ["cleanup.py", "--delete-batch-size", "2500", "--max-delete-batches", "4"],
+        [
+            "cleanup.py",
+            "--delete-batch-size",
+            "2500",
+            "--max-delete-batches",
+            "4",
+            "--confirm-delete",
+        ],
     ):
         exit_code = main()
         assert exit_code == 0
@@ -120,6 +137,7 @@ def test_cleanup_with_batch_controls(mock_db, mock_aggregation, mock_db_stats):
             retention_days=30,
             batch_size=2500,
             max_batches=4,
+            confirm_delete=True,
         )
 
 
@@ -130,7 +148,7 @@ def test_cleanup_can_skip_aggregate_refresh(mock_db, mock_aggregation, mock_db_s
     mock_db_instance = mock_db.return_value
     mock_db_instance.cleanup_old_measurements.return_value = 200
 
-    with patch("sys.argv", ["cleanup.py", "--skip-aggregate-refresh"]):
+    with patch("sys.argv", ["cleanup.py", "--skip-aggregate-refresh", "--confirm-delete"]):
         exit_code = main()
         assert exit_code == 0
         mock_aggregation.return_value.backfill.assert_not_called()
@@ -138,7 +156,21 @@ def test_cleanup_can_skip_aggregate_refresh(mock_db, mock_aggregation, mock_db_s
             retention_days=30,
             batch_size=5000,
             max_batches=None,
+            confirm_delete=True,
         )
+
+
+@patch("waittime.cli.cleanup.AggregationService")
+@patch("waittime.cli.cleanup.DatabaseService")
+def test_non_dry_run_requires_confirmation_before_database_or_aggregation(
+    mock_db, mock_aggregation
+):
+    with patch("sys.argv", ["cleanup.py"]), pytest.raises(SystemExit) as error:
+        main()
+
+    assert error.value.code == 2
+    mock_db.assert_not_called()
+    mock_aggregation.assert_not_called()
 
 
 @patch("waittime.cli.cleanup.AggregationService")
@@ -147,6 +179,6 @@ def test_cleanup_handles_exception(mock_db, mock_aggregation):
     """Verify that exceptions return exit code 1."""
     mock_aggregation.return_value.backfill.side_effect = Exception("DB Error")
 
-    with patch("sys.argv", ["cleanup.py"]):
+    with patch("sys.argv", ["cleanup.py", "--confirm-delete"]):
         exit_code = main()
         assert exit_code == 1

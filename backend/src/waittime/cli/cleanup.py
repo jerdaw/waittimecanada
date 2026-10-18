@@ -7,9 +7,9 @@ The default behavior:
 
 Usage:
     python -m waittime.cli.cleanup --dry-run
-    python -m waittime.cli.cleanup
-    python -m waittime.cli.cleanup --with-stats
-    python -m waittime.cli.cleanup --retention-days 60
+    python -m waittime.cli.cleanup --confirm-delete
+    python -m waittime.cli.cleanup --with-stats --confirm-delete
+    python -m waittime.cli.cleanup --retention-days 60 --confirm-delete
 """
 
 import argparse
@@ -61,6 +61,11 @@ def main() -> int:
         help="Preview cleanup without mutating data",
     )
     parser.add_argument(
+        "--confirm-delete",
+        action="store_true",
+        help="Acknowledge that this run may permanently delete expired raw measurements",
+    )
+    parser.add_argument(
         "--verbose",
         "-v",
         action="store_true",
@@ -73,6 +78,8 @@ def main() -> int:
     )
 
     args = parser.parse_args()
+    if not args.dry_run and not args.confirm_delete:
+        parser.error("non-dry-run cleanup requires --confirm-delete")
 
     try:
         db = DatabaseService()
@@ -151,6 +158,7 @@ def main() -> int:
             retention_days=args.retention_days,
             batch_size=args.delete_batch_size,
             max_batches=args.max_delete_batches,
+            confirm_delete=args.confirm_delete,
         )
 
         logger.info("\n✅ Cleanup complete!")

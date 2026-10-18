@@ -37,9 +37,13 @@ Cleanup does **NOT** delete:
 ### GitHub Actions
 
 The cleanup workflow is currently manual-dispatch only:
+- **Confirmation**: `confirm_delete` is a required boolean input defaulting to `false`; the job is skipped unless it is set to `true`
 - **Workflow**: `.github/workflows/database-cleanup.yml`
-- **Workflow behavior**: skip aggregate refresh, delete old rows in bounded batches, then report storage footprint
+- **Workflow behavior**: pass `--confirm-delete`, skip aggregate refresh, delete old rows in bounded batches, then report storage footprint
 - **Stats behavior**: use `--verbose` or `--with-stats` to print age metrics too
+
+The confirmation acknowledges operator intent only. It does not prove that the
+operator is authorized or that backups and restore readiness have been verified.
 
 ### Manual Cleanup
 
@@ -50,19 +54,19 @@ You can also run cleanup manually:
 python -m waittime.cli.cleanup --dry-run
 
 # Refresh aggregates and delete measurements older than 30 days
-python -m waittime.cli.cleanup
+python -m waittime.cli.cleanup --confirm-delete
 
 # Collect age statistics too
-python -m waittime.cli.cleanup --with-stats
+python -m waittime.cli.cleanup --with-stats --confirm-delete
 
 # Match the bounded production cleanup path
-python -m waittime.cli.cleanup --verbose --skip-aggregate-refresh --delete-batch-size 5000 --max-delete-batches 20
+python -m waittime.cli.cleanup --verbose --skip-aggregate-refresh --delete-batch-size 5000 --max-delete-batches 20 --confirm-delete
 
 # Use a custom retention window
-python -m waittime.cli.cleanup --retention-days 60
+python -m waittime.cli.cleanup --retention-days 60 --confirm-delete
 
 # Verbose output with statistics
-python -m waittime.cli.cleanup --verbose
+python -m waittime.cli.cleanup --verbose --confirm-delete
 
 # Inspect measurements table growth
 python -m waittime.cli.storage_stats --relation measurements
@@ -245,12 +249,12 @@ The retention period is configurable:
 
 ```python
 # In code
-db.cleanup_old_measurements(retention_days=60)
+db.cleanup_old_measurements(retention_days=60, confirm_delete=True)
 ```
 
 ```bash
 # Via CLI
-python -m waittime.cli.cleanup --retention-days 60
+python -m waittime.cli.cleanup --retention-days 60 --confirm-delete
 ```
 
 ```yaml
@@ -262,6 +266,7 @@ python -m waittime.cli.cleanup --retention-days 60
 ## Security Considerations
 
 - Cleanup requires `DATABASE_URL` with write permissions
+- `--confirm-delete` acknowledges operator intent; it does not verify authorization, backup availability, or restore readiness
 - The GitHub Action uses repository secrets for database access
 - Always test a new retention window with `--dry-run` in production first
 - Run cleanup during low-traffic windows when possible

@@ -919,6 +919,7 @@ class DatabaseService:
         retention_days: int = 30,
         batch_size: int = 5000,
         max_batches: int | None = None,
+        confirm_delete: bool = False,
     ) -> int:
         """Delete measurements older than retention period in bounded batches.
 
@@ -931,15 +932,20 @@ class DatabaseService:
             retention_days: Number of days to retain raw measurements before an explicit purge
             batch_size: Maximum number of rows to delete per transaction
             max_batches: Optional cap on the number of delete batches to execute
+            confirm_delete: Required acknowledgement before deleting raw measurements
 
         Returns:
             Number of measurements deleted
 
         Example:
             >>> db = DatabaseService()
-            >>> deleted = db.cleanup_old_measurements(retention_days=30)
+            >>> deleted = db.cleanup_old_measurements(retention_days=30, confirm_delete=True)
             >>> logger.info(f"Deleted {deleted} old measurements")
         """
+        if not confirm_delete:
+            raise ValueError(
+                "Cleanup requires explicit confirmation; pass confirm_delete=True to delete data"
+            )
         if batch_size <= 0:
             raise ValueError("batch_size must be positive")
         if max_batches is not None and max_batches <= 0:
