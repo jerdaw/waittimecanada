@@ -11,13 +11,56 @@ import { DataExport } from "@/components/DataExport";
 describe("DataExport", () => {
   // Store original window.location
   const originalLocation = window.location;
+  const originalCreateObjectURL = URL.createObjectURL;
+  const originalRevokeObjectURL = URL.revokeObjectURL;
+  let downloadClick: ReturnType<typeof vi.spyOn>;
+
+  function makeResponse({
+    hasMore = false,
+    link,
+    count = 2,
+    ok = true,
+  }: { hasMore?: boolean; link?: string; count?: number; ok?: boolean } = {}) {
+    const headerValues: Record<string, string> = {
+      "x-export-has-more": String(hasMore),
+      "x-export-record-count": String(count),
+    };
+    if (link) headerValues.link = link;
+
+    return {
+      ok,
+      url: "",
+      headers: {
+        get(name: string) {
+          return headerValues[name.toLowerCase()] ?? null;
+        },
+      },
+      blob: vi.fn().mockResolvedValue(new Blob(["page data"])),
+    } as unknown as Response;
+  }
 
   beforeEach(() => {
     // Mock window.location.href
     Object.defineProperty(window, "location", {
       configurable: true,
-      value: { ...originalLocation, href: "" },
+      value: {
+        ...originalLocation,
+        origin: originalLocation.origin,
+        href: "",
+      },
     });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(makeResponse()));
+    Object.defineProperty(URL, "createObjectURL", {
+      configurable: true,
+      value: vi.fn().mockReturnValue("blob:http://localhost/export"),
+    });
+    Object.defineProperty(URL, "revokeObjectURL", {
+      configurable: true,
+      value: vi.fn(),
+    });
+    downloadClick = vi
+      .spyOn(HTMLAnchorElement.prototype, "click")
+      .mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -26,6 +69,24 @@ describe("DataExport", () => {
       configurable: true,
       value: originalLocation,
     });
+    downloadClick.mockRestore();
+    vi.unstubAllGlobals();
+    if (originalCreateObjectURL) {
+      Object.defineProperty(URL, "createObjectURL", {
+        configurable: true,
+        value: originalCreateObjectURL,
+      });
+    } else {
+      Reflect.deleteProperty(URL, "createObjectURL");
+    }
+    if (originalRevokeObjectURL) {
+      Object.defineProperty(URL, "revokeObjectURL", {
+        configurable: true,
+        value: originalRevokeObjectURL,
+      });
+    } else {
+      Reflect.deleteProperty(URL, "revokeObjectURL");
+    }
   });
 
   it("renders with default state", () => {
@@ -252,7 +313,7 @@ describe("DataExport", () => {
   });
 
   describe("download functionality", () => {
-    it("triggers download with correct URL for default options", () => {
+    it("fetches the first raw page with correct URL for default options", async () => {
       render(<DataExport />);
 
       const downloadButton = screen.getByRole("button", {
@@ -260,14 +321,19 @@ describe("DataExport", () => {
       });
       fireEvent.click(downloadButton);
 
-      // Should construct URL with format=csv, granularity=raw, and start_date for 7d range
-      expect(window.location.href).toContain("/api/export");
-      expect(window.location.href).toContain("format=csv");
-      expect(window.location.href).toContain("granularity=raw");
-      expect(window.location.href).toContain("start_date=");
+      await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+      const requestUrl = new URL(
+        String(vi.mocked(fetch).mock.calls[0][0]),
+        window.location.origin,
+      );
+      expect(requestUrl.pathname).toBe("/api/export");
+      expect(requestUrl.searchParams.get("format")).toBe("csv");
+      expect(requestUrl.searchParams.get("granularity")).toBe("raw");
+      expect(requestUrl.searchParams.get("start_date")).toBeTruthy();
+      expect(requestUrl.searchParams.get("page_size")).toBe("10000");
     });
 
-    it("includes province parameter when selected", () => {
+    it("includes province parameter when selected", async () => {
       render(<DataExport />);
 
       const provinceSelect = screen.getByLabelText("Province");
@@ -278,10 +344,15 @@ describe("DataExport", () => {
       });
       fireEvent.click(downloadButton);
 
-      expect(window.location.href).toContain("province=ON");
+      await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+      const requestUrl = new URL(
+        String(vi.mocked(fetch).mock.calls[0][0]),
+        window.location.origin,
+      );
+      expect(requestUrl.searchParams.get("province")).toBe("ON");
     });
 
-    it("uses JSON format when selected", () => {
+    it("uses JSON format when selected", async () => {
       render(<DataExport />);
 
       const jsonButton = screen.getByRole("button", { name: /JSON/i });
@@ -292,10 +363,15 @@ describe("DataExport", () => {
       });
       fireEvent.click(downloadButton);
 
-      expect(window.location.href).toContain("format=json");
+      await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+      const requestUrl = new URL(
+        String(vi.mocked(fetch).mock.calls[0][0]),
+        window.location.origin,
+      );
+      expect(requestUrl.searchParams.get("format")).toBe("json");
     });
 
-    it('does not include start_date for "All Data" range', () => {
+    it('does not include start_date for "All Data" range', async () => {
       render(<DataExport />);
 
       const dateRangeSelect = screen.getByLabelText("Date Range");
@@ -306,11 +382,21 @@ describe("DataExport", () => {
       });
       fireEvent.click(downloadButton);
 
-      expect(window.location.href).not.toContain("start_date=");
+      await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+      const requestUrl = new URL(
+        String(vi.mocked(fetch).mock.calls[0][0]),
+        window.location.origin,
+      );
+      expect(requestUrl.searchParams.has("start_date")).toBe(false);
     });
 
-    it("shows loading state during download", () => {
-      vi.useFakeTimers();
+    it("shows loading state while a raw page request is in flight", async () => {
+      let resolveFetch!: (response: Response) => void;
+      vi.mocked(fetch).mockReturnValueOnce(
+        new Promise<Response>((resolve) => {
+          resolveFetch = resolve;
+        }),
+      );
       render(<DataExport />);
 
       const downloadButton = screen.getByRole("button", {
@@ -318,24 +404,165 @@ describe("DataExport", () => {
       });
       fireEvent.click(downloadButton);
 
-      // Loading state should appear immediately (synchronous)
       expect(
-        screen.getByRole("button", { name: /Preparing/i }),
+        screen.getByRole("button", { name: /Downloading page/i }),
       ).toBeInTheDocument();
       expect(downloadButton).toBeDisabled();
 
-      // Advance all timers to complete the loading timeout
-      act(() => {
-        vi.runAllTimers();
-      });
+      await act(async () => resolveFetch(makeResponse()));
+      await waitFor(() => expect(downloadButton).not.toBeDisabled());
 
-      // Button should now be back to normal state
       expect(
         screen.getByRole("button", { name: /Download Data/i }),
       ).toBeInTheDocument();
-      expect(downloadButton).not.toBeDisabled();
+    });
 
-      vi.useRealTimers();
+    it("downloads pages only after user clicks and allows retrying the same next page", async () => {
+      const requests: string[] = [];
+      const downloadedNames: string[] = [];
+      downloadClick.mockImplementation(function (this: HTMLAnchorElement) {
+        downloadedNames.push(this.download);
+      });
+      vi.mocked(fetch).mockImplementation(async (input) => {
+        const requestUrl = new URL(String(input), window.location.origin);
+        requests.push(requestUrl.href);
+        const cursor = requestUrl.searchParams.get("cursor");
+        if (!cursor) {
+          const next = new URL(requestUrl);
+          next.searchParams.set("cursor", "page-two-cursor");
+          return makeResponse({
+            hasMore: true,
+            link: `<${next.pathname}${next.search}>; rel="next"`,
+            count: 10000,
+          });
+        }
+        if (
+          requests.filter((url) => new URL(url).searchParams.has("cursor"))
+            .length === 1
+        ) {
+          return makeResponse({ ok: false });
+        }
+        return makeResponse({ count: 23 });
+      });
+
+      render(<DataExport />);
+      fireEvent.click(screen.getByRole("button", { name: /Download Data/i }));
+
+      expect(await screen.findByRole("status")).toHaveTextContent(
+        "Page 1 downloaded (10,000 rows). More data is available",
+      );
+      expect(
+        screen.getByRole("button", { name: /Download next page \(2\)/i }),
+      ).toBeInTheDocument();
+      expect(fetch).toHaveBeenCalledTimes(1);
+
+      fireEvent.click(
+        screen.getByRole("button", { name: /Download next page \(2\)/i }),
+      );
+      expect(await screen.findByRole("alert")).toHaveTextContent(
+        "Your current filters are unchanged; retry the export",
+      );
+      expect(
+        screen.getByRole("button", { name: /Download next page \(2\)/i }),
+      ).toBeInTheDocument();
+      expect(fetch).toHaveBeenCalledTimes(2);
+
+      fireEvent.click(
+        screen.getByRole("button", { name: /Download next page \(2\)/i }),
+      );
+      expect(await screen.findByRole("status")).toHaveTextContent(
+        "Page 2 downloaded (23 rows). No additional matching rows were reported",
+      );
+      expect(fetch).toHaveBeenCalledTimes(3);
+      expect(downloadedNames).toEqual([
+        expect.stringMatching(/page-001\.csv$/),
+        expect.stringMatching(/page-002\.csv$/),
+      ]);
+
+      const cursorUrls = requests
+        .map((url) => new URL(url))
+        .filter((url) => url.searchParams.has("cursor"));
+      expect(cursorUrls).toHaveLength(2);
+      expect(cursorUrls[0].href).toBe(cursorUrls[1].href);
+      expect(requests).toHaveLength(3);
+    });
+
+    it("resets pagination when filters change and keeps aggregates on the existing download path", async () => {
+      vi.mocked(fetch).mockImplementationOnce(async (input) => {
+        const requestUrl = new URL(String(input), window.location.origin);
+        const next = new URL(requestUrl);
+        next.searchParams.set("cursor", "page-two-cursor");
+        return makeResponse({
+          hasMore: true,
+          link: `<${next.pathname}${next.search}>; rel="next"`,
+        });
+      });
+      render(<DataExport />);
+      fireEvent.click(screen.getByRole("button", { name: /Download Data/i }));
+      expect(await screen.findByRole("status")).toHaveTextContent(
+        "More data is available",
+      );
+
+      fireEvent.change(screen.getByLabelText("Province"), {
+        target: { value: "ON" },
+      });
+      expect(
+        screen.queryByRole("button", { name: /Download next page/i }),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole("button", { name: /Download Data/i }));
+      await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+      const restartedUrl = new URL(
+        String(vi.mocked(fetch).mock.calls[1][0]),
+        window.location.origin,
+      );
+      expect(restartedUrl.searchParams.get("province")).toBe("ON");
+      expect(restartedUrl.searchParams.has("cursor")).toBe(false);
+
+      fireEvent.change(screen.getByLabelText("Data Granularity"), {
+        target: { value: "daily" },
+      });
+      fireEvent.click(screen.getByRole("button", { name: /Download Data/i }));
+
+      expect(window.location.href).toContain("granularity=daily");
+      expect(fetch).toHaveBeenCalledTimes(2);
+      expect(window.location.href).not.toContain("page_size=");
+    });
+
+    it("does not download a page when the server returns an unsafe next link", async () => {
+      vi.mocked(fetch).mockResolvedValueOnce(
+        makeResponse({
+          hasMore: true,
+          link: "<https://example.invalid/api/export?cursor=external>; rel=next",
+        }),
+      );
+      render(<DataExport />);
+      fireEvent.click(screen.getByRole("button", { name: /Download Data/i }));
+
+      expect(await screen.findByRole("alert")).toHaveTextContent(
+        "could not be downloaded safely",
+      );
+      expect(downloadClick).not.toHaveBeenCalled();
+      expect(
+        screen.queryByRole("button", { name: /Download next page/i }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("uses JSON page filenames when JSON is selected", async () => {
+      const downloadedNames: string[] = [];
+      downloadClick.mockImplementation(function (this: HTMLAnchorElement) {
+        downloadedNames.push(this.download);
+      });
+      render(<DataExport />);
+      fireEvent.click(screen.getByRole("button", { name: /JSON/i }));
+      fireEvent.click(screen.getByRole("button", { name: /Download Data/i }));
+
+      expect(await screen.findByRole("status")).toHaveTextContent(
+        "Page 1 downloaded",
+      );
+      expect(downloadedNames).toHaveLength(1);
+      expect(downloadedNames[0]).toMatch(/page-001\.json$/);
     });
   });
 

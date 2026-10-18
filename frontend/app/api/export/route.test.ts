@@ -23,6 +23,12 @@ describe("GET /api/export", () => {
 
   beforeEach(() => {
     mockSql = vi.fn();
+    mockSql.typed = vi.fn((value: string, type: number) => ({
+      __sqlTypedParameter: true,
+      value,
+      type,
+    }));
+    (getDb as any).mockClear();
     (getDb as any).mockReturnValue(mockSql);
   });
 
@@ -31,17 +37,18 @@ describe("GET /api/export", () => {
     return req;
   }
 
-  function useFragmentAwareSql(results: Record<string, unknown>[]) {
+  function useFragmentAwareSql(resultSets: Record<string, unknown>[][]) {
     mockSql.mockImplementation(
       (strings: TemplateStringsArray, ...values: any[]) => {
-        if (strings.join("").includes("SELECT")) {
-          return Promise.resolve(results);
-        }
-        return {
+        const fragment = {
           __sqlFragment: true,
           strings: Array.from(strings),
           values,
         };
+        if (strings.join("").includes("SELECT")) {
+          return Promise.resolve(resultSets.shift() ?? []);
+        }
+        return fragment;
       },
     );
   }
@@ -49,7 +56,7 @@ describe("GET /api/export", () => {
   function flattenSql(strings: string[], values: any[]): string {
     return strings.reduce((query, part, index) => {
       const value = values[index];
-      const renderedValue = value?.__sqlFragment
+      const renderedValue: string = value?.__sqlFragment
         ? flattenSql(value.strings, value.values)
         : value === undefined
           ? ""
@@ -58,9 +65,27 @@ describe("GET /api/export", () => {
     }, "");
   }
 
-  function makeRawRow(overrides: Record<string, unknown> = {}) {
+  function flattenSqlParameters(values: any[]): unknown[] {
+    return values.flatMap((value) =>
+      value?.__sqlFragment ? flattenSqlParameters(value.values) : [value],
+    );
+  }
+
+  function flattenSqlValues(values: any[]): unknown[] {
+    return flattenSqlParameters(values).map((value: any) =>
+      value?.__sqlTypedParameter ? value.value : value,
+    );
+  }
+
+  function makeRawRow(
+    id = "1",
+    timestamp = "2026-03-01T12:00:00.123456Z",
+    overrides: Record<string, unknown> = {},
+  ) {
     return {
-      timestamp_utc: "2026-03-01T12:00:00.123456Z",
+      export_cursor_id: id,
+      export_cursor_timestamp: timestamp,
+      timestamp_utc: timestamp,
       hospital_id: "ca-on-test",
       hospital_name: "Test Hospital",
       province: "ON",
@@ -82,18 +107,45 @@ describe("GET /api/export", () => {
     };
   }
 
+  function getSelectCalls() {
+    return mockSql.mock.calls.filter(([queryStrings]: [TemplateStringsArray]) =>
+      queryStrings.join("").includes("SELECT"),
+    );
+  }
+
+  function getSelectQueries() {
+    return getSelectCalls().map(
+      ([strings, ...values]: [TemplateStringsArray, ...any[]]) =>
+        flattenSql(Array.from(strings), values),
+    );
+  }
+
   function getSelectQuery() {
-    const [strings, ...values] = mockSql.mock.calls.find(
-      ([queryStrings]: [TemplateStringsArray]) =>
-        queryStrings.join("").includes("SELECT"),
-    )!;
-    return flattenSql(Array.from(strings), values);
+    return getSelectQueries()[0];
+  }
+
+  function getSelectValues(index = 0) {
+    const [, ...values] = getSelectCalls()[index];
+    return flattenSqlValues(values);
+  }
+
+  function expectSelectLimit(expected: number) {
+    expect(getSelectQuery()).toMatch(/LIMIT\s+\?\s*$/);
+    expect(getSelectValues().at(-1)).toBe(expected);
+  }
+
+  function makeCursorWithId(cursorToken: string, id: string) {
+    const cursor = JSON.parse(
+      Buffer.from(cursorToken, "base64url").toString("utf8"),
+    );
+    cursor.id = id;
+    return Buffer.from(JSON.stringify(cursor)).toString("base64url");
   }
 
   it("exports measurement-level provenance in JSON, without raw snippets", async () => {
     // Attribute source metadata via the stored measurement source, not the
     // hospital's potentially changed current mapping.
-    useFragmentAwareSql([makeRawRow()]);
+    useFragmentAwareSql([[makeRawRow()]]);
 
     const response = await GET(
       createRequest(
@@ -122,12 +174,22 @@ describe("GET /api/export", () => {
     expect(query).toContain("AND h.province =");
     expect(query).toContain("AND m.timestamp_utc >=");
     expect(query).toContain("AND m.timestamp_utc <=");
-    expect(query).toContain("ORDER BY m.timestamp_utc DESC");
-    expect(query).toContain("LIMIT 10000");
+    expect(query).toContain("ORDER BY m.timestamp_utc DESC, m.id DESC");
+    expectSelectLimit(10001);
+    expect(json.data[0]).not.toHaveProperty("export_cursor_id");
+    expect(json.data[0]).not.toHaveProperty("export_cursor_timestamp");
+    expect(json.metadata).toMatchObject({
+      page_size: 10000,
+      record_count: 1,
+      has_more: false,
+      is_complete: true,
+      next_cursor: null,
+      next_url: null,
+    });
   });
 
   it("exports measurement provenance columns in CSV even when methodology is omitted", async () => {
-    useFragmentAwareSql([makeRawRow()]);
+    useFragmentAwareSql([[makeRawRow()]]);
 
     const response = await GET(
       createRequest("/api/export?format=csv&include_methodology=false"),
@@ -149,9 +211,36 @@ describe("GET /api/export", () => {
     expect(headers).not.toContain("raw_payload_snippet");
   });
 
+  it("reports raw CSV page metadata and a same-filter next link", async () => {
+    useFragmentAwareSql([[makeRawRow("9"), makeRawRow("8")]]);
+
+    const response = await GET(
+      createRequest("/api/export?format=csv&page_size=1&province=ON"),
+    );
+    const csv = await response.text();
+    const link = response.headers.get("link");
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("x-export-record-count")).toBe("1");
+    expect(response.headers.get("x-export-page-size")).toBe("1");
+    expect(response.headers.get("x-export-has-more")).toBe("true");
+    expect(response.headers.get("x-export-complete")).toBe("false");
+    expect(response.headers.get("x-export-next-cursor")).toBeTruthy();
+    expect(link).toMatch(/^<\/api\/export\?/);
+    expect(link).toContain("province=ON");
+    expect(link).toContain("page_size=1");
+    expect(link).toContain("cursor=");
+    expect(csv.split("\n")).toHaveLength(2);
+    expect(csv).not.toContain("raw_payload_snippet");
+    expectSelectLimit(2);
+  });
+
   it("preserves null provenance values without synthesizing replacements", async () => {
-    const row = makeRawRow({ raw_payload_hash: null, parser_version: null });
-    useFragmentAwareSql([row]);
+    const row = makeRawRow("7", undefined, {
+      raw_payload_hash: null,
+      parser_version: null,
+    });
+    useFragmentAwareSql([[row]]);
 
     const jsonResponse = await GET(createRequest("/api/export?format=json"));
     const json = await jsonResponse.json();
@@ -159,7 +248,7 @@ describe("GET /api/export", () => {
     expect(json.data[0].raw_payload_hash).toBeNull();
     expect(json.data[0].parser_version).toBeNull();
 
-    useFragmentAwareSql([row]);
+    useFragmentAwareSql([[row]]);
     const csvResponse = await GET(createRequest("/api/export?format=csv"));
     const [headerLine, valueLine] = (await csvResponse.text())
       .trim()
@@ -176,21 +265,23 @@ describe("GET /api/export", () => {
 
   it("does not expose per-measurement provenance on aggregate exports", async () => {
     useFragmentAwareSql([
-      {
-        period_start: "2026-03-01T00:00:00Z",
-        period_end: "2026-03-02T00:00:00Z",
-        hospital_id: "ca-on-test",
-        hospital_name: "Test Hospital",
-        province: "ON",
-        mean_wait_minutes: 30,
-        sample_count: 3,
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "MEAN",
-        source_id: "aggregate-source",
-        methodology_url: "https://example.com/methodology",
-      },
+      [
+        {
+          period_start: "2026-03-01T00:00:00Z",
+          period_end: "2026-03-02T00:00:00Z",
+          hospital_id: "ca-on-test",
+          hospital_name: "Test Hospital",
+          province: "ON",
+          mean_wait_minutes: 30,
+          sample_count: 3,
+          metric_family: "TIME_TO_PROVIDER",
+          start_event: "TRIAGE",
+          end_event: "PHYSICIAN",
+          statistic_type: "MEAN",
+          source_id: "aggregate-source",
+          methodology_url: "https://example.com/methodology",
+        },
+      ],
     ]);
 
     const response = await GET(
@@ -204,6 +295,195 @@ describe("GET /api/export", () => {
     expect(json.data[0]).not.toHaveProperty("parser_version");
     expect(query).not.toContain("raw_payload_hash");
     expect(query).not.toContain("parser_version");
+    expect(json.metadata).not.toHaveProperty("page_size");
+    expect(response.headers.get("x-export-record-count")).toBeNull();
+  });
+
+  it("returns a bounded first page from a result set larger than 10,000 rows", async () => {
+    const queriedRows = Array.from({ length: 10001 }, (_, index) =>
+      makeRawRow(
+        String(10001 - index),
+        `2026-03-01T12:00:00.${String(999999 - index).padStart(6, "0")}Z`,
+        { source_id: String(10001 - index) },
+      ),
+    );
+    useFragmentAwareSql([queriedRows]);
+
+    const response = await GET(createRequest("/api/export?format=json"));
+    const json = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(json.data).toHaveLength(10000);
+    expect(json.data[0].hospital_id).toBe("ca-on-test");
+    expect(json.data.at(-1).source_id).toBe("2");
+    expect(json.data.map((row: any) => row.source_id)).not.toContain("1");
+    expect(json.metadata).toMatchObject({
+      record_count: 10000,
+      page_size: 10000,
+      has_more: true,
+      is_complete: false,
+    });
+    expect(typeof json.metadata.next_cursor).toBe("string");
+    expect(json.metadata.next_url).toContain("cursor=");
+    expectSelectLimit(10001);
+  });
+
+  it("continues after tied timestamps using exact microseconds and bigint-safe IDs", async () => {
+    const rows = [
+      makeRawRow("9007199254740993", "2026-03-01T12:00:00.123456Z"),
+      makeRawRow("9007199254740992", "2026-03-01T12:00:00.123456Z"),
+      makeRawRow("9007199254740991", "2026-03-01T12:00:00.123455Z"),
+    ];
+    useFragmentAwareSql([rows]);
+
+    const firstResponse = await GET(
+      createRequest("/api/export?format=json&page_size=2&province=ON"),
+    );
+    const firstPage = await firstResponse.json();
+    const cursor = JSON.parse(
+      Buffer.from(firstPage.metadata.next_cursor, "base64url").toString("utf8"),
+    );
+
+    expect(firstPage.data).toHaveLength(2);
+    expect(cursor).toMatchObject({
+      id: "9007199254740992",
+      timestamp: "2026-03-01T12:00:00.123456Z",
+    });
+    expectSelectLimit(3);
+
+    mockSql.mockClear();
+    useFragmentAwareSql([[rows[2]]]);
+    const secondResponse = await GET(
+      createRequest(
+        `/api/export?format=json&page_size=2&province=ON&cursor=${encodeURIComponent(firstPage.metadata.next_cursor)}`,
+      ),
+    );
+    const secondPage = await secondResponse.json();
+    const secondQuery = getSelectQuery();
+
+    expect(secondPage.data).toHaveLength(1);
+    expect(secondPage.data[0].timestamp_utc).toBe(
+      "2026-03-01T12:00:00.123455Z",
+    );
+    expect(secondPage.metadata.has_more).toBe(false);
+    expect(secondQuery).toContain("(m.timestamp_utc, m.id) <");
+    expect(getSelectValues()).toContain("2026-03-01T12:00:00.123456Z");
+    expect(getSelectValues()).toContain("9007199254740992");
+    expectSelectLimit(3);
+    expect(secondQuery).toContain("ORDER BY m.timestamp_utc DESC, m.id DESC");
+  });
+
+  it.each([
+    ["minimum bigint", "-9223372036854775808"],
+    ["zero", "0"],
+    ["maximum bigint", "9223372036854775807"],
+  ])("accepts %s cursor IDs as decimal strings", async (_label, id) => {
+    useFragmentAwareSql([[makeRawRow("1"), makeRawRow("0")]]);
+    const first = await GET(
+      createRequest("/api/export?format=json&page_size=1"),
+    );
+    const firstPage = await first.json();
+    const validBoundaryCursor = makeCursorWithId(
+      firstPage.metadata.next_cursor,
+      id,
+    );
+
+    mockSql.mockClear();
+    useFragmentAwareSql([[]]);
+    const response = await GET(
+      createRequest(
+        `/api/export?format=json&page_size=1&cursor=${encodeURIComponent(validBoundaryCursor)}`,
+      ),
+    );
+
+    expect(response.status).toBe(200);
+    expect(getSelectValues()).toContain(id);
+  });
+
+  it.each([
+    ["above maximum", "9223372036854775808"],
+    ["below minimum", "-9223372036854775809"],
+    ["non-canonical negative zero", "-0"],
+  ])("rejects %s cursor IDs before querying", async (_label, id) => {
+    useFragmentAwareSql([[makeRawRow("1"), makeRawRow("0")]]);
+    const first = await GET(
+      createRequest("/api/export?format=json&page_size=1"),
+    );
+    const firstPage = await first.json();
+    const invalidCursor = makeCursorWithId(firstPage.metadata.next_cursor, id);
+
+    (getDb as any).mockClear();
+    mockSql.mockClear();
+    const response = await GET(
+      createRequest(
+        `/api/export?format=json&page_size=1&cursor=${encodeURIComponent(invalidCursor)}`,
+      ),
+    );
+
+    expect(response.status).toBe(400);
+    expect(getDb).not.toHaveBeenCalled();
+  });
+
+  it("rejects malformed and filter-mismatched cursors before querying", async () => {
+    (getDb as any).mockClear();
+    const malformed = await GET(
+      createRequest("/api/export?format=json&cursor=not-a-valid-token!"),
+    );
+    expect(malformed.status).toBe(400);
+    expect(getDb).not.toHaveBeenCalled();
+
+    useFragmentAwareSql([[makeRawRow("1"), makeRawRow("0")]]);
+    const first = await GET(
+      createRequest("/api/export?format=json&page_size=1&province=ON"),
+    );
+    const firstPage = await first.json();
+    (getDb as any).mockClear();
+
+    const mismatched = await GET(
+      createRequest(
+        `/api/export?format=json&page_size=1&province=QC&cursor=${encodeURIComponent(firstPage.metadata.next_cursor)}`,
+      ),
+    );
+
+    expect(mismatched.status).toBe(400);
+    expect(getDb).not.toHaveBeenCalled();
+  });
+
+  it("rejects pagination parameters for aggregate exports and leaves aggregate queries unchanged", async () => {
+    const invalid = await GET(
+      createRequest("/api/export?granularity=daily&page_size=2&format=json"),
+    );
+    expect(invalid.status).toBe(400);
+    expect(getDb).not.toHaveBeenCalled();
+
+    useFragmentAwareSql([
+      [
+        {
+          period_start: "2026-03-01T00:00:00Z",
+          period_end: "2026-03-02T00:00:00Z",
+          hospital_id: "ca-on-test",
+          hospital_name: "Test Hospital",
+          province: "ON",
+          mean_wait_minutes: 30,
+          sample_count: 3,
+          metric_family: "TIME_TO_PROVIDER",
+          start_event: "TRIAGE",
+          end_event: "PHYSICIAN",
+          statistic_type: "MEAN",
+          source_id: "aggregate-source",
+          methodology_url: "https://example.com/methodology",
+        },
+      ],
+    ]);
+    const aggregate = await GET(
+      createRequest("/api/export?granularity=daily&format=json"),
+    );
+    const json = await aggregate.json();
+
+    expect(aggregate.status).toBe(200);
+    expect(json.metadata).not.toHaveProperty("page_size");
+    expect(aggregate.headers.get("x-export-has-more")).toBeNull();
+    expect(getSelectQuery()).toContain("LIMIT 10000");
   });
 
   it("includes methodology_homogeneity in JSON metadata for raw export", async () => {
