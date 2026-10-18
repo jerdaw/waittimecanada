@@ -127,9 +127,16 @@ source incident is newly opened or changes fingerprint.
 
 ### 6. `database-cleanup.yml` - Database Cleanup
 
-**Trigger:** currently manual dispatch only (scheduled cron temporarily paused due to GitHub Actions quota exhaustion).
+**Trigger:** manual dispatch only (no scheduled cleanup). The required boolean
+`confirm_delete` input defaults to `false`; the job is skipped unless the
+operator explicitly sets it to `true`.
 
-**Purpose:** Provide an operator-run retention cleanup entry point. The workflow skips aggregate refresh, deletes raw measurements older than 30 days in bounded batches, and reports `measurements` storage growth.
+**Purpose:** Provide an operator-run retention cleanup entry point. When
+confirmed, the workflow passes `--confirm-delete` to the CLI, skips aggregate
+refresh, deletes raw measurements older than 30 days in bounded batches, and
+reports `measurements` storage growth. This acknowledgement records operator
+intent; it does not verify authorization, backup availability, or restore
+readiness.
 
 **Optimization controls:**
 

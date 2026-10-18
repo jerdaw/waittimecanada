@@ -4,7 +4,13 @@ name: Database Cleanup
 # scheduled jobs remain paused. The delete path is intentionally batched so a
 # single maintenance run stays bounded and observable.
 on:
-  workflow_dispatch:  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      confirm_delete:
+        description: "Acknowledge that this run may permanently delete expired raw measurements"
+        required: true
+        type: boolean
+        default: false
 
 env:
   UV_VERSION: "0.11.23"
@@ -15,6 +21,7 @@ concurrency:
 
 jobs:
   cleanup:
+    if: ${{ inputs.confirm_delete == true }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -39,7 +46,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          uv run python -m waittime.cli.cleanup --verbose --skip-aggregate-refresh --delete-batch-size 5000 --max-delete-batches 20
+          uv run python -m waittime.cli.cleanup --verbose --skip-aggregate-refresh --delete-batch-size 5000 --max-delete-batches 20 --confirm-delete
 
       - name: Report measurement storage footprint
         working-directory: backend
