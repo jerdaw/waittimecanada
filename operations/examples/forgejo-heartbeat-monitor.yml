@@ -1,0 +1,41 @@
+# Copy/adapt example only.
+# This file is intentionally stored under docs/operations/examples/ so it cannot
+# run unless a maintainer copies it into a private Forgejo workflow location.
+#
+# Safety requirements before use:
+# - Run only trusted branch, tag, or manually approved operational jobs.
+# - Do not run fork pull-request code on a private runner.
+# - Keep GitHub workflow_dispatch heartbeat-monitor.yml available as fallback.
+# - Store real secret values only in the private runner secret store.
+
+name: Heartbeat Offload Pilot
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check-heartbeat:
+    name: Check scraper heartbeats
+    runs-on: docker
+    container:
+      image: python:3.12-slim
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: ${{ secrets.WTC_DATABASE_URL }}
+      ALERT_API_URL: ${{ secrets.WTC_ALERT_API_URL }}
+      ALERT_USER_KEY: ${{ secrets.WTC_ALERT_USER_KEY }}
+      ALERT_API_TOKEN: ${{ secrets.WTC_ALERT_API_TOKEN }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install backend package
+        run: |
+          cd backend
+          python -m pip install "uv==0.11.23"
+          uv sync --locked --no-dev
+
+      - name: Check heartbeats
+        run: |
+          cd backend
+          uv run python -m waittime.cli.check_heartbeat --max-age 120 --max-consecutive-failures 1

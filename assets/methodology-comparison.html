@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wait Time Canada - Provincial Methodology Comparison</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .metadata {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        th {
+            background: #3498db;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .province-code {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .ontology-field {
+            font-family: 'Courier New', monospace;
+            background: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+            color: #7f8c8d;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 Provincial Emergency Department Wait Time Methodology Comparison</h1>
+        <div class="metadata">
+            <strong>Wait Time Canada</strong> - Health Systems Observatory<br>
+            Generated: 2026-04-16 14:15:55 UTC<br>
+            Provinces: Ontario, Alberta, British Columbia, Quebec<br>
+            Source: <a href="https://github.com/jerdaw/waittimecanada">github.com/jerdaw/waittimecanada</a>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Comparability Warning:</strong> Direct comparison of wait times across provinces
+            may be scientifically invalid due to methodological differences. Always consider
+            start_event, end_event, and statistic_type when interpreting cross-province data.
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Province</th>
+                    <th>Source ID</th>
+                    <th>Start Event</th>
+                    <th>End Event</th>
+                    <th>Statistic Type</th>
+                    <th>Update Frequency</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="province-code">ON</span> Ontario</td>
+                    <td><code>ontario-health</code></td>
+                    <td><span class="ontology-field">TRIAGE</span></td>
+                    <td><span class="ontology-field">PHYSICIAN</span></td>
+                    <td><span class="ontology-field">MEAN</span></td>
+                    <td>Quarterly</td>
+                    <td>Historical mean TRIAGE → PHYSICIAN wait times from Ontario's official performance reporting.</td>
+                </tr>
+                <tr>
+                    <td><span class="province-code">AB</span> Alberta</td>
+                    <td><code>alberta-ahs</code></td>
+                    <td><span class="ontology-field">TRIAGE</span></td>
+                    <td><span class="ontology-field">PHYSICIAN</span></td>
+                    <td><span class="ontology-field">POINT_ESTIMATE</span></td>
+                    <td>~2 min</td>
+                    <td>Real-time point estimate with the fastest public refresh cadence in the active set.</td>
+                </tr>
+                <tr>
+                    <td><span class="province-code">BC</span> British Columbia</td>
+                    <td><code>bc-phsa</code></td>
+                    <td><span class="ontology-field">TRIAGE</span></td>
+                    <td><span class="ontology-field">PHYSICIAN</span></td>
+                    <td><span class="ontology-field">P90</span></td>
+                    <td>~5 min</td>
+                    <td>P90 TRIAGE → PHYSICIAN reporting; more conservative than mean or point-estimate displays.</td>
+                </tr>
+                <tr>
+                    <td><span class="province-code">QC</span> Quebec</td>
+                    <td><code>quebec-msss</code></td>
+                    <td><span class="ontology-field">REGISTRATION</span></td>
+                    <td><span class="ontology-field">PHYSICIAN</span></td>
+                    <td><span class="ontology-field">ROLLING_AVG</span></td>
+                    <td>Periodic</td>
+                    <td>Uses REGISTRATION (not TRIAGE) start event plus a rolling average statistic.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>📋 Ontology Field Definitions</h2>
+        <table>
+            <tr>
+                <th>Field</th>
+                <th>Definition</th>
+                <th>Implications</th>
+            </tr>
+            <tr>
+                <td><span class="ontology-field">START_EVENT</span></td>
+                <td>When the wait time clock starts</td>
+                <td>TRIAGE starts after clinical assessment; REGISTRATION starts after administrative check-in (earlier)</td>
+            </tr>
+            <tr>
+                <td><span class="ontology-field">END_EVENT</span></td>
+                <td>When the wait time clock stops</td>
+                <td>PHYSICIAN = first physician assessment (standard across all provinces)</td>
+            </tr>
+            <tr>
+                <td><span class="ontology-field">STATISTIC_TYPE</span></td>
+                <td>How the value is calculated</td>
+                <td>MEAN = arithmetic average; POINT_ESTIMATE = current/instantaneous; P90 = 90th percentile; ROLLING_AVG = moving average</td>
+            </tr>
+        </table>
+
+        <div class="footer">
+            <strong>Citation:</strong><br>
+            Wait Time Canada. (2026). Provincial Emergency Department Wait Time Methodology Comparison.
+            Retrieved from https://github.com/jerdaw/waittimecanada<br><br>
+
+            <strong>License:</strong> MIT License<br>
+            <strong>Contact:</strong> See repository for details
+        </div>
+    </div>
+</body>
+</html>
