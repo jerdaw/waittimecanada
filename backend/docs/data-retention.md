@@ -94,6 +94,14 @@ credentials. Because exact counts and grouped bounds scan the tables, the query
 may time out on a large database; on timeout it returns only a fixed error
 classification and no partial report.
 
+Before writing to stdout, the CLI validates the complete result against a fixed
+field and label allowlist. Unknown fields, unsupported non-null source or
+dimension labels, and malformed values produce only the fixed
+`output_contract_mismatch` error; no partial report is emitted. Legitimate
+null provenance, dimension, and timestamp fields remain null. Adding a source
+ID or changing the ontology requires a corresponding reviewed CLI allowlist
+update before the value can appear in this output.
+
 The inventory defines the 30-day comparison as 30 elapsed 24-hour days from a
 UTC snapshot. It is not a purge preview or an audit of past cleanup runs. The
 aggregate section reports summary-row coverage only and is not a backup. The
@@ -103,8 +111,9 @@ or that a restore is possible. Keep those claims tied to separate provider and
 isolated-restore evidence. This command does not add a production queue route or
 change cleanup, retention, schedule, or backup behavior.
 
-The existing database-cleanup.yml workflow is not an inventory route. In this
-main revision it has no confirmation input and executes cleanup before
+The existing database-cleanup.yml workflow is not an inventory route. It
+requires an explicit `confirm_delete` input (default false) and skips the job
+unless that confirmation is true; when run, it executes cleanup before
 reporting storage statistics. Do not dispatch it to inspect preservation or
 data age.
 
