@@ -84,14 +84,37 @@ Additional optional export params:
 - `start_date`
 - `end_date`
 - `include_methodology=true|false`
+- `page_size` (raw only; integer from 1 to 10,000, default 10,000)
+- `cursor` (raw only; opaque cursor returned by the preceding page)
 
 Raw measurement exports include each row's stored `source_id`, `raw_payload_hash`,
 and `parser_version`; `raw_payload_snippet` is never exposed. `source_name` and
 `methodology_url` are joined from the current source catalog, so they are not a
 historical snapshot of source metadata. Aggregate exports may identify their
 aggregate source, but do not include per-measurement hashes or parser versions.
-Raw exports are limited to 10,000 rows per request; a capped response is not a
-complete archive.
+
+Raw measurements are ordered by descending `(timestamp_utc, measurement ID)`
+and use keyset pagination. JSON metadata describes the current page, including
+`record_count`, `page_size`, `has_more`, `is_complete`, `next_cursor`, and
+`next_url`; `methodology_homogeneity` also describes only that page.
+`is_complete` means no additional matching row was reported at request time; it
+does not indicate a complete archive.
+CSV and JSON responses expose `X-Export-Record-Count`, `X-Export-Page-Size`,
+`X-Export-Has-More`, and `X-Export-Complete`; when another page exists, they
+also provide `X-Export-Next-Cursor` and a `Link` header with `rel="next"`.
+The cursor is bound to the province/date filters, format, methodology-column
+choice, and page size. Changing those values requires starting without the
+cursor.
+
+Raw export timestamps remain strings in UTC ISO 8601 form with six fractional-
+second digits (`YYYY-MM-DDTHH:mm:ss.ffffffZ`), preserving microsecond precision
+for output, date bounds, and cursor comparisons. Each page is a separate
+request, not a transactionally consistent snapshot. Concurrent inserts or
+deletes can change which rows are observed across pages; page metadata does not
+claim a complete archive. The page size limits returned rows, not the amount of
+data a database may inspect or sort. Pagination applies only to `granularity=raw`;
+hourly and pre-aggregated exports retain their existing 10,000-result cap and
+do not return pagination metadata.
 
 ## Geolocation
 

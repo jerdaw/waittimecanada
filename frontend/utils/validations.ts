@@ -166,6 +166,8 @@ export const ExportQuerySchema = z.object({
   province: ProvinceSchema.optional(),
   start_date: z.string().datetime().optional(), // ISO string
   end_date: z.string().datetime().optional(),
+  page_size: z.coerce.number().int().min(1).max(10000).optional(),
+  cursor: z.string().min(1).max(1024).optional(),
   format: z.enum(["csv", "json"]).default("csv"),
   include_methodology: z
     .enum(["true", "false"])
