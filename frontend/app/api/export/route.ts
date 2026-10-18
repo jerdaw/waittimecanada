@@ -390,12 +390,14 @@ export async function GET(request: NextRequest) {
         m.end_event,
         m.statistic_type,
         m.patient_scope,
-        s.id as source_id,
+        m.source_id,
         s.name as source_name,
-        s.methodology_url
+        s.methodology_url,
+        m.raw_payload_hash,
+        m.parser_version
       FROM measurements m
       JOIN hospitals h ON m.hospital_id = h.id
-      JOIN sources s ON h.source_id = s.id
+      JOIN sources s ON m.source_id = s.id
       WHERE h.is_verified = true
       ${province ? sql`AND h.province = ${province}` : sql``}
       ${startDate ? sql`AND m.timestamp_utc >= ${startDate}::timestamptz` : sql``}
@@ -449,6 +451,8 @@ export async function GET(request: NextRequest) {
       "source_id",
       "source_name",
       "methodology_url",
+      "raw_payload_hash",
+      "parser_version",
     ];
 
     const csvRows = [];

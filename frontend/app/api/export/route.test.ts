@@ -31,6 +31,181 @@ describe("GET /api/export", () => {
     return req;
   }
 
+  function useFragmentAwareSql(results: Record<string, unknown>[]) {
+    mockSql.mockImplementation(
+      (strings: TemplateStringsArray, ...values: any[]) => {
+        if (strings.join("").includes("SELECT")) {
+          return Promise.resolve(results);
+        }
+        return {
+          __sqlFragment: true,
+          strings: Array.from(strings),
+          values,
+        };
+      },
+    );
+  }
+
+  function flattenSql(strings: string[], values: any[]): string {
+    return strings.reduce((query, part, index) => {
+      const value = values[index];
+      const renderedValue = value?.__sqlFragment
+        ? flattenSql(value.strings, value.values)
+        : value === undefined
+          ? ""
+          : " ? ";
+      return `${query}${part}${renderedValue}`;
+    }, "");
+  }
+
+  function makeRawRow(overrides: Record<string, unknown> = {}) {
+    return {
+      timestamp_utc: "2026-03-01T12:00:00.123456Z",
+      hospital_id: "ca-on-test",
+      hospital_name: "Test Hospital",
+      province: "ON",
+      city: "Toronto",
+      latitude: 43.7,
+      longitude: -79.4,
+      wait_time_minutes: 30,
+      metric_family: "TIME_TO_PROVIDER",
+      start_event: "TRIAGE",
+      end_event: "PHYSICIAN",
+      statistic_type: "MEAN",
+      patient_scope: "ALL",
+      source_id: "historical-measurement-source",
+      source_name: "Measurement Source Catalog Label",
+      methodology_url: "https://example.com/methodology",
+      raw_payload_hash: "a".repeat(64),
+      parser_version: "v1.2",
+      ...overrides,
+    };
+  }
+
+  function getSelectQuery() {
+    const [strings, ...values] = mockSql.mock.calls.find(
+      ([queryStrings]: [TemplateStringsArray]) =>
+        queryStrings.join("").includes("SELECT"),
+    )!;
+    return flattenSql(Array.from(strings), values);
+  }
+
+  it("exports measurement-level provenance in JSON, without raw snippets", async () => {
+    // Attribute source metadata via the stored measurement source, not the
+    // hospital's potentially changed current mapping.
+    useFragmentAwareSql([makeRawRow()]);
+
+    const response = await GET(
+      createRequest(
+        "/api/export?format=json&include_methodology=false&province=ON&start_date=2026-03-01T00:00:00Z&end_date=2026-03-02T00:00:00Z",
+      ),
+    );
+    const json = await response.json();
+    const query = getSelectQuery();
+
+    expect(response.status).toBe(200);
+    expect(json.data[0]).toMatchObject({
+      source_id: "historical-measurement-source",
+      source_name: "Measurement Source Catalog Label",
+      methodology_url: "https://example.com/methodology",
+      raw_payload_hash: "a".repeat(64),
+      parser_version: "v1.2",
+    });
+    expect(json.data[0]).not.toHaveProperty("raw_payload_snippet");
+    expect(query).toContain("m.source_id");
+    expect(query).toContain("JOIN sources s ON m.source_id = s.id");
+    expect(query).toContain("m.raw_payload_hash");
+    expect(query).toContain("m.parser_version");
+    expect(query).not.toContain("raw_payload_snippet");
+    expect(query).not.toContain("JOIN sources s ON h.source_id = s.id");
+    expect(query).toContain("WHERE h.is_verified = true");
+    expect(query).toContain("AND h.province =");
+    expect(query).toContain("AND m.timestamp_utc >=");
+    expect(query).toContain("AND m.timestamp_utc <=");
+    expect(query).toContain("ORDER BY m.timestamp_utc DESC");
+    expect(query).toContain("LIMIT 10000");
+  });
+
+  it("exports measurement provenance columns in CSV even when methodology is omitted", async () => {
+    useFragmentAwareSql([makeRawRow()]);
+
+    const response = await GET(
+      createRequest("/api/export?format=csv&include_methodology=false"),
+    );
+    const records = (await response.text()).trim().split("\n");
+    const headers = records[0].split(",");
+    const values = records[1].split(",");
+    const exportedRow = Object.fromEntries(
+      headers.map((header, index) => [header, values[index]]),
+    );
+
+    expect(exportedRow).toMatchObject({
+      source_id: "historical-measurement-source",
+      source_name: "Measurement Source Catalog Label",
+      methodology_url: "https://example.com/methodology",
+      raw_payload_hash: "a".repeat(64),
+      parser_version: "v1.2",
+    });
+    expect(headers).not.toContain("raw_payload_snippet");
+  });
+
+  it("preserves null provenance values without synthesizing replacements", async () => {
+    const row = makeRawRow({ raw_payload_hash: null, parser_version: null });
+    useFragmentAwareSql([row]);
+
+    const jsonResponse = await GET(createRequest("/api/export?format=json"));
+    const json = await jsonResponse.json();
+
+    expect(json.data[0].raw_payload_hash).toBeNull();
+    expect(json.data[0].parser_version).toBeNull();
+
+    useFragmentAwareSql([row]);
+    const csvResponse = await GET(createRequest("/api/export?format=csv"));
+    const [headerLine, valueLine] = (await csvResponse.text())
+      .trim()
+      .split("\n");
+    const headers = headerLine.split(",");
+    const values = valueLine.split(",");
+    const exportedRow = Object.fromEntries(
+      headers.map((header, index) => [header, values[index]]),
+    );
+
+    expect(exportedRow.raw_payload_hash).toBe("");
+    expect(exportedRow.parser_version).toBe("");
+  });
+
+  it("does not expose per-measurement provenance on aggregate exports", async () => {
+    useFragmentAwareSql([
+      {
+        period_start: "2026-03-01T00:00:00Z",
+        period_end: "2026-03-02T00:00:00Z",
+        hospital_id: "ca-on-test",
+        hospital_name: "Test Hospital",
+        province: "ON",
+        mean_wait_minutes: 30,
+        sample_count: 3,
+        metric_family: "TIME_TO_PROVIDER",
+        start_event: "TRIAGE",
+        end_event: "PHYSICIAN",
+        statistic_type: "MEAN",
+        source_id: "aggregate-source",
+        methodology_url: "https://example.com/methodology",
+      },
+    ]);
+
+    const response = await GET(
+      createRequest("/api/export?format=json&granularity=daily"),
+    );
+    const json = await response.json();
+    const query = getSelectQuery();
+
+    expect(json.metadata.data_type).toBe("aggregated");
+    expect(json.data[0]).not.toHaveProperty("raw_payload_hash");
+    expect(json.data[0]).not.toHaveProperty("parser_version");
+    expect(query).not.toContain("raw_payload_hash");
+    expect(query).not.toContain("parser_version");
+  });
+
   it("includes methodology_homogeneity in JSON metadata for raw export", async () => {
     const mockResults = [
       {

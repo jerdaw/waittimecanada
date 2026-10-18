@@ -85,6 +85,14 @@ Additional optional export params:
 - `end_date`
 - `include_methodology=true|false`
 
+Raw measurement exports include each row's stored `source_id`, `raw_payload_hash`,
+and `parser_version`; `raw_payload_snippet` is never exposed. `source_name` and
+`methodology_url` are joined from the current source catalog, so they are not a
+historical snapshot of source metadata. Aggregate exports may identify their
+aggregate source, but do not include per-measurement hashes or parser versions.
+Raw exports are limited to 10,000 rows per request; a capped response is not a
+complete archive.
+
 ## Geolocation
 
 - `GET /api/geolocation`
