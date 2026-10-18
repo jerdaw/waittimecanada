@@ -417,6 +417,159 @@ describe("DataExport", () => {
       ).toBeInTheDocument();
     });
 
+    it("rejects a same-origin next link that changes the export filters", async () => {
+      vi.mocked(fetch).mockImplementationOnce(async (input) => {
+        const requestUrl = new URL(String(input), window.location.origin);
+        const next = new URL(requestUrl);
+        next.searchParams.set("cursor", "page-two-cursor");
+        next.searchParams.set("province", "ON");
+        return makeResponse({
+          hasMore: true,
+          link: `<${next.pathname}${next.search}>; rel="next"`,
+        });
+      });
+      render(<DataExport />);
+      fireEvent.click(screen.getByRole("button", { name: /Download Data/i }));
+
+      expect(await screen.findByRole("alert")).toHaveTextContent(
+        "could not be downloaded safely",
+      );
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(downloadClick).not.toHaveBeenCalled();
+      expect(
+        screen.queryByRole("button", { name: /Download next page/i }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("ignores a stale fetch response without ending the current download", async () => {
+      const requests: Array<{
+        signal: AbortSignal | null | undefined;
+        resolve: (response: Response) => void;
+        url: string;
+      }> = [];
+      vi.mocked(fetch).mockImplementation((input, init) => {
+        return new Promise<Response>((resolve) => {
+          requests.push({
+            signal: init?.signal,
+            resolve,
+            url: String(input),
+          });
+        });
+      });
+      render(<DataExport />);
+      fireEvent.click(screen.getByRole("button", { name: /Download Data/i }));
+      await waitFor(() => expect(requests).toHaveLength(1));
+
+      fireEvent.change(screen.getByLabelText("Province"), {
+        target: { value: "ON" },
+      });
+      expect(requests[0].signal?.aborted).toBe(true);
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole("button", { name: /Download Data/i }));
+      await waitFor(() => expect(requests).toHaveLength(2));
+      expect(
+        new URL(requests[1].url, window.location.origin).searchParams.get(
+          "province",
+        ),
+      ).toBe("ON");
+      expect(requests[1].signal?.aborted).toBe(false);
+
+      const staleNext = new URL(requests[0].url, window.location.origin);
+      staleNext.searchParams.set("cursor", "stale-page-two-cursor");
+      const staleResponse = makeResponse({
+        hasMore: true,
+        link: `<${staleNext.pathname}${staleNext.search}>; rel="next"`,
+      });
+      await act(async () => {
+        requests[0].resolve(staleResponse);
+      });
+
+      expect(staleResponse.blob).not.toHaveBeenCalled();
+      expect(
+        screen.getByRole("button", { name: /Downloading page/i }),
+      ).toBeDisabled();
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /Download next page/i }),
+      ).not.toBeInTheDocument();
+      expect(requests[1].signal?.aborted).toBe(false);
+      expect(downloadClick).not.toHaveBeenCalled();
+
+      await act(async () => requests[1].resolve(makeResponse({ count: 7 })));
+      expect(await screen.findByRole("status")).toHaveTextContent(
+        "Page 1 downloaded (7 rows). No additional matching rows were reported",
+      );
+      expect(downloadClick).toHaveBeenCalledTimes(1);
+    });
+
+    it("ignores a stale blob response without ending the current download", async () => {
+      let resolveStaleBlob!: (blob: Blob) => void;
+      let resolveCurrentFetch!: (response: Response) => void;
+      const staleBlob = new Promise<Blob>((resolve) => {
+        resolveStaleBlob = resolve;
+      });
+      let staleResponse!: Response;
+
+      const requests: Array<{
+        signal: AbortSignal | null | undefined;
+        url: string;
+      }> = [];
+      vi.mocked(fetch)
+        .mockImplementationOnce((input, init) => {
+          requests.push({ signal: init?.signal, url: String(input) });
+          const staleNext = new URL(String(input), window.location.origin);
+          staleNext.searchParams.set("cursor", "stale-page-two-cursor");
+          staleResponse = makeResponse({
+            hasMore: true,
+            link: `<${staleNext.pathname}${staleNext.search}>; rel="next"`,
+          });
+          vi.mocked(staleResponse.blob).mockReturnValue(staleBlob);
+          return Promise.resolve(staleResponse);
+        })
+        .mockImplementationOnce((input, init) => {
+          requests.push({ signal: init?.signal, url: String(input) });
+          return new Promise<Response>((resolve) => {
+            resolveCurrentFetch = resolve;
+          });
+        });
+
+      render(<DataExport />);
+      fireEvent.click(screen.getByRole("button", { name: /Download Data/i }));
+      await waitFor(() => expect(staleResponse.blob).toHaveBeenCalledTimes(1));
+
+      fireEvent.change(screen.getByLabelText("Province"), {
+        target: { value: "ON" },
+      });
+      expect(requests[0].signal?.aborted).toBe(true);
+      fireEvent.click(screen.getByRole("button", { name: /Download Data/i }));
+      await waitFor(() => expect(requests).toHaveLength(2));
+      expect(
+        new URL(requests[1].url, window.location.origin).searchParams.get(
+          "province",
+        ),
+      ).toBe("ON");
+
+      await act(async () => resolveStaleBlob(new Blob(["stale page data"])));
+      expect(
+        screen.getByRole("button", { name: /Downloading page/i }),
+      ).toBeDisabled();
+      expect(screen.queryByRole("status")).not.toBeInTheDocument();
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /Download next page/i }),
+      ).not.toBeInTheDocument();
+      expect(requests[1].signal?.aborted).toBe(false);
+      expect(downloadClick).not.toHaveBeenCalled();
+
+      await act(async () => resolveCurrentFetch(makeResponse({ count: 5 })));
+      expect(await screen.findByRole("status")).toHaveTextContent(
+        "Page 1 downloaded (5 rows). No additional matching rows were reported",
+      );
+      expect(downloadClick).toHaveBeenCalledTimes(1);
+    });
+
     it("downloads pages only after user clicks and allows retrying the same next page", async () => {
       const requests: string[] = [];
       const downloadedNames: string[] = [];
