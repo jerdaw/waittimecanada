@@ -259,8 +259,9 @@ for scan cost, disclosure, and the separate production-approval and secret-
 target verification gate.
 
 The existing database-cleanup workflow is not an inventory route on this
-main revision: it has no confirmation input and runs cleanup before its
-storage report. Never dispatch it to inspect preservation or data age.
+main revision: it requires a default-false `confirm_delete` input and skips
+unless that input is true; when run, it performs cleanup before its storage
+report. Never dispatch it to inspect preservation or data age.
 
 Dispatch only in an approved quiet window after confirming there is no active
 or pending cleanup/inventory run. The shared GitHub concurrency group is not a
