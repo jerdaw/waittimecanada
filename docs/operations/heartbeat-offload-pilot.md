@@ -213,6 +213,10 @@ The older copy/adapt Forgejo-style heartbeat example remains at
 for ADR-0027 historical context only. The durable source-freshness target is the
 trusted timer runner described above.
 
+The separate [GitHub collector dispatcher preparation](github-collector-dispatcher.md)
+is also inert: its example timer is dry-run-only and this repository does not
+install or enable it.
+
 ## Related Documents
 
 - [ADR-0027: Hybrid CI Offload Strategy](../adr/0027-hybrid-ci-offload-strategy.md)

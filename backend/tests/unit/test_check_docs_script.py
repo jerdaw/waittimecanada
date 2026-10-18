@@ -211,6 +211,12 @@ def _create_docs_fixture(tmp_path: Path) -> Path:
             encoding="utf-8"
         ),
     )
+    _write(
+        root / "docs" / "operations" / "github-collector-dispatcher.md",
+        (REPO_ROOT / "docs" / "operations" / "github-collector-dispatcher.md").read_text(
+            encoding="utf-8"
+        ),
+    )
     for example_path in (REPO_ROOT / "docs" / "operations" / "examples").glob(
         "waittime-freshness-*"
     ):
