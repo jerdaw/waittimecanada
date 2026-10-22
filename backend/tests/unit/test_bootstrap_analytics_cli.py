@@ -3,7 +3,10 @@
 from pathlib import Path
 from unittest.mock import Mock, patch
 
+import pytest
+
 from waittime.cli.bootstrap_analytics import (
+    MIGRATIONS_DIR,
     _migration_files,
     apply_migrations,
     backfill_analytics_aggregates,
@@ -23,72 +26,72 @@ def test_migration_files_sorted(tmp_path: Path) -> None:
     assert [file.name for file in files] == ["001.sql", "002.sql", "010.sql"]
 
 
+def test_default_migration_discovery_is_independent_of_working_directory(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+
+    files = _migration_files()
+
+    assert files
+    assert all(file.parent == MIGRATIONS_DIR for file in files)
+    assert [file.name for file in files] == sorted(
+        file.name for file in MIGRATIONS_DIR.glob("*.sql")
+    )
+
+
 def test_apply_migrations_dry_run() -> None:
     """Dry run should not open DB connections."""
     mock_db = Mock()
     migration = Path("001_test.sql")
 
-    with patch("waittime.cli.bootstrap_analytics._migration_files", return_value=[migration]):
+    with (
+        patch("waittime.cli.bootstrap_analytics._migration_files", return_value=[migration]),
+        patch("waittime.cli.bootstrap_analytics.run_canonical_migrations") as canonical_runner,
+    ):
         count = apply_migrations(mock_db, dry_run=True)
 
     assert count == 1
     mock_db.get_connection.assert_not_called()
+    canonical_runner.assert_not_called()
 
 
-def test_apply_migrations_executes_sql(tmp_path: Path) -> None:
-    """Migrations should execute SQL via db cursor."""
-    migration = tmp_path / "001_test.sql"
-    migration.write_text("SELECT 1;", encoding="utf-8")
-
-    mock_cursor = Mock()
-    mock_cursor_ctx = Mock()
-    mock_cursor_ctx.__enter__ = Mock(return_value=mock_cursor)
-    mock_cursor_ctx.__exit__ = Mock(return_value=False)
-
-    mock_conn = Mock()
-    mock_conn.cursor.return_value = mock_cursor_ctx
-
-    mock_conn_ctx = Mock()
-    mock_conn_ctx.__enter__ = Mock(return_value=mock_conn)
-    mock_conn_ctx.__exit__ = Mock(return_value=False)
-
+def test_apply_migrations_delegates_to_canonical_runner(tmp_path: Path) -> None:
+    """Migrations should use the canonical runner and its ledger contract."""
+    migration = tmp_path / "023_contract.sql"
     mock_db = Mock()
-    mock_db.get_connection.return_value = mock_conn_ctx
+    result = Mock(filename=migration.name, status="applied", detail="")
 
-    with patch("waittime.cli.bootstrap_analytics._migration_files", return_value=[migration]):
+    with (
+        patch("waittime.cli.bootstrap_analytics._migration_files", return_value=[migration]),
+        patch(
+            "waittime.cli.bootstrap_analytics.run_canonical_migrations",
+            return_value=[result],
+        ) as canonical_runner,
+    ):
         count = apply_migrations(mock_db, dry_run=False)
 
     assert count == 1
-    mock_cursor.execute.assert_called_once_with("SELECT 1;")
+    canonical_runner.assert_called_once_with(mock_db, [migration])
+    mock_db.get_connection.assert_not_called()
 
 
-def test_apply_migrations_skips_duplicate_error(tmp_path: Path) -> None:
-    """Duplicate-object errors should be treated as already applied."""
-    migration = tmp_path / "001_test.sql"
-    migration.write_text("SELECT 1;", encoding="utf-8")
-
-    duplicate_exc = Exception('relation "sources" already exists')
-    duplicate_exc.pgcode = "42P07"
-
-    mock_cursor = Mock()
-    mock_cursor.execute.side_effect = duplicate_exc
-    mock_cursor_ctx = Mock()
-    mock_cursor_ctx.__enter__ = Mock(return_value=mock_cursor)
-    mock_cursor_ctx.__exit__ = Mock(return_value=False)
-
-    mock_conn = Mock()
-    mock_conn.cursor.return_value = mock_cursor_ctx
-    mock_conn_ctx = Mock()
-    mock_conn_ctx.__enter__ = Mock(return_value=mock_conn)
-    mock_conn_ctx.__exit__ = Mock(return_value=False)
-
+def test_apply_migrations_propagates_canonical_runner_failure(tmp_path: Path) -> None:
+    """A migration error must stop bootstrap instead of being silently skipped."""
+    migration = tmp_path / "023_contract.sql"
     mock_db = Mock()
-    mock_db.get_connection.return_value = mock_conn_ctx
+    duplicate_exc = RuntimeError("relation already exists")
 
-    with patch("waittime.cli.bootstrap_analytics._migration_files", return_value=[migration]):
-        count = apply_migrations(mock_db, dry_run=False)
-
-    assert count == 1
+    with (
+        patch("waittime.cli.bootstrap_analytics._migration_files", return_value=[migration]),
+        patch(
+            "waittime.cli.bootstrap_analytics.run_canonical_migrations",
+            side_effect=duplicate_exc,
+        ),
+        pytest.raises(RuntimeError, match="relation already exists"),
+    ):
+        apply_migrations(mock_db, dry_run=False)
 
 
 def test_seed_region_mappings_delegates_to_seed_helpers(tmp_path: Path) -> None:

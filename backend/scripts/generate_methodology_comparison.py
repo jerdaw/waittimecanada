@@ -34,13 +34,21 @@ COMPARABILITY_FIELDS = [
     "start_event",
     "end_event",
     "statistic_type",
+    "patient_scope",
 ]
+UNKNOWN_PATIENT_SCOPE = "UNKNOWN"
+UNVERIFIED_TAG_BASIS = (
+    "Published page confirms patient scope only; other tags are legacy and unverified"
+)
 PROVINCE_METADATA: dict[str, dict[str, str]] = {
     "ontario-health": {
         "province": "Ontario",
         "province_code": "ON",
         "update_frequency": "Quarterly",
         "data_source": "Health Quality Ontario",
+        "patient_scope": "ALL",
+        "scope_basis": "Existing project mapping; not independently verified",
+        "tag_basis": "Documented source mapping",
         "notes": "Historical mean TRIAGE → PHYSICIAN wait times from Ontario's official performance reporting.",
     },
     "alberta-ahs": {
@@ -48,6 +56,9 @@ PROVINCE_METADATA: dict[str, dict[str, str]] = {
         "province_code": "AB",
         "update_frequency": "~2 min",
         "data_source": "Alberta Health Services Wait Times Portal",
+        "patient_scope": "ALL",
+        "scope_basis": "Existing project mapping; not independently verified",
+        "tag_basis": "Documented source mapping",
         "notes": "Real-time point estimate with the fastest public refresh cadence in the active set.",
     },
     "bc-phsa": {
@@ -55,6 +66,9 @@ PROVINCE_METADATA: dict[str, dict[str, str]] = {
         "province_code": "BC",
         "update_frequency": "~5 min",
         "data_source": "Provincial Health Services Authority (edwaittimes.ca)",
+        "patient_scope": "ALL",
+        "scope_basis": "Existing project mapping; not independently verified",
+        "tag_basis": "Documented source mapping",
         "notes": "P90 TRIAGE → PHYSICIAN reporting; more conservative than mean or point-estimate displays.",
     },
     "quebec-msss": {
@@ -62,7 +76,10 @@ PROVINCE_METADATA: dict[str, dict[str, str]] = {
         "province_code": "QC",
         "update_frequency": "Periodic",
         "data_source": "MSSS Emergency Room Situation Portal",
-        "notes": "Uses REGISTRATION (not TRIAGE) start event plus a rolling average statistic.",
+        "patient_scope": "NON_PRIORITY",
+        "scope_basis": "Published page identifies non-priority cases",
+        "tag_basis": UNVERIFIED_TAG_BASIS,
+        "notes": "Published page identifies an estimated wait for non-priority cases; it does not confirm the legacy event or statistic tags shown here.",
     },
 }
 
@@ -80,7 +97,7 @@ def load_source_catalog() -> dict[str, dict[str, Any]]:
 
 
 def build_province_rows(catalog: dict[str, dict[str, Any]]) -> list[dict[str, str]]:
-    """Build methodology comparison rows from canonical source metadata."""
+    """Build rows from registered source tags and curated scope evidence."""
     provinces: list[dict[str, str]] = []
 
     for source_id in ORDERED_SOURCE_IDS:
@@ -95,6 +112,9 @@ def build_province_rows(catalog: dict[str, dict[str, Any]]) -> list[dict[str, st
                 "start_event": source["default_start_event"],
                 "end_event": source["default_end_event"],
                 "statistic_type": source["default_statistic_type"],
+                "patient_scope": metadata.get("patient_scope") or UNKNOWN_PATIENT_SCOPE,
+                "scope_basis": metadata.get("scope_basis", "Not recorded"),
+                "tag_basis": metadata["tag_basis"],
                 "update_frequency": metadata["update_frequency"],
                 "data_source": metadata["data_source"],
                 "notes": metadata["notes"],
@@ -110,10 +130,20 @@ def build_pairwise_rows(provinces: list[dict[str, str]]) -> list[dict[str, str]]
 
     for index, left in enumerate(provinces):
         for right in provinces[index + 1 :]:
-            differences = [field for field in COMPARABILITY_FIELDS if left[field] != right[field]]
+            differences = [
+                field
+                for field in COMPARABILITY_FIELDS
+                if left[field] != right[field]
+                or (
+                    field == "patient_scope"
+                    and UNKNOWN_PATIENT_SCOPE in (left[field], right[field])
+                )
+            ]
             match_count = len(COMPARABILITY_FIELDS) - len(differences)
 
-            if not differences:
+            if any(province.get("tag_basis") == UNVERIFIED_TAG_BASIS for province in (left, right)):
+                comparable = "Not established"
+            elif not differences:
                 comparable = "Yes"
             elif match_count >= 2:
                 comparable = "Partial"
@@ -140,17 +170,44 @@ def format_divergent_fields(
     if not differences:
         return "none"
 
-    if len(differences) == 1:
-        field = differences[0]
-        return f"{field} ({left[field]} vs {right[field]})"
-
-    return " + ".join(differences)
+    formatted = []
+    for field in differences:
+        if field == "patient_scope" and UNKNOWN_PATIENT_SCOPE in (
+            left[field],
+            right[field],
+        ):
+            formatted.append("patient_scope unknown for one or both sources")
+        else:
+            formatted.append(f"{field} ({left[field]} vs {right[field]})")
+    return "; ".join(formatted)
 
 
 def build_pairwise_note(left: dict[str, str], right: dict[str, str], differences: list[str]) -> str:
     """Build a human-readable note for pairwise comparisons."""
+    if any(province.get("tag_basis") == UNVERIFIED_TAG_BASIS for province in (left, right)):
+        return (
+            "Compares registered project tags only. The published Québec.ca page confirms "
+            "non-priority scope, but not the Québec clock events or statistic; direct "
+            "methodological comparability is not established."
+        )
+
     if not differences:
-        return "All four ontology dimensions match."
+        return "All five registered project tags match; source-method equivalence still requires review."
+
+    if "patient_scope" in differences and UNKNOWN_PATIENT_SCOPE in (
+        left["patient_scope"],
+        right["patient_scope"],
+    ):
+        return (
+            "Patient scope is unknown for one or both sources, so direct "
+            "comparability cannot be established."
+        )
+
+    if differences == ["patient_scope"]:
+        return (
+            "Patient populations differ, so direct comparison is invalid "
+            f"({left['patient_scope']} vs {right['patient_scope']})."
+        )
 
     if differences == ["statistic_type"]:
         return (
@@ -193,10 +250,14 @@ def main() -> None:
                 "start_event",
                 "end_event",
                 "statistic_type",
+                "patient_scope",
+                "scope_basis",
+                "tag_basis",
                 "update_frequency",
                 "data_source",
                 "notes",
             ],
+            lineterminator="\n",
         )
         writer.writeheader()
         writer.writerows(provinces)
@@ -220,6 +281,7 @@ def main() -> None:
                 "divergent_fields",
                 "notes",
             ],
+            lineterminator="\n",
         )
         writer.writeheader()
         writer.writerows(pairwise)
@@ -245,7 +307,7 @@ def generate_main_html(provinces: list[dict[str, str]]) -> str:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wait Time Canada - Provincial Methodology Comparison</title>
+    <title>Wait Time Canada - Provincial Ontology Tags and Evidence</title>
     <style>
         body {{
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -319,7 +381,7 @@ def generate_main_html(provinces: list[dict[str, str]]) -> str:
 </head>
 <body>
     <div class="container">
-        <h1>🏥 Provincial Emergency Department Wait Time Methodology Comparison</h1>
+        <h1>🏥 Provincial Emergency Department Wait-Time Ontology Tags</h1>
         <div class="metadata">
             <strong>Wait Time Canada</strong> - Health Systems Observatory<br>
             Generated: {timestamp}<br>
@@ -330,7 +392,8 @@ def generate_main_html(provinces: list[dict[str, str]]) -> str:
         <div class="warning">
             <strong>⚠️ Comparability Warning:</strong> Direct comparison of wait times across provinces
             may be scientifically invalid due to methodological differences. Always consider
-            start_event, end_event, and statistic_type when interpreting cross-province data.
+            the registered metric_family, start_event, end_event, statistic_type, and patient_scope tags.
+            Québec's published page confirms non-priority scope only; its remaining tags are legacy and unverified.
         </div>
 
         <table>
@@ -338,9 +401,13 @@ def generate_main_html(provinces: list[dict[str, str]]) -> str:
                 <tr>
                     <th>Province</th>
                     <th>Source ID</th>
+                    <th>Metric Family</th>
                     <th>Start Event</th>
                     <th>End Event</th>
                     <th>Statistic Type</th>
+                    <th>Patient Scope</th>
+                    <th>Scope Evidence</th>
+                    <th>Evidence Basis</th>
                     <th>Update Frequency</th>
                     <th>Notes</th>
                 </tr>
@@ -352,9 +419,13 @@ def generate_main_html(provinces: list[dict[str, str]]) -> str:
         html += f"""                <tr>
                     <td><span class="province-code">{province["province_code"]}</span> {province["province"]}</td>
                     <td><code>{province["source_id"]}</code></td>
+                    <td><span class="ontology-field">{province["metric_family"]}</span></td>
                     <td><span class="ontology-field">{province["start_event"]}</span></td>
                     <td><span class="ontology-field">{province["end_event"]}</span></td>
                     <td><span class="ontology-field">{province["statistic_type"]}</span></td>
+                    <td><span class="ontology-field">{province["patient_scope"]}</span></td>
+                    <td>{province["scope_basis"]}</td>
+                    <td>{province["tag_basis"]}</td>
                     <td>{province["update_frequency"]}</td>
                     <td>{province["notes"]}</td>
                 </tr>
@@ -372,24 +443,29 @@ def generate_main_html(provinces: list[dict[str, str]]) -> str:
             </tr>
             <tr>
                 <td><span class="ontology-field">START_EVENT</span></td>
-                <td>When the wait time clock starts</td>
-                <td>TRIAGE starts after clinical assessment; REGISTRATION starts after administrative check-in (earlier)</td>
+                <td>The recorded clock-start label</td>
+                <td>A tag does not establish the source's operational definition; review source documentation.</td>
             </tr>
             <tr>
                 <td><span class="ontology-field">END_EVENT</span></td>
-                <td>When the wait time clock stops</td>
-                <td>PHYSICIAN = first physician assessment (standard across all provinces)</td>
+                <td>The recorded clock-end label</td>
+                <td>Do not assume identical event semantics across sources from matching labels alone.</td>
             </tr>
             <tr>
                 <td><span class="ontology-field">STATISTIC_TYPE</span></td>
-                <td>How the value is calculated</td>
-                <td>MEAN = arithmetic average; POINT_ESTIMATE = current/instantaneous; P90 = 90th percentile; ROLLING_AVG = moving average</td>
+                <td>The recorded calculation label</td>
+                <td>The source may not publish the calculation details or averaging window; check its documentation.</td>
+            </tr>
+            <tr>
+                <td><span class="ontology-field">PATIENT_SCOPE</span></td>
+                <td>Which patient population is included</td>
+                <td>Different scopes are not directly comparable; UNKNOWN never counts as a match</td>
             </tr>
         </table>
 
         <div class="footer">
             <strong>Citation:</strong><br>
-            Wait Time Canada. (2026). Provincial Emergency Department Wait Time Methodology Comparison.
+            Wait Time Canada. (2026). Provincial Emergency Department Wait-Time Ontology Tags.
             Retrieved from https://github.com/jerdaw/waittimecanada<br><br>
 
             <strong>License:</strong> MIT License<br>
@@ -412,7 +488,7 @@ def generate_pairwise_html(pairwise: list[dict[str, str]]) -> str:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wait Time Canada - Pairwise Comparability Matrix</title>
+    <title>Wait Time Canada - Pairwise Ontology-Tag Alignment</title>
     <style>
         body {{
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -478,6 +554,13 @@ def generate_pairwise_html(pairwise: list[dict[str, str]]) -> str:
             border-radius: 4px;
             font-weight: 600;
         }}
+        .comparable-unknown {{
+            background: #e2e3e5;
+            color: #343a40;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }}
         .key-finding {{
             background: #e8f4f8;
             border-left: 4px solid #3498db;
@@ -496,7 +579,7 @@ def generate_pairwise_html(pairwise: list[dict[str, str]]) -> str:
 </head>
 <body>
     <div class="container">
-        <h1>🔍 Pairwise Province Comparability Matrix</h1>
+        <h1>🔍 Pairwise Ontology-Tag Alignment Matrix</h1>
         <div class="metadata">
             <strong>Wait Time Canada</strong> - Health Systems Observatory<br>
             Generated: {timestamp}<br>
@@ -505,9 +588,9 @@ def generate_pairwise_html(pairwise: list[dict[str, str]]) -> str:
         </div>
 
         <div class="key-finding">
-            <strong>🔬 Key Finding:</strong> No province pair is fully comparable. Ontario and Alberta
-            share TRIAGE → PHYSICIAN event boundaries, but they still diverge on statistic type
-            (MEAN vs POINT_ESTIMATE). <strong>Quebec remains the most methodologically distinct province.</strong>
+            <strong>⚠️ Interpretation:</strong> This matrix compares registered project tags, not necessarily
+            source-confirmed methods. Québec's published page confirms a non-priority wait estimate but does not
+            specify its clock events or statistic; direct methodological comparability involving Québec is not established.
         </div>
 
         <table>
@@ -516,7 +599,7 @@ def generate_pairwise_html(pairwise: list[dict[str, str]]) -> str:
                     <th>Province A</th>
                     <th>Province B</th>
                     <th>Comparable?</th>
-                    <th>Divergent Fields</th>
+                    <th>Project Tag Differences</th>
                     <th>Notes</th>
                 </tr>
             </thead>
@@ -528,6 +611,7 @@ def generate_pairwise_html(pairwise: list[dict[str, str]]) -> str:
             "Yes": "comparable-yes",
             "No": "comparable-no",
             "Partial": "comparable-partial",
+            "Not established": "comparable-unknown",
         }[comparison["comparable"]]
 
         html += f"""                <tr>
@@ -542,20 +626,24 @@ def generate_pairwise_html(pairwise: list[dict[str, str]]) -> str:
     html += """            </tbody>
         </table>
 
-        <h2>📊 Comparability Criteria</h2>
-        <p>Two measurements are <strong>directly comparable</strong> if and only if:</p>
+        <p>Rows marked <strong>Not established</strong> contain legacy or incomplete source-method tags.
+        Equal project tags alone do not establish that the underlying measures are methodologically equivalent.</p>
+
+        <h2>📊 Recorded-Tag Screening Criteria</h2>
+        <p>All five recorded ontology tags must match for the tag-alignment screen to pass:</p>
         <pre style="background: #ecf0f1; padding: 15px; border-radius: 4px; overflow-x: auto;">comparable = (
     measurement_a.metric_family == measurement_b.metric_family AND
     measurement_a.start_event == measurement_b.start_event AND
     measurement_a.end_event == measurement_b.end_event AND
     measurement_a.statistic_type == measurement_b.statistic_type
+    AND measurement_a.patient_scope == measurement_b.patient_scope
 )</pre>
-        <p>If any dimension differs, a <strong>divergence brief</strong> must be generated explaining
-        why direct comparison is scientifically invalid.</p>
+        <p>Matching tags are necessary but do not prove source methods are identical or a scientific comparison is valid.
+        Review source definitions and limitations. Unknown patient scope never counts as a match.</p>
 
         <div class="footer">
             <strong>Citation:</strong><br>
-            Wait Time Canada. (2026). Provincial Emergency Department Wait Time Pairwise Comparability Matrix.
+            Wait Time Canada. (2026). Provincial Emergency Department Ontology-Tag Alignment Matrix.
             Retrieved from https://github.com/jerdaw/waittimecanada<br><br>
 
             <strong>License:</strong> MIT License<br>

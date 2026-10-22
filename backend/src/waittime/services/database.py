@@ -8,7 +8,7 @@ Handles all database operations including:
 
 import logging
 import os
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -19,6 +19,7 @@ import psycopg2.extras
 from psycopg2 import sql
 
 from waittime.core import (
+    AggregateGap,
     Hospital,
     Measurement,
     MeasurementAggregate,
@@ -92,14 +93,26 @@ class DatabaseService:
         if not self.database_url and not self._provided_conn:
             raise ValueError("Database URL or connection required.")
 
+    @property
+    def uses_owned_connections(self) -> bool:
+        """Whether each connection context owns and closes its connection."""
+        return self._provided_conn is None
+
     @contextmanager
-    def get_connection(self) -> Generator[psycopg2.extensions.connection, None, None]:
-        """Get a database connection context manager."""
+    def get_connection(
+        self,
+        *,
+        connect_timeout: int | None = None,
+    ) -> Generator[psycopg2.extensions.connection, None, None]:
+        """Get a database connection context, optionally bounding connection setup."""
         if self._provided_conn:
             yield self._provided_conn
             return
 
-        conn = psycopg2.connect(self.database_url)
+        if connect_timeout is None:
+            conn = psycopg2.connect(self.database_url)
+        else:
+            conn = psycopg2.connect(self.database_url, connect_timeout=connect_timeout)
         try:
             yield conn
             conn.commit()
@@ -1406,7 +1419,8 @@ class DatabaseService:
                 cur.execute(
                     """
                     SELECT value, timestamp_utc, source_id,
-                           metric_family, start_event, end_event, statistic_type
+                           metric_family, start_event, end_event, statistic_type,
+                           patient_scope
                     FROM measurements
                     WHERE hospital_id = %s
                       AND timestamp_utc >= %s
@@ -1516,17 +1530,98 @@ class DatabaseService:
 
                 return results
 
+    @staticmethod
+    def _canonical_aggregate_period_start(period_start: datetime) -> datetime:
+        """Return a UTC lock identity for a timezone-aware bucket timestamp."""
+        if period_start.tzinfo is None or period_start.utcoffset() is None:
+            raise ValueError("Aggregate period_start must be timezone-aware")
+        return period_start.astimezone(UTC)
+
+    @staticmethod
+    def _lock_aggregate_bucket(
+        cur: psycopg2.extras.RealDictCursor,
+        hospital_id: str,
+        period_type: str,
+        period_start: datetime,
+    ) -> set[str]:
+        """Lock one aggregate bucket and return its open-gap families."""
+        canonical_start = DatabaseService._canonical_aggregate_period_start(period_start)
+        lock_key = f"wtc:aggregate:{hospital_id}:{period_type}:{canonical_start.isoformat()}"
+        cur.execute(
+            "SELECT pg_advisory_xact_lock(hashtextextended(%s, 28673))",
+            (lock_key,),
+        )
+        cur.execute(
+            """
+            SELECT metric_family
+            FROM measurement_aggregate_gaps
+            WHERE hospital_id = %s
+              AND period_type = %s
+              AND period_start = %s
+              AND state = 'open'
+            """,
+            (hospital_id, period_type, period_start),
+        )
+        return {row["metric_family"] for row in cur.fetchall()}
+
+    def _lock_and_filter_open_gap_aggregates(
+        self,
+        cur: psycopg2.extras.RealDictCursor,
+        aggregates: list[MeasurementAggregate],
+    ) -> list[MeasurementAggregate]:
+        """Lock buckets in stable order and exclude families with open gaps."""
+        bucket_map = {
+            (
+                aggregate.hospital_id,
+                aggregate.period_type,
+                self._canonical_aggregate_period_start(aggregate.period_start).isoformat(),
+            ): (
+                aggregate.hospital_id,
+                aggregate.period_type,
+                self._canonical_aggregate_period_start(aggregate.period_start),
+            )
+            for aggregate in aggregates
+        }
+        open_gap_families: dict[tuple[str, str, str], set[str]] = {}
+        for bucket_key in sorted(bucket_map):
+            hospital_id, period_type, period_start = bucket_map[bucket_key]
+            open_gap_families[bucket_key] = self._lock_aggregate_bucket(
+                cur, hospital_id, period_type, period_start
+            )
+
+        return [
+            aggregate
+            for aggregate in aggregates
+            if aggregate.metric_family
+            not in open_gap_families[
+                (
+                    aggregate.hospital_id,
+                    aggregate.period_type,
+                    self._canonical_aggregate_period_start(aggregate.period_start).isoformat(),
+                )
+            ]
+        ]
+
     def insert_aggregate(self, aggregate: MeasurementAggregate) -> bool:
-        """Insert an aggregate, skipping if a duplicate already exists.
+        """Insert an unverified aggregate unless its family has an open gap.
 
         Uses ON CONFLICT DO NOTHING on the (hospital_id, period_type, period_start, metric_family)
-        unique constraint.
+        unique constraint. This legacy path has no raw snapshot to verify, so
+        newly inserted rows retain the schema's ``legacy_unverified`` default.
 
         Returns:
-            True if inserted, False if it already existed
+            True if inserted; False for an existing row or an open-gap family.
         """
         with self.get_connection() as conn:
             with self.get_cursor(conn) as cur:
+                open_gap_families = self._lock_aggregate_bucket(
+                    cur,
+                    aggregate.hospital_id,
+                    aggregate.period_type,
+                    aggregate.period_start,
+                )
+                if aggregate.metric_family in open_gap_families:
+                    return False
                 cur.execute(
                     """
                     INSERT INTO measurement_aggregates (
@@ -1559,16 +1654,185 @@ class DatabaseService:
                 )
                 return cur.rowcount > 0
 
-    def insert_aggregates(self, aggregates: list[MeasurementAggregate]) -> int:
-        """Insert multiple aggregates in one batch.
+    def refresh_aggregate_bucket(
+        self,
+        hospital_id: str,
+        period_type: str,
+        period_start: datetime,
+        period_end: datetime,
+        compute: Callable[
+            [list[dict[str, Any]]], tuple[list[MeasurementAggregate], list[AggregateGap]]
+        ],
+        *,
+        refresh_all: bool = False,
+    ) -> int:
+        """Atomically classify one raw bucket and update summary/gap state.
 
-        Returns the number of newly inserted rows.
+        The raw snapshot, conflict classification, and new aggregate/gap writes
+        share one transaction. An open historical gap is never automatically
+        cleared or overwritten from current raw rows: row removal is not proof
+        of a reviewed methodology correction. Its stored aggregate remains
+        unchanged and hidden by the read view while the gap is open.
+        """
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
+                open_gap_families = self._lock_aggregate_bucket(
+                    cur, hospital_id, period_type, period_start
+                )
+                cur.execute(
+                    """
+                    SELECT value, timestamp_utc, source_id,
+                           metric_family, start_event, end_event, statistic_type,
+                           patient_scope
+                    FROM measurements
+                    WHERE hospital_id = %s
+                      AND timestamp_utc >= %s
+                      AND timestamp_utc < %s
+                    ORDER BY timestamp_utc, id
+                    """,
+                    (hospital_id, period_start, period_end),
+                )
+                rows = [dict(row) for row in cur.fetchall()]
+                aggregates, gaps = compute(rows) if rows else ([], [])
+
+                cur.execute(
+                    """
+                    SELECT metric_family
+                    FROM measurement_aggregates
+                    WHERE hospital_id = %s
+                      AND period_type = %s
+                      AND period_start = %s
+                      AND verification_state = 'legacy_unverified'
+                    """,
+                    (hospital_id, period_type, period_start),
+                )
+                legacy_unverified_families = {row["metric_family"] for row in cur.fetchall()}
+
+                for gap in gaps:
+                    # Keep the first unresolved evidence intact. A later refresh
+                    # may see fewer rows after retention or deletion; that must
+                    # not rewrite the historical fingerprint/signature count.
+                    if gap.metric_family in open_gap_families:
+                        continue
+                    cur.execute(
+                        """
+                        INSERT INTO measurement_aggregate_gaps (
+                            hospital_id, period_type, period_start, metric_family,
+                            state, reason, fingerprint, signature_count,
+                            first_detected_at, last_detected_at, resolved_at
+                        ) VALUES (%s, %s, %s, %s, 'open', %s, %s, %s, NOW(), NOW(), NULL)
+                        ON CONFLICT (hospital_id, period_type, period_start, metric_family)
+                        DO UPDATE SET
+                            first_detected_at = CASE
+                                WHEN measurement_aggregate_gaps.state = 'open'
+                                 AND measurement_aggregate_gaps.reason = EXCLUDED.reason
+                                 AND measurement_aggregate_gaps.fingerprint = EXCLUDED.fingerprint
+                                THEN measurement_aggregate_gaps.first_detected_at
+                                ELSE NOW()
+                            END,
+                            last_detected_at = NOW(),
+                            state = 'open',
+                            reason = EXCLUDED.reason,
+                            fingerprint = EXCLUDED.fingerprint,
+                            signature_count = EXCLUDED.signature_count,
+                            resolved_at = NULL
+                        """,
+                        (
+                            hospital_id,
+                            period_type,
+                            period_start,
+                            gap.metric_family,
+                            gap.reason,
+                            gap.fingerprint,
+                            gap.signature_count,
+                        ),
+                    )
+
+                refreshed_count = 0
+                for aggregate in aggregates:
+                    # A homogeneous current snapshot cannot establish that the
+                    # historical conflict was corrected rather than deleted.
+                    # Preserve the old summary and leave its gap open until an
+                    # explicit provenance-backed resolution path exists.
+                    if aggregate.metric_family in open_gap_families:
+                        continue
+                    # Existing pre-migration summaries have no completeness
+                    # record. A forced rescan cannot recover expired or partially
+                    # removed provenance, so it never promotes or overwrites them.
+                    if aggregate.metric_family in legacy_unverified_families:
+                        continue
+                    cur.execute(
+                        """
+                        INSERT INTO measurement_aggregates (
+                            hospital_id, source_id,
+                            period_type, period_start, period_end,
+                            mean_value, median_value, p90_value,
+                            min_value, max_value, std_dev, sample_count,
+                            metric_family, start_event, end_event, statistic_type,
+                            verification_state, verified_at
+                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                                  'verified', NOW())
+                        ON CONFLICT (hospital_id, period_type, period_start, metric_family)
+                        DO UPDATE SET
+                            source_id = EXCLUDED.source_id,
+                            period_end = EXCLUDED.period_end,
+                            mean_value = EXCLUDED.mean_value,
+                            median_value = EXCLUDED.median_value,
+                            p90_value = EXCLUDED.p90_value,
+                            min_value = EXCLUDED.min_value,
+                            max_value = EXCLUDED.max_value,
+                            std_dev = EXCLUDED.std_dev,
+                            sample_count = EXCLUDED.sample_count,
+                            start_event = EXCLUDED.start_event,
+                            end_event = EXCLUDED.end_event,
+                            statistic_type = EXCLUDED.statistic_type,
+                            verification_state = 'verified',
+                            verified_at = NOW()
+                        WHERE %s
+                        RETURNING 1
+                        """,
+                        (
+                            aggregate.hospital_id,
+                            aggregate.source_id,
+                            aggregate.period_type,
+                            aggregate.period_start,
+                            aggregate.period_end,
+                            aggregate.mean_value,
+                            aggregate.median_value,
+                            aggregate.p90_value,
+                            aggregate.min_value,
+                            aggregate.max_value,
+                            aggregate.std_dev,
+                            aggregate.sample_count,
+                            aggregate.metric_family,
+                            aggregate.start_event,
+                            aggregate.end_event,
+                            aggregate.statistic_type,
+                            refresh_all,
+                        ),
+                    )
+                    if cur.fetchone() is not None:
+                        refreshed_count += 1
+
+                return refreshed_count
+
+    def insert_aggregates(self, aggregates: list[MeasurementAggregate]) -> int:
+        """Insert unverified aggregates, excluding families with open gaps.
+
+        This legacy create-only path has no raw snapshot to verify. Any inserted
+        rows retain the schema's ``legacy_unverified`` default and remain absent
+        from ``measurement_aggregates_usable`` until an explicit review path is
+        implemented.
         """
         if not aggregates:
             return 0
 
         with self.get_connection() as conn:
             with self.get_cursor(conn) as cur:
+                safe_aggregates = self._lock_and_filter_open_gap_aggregates(cur, aggregates)
+                if not safe_aggregates:
+                    return 0
                 rows = [
                     (
                         aggregate.hospital_id,
@@ -1588,7 +1852,7 @@ class DatabaseService:
                         aggregate.end_event,
                         aggregate.statistic_type,
                     )
-                    for aggregate in aggregates
+                    for aggregate in safe_aggregates
                 ]
 
                 inserted = psycopg2.extras.execute_values(
@@ -1632,7 +1896,7 @@ class DatabaseService:
             with self.get_cursor(conn) as cur:
                 cur.execute(
                     """
-                    SELECT * FROM measurement_aggregates
+                    SELECT * FROM measurement_aggregates_usable
                     WHERE hospital_id = %s
                       AND period_type = %s
                       AND period_start >= %s
@@ -1663,6 +1927,30 @@ class DatabaseService:
                       AND period_type = %s
                       AND period_start >= %s
                       AND period_start <= %s
+                    """,
+                    (hospital_id, period_type, start, end),
+                )
+                return {row["period_start"] for row in cur.fetchall()}
+
+    def get_aggregate_periods_with_open_gaps(
+        self,
+        hospital_id: str,
+        period_type: str,
+        start: datetime,
+        end: datetime,
+    ) -> set[datetime]:
+        """Return open-gap buckets so backfill can revisit unaffected families."""
+        with self.get_connection() as conn:
+            with self.get_cursor(conn) as cur:
+                cur.execute(
+                    """
+                    SELECT DISTINCT period_start
+                    FROM measurement_aggregate_gaps
+                    WHERE hospital_id = %s
+                      AND period_type = %s
+                      AND period_start >= %s
+                      AND period_start <= %s
+                      AND state = 'open'
                     """,
                     (hospital_id, period_type, start, end),
                 )
@@ -1716,65 +2004,15 @@ class DatabaseService:
                 return [row["hospital_id"] for row in cur.fetchall()]
 
     def upsert_aggregates(self, aggregates: list[MeasurementAggregate]) -> int:
-        """Insert or refresh multiple aggregates in one batch."""
+        """Reject unsafe precomputed writes that bypass bucket classification."""
         if not aggregates:
             return 0
-
-        with self.get_connection() as conn:
-            with self.get_cursor(conn) as cur:
-                rows = [
-                    (
-                        aggregate.hospital_id,
-                        aggregate.source_id,
-                        aggregate.period_type,
-                        aggregate.period_start,
-                        aggregate.period_end,
-                        aggregate.mean_value,
-                        aggregate.median_value,
-                        aggregate.p90_value,
-                        aggregate.min_value,
-                        aggregate.max_value,
-                        aggregate.std_dev,
-                        aggregate.sample_count,
-                        aggregate.metric_family,
-                        aggregate.start_event,
-                        aggregate.end_event,
-                        aggregate.statistic_type,
-                    )
-                    for aggregate in aggregates
-                ]
-
-                refreshed = psycopg2.extras.execute_values(
-                    cur,
-                    """
-                    INSERT INTO measurement_aggregates (
-                        hospital_id, source_id,
-                        period_type, period_start, period_end,
-                        mean_value, median_value, p90_value,
-                        min_value, max_value, std_dev, sample_count,
-                        metric_family, start_event, end_event, statistic_type
-                    ) VALUES %s
-                    ON CONFLICT (hospital_id, period_type, period_start, metric_family)
-                    DO UPDATE SET
-                        source_id = EXCLUDED.source_id,
-                        period_end = EXCLUDED.period_end,
-                        mean_value = EXCLUDED.mean_value,
-                        median_value = EXCLUDED.median_value,
-                        p90_value = EXCLUDED.p90_value,
-                        min_value = EXCLUDED.min_value,
-                        max_value = EXCLUDED.max_value,
-                        std_dev = EXCLUDED.std_dev,
-                        sample_count = EXCLUDED.sample_count,
-                        start_event = EXCLUDED.start_event,
-                        end_event = EXCLUDED.end_event,
-                        statistic_type = EXCLUDED.statistic_type
-                    RETURNING 1
-                    """,
-                    rows,
-                    template="(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                    fetch=True,
-                )
-                return len(refreshed)
+        raise RuntimeError(
+            "Precomputed aggregate upserts are disabled; use "
+            "refresh_aggregate_bucket through AggregationService.backfill or "
+            "refresh_recent_periods so raw classification, gap state, and writes "
+            "share one bucket transaction."
+        )
 
     def _row_to_aggregate(self, row: dict[str, Any]) -> MeasurementAggregate:
         """Convert database row to MeasurementAggregate model."""
@@ -2159,7 +2397,7 @@ class DatabaseService:
                         SELECT
                             ma.hospital_id,
                             AVG(ma.mean_value)::float AS period_mean
-                        FROM measurement_aggregates ma
+                        FROM measurement_aggregates_usable ma
                         WHERE ma.period_type = 'daily'
                           AND ma.period_start >= %s
                           AND ma.period_start < %s
@@ -2169,7 +2407,7 @@ class DatabaseService:
                         SELECT
                             ma.hospital_id,
                             AVG(ma.mean_value)::float AS period_mean
-                        FROM measurement_aggregates ma
+                        FROM measurement_aggregates_usable ma
                         WHERE ma.period_type = 'daily'
                           AND ma.period_start >= %s
                           AND ma.period_start < %s

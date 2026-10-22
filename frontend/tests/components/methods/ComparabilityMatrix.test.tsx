@@ -91,7 +91,7 @@ describe("ComparabilityMatrix", () => {
   it("shows checkmark for same province (diagonal)", () => {
     render(<ComparabilityMatrix sources={mockSources} />);
 
-    // Diagonal cells should all be comparable (same province with itself)
+    // Diagonal cells are identity self-pairs, not cross-province method claims.
     const checkmarks = screen.getAllByText("✓");
     expect(checkmarks.length).toBeGreaterThanOrEqual(3);
   });
@@ -116,13 +116,16 @@ describe("ComparabilityMatrix", () => {
   it("displays comparison legend", () => {
     render(<ComparabilityMatrix sources={mockSources} />);
 
-    expect(screen.getAllByText("Directly comparable").length).toBeGreaterThan(
-      0,
-    );
-    expect(screen.getAllByText(/Partially comparable/i).length).toBeGreaterThan(
-      0,
-    );
-    expect(screen.getAllByText(/Not comparable/i).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(/All five recorded dimensions match/).length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(/Some, but not all, recorded dimensions match/i)
+        .length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(/Few recorded dimensions match/i).length,
+    ).toBeGreaterThan(0);
   });
 
   it("shows detail panel when cell is clicked", async () => {
@@ -132,15 +135,13 @@ describe("ComparabilityMatrix", () => {
     // Click a cell (not on header row/col)
     const cells = screen.getAllByRole("cell");
     // Find a non-header cell
-    const dataCell = cells.find((cell) => cell.querySelector("[title]"));
+    const dataCell = cells[1];
+    expect(dataCell).toBeInTheDocument();
+    await user.click(dataCell!);
 
-    if (dataCell) {
-      await user.click(dataCell);
-
-      await waitFor(() => {
-        expect(screen.getByText(/Comparing/i)).toBeInTheDocument();
-      });
-    }
+    await waitFor(() => {
+      expect(screen.getByText(/Comparing/i)).toBeInTheDocument();
+    });
   });
 
   it("displays methodology dimensions in detail panel", async () => {
@@ -148,18 +149,18 @@ describe("ComparabilityMatrix", () => {
     render(<ComparabilityMatrix sources={mockSources} />);
 
     const cells = screen.getAllByRole("cell");
-    const dataCell = cells.find((cell) => cell.querySelector("[title]"));
+    const dataCell = cells[1];
+    expect(dataCell).toBeInTheDocument();
+    await user.click(dataCell!);
 
-    if (dataCell) {
-      await user.click(dataCell);
-
-      await waitFor(() => {
-        expect(screen.getByText("Metric Family:")).toBeInTheDocument();
-        expect(screen.getByText("Start Event:")).toBeInTheDocument();
-        expect(screen.getByText("End Event:")).toBeInTheDocument();
-        expect(screen.getByText("Statistic Type:")).toBeInTheDocument();
-      });
-    }
+    await waitFor(() => {
+      expect(screen.getByText("Metric Family:")).toBeInTheDocument();
+      expect(screen.getByText("Start Event:")).toBeInTheDocument();
+      expect(screen.getByText("End Event:")).toBeInTheDocument();
+      expect(screen.getByText("Statistic Type:")).toBeInTheDocument();
+      expect(screen.getByText("Patient Scope:")).toBeInTheDocument();
+      expect(screen.getAllByText("Unknown").length).toBeGreaterThan(0);
+    });
   });
 
   it("highlights selected cell", async () => {
@@ -167,17 +168,15 @@ describe("ComparabilityMatrix", () => {
     const { container } = render(<ComparabilityMatrix sources={mockSources} />);
 
     const cells = screen.getAllByRole("cell");
-    const dataCell = cells.find((cell) => cell.querySelector("[title]"));
+    const dataCell = cells[1];
+    expect(dataCell).toBeInTheDocument();
+    await user.click(dataCell!);
 
-    if (dataCell) {
-      await user.click(dataCell);
-
-      await waitFor(() => {
-        // Check if cell has highlight styling
-        const highlighted = container.querySelector(".ring-blue-500");
-        expect(highlighted).toBeInTheDocument();
-      });
-    }
+    await waitFor(() => {
+      // Check if cell has highlight styling
+      const highlighted = container.querySelector(".ring-primary");
+      expect(highlighted).toBeInTheDocument();
+    });
   });
 
   it("identifies Ontario and Alberta as partially aligned", () => {
@@ -241,14 +240,12 @@ describe("ComparabilityMatrix", () => {
     render(<ComparabilityMatrix sources={mockSources} />);
 
     const cells = screen.getAllByRole("cell");
-    const dataCell = cells.find((cell) => cell.querySelector("[title]"));
+    const dataCell = cells[1];
+    expect(dataCell).toBeInTheDocument();
+    await user.click(dataCell!);
 
-    if (dataCell) {
-      await user.click(dataCell);
-
-      await waitFor(() => {
-        expect(mockRouter.replace).toHaveBeenCalled();
-      });
-    }
+    await waitFor(() => {
+      expect(mockRouter.replace).toHaveBeenCalled();
+    });
   });
 });

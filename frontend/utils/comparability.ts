@@ -3,6 +3,7 @@ export interface Methodology {
   start_event: string;
   end_event: string;
   statistic_type: string;
+  patient_scope: string;
 }
 
 export interface MethodologySource {
@@ -13,13 +14,15 @@ export interface MethodologySource {
   default_start_event: string;
   default_end_event: string;
   default_statistic_type: string;
+  default_patient_scope?: string | null;
 }
 
 export type ComparabilityDimensionKey =
   | "metric_family"
   | "start_event"
   | "end_event"
-  | "statistic_type";
+  | "statistic_type"
+  | "patient_scope";
 
 export type ComparabilityLevel = "comparable" | "partial" | "not-comparable";
 
@@ -37,18 +40,24 @@ const COMPARABILITY_DIMENSION_KEYS: ComparabilityDimensionKey[] = [
   "start_event",
   "end_event",
   "statistic_type",
+  "patient_scope",
 ];
 
 export function getComparabilityDimensions(
   a: MethodologyLike,
   b: MethodologyLike,
 ): ComparabilityDimension[] {
-  return COMPARABILITY_DIMENSION_KEYS.map((key) => ({
-    key,
-    left_value: getMethodologyValue(a, key),
-    right_value: getMethodologyValue(b, key),
-    matches: getMethodologyValue(a, key) === getMethodologyValue(b, key),
-  }));
+  return COMPARABILITY_DIMENSION_KEYS.map((key) => {
+    const leftValue = getMethodologyValue(a, key);
+    const rightValue = getMethodologyValue(b, key);
+
+    return {
+      key,
+      left_value: leftValue ?? "Unknown",
+      right_value: rightValue ?? "Unknown",
+      matches: typeof leftValue === "string" && leftValue === rightValue,
+    };
+  });
 }
 
 export function getComparabilityMatchCount(
@@ -96,6 +105,11 @@ export function generateDivergenceBrief(
           return `Different end points: ${dimension.left_value} vs ${dimension.right_value}`;
         case "statistic_type":
           return `Different statistics: ${dimension.left_value} vs ${dimension.right_value}`;
+        case "patient_scope":
+          return dimension.left_value === "Unknown" ||
+            dimension.right_value === "Unknown"
+            ? "Patient scope is unknown for one or both measurements"
+            : `Different patient scopes: ${dimension.left_value} vs ${dimension.right_value}`;
       }
     });
 
@@ -145,5 +159,7 @@ function getMethodologyValue(
       return source.default_end_event;
     case "statistic_type":
       return source.default_statistic_type;
+    case "patient_scope":
+      return source.default_patient_scope ?? null;
   }
 }

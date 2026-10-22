@@ -24,6 +24,7 @@ aggregate = "waittime.cli.aggregate:main"
 database_cleanup = "waittime.cli.cleanup:main"
 snapshot_quality = "waittime.cli.snapshot_quality:main"
 storage_stats = "waittime.cli.storage_stats:main"
+measurement_archive = "waittime.cli.measurement_archive:main"
 
 [project.optional-dependencies]
 dev = [
@@ -130,6 +131,7 @@ addopts = [
 markers = [
     "unit: Fast tests with no I/O",
     "integration: Tests with database or HTTP",
+    "native_postgres: Explicitly enabled isolated native PostgreSQL archive validation",
     "e2e: End-to-end workflow tests",
     "slow: Tests that take longer to run",
 ]

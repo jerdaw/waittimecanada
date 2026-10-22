@@ -20,7 +20,7 @@ uv run python run_migrations.py
 **Output:**
 
 ```
-Found 22 migration files:
+Found 23 migration files:
 
 Running: 001_create_enums.sql
   ✓ Success
@@ -29,17 +29,21 @@ Running: 002_create_tables.sql
   ✓ Success
 
 ...
+Running: 023_add_measurement_aggregate_gaps.sql
+  ✓ Success
 
 All migrations completed successfully!
 ```
 
 ### Idempotency
 
-Migrations use `DO $$ ... EXCEPTION WHEN duplicate_object THEN NULL; END $$;`
-blocks or similar patterns to support legacy re-runs. The migration runner also
-maintains a `schema_migrations` checksum ledger. Already-recorded migrations are
-skipped when the checksum matches, and changed migration files are rejected so
-applied history is not edited in place.
+Some historical migrations use `DO $$ ... EXCEPTION WHEN duplicate_object THEN
+NULL; END $$;` blocks to support legacy re-runs. The migration runner maintains
+a `schema_migrations` checksum ledger. Already-recorded migrations are skipped
+when the checksum matches, and changed migration files are rejected so applied
+history is not edited in place. Duplicate-error adoption is limited to the
+explicit allowlist of existing pre-023 migration filenames; new migrations
+must complete fully and cannot be adopted based on an object-name collision.
 
 ---
 
@@ -51,13 +55,13 @@ applied history is not edited in place.
 NNN_descriptive_name.sql
 ```
 
-- `NNN`: Zero-padded sequential number (001, 002, ..., 022)
+- `NNN`: Zero-padded sequential number (001, 002, ..., 023)
 - `descriptive_name`: Action and target (e.g., `create_enums`, `add_occupancy_columns`)
 - **Always use `.sql` extension** (`.sql.skip` files are intentionally excluded)
 
 The historical duplicate `020_` prefix is preserved because those files may
 already be applied in deployed databases. Do not create new duplicate prefixes.
-The next migration number is `023`.
+The next migration number is `024`.
 
 Run the guard before adding or renaming migrations:
 
@@ -72,18 +76,22 @@ Migrations run in **lexicographic order** (alphabetical). The numeric prefix ens
 
 ### Migration Runner
 
-**Location:** `backend/run_migrations.py`
+The CLI entry point is `backend/run_migrations.py`; the canonical reusable
+implementation is `backend/src/waittime/services/migration_runner.py`.
 
 **Behavior:**
 
 - Reads all `*.sql` files from `backend/migrations/`
-- Sorts alphabetically (001 → 022)
+- Sorts alphabetically (001 → 023)
 - Creates and uses the `schema_migrations` checksum ledger
 - Skips files already recorded with a matching checksum
 - Rejects files whose recorded checksum no longer matches the on-disk SQL
 - Executes unrecorded files and records their checksum after success
-- Stops on first error (unless safe duplicate)
-- Safe duplicate errors (already exists): records the file as a legacy adoption
+- Stops on first error, except for safe duplicate errors in explicitly
+  allowlisted historical migration files
+- Safe duplicate errors in those historical files are recorded as legacy
+  adoptions; migration 023 and later, as well as unknown filenames, fail rather
+  than claiming completion when an object already exists
 - Other errors: fails and stops execution
 
 **Safe Duplicate Error Codes:**
@@ -601,20 +609,66 @@ WHERE id = 'ontario-health';
 
 ---
 
+### Aggregate Gap Containment and Verification (023)
+
+#### 023_add_measurement_aggregate_gaps.sql
+
+**Purpose:** Preserve stored aggregate rows while preventing a bucket/family
+with ambiguous methodology or unsupported patient scope from being returned as
+a usable analytic result.
+
+**Objects Created:**
+
+- `measurement_aggregate_gaps`: open/resolved gap state keyed to the aggregate
+  uniqueness key, including a stable signature fingerprint and timestamps.
+- `measurement_aggregates.verification_state` and `verified_at`, including
+  constraints that keep the verification state/time pairing consistent.
+- `measurement_aggregates_usable`: read view exposing only verified rows whose
+  exact hospital/period/family key has no open gap.
+
+**Behavior:** An open gap hides, but does not delete, its stored aggregate.
+Automatic resolution is not supported: empty raw windows, fewer conflicting
+rows, or a newly homogeneous snapshot do not prove a reviewed methodology
+correction. Refreshes preserve the open gap and its original fingerprint and
+stored aggregate; unaffected families and buckets without open gaps continue
+to refresh normally. Existing summaries default to `legacy_unverified` and
+stay physically preserved but hidden; an empty gap table does not establish
+that historical rows were verified. Only a nonempty raw snapshot classified
+inside `refresh_aggregate_bucket` may create a `verified` summary. Legacy rows
+are not automatically promoted or overwritten by forced backfill or create-only
+writes. The gap table, verification columns, constraints, and final usable view
+are installed by this single transactional migration, so a failure leaves none
+of those objects partially committed.
+
+**Rollout:** The `ALTER TABLE` obtains an `ACCESS EXCLUSIVE` lock on
+`measurement_aggregates` and holds it until the migration transaction commits.
+Use a bounded maintenance rollout and coordinate scheduled workers separately:
+the single transaction prevents a committed partial schema, but does not
+prevent an independently started worker from running against the old schema
+before the migration succeeds.
+
+**Rollback:** Drop `measurement_aggregates_usable`, drop the gap-state table,
+then drop both verification constraints and the two verification columns. This
+removes gap history and verification state, but leaves stored aggregate rows and
+their values intact; after rollback, direct readers can see those legacy rows
+again.
+
+---
+
 ## Creating New Migrations
 
 ### Step 1: Determine Next Number
 
 ```bash
 ls backend/migrations/*.sql | tail -1
-# Output: backend/migrations/022_update_ontario_health_source_url.sql
-# Next: 023
+# Output: backend/migrations/023_add_measurement_aggregate_gaps.sql
+# Next: 024
 ```
 
 ### Step 2: Create Migration File
 
 ```bash
-touch backend/migrations/023_your_descriptive_name.sql
+touch backend/migrations/024_your_descriptive_name.sql
 ```
 
 ### Step 3: Write Migration
@@ -622,7 +676,7 @@ touch backend/migrations/023_your_descriptive_name.sql
 **Template:**
 
 ```sql
--- 023_your_descriptive_name.sql
+-- 024_your_descriptive_name.sql
 -- Brief description of what this migration does
 -- Depends on: NNN_previous_migration.sql (if applicable)
 
@@ -1062,7 +1116,7 @@ For migration questions or issues:
 
 ---
 
-**Last Updated:** 2026-07-08
-**Total Migrations:** 22
+**Last Updated:** 2026-10-22
+**Total Migrations:** 23
 **Database Engine:** PostgreSQL 17
-**Schema Version:** 022 (Ontario Health Source URL)
+**Schema Version:** 023 (Aggregate gap containment and verification)

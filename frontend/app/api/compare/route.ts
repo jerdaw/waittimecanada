@@ -44,7 +44,8 @@ async function getHospitalWithMeasurement(
       m.metric_family,
       m.start_event,
       m.end_event,
-      m.statistic_type
+      m.statistic_type,
+      m.patient_scope
     FROM hospitals h
     INNER JOIN LATERAL (
       SELECT *
@@ -74,6 +75,7 @@ async function getHospitalWithMeasurement(
       start_event: row.start_event,
       end_event: row.end_event,
       statistic_type: row.statistic_type,
+      patient_scope: row.patient_scope,
     },
   };
 }

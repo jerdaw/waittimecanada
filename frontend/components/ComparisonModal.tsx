@@ -16,6 +16,7 @@ interface Hospital {
     start_event: string;
     end_event: string;
     statistic_type: string;
+    patient_scope: string;
   };
 }
 
@@ -224,11 +225,13 @@ export function ComparisonModal({
                 </div>
                 <div>
                   <h4 className="font-semibold text-emerald-900 text-sm mb-1">
-                    Directly Comparable
+                    Recorded Tags Match
                   </h4>
                   <p className="text-emerald-800 text-sm">
-                    These hospitals use identical methodologies. Direct
-                    comparison is statistically valid.
+                    All five stored ontology tags match. This is only a
+                    screening condition; review source definitions and
+                    limitations before treating the measures as scientifically
+                    comparable.
                   </p>
                 </div>
               </div>
@@ -282,6 +285,10 @@ export function ComparisonModal({
                   <span className="font-medium">Stat:</span>{" "}
                   {data.hospital_a.methodology.statistic_type}
                 </div>
+                <div>
+                  <span className="font-medium">Patient scope:</span>{" "}
+                  {data.hospital_a.methodology.patient_scope}
+                </div>
               </div>
             </div>
 
@@ -330,6 +337,10 @@ export function ComparisonModal({
                   <span className="font-medium">Stat:</span>{" "}
                   {data.hospital_b.methodology.statistic_type}
                 </div>
+                <div>
+                  <span className="font-medium">Patient scope:</span>{" "}
+                  {data.hospital_b.methodology.patient_scope}
+                </div>
               </div>
             </div>
           </div>
@@ -359,6 +370,11 @@ export function ComparisonModal({
                 label="Statistic Type"
                 valueA={data.hospital_a.methodology.statistic_type}
                 valueB={data.hospital_b.methodology.statistic_type}
+              />
+              <MethodologyField
+                label="Patient Scope"
+                valueA={data.hospital_a.methodology.patient_scope}
+                valueB={data.hospital_b.methodology.patient_scope}
               />
             </div>
           </div>

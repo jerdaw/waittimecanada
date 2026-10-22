@@ -12,7 +12,7 @@ import httpx
 import pytest
 from tenacity import RetryError
 
-from waittime.core import EndEvent, MetricFamily, StartEvent, StatisticType
+from waittime.core import EndEvent, MetricFamily, PatientScope, StartEvent, StatisticType
 from waittime.scrapers.quebec import QuebecScraper, _safe_content_type, create_quebec_source
 
 
@@ -296,6 +296,9 @@ class TestQuebecScraper:
         assert m.start_event == StartEvent.REGISTRATION
         assert m.end_event == EndEvent.PHYSICIAN
         assert m.statistic_type == StatisticType.ROLLING_AVG
+        # Keep the producer held until the aggregate/reader contract is ready.
+        # This is the known legacy default, not evidence of the source population.
+        assert m.patient_scope == PatientScope.ALL
         assert m.source_id == "quebec-msss"
 
     def test_measurement_has_payload_hash(self, scraper):
