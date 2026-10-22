@@ -19,6 +19,7 @@ from pathlib import Path
 from waittime.cli.seed_regions import load_regions_from_json, seed_regions
 from waittime.services.aggregation import AggregationService
 from waittime.services.database import DatabaseService
+from waittime.services.migration_runner import run_migrations as run_canonical_migrations
 
 logger = logging.getLogger(__name__)
 
@@ -26,22 +27,11 @@ logger = logging.getLogger(__name__)
 BACKEND_ROOT = Path(__file__).resolve().parents[3]
 MIGRATIONS_DIR = BACKEND_ROOT / "migrations"
 DEFAULT_REGIONS_FILE = BACKEND_ROOT / "data" / "regions" / "ontario-regions.json"
-SAFE_DUPLICATE_ERROR_CODES = {"42710", "42P07", "42723"}
 
 
 def _migration_files(migrations_dir: Path = MIGRATIONS_DIR) -> list[Path]:
     """Return migration SQL files sorted lexicographically."""
     return sorted(migrations_dir.glob("*.sql"))
-
-
-def _is_safe_duplicate_error(exc: Exception) -> bool:
-    """Return True when migration failure indicates existing schema objects."""
-    code = getattr(exc, "pgcode", None)
-    if code in SAFE_DUPLICATE_ERROR_CODES:
-        return True
-
-    message = str(exc).lower()
-    return "already exists" in message or "duplicate object" in message
 
 
 def apply_migrations(db: DatabaseService, dry_run: bool = False) -> int:
@@ -50,24 +40,25 @@ def apply_migrations(db: DatabaseService, dry_run: bool = False) -> int:
     if not files:
         raise FileNotFoundError(f"No migration files found in {MIGRATIONS_DIR}")
 
-    for file_path in files:
-        if dry_run:
+    if dry_run:
+        for file_path in files:
             logger.info("[DRY RUN] Would apply migration: %s", file_path.name)
-            continue
+        return len(files)
 
-        sql = file_path.read_text(encoding="utf-8")
-        try:
-            with db.get_connection() as conn:
-                with conn.cursor() as cur:
-                    cur.execute(sql)
-            logger.info("Applied migration: %s", file_path.name)
-        except Exception as exc:
-            if _is_safe_duplicate_error(exc):
-                logger.info("Skipped migration (already applied): %s", file_path.name)
-                continue
-            raise
+    results = run_canonical_migrations(db, files)
+    for result in results:
+        if result.status == "applied":
+            logger.info("Applied migration: %s", result.filename)
+        elif result.status == "skipped":
+            logger.info("Skipped migration (already applied): %s", result.filename)
+        else:
+            logger.info(
+                "Adopted legacy migration (already applied): %s: %s",
+                result.filename,
+                result.detail,
+            )
 
-    return len(files)
+    return len(results)
 
 
 def seed_region_mappings(

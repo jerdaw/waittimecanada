@@ -70,9 +70,11 @@ $$;
 -- ALTER TABLE your_table DROP COLUMN IF EXISTS your_column;
 ```
 
-Once a migration has been applied, do not edit that migration file. The runner
-records a SHA256 checksum in `schema_migrations` and rejects changed files. Add
-a new migration for follow-up schema changes.
+Once a migration has been applied, do not edit that migration file. The shared
+implementation in `backend/src/waittime/services/migration_runner.py` records a
+SHA256 checksum in `schema_migrations` and rejects changed files. The
+`backend/run_migrations.py` script and analytics bootstrap CLI both use this
+implementation. Add a new migration for follow-up schema changes.
 
 ### 4. Test locally
 

@@ -76,7 +76,8 @@ Migrations run in **lexicographic order** (alphabetical). The numeric prefix ens
 
 ### Migration Runner
 
-**Location:** `backend/run_migrations.py`
+The CLI entry point is `backend/run_migrations.py`; the canonical reusable
+implementation is `backend/src/waittime/services/migration_runner.py`.
 
 **Behavior:**
 

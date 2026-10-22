@@ -7,6 +7,7 @@ import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, cast
+from unittest.mock import patch
 
 import psycopg2
 import pytest
@@ -16,6 +17,7 @@ from native_postgres_archive import (  # type: ignore[import-untyped]
 )
 from psycopg2.extensions import make_dsn
 
+from waittime.cli import bootstrap_analytics
 from waittime.services.database import DatabaseService  # type: ignore[import-untyped]
 
 pytestmark = [pytest.mark.integration, pytest.mark.native_postgres]
@@ -225,5 +227,98 @@ def test_runner_rejects_023_after_partial_duplicate_collision_without_adoption(
                     """
                 )
                 assert cursor.fetchall() == [("collision_id",)]
+    finally:
+        database.drop()
+
+
+def test_bootstrap_rejects_023_after_partial_duplicate_collision(
+    native_pg_cluster: NativePostgresCluster,
+) -> None:
+    """The documented bootstrap consumer must not silently adopt a partial 023."""
+    database = native_pg_cluster.create_database()
+    try:
+        service = _runner_database_service(database)
+        setup_paths = [MIGRATIONS_DIR / name for name in SETUP_MIGRATION_NAMES]
+        setup_results = run_migrations.run_migrations(service, setup_paths)
+        assert [result.status for result in setup_results] == ["applied", "applied"]
+
+        with database.admin_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute("CREATE TABLE measurement_aggregate_gaps (collision_id INTEGER)")
+
+        migration = MIGRATIONS_DIR / CONSOLIDATED_MIGRATION_NAME
+        with patch.object(bootstrap_analytics, "_migration_files", return_value=[migration]):
+            with pytest.raises(psycopg2.errors.DuplicateTable):
+                bootstrap_analytics.apply_migrations(service)
+
+        with database.admin_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT filename FROM schema_migrations ORDER BY filename")
+                assert cursor.fetchall() == [(name,) for name in SETUP_MIGRATION_NAMES]
+                cursor.execute(
+                    """
+                    SELECT to_regclass('public.measurement_aggregates_usable'),
+                           EXISTS (
+                               SELECT 1 FROM information_schema.columns
+                               WHERE table_schema = 'public'
+                                 AND table_name = 'measurement_aggregates'
+                                 AND column_name = 'verification_state'
+                           )
+                    """
+                )
+                assert cursor.fetchone() == (None, False)
+                cursor.execute(
+                    """
+                    SELECT column_name
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public'
+                      AND table_name = 'measurement_aggregate_gaps'
+                    ORDER BY ordinal_position
+                    """
+                )
+                assert cursor.fetchall() == [("collision_id",)]
+    finally:
+        database.drop()
+
+
+def test_bootstrap_023_is_ledgered_and_canonical_runner_skips_it(
+    native_pg_cluster: NativePostgresCluster,
+) -> None:
+    """Successful bootstrap migration is checksum-ledgered and idempotent."""
+    database = native_pg_cluster.create_database()
+    try:
+        service = _runner_database_service(database)
+        setup_paths = [MIGRATIONS_DIR / name for name in SETUP_MIGRATION_NAMES]
+        setup_results = run_migrations.run_migrations(service, setup_paths)
+        assert [result.status for result in setup_results] == ["applied", "applied"]
+
+        migration = MIGRATIONS_DIR / CONSOLIDATED_MIGRATION_NAME
+        with patch.object(bootstrap_analytics, "_migration_files", return_value=[migration]):
+            assert bootstrap_analytics.apply_migrations(service) == 1
+
+        next_run = run_migrations.run_migrations(service, [migration])
+        assert [(result.filename, result.status) for result in next_run] == [
+            (CONSOLIDATED_MIGRATION_NAME, "skipped")
+        ]
+
+        with database.admin_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT checksum_sha256 FROM schema_migrations WHERE filename = %s",
+                    (CONSOLIDATED_MIGRATION_NAME,),
+                )
+                assert cursor.fetchone() == (
+                    run_migrations.migration_checksum(migration.read_text(encoding="utf-8")),
+                )
+                cursor.execute(
+                    """
+                    SELECT to_regclass('public.measurement_aggregate_gaps'),
+                           to_regclass('public.measurement_aggregates_usable')
+                    """
+                )
+                assert cursor.fetchone() == (
+                    "measurement_aggregate_gaps",
+                    "measurement_aggregates_usable",
+                )
     finally:
         database.drop()
