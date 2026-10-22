@@ -104,7 +104,8 @@ describe.each(aggregateReaders)("$name aggregate reader", ({ run }) => {
   });
 
   it("reads aggregate rows through the verification-filtered usable view", async () => {
-    await run();
+    const response = await run();
+    expect(response.status).toBe(200);
 
     const aggregateQueries = capturedQueries().filter((query) =>
       /measurement_aggregates(?:_usable)?/i.test(query),
@@ -114,6 +115,11 @@ describe.each(aggregateReaders)("$name aggregate reader", ({ run }) => {
     expect(
       aggregateQueries.every((query) =>
         /measurement_aggregates_usable/i.test(query),
+      ),
+    ).toBe(true);
+    expect(
+      aggregateQueries.every(
+        (query) => !/\bmeasurement_aggregates\b/i.test(query),
       ),
     ).toBe(true);
   });
