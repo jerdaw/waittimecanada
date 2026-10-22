@@ -11,10 +11,14 @@ from collections.abc import Generator
 from pathlib import Path
 
 import pytest
-from native_postgres_archive import NativePostgresCluster, require_sanitized_database_environment
 from psycopg2 import sql
 
 from waittime.services.database import DatabaseService
+
+from .native_postgres_archive import (
+    NativePostgresCluster,
+    require_sanitized_database_environment,
+)
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:

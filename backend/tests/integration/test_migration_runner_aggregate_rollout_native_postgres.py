@@ -11,14 +11,15 @@ from unittest.mock import patch
 
 import psycopg2
 import pytest
-from native_postgres_archive import (  # type: ignore[import-untyped]
-    NativePostgresCluster,
-    NativePostgresDatabase,
-)
 from psycopg2.extensions import make_dsn
 
 from waittime.cli import bootstrap_analytics
 from waittime.services.database import DatabaseService  # type: ignore[import-untyped]
+
+from .native_postgres_archive import (  # type: ignore[import-untyped]
+    NativePostgresCluster,
+    NativePostgresDatabase,
+)
 
 pytestmark = [pytest.mark.integration, pytest.mark.native_postgres]
 

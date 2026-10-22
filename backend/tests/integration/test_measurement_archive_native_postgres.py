@@ -13,13 +13,6 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
-from native_postgres_archive import (
-    FIXTURE_ENUM_VALUES,
-    WAIT_TIME_ONTOLOGY,
-    NativePostgresCluster,
-    NativePostgresDatabase,
-    canonical_measurement_row,
-)
 from psycopg2 import sql
 from psycopg2.extensions import TRANSACTION_STATUS_IDLE
 
@@ -29,6 +22,14 @@ from waittime.services.measurement_archive import (
     ArchiveUsePolicy,
     MeasurementArchiveError,
     export_measurement_archive,
+)
+
+from .native_postgres_archive import (
+    FIXTURE_ENUM_VALUES,
+    WAIT_TIME_ONTOLOGY,
+    NativePostgresCluster,
+    NativePostgresDatabase,
+    canonical_measurement_row,
 )
 
 pytestmark = [pytest.mark.integration, pytest.mark.native_postgres]

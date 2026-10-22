@@ -8,7 +8,8 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from native_postgres_archive import (
+
+from .native_postgres_archive import (
     NativePostgresCluster,
     NativePostgresConfigurationError,
     PostgresBinaries,
@@ -117,7 +118,7 @@ def test_unknown_pg_ctl_status_preserves_owned_cluster_and_evidence(
     monkeypatch: pytest.MonkeyPatch,
     status_codes: tuple[int, ...],
 ) -> None:
-    import native_postgres_archive as harness
+    from . import native_postgres_archive as harness
 
     binary_directory = (tmp_path / "postgres-bin").resolve()
     binary_directory.mkdir()

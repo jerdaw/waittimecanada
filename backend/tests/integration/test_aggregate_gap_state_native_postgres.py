@@ -6,15 +6,16 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
-from native_postgres_archive import (
+
+from waittime.services.aggregation import AggregationService
+from waittime.services.database import DatabaseService
+
+from .native_postgres_archive import (
     OCCUPANCY_SNAPSHOT_ONTOLOGY,
     WAIT_TIME_ONTOLOGY,
     NativePostgresCluster,
     NativePostgresDatabase,
 )
-
-from waittime.services.aggregation import AggregationService
-from waittime.services.database import DatabaseService
 
 pytestmark = [pytest.mark.integration, pytest.mark.native_postgres]
 
