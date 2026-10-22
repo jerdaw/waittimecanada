@@ -42,18 +42,23 @@ MSSS. The `ALL` patient scope conflicts with the public page's explicit
 `Measurement` model supplies `ALL` as its default. This is a substantive
 source-contract and data interpretation mismatch.
 
-Changing the producer to `NON_PRIORITY` is not a seed-only or documentation-
-only correction. The current `are_comparable()` check compares metric family,
-start event, end event, and statistic type, but not patient scope. The
-comparison service reads scope into its internal measurements but omits it
-from the response's methodology fields; the divergence brief does not
-currently identify a scope-only difference. Aggregation includes scope in its
-method signature: mixed scopes produce an `ambiguous_methodology` gap, while a
-homogeneous non-`ALL` group is rejected because the aggregate schema cannot
-represent scope. A prospective correction therefore needs a separately
-reviewed producer change plus scope-aware comparability and aggregate/reader
-handling. Preserve existing `ALL` rows; do not silently relabel historical
-measurements or change runtime behavior in this documentation update.
+The local candidate now checks patient scope with the other four recorded
+ontology fields, returns scope in the comparison response, and includes scope
+mismatches in divergence briefs. These are checks of recorded tags only; five
+matching tags are a necessary screening condition, not proof that the source
+methods are identical or scientifically comparable.
+
+The producer remains held: `QuebecScraper` still omits `patient_scope`, and the
+`Measurement` model supplies the legacy `ALL` default. Existing rows are
+unchanged and must not be described as corrected. The database `Source` model,
+source table, and seed/upsert contract also do not yet carry
+`default_patient_scope`; the live `/methods` query therefore presents source
+scope as unknown. The aggregate schema cannot represent a non-`ALL` scope:
+mixed groups produce an `ambiguous_methodology` gap, while homogeneous
+non-`ALL` groups are rejected. A prospective producer correction remains
+blocked on a separately reviewed source-metadata, aggregate-grain, and reader
+contract. No database migration or production behavior changed in this
+candidate.
 
 The scraper also assigns stretcher occupancy a separate
 `STRETCHER_OCCUPANCY` metric with `UNKNOWN` start event and

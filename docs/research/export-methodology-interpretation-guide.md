@@ -11,18 +11,20 @@ dataset but must avoid invalid cross-system comparisons.
 
 ## Core Rule
 
-Exported records are directly comparable only when all four ontology dimensions
-match:
+For raw records, all five recorded ontology dimensions are a necessary
+screening condition:
 
 1. `metric_family`
 2. `start_event`
 3. `end_event`
 4. `statistic_type`
+5. `patient_scope`
 
-If any of those fields differ, a numeric difference may reflect source
-methodology rather than operational performance. The export should then be used
-for audit, provenance, or methodology analysis, not for ranking hospitals or
-provinces.
+Matching all five tags is not proof that source methods are identical or that a
+scientific comparison is valid. Review the original source definitions,
+limitations, and population metadata before interpreting differences. If a
+field differs or patient scope is unknown, use the export for audit,
+provenance, or methodology analysis rather than ranking hospitals or provinces.
 
 ## Export Shapes
 
@@ -34,6 +36,15 @@ The export endpoint supports raw and aggregate views:
   measurements and limited to 30-day windows.
 - `granularity=daily`, `weekly`, or `monthly`: permanent aggregate rows from
   `measurement_aggregates`.
+
+The current aggregate schema does not retain patient scope, and the export
+homogeneity summary groups on four legacy ontology fields. Therefore
+`is_homogeneous=true` is not evidence that patient scope matches. Raw exports
+include the stored `patient_scope`; aggregate exports cannot support
+scope-stratified comparisons until a separately reviewed aggregate/reader
+contract is implemented. Québec wait-time rows currently carry the legacy
+`ALL` tag even though the published page specifies non-priority cases; this
+guide does not relabel those rows.
 
 Exports use `Cache-Control: no-store` so downloadable datasets are not served
 from stale shared caches.
@@ -79,9 +90,9 @@ Example shape:
 
 Recommended interpretation:
 
-- `is_homogeneous=true`: the exported rows share the four direct-comparison
-  ontology fields. Other caveats can still apply, including patient scope,
-  source freshness, update cadence, and source documentation limits.
+- `is_homogeneous=true`: the exported rows share the four fields used by the
+  current summary. Patient scope is not part of that summary; inspect raw-row
+  scope where available and review source documentation.
 - `is_homogeneous=false`: do not rank or compare exported values across the
   listed groups as if they measure the same operational quantity.
 - `distinct_methodology_groups`: use this as a grouping variable before any
@@ -103,9 +114,10 @@ CSV exports expose the same warning in two ways:
 period_start,period_end,hospital_id,hospital_name,province,city,latitude,longitude,mean_wait_minutes,median_wait_minutes,p90_wait_minutes,min_wait_minutes,max_wait_minutes,sample_count,std_dev,metric_family,start_event,end_event,statistic_type,source_id,methodology_url
 ```
 
-When `include_methodology=true`, CSV rows include the ontology fields needed to
-group records before analysis. If a CSV parser drops leading comment rows,
-consumers should still inspect the methodology headers and ontology columns.
+When `include_methodology=true`, raw CSV rows include ontology fields for
+grouping before analysis. Aggregate exports do not preserve patient scope. If a
+CSV parser drops leading comment rows, consumers should still inspect the
+methodology headers and ontology columns.
 
 ## Safe Analytical Uses
 

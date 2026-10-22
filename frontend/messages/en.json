@@ -492,7 +492,7 @@
   "AboutSection": {
     "badge": "Mission and Stewardship",
     "title": "Why Wait Time Canada Exists",
-    "p1": "Canadian provinces publish emergency department information using <strong>different definitions, clocks, and statistics</strong>. Ontario's current public feed reports mean triage-to-physician time, while Quebec reports rolling-average registration-to-physician time. Those numbers answer different operational questions and should not be treated as interchangeable.",
+    "p1": "Canadian provinces publish emergency department information using <strong>different and sometimes incomplete definitions</strong>. Ontario's current public feed reports mean triage-to-physician time. Quebec's public page labels an estimated wait for non-priority cases to see a doctor, but does not specify its clock events or calculation. The available definitions do not support treating those values as interchangeable.",
     "p2": "<strong>Wait Time Canada is a public-interest health systems observatory.</strong> Instead of pretending the data is directly comparable, the project audits it. Every measurement is tagged with methodology, invalid comparisons are flagged, and official-source provenance remains visible.",
     "p3": "The goal is to reduce barriers to public health-system information with an equity, EDIA, and stewardship lens: clearer definitions, clearer caveats, and more responsible interpretation for patients, clinicians, researchers, journalists, and decision-makers.",
     "contact": "Project links and contact",
@@ -515,9 +515,9 @@
   "StructuredData": {
     "faq": {
       "q1": "How does Wait Time Canada measure ER wait times?",
-      "a1": "We aggregate data from provincial health authorities and preserve the methodology attached to each source. Ontario's current public feed reports mean triage-to-physician wait time, while Quebec reports rolling-average registration-to-physician wait time.",
+      "a1": "We aggregate data from provincial health authorities and preserve recorded methodology tags. Ontario's current public feed reports mean triage-to-physician wait time. Quebec's public page labels an estimated wait for non-priority cases to see a doctor, but does not specify the clock events or calculation.",
       "q2": "Why can't I compare Ontario and Quebec wait times directly?",
-      "a2": "Ontario reports mean triage-to-physician times, while Quebec reports rolling-average registration-to-physician times. These different methodologies mean direct comparison is statistically invalid.",
+      "a2": "Ontario reports mean triage-to-physician time. Quebec's public page identifies an estimated wait for non-priority cases to see a doctor but does not document its clock events or calculation. Review those source definitions and limitations before drawing a cross-province conclusion.",
       "q3": "How current is this data?",
       "a3": "We check all four provincial sources for updates on an hourly schedule. Provincial publication timing varies, and scheduled jobs can be delayed or skipped, so this is a polling cadence—not a guarantee that every value is new or less than an hour old."
     },
@@ -608,7 +608,7 @@
       },
       "q6": {
         "question": "Can I compare hospitals across provinces?",
-        "answer": "Only if they use the same measurement methodology. Ontario reports mean triage-to-physician time, while Quebec reports rolling average registration-to-provider time. Our platform flags when direct comparison is statistically invalid and shows a methodology divergence warning."
+        "answer": "Matching recorded ontology tags is only a screening condition, not proof of methodological equivalence. Ontario reports mean triage-to-physician time; Quebec's public page labels an estimated wait for non-priority cases but does not specify clock events or calculation. Review the source definitions before comparing values."
       },
       "q7": {
         "question": "What do the methodology badges on hospital cards mean?",
@@ -743,7 +743,7 @@
     "sections": {
       "comparabilityMatrix": {
         "title": "Provincial Comparability Matrix",
-        "description": "This matrix shows which provinces can be directly compared. Click any cell to see detailed methodology differences."
+        "description": "This matrix screens recorded ontology tags field by field. Matching tags are necessary but do not prove source methods are identical; review source definitions and limitations before drawing conclusions."
       },
       "provincialMethodologies": {
         "title": "Provincial Methodologies",
@@ -772,8 +772,8 @@
     "ComparabilityMatrix": {
       "noData": "No data sources configured yet.",
       "levels": {
-        "comparable": "Directly comparable",
-        "partial": "Partially comparable",
+        "comparable": "All recorded dimensions match",
+        "partial": "Some recorded dimensions match",
         "notComparable": "Not comparable"
       },
       "verdicts": {
@@ -781,42 +781,44 @@
         "mismatch": "Mismatch"
       },
       "legend": {
-        "comparable": "Directly comparable",
-        "partial": "Partially comparable (2-3 matches)",
-        "notComparable": "Not comparable (0-1 matches)"
+        "comparable": "All five recorded dimensions match; source definitions still need review",
+        "partial": "Some, but not all, recorded dimensions match",
+        "notComparable": "Few recorded dimensions match"
       },
       "export": "Export CSV",
       "comparing": "Comparing {p1} with {p2}",
-      "detailsIntro": "Field-by-field ontology verdict for this province pair.",
+      "detailsIntro": "Field-by-field check of recorded ontology tags; this is not independent source validation.",
       "summary": {
-        "matchCount": "Ontology alignment",
-        "matchCountValue": "{count} of {total} dimensions match",
+        "matchCount": "Recorded tag alignment",
+        "matchCountValue": "{count} of {total} recorded dimensions match",
         "implication": "Clinical implication"
       },
       "metrics": {
         "family": "Metric Family",
         "start": "Start Event",
         "end": "End Event",
-        "stat": "Statistic Type"
+        "stat": "Statistic Type",
+        "patientScope": "Patient Scope"
       },
       "implications": {
-        "comparable": "These sources align on all four ontology dimensions, so direct cross-province comparison is methodologically valid.",
-        "partial": "These sources share some ontology dimensions, but the remaining mismatches still make direct comparison unsafe without qualification.",
-        "notComparable": "These sources diverge on most core ontology dimensions. Ranking or treating them as equivalent would be misleading."
+        "comparable": "All five recorded ontology dimensions match. This is only a screening condition; review source definitions and limitations before treating the measures as scientifically comparable.",
+        "partial": "Some recorded ontology dimensions match, but the recorded mismatches prevent a direct comparison without further source-specific review.",
+        "notComparable": "Few recorded ontology dimensions match. Treating these measures as equivalent would be unsupported."
       },
       "explanations": {
-        "comparable": "✓ These provinces use identical methodologies and can be directly compared.",
-        "partial": "⚠ These provinces differ in some dimensions. Comparisons should note these differences.",
-        "notComparable": "✗ These provinces use fundamentally different methodologies. Direct comparison is statistically invalid."
+        "comparable": "✓ All five recorded tags match. Source definitions and limitations still need review; tag agreement alone does not establish methodological equivalence.",
+        "partial": "⚠ Some recorded tags differ. Review the source definitions before interpreting the values together.",
+        "notComparable": "✗ Few recorded tags match. The current records do not support treating these measures as equivalent."
       },
       "pairwise": {
         "title": "Pairwise Verdicts",
-        "description": "Each province pair is broken down field by field so you can see exactly which ontology dimensions match and which ones invalidate direct comparison."
+        "description": "Each province pair is broken down by recorded tag. Matching dimensions are only a screening result; they do not establish source-method equivalence."
       }
     },
     "ProvinceMethodologyCard": {
       "viewOfficial": "View Official Methodology",
       "notAvailable": "Official methodology documentation not available",
+      "patientScopeUnknown": "Unknown (not represented in source metadata)",
       "metricFamily": {
         "TIME_TO_PROVIDER": "Time until first contact with physician or healthcare provider",
         "TOTAL_LOS": "Complete length of stay in emergency department",
@@ -849,7 +851,7 @@
       "items": {
         "q1": {
           "question": "Why can't I compare Ottawa and Gatineau directly?",
-          "answer": "Ottawa (Ontario) and Gatineau (Quebec) use different measurement methodologies. Ontario reports mean triage-to-physician time, while Quebec reports rolling-average registration-to-provider time. These differences mean direct comparison would be statistically invalid. Our platform displays a methodology divergence warning when you attempt such comparisons."
+          "answer": "Ontario reports mean triage-to-physician time. Quebec's public page labels an estimated wait for non-priority cases to see a doctor, but does not specify the clock events or calculation. Recorded-tag agreement is not source validation; review both definitions and limitations before drawing a conclusion about Ottawa and Gatineau."
         },
         "q2": {
           "question": "What does '90th percentile' mean in practice?",
@@ -901,8 +903,8 @@
       "error": "Error loading methodology changes: {message}"
     },
     "OntologyExplainer": {
-      "title": "The Four Dimensions of Wait Time Measurement",
-      "subtitle": "For two measurements to be comparable, all four dimensions must match. Understanding these dimensions is crucial for interpreting published wait times.",
+      "title": "The Five Dimensions of Wait Time Measurement",
+      "subtitle": "Matching all five recorded dimensions is a necessary screen only. Review source definitions and limitations before comparing published wait times.",
       "dimensions": {
         "metricFamily": {
           "title": "Metric Family",
@@ -981,6 +983,21 @@
             "pointEstimate": {
               "label": "Real-Time Estimate",
               "explanation": "Current snapshot based on current conditions and queue"
+            }
+          }
+        },
+        "patientScope": {
+          "title": "Patient Scope",
+          "subtitle": "Which patients are included?",
+          "description": "The population included in a reported metric. Scope is one necessary comparison dimension, but source definitions and exclusions still require review. If source metadata do not provide scope, treat it as unknown rather than assuming all patients.",
+          "examples": {
+            "all": {
+              "label": "All patients",
+              "explanation": "Includes the full patient population defined by the source."
+            },
+            "nonPriority": {
+              "label": "Non-priority patients",
+              "explanation": "Restricted to the source-defined non-priority group; do not treat it as equivalent to an all-patient measure."
             }
           }
         }

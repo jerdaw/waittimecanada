@@ -23,15 +23,16 @@ names the Système d'information et de gestion des urgences as its data source.
 
 The scraper currently records the displayed estimate as
 `TIME_TO_PROVIDER`, `REGISTRATION → PHYSICIAN`, `ROLLING_AVG`, with
-`patient_scope=ALL` supplied by the `Measurement` model default. This is the
-project's existing ontology mapping, documented in
-`backend/docs/methodologies/quebec-methodology.md`; the public page does not
-publish the estimate's calculation formula or averaging window. Treat those
-ontology details as the project's documented interpretation, not as a
-CSV-derived fact or a fully specified MSSS statistical method. In particular,
-`ALL` conflicts with the published non-priority scope and requires separate
-review of producer, comparability, aggregate, and reader behavior; this note
-does not relabel stored measurements.
+`patient_scope=ALL` supplied by the `Measurement` model default. The published
+page confirms only the non-priority population; it does not confirm the
+registered event/statistic tags. The local candidate adds patient scope to
+recorded-tag comparison and divergence output, but does not alter the scraper,
+stored measurements, schema, or live source metadata. Because the database
+`Source` contract lacks `default_patient_scope`, the live `/methods` surface
+continues to treat source scope as unknown. The aggregate schema also cannot
+represent non-`ALL` scope, so producer activation remains gated on a separately
+reviewed source-metadata, aggregate-grain, and reader contract. Historical
+measurements are not relabeled.
 
 ## Official Hourly CSV Publication
 

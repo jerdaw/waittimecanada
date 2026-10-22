@@ -85,6 +85,7 @@ class ComparisonService:
                     "start_event": hospital_a["measurement"]["start_event"],
                     "end_event": hospital_a["measurement"]["end_event"],
                     "statistic_type": hospital_a["measurement"]["statistic_type"],
+                    "patient_scope": hospital_a["measurement"]["patient_scope"],
                 },
             },
             "hospital_b": {
@@ -99,6 +100,7 @@ class ComparisonService:
                     "start_event": hospital_b["measurement"]["start_event"],
                     "end_event": hospital_b["measurement"]["end_event"],
                     "statistic_type": hospital_b["measurement"]["statistic_type"],
+                    "patient_scope": hospital_b["measurement"]["patient_scope"],
                 },
             },
             "comparable": comparable,

@@ -10,6 +10,7 @@ interface Source {
   default_start_event: string;
   default_end_event: string;
   default_statistic_type: string;
+  default_patient_scope?: string | null;
 }
 
 interface ProvinceMethodologyCardProps {
@@ -85,6 +86,10 @@ export function ProvinceMethodologyCard({
           label="Statistic Type"
           value={source.default_statistic_type}
           description={t(`statisticType.${source.default_statistic_type}`)}
+        />
+        <MethodologyField
+          label="Patient Scope"
+          value={source.default_patient_scope ?? t("patientScopeUnknown")}
         />
       </div>
 

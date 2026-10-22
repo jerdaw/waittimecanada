@@ -96,15 +96,21 @@ PATIENT_SCOPE = ["ALL", "MID_ACUITY", "NON_PRIORITY", "HIGH_ACUITY"]
 
 **Comparability Logic:**
 
-Two measurements are comparable if and only if:
+The recorded-ontology screen requires all five dimensions to match:
 ```python
 comparable = (
     A.metric_family == B.metric_family and
     A.start_event == B.start_event and
     A.end_event == B.end_event and
-    A.statistic_type == B.statistic_type
+    A.statistic_type == B.statistic_type and
+    A.patient_scope == B.patient_scope
 )
 ```
+
+An unrecorded patient scope is unknown and must not be treated as a match.
+Matching recorded dimensions are a necessary screen, not proof that source
+methodologies are identical or that a scientific comparison is valid. Review
+source definitions, populations, and limitations before drawing that conclusion.
 
 If not comparable, generate a **"Divergence Brief"** explaining why direct comparison is invalid.
 

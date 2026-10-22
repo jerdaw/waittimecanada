@@ -386,6 +386,7 @@ def are_comparable(a: Measurement, b: Measurement) -> bool:
         and a.start_event == b.start_event
         and a.end_event == b.end_event
         and a.statistic_type == b.statistic_type
+        and a.patient_scope == b.patient_scope
     )
 
 
@@ -413,6 +414,11 @@ def generate_divergence_brief(a: Measurement, b: Measurement) -> str | None:
     if a.statistic_type != b.statistic_type:
         differences.append(
             f"Different statistics: {a.statistic_type.value} vs {b.statistic_type.value}"
+        )
+
+    if a.patient_scope != b.patient_scope:
+        differences.append(
+            f"Different patient scopes: {a.patient_scope.value} vs {b.patient_scope.value}"
         )
 
     return (

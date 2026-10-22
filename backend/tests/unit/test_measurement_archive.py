@@ -164,7 +164,7 @@ def _build(rows: list[dict[str, Any]], destination: Path):
 def test_archive_round_trip_contains_all_stored_measurement_columns(tmp_path: Path) -> None:
     destination = tmp_path / "private-archive"
     rows = [
-        _measurement_row(1),
+        _measurement_row(1, patient_scope="NON_PRIORITY"),
         _measurement_row(
             2,
             patient_scope="FUTURE_SCOPE_LABEL",
@@ -191,6 +191,7 @@ def test_archive_round_trip_contains_all_stored_measurement_columns(tmp_path: Pa
         "isolation_level": "repeatable read",
         "read_only": True,
     }
+    assert archived_rows[0]["patient_scope"] == "NON_PRIORITY"
     assert archived_rows[1]["patient_scope"] == "FUTURE_SCOPE_LABEL"
     assert archived_rows[1]["raw_payload_snippet"] is None
     assert archived_rows[1]["total_treatment_spaces"] == 8
