@@ -15,7 +15,7 @@ from typing import Any, Literal
 from waittime.services import DatabaseService
 
 SAFE_DUPLICATE_ERROR_CODES = {"42710", "42P07", "42723"}
-# Exact deployed migration names retain the pre-ledger duplicate-adoption
+# Exact historical migration filenames retain the pre-ledger duplicate-adoption
 # behavior. New or otherwise unknown migrations must apply fully or fail.
 LEGACY_DUPLICATE_ADOPTION_MIGRATIONS = frozenset(
     {
