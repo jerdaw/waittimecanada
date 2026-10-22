@@ -14,6 +14,7 @@ from typing import Any
 import psycopg2
 import pytest
 
+from waittime.cli import measurement_archive as archive_cli
 from waittime.cli.measurement_archive import main as archive_cli_main
 from waittime.services.database import DatabaseService
 from waittime.services.measurement_archive import (
@@ -548,6 +549,233 @@ def test_offline_cli_labels_readback_not_actual_postgresql_restore(tmp_path: Pat
     assert output["check"] == "offline_readback"
     assert output["actual_postgresql_restore"] is False
     assert "123.5" not in json.dumps(output)
+
+
+def _export_cli_args(destination: Path) -> list[str]:
+    return [
+        "export",
+        "--destination",
+        str(destination),
+        "--policy-reference",
+        "synthetic-policy-01",
+        "--access-control-reference",
+        "synthetic-private-store-01",
+        "--expires-at-utc",
+        "2099-10-18T12:00:00Z",
+        "--confirm-export",
+    ]
+
+
+def test_export_cli_uses_existing_writer_and_emits_bounded_summary(
+    tmp_path: Path,
+    capsys,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    payload_marker = "synthetic-payload-must-not-reach-output"
+    connection = _SyntheticConnection(
+        [_measurement_row(1, raw_payload_snippet=payload_marker, value=9876.5)]
+    )
+    database = _SyntheticDatabase(connection)
+    monkeypatch.setattr(archive_cli, "DatabaseService", lambda: database)
+    destination = tmp_path / "cli-export"
+
+    assert archive_cli_main(_export_cli_args(destination)) == 0
+
+    captured = capsys.readouterr()
+    output = json.loads(captured.out)
+    assert captured.err == ""
+    assert output["status"] == "exported"
+    assert output["row_count"] == 1
+    assert output["offline_readback_verified"] is True
+    assert output["actual_postgresql_restore"] is False
+    assert len(captured.out) < 512
+    assert payload_marker not in captured.out
+    assert "9876.5" not in captured.out
+    assert "synthetic-policy-01" not in captured.out
+    assert "cli-export" not in captured.out
+    assert (destination / ARCHIVE_FILE).exists()
+    assert verify_measurement_archive(destination).row_count == 1
+    assert connection.commit_count == 1
+    assert connection.rollback_count == 0
+
+
+@pytest.mark.parametrize(
+    "missing_option",
+    [
+        "--destination",
+        "--policy-reference",
+        "--access-control-reference",
+        "--expires-at-utc",
+        "--confirm-export",
+    ],
+)
+def test_export_cli_missing_required_gate_never_constructs_database(
+    tmp_path: Path,
+    capsys,
+    monkeypatch: pytest.MonkeyPatch,
+    missing_option: str,
+) -> None:
+    args = _export_cli_args(tmp_path / "missing-gate")
+    if missing_option in {
+        "--destination",
+        "--policy-reference",
+        "--access-control-reference",
+        "--expires-at-utc",
+    }:
+        option_index = args.index(missing_option)
+        del args[option_index : option_index + 2]
+    else:
+        args.remove(missing_option)
+
+    def unexpected_database_construction():
+        pytest.fail("database service was constructed before CLI gates passed")
+
+    monkeypatch.setattr(archive_cli, "DatabaseService", unexpected_database_construction)
+    with pytest.raises(SystemExit) as exc_info:
+        archive_cli_main(args)
+
+    assert exc_info.value.code == 2
+    assert "synthetic-policy-01" not in capsys.readouterr().err
+    assert not (tmp_path / "missing-gate").exists()
+
+
+@pytest.mark.parametrize(
+    "updates",
+    [
+        {"policy-reference": ""},
+        {"access-control-reference": "   "},
+        {"expires-at-utc": "2099-10-18T12:00:00"},
+        {"expires-at-utc": "2000-10-18T12:00:00Z"},
+    ],
+)
+def test_export_cli_invalid_policy_inputs_fail_before_database_or_paths(
+    tmp_path: Path,
+    capsys,
+    monkeypatch: pytest.MonkeyPatch,
+    updates: dict[str, str],
+) -> None:
+    args = _export_cli_args(tmp_path / "invalid-policy")
+    for option, value in updates.items():
+        args[args.index(f"--{option}") + 1] = value
+
+    def unexpected_database_construction():
+        pytest.fail("database service was constructed before policy validation")
+
+    monkeypatch.setattr(archive_cli, "DatabaseService", unexpected_database_construction)
+    assert archive_cli_main(args) == 2
+
+    assert json.loads(capsys.readouterr().err) == {
+        "error": "invalid_export_options",
+        "status": "failed",
+    }
+    assert not (tmp_path / "invalid-policy").exists()
+
+
+@pytest.mark.parametrize("destination_kind", ["existing", "symlink"])
+def test_export_cli_rejects_existing_or_symlink_destination_without_overwrite(
+    tmp_path: Path,
+    capsys,
+    monkeypatch: pytest.MonkeyPatch,
+    destination_kind: str,
+) -> None:
+    existing = tmp_path / "existing-destination"
+    existing.mkdir()
+    marker = existing / "keep.txt"
+    marker.write_text("preserve", encoding="utf-8")
+    destination = existing
+    if destination_kind == "symlink":
+        destination = tmp_path / "destination-link"
+        destination.symlink_to(existing, target_is_directory=True)
+
+    def unexpected_database_construction():
+        pytest.fail("database service was constructed before destination validation")
+
+    monkeypatch.setattr(archive_cli, "DatabaseService", unexpected_database_construction)
+    args = _export_cli_args(destination)
+    assert archive_cli_main(args) == 2
+
+    assert json.loads(capsys.readouterr().err) == {
+        "error": "invalid_export_options",
+        "status": "failed",
+    }
+    assert marker.read_text(encoding="utf-8") == "preserve"
+
+
+def test_export_cli_allows_resolved_parent_symlink_without_replacing_target(
+    tmp_path: Path,
+    capsys,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    real_parent = tmp_path / "real-parent"
+    real_parent.mkdir()
+    linked_parent = tmp_path / "linked-parent"
+    linked_parent.symlink_to(real_parent, target_is_directory=True)
+    destination = linked_parent / "new-archive"
+    connection = _SyntheticConnection([_measurement_row(1)])
+    monkeypatch.setattr(archive_cli, "DatabaseService", lambda: _SyntheticDatabase(connection))
+
+    assert archive_cli_main(_export_cli_args(destination)) == 0
+
+    output = json.loads(capsys.readouterr().out)
+    assert output["status"] == "exported"
+    assert (real_parent / "new-archive" / ARCHIVE_FILE).exists()
+    assert destination.is_dir()
+
+
+def test_export_cli_redacts_unexpected_database_exception(
+    tmp_path: Path,
+    capsys,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database_error_text = "synthetic-database-error-marker-do-not-echo"
+    monkeypatch.setattr(archive_cli, "DatabaseService", lambda: object())
+
+    def fail_export(*_args: Any, **_kwargs: Any):
+        raise RuntimeError(database_error_text)
+
+    monkeypatch.setattr(archive_cli, "export_measurement_archive", fail_export)
+    assert archive_cli_main(_export_cli_args(tmp_path / "redacted-failure")) == 2
+
+    captured = capsys.readouterr()
+    assert json.loads(captured.err) == {"error": "export_failed", "status": "failed"}
+    assert database_error_text not in captured.err
+    assert not (tmp_path / "redacted-failure").exists()
+
+
+def test_export_cli_rejects_database_url_argument_without_echoing_it(
+    capsys,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    credential_text = "synthetic-credential-argument-marker-do-not-echo"
+
+    def unexpected_database_construction():
+        pytest.fail("unknown credential arguments must be rejected before database setup")
+
+    monkeypatch.setattr(archive_cli, "DatabaseService", unexpected_database_construction)
+    with pytest.raises(SystemExit) as exc_info:
+        archive_cli_main(["export", "--database-url", credential_text])
+
+    assert exc_info.value.code == 2
+    assert credential_text not in capsys.readouterr().err
+
+
+def test_offline_verify_command_remains_database_free(
+    tmp_path: Path,
+    capsys,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    destination = tmp_path / "offline-cli-archive"
+    _build([_measurement_row(1)], destination)
+
+    def unexpected_database_construction():
+        pytest.fail("offline verification must not construct a database service")
+
+    monkeypatch.setattr(archive_cli, "DatabaseService", unexpected_database_construction)
+    assert archive_cli_main(["verify", str(destination)]) == 0
+
+    output = json.loads(capsys.readouterr().out)
+    assert output["check"] == "integrity"
+    assert output["actual_postgresql_restore"] is False
 
 
 def test_database_export_rejects_unsafe_batch_limits(tmp_path: Path) -> None:

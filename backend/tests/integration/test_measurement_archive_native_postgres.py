@@ -16,6 +16,7 @@ import pytest
 from psycopg2 import sql
 from psycopg2.extensions import TRANSACTION_STATUS_IDLE
 
+from waittime.cli import measurement_archive as archive_cli
 from waittime.services.measurement_archive import (
     ARCHIVE_FILE,
     MEASUREMENT_QUERY,
@@ -185,9 +186,57 @@ def test_added_measurement_column_is_rejected_before_data_query(
     assert not destination.exists()
     assert service.rollback_performed
     assert service.transaction_status_after_rollback == TRANSACTION_STATUS_IDLE
+    assert service.connection_closed is True
     native_pg_cluster.record_assertion(
         "schema_drift_rejected_before_measurement_read",
         {"data_query_started": False, "partial_archive_published": False, "rollback": True},
+    )
+
+
+def test_export_cli_reads_only_synthetic_native_rows_and_closes_owned_connection(
+    native_pg_cluster: NativePostgresCluster,
+    native_pg_database: NativePostgresDatabase,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    database = native_pg_database
+    expected_ids = database.insert_synthetic_measurements(2)
+    service = database.archive_service()
+    monkeypatch.setattr(archive_cli, "DatabaseService", lambda: service)
+    destination = native_pg_cluster.archive_destination("cli-export")
+    expiry = (datetime.now(UTC) + timedelta(days=1)).isoformat().replace("+00:00", "Z")
+
+    result = archive_cli.main(
+        [
+            "export",
+            "--destination",
+            str(destination),
+            "--policy-reference",
+            "synthetic-native-test-policy",
+            "--access-control-reference",
+            "private-local-test-directory",
+            "--expires-at-utc",
+            expiry,
+            "--confirm-export",
+        ]
+    )
+
+    output = json.loads(capsys.readouterr().out)
+    assert result == 0
+    assert output["status"] == "exported"
+    assert output["row_count"] == len(expected_ids)
+    assert output["actual_postgresql_restore"] is False
+    assert "synthetic archive fixture row" not in json.dumps(output)
+    assert [row["id"] for row in _archive_rows(destination)] == expected_ids
+    assert service.last_session_settings == {"isolation_level": "REPEATABLE READ", "readonly": True}
+    assert service.connection_closed is True
+    native_pg_cluster.record_assertion(
+        "cli_export_synthetic_rows_only",
+        {
+            "row_count": output["row_count"],
+            "output_omitted_measurement_values": True,
+            "owned_connection_closed": service.connection_closed,
+        },
     )
 
 
@@ -236,6 +285,7 @@ def test_statement_cancellation_rolls_back_and_removes_partial_archive(
     assert service.last_error_type == "QueryCanceled"
     assert service.rollback_performed
     assert service.transaction_status_after_rollback == TRANSACTION_STATUS_IDLE
+    assert service.connection_closed is True
     assert not destination.exists()
     with database.admin_connection() as connection:
         with connection.cursor() as cursor:

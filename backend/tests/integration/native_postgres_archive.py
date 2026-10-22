@@ -922,6 +922,7 @@ class NativeArchiveDatabaseService:
         self.after_first_fetch = after_first_fetch
         self.executed_queries: list[str] = []
         self.last_session_settings: dict[str, Any] = {}
+        self.connection_closed = False
         self.rollback_performed = False
         self.transaction_status_after_rollback: int | None = None
         self.last_error_type: str | None = None
@@ -940,6 +941,7 @@ class NativeArchiveDatabaseService:
             raise
         finally:
             connection.close()
+            self.connection_closed = bool(connection.closed)
 
     def get_cursor(self, connection: Any) -> _CursorProxy:
         return connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
