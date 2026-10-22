@@ -6,14 +6,16 @@ long-range analytics efficient even when raw measurements are retained
 indefinitely for historical analysis.
 """
 
+import hashlib
+import json
 import logging
 import statistics
 from calendar import monthrange
 from collections import defaultdict
 from datetime import UTC, datetime, timedelta
-from typing import Any
+from typing import Any, Literal
 
-from waittime.core import MeasurementAggregate
+from waittime.core import AggregateGap, MeasurementAggregate
 from waittime.services.database import DatabaseService
 
 logger = logging.getLogger(__name__)
@@ -74,31 +76,99 @@ class AggregationService:
             period_end: End of the period (exclusive)
 
         Returns:
-            List of MeasurementAggregate (one per distinct methodology/ontology), empty if no measurements
+            One MeasurementAggregate per metric family, empty if no measurements.
+
+            Families with multiple source/method signatures are omitted and
+            reported because the aggregate table's unique key cannot represent
+            them separately.
         """
         rows = self.db.get_measurements_in_range(hospital_id, period_start, period_end)
+        aggregates, _gaps = self._compute_period_outcome(
+            hospital_id, period_type, period_start, period_end, rows
+        )
+        return aggregates
+
+    def _compute_period_outcome(
+        self,
+        hospital_id: str,
+        period_type: str,
+        period_start: datetime,
+        period_end: datetime,
+        rows: list[dict[str, Any]],
+    ) -> tuple[list[MeasurementAggregate], list[AggregateGap]]:
+        """Classify one raw snapshot into representable aggregates and explicit gaps."""
         if not rows:
-            return []
+            return [], []
 
-        # Group by ontology to prevent mixing metric families or events
-        by_ontology = defaultdict(list)
+        # The aggregate table permits one row per hospital, period, and metric
+        # family. Detect incompatible source/method signatures before computing
+        # so batch upserts cannot misattribute provenance or collide silently.
+        by_family: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for row in rows:
-            key = (
-                row["metric_family"],
-                row["start_event"],
-                row["end_event"],
-                row["statistic_type"],
-            )
-            by_ontology[key].append(row)
+            by_family[row["metric_family"]].append(row)
 
-        aggregates = []
-        for _, ontology_rows in by_ontology.items():
-            values = [row["value"] for row in ontology_rows]
+        aggregates: list[MeasurementAggregate] = []
+        gaps: list[AggregateGap] = []
+        for metric_family, family_rows in by_family.items():
+            signatures = {
+                (
+                    row["source_id"],
+                    row["start_event"],
+                    row["end_event"],
+                    row["statistic_type"],
+                    row.get("patient_scope"),
+                )
+                for row in family_rows
+            }
+            if len(signatures) > 1:
+                gaps.append(
+                    self._make_gap(
+                        metric_family,
+                        "ambiguous_methodology",
+                        signatures,
+                    )
+                )
+                logger.error(
+                    "Skipping ambiguous aggregate family; raw measurements are untouched "
+                    "(hospital_id=%s, period_type=%s, period_start=%s, metric_family=%s, "
+                    "source_method_signature_count=%s)",
+                    hospital_id,
+                    period_type,
+                    period_start.isoformat(),
+                    metric_family,
+                    len(signatures),
+                )
+                continue
+
+            # The aggregate schema has no patient_scope column, so only ALL
+            # observations can be represented without losing methodology.
+            patient_scope = family_rows[0].get("patient_scope")
+            if patient_scope != "ALL":
+                gaps.append(
+                    self._make_gap(
+                        metric_family,
+                        "unsupported_patient_scope",
+                        signatures,
+                    )
+                )
+                logger.error(
+                    "Skipping aggregate family with unsupported patient scope; raw measurements "
+                    "are untouched (hospital_id=%s, period_type=%s, period_start=%s, "
+                    "metric_family=%s, patient_scope=%s)",
+                    hospital_id,
+                    period_type,
+                    period_start.isoformat(),
+                    metric_family,
+                    patient_scope,
+                )
+                continue
+
+            values = [row["value"] for row in family_rows]
             stats = self._compute_statistics(values)
             if stats is None:
                 continue
 
-            first = ontology_rows[0]
+            first = family_rows[0]
             aggregates.append(
                 MeasurementAggregate(
                     hospital_id=hospital_id,
@@ -120,7 +190,26 @@ class AggregationService:
                 )
             )
 
-        return aggregates
+        return aggregates, gaps
+
+    @staticmethod
+    def _make_gap(
+        metric_family: str,
+        reason: Literal["ambiguous_methodology", "unsupported_patient_scope"],
+        signatures: set[tuple[Any, ...]],
+    ) -> AggregateGap:
+        """Create a stable digest of the incompatible tags."""
+        signature_json = sorted(
+            json.dumps(signature, ensure_ascii=True, separators=(",", ":"))
+            for signature in signatures
+        )
+        fingerprint = hashlib.sha256("\n".join(signature_json).encode("utf-8")).hexdigest()
+        return AggregateGap(
+            metric_family=str(metric_family),
+            reason=reason,
+            fingerprint=fingerprint,
+            signature_count=len(signatures),
+        )
 
     def aggregate_hourly(
         self, hospital_id: str, hour_start: datetime
@@ -151,9 +240,11 @@ class AggregationService:
         return self.aggregate_period(hospital_id, "monthly", month_start, month_end)
 
     def save_aggregate(self, aggregate: MeasurementAggregate) -> bool:
-        """Save an aggregate to the database.
+        """Create an unverified aggregate through the legacy create-only path.
 
-        Uses INSERT ... ON CONFLICT DO NOTHING to skip already-computed periods.
+        No raw snapshot accompanies this precomputed value, so it is not
+        eligible for the verified aggregate read view. Existing rows and
+        families with an open gap are left untouched.
 
         Returns:
             True if inserted, False if already existed
@@ -161,11 +252,16 @@ class AggregationService:
         return self.db.insert_aggregate(aggregate)
 
     def save_aggregates(self, aggregates: list[MeasurementAggregate]) -> int:
-        """Save multiple aggregates to the database in one batch."""
+        """Create unverified precomputed rows, excluding open-gap families."""
         return self.db.insert_aggregates(aggregates)
 
     def refresh_aggregates(self, aggregates: list[MeasurementAggregate]) -> int:
-        """Insert or refresh current-period aggregates in one batch."""
+        """Reject precomputed refreshes that lack a classified raw snapshot.
+
+        Use ``backfill(force=True)`` or ``refresh_recent_periods`` to refresh
+        through the bucket lock and gap-aware transaction. Force does not
+        promote legacy-unverified rows or resolve open gaps.
+        """
         return self.db.upsert_aggregates(aggregates)
 
     def backfill(
@@ -185,7 +281,9 @@ class AggregationService:
             end_date: End of backfill range (defaults to now)
             period_types: Which periods to compute (default: all four)
             dry_run: If True, count what would be computed without saving
-            force: If True, bypass existing checks and recompute all periods in range
+            force: If True, revisit existing periods; open gaps remain protected,
+                and legacy-unverified rows cannot be promoted from an incomplete
+                current raw snapshot.
 
         Returns:
             Dict with counts per period type, e.g. {'hourly': 48, 'daily': 2, ...}
@@ -224,30 +322,53 @@ class AggregationService:
         force: bool,
     ) -> int:
         """Backfill a single period type for a single hospital. Returns count of new aggregates."""
-        existing = set()
+        existing: set[datetime] = set()
+        open_gaps: set[datetime] = set()
         if not force:
             existing = self.db.get_existing_aggregate_periods(
+                hospital_id, period_type, start_date, end_date
+            )
+            open_gaps = self.db.get_aggregate_periods_with_open_gaps(
                 hospital_id, period_type, start_date, end_date
             )
 
         periods = self._generate_periods(period_type, start_date, end_date)
         computed = 0
-        pending_aggregates: list[MeasurementAggregate] = []
 
         for period_start, period_end in periods:
-            if period_start in existing:
+            if period_start in existing and period_start not in open_gaps and not force:
                 continue
 
-            aggs = self.aggregate_period(hospital_id, period_type, period_start, period_end)
-            if not aggs:
+            if dry_run:
+                aggregates = self.aggregate_period(
+                    hospital_id, period_type, period_start, period_end
+                )
+                computed += len(aggregates)
                 continue
 
-            computed += len(aggs)
-            if not dry_run:
-                pending_aggregates.extend(aggs)
+            def compute_bucket(
+                rows: list[dict[str, Any]],
+                bucket_hospital_id: str = hospital_id,
+                bucket_period_type: str = period_type,
+                bucket_period_start: datetime = period_start,
+                bucket_period_end: datetime = period_end,
+            ) -> tuple[list[MeasurementAggregate], list[AggregateGap]]:
+                return self._compute_period_outcome(
+                    bucket_hospital_id,
+                    bucket_period_type,
+                    bucket_period_start,
+                    bucket_period_end,
+                    rows,
+                )
 
-        if not dry_run and pending_aggregates:
-            return self.save_aggregates(pending_aggregates)
+            computed += self.db.refresh_aggregate_bucket(
+                hospital_id,
+                period_type,
+                period_start,
+                period_end,
+                compute_bucket,
+                refresh_all=force,
+            )
 
         return computed
 
@@ -348,21 +469,37 @@ class AggregationService:
                     self._period_start_for_timestamp(period_type, timestamp)
                     for timestamp in timestamps
                 }
-                pending_aggregates: list[MeasurementAggregate] = []
                 for period_start in sorted(period_starts):
                     period_end = self._period_end_for_start(period_type, period_start)
-                    pending_aggregates.extend(
-                        self.aggregate_period(h_id, period_type, period_start, period_end)
-                    )
+                    if dry_run:
+                        counts[period_type] += len(
+                            self.aggregate_period(h_id, period_type, period_start, period_end)
+                        )
+                    else:
 
-                if not pending_aggregates:
-                    continue
+                        def compute_bucket(
+                            rows: list[dict[str, Any]],
+                            bucket_hospital_id: str = h_id,
+                            bucket_period_type: str = period_type,
+                            bucket_period_start: datetime = period_start,
+                            bucket_period_end: datetime = period_end,
+                        ) -> tuple[list[MeasurementAggregate], list[AggregateGap]]:
+                            return self._compute_period_outcome(
+                                bucket_hospital_id,
+                                bucket_period_type,
+                                bucket_period_start,
+                                bucket_period_end,
+                                rows,
+                            )
 
-                counts[period_type] += (
-                    len(pending_aggregates)
-                    if dry_run
-                    else self.refresh_aggregates(pending_aggregates)
-                )
+                        counts[period_type] += self.db.refresh_aggregate_bucket(
+                            h_id,
+                            period_type,
+                            period_start,
+                            period_end,
+                            compute_bucket,
+                            refresh_all=True,
+                        )
 
         logger.info(
             "Recent aggregate refresh complete: %s (dry_run=%s, since=%s)",

@@ -4,6 +4,7 @@ These models enforce the metric ontology at the application layer,
 complementing the database-level constraints.
 """
 
+from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from typing import ClassVar, Literal, Self
 
@@ -309,6 +310,16 @@ class MeasurementAggregate(BaseModel):
         if self.period_end <= self.period_start:
             raise ValueError("period_end must be after period_start")
         return self
+
+
+@dataclass(frozen=True)
+class AggregateGap:
+    """A bucket/family that cannot be represented by one aggregate row safely."""
+
+    metric_family: str
+    reason: Literal["ambiguous_methodology", "unsupported_patient_scope"]
+    fingerprint: str
+    signature_count: int
 
 
 class ScraperStatus(BaseModel):

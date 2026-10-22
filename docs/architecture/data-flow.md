@@ -48,20 +48,25 @@ Raw measurements are retained for historical analysis. The aggregation pipeline 
 
 ```mermaid
 graph TD
-    DB[(PostgreSQL<br/>measurements)] -->|Select| Batch[Raw Data Batch<br/>(full retained history)]
+    DB[(PostgreSQL<br/>measurements)] -->|Read bucket snapshot| Batch[Raw Data Batch]
 
     subgraph Aggregation Service
         Batch -->|Group By| Group[Hospital + Methodology]
         Group -->|Calculate| Stats[Min/Max/Mean/P90]
-        Stats -->|Snapshot| Method[Methodology Snapshot]
+        Stats -->|Classify| Classified{Coherent and nonempty?}
+        Classified -->|Yes| Method[Verified Methodology Snapshot]
+        Classified -->|Conflict or unsupported scope| Gap[Open bucket/family gap]
     end
 
-    Method -->|Upsert| AggDB[(PostgreSQL<br/>measurement_aggregates)]
+    Method -->|Bucket lock + atomic write| AggDB[(PostgreSQL<br/>measurement_aggregates)]
+    Gap -->|Preserve evidence| GapDB[(PostgreSQL<br/>measurement_aggregate_gaps)]
+    AggDB -->|Verified and no open gap| Usable[measurement_aggregates_usable]
 ```
 
 ### Key Principles
 
 - **Methodology Preservation**: If a hospital changes its reporting methodology (e.g., from "Triage" to "Registration"), the aggregate record preserves the methodology _as it was effectively used_ during that time period.
+- **Legacy Summaries**: Pre-migration and direct precomputed rows remain `legacy_unverified` and are hidden from the usable view. Empty gap state or a forced rescan cannot reconstruct expired provenance. Open gaps require a future explicit, provenance-backed correction path; unaffected siblings and clean new buckets still refresh.
 
 ## 3. Comparability Logic (Read Path)
 

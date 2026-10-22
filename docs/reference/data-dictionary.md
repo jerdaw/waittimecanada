@@ -176,6 +176,8 @@ Permanent statistical summaries (hourly/daily/weekly/monthly).
 | `mean_value` | DOUBLE | Average wait time for this period. |
 | `p90_value` | DOUBLE | 90th percentile wait time (if sufficient samples). |
 | `metric_family` | TEXT | **Denormalized** ontology snapshot. |
+| `verification_state` | TEXT | `legacy_unverified` for pre-migration or direct-write rows; `verified` only after an atomic nonempty raw-snapshot classification. The usable view exposes only `verified` rows. |
+| `verified_at` | TIMESTAMPTZ | When the gap-aware bucket refresh verified this summary; `NULL` for legacy-unverified rows. |
 
 ### `regions`
 Province region metadata for analytics segmentation.

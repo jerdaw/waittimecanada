@@ -187,7 +187,7 @@ async function queryAggregateRows(
       ma.min_value,
       ma.max_value,
       ma.sample_count
-    FROM measurement_aggregates ma
+    FROM measurement_aggregates_usable ma
     JOIN hospitals h ON h.id = ma.hospital_id
     WHERE h.province = ${province}
       AND h.is_visible = true
@@ -330,7 +330,7 @@ async function queryMethodologyContext(
       ma.end_event,
       ma.statistic_type,
       COUNT(DISTINCT ma.hospital_id) as hospital_count
-    FROM measurement_aggregates ma
+    FROM measurement_aggregates_usable ma
     JOIN hospitals h ON h.id = ma.hospital_id
     WHERE h.province = ${province}
       AND h.is_visible = true

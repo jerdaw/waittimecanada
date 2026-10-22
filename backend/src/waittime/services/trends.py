@@ -220,7 +220,7 @@ class SystemTrendService:
                 ma.start_event,
                 ma.end_event,
                 ma.statistic_type
-            FROM measurement_aggregates ma
+            FROM measurement_aggregates_usable ma
             JOIN hospitals h ON h.id = ma.hospital_id
             WHERE h.province = %s
               AND h.is_visible = TRUE

@@ -11,6 +11,7 @@ from waittime.core.enums import (
     StatisticType,
 )
 from waittime.core.models import (
+    AggregateGap,
     Hospital,
     Measurement,
     MeasurementAggregate,
@@ -34,6 +35,7 @@ __all__ = [
     "StatisticType",
     "PatientScope",
     # Models
+    "AggregateGap",
     "Measurement",
     "MeasurementAggregate",
     "Hospital",

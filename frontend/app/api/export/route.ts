@@ -381,7 +381,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (granularity !== "raw") {
-      // Serve aggregated data from measurement_aggregates table
+      // Serve only gap-free aggregate rows from the usable aggregate view
       const results = await sql`
         SELECT
           ma.period_start,
@@ -405,7 +405,7 @@ export async function GET(request: NextRequest) {
           ma.statistic_type,
           ma.source_id,
           s.methodology_url
-        FROM measurement_aggregates ma
+        FROM measurement_aggregates_usable ma
         JOIN hospitals h ON ma.hospital_id = h.id
         JOIN sources s ON ma.source_id = s.id
         WHERE h.is_verified = true

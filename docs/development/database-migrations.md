@@ -4,7 +4,7 @@ This document explains how to create, apply, and roll back database migrations f
 
 > [!NOTE]
 > The canonical migration history and schema reference lives in
-> See `backend/migrations/README.md`.
+> `backend/migrations/README.md`.
 > This guide covers the **process** — when and how to create migrations.
 
 ---
@@ -29,7 +29,7 @@ Create a migration whenever you need to:
 
 ```bash
 ls backend/migrations/*.sql | tail -1
-# e.g. backend/migrations/021_add_alert_notification_state.sql -> next is 022
+# e.g. backend/migrations/024_add_aggregate_verification_state.sql -> next is 025
 ```
 
 The repository also enforces this with:
@@ -42,7 +42,7 @@ uv run python scripts/check_migration_sequence.py
 ### 2. Create the migration file
 
 ```bash
-touch backend/migrations/022_your_descriptive_name.sql
+touch backend/migrations/025_your_descriptive_name.sql
 ```
 
 ### 3. Write the migration
@@ -50,7 +50,7 @@ touch backend/migrations/022_your_descriptive_name.sql
 Use idempotent SQL so migrations are safe to re-run:
 
 ```sql
--- 022_your_descriptive_name.sql
+-- 025_your_descriptive_name.sql
 -- Purpose: Brief description
 -- Depends on: 012_optimize_indexes.sql
 

@@ -32,6 +32,8 @@ From `002_create_tables.sql`:
 ## Analytics and quality extensions
 
 - `measurement_aggregates` (`006_create_measurement_aggregates.sql`)
+- `measurement_aggregate_gaps` and the gap-filtered `measurement_aggregates_usable` view (`023_add_measurement_aggregate_gaps.sql`)
+- Aggregate verification state for legacy-compatible usable reads (`024_add_aggregate_verification_state.sql`)
 - `data_quality_snapshots` (`007_create_data_quality_snapshots.sql`)
 - anomaly flags on `measurements` (`008_add_anomaly_columns.sql`)
 - `methodology_change_events` (`009_create_methodology_change_events.sql`)
@@ -110,6 +112,7 @@ uv run python -m waittime.cli.bootstrap_analytics --days 180
 
 - Map and list views pull latest measurement per hospital.
 - Trends and benchmarks prefer aggregate tables (`measurement_aggregates`) for daily/weekly/monthly views.
+- Result-producing aggregate readers use `measurement_aggregates_usable`, which requires a verified summary and no open bucket/family gap. Pre-migration summaries are marked `legacy_unverified`, remain physically preserved, and stay hidden; an empty gap table does not assert they were checked. Only a nonempty raw snapshot classified in the atomic bucket refresh can verify a new summary. Force backfill cannot promote legacy rows or recover expired provenance. Automatic gap resolution is not supported: row deletion, expiry, or a newly homogeneous snapshot is not evidence of a reviewed methodology correction. Open gaps and stored summaries remain unchanged pending a future explicit provenance-backed correction path; unaffected siblings and clean new buckets continue to refresh.
 - Intra-day patterns and bounded hourly exports derive from raw `measurements` for fidelity.
 - Data quality and anomalies rely on quality snapshot + anomaly flags.
 - Region analytics depend on `regions` + `hospital_regions` mapping coverage.
