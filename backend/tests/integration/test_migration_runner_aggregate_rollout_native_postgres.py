@@ -168,3 +168,62 @@ def test_runner_rolls_back_all_of_023_then_hides_preserved_legacy_rows(
                 ]
     finally:
         database.drop()
+
+
+def test_runner_rejects_023_after_partial_duplicate_collision_without_adoption(
+    native_pg_cluster: NativePostgresCluster,
+) -> None:
+    """A partial collision cannot count as completion of migration 023."""
+    database = native_pg_cluster.create_database()
+    try:
+        service = _runner_database_service(database)
+        setup_paths = [MIGRATIONS_DIR / name for name in SETUP_MIGRATION_NAMES]
+        setup_results = run_migrations.run_migrations(service, setup_paths)
+        assert [result.status for result in setup_results] == ["applied", "applied"]
+
+        # The name collision triggers PostgreSQL 42P07 at the first statement
+        # in 023, before its verification columns and usable view are created.
+        with database.admin_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute("CREATE TABLE measurement_aggregate_gaps (collision_id INTEGER)")
+
+        with pytest.raises(psycopg2.errors.DuplicateTable):
+            run_migrations.run_migrations(service, [MIGRATIONS_DIR / CONSOLIDATED_MIGRATION_NAME])
+
+        with database.admin_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT filename FROM schema_migrations ORDER BY filename",
+                )
+                assert cursor.fetchall() == [(name,) for name in SETUP_MIGRATION_NAMES]
+                cursor.execute(
+                    "SELECT checksum_sha256 FROM schema_migrations WHERE filename = %s",
+                    (CONSOLIDATED_MIGRATION_NAME,),
+                )
+                assert cursor.fetchone() is None
+                cursor.execute(
+                    """
+                    SELECT to_regclass('public.measurement_aggregates_usable'),
+                           EXISTS (
+                               SELECT 1 FROM information_schema.columns
+                               WHERE table_schema = 'public'
+                                 AND table_name = 'measurement_aggregates'
+                                 AND column_name = 'verification_state'
+                           )
+                    """
+                )
+                # The conflict leaves 023 wholly unapplied and preserves only
+                # the pre-existing placeholder object.
+                assert cursor.fetchone() == (None, False)
+                cursor.execute(
+                    """
+                    SELECT column_name
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public'
+                      AND table_name = 'measurement_aggregate_gaps'
+                    ORDER BY ordinal_position
+                    """
+                )
+                assert cursor.fetchall() == [("collision_id",)]
+    finally:
+        database.drop()

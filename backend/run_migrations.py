@@ -15,6 +15,34 @@ from typing import Any, Literal
 from waittime.services import DatabaseService
 
 SAFE_DUPLICATE_ERROR_CODES = {"42710", "42P07", "42723"}
+# Exact deployed migration names retain the pre-ledger duplicate-adoption
+# behavior. New or otherwise unknown migrations must apply fully or fail.
+LEGACY_DUPLICATE_ADOPTION_MIGRATIONS = frozenset(
+    {
+        "001_create_enums.sql",
+        "002_create_tables.sql",
+        "004_seed_sources.sql",
+        "005_create_functions.sql",
+        "006_create_measurement_aggregates.sql",
+        "007_create_data_quality_snapshots.sql",
+        "008_add_anomaly_columns.sql",
+        "009_create_methodology_change_events.sql",
+        "010_create_regions_tables.sql",
+        "011_add_occupancy_columns.sql",
+        "012_optimize_indexes.sql",
+        "013_add_scraper_observability_columns.sql",
+        "014_relax_value_constraint.sql",
+        "015_add_metric_family_to_aggregates.sql",
+        "016_add_measurement_retention_efficiency_guards.sql",
+        "017_add_scraper_alert_state.sql",
+        "018_create_public_health_hub_tables.sql",
+        "019_add_public_health_source_alert_state.sql",
+        "020_add_public_health_system_metrics.sql",
+        "020_sync_active_source_definitions.sql",
+        "021_add_alert_notification_state.sql",
+        "022_update_ontario_health_source_url.sql",
+    }
+)
 MIGRATIONS_DIR = Path(__file__).parent / "migrations"
 
 MigrationStatus = Literal["applied", "skipped", "adopted"]
@@ -55,6 +83,16 @@ def is_safe_duplicate_error(exc: Exception) -> bool:
         return True
     message = str(exc).lower()
     return "already exists" in message or "duplicate object" in message
+
+
+def allows_legacy_duplicate_adoption(filename: str) -> bool:
+    """Return whether a historical migration may be adopted after a duplicate.
+
+    Only known historical filenames retain the runner's legacy behavior.
+    New or renamed migrations must apply fully; an object collision is not
+    proof of migration completion.
+    """
+    return filename in LEGACY_DUPLICATE_ADOPTION_MIGRATIONS
 
 
 def ensure_schema_migrations(conn: Any) -> None:
@@ -146,7 +184,7 @@ def apply_migration_file(conn: Any, migration_file: Path) -> MigrationResult:
             cur.execute(sql_text)
         except Exception as exc:
             cur.close()
-            if not is_safe_duplicate_error(exc):
+            if not is_safe_duplicate_error(exc) or not allows_legacy_duplicate_adoption(filename):
                 raise
             adopt_legacy_migration(conn, filename, checksum)
             return MigrationResult(

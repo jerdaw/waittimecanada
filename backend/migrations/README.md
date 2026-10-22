@@ -37,11 +37,13 @@ All migrations completed successfully!
 
 ### Idempotency
 
-Migrations use `DO $$ ... EXCEPTION WHEN duplicate_object THEN NULL; END $$;`
-blocks or similar patterns to support legacy re-runs. The migration runner also
-maintains a `schema_migrations` checksum ledger. Already-recorded migrations are
-skipped when the checksum matches, and changed migration files are rejected so
-applied history is not edited in place.
+Some historical migrations use `DO $$ ... EXCEPTION WHEN duplicate_object THEN
+NULL; END $$;` blocks to support legacy re-runs. The migration runner maintains
+a `schema_migrations` checksum ledger. Already-recorded migrations are skipped
+when the checksum matches, and changed migration files are rejected so applied
+history is not edited in place. Duplicate-error adoption is limited to the
+explicit allowlist of existing pre-023 migration filenames; new migrations
+must complete fully and cannot be adopted based on an object-name collision.
 
 ---
 
@@ -84,8 +86,11 @@ Migrations run in **lexicographic order** (alphabetical). The numeric prefix ens
 - Skips files already recorded with a matching checksum
 - Rejects files whose recorded checksum no longer matches the on-disk SQL
 - Executes unrecorded files and records their checksum after success
-- Stops on first error (unless safe duplicate)
-- Safe duplicate errors (already exists): records the file as a legacy adoption
+- Stops on first error, except for safe duplicate errors in explicitly
+  allowlisted historical migration files
+- Safe duplicate errors in those historical files are recorded as legacy
+  adoptions; migration 023 and later, as well as unknown filenames, fail rather
+  than claiming completion when an object already exists
 - Other errors: fails and stops execution
 
 **Safe Duplicate Error Codes:**
