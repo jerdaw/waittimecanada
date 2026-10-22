@@ -20,7 +20,7 @@ uv run python run_migrations.py
 **Output:**
 
 ```
-Found 24 migration files:
+Found 23 migration files:
 
 Running: 001_create_enums.sql
   ✓ Success
@@ -29,7 +29,7 @@ Running: 002_create_tables.sql
   ✓ Success
 
 ...
-Running: 024_add_aggregate_verification_state.sql
+Running: 023_add_measurement_aggregate_gaps.sql
   ✓ Success
 
 All migrations completed successfully!
@@ -53,13 +53,13 @@ applied history is not edited in place.
 NNN_descriptive_name.sql
 ```
 
-- `NNN`: Zero-padded sequential number (001, 002, ..., 024)
+- `NNN`: Zero-padded sequential number (001, 002, ..., 023)
 - `descriptive_name`: Action and target (e.g., `create_enums`, `add_occupancy_columns`)
 - **Always use `.sql` extension** (`.sql.skip` files are intentionally excluded)
 
 The historical duplicate `020_` prefix is preserved because those files may
 already be applied in deployed databases. Do not create new duplicate prefixes.
-The next migration number is `025`.
+The next migration number is `024`.
 
 Run the guard before adding or renaming migrations:
 
@@ -79,7 +79,7 @@ Migrations run in **lexicographic order** (alphabetical). The numeric prefix ens
 **Behavior:**
 
 - Reads all `*.sql` files from `backend/migrations/`
-- Sorts alphabetically (001 → 024)
+- Sorts alphabetically (001 → 023)
 - Creates and uses the `schema_migrations` checksum ledger
 - Skips files already recorded with a matching checksum
 - Rejects files whose recorded checksum no longer matches the on-disk SQL
@@ -603,7 +603,7 @@ WHERE id = 'ontario-health';
 
 ---
 
-### Aggregate Gap Containment (023)
+### Aggregate Gap Containment and Verification (023)
 
 #### 023_add_measurement_aggregate_gaps.sql
 
@@ -615,49 +615,37 @@ a usable analytic result.
 
 - `measurement_aggregate_gaps`: open/resolved gap state keyed to the aggregate
   uniqueness key, including a stable signature fingerprint and timestamps.
-- `measurement_aggregates_usable`: read view excluding only rows whose exact
-  hospital/period/family key has an open gap.
+- `measurement_aggregates.verification_state` and `verified_at`, including
+  constraints that keep the verification state/time pairing consistent.
+- `measurement_aggregates_usable`: read view exposing only verified rows whose
+  exact hospital/period/family key has no open gap.
 
 **Behavior:** An open gap hides, but does not delete, its stored aggregate.
 Automatic resolution is not supported: empty raw windows, fewer conflicting
 rows, or a newly homogeneous snapshot do not prove a reviewed methodology
 correction. Refreshes preserve the open gap and its original fingerprint and
 stored aggregate; unaffected families and buckets without open gaps continue
-to refresh normally. Migration 024 adds a legacy-verification gate to the
-usable view so pre-existing rows are not treated as verified merely because
-this gap table starts empty.
+to refresh normally. Existing summaries default to `legacy_unverified` and
+stay physically preserved but hidden; an empty gap table does not establish
+that historical rows were verified. Only a nonempty raw snapshot classified
+inside `refresh_aggregate_bucket` may create a `verified` summary. Legacy rows
+are not automatically promoted or overwritten by forced backfill or create-only
+writes. The gap table, verification columns, constraints, and final usable view
+are installed by this single transactional migration, so a failure leaves none
+of those objects partially committed.
 
-**Rollback:** Drop the view, then the gap-state table. This removes gap history;
-it does not modify rows in `measurement_aggregates`.
+**Rollout:** The `ALTER TABLE` obtains an `ACCESS EXCLUSIVE` lock on
+`measurement_aggregates` and holds it until the migration transaction commits.
+Use a bounded maintenance rollout and coordinate scheduled workers separately:
+the single transaction prevents a committed partial schema, but does not
+prevent an independently started worker from running against the old schema
+before the migration succeeds.
 
-### Aggregate Verification State (024)
-
-#### 024_add_aggregate_verification_state.sql
-
-**Purpose:** Prevent pre-migration summaries from being presented as verified
-when their raw provenance may already have expired or be incomplete.
-
-**Schema Changes:**
-
-- Adds `verification_state` and `verified_at` to `measurement_aggregates`.
-- Existing summaries default to `legacy_unverified`; their values remain
-  physically preserved.
-- `measurement_aggregates_usable` now requires `verification_state = 'verified'`
-  and no open gap for that exact hospital/period/family key.
-
-**Behavior:** Only a nonempty raw snapshot classified inside
-`refresh_aggregate_bucket` may verify a newly created aggregate. Existing
-`legacy_unverified` summaries are never automatically promoted or overwritten,
-even by `backfill(force=True)`: current rows cannot prove historical
-completeness, and an empty window cannot recover expired provenance. Legacy
-create-only writes remain `legacy_unverified`; precomputed batch upserts are
-disabled. Explicit review may be added as a separate provenance-backed path in
-the future.
-
-**Rollback:** Drop `measurement_aggregates_usable`, drop the verification
-constraint and columns, then recreate the 023 gap-only view. This makes all
-legacy summaries visible again without verification; review that data-integrity
-impact before any rollback. The commented SQL uses this dependency-safe order.
+**Rollback:** Drop `measurement_aggregates_usable`, drop the gap-state table,
+then drop both verification constraints and the two verification columns. This
+removes gap history and verification state, but leaves stored aggregate rows and
+their values intact; after rollback, direct readers can see those legacy rows
+again.
 
 ---
 
@@ -667,14 +655,14 @@ impact before any rollback. The commented SQL uses this dependency-safe order.
 
 ```bash
 ls backend/migrations/*.sql | tail -1
-# Output: backend/migrations/024_add_aggregate_verification_state.sql
-# Next: 025
+# Output: backend/migrations/023_add_measurement_aggregate_gaps.sql
+# Next: 024
 ```
 
 ### Step 2: Create Migration File
 
 ```bash
-touch backend/migrations/025_your_descriptive_name.sql
+touch backend/migrations/024_your_descriptive_name.sql
 ```
 
 ### Step 3: Write Migration
@@ -682,7 +670,7 @@ touch backend/migrations/025_your_descriptive_name.sql
 **Template:**
 
 ```sql
--- 025_your_descriptive_name.sql
+-- 024_your_descriptive_name.sql
 -- Brief description of what this migration does
 -- Depends on: NNN_previous_migration.sql (if applicable)
 
@@ -1122,7 +1110,7 @@ For migration questions or issues:
 
 ---
 
-**Last Updated:** 2026-10-18
-**Total Migrations:** 24
+**Last Updated:** 2026-10-22
+**Total Migrations:** 23
 **Database Engine:** PostgreSQL 17
-**Schema Version:** 024 (Aggregate verification and legacy compatibility)
+**Schema Version:** 023 (Aggregate gap containment and verification)

@@ -30,7 +30,6 @@ def native_aggregate_database(native_pg_cluster: NativePostgresCluster):
                     "006_create_measurement_aggregates.sql",
                     "015_add_metric_family_to_aggregates.sql",
                     "023_add_measurement_aggregate_gaps.sql",
-                    "024_add_aggregate_verification_state.sql",
                 ):
                     cursor.execute((migration_directory / filename).read_text(encoding="utf-8"))
         yield database

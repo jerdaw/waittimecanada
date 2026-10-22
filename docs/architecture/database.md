@@ -32,8 +32,7 @@ From `002_create_tables.sql`:
 ## Analytics and quality extensions
 
 - `measurement_aggregates` (`006_create_measurement_aggregates.sql`)
-- `measurement_aggregate_gaps` and the gap-filtered `measurement_aggregates_usable` view (`023_add_measurement_aggregate_gaps.sql`)
-- Aggregate verification state for legacy-compatible usable reads (`024_add_aggregate_verification_state.sql`)
+- `measurement_aggregate_gaps`, aggregate verification state, and the verified/no-open-gap `measurement_aggregates_usable` view, installed atomically (`023_add_measurement_aggregate_gaps.sql`)
 - `data_quality_snapshots` (`007_create_data_quality_snapshots.sql`)
 - anomaly flags on `measurements` (`008_add_anomaly_columns.sql`)
 - `methodology_change_events` (`009_create_methodology_change_events.sql`)
