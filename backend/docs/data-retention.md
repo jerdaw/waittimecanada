@@ -111,6 +111,70 @@ or that a restore is possible. Keep those claims tied to separate provider and
 isolated-restore evidence. This command does not add a production queue route or
 change cleanup, retention, schedule, or backup behavior.
 
+### Private Measurement Archive Utility (Not Operational)
+
+The backend contains an opt-in private archive writer and an offline verifier
+for exact stored `measurements` rows. The writer is not exposed through a CLI,
+workflow, scheduler, cleanup path, public exporter, route, or production job;
+it runs only when explicitly called by separately authorized local code. It
+uses a read-only repeatable-read PostgreSQL transaction and streams the full
+stored row identity and provenance fields without joins or scientific
+normalization. The representation preserves unknown stored labels and nullable
+values; it does not claim that archived observations are scientifically
+equivalent or comparable. Before reading rows, the writer compares the live
+`measurements` table's column names, types, modifiers, and nullability with the
+versioned projection, independent of physical column order, and fails closed on
+schema drift. The explicit select list controls archive order. The resulting
+artifact covers the measurement table only; it is not a full database backup
+of hospitals, sources, or schema.
+The writer passes a libpq connection timeout capped at 10 seconds, bounds each
+control and fetch statement by the remaining 600-second transaction deadline
+(with a maximum 120-second statement timeout), and aborts if the deadline is
+exceeded. Client/server scheduling may still cause a small cancellation
+overrun; libpq may apply its connection timeout separately to each host in a
+multi-host connection string.
+
+The archive directory and files are created with owner-only permissions. Its
+canonical JSONL artifact and manifest are checksummed and the manifest is
+published last, so incomplete output is rejected. Checksums detect accidental
+changes and truncation but are not a digital signature or an authenticated
+source/approval record. The manifest requires policy, access-control, and
+expiry references, but those values are recorded only: this utility does not
+verify approval, authorize access, or enforce expiry. An archive contains
+complete historical measurement rows, including payload snippets, and must be
+handled as sensitive data.
+
+The offline `verify` and `restore-check` CLI commands inspect only local files.
+They confirm archive checksums, schema, row ordering, and exact parse/serialize
+read-back; `restore-check` is explicitly **not** a PostgreSQL restore. A
+separate isolated PostgreSQL 17.11 run passed the native archive tests using
+synthetic records only, including repeatable-read behavior during concurrent
+insert/update, schema-drift rejection, statement-cancellation cleanup, and an
+exact restore into a separate test database. This does not validate provider
+backups/PITR or any restore of real Wait Time Canada data. No archive or purge
+receipt is created by the inventory command. Before any archive of real rows
+is allowed, the owner must approve its purpose, authorized operators,
+access-controlled storage location, and expiry/deletion process; real-data
+backup and restore readiness remain separate gates. The 30-day raw-measurement
+retention policy and production cleanup behavior remain unchanged.
+
+To repeat the synthetic test from `backend/`, use a sanitized environment and
+an explicit PostgreSQL 17 binary directory; no database URL or environment
+database settings are accepted. The current native fixture creates temporary
+cluster state under canonical `/private/tmp`, which must be writable on the
+host:
+
+```sh
+env -i PATH=/usr/bin:/bin LC_ALL=C LANG=C TZ=UTC PYTHONPATH=src:tests/integration \
+  /absolute/path/to/python -m pytest -q \
+  tests/integration/test_measurement_archive_native_postgres.py \
+  --run-native-archive-pg \
+  --native-pg-bin-dir=/absolute/path/to/postgresql-17/bin
+```
+
+The database-backed cases in this test module remain skipped unless both
+explicit options are supplied; its pure enum regression runs without them.
+
 The existing database-cleanup.yml workflow is not an inventory route. It
 requires an explicit `confirm_delete` input (default false) and skips the job
 unless that confirmation is true; when run, it executes cleanup before

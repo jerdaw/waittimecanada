@@ -130,6 +130,7 @@ addopts = [
 markers = [
     "unit: Fast tests with no I/O",
     "integration: Tests with database or HTTP",
+    "native_postgres: Explicitly enabled isolated native PostgreSQL archive validation",
     "e2e: End-to-end workflow tests",
     "slow: Tests that take longer to run",
 ]
