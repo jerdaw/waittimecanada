@@ -92,6 +92,197 @@ def _ledger(path: Path) -> dict[str, object]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _credential_directory(
+    tmp_path: Path,
+    content: bytes = b"managed-test-token\n",
+    *,
+    mode: int = 0o400,
+) -> Path:
+    directory = tmp_path / "credentials"
+    directory.mkdir(mode=0o700, parents=True)
+    directory.chmod(0o700)
+    credential = directory / "github_token"
+    credential.write_bytes(content)
+    credential.chmod(mode)
+    return directory
+
+
+@pytest.mark.unit
+def test_systemd_token_reader_accepts_private_text_credential(tmp_path: Path) -> None:
+    dispatcher = _load_dispatcher()
+    directory = _credential_directory(tmp_path)
+
+    assert dispatcher._read_systemd_token(str(directory)) == ("managed-test-token", None)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "content",
+    [
+        b"",
+        b"token\nsecond-line\n",
+        b"token with space\n",
+        b"bad\x00token\n",
+        b"\xff\n",
+        b"x" * 4097,
+    ],
+    ids=["empty", "multiple_lines", "whitespace", "nul", "non_ascii", "oversized"],
+)
+def test_systemd_token_reader_rejects_empty_malformed_or_oversized_content(
+    tmp_path: Path, content: bytes
+) -> None:
+    dispatcher = _load_dispatcher()
+    directory = _credential_directory(tmp_path, content)
+
+    assert dispatcher._read_systemd_token(str(directory)) == (None, "token_invalid")
+
+
+@pytest.mark.unit
+def test_systemd_token_reader_rejects_unsafe_mode_missing_and_nonregular_files(
+    tmp_path: Path,
+) -> None:
+    dispatcher = _load_dispatcher()
+    unsafe_mode = _credential_directory(tmp_path / "unsafe", mode=0o600)
+    missing = tmp_path / "missing"
+    missing.mkdir()
+    nonregular = tmp_path / "nonregular"
+    nonregular.mkdir()
+    (nonregular / "github_token").mkdir()
+
+    assert dispatcher._read_systemd_token(str(unsafe_mode)) == (None, "token_invalid")
+    assert dispatcher._read_systemd_token(str(missing)) == (None, "token_unavailable")
+    assert dispatcher._read_systemd_token(str(nonregular)) == (None, "token_invalid")
+
+
+@pytest.mark.unit
+def test_systemd_token_reader_rejects_symlinked_directory_and_file(tmp_path: Path) -> None:
+    dispatcher = _load_dispatcher()
+    real_directory = _credential_directory(tmp_path)
+    linked_directory = tmp_path / "linked-directory"
+    linked_directory.symlink_to(real_directory, target_is_directory=True)
+
+    file_directory = tmp_path / "linked-file"
+    file_directory.mkdir()
+    target = tmp_path / "elsewhere"
+    target.write_bytes(b"managed-test-token\n")
+    target.chmod(0o400)
+    (file_directory / "github_token").symlink_to(target)
+
+    assert dispatcher._read_systemd_token(str(linked_directory)) == (None, "token_invalid")
+    assert dispatcher._read_systemd_token(str(file_directory)) == (None, "token_invalid")
+
+
+@pytest.mark.unit
+def test_token_loader_preserves_valid_environment_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    dispatcher = _load_dispatcher()
+    monkeypatch.setenv("GITHUB_TOKEN", "existing-env-token")
+    monkeypatch.delenv("CREDENTIALS_DIRECTORY", raising=False)
+
+    assert dispatcher._load_execution_token() == ("existing-env-token", None)
+
+
+@pytest.mark.unit
+def test_token_loader_rejects_ambiguous_sources(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    dispatcher = _load_dispatcher()
+    directory = _credential_directory(tmp_path)
+    monkeypatch.setenv("GITHUB_TOKEN", "env-token")
+    monkeypatch.setenv("CREDENTIALS_DIRECTORY", str(directory))
+
+    assert dispatcher._load_execution_token() == (None, "token_source_ambiguous")
+
+
+@pytest.mark.unit
+def test_cli_reads_credential_only_after_execute_gate_and_current_slot(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    dispatcher = _load_dispatcher()
+
+    class FrozenDateTime:
+        minute = 40
+
+        @classmethod
+        def now(cls, tz: object = None) -> datetime:
+            return _now(cls.minute)
+
+    def unexpected_token_read() -> tuple[str | None, str | None]:
+        raise AssertionError("token source read before all gates")
+
+    monkeypatch.setattr(dispatcher, "datetime", FrozenDateTime)
+    monkeypatch.setattr(dispatcher, "_load_execution_token", unexpected_token_read)
+    monkeypatch.delenv("CREDENTIALS_DIRECTORY", raising=False)
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+    monkeypatch.setenv("WTC_GITHUB_DISPATCH_ENABLED", "0")
+    assert dispatcher.main(["--execute"]) == dispatcher.EXIT_BLOCKED
+    assert '"reason": "execution_disabled"' in capsys.readouterr().out
+
+    monkeypatch.setenv("WTC_GITHUB_DISPATCH_ENABLED", "1")
+    FrozenDateTime.minute = 38
+    assert dispatcher.main(["--execute"]) == dispatcher.EXIT_BLOCKED
+    assert '"reason": "outside_eligibility_window"' in capsys.readouterr().out
+
+
+@pytest.mark.unit
+def test_cli_passes_managed_credential_to_dispatch_without_emitting_it(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    dispatcher = _load_dispatcher()
+    directory = _credential_directory(tmp_path)
+    captured: dict[str, object] = {}
+
+    class FrozenDateTime:
+        @staticmethod
+        def now(tz: object = None) -> datetime:
+            return _now()
+
+    def fake_dispatch_once(**kwargs: object):
+        captured.update(kwargs)
+        return dispatcher.Result("blocked", "synthetic_test", "2026-10-18T13:29:00Z")
+
+    monkeypatch.setattr(dispatcher, "datetime", FrozenDateTime)
+    monkeypatch.setattr(dispatcher, "dispatch_once", fake_dispatch_once)
+    monkeypatch.setenv("WTC_GITHUB_DISPATCH_ENABLED", "1")
+    monkeypatch.setenv("CREDENTIALS_DIRECTORY", str(directory))
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+
+    assert dispatcher.main(["--execute"]) == dispatcher.EXIT_BLOCKED
+    output = capsys.readouterr().out
+    assert captured["token"] == (directory / "github_token").read_text().strip()
+    assert "managed-test-token" not in output
+    assert str(directory) not in output
+
+
+@pytest.mark.unit
+def test_cli_sanitizes_invalid_credential_failure(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    dispatcher = _load_dispatcher()
+    directory = _credential_directory(tmp_path, b"invalid token\n")
+
+    class FrozenDateTime:
+        @staticmethod
+        def now(tz: object = None) -> datetime:
+            return _now()
+
+    monkeypatch.setattr(dispatcher, "datetime", FrozenDateTime)
+    monkeypatch.setenv("WTC_GITHUB_DISPATCH_ENABLED", "1")
+    monkeypatch.setenv("CREDENTIALS_DIRECTORY", str(directory))
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+
+    assert dispatcher.main(["--execute"]) == dispatcher.EXIT_BLOCKED
+    output = capsys.readouterr().out
+    assert '"reason": "token_invalid"' in output
+    assert str(directory) not in output
+    assert "invalid token" not in output
+
+
 def _slot_entry(path: Path) -> dict[str, object]:
     ledger = _ledger(path)
     slots = ledger["slots"]
@@ -419,12 +610,16 @@ def test_cli_defaults_to_dry_run_without_reading_token_or_dispatching(
 ) -> None:
     dispatcher = _load_dispatcher()
 
+    def unexpected_token_read() -> tuple[str | None, str | None]:
+        raise AssertionError("default dry run must not read a token source")
+
     class FrozenDateTime:
         @staticmethod
         def now(tz: object = None) -> datetime:
             return _now()
 
     monkeypatch.setattr(dispatcher, "datetime", FrozenDateTime)
+    monkeypatch.setattr(dispatcher, "_load_execution_token", unexpected_token_read)
     monkeypatch.setenv("WTC_GITHUB_DISPATCH_ENABLED", "1")
     monkeypatch.setenv("GITHUB_TOKEN", "must-not-be-used")
     monkeypatch.setattr(
