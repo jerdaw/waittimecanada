@@ -1,0 +1,11 @@
+# Copy/adapt example only. This service is dry-run-only and does not need a token.
+
+[Unit]
+Description=Wait Time Canada guarded GitHub collector dispatch dry run
+
+[Service]
+Type=oneshot
+User=waittimecanada
+StateDirectory=waittimecanada-dispatcher
+Environment=WTC_GITHUB_DISPATCH_ENABLED=0
+ExecStart=/usr/bin/python3 /opt/waittimecanada/backend/scripts/waittime_github_dispatcher.py --dry-run

@@ -1,0 +1,13 @@
+# Copy/adapt example only. Replace WorkingDirectory and ExecStart paths in
+# private operations before enabling this service.
+
+[Unit]
+Description=Wait Time Canada freshness-only scraper
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/waittimecanada
+EnvironmentFile=/etc/waittime/freshness.env
+ExecStart=/usr/bin/python3 /opt/waittimecanada/scripts/waittime-freshness-runner.py scrape

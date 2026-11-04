@@ -1,0 +1,242 @@
+openapi: 3.0.3
+info:
+  title: Wait Time Canada API
+  description: |
+    Clinically defensible Health Systems Observatory for Canadian emergency department wait-time methodology and data quality.
+
+    ## Conventions
+    - All endpoints return JSON.
+    - Most endpoints return `{ "success": true, "data": ... }` on success.
+    - Errors return `{ "success": false, "error": "Type", "message": "Details" }`.
+  version: 1.0.0
+  contact:
+    name: Jeremy Dawson
+    url: https://github.com/jerdaw/waittimecanada
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://wait-time.ca/api
+    description: Production API (when deployed)
+  - url: http://localhost:3000/api
+    description: Local Development
+
+paths:
+  /hospitals:
+    get:
+      summary: List hospitals
+      description: Retrieve verified and visible hospitals, optionally filtered by province and paginated.
+      parameters:
+        - name: province
+          in: query
+          description: Two-letter province code (e.g., ON, QC, AB, BC).
+          schema:
+            type: string
+            enum: [ON, QC, AB, BC]
+        - name: page
+          in: query
+          description: Optional page number. Pagination is applied only when page or limit is supplied.
+          schema:
+            type: integer
+            minimum: 1
+        - name: limit
+          in: query
+          description: Optional page size for opt-in pagination.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HospitalListResponse'
+
+  /hospitals/{slug}/trends:
+    get:
+      summary: Get hospital trends
+      description: Retrieve historical trend data for a specific hospital.
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: query
+          description: Time period for trends.
+          schema:
+            type: string
+            enum: [24h, 7d, 30d, 90d, 6m, 1y]
+            default: 7d
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object # Define specific schema if available
+
+  /compare:
+    get:
+      summary: Compare hospitals
+      description: Compare two hospitals and check for methodology divergence.
+      parameters:
+        - name: a
+          in: query
+          required: true
+          description: First hospital ID/slug
+          schema:
+            type: string
+        - name: b
+          in: query
+          required: true
+          description: Second hospital ID/slug
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Comparison result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComparisonResponse'
+
+  /analytics/benchmarks:
+    get:
+      summary: Get benchmarks
+      parameters:
+        - name: province
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [24h, 7d, 30d]
+        - name: hospital_id
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Benchmark data
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /analytics/occupancy:
+    get:
+      summary: Get occupancy data (Quebec)
+      parameters:
+        - name: province
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [QC]
+      responses:
+        '200':
+          description: Occupancy data with availability status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [available, no_reporting_data, not_available_yet]
+                  data:
+                    type: object
+
+  /data-quality:
+    get:
+      summary: Get data quality metrics
+      parameters:
+        - name: hospital_id
+          in: query
+          schema:
+            type: string
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 30
+      responses:
+        '200':
+          description: Quality metrics
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /health:
+    get:
+      summary: System health check
+      responses:
+        '200':
+          description: System status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+components:
+  schemas:
+    HospitalListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hospital'
+
+    Hospital:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        province:
+          type: string
+        city:
+          type: string
+        # Add other hospital fields as needed
+
+    ComparisonResponse:
+      type: object
+      properties:
+        comparable:
+          type: boolean
+        divergence_brief:
+          type: string
+          nullable: true
+        hospital_a:
+          $ref: '#/components/schemas/HospitalMethodology'
+        hospital_b:
+          $ref: '#/components/schemas/HospitalMethodology'
+
+    HospitalMethodology:
+      type: object
+      properties:
+        metric_family:
+          type: string
+        start_event:
+          type: string
+        end_event:
+          type: string
+        statistic_type:
+          type: string
