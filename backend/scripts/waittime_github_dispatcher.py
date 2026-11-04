@@ -27,6 +27,8 @@ API_ROOT = "https://api.github.com"
 API_VERSION = "2026-03-10"
 USER_AGENT = "waittimecanada-collector-dispatcher/1.0"
 DEFAULT_STATE_FILE = Path("/var/lib/waittimecanada-dispatcher/dispatch-ledger.json")
+TOKEN_CREDENTIAL_NAME = "github_token"  # noqa: S105 - fixed credential ID, not a secret
+MAX_TOKEN_BYTES = 4096
 HTTP_TIMEOUT_SECONDS = 20
 PER_PAGE = 100
 MAX_RUNS = 1000
@@ -92,6 +94,97 @@ def _slot_for(now: datetime) -> datetime | None:
 
 def _slot_text(slot: datetime) -> str:
     return slot.astimezone(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def _validated_token(raw: bytes, *, allow_trailing_newline: bool) -> str | None:
+    if len(raw) > MAX_TOKEN_BYTES:
+        return None
+    if allow_trailing_newline:
+        if raw.endswith(b"\r\n"):
+            raw = raw[:-2]
+        elif raw.endswith(b"\n"):
+            raw = raw[:-1]
+    if not raw or any(byte < 33 or byte > 126 for byte in raw):
+        return None
+    return raw.decode("ascii")
+
+
+def _read_systemd_token(credentials_directory: str) -> tuple[str | None, str | None]:
+    """Read one systemd credential without exposing OS details."""
+    directory = Path(credentials_directory)
+    no_follow = getattr(os, "O_NOFOLLOW", None)
+    directory_flag = getattr(os, "O_DIRECTORY", None)
+    if (
+        not credentials_directory
+        or not directory.is_absolute()
+        or no_follow is None
+        or directory_flag is None
+    ):
+        return None, "token_invalid"
+
+    directory_fd: int | None = None
+    token_fd: int | None = None
+    try:
+        directory_fd = os.open(directory, os.O_RDONLY | directory_flag | no_follow)
+        directory_stat = os.fstat(directory_fd)
+        if not stat.S_ISDIR(directory_stat.st_mode):
+            return None, "token_invalid"
+
+        token_fd = os.open(
+            TOKEN_CREDENTIAL_NAME,
+            os.O_RDONLY | no_follow | getattr(os, "O_NONBLOCK", 0),
+            dir_fd=directory_fd,
+        )
+        token_stat = os.fstat(token_fd)
+        token_mode = stat.S_IMODE(token_stat.st_mode)
+        if (
+            not stat.S_ISREG(token_stat.st_mode)
+            or token_mode != 0o400
+            or token_stat.st_size <= 0
+            or token_stat.st_size > MAX_TOKEN_BYTES
+        ):
+            return None, "token_invalid"
+
+        chunks: list[bytes] = []
+        remaining = MAX_TOKEN_BYTES + 1
+        while remaining:
+            chunk = os.read(token_fd, remaining)
+            if not chunk:
+                break
+            chunks.append(chunk)
+            remaining -= len(chunk)
+        content = b"".join(chunks)
+        token = _validated_token(content, allow_trailing_newline=True)
+        return (token, None) if token is not None else (None, "token_invalid")
+    except FileNotFoundError:
+        return None, "token_unavailable"
+    except (OSError, RuntimeError, ValueError):
+        return None, "token_invalid"
+    finally:
+        if token_fd is not None:
+            with contextlib.suppress(OSError):
+                os.close(token_fd)
+        if directory_fd is not None:
+            with contextlib.suppress(OSError):
+                os.close(directory_fd)
+
+
+def _load_execution_token() -> tuple[str | None, str | None]:
+    """Load exactly one token source after the execution gate has opened."""
+    environment_token_present = "GITHUB_TOKEN" in os.environ
+    credentials_directory_present = "CREDENTIALS_DIRECTORY" in os.environ
+    if environment_token_present and credentials_directory_present:
+        return None, "token_source_ambiguous"
+    if credentials_directory_present:
+        return _read_systemd_token(os.environ["CREDENTIALS_DIRECTORY"])
+    if environment_token_present:
+        token = os.environ["GITHUB_TOKEN"]
+        if not token.isascii() or any(not 33 <= ord(character) <= 126 for character in token):
+            return None, "token_invalid"
+        if not token or len(token) > MAX_TOKEN_BYTES:
+            return None, "token_invalid"
+        return token, None
+    return None, "token_unavailable"
 
 
 def _json_request(
@@ -481,18 +574,28 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--dry-run", action="store_true", help="report eligibility without I/O")
     args = parser.parse_args(argv)
     execute = bool(args.execute)
+    now = datetime.now(UTC)
     enabled = False
     token: str | None = None
+    token_error: str | None = None
     if execute:
         enabled = os.environ.get("WTC_GITHUB_DISPATCH_ENABLED") == "1"
-        if enabled:
-            token = os.environ.get("GITHUB_TOKEN")
-    result = dispatch_once(
-        now=datetime.now(UTC),
-        execute=execute,
-        enabled=enabled,
-        token=token,
-    )
+        if enabled and _slot_for(now) is not None:
+            token, token_error = _load_execution_token()
+    if token_error is not None:
+        slot = _slot_for(now)
+        result = Result(
+            "blocked",
+            token_error,
+            _slot_text(slot) if slot is not None else None,
+        )
+    else:
+        result = dispatch_once(
+            now=now,
+            execute=execute,
+            enabled=enabled,
+            token=token,
+        )
     _emit(result)
     if result.status in {"dry_run", "accepted"}:
         return EXIT_OK

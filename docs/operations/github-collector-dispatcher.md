@@ -20,11 +20,20 @@ unavailable check prevents a request.
 
 The default invocation is a dry run and performs no API or state-file I/O. An
 actual request requires both the explicit `--execute` flag and
-`WTC_GITHUB_DISPATCH_ENABLED=1`, plus a `GITHUB_TOKEN` available to the
-process. The token is sent only to the fixed GitHub API host, and neither the
-token nor raw API responses are printed or saved. The request targets `main`,
-sets `refresh_analytics` to `false`, and asks GitHub to return the created run
-ID.
+`WTC_GITHUB_DISPATCH_ENABLED=1`, plus exactly one token source: the existing
+`GITHUB_TOKEN` environment variable or a managed credential-file source. The
+helper reads the token only after the execute flag, enablement gate, and current
+slot are all eligible. If both sources are set, dispatch is blocked.
+
+The file-backed source requires a regular, non-symlink file with mode `0400`,
+at most 4096 bytes total, and printable ASCII token content with at most one
+trailing line ending. Invalid or unavailable credentials produce a fixed safe
+reason; paths, token values, and raw operating-system errors are not printed.
+Credential provisioning and runtime integration are outside this public
+repository; the example service remains dry-run-only. The token is sent only to
+the fixed GitHub API host, and neither the token nor raw API responses are
+printed or saved. The request targets `main`, sets `refresh_analytics` to
+`false`, and asks GitHub to return the created run ID.
 
 The dispatcher uses a host-local nonblocking lock and an atomic, fsynced ledger
 at `/var/lib/waittimecanada-dispatcher/dispatch-ledger.json`. It records a
