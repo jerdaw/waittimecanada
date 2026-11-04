@@ -120,7 +120,7 @@ export async function GET(request: Request) {
             SELECT
               ma.hospital_id,
               AVG(ma.mean_value)::float AS period_mean
-            FROM measurement_aggregates ma
+            FROM measurement_aggregates_usable ma
             JOIN hospitals h ON h.id = ma.hospital_id
             WHERE h.province = ${province}
               AND h.is_visible = true

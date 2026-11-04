@@ -492,7 +492,7 @@
   "AboutSection": {
     "badge": "Mission et Intendance",
     "title": "Pourquoi Wait Time Canada existe",
-    "p1": "Les provinces canadiennes publient l'information sur les urgences en utilisant des <strong>définitions, des points de départ et des statistiques différents</strong>. Le flux public actuel de l'Ontario rapporte le temps moyen du triage au médecin, tandis que le Québec rapporte la moyenne mobile de l'inscription au médecin. Ces chiffres répondent à des questions opérationnelles différentes et ne devraient pas être traités comme interchangeables.",
+    "p1": "Les provinces canadiennes publient des renseignements sur les urgences avec des <strong>définitions différentes et parfois incomplètes</strong>. Le flux public actuel de l'Ontario rapporte un temps moyen du triage au médecin. La page publique du Québec indique un temps d'attente estimé pour les cas non prioritaires jusqu'à la consultation d'un médecin, sans préciser les événements de départ et d'arrivée ni la formule. Les définitions disponibles ne permettent pas de traiter ces valeurs comme interchangeables.",
     "p2": "<strong>Wait Time Canada est un observatoire d'intérêt public des systèmes de santé.</strong> Au lieu de prétendre que les données sont directement comparables, le projet les audite. Chaque mesure est marquée avec sa méthodologie, les comparaisons invalides sont signalées et la provenance des sources officielles demeure visible.",
     "p3": "L'objectif est de réduire les barrières à l'information sur le système de santé avec une perspective d'équité en santé, d'EDIA et d'intendance : des définitions plus claires, des réserves plus claires et une interprétation plus responsable pour les patients, les cliniciens, les chercheurs, les journalistes et les décideurs.",
     "contact": "Liens du projet et contact",
@@ -515,9 +515,9 @@
   "StructuredData": {
     "faq": {
       "q1": "Comment Wait Time Canada mesure-t-il les temps d'attente aux urgences ?",
-      "a1": "Nous agrégeons les données des autorités sanitaires provinciales et conservons la méthodologie associée à chaque source. Le flux public actuel de l'Ontario rapporte le temps moyen du triage au médecin, tandis que le Québec rapporte le temps d'attente moyen mobile de l'inscription au médecin.",
+      "a1": "Nous agrégeons les données des autorités sanitaires provinciales et conservons les balises méthodologiques enregistrées. Le flux public actuel de l'Ontario rapporte le temps moyen du triage au médecin. La page publique du Québec indique un temps d'attente estimé pour les cas non prioritaires jusqu'à la consultation d'un médecin, sans préciser les événements de mesure ni la formule.",
       "q2": "Pourquoi ne puis-je pas comparer directement les temps d'attente de l'Ontario et du Québec ?",
-      "a2": "L'Ontario rapporte les temps moyens du triage au médecin, tandis que le Québec rapporte la moyenne mobile de l'inscription au médecin. Ces méthodologies différentes rendent la comparaison directe statistiquement invalide.",
+      "a2": "L'Ontario rapporte le temps moyen du triage au médecin. La page publique du Québec indique un temps d'attente estimé pour les cas non prioritaires, sans préciser les événements de mesure ni la formule. Examinez les définitions et limites des sources avant de tirer une conclusion interprovinciale.",
       "q3": "À quel point ces données sont-elles à jour ?",
       "a3": "Nous vérifions chaque heure les quatre sources provinciales. Le rythme de publication varie selon la province et les tâches planifiées peuvent être retardées ou omises : il s’agit d’une cadence de vérification, et non d’une garantie que chaque valeur est nouvelle ou date de moins d’une heure."
     },
@@ -608,7 +608,7 @@
       },
       "q6": {
         "question": "Can I compare hospitals across provinces?",
-        "answer": "Seulement si elles utilisent la même méthodologie de mesure. L'Ontario rapporte le temps moyen triage-médecin, tandis que le Québec rapporte la moyenne mobile inscription-fournisseur. Notre plateforme signale quand une comparaison directe est statistiquement invalide et affiche un avertissement de divergence méthodologique."
+        "answer": "La concordance des balises ontologiques enregistrées n'est qu'un critère de présélection et ne prouve pas l'équivalence méthodologique. L'Ontario rapporte le temps moyen du triage au médecin; la page publique du Québec indique un temps estimé pour les cas non prioritaires, sans préciser les événements de mesure ni la formule. Examinez les définitions des sources avant toute comparaison."
       },
       "q7": {
         "question": "What do the methodology badges on hospital cards mean?",
@@ -743,7 +743,7 @@
     "sections": {
       "comparabilityMatrix": {
         "title": "Matrice de Comparabilité Provinciale",
-        "description": "Cette matrice montre quelles provinces peuvent être directement comparées. Cliquez sur n'importe quelle cellule pour voir les différences méthodologiques détaillées."
+        "description": "Cette matrice examine les balises ontologiques enregistrées, champ par champ. Des balises identiques sont nécessaires, mais ne prouvent pas que les méthodes sources sont identiques; consultez les définitions et limites des sources avant de tirer des conclusions."
       },
       "provincialMethodologies": {
         "title": "Méthodologies Provinciales",
@@ -772,8 +772,8 @@
     "ComparabilityMatrix": {
       "noData": "Aucune source de données configurée pour le moment.",
       "levels": {
-        "comparable": "Directement comparable",
-        "partial": "Partiellement comparable",
+        "comparable": "Toutes les dimensions enregistrées concordent",
+        "partial": "Certaines dimensions enregistrées concordent",
         "notComparable": "Non comparable"
       },
       "verdicts": {
@@ -781,42 +781,44 @@
         "mismatch": "Diffère"
       },
       "legend": {
-        "comparable": "Directement comparable",
-        "partial": "Partiellement comparable (2-3 correspondances)",
-        "notComparable": "Non comparable (0-1 correspondance)"
+        "comparable": "Les cinq dimensions enregistrées concordent; les définitions des sources doivent encore être examinées",
+        "partial": "Certaines dimensions enregistrées concordent, mais pas toutes",
+        "notComparable": "Peu de dimensions enregistrées concordent"
       },
       "export": "Exporter CSV",
       "comparing": "Comparaison de {p1} avec {p2}",
-      "detailsIntro": "Verdict ontologique champ par champ pour cette paire de provinces.",
+      "detailsIntro": "Vérification champ par champ des balises ontologiques enregistrées; il ne s'agit pas d'une validation indépendante des sources.",
       "summary": {
-        "matchCount": "Alignement ontologique",
-        "matchCountValue": "{count} dimensions sur {total} correspondent",
+        "matchCount": "Alignement des balises enregistrées",
+        "matchCountValue": "{count} dimensions enregistrées sur {total} concordent",
         "implication": "Implication clinique"
       },
       "metrics": {
         "family": "Famille de Métriques",
         "start": "Événement de Début",
         "end": "Événement de Fin",
-        "stat": "Type de Statistique"
+        "stat": "Type de Statistique",
+        "patientScope": "Population de patients"
       },
       "implications": {
-        "comparable": "Ces sources concordent sur les quatre dimensions de l'ontologie; une comparaison directe interprovinciale est donc méthodologiquement valide.",
-        "partial": "Ces sources partagent certaines dimensions de l'ontologie, mais les divergences restantes rendent une comparaison directe imprudente sans mise en contexte.",
-        "notComparable": "Ces sources divergent sur la plupart des dimensions ontologiques essentielles. Les classer ou les traiter comme équivalentes serait trompeur."
+        "comparable": "Les cinq dimensions ontologiques enregistrées concordent. Il s'agit uniquement d'un critère de présélection; examinez les définitions et les limites des sources avant de considérer les mesures comme scientifiquement comparables.",
+        "partial": "Certaines dimensions ontologiques enregistrées concordent, mais les divergences enregistrées empêchent une comparaison directe sans examen supplémentaire des sources.",
+        "notComparable": "Peu de dimensions ontologiques enregistrées concordent. Rien ne permet de traiter ces mesures comme équivalentes."
       },
       "explanations": {
-        "comparable": "✓ Ces provinces utilisent des méthodologies identiques et peuvent être directement comparées.",
-        "partial": "⚠ Ces provinces diffèrent sur certaines dimensions. Les comparaisons doivent noter ces différences.",
-        "notComparable": "✗ Ces provinces utilisent des méthodologies fondamentalement différentes. La comparaison directe est statistiquement invalide."
+        "comparable": "✓ Les cinq balises enregistrées concordent. Les définitions et limites des sources doivent tout de même être examinées; l'accord des balises ne prouve pas l'équivalence méthodologique.",
+        "partial": "⚠ Certaines balises enregistrées diffèrent. Examinez les définitions des sources avant d'interpréter les valeurs ensemble.",
+        "notComparable": "✗ Peu de balises enregistrées concordent. Les dossiers actuels ne permettent pas de traiter ces mesures comme équivalentes."
       },
       "pairwise": {
         "title": "Verdicts par paire",
-        "description": "Chaque paire de provinces est détaillée champ par champ afin de montrer exactement quelles dimensions de l'ontologie concordent et lesquelles invalident une comparaison directe."
+        "description": "Chaque paire de provinces est détaillée selon les balises enregistrées. Les dimensions concordantes ne sont qu'un résultat de présélection et ne prouvent pas l'équivalence des méthodes sources."
       }
     },
     "ProvinceMethodologyCard": {
       "viewOfficial": "Voir la Méthodologie Officielle",
       "notAvailable": "Documentation méthodologique officielle non disponible",
+      "patientScopeUnknown": "Inconnue (non représentée dans les métadonnées de source)",
       "metricFamily": {
         "TIME_TO_PROVIDER": "Temps jusqu'au premier contact avec un médecin ou un fournisseur de soins",
         "TOTAL_LOS": "Durée complète du séjour aux urgences",
@@ -849,7 +851,7 @@
       "items": {
         "q1": {
           "question": "Pourquoi ne puis-je pas comparer Ottawa et Gatineau directement ?",
-          "answer": "Ottawa (Ontario) et Gatineau (Québec) utilisent des méthodologies de mesure différentes. L'Ontario rapporte le temps moyen triage-médecin, tandis que le Québec rapporte la moyenne mobile inscription-fournisseur. Ces différences signifient qu'une comparaison directe serait statistiquement invalide. Notre plateforme affiche un avertissement de divergence méthodologique lorsque vous tentez de telles comparaisons."
+          "answer": "L'Ontario rapporte le temps moyen du triage au médecin. La page publique du Québec indique un temps d'attente estimé pour les cas non prioritaires jusqu'à la consultation d'un médecin, sans préciser les événements de mesure ni la formule. La concordance des balises enregistrées ne valide pas les sources; examinez leurs définitions et limites avant de tirer une conclusion sur Ottawa et Gatineau."
         },
         "q2": {
           "question": "Que signifie « 90e centile » en pratique ?",
@@ -901,8 +903,8 @@
       "error": "Erreur lors du chargement des changements méthodologiques : {message}"
     },
     "OntologyExplainer": {
-      "title": "Les Quatre Dimensions de la Mesure du Temps d'Attente",
-      "subtitle": "Pour que deux mesures soient comparables, les quatre dimensions doivent correspondre. Comprendre ces dimensions est crucial pour interpréter les temps d'attente publiés.",
+      "title": "Les Cinq Dimensions de la Mesure du Temps d'Attente",
+      "subtitle": "La concordance des cinq dimensions enregistrées est uniquement un critère nécessaire de présélection. Examinez les définitions et limites des sources avant de comparer les temps d'attente publiés.",
       "dimensions": {
         "metricFamily": {
           "title": "Famille de Métriques",
@@ -981,6 +983,21 @@
             "pointEstimate": {
               "label": "Estimation Temps Réel",
               "explanation": "Instantané actuel basé sur les conditions actuelles et la file d'attente"
+            }
+          }
+        },
+        "patientScope": {
+          "title": "Population de patients",
+          "subtitle": "Quels patients sont inclus ?",
+          "description": "La population incluse dans une mesure publiée. La portée est une dimension nécessaire à l'examen, mais les définitions et exclusions propres à chaque source doivent aussi être vérifiées. Si les métadonnées disponibles ne précisent pas la population, traitez-la comme inconnue plutôt que de supposer qu'elle inclut tous les patients.",
+          "examples": {
+            "all": {
+              "label": "Tous les patients",
+              "explanation": "Inclut l'ensemble de la population définie par la source."
+            },
+            "nonPriority": {
+              "label": "Patients non prioritaires",
+              "explanation": "Limité au groupe non prioritaire défini par la source; ne l'assimilez pas à une mesure couvrant tous les patients."
             }
           }
         }

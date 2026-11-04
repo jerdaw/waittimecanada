@@ -165,7 +165,7 @@ export async function GET(request: Request) {
             SELECT
               ma.hospital_id,
               AVG(ma.mean_value)::float AS period_mean
-            FROM measurement_aggregates ma
+            FROM measurement_aggregates_usable ma
             WHERE ma.period_type = 'daily'
               AND ma.period_start >= ${currentStart.toISOString()}::timestamptz
               AND ma.period_start < ${now.toISOString()}::timestamptz
@@ -175,7 +175,7 @@ export async function GET(request: Request) {
             SELECT
               ma.hospital_id,
               AVG(ma.mean_value)::float AS period_mean
-            FROM measurement_aggregates ma
+            FROM measurement_aggregates_usable ma
             WHERE ma.period_type = 'daily'
               AND ma.period_start >= ${previousStart.toISOString()}::timestamptz
               AND ma.period_start < ${currentStart.toISOString()}::timestamptz

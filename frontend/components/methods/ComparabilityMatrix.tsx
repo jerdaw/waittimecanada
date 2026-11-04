@@ -287,7 +287,7 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
               label={t("summary.matchCount")}
               value={t("summary.matchCountValue", {
                 count: selectedMatchCount,
-                total: 4,
+                total: selectedDimensions.length,
               })}
             />
             <SummaryCard
@@ -317,6 +317,11 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
             <ComparisonRow
               label={t("metrics.stat")}
               dimension={selectedDimensions[3]}
+              t={t}
+            />
+            <ComparisonRow
+              label={t("metrics.patientScope")}
+              dimension={selectedDimensions[4]}
               t={t}
             />
           </div>
@@ -355,7 +360,7 @@ export function ComparabilityMatrix({ sources }: ComparabilityMatrixProps) {
                   <p className="text-sm text-muted-foreground">
                     {t("summary.matchCountValue", {
                       count: getComparabilityMatchCount(left, right),
-                      total: 4,
+                      total: getComparabilityDimensions(left, right).length,
                     })}
                   </p>
                 </div>
@@ -482,6 +487,8 @@ function dimensionToMetricKey(key: ComparabilityDimension["key"]) {
       return "end";
     case "statistic_type":
       return "stat";
+    case "patient_scope":
+      return "patientScope";
   }
 }
 

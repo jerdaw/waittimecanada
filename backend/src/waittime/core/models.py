@@ -4,6 +4,7 @@ These models enforce the metric ontology at the application layer,
 complementing the database-level constraints.
 """
 
+from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from typing import ClassVar, Literal, Self
 
@@ -311,6 +312,16 @@ class MeasurementAggregate(BaseModel):
         return self
 
 
+@dataclass(frozen=True)
+class AggregateGap:
+    """A bucket/family that cannot be represented by one aggregate row safely."""
+
+    metric_family: str
+    reason: Literal["ambiguous_methodology", "unsupported_patient_scope"]
+    fingerprint: str
+    signature_count: int
+
+
 class ScraperStatus(BaseModel):
     """Heartbeat record for monitoring scraper health."""
 
@@ -375,6 +386,7 @@ def are_comparable(a: Measurement, b: Measurement) -> bool:
         and a.start_event == b.start_event
         and a.end_event == b.end_event
         and a.statistic_type == b.statistic_type
+        and a.patient_scope == b.patient_scope
     )
 
 
@@ -402,6 +414,11 @@ def generate_divergence_brief(a: Measurement, b: Measurement) -> str | None:
     if a.statistic_type != b.statistic_type:
         differences.append(
             f"Different statistics: {a.statistic_type.value} vs {b.statistic_type.value}"
+        )
+
+    if a.patient_scope != b.patient_scope:
+        differences.append(
+            f"Different patient scopes: {a.patient_scope.value} vs {b.patient_scope.value}"
         )
 
     return (

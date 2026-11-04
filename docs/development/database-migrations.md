@@ -4,7 +4,7 @@ This document explains how to create, apply, and roll back database migrations f
 
 > [!NOTE]
 > The canonical migration history and schema reference lives in
-> See `backend/migrations/README.md`.
+> `backend/migrations/README.md`.
 > This guide covers the **process** — when and how to create migrations.
 
 ---
@@ -29,7 +29,7 @@ Create a migration whenever you need to:
 
 ```bash
 ls backend/migrations/*.sql | tail -1
-# e.g. backend/migrations/021_add_alert_notification_state.sql -> next is 022
+# e.g. backend/migrations/023_add_measurement_aggregate_gaps.sql -> next is 024
 ```
 
 The repository also enforces this with:
@@ -42,7 +42,7 @@ uv run python scripts/check_migration_sequence.py
 ### 2. Create the migration file
 
 ```bash
-touch backend/migrations/022_your_descriptive_name.sql
+touch backend/migrations/024_your_descriptive_name.sql
 ```
 
 ### 3. Write the migration
@@ -50,7 +50,7 @@ touch backend/migrations/022_your_descriptive_name.sql
 Use idempotent SQL so migrations are safe to re-run:
 
 ```sql
--- 022_your_descriptive_name.sql
+-- 024_your_descriptive_name.sql
 -- Purpose: Brief description
 -- Depends on: 012_optimize_indexes.sql
 
@@ -70,9 +70,11 @@ $$;
 -- ALTER TABLE your_table DROP COLUMN IF EXISTS your_column;
 ```
 
-Once a migration has been applied, do not edit that migration file. The runner
-records a SHA256 checksum in `schema_migrations` and rejects changed files. Add
-a new migration for follow-up schema changes.
+Once a migration has been applied, do not edit that migration file. The shared
+implementation in `backend/src/waittime/services/migration_runner.py` records a
+SHA256 checksum in `schema_migrations` and rejects changed files. The
+`backend/run_migrations.py` script and analytics bootstrap CLI both use this
+implementation. Add a new migration for follow-up schema changes.
 
 ### 4. Test locally
 

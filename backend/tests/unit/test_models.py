@@ -184,6 +184,17 @@ class TestComparability:
         """Different start events make measurements incomparable."""
         assert are_comparable(quebec_measurement, alberta_measurement) is False
 
+    def test_different_patient_scope_not_comparable(self, quebec_measurement: Measurement) -> None:
+        """Population scope is a required comparability dimension."""
+        non_priority = quebec_measurement.model_copy(
+            update={"patient_scope": PatientScope.NON_PRIORITY}
+        )
+
+        assert are_comparable(quebec_measurement, non_priority) is False
+        brief = generate_divergence_brief(quebec_measurement, non_priority)
+        assert brief is not None
+        assert "Different patient scopes: ALL vs NON_PRIORITY" in brief
+
     def test_divergence_brief_returns_none_when_comparable(
         self, quebec_measurement: Measurement, another_quebec_measurement: Measurement
     ) -> None:

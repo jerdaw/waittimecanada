@@ -111,6 +111,98 @@ or that a restore is possible. Keep those claims tied to separate provider and
 isolated-restore evidence. This command does not add a production queue route or
 change cleanup, retention, schedule, or backup behavior.
 
+### Opt-In Private Measurement Archive Command (Not a Backup or Restore)
+
+The backend provides an explicitly invoked command for exporting exact stored
+`measurements` rows, plus offline verification commands. Export is not called
+by a workflow, scheduler, cleanup path, public exporter, route, or production
+job. Its `--confirm-export` flag records operator intent only; it does not
+establish authorization. The command uses a read-only repeatable-read PostgreSQL
+transaction and streams the full stored row identity and provenance fields
+without joins or scientific normalization. The representation preserves
+unknown stored labels and nullable values; it does not claim that archived
+observations are scientifically equivalent or comparable. Before reading rows,
+the writer compares the live `measurements` table's column names, types,
+modifiers, and nullability with the versioned projection, independent of
+physical column order, and fails closed on schema drift. The explicit select
+list controls archive order. The resulting artifact covers the measurement
+table only; it is not a full database backup of hospitals, sources, or schema.
+The writer passes a libpq connection timeout capped at 10 seconds, bounds each
+control and fetch statement by the remaining 600-second transaction deadline
+(with a maximum 120-second statement timeout), and aborts if the deadline is
+exceeded. Client/server scheduling may still cause a small cancellation
+overrun; libpq may apply its connection timeout separately to each host in a
+multi-host connection string.
+
+The archive directory and files are created with owner-only permissions. The
+utility does not inspect the destination parent's permissions, access controls,
+encryption, or durability; choose an already approved, access-controlled
+storage location. A parent symlink is resolved before creating the archive,
+while an existing or symlink final destination is rejected. Its canonical
+JSONL artifact and manifest are checksummed and the manifest is published last,
+so incomplete output is rejected. Checksums detect accidental changes and
+truncation but are not a digital signature or an authenticated source/approval
+record. The manifest requires policy, access-control, and
+expiry references, but those values are recorded only: this utility does not
+verify approval, authorize access, or enforce expiry. Supply reference
+identifiers, never credentials, keys, or secret URLs. An archive contains
+complete historical measurement rows, including payload snippets, and must be
+handled as sensitive data.
+
+The `python -m waittime.cli.measurement_archive export` command requires an
+explicit new destination, policy and access-control references, a
+timezone-aware expiry, and `--confirm-export`. It reads its database
+connection from the existing runtime environment; it has no credential
+argument. Before constructing the database service, it validates these inputs
+and rejects an unavailable, existing, or symlink destination. Its bounded JSON
+output contains only status, row count,
+checksums, and verification flags; failures do not echo paths, database errors,
+or row content. For example, the command shape is:
+
+```bash
+python -m waittime.cli.measurement_archive export \
+  --destination /path/to/new-private-directory \
+  --policy-reference approved-policy-id \
+  --access-control-reference approved-access-id \
+  --expires-at-utc 2027-10-18T12:00:00Z \
+  --confirm-export
+```
+
+This example is documentation only, not approval to export real rows. Before
+any export of real rows, the owner must separately approve its purpose,
+authorized operators, access-controlled storage location, and expiry/deletion
+process. The offline `python -m waittime.cli.measurement_archive verify` and
+`python -m waittime.cli.measurement_archive restore-check` commands inspect
+only local files. They confirm archive checksums, schema, row ordering, and
+exact parse/serialize read-back; `restore-check` is explicitly **not** a
+PostgreSQL restore. A separate isolated PostgreSQL 17.11 run passed the
+native archive tests using synthetic records only, including repeatable-read
+behavior during concurrent insert/update, schema-drift rejection,
+statement-cancellation cleanup, and an exact restore into a separate test
+database. This does not validate provider
+backups/PITR or any restore of real Wait Time Canada data. No archive or purge
+receipt is created by the inventory command. Before any archive of real rows
+is run, real-data backup and restore readiness remain separate gates. The
+30-day raw-measurement retention policy and production cleanup behavior remain
+unchanged.
+
+To repeat the synthetic test from `backend/`, use a sanitized environment and
+an explicit PostgreSQL 17 binary directory; no database URL or environment
+database settings are accepted. The current native fixture creates temporary
+cluster state under canonical `/private/tmp`, which must be writable on the
+host:
+
+```sh
+env -i PATH=/usr/bin:/bin LC_ALL=C LANG=C TZ=UTC PYTHONPATH=src \
+  /absolute/path/to/python -m pytest -q \
+  tests/integration/test_measurement_archive_native_postgres.py \
+  --run-native-archive-pg \
+  --native-pg-bin-dir=/absolute/path/to/postgresql-17/bin
+```
+
+The database-backed cases in this test module remain skipped unless both
+explicit options are supplied; its pure enum regression runs without them.
+
 The existing database-cleanup.yml workflow is not an inventory route. It
 requires an explicit `confirm_delete` input (default false) and skips the job
 unless that confirmation is true; when run, it executes cleanup before

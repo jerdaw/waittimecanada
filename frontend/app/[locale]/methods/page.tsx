@@ -18,6 +18,7 @@ interface Source {
   default_start_event: string;
   default_end_event: string;
   default_statistic_type: string;
+  default_patient_scope?: string | null;
 }
 
 const PROVINCE_NAMES: Record<string, string> = {

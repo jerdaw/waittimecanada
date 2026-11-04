@@ -23,6 +23,7 @@ describe("ComparisonModal", () => {
           start_event: "TRIAGE",
           end_event: "PHYSICIAN",
           statistic_type: "P90",
+          patient_scope: "ALL",
         },
       },
       hospital_b: {
@@ -37,11 +38,12 @@ describe("ComparisonModal", () => {
           start_event: "REGISTRATION",
           end_event: "PHYSICIAN",
           statistic_type: "ROLLING_AVG",
+          patient_scope: "NON_PRIORITY",
         },
       },
       comparable: false,
       divergence_brief:
-        "Methodology Divergence: Direct comparison is scientifically invalid. Different start points: TRIAGE vs REGISTRATION; Different statistics: P90 vs ROLLING_AVG.",
+        "Methodology Divergence: Direct comparison is scientifically invalid. Different start points: TRIAGE vs REGISTRATION; Different statistics: P90 vs ROLLING_AVG; Different patient scopes: ALL vs NON_PRIORITY.",
       comparison_timestamp: new Date().toISOString(),
     },
   };
@@ -57,6 +59,7 @@ describe("ComparisonModal", () => {
           start_event: "TRIAGE",
           end_event: "PHYSICIAN",
           statistic_type: "P90",
+          patient_scope: "ALL",
         },
       },
       comparable: true,
@@ -138,7 +141,7 @@ describe("ComparisonModal", () => {
     });
   });
 
-  it("shows success banner for compatible hospitals", async () => {
+  it("shows a recorded-tag screening banner for matching hospitals", async () => {
     (global.fetch as any).mockResolvedValue({
       json: async () => mockComparisonDataCompatible,
     });
@@ -152,9 +155,9 @@ describe("ComparisonModal", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Directly Comparable")).toBeInTheDocument();
+      expect(screen.getByText("Recorded Tags Match")).toBeInTheDocument();
       expect(
-        screen.getByText(/use identical methodologies/),
+        screen.getByText(/screening condition; review source definitions/),
       ).toBeInTheDocument();
     });
   });
@@ -190,6 +193,7 @@ describe("ComparisonModal", () => {
       expect(screen.getByText("Start Event")).toBeInTheDocument();
       expect(screen.getByText("End Event")).toBeInTheDocument();
       expect(screen.getByText("Statistic Type")).toBeInTheDocument();
+      expect(screen.getByText("Patient Scope")).toBeInTheDocument();
     });
   });
 
@@ -223,7 +227,7 @@ describe("ComparisonModal", () => {
 
     await waitFor(() => {
       const equalitySigns = screen.getAllByText("=");
-      expect(equalitySigns.length).toBe(4); // All 4 dimensions match
+      expect(equalitySigns.length).toBe(5); // All 5 dimensions match
     });
   });
 

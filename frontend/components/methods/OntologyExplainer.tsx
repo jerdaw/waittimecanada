@@ -115,6 +115,25 @@ export function OntologyExplainer() {
         },
       ],
     },
+    {
+      title: t("dimensions.patientScope.title"),
+      subtitle: t("dimensions.patientScope.subtitle"),
+      description: t("dimensions.patientScope.description"),
+      examples: [
+        {
+          value: "ALL",
+          label: t("dimensions.patientScope.examples.all.label"),
+          explanation: t("dimensions.patientScope.examples.all.explanation"),
+        },
+        {
+          value: "NON_PRIORITY",
+          label: t("dimensions.patientScope.examples.nonPriority.label"),
+          explanation: t(
+            "dimensions.patientScope.examples.nonPriority.explanation",
+          ),
+        },
+      ],
+    },
   ];
 
   return (

@@ -246,7 +246,7 @@ export async function GET(request: Request) {
               AVG(mean_value)::float AS mean,
               AVG(median_value)::float AS median,
               SUM(sample_count)::int AS sample_count
-            FROM measurement_aggregates
+            FROM measurement_aggregates_usable
             WHERE hospital_id = ${hospitalId}
               AND period_type = 'daily'
               AND period_start >= ${start.toISOString()}::timestamptz
@@ -351,7 +351,7 @@ export async function GET(request: Request) {
             AVG(mean_value)::float AS mean,
             AVG(median_value)::float AS median,
             SUM(sample_count)::int AS sample_count
-          FROM measurement_aggregates
+          FROM measurement_aggregates_usable
           WHERE hospital_id = ${hospitalId}
             AND period_type = 'monthly'
             AND period_start >= ${start.toISOString()}::timestamptz

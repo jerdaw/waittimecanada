@@ -293,6 +293,11 @@ describe("GET /api/export", () => {
     expect(json.metadata.data_type).toBe("aggregated");
     expect(json.data[0]).not.toHaveProperty("raw_payload_hash");
     expect(json.data[0]).not.toHaveProperty("parser_version");
+    expect(json.data[0].patient_scope).toBeNull();
+    expect(json.metadata.methodology_homogeneity.is_homogeneous).toBe(false);
+    expect(
+      json.metadata.methodology_homogeneity.groups[0].patient_scope,
+    ).toBeNull();
     expect(query).not.toContain("raw_payload_hash");
     expect(query).not.toContain("parser_version");
     expect(json.metadata).not.toHaveProperty("page_size");
@@ -493,6 +498,7 @@ describe("GET /api/export", () => {
         start_event: "TRIAGE",
         end_event: "PHYSICIAN",
         statistic_type: "P90",
+        patient_scope: "ALL",
         value: 120,
       },
     ];
@@ -521,12 +527,14 @@ describe("GET /api/export", () => {
         start_event: "B",
         end_event: "C",
         statistic_type: "D",
+        patient_scope: "ALL",
       },
       {
         metric_family: "A",
         start_event: "B",
         end_event: "C",
         statistic_type: "D",
+        patient_scope: "ALL",
       },
     ];
     mockSql.mockResolvedValue(mockResults);
@@ -544,6 +552,154 @@ describe("GET /api/export", () => {
     );
   });
 
+  it("treats patient scope as a methodology dimension in raw JSON exports", async () => {
+    mockSql.mockResolvedValue([
+      makeRawRow("1", undefined, { patient_scope: "ALL" }),
+      makeRawRow("2", undefined, { patient_scope: "NON_PRIORITY" }),
+    ]);
+
+    const res = await GET(createRequest("/api/export?format=json"));
+    const json = await res.json();
+    const homogeneity = json.metadata.methodology_homogeneity;
+
+    expect(res.status).toBe(200);
+    expect(
+      json.data.map((row: Record<string, unknown>) => row.patient_scope),
+    ).toEqual(["ALL", "NON_PRIORITY"]);
+    expect(homogeneity.is_homogeneous).toBe(false);
+    expect(homogeneity.distinct_methodology_groups).toBe(2);
+    expect(
+      homogeneity.groups.map(
+        (group: Record<string, unknown>) => group.patient_scope,
+      ),
+    ).toEqual(["ALL", "NON_PRIORITY"]);
+    expect(homogeneity.divergence_note).toContain(
+      "Patient scope differs across exported records.",
+    );
+  });
+
+  it("fails closed when raw export patient scope is null or missing", async () => {
+    const missingScopeRow = makeRawRow("2");
+    delete (missingScopeRow as Record<string, unknown>).patient_scope;
+    mockSql.mockResolvedValue([
+      makeRawRow("1", undefined, { patient_scope: null }),
+      missingScopeRow,
+    ]);
+
+    const res = await GET(createRequest("/api/export?format=json"));
+    const json = await res.json();
+    const homogeneity = json.metadata.methodology_homogeneity;
+
+    expect(res.status).toBe(200);
+    expect(
+      json.data.map((row: Record<string, unknown>) => row.patient_scope),
+    ).toEqual([null, null]);
+    expect(homogeneity.is_homogeneous).toBe(false);
+    expect(homogeneity.unknown_patient_scope_records).toBe(2);
+    expect(homogeneity.groups).toEqual([
+      expect.objectContaining({
+        patient_scope: null,
+        patient_scope_status: "unknown",
+        record_count: 2,
+      }),
+    ]);
+    expect(homogeneity.divergence_note).toContain(
+      "homogeneity cannot be established",
+    );
+  });
+
+  it("writes scope divergence and exact values to methodology-aware CSV", async () => {
+    mockSql.mockResolvedValue([
+      makeRawRow("1", undefined, { patient_scope: "ALL" }),
+      makeRawRow("2", undefined, { patient_scope: "NON_PRIORITY" }),
+    ]);
+
+    const res = await GET(
+      createRequest("/api/export?format=csv&include_methodology=true"),
+    );
+    const text = await res.text();
+
+    expect(res.headers.get("x-methodology-divergence")).toBe("true");
+    expect(text.split("\n")[0]).toContain(
+      "Patient scope differs across exported records.",
+    );
+    expect(text.split("\n")[1]).toContain("patient_scope");
+    expect(text).toContain(",ALL,");
+    expect(text).toContain(",NON_PRIORITY,");
+  });
+
+  it("marks durable aggregates with unavailable scope as unknown", async () => {
+    useFragmentAwareSql([
+      [
+        {
+          period_start: "2026-03-01T00:00:00Z",
+          period_end: "2026-03-02T00:00:00Z",
+          hospital_id: "ca-on-test",
+          hospital_name: "Test Hospital",
+          province: "ON",
+          mean_wait_minutes: 30,
+          sample_count: 3,
+          metric_family: "TIME_TO_PROVIDER",
+          start_event: "TRIAGE",
+          end_event: "PHYSICIAN",
+          statistic_type: "MEAN",
+          source_id: "aggregate-source",
+          methodology_url: "https://example.com/methodology",
+        },
+      ],
+    ]);
+
+    const res = await GET(
+      createRequest("/api/export?format=json&granularity=daily"),
+    );
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(json.data[0].patient_scope).toBeNull();
+    expect(json.metadata.methodology_homogeneity.is_homogeneous).toBe(false);
+    expect(json.metadata.methodology_homogeneity.groups[0]).toMatchObject({
+      patient_scope: null,
+      patient_scope_status: "unknown",
+    });
+    expect(json.metadata.methodology_homogeneity.divergence_note).toContain(
+      "homogeneity cannot be established",
+    );
+  });
+
+  it("uses an explicit UNKNOWN CSV value for aggregate scope that is unavailable", async () => {
+    useFragmentAwareSql([
+      [
+        {
+          period_start: "2026-03-01T00:00:00Z",
+          period_end: "2026-03-02T00:00:00Z",
+          hospital_id: "ca-on-test",
+          hospital_name: "Test Hospital",
+          province: "ON",
+          mean_wait_minutes: 30,
+          sample_count: 3,
+          metric_family: "TIME_TO_PROVIDER",
+          start_event: "TRIAGE",
+          end_event: "PHYSICIAN",
+          statistic_type: "MEAN",
+          source_id: "aggregate-source",
+          methodology_url: "https://example.com/methodology",
+        },
+      ],
+    ]);
+
+    const res = await GET(
+      createRequest(
+        "/api/export?format=csv&granularity=daily&include_methodology=true",
+      ),
+    );
+    const text = await res.text();
+
+    expect(res.headers.get("x-methodology-divergence")).toBe("true");
+    expect(text.split("\n")[0]).toContain("homogeneity cannot be established");
+    expect(text.split("\n")[1]).toContain("patient_scope");
+    expect(text.split("\n")[2]).toContain(",UNKNOWN,");
+  });
+
   it("marks is_homogeneous=false and lists groups when mixed methodology", async () => {
     const mockResults = [
       {
@@ -551,12 +707,14 @@ describe("GET /api/export", () => {
         start_event: "B",
         end_event: "C",
         statistic_type: "D",
+        patient_scope: "ALL",
       },
       {
         metric_family: "X",
         start_event: "Y",
         end_event: "Z",
         statistic_type: "W",
+        patient_scope: "ALL",
       },
     ];
     mockSql.mockResolvedValue(mockResults);
@@ -582,6 +740,7 @@ describe("GET /api/export", () => {
         start_event: "B",
         end_event: "C",
         statistic_type: "D",
+        patient_scope: "ALL",
       },
     ];
     mockSql.mockResolvedValue(mockResults);
@@ -603,12 +762,14 @@ describe("GET /api/export", () => {
         start_event: "B",
         end_event: "C",
         statistic_type: "D",
+        patient_scope: "ALL",
       },
       {
         metric_family: "X",
         start_event: "Y",
         end_event: "Z",
         statistic_type: "W",
+        patient_scope: "ALL",
       },
     ];
     mockSql.mockResolvedValue(mockResults);
@@ -631,6 +792,7 @@ describe("GET /api/export", () => {
         start_event: "B",
         end_event: "C",
         statistic_type: "D",
+        patient_scope: "ALL",
         period_start: "2026-01-01",
       },
       {
@@ -638,6 +800,7 @@ describe("GET /api/export", () => {
         start_event: "Y",
         end_event: "Z",
         statistic_type: "W",
+        patient_scope: "ALL",
         period_start: "2026-01-02",
       },
     ];
@@ -704,6 +867,11 @@ describe("GET /api/export", () => {
     expect(json.metadata.granularity).toBe("hourly");
     expect(json.metadata.data_type).toBe("aggregated");
     expect(json.data).toHaveLength(1);
+    expect(json.data[0].patient_scope).toBeNull();
+    expect(json.metadata.methodology_homogeneity.is_homogeneous).toBe(false);
+    expect(json.metadata.methodology_homogeneity.divergence_note).toContain(
+      "homogeneity cannot be established",
+    );
   });
 
   it("redacts server details when export queries fail", async () => {

@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -51,6 +51,18 @@ class TestDatabaseService:
         monkeypatch.delenv("DATABASE_URL", raising=False)
         with pytest.raises(ValueError, match="Database URL or connection required"):
             DatabaseService(database_url=None)
+
+    @patch("psycopg2.connect")
+    def test_get_connection_passes_optional_connect_timeout(self, mock_connect, db_service):
+        mock_conn = MagicMock()
+        mock_connect.return_value = mock_conn
+
+        with db_service.get_connection(connect_timeout=7) as connection:
+            assert connection is mock_conn
+
+        mock_connect.assert_called_once_with(db_service.database_url, connect_timeout=7)
+        mock_conn.commit.assert_called_once_with()
+        mock_conn.close.assert_called_once_with()
 
     @patch("psycopg2.connect")
     def test_upsert_source(self, mock_connect, db_service):
@@ -275,6 +287,40 @@ class TestDatabaseService:
         count = db_service.insert_measurements([])
         assert count == 0
         mock_connect.assert_not_called()
+
+    @patch("psycopg2.connect")
+    def test_get_measurements_in_range_projects_patient_scope(self, mock_connect, db_service):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        timestamp = datetime(2026, 2, 6, 14, 0, tzinfo=UTC)
+        expected_row = {
+            "value": 120.0,
+            "timestamp_utc": timestamp,
+            "source_id": "src1",
+            "metric_family": "TIME_TO_PROVIDER",
+            "start_event": "TRIAGE",
+            "end_event": "PHYSICIAN",
+            "statistic_type": "MEAN",
+            "patient_scope": "ALL",
+        }
+        mock_cursor.fetchall.return_value = [expected_row]
+
+        result = db_service.get_measurements_in_range(
+            "hosp1", timestamp, datetime(2026, 2, 6, 15, 0, tzinfo=UTC)
+        )
+
+        sql, params = mock_cursor.execute.call_args.args
+        selected_columns = sql.split("FROM measurements", maxsplit=1)[0]
+        assert "patient_scope" in selected_columns
+        assert params == (
+            "hosp1",
+            timestamp,
+            datetime(2026, 2, 6, 15, 0, tzinfo=UTC),
+        )
+        assert result == [expected_row]
 
     @patch("psycopg2.connect")
     def test_open_scraper_alert_incident(self, mock_connect, db_service):
@@ -533,6 +579,7 @@ class TestDatabaseService:
         mock_connect.return_value = mock_conn
         mock_conn.cursor.return_value = mock_cursor
         mock_cursor.__enter__.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = []
         mock_execute_values.return_value = [(1,), (1,)]
 
         aggregates = [
@@ -580,14 +627,134 @@ class TestDatabaseService:
 
     @patch("psycopg2.connect")
     @patch("psycopg2.extras.execute_values")
-    def test_upsert_aggregates_batch(self, mock_execute_values, mock_connect, db_service):
+    def test_insert_aggregates_excludes_open_gap_family_but_keeps_sibling(
+        self, mock_execute_values, mock_connect, db_service
+    ):
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
         mock_connect.return_value = mock_conn
         mock_conn.cursor.return_value = mock_cursor
         mock_cursor.__enter__.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [{"metric_family": "TIME_TO_PROVIDER"}]
+        mock_execute_values.return_value = [(1,)]
+        period_start = datetime(2026, 2, 1, tzinfo=UTC)
+
+        def aggregate(metric_family):
+            return MeasurementAggregate(
+                hospital_id="hosp1",
+                source_id="src1",
+                period_type="daily",
+                period_start=period_start,
+                period_end=period_start + timedelta(days=1),
+                mean_value=100,
+                median_value=100,
+                p90_value=100,
+                min_value=90,
+                max_value=110,
+                std_dev=5,
+                sample_count=3,
+                metric_family=metric_family,
+                start_event="TRIAGE",
+                end_event="PHYSICIAN",
+                statistic_type="MEAN",
+            )
+
+        inserted = db_service.insert_aggregates(
+            [aggregate("TIME_TO_PROVIDER"), aggregate("STRETCHER_OCCUPANCY")]
+        )
+
+        assert inserted == 1
+        mock_execute_values.assert_called_once()
+        inserted_rows = mock_execute_values.call_args.args[2]
+        assert [row[12] for row in inserted_rows] == ["STRETCHER_OCCUPANCY"]
+        assert mock_cursor.execute.call_args_list[0].args[0] == (
+            "SELECT pg_advisory_xact_lock(hashtextextended(%s, 28673))"
+        )
+
+    @patch("psycopg2.connect")
+    @patch("psycopg2.extras.execute_values")
+    def test_batch_writes_share_lock_for_offset_equivalent_bucket_timestamps(
+        self, mock_execute_values, mock_connect, db_service
+    ):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = []
         mock_execute_values.return_value = [(1,), (1,)]
 
+        def aggregate(period_start, metric_family):
+            return MeasurementAggregate(
+                hospital_id="hosp1",
+                source_id="src1",
+                period_type="daily",
+                period_start=period_start,
+                period_end=period_start + timedelta(days=1),
+                mean_value=100,
+                median_value=100,
+                p90_value=100,
+                min_value=90,
+                max_value=110,
+                std_dev=5,
+                sample_count=3,
+                metric_family=metric_family,
+                start_event="TRIAGE",
+                end_event="PHYSICIAN",
+                statistic_type="MEAN",
+            )
+
+        inserted = db_service.insert_aggregates(
+            [
+                aggregate(datetime.fromisoformat("2026-02-01T00:00:00+00:00"), "TIME_TO_PROVIDER"),
+                aggregate(
+                    datetime.fromisoformat("2026-02-01T01:00:00+01:00"), "STRETCHER_OCCUPANCY"
+                ),
+            ]
+        )
+
+        assert inserted == 2
+        assert mock_cursor.fetchall.call_count == 1
+        assert mock_cursor.execute.call_args_list[0].args[1] == (
+            "wtc:aggregate:hosp1:daily:2026-02-01T00:00:00+00:00",
+        )
+
+    @patch("psycopg2.connect")
+    def test_insert_aggregate_refuses_open_gap_family(self, mock_connect, db_service):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [{"metric_family": "TIME_TO_PROVIDER"}]
+        period_start = datetime(2026, 2, 1, tzinfo=UTC)
+        aggregate = MeasurementAggregate(
+            hospital_id="hosp1",
+            source_id="src1",
+            period_type="daily",
+            period_start=period_start,
+            period_end=period_start + timedelta(days=1),
+            mean_value=100,
+            median_value=100,
+            p90_value=100,
+            min_value=90,
+            max_value=110,
+            std_dev=5,
+            sample_count=3,
+            metric_family="TIME_TO_PROVIDER",
+            start_event="TRIAGE",
+            end_event="PHYSICIAN",
+            statistic_type="MEAN",
+        )
+
+        assert db_service.insert_aggregate(aggregate) is False
+        assert mock_cursor.execute.call_count == 2
+        assert not any(
+            "INSERT INTO measurement_aggregates (" in call.args[0]
+            for call in mock_cursor.execute.call_args_list
+        )
+
+    def test_upsert_aggregates_batch_is_rejected_without_database_access(self, db_service):
         aggregates = [
             MeasurementAggregate(
                 hospital_id="hosp1",
@@ -627,10 +794,89 @@ class TestDatabaseService:
             ),
         ]
 
-        refreshed = db_service.upsert_aggregates(aggregates)
-        assert refreshed == 2
-        mock_execute_values.assert_called_once()
-        assert "DO UPDATE SET" in mock_execute_values.call_args[0][1]
+        with pytest.raises(RuntimeError, match="Precomputed aggregate upserts are disabled"):
+            db_service.upsert_aggregates(aggregates)
+
+    @patch("psycopg2.connect")
+    def test_refresh_bucket_preserves_open_gap_and_refreshes_sibling_and_clean_bucket(
+        self, mock_connect, db_service
+    ):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.__enter__.return_value = mock_cursor
+        mock_cursor.fetchall.side_effect = [
+            [{"metric_family": "TIME_TO_PROVIDER"}],
+            [{"value": 1}],
+            [],
+            [],
+            [{"value": 1}],
+            [],
+        ]
+        mock_cursor.fetchone.return_value = (1,)
+
+        period_start = datetime(2026, 2, 1, tzinfo=UTC)
+
+        def aggregate(metric_family, bucket_start, value):
+            return MeasurementAggregate(
+                hospital_id="hosp1",
+                source_id="src1",
+                period_type="daily",
+                period_start=bucket_start,
+                period_end=bucket_start + timedelta(days=1),
+                mean_value=value,
+                median_value=value,
+                p90_value=value,
+                min_value=value,
+                max_value=value,
+                std_dev=0,
+                sample_count=1,
+                metric_family=metric_family,
+                start_event="TRIAGE",
+                end_event="PHYSICIAN",
+                statistic_type="MEAN",
+            )
+
+        ambiguous_period_result = [
+            aggregate("TIME_TO_PROVIDER", period_start, 999),
+            aggregate("STRETCHER_OCCUPANCY", period_start, 42),
+        ]
+        refreshed = db_service.refresh_aggregate_bucket(
+            "hosp1",
+            "daily",
+            period_start,
+            period_start + timedelta(days=1),
+            lambda _rows: (ambiguous_period_result, []),
+            refresh_all=True,
+        )
+
+        clean_period_start = period_start + timedelta(days=1)
+        clean_refreshed = db_service.refresh_aggregate_bucket(
+            "hosp1",
+            "daily",
+            clean_period_start,
+            clean_period_start + timedelta(days=1),
+            lambda _rows: ([aggregate("TIME_TO_PROVIDER", clean_period_start, 120)], []),
+            refresh_all=True,
+        )
+
+        aggregate_writes = [
+            call
+            for call in mock_cursor.execute.call_args_list
+            if "INSERT INTO measurement_aggregates (" in call.args[0]
+        ]
+        written_keys = [(call.args[1][12], call.args[1][3]) for call in aggregate_writes]
+        statements = [call.args[0] for call in mock_cursor.execute.call_args_list]
+
+        assert refreshed == 1
+        assert clean_refreshed == 1
+        assert written_keys == [
+            ("STRETCHER_OCCUPANCY", period_start),
+            ("TIME_TO_PROVIDER", clean_period_start),
+        ]
+        assert not any("INSERT INTO measurement_aggregate_gaps" in sql for sql in statements)
+        assert not any("SET state = 'resolved'" in sql for sql in statements)
 
     @patch("psycopg2.connect")
     def test_get_hospital_ids_with_measurements_since(self, mock_connect, db_service):

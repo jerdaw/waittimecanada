@@ -31,6 +31,7 @@ describe("API Route Integration: Compare", () => {
       start_event: "arrival",
       end_event: "admission",
       statistic_type: "mean",
+      patient_scope: "ALL",
       wait_time: 120,
     };
     const mockHosp2 = {
@@ -42,6 +43,7 @@ describe("API Route Integration: Compare", () => {
       start_event: "arrival",
       end_event: "admission",
       statistic_type: "mean",
+      patient_scope: "ALL",
       wait_time: 130,
     };
 
@@ -54,6 +56,7 @@ describe("API Route Integration: Compare", () => {
 
     const firstQuery = mockSql.mock.calls[0][0].join("");
     expect(firstQuery).toContain("metric_family = 'TIME_TO_PROVIDER'");
+    expect(firstQuery).toContain("m.patient_scope");
   });
 
   test("returns 400 if params missing", async () => {
@@ -103,6 +106,7 @@ describe("API Route Integration: Compare", () => {
           start_event: "TRIAGE",
           end_event: "PHYSICIAN",
           statistic_type: "MEAN",
+          patient_scope: "ALL",
           wait_time: 168,
         },
       ])
@@ -117,6 +121,7 @@ describe("API Route Integration: Compare", () => {
           start_event: "REGISTRATION",
           end_event: "PHYSICIAN",
           statistic_type: "ROLLING_AVG",
+          patient_scope: "ALL",
           wait_time: 146,
         },
       ]);
@@ -132,6 +137,51 @@ describe("API Route Integration: Compare", () => {
     );
     expect(data.data.divergence_brief).toContain(
       "Different statistics: MEAN vs ROLLING_AVG",
+    );
+  });
+
+  test("returns a divergence brief when only patient scope differs", async () => {
+    const req = new NextRequest(
+      "http://localhost/api/compare?a=hospital-all&b=hospital-non-priority",
+    );
+    const common = {
+      metric_family: "TIME_TO_PROVIDER",
+      last_updated: "2026-10-22T12:00:00.000Z",
+      start_event: "REGISTRATION",
+      end_event: "PHYSICIAN",
+      statistic_type: "ROLLING_AVG",
+      wait_time: 120,
+    };
+
+    mockSql
+      .mockResolvedValueOnce([
+        {
+          id: "hospital-all",
+          name: "All patients",
+          province: "ON",
+          city: "Toronto",
+          ...common,
+          patient_scope: "ALL",
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: "hospital-non-priority",
+          name: "Non-priority patients",
+          province: "QC",
+          city: "Montreal",
+          ...common,
+          patient_scope: "NON_PRIORITY",
+        },
+      ]);
+
+    const response = await GET(req);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.data.comparable).toBe(false);
+    expect(body.data.divergence_brief).toContain(
+      "Different patient scopes: ALL vs NON_PRIORITY",
     );
   });
 });

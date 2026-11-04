@@ -118,7 +118,11 @@ def test_apply_migration_rejects_changed_applied_file(tmp_path: Path) -> None:
 
 
 def test_safe_duplicate_error_records_legacy_adoption(tmp_path: Path) -> None:
-    migration = write_migration(tmp_path, "001_test.sql", "CREATE TABLE test_table (id int);")
+    migration = write_migration(
+        tmp_path,
+        "001_create_enums.sql",
+        "CREATE TABLE test_table (id int);",
+    )
     conn = FakeConnection(migration_error=DuplicateTableError("relation already exists"))
 
     result = run_migrations.apply_migration_file(conn, migration)
@@ -126,6 +130,37 @@ def test_safe_duplicate_error_records_legacy_adoption(tmp_path: Path) -> None:
     assert result.status == "adopted"
     assert conn.rollback_count == 1
     assert conn.schema_table_ensured is True
-    assert conn.records["001_test.sql"] == run_migrations.migration_checksum(
+    assert conn.records["001_create_enums.sql"] == run_migrations.migration_checksum(
         "CREATE TABLE test_table (id int);"
     )
+
+
+@pytest.mark.parametrize(
+    ("filename", "expected"),
+    [
+        ("001_create_enums.sql", True),
+        ("020_add_public_health_system_metrics.sql", True),
+        ("020_sync_active_source_definitions.sql", True),
+        ("022_update_ontario_health_source_url.sql", True),
+        ("023_add_measurement_aggregate_gaps.sql", False),
+        ("024_future_migration.sql", False),
+        ("022_unreviewed_migration.sql", False),
+        ("unversioned_migration.sql", False),
+    ],
+)
+def test_legacy_duplicate_adoption_boundary(filename: str, expected: bool) -> None:
+    assert run_migrations.allows_legacy_duplicate_adoption(filename) is expected
+
+
+def test_new_migration_duplicate_error_is_not_adopted(tmp_path: Path) -> None:
+    migration = write_migration(
+        tmp_path, "023_new_contract.sql", "CREATE TABLE test_table (id int);"
+    )
+    conn = FakeConnection(migration_error=DuplicateTableError("relation already exists"))
+
+    with pytest.raises(DuplicateTableError, match="already exists"):
+        run_migrations.apply_migration_file(conn, migration)
+
+    assert conn.rollback_count == 0
+    assert conn.schema_table_ensured is False
+    assert conn.records == {}

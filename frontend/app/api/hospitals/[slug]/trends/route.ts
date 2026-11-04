@@ -110,7 +110,7 @@ export async function GET(
             min_value::integer as min_wait_time,
             max_value::integer as max_wait_time,
             sample_count
-          FROM measurement_aggregates
+          FROM measurement_aggregates_usable
           WHERE hospital_id = (SELECT id FROM hospitals WHERE id = ${slug} OR name ILIKE ${slug})
             AND period_type = ${periodType}
             AND period_start >= ${start.toISOString()}

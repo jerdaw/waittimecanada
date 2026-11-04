@@ -136,12 +136,25 @@ class TestCompareHospitals:
 
         # Check hospital A methodology
         assert result["hospital_a"]["methodology"]["metric_family"] == "TIME_TO_PROVIDER"
+        assert result["hospital_a"]["methodology"]["patient_scope"] == "ALL"
         assert result["hospital_a"]["methodology"]["start_event"] == "TRIAGE"
         assert result["hospital_a"]["methodology"]["end_event"] == "PHYSICIAN"
         assert result["hospital_a"]["methodology"]["statistic_type"] == "P90"
 
         # Check hospital B methodology
         assert result["hospital_b"]["methodology"]["metric_family"] == "TIME_TO_PROVIDER"
+
+    def test_scope_mismatch_is_reported_in_result_and_brief(self, comparison_service, mock_db):
+        hospital_a = create_hospital_row("ca-on-ottawa", 120)
+        hospital_b = create_hospital_row("ca-qc-gatineau", 120)
+        hospital_b["patient_scope"] = "NON_PRIORITY"
+        setup_db_mock(mock_db, hospital_a, hospital_b)
+
+        result = comparison_service.compare_hospitals("ca-on-ottawa", "ca-qc-gatineau")
+
+        assert result["comparable"] is False
+        assert result["hospital_b"]["methodology"]["patient_scope"] == "NON_PRIORITY"
+        assert "Different patient scopes: ALL vs NON_PRIORITY" in result["divergence_brief"]
 
     def test_includes_timestamp(self, comparison_service, mock_db):
         """Should include comparison timestamp."""

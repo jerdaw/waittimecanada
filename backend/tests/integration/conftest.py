@@ -4,13 +4,74 @@ Integration tests require a real PostgreSQL database connection.
 Set DATABASE_URL environment variable to run these tests.
 """
 
+from __future__ import annotations
+
 import os
 from collections.abc import Generator
+from pathlib import Path
 
 import pytest
 from psycopg2 import sql
 
 from waittime.services.database import DatabaseService
+
+from .native_postgres_archive import (
+    NativePostgresCluster,
+    require_sanitized_database_environment,
+)
+
+
+def pytest_addoption(parser: pytest.Parser) -> None:
+    group = parser.getgroup("isolated native PostgreSQL archive tests")
+    group.addoption(
+        "--run-native-archive-pg",
+        action="store_true",
+        default=False,
+        help="explicitly enable the isolated native PostgreSQL 17 archive tests",
+    )
+    group.addoption(
+        "--native-pg-bin-dir",
+        type=Path,
+        default=None,
+        help="absolute directory containing the exact initdb, pg_ctl, and postgres binaries",
+    )
+
+
+@pytest.fixture(scope="session")
+def native_pg_cluster(pytestconfig: pytest.Config) -> Generator[NativePostgresCluster, None, None]:
+    """Start an owned socket-only cluster only after both explicit CLI gates."""
+    if not pytestconfig.getoption("--run-native-archive-pg"):
+        pytest.skip("native archive PostgreSQL tests require explicit coordinator-reviewed opt-in")
+    binary_directory = pytestconfig.getoption("--native-pg-bin-dir")
+    if binary_directory is None:
+        raise pytest.UsageError(
+            "--run-native-archive-pg requires --native-pg-bin-dir with an absolute PostgreSQL 17 bin path"
+        )
+    try:
+        require_sanitized_database_environment(os.environ.keys())
+    except RuntimeError as exc:
+        raise pytest.UsageError(str(exc)) from exc
+    cluster = NativePostgresCluster(binary_directory, explicitly_enabled=True)
+    cluster.start()
+    try:
+        yield cluster
+    finally:
+        evidence_path = cluster.shutdown()
+        if evidence_path is not None:
+            reporter = pytestconfig.pluginmanager.get_plugin("terminalreporter")
+            if reporter is not None:
+                reporter.write_line(f"Native PostgreSQL archive evidence: {evidence_path}")
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[object]):
+    outcome = yield
+    report = outcome.get_result()
+    if item.get_closest_marker("native_postgres") is None:
+        return
+    cluster = item.funcargs.get("native_pg_cluster")
+    if isinstance(cluster, NativePostgresCluster):
+        cluster.record_test_result(item.name, report.when, report.outcome)
 
 
 def _delete_if_table_exists(

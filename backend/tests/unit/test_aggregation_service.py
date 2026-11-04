@@ -1,5 +1,6 @@
 """Unit tests for AggregationService."""
 
+import logging
 from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
@@ -29,6 +30,7 @@ def _make_measurement_row(
     start_event: str = "TRIAGE",
     end_event: str = "PHYSICIAN",
     statistic_type: str = "MEAN",
+    patient_scope: str | None = "ALL",
 ) -> dict:
     """Helper to create a measurement row dict as returned by DatabaseService."""
     return {
@@ -39,6 +41,7 @@ def _make_measurement_row(
         "start_event": start_event,
         "end_event": end_event,
         "statistic_type": statistic_type,
+        "patient_scope": patient_scope,
     }
 
 
@@ -130,9 +133,9 @@ class TestAggregatePeriod:
         """Should return a valid aggregate when measurements exist."""
         hour_start = datetime(2026, 2, 6, 14, 0, 0, tzinfo=UTC)
         mock_db.get_measurements_in_range.return_value = [
-            _make_measurement_row(value=100.0),
-            _make_measurement_row(value=200.0),
-            _make_measurement_row(value=300.0),
+            _make_measurement_row(value=100.0, patient_scope="ALL"),
+            _make_measurement_row(value=200.0, patient_scope="ALL"),
+            _make_measurement_row(value=300.0, patient_scope="ALL"),
         ]
 
         result = service.aggregate_hourly("ca-on-test", hour_start)
@@ -244,6 +247,95 @@ class TestAggregatePeriod:
         assert metrics["TOTAL_LOS"].statistic_type == "P90"
 
         assert "TIME_TO_PROVIDER" in metrics
+
+    @pytest.mark.parametrize(
+        "conflicting_fields",
+        [
+            {"source_id": "bc-phsa"},
+            {"start_event": "REGISTRATION"},
+            {"patient_scope": "MID_ACUITY"},
+            {"patient_scope": "UNRECOGNIZED_SCOPE"},
+        ],
+        ids=["mixed-source", "mixed-method", "mixed-scope", "unknown-scope"],
+    )
+    def test_aggregate_period_rejects_unrepresentable_family_signatures(
+        self, service, mock_db, conflicting_fields, caplog
+    ) -> None:
+        """Mixed provenance is omitted with an explicit bounded quality-gap record."""
+        caplog.set_level(logging.ERROR, logger="waittime.services.aggregation")
+        period_start = datetime(2026, 2, 6, 14, 0, 0, tzinfo=UTC)
+        mock_db.get_measurements_in_range.return_value = [
+            _make_measurement_row(value=100.0, timestamp_utc=period_start),
+            _make_measurement_row(
+                value=300.0,
+                timestamp_utc=period_start + timedelta(minutes=10),
+                **conflicting_fields,
+            ),
+        ]
+
+        result = service.aggregate_period(
+            "ca-on-test",
+            "hourly",
+            period_start,
+            period_start + timedelta(hours=1),
+        )
+
+        assert result == []
+        assert len(caplog.records) == 1
+        assert "Skipping ambiguous aggregate family" in caplog.text
+        assert "source_method_signature_count=2" in caplog.text
+
+    @pytest.mark.parametrize(
+        "patient_scope",
+        ["MID_ACUITY", "NON_PRIORITY", "HIGH_ACUITY", "UNRECOGNIZED_SCOPE"],
+    )
+    def test_aggregate_period_rejects_homogeneous_non_all_patient_scope(
+        self, service, mock_db, patient_scope, caplog
+    ) -> None:
+        """A homogeneous non-ALL scope cannot be represented by the aggregate schema."""
+        caplog.set_level(logging.ERROR, logger="waittime.services.aggregation")
+        period_start = datetime(2026, 2, 6, 14, 0, 0, tzinfo=UTC)
+        mock_db.get_measurements_in_range.return_value = [
+            _make_measurement_row(value=100.0, patient_scope=patient_scope),
+            _make_measurement_row(
+                value=200.0,
+                timestamp_utc=period_start + timedelta(minutes=10),
+                patient_scope=patient_scope,
+            ),
+        ]
+
+        result = service.aggregate_period(
+            "ca-on-test",
+            "hourly",
+            period_start,
+            period_start + timedelta(hours=1),
+        )
+
+        assert result == []
+        assert "unsupported patient scope" in caplog.text
+        mock_db.get_measurements_in_range.assert_called_once()
+
+    @pytest.mark.parametrize("missing_scope", [False, True], ids=["null-scope", "missing-scope"])
+    def test_aggregate_period_rejects_unresolved_patient_scope(
+        self, service, mock_db, missing_scope, caplog
+    ) -> None:
+        """Null or absent scope metadata must not silently become an ALL aggregate."""
+        caplog.set_level(logging.ERROR, logger="waittime.services.aggregation")
+        period_start = datetime(2026, 2, 6, 14, 0, 0, tzinfo=UTC)
+        row = _make_measurement_row(value=100.0, patient_scope=None)
+        if missing_scope:
+            del row["patient_scope"]
+        mock_db.get_measurements_in_range.return_value = [row]
+
+        result = service.aggregate_period(
+            "ca-on-test",
+            "hourly",
+            period_start,
+            period_start + timedelta(hours=1),
+        )
+
+        assert result == []
+        assert "unsupported patient scope" in caplog.text
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -376,12 +468,15 @@ class TestBackfill:
         end = datetime(2026, 2, 7, 0, 0, 0, tzinfo=UTC)
 
         mock_db.get_existing_aggregate_periods.return_value = set()
+        mock_db.get_aggregate_periods_with_open_gaps.return_value = set()
         mock_db.get_measurements_in_range.return_value = [
             _make_measurement_row(value=100.0),
             _make_measurement_row(value=200.0),
             _make_measurement_row(value=300.0),
         ]
-        mock_db.insert_aggregates.return_value = 1
+        mock_db.refresh_aggregate_bucket.side_effect = lambda *args, **kwargs: len(
+            args[4](mock_db.get_measurements_in_range.return_value)[0]
+        )
 
         counts = service.backfill(
             hospital_id="ca-on-test",
@@ -393,7 +488,7 @@ class TestBackfill:
         assert counts["daily"] == 1
         # Should NOT have called get_all_hospital_ids
         mock_db.get_all_hospital_ids.assert_not_called()
-        mock_db.insert_aggregates.assert_called_once()
+        mock_db.refresh_aggregate_bucket.assert_called_once()
 
     def test_backfill_all_hospitals(self, service, mock_db) -> None:
         """Should process all visible hospitals when hospital_id is None."""
@@ -402,10 +497,13 @@ class TestBackfill:
 
         mock_db.get_all_hospital_ids.return_value = ["ca-on-a", "ca-on-b"]
         mock_db.get_existing_aggregate_periods.return_value = set()
+        mock_db.get_aggregate_periods_with_open_gaps.return_value = set()
         mock_db.get_measurements_in_range.return_value = [
             _make_measurement_row(value=150.0),
         ]
-        mock_db.insert_aggregates.return_value = 1
+        mock_db.refresh_aggregate_bucket.side_effect = lambda *args, **kwargs: len(
+            args[4](mock_db.get_measurements_in_range.return_value)[0]
+        )
 
         counts = service.backfill(
             start_date=start,
@@ -425,10 +523,13 @@ class TestBackfill:
         mock_db.get_existing_aggregate_periods.return_value = {
             datetime(2026, 2, 5, 0, 0, 0, tzinfo=UTC),
         }
+        mock_db.get_aggregate_periods_with_open_gaps.return_value = set()
         mock_db.get_measurements_in_range.return_value = [
             _make_measurement_row(value=100.0),
         ]
-        mock_db.insert_aggregates.return_value = 1
+        mock_db.refresh_aggregate_bucket.side_effect = lambda *args, **kwargs: len(
+            args[4](mock_db.get_measurements_in_range.return_value)[0]
+        )
 
         counts = service.backfill(
             hospital_id="ca-on-test",
@@ -446,6 +547,7 @@ class TestBackfill:
         end = datetime(2026, 2, 7, 0, 0, 0, tzinfo=UTC)
 
         mock_db.get_existing_aggregate_periods.return_value = set()
+        mock_db.get_aggregate_periods_with_open_gaps.return_value = set()
         mock_db.get_measurements_in_range.return_value = [
             _make_measurement_row(value=100.0),
         ]
@@ -467,7 +569,11 @@ class TestBackfill:
         end = datetime(2026, 2, 7, 0, 0, 0, tzinfo=UTC)
 
         mock_db.get_existing_aggregate_periods.return_value = set()
+        mock_db.get_aggregate_periods_with_open_gaps.return_value = set()
         mock_db.get_measurements_in_range.return_value = []
+        mock_db.refresh_aggregate_bucket.side_effect = lambda *args, **kwargs: len(
+            args[4](mock_db.get_measurements_in_range.return_value)[0]
+        )
 
         counts = service.backfill(
             hospital_id="ca-on-test",
@@ -485,7 +591,11 @@ class TestBackfill:
         end = datetime(2026, 2, 6, 1, 0, 0, tzinfo=UTC)
 
         mock_db.get_existing_aggregate_periods.return_value = set()
+        mock_db.get_aggregate_periods_with_open_gaps.return_value = set()
         mock_db.get_measurements_in_range.return_value = []
+        mock_db.refresh_aggregate_bucket.side_effect = lambda *args, **kwargs: len(
+            args[4](mock_db.get_measurements_in_range.return_value)[0]
+        )
 
         counts = service.backfill(hospital_id="ca-on-test", start_date=start, end_date=end)
 
@@ -550,10 +660,147 @@ class TestQueryAggregates:
 class TestRefreshRecentPeriods:
     """Tests for targeted post-scrape aggregate refresh."""
 
+    def test_refresh_reports_ambiguous_family_and_upserts_valid_family_only(
+        self, service, mock_db, caplog
+    ) -> None:
+        caplog.set_level(logging.ERROR, logger="waittime.services.aggregation")
+        recent_timestamp = datetime(2026, 2, 6, 23, 45, tzinfo=UTC)
+        mock_db.get_hospital_ids_with_measurements_since.return_value = ["ca-on-test"]
+        mock_db.get_measurement_timestamps.return_value = [recent_timestamp]
+        mock_db.get_measurements_in_range.return_value = [
+            _make_measurement_row(value=100.0, timestamp_utc=recent_timestamp),
+            _make_measurement_row(
+                value=300.0,
+                timestamp_utc=recent_timestamp + timedelta(minutes=10),
+                source_id="bc-phsa",
+            ),
+            _make_measurement_row(
+                value=200.0,
+                timestamp_utc=recent_timestamp,
+                metric_family="TOTAL_LOS",
+                start_event="DOOR",
+                end_event="DISCHARGE",
+                statistic_type="P90",
+            ),
+        ]
+        mock_db.refresh_aggregate_bucket.side_effect = lambda *args, **kwargs: len(
+            args[4](mock_db.get_measurements_in_range.return_value)[0]
+        )
+
+        counts = service.refresh_recent_periods(
+            since=datetime(2026, 2, 6, 22, 0, tzinfo=UTC),
+            period_types=["daily"],
+        )
+
+        assert counts == {"daily": 1}
+        mock_db.refresh_aggregate_bucket.assert_called_once()
+        aggregates, gaps = mock_db.refresh_aggregate_bucket.call_args.args[4](
+            mock_db.get_measurements_in_range.return_value
+        )
+        assert [aggregate.metric_family for aggregate in aggregates] == ["TOTAL_LOS"]
+        assert [gap.metric_family for gap in gaps] == ["TIME_TO_PROVIDER"]
+        assert "Skipping ambiguous aggregate family" in caplog.text
+
+    def test_refresh_preserves_ambiguous_family_aggregate_and_records_gap(self) -> None:
+        """Keep stale output stored while an ambiguous family is hidden by its open gap."""
+        period_start = datetime(2026, 2, 6, 23, 45, tzinfo=UTC)
+        period_bucket_start = datetime(2026, 2, 6, 0, 0, tzinfo=UTC)
+        old_aggregate = MeasurementAggregate(
+            hospital_id="ca-on-test",
+            source_id="ontario-health",
+            period_type="daily",
+            period_start=period_bucket_start,
+            period_end=period_bucket_start + timedelta(days=1),
+            mean_value=100.0,
+            min_value=100.0,
+            max_value=100.0,
+            sample_count=1,
+            metric_family="TIME_TO_PROVIDER",
+            start_event="TRIAGE",
+            end_event="PHYSICIAN",
+            statistic_type="MEAN",
+        )
+        sibling_aggregate = old_aggregate.model_copy(
+            update={
+                "mean_value": 200.0,
+                "min_value": 200.0,
+                "max_value": 200.0,
+                "metric_family": "TOTAL_LOS",
+                "start_event": "DOOR",
+                "end_event": "DISCHARGE",
+                "statistic_type": "P90",
+            }
+        )
+
+        class StatefulAggregateDatabase:
+            def __init__(self) -> None:
+                self.aggregates = [old_aggregate, sibling_aggregate]
+                self.gaps = []
+                self.measurements = [
+                    _make_measurement_row(value=100.0, timestamp_utc=period_start),
+                    _make_measurement_row(
+                        value=300.0,
+                        timestamp_utc=period_start + timedelta(minutes=10),
+                        source_id="bc-phsa",
+                    ),
+                ]
+
+            def get_hospital_ids_with_measurements_since(self, *_args, **_kwargs):
+                return ["ca-on-test"]
+
+            def get_measurement_timestamps(self, *_args, **_kwargs):
+                return [period_start]
+
+            def get_measurements_in_range(self, *_args, **_kwargs):
+                return self.measurements
+
+            def refresh_aggregate_bucket(
+                self,
+                hospital_id,
+                period_type,
+                bucket_start,
+                bucket_end,
+                compute,
+                *,
+                refresh_all=False,
+            ):
+                aggregates, gaps = compute(self.measurements)
+                self.gaps.extend(gaps)
+                for aggregate in aggregates:
+                    self.aggregates = [
+                        stored
+                        for stored in self.aggregates
+                        if not (
+                            stored.hospital_id == hospital_id
+                            and stored.period_type == period_type
+                            and stored.period_start == bucket_start
+                            and stored.metric_family == aggregate.metric_family
+                        )
+                    ]
+                    self.aggregates.append(aggregate)
+                return len(aggregates)
+
+        database = StatefulAggregateDatabase()
+        stateful_service = AggregationService(database)
+
+        assert database.aggregates == [old_aggregate, sibling_aggregate]
+
+        stateful_service.refresh_recent_periods(
+            since=datetime(2026, 2, 6, 22, 0, tzinfo=UTC),
+            period_types=["daily"],
+        )
+
+        assert database.aggregates == [old_aggregate, sibling_aggregate]
+        assert len(database.gaps) == 1
+        assert database.gaps[0].metric_family == "TIME_TO_PROVIDER"
+        assert database.gaps[0].reason == "ambiguous_methodology"
+        assert database.gaps[0].signature_count == 2
+
     def test_refresh_recent_periods_uses_recent_hospitals(self, service, mock_db) -> None:
         recent_timestamp = datetime(2026, 2, 6, 23, 45, tzinfo=UTC)
         mock_db.get_hospital_ids_with_measurements_since.return_value = ["ca-on-test"]
         mock_db.get_measurement_timestamps.return_value = [recent_timestamp]
+        mock_db.refresh_aggregate_bucket.return_value = 1
         mock_db.get_measurements_in_range.return_value = [
             _make_measurement_row(value=100.0, timestamp_utc=recent_timestamp),
             _make_measurement_row(value=150.0, timestamp_utc=recent_timestamp),
@@ -567,7 +814,7 @@ class TestRefreshRecentPeriods:
 
         assert counts == {"daily": 1, "weekly": 1, "monthly": 1}
         mock_db.get_hospital_ids_with_measurements_since.assert_called_once()
-        assert mock_db.upsert_aggregates.call_count == 3
+        assert mock_db.refresh_aggregate_bucket.call_count == 3
 
     def test_refresh_recent_periods_dry_run_skips_upsert(self, service, mock_db) -> None:
         recent_timestamp = datetime(2026, 2, 6, 10, 0, tzinfo=UTC)

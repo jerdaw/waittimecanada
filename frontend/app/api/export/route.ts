@@ -101,14 +101,38 @@ function getNextPagePath(request: NextRequest, cursor: string) {
 
 function computeMethodologyHomogeneity(results: Record<string, unknown>[]) {
   const groupsMap = new Map<string, any>();
+  const knownPatientScopes = new Set<string>();
+  let unknownPatientScopeRecords = 0;
+
   for (const row of results) {
-    const key = `${row.metric_family}|${row.start_event}|${row.end_event}|${row.statistic_type}`;
+    const patientScope = row.patient_scope;
+    const hasKnownPatientScope =
+      typeof patientScope === "string" && patientScope.trim().length > 0;
+    if (typeof patientScope === "string" && patientScope.trim().length > 0) {
+      knownPatientScopes.add(patientScope);
+    } else {
+      unknownPatientScopeRecords++;
+    }
+
+    const methodology = [
+      String(row.metric_family),
+      String(row.start_event),
+      String(row.end_event),
+      String(row.statistic_type),
+    ];
+    const key = JSON.stringify([
+      ...methodology,
+      hasKnownPatientScope ? "recorded" : "unknown",
+      patientScope ?? null,
+    ]);
     if (!groupsMap.has(key)) {
       groupsMap.set(key, {
-        metric_family: String(row.metric_family),
-        start_event: String(row.start_event),
-        end_event: String(row.end_event),
-        statistic_type: String(row.statistic_type),
+        metric_family: methodology[0],
+        start_event: methodology[1],
+        end_event: methodology[2],
+        statistic_type: methodology[3],
+        patient_scope: patientScope ?? null,
+        patient_scope_status: hasKnownPatientScope ? "recorded" : "unknown",
         record_count: 0,
       });
     }
@@ -116,16 +140,58 @@ function computeMethodologyHomogeneity(results: Record<string, unknown>[]) {
   }
 
   const groups = Array.from(groupsMap.values());
-  const is_homogeneous = groups.length <= 1;
+  const is_homogeneous = groups.length <= 1 && unknownPatientScopeRecords === 0;
+  const divergenceReasons = [];
+  if (groups.length > 1) {
+    divergenceReasons.push(
+      `This export contains ${groups.length} distinct methodology groups.`,
+    );
+  }
+  if (knownPatientScopes.size > 1) {
+    divergenceReasons.push("Patient scope differs across exported records.");
+  }
+  if (unknownPatientScopeRecords > 0) {
+    divergenceReasons.push(
+      `Patient scope is missing or unknown for ${unknownPatientScopeRecords} record(s); homogeneity cannot be established.`,
+    );
+  }
+  if (groups.length > 1) {
+    divergenceReasons.push(
+      "Direct comparison across groups is scientifically invalid.",
+    );
+  }
 
   return {
     is_homogeneous,
     distinct_methodology_groups: groups.length,
+    unknown_patient_scope_records: unknownPatientScopeRecords,
     divergence_note: is_homogeneous
       ? null
-      : `This export contains measurements from ${groups.length} distinct methodology groups. Direct comparison across groups is scientifically invalid. See methodology_url per record for details.`,
+      : `${divergenceReasons.join(" ")} See methodology_url per record for details.`,
     groups,
   };
+}
+
+function normalizeMissingPatientScope(
+  rows: Record<string, unknown>[],
+): Record<string, unknown>[] {
+  return rows.map((row) => ({
+    ...row,
+    patient_scope: row.patient_scope ?? null,
+  }));
+}
+
+function formatExportCsvValue(header: string, value: unknown) {
+  if (header === "patient_scope" && (value === null || value === undefined)) {
+    return "UNKNOWN";
+  }
+  if (
+    typeof value === "string" &&
+    (value.includes(",") || value.includes('"'))
+  ) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value ?? "";
 }
 
 export async function GET(request: NextRequest) {
@@ -240,7 +306,7 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      const results = await sql`
+      const queriedResults = await sql`
         SELECT
           date_trunc('hour', m.timestamp_utc) AS period_start,
           date_trunc('hour', m.timestamp_utc) + INTERVAL '1 hour' AS period_end,
@@ -287,6 +353,7 @@ export async function GET(request: NextRequest) {
         ORDER BY period_start DESC
         LIMIT 10000
       `;
+      const results = normalizeMissingPatientScope(queriedResults);
 
       const homogeneity = computeMethodologyHomogeneity(results);
 
@@ -331,7 +398,13 @@ export async function GET(request: NextRequest) {
         "sample_count",
         "std_dev",
         ...(includeMethodology
-          ? ["metric_family", "start_event", "end_event", "statistic_type"]
+          ? [
+              "metric_family",
+              "start_event",
+              "end_event",
+              "statistic_type",
+              "patient_scope",
+            ]
           : []),
         "source_id",
         "methodology_url",
@@ -347,16 +420,7 @@ export async function GET(request: NextRequest) {
       csvRows.push(
         ...results.map((row: Record<string, unknown>) =>
           aggHeaders
-            .map((header) => {
-              const val = row[header] as string | number | null | undefined;
-              if (
-                typeof val === "string" &&
-                (val.includes(",") || val.includes('"'))
-              ) {
-                return `"${val.replace(/"/g, '""')}"`;
-              }
-              return val ?? "";
-            })
+            .map((header) => formatExportCsvValue(header, row[header]))
             .join(","),
         ),
       );
@@ -381,8 +445,8 @@ export async function GET(request: NextRequest) {
     }
 
     if (granularity !== "raw") {
-      // Serve aggregated data from measurement_aggregates table
-      const results = await sql`
+      // Serve only gap-free aggregate rows from the usable aggregate view
+      const queriedResults = await sql`
         SELECT
           ma.period_start,
           ma.period_end,
@@ -405,7 +469,7 @@ export async function GET(request: NextRequest) {
           ma.statistic_type,
           ma.source_id,
           s.methodology_url
-        FROM measurement_aggregates ma
+        FROM measurement_aggregates_usable ma
         JOIN hospitals h ON ma.hospital_id = h.id
         JOIN sources s ON ma.source_id = s.id
         WHERE h.is_verified = true
@@ -416,6 +480,7 @@ export async function GET(request: NextRequest) {
         ORDER BY ma.period_start DESC
         LIMIT 10000
       `;
+      const results = normalizeMissingPatientScope(queriedResults);
 
       const homogeneity = computeMethodologyHomogeneity(results);
 
@@ -457,7 +522,13 @@ export async function GET(request: NextRequest) {
         "sample_count",
         "std_dev",
         ...(includeMethodology
-          ? ["metric_family", "start_event", "end_event", "statistic_type"]
+          ? [
+              "metric_family",
+              "start_event",
+              "end_event",
+              "statistic_type",
+              "patient_scope",
+            ]
           : []),
         "source_id",
         "methodology_url",
@@ -473,18 +544,7 @@ export async function GET(request: NextRequest) {
 
       csvRows.push(
         ...results.map((row: Record<string, unknown>) =>
-          aggHeaders
-            .map((h) => {
-              const val = row[h] as string | number | null | undefined;
-              if (
-                typeof val === "string" &&
-                (val.includes(",") || val.includes('"'))
-              ) {
-                return `"${val.replace(/"/g, '""')}"`;
-              }
-              return val ?? "";
-            })
-            .join(","),
+          aggHeaders.map((h) => formatExportCsvValue(h, row[h])).join(","),
         ),
       );
 
@@ -564,7 +624,10 @@ export async function GET(request: NextRequest) {
         export_cursor_id: _cursorId,
         export_cursor_timestamp: _cursorTimestamp,
         ...row
-      }: Record<string, unknown>) => row,
+      }: Record<string, unknown>) => ({
+        ...row,
+        patient_scope: row.patient_scope ?? null,
+      }),
     );
     const nextCursor =
       hasMore && pageRows.length > 0
@@ -657,19 +720,7 @@ export async function GET(request: NextRequest) {
 
     csvRows.push(
       ...results.map((row: Record<string, unknown>) =>
-        headers
-          .map((h) => {
-            const val = row[h] as string | number | null | undefined;
-            // Escape commas and quotes
-            if (
-              typeof val === "string" &&
-              (val.includes(",") || val.includes('"'))
-            ) {
-              return `"${val.replace(/"/g, '""')}"`;
-            }
-            return val ?? "";
-          })
-          .join(","),
+        headers.map((h) => formatExportCsvValue(h, row[h])).join(","),
       ),
     );
 

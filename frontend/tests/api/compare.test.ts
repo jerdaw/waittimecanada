@@ -1,147 +1,49 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+import {
+  areMethodologiesComparable,
+  generateDivergenceBrief,
+  type Methodology,
+} from "@/utils/comparability";
 
-// Test the comparability logic from the API route
-describe("Comparability Logic (API)", () => {
-  interface Methodology {
-    metric_family: string;
-    start_event: string;
-    end_event: string;
-    statistic_type: string;
-  }
+describe("Comparison utility used by the API", () => {
+  const allPatients: Methodology = {
+    metric_family: "TIME_TO_PROVIDER",
+    start_event: "TRIAGE",
+    end_event: "PHYSICIAN",
+    statistic_type: "P90",
+    patient_scope: "ALL",
+  };
 
-  function areComparable(a: Methodology, b: Methodology): boolean {
-    return (
-      a.metric_family === b.metric_family &&
-      a.start_event === b.start_event &&
-      a.end_event === b.end_event &&
-      a.statistic_type === b.statistic_type
+  it("accepts matching recorded tags as a screening result", () => {
+    expect(areMethodologiesComparable(allPatients, { ...allPatients })).toBe(
+      true,
     );
-  }
-
-  function generateDivergenceBrief(
-    a: Methodology,
-    b: Methodology,
-  ): string | null {
-    if (areComparable(a, b)) return null;
-
-    const differences: string[] = [];
-
-    if (a.metric_family !== b.metric_family) {
-      differences.push(
-        `Different metrics: ${a.metric_family} vs ${b.metric_family}`,
-      );
-    }
-    if (a.start_event !== b.start_event) {
-      differences.push(
-        `Different start points: ${a.start_event} vs ${b.start_event}`,
-      );
-    }
-    if (a.end_event !== b.end_event) {
-      differences.push(
-        `Different end points: ${a.end_event} vs ${b.end_event}`,
-      );
-    }
-    if (a.statistic_type !== b.statistic_type) {
-      differences.push(
-        `Different statistics: ${a.statistic_type} vs ${b.statistic_type}`,
-      );
-    }
-
-    return (
-      "Methodology Divergence: Direct comparison is scientifically invalid. " +
-      differences.join("; ") +
-      "."
-    );
-  }
-
-  describe("areComparable", () => {
-    it("returns true for identical methodologies", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const b: Methodology = { ...a };
-
-      expect(areComparable(a, b)).toBe(true);
-    });
-
-    it("returns false if any dimension differs", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const b: Methodology = {
-        ...a,
-        start_event: "REGISTRATION",
-      };
-
-      expect(areComparable(a, b)).toBe(false);
-    });
   });
 
-  describe("generateDivergenceBrief", () => {
-    it("returns null for comparable methodologies", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const b: Methodology = { ...a };
-
-      expect(generateDivergenceBrief(a, b)).toBeNull();
-    });
-
-    it("explains Ontario vs Quebec differences", () => {
-      const ontario: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const quebec: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
+  it("rejects any recorded-dimension mismatch", () => {
+    expect(
+      areMethodologiesComparable(allPatients, {
+        ...allPatients,
         start_event: "REGISTRATION",
-        end_event: "PHYSICIAN",
-        statistic_type: "ROLLING_AVG",
-      };
+      }),
+    ).toBe(false);
+  });
 
-      const brief = generateDivergenceBrief(ontario, quebec);
+  it("returns no divergence brief when all recorded tags match", () => {
+    expect(generateDivergenceBrief(allPatients, { ...allPatients })).toBeNull();
+  });
 
-      expect(brief).toContain("TRIAGE vs REGISTRATION");
-      expect(brief).toContain("P90 vs ROLLING_AVG");
-      expect(brief).toContain("Methodology Divergence");
-    });
+  it("explains a patient-scope-only mismatch", () => {
+    const nonPriorityPatients: Methodology = {
+      ...allPatients,
+      patient_scope: "NON_PRIORITY",
+    };
 
-    it("includes all differing dimensions", () => {
-      const a: Methodology = {
-        metric_family: "TIME_TO_PROVIDER",
-        start_event: "TRIAGE",
-        end_event: "PHYSICIAN",
-        statistic_type: "P90",
-      };
-
-      const b: Methodology = {
-        metric_family: "TOTAL_LOS",
-        start_event: "REGISTRATION",
-        end_event: "DISCHARGE",
-        statistic_type: "MEDIAN",
-      };
-
-      const brief = generateDivergenceBrief(a, b);
-
-      expect(brief).toContain("TIME_TO_PROVIDER vs TOTAL_LOS");
-      expect(brief).toContain("TRIAGE vs REGISTRATION");
-      expect(brief).toContain("PHYSICIAN vs DISCHARGE");
-      expect(brief).toContain("P90 vs MEDIAN");
-    });
+    expect(areMethodologiesComparable(allPatients, nonPriorityPatients)).toBe(
+      false,
+    );
+    expect(generateDivergenceBrief(allPatients, nonPriorityPatients)).toContain(
+      "Different patient scopes: ALL vs NON_PRIORITY",
+    );
   });
 });

@@ -13,7 +13,7 @@ describe("AboutSection", () => {
 
     // Content should NOT be visible when collapsed by default
     expect(
-      screen.queryByText(/different definitions, clocks, and statistics/i),
+      screen.queryByText(/different and sometimes incomplete definitions/i),
     ).not.toBeInTheDocument();
   });
 
@@ -27,7 +27,7 @@ describe("AboutSection", () => {
 
     // Content should now be visible
     expect(
-      screen.getByText(/different definitions, clocks, and statistics/i),
+      screen.getByText(/different and sometimes incomplete definitions/i),
     ).toBeInTheDocument();
   });
 
@@ -39,13 +39,13 @@ describe("AboutSection", () => {
     // Expand
     fireEvent.click(button);
     expect(
-      screen.getByText(/different definitions, clocks, and statistics/i),
+      screen.getByText(/different and sometimes incomplete definitions/i),
     ).toBeInTheDocument();
 
     // Collapse
     fireEvent.click(button);
     expect(
-      screen.queryByText(/different definitions, clocks, and statistics/i),
+      screen.queryByText(/different and sometimes incomplete definitions/i),
     ).not.toBeInTheDocument();
   });
 
@@ -117,7 +117,7 @@ describe("AboutSection", () => {
     fireEvent.click(button);
 
     const strongElements = screen.getAllByText(
-      /different definitions, clocks, and statistics|Wait Time Canada is a public-interest health systems observatory/i,
+      /different and sometimes incomplete definitions|Wait Time Canada is a public-interest health systems observatory/i,
     );
     expect(strongElements.length).toBeGreaterThan(0);
   });

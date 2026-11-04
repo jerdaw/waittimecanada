@@ -155,7 +155,7 @@ class BenchmarkingService:
                 end_event,
                 statistic_type,
                 COUNT(*) as cnt
-            FROM measurement_aggregates ma
+            FROM measurement_aggregates_usable ma
             JOIN hospitals h ON h.id = ma.hospital_id
             WHERE h.province = %s
               AND ma.period_type = 'daily'
@@ -196,7 +196,7 @@ class BenchmarkingService:
                 SELECT
                     hospital_id,
                     AVG(mean_value)::float AS period_mean
-                FROM measurement_aggregates
+                FROM measurement_aggregates_usable
                 WHERE period_type = 'daily'
                   AND period_start >= %s
                   AND period_start < %s
@@ -207,7 +207,7 @@ class BenchmarkingService:
                 SELECT
                     hospital_id,
                     AVG(mean_value)::float AS period_mean
-                FROM measurement_aggregates
+                FROM measurement_aggregates_usable
                 WHERE period_type = 'daily'
                   AND period_start >= %s
                   AND period_start < %s
