@@ -17,6 +17,7 @@ FR_MESSAGES = ROOT / "frontend" / "messages" / "fr.json"
 
 EXPECTED_SCRAPER_CRON = "29 * * * *"
 EXPECTED_HEARTBEAT_CRON = "14,44 * * * *"
+EXPECTED_SCRAPER_RUNNER = "ubuntu-24.04"
 
 
 def _step_block(text: str, step_name: str) -> str:
@@ -62,6 +63,21 @@ def _main() -> int:
     if _schedule_crons(text) != [EXPECTED_SCRAPER_CRON]:
         failures.append(
             f"scraper schedule must be exactly hourly at minute 29: {EXPECTED_SCRAPER_CRON}"
+        )
+    scraper_job_match = re.search(
+        r"(?ms)^  run-scrapers:\n(?P<body>.*?)(?=^  [A-Za-z0-9_-]+:\n|\Z)",
+        text,
+    )
+    if scraper_job_match is None:
+        failures.append("scraper workflow must define the run-scrapers job")
+    elif not re.search(
+        rf"^    runs-on:\s*{re.escape(EXPECTED_SCRAPER_RUNNER)}\s*$",
+        scraper_job_match.group("body"),
+        re.MULTILINE,
+    ):
+        failures.append(
+            f"run-scrapers runner must stay pinned to {EXPECTED_SCRAPER_RUNNER} "
+            "because the locked Playwright version does not support Ubuntu 26.04"
         )
     if _schedule_crons(heartbeat_text) != [EXPECTED_HEARTBEAT_CRON]:
         failures.append(

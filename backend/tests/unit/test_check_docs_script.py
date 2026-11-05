@@ -451,6 +451,23 @@ def test_check_docs_rejects_scheduler_cadence_drift(tmp_path: Path) -> None:
     assert "scraper schedule must be exactly hourly" in result.stdout
 
 
+def test_check_docs_rejects_unpinned_playwright_scraper_runner(tmp_path: Path) -> None:
+    root = _create_docs_fixture(tmp_path)
+    workflow_path = root / ".github" / "workflows" / "scraper-cron.yml"
+    workflow_path.write_text(
+        workflow_path.read_text(encoding="utf-8").replace(
+            "    runs-on: ubuntu-24.04\n",
+            "    runs-on: ubuntu-latest\n",
+        ),
+        encoding="utf-8",
+    )
+
+    result = _run_check_docs(root)
+
+    assert result.returncode == 1
+    assert "run-scrapers runner must stay pinned to ubuntu-24.04" in result.stdout
+
+
 def test_check_docs_rejects_unbounded_heartbeat_recovery(tmp_path: Path) -> None:
     root = _create_docs_fixture(tmp_path)
     workflow_path = root / ".github" / "workflows" / "heartbeat-monitor.yml"
