@@ -15,6 +15,7 @@ import re
 import time
 from collections.abc import Callable
 from datetime import UTC, datetime
+from typing import Any
 
 import structlog
 from bs4 import BeautifulSoup, Tag
@@ -29,11 +30,19 @@ from waittime.core import (
     StatisticType,
 )
 from waittime.scrapers.base import BaseScraper
+from waittime.scrapers.hospital_matching import (
+    MatchReport,
+    find_colliding_ids,
+    match_source_name,
+)
 from waittime.scrapers.observability import HTTP_FETCH_ATTEMPTS, fetch_retry_wait
 
 logger = logging.getLogger(__name__)
 
 _ALLOWED_CONTENT_TYPES = frozenset({"text/html", "text/plain"})
+
+# One source facility card: (source name, hospital ID, measurements extracted from it).
+_FacilityRow = tuple[str, str, list[Measurement]]
 
 
 def _safe_content_type(value: str | None) -> str:
@@ -87,7 +96,13 @@ class QuebecScraper(BaseScraper):
         "Hôpital Santa Cabrini": "ca-qc-santa-cabrini",
         "Hôpital Jean-Talon": "ca-qc-jean-talon",
         "Hôpital Fleury": "ca-qc-fleury",
+        # Source spelling of an entry above (same facility, without the CHU prefix).
+        "Hôpital de l'Enfant-Jésus": "ca-qc-enfant-jesus",
     }
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.match_report = MatchReport()
 
     def run(
         self,
@@ -99,9 +114,10 @@ class QuebecScraper(BaseScraper):
         start_time = datetime.now(UTC)
         failure_recorded = False
         max_pages = 20
+        self.match_report.clear()
 
         try:
-            measurements: list[Measurement] = []
+            all_rows: list[_FacilityRow] = []
 
             # We need to iterate through pages.
             # There are typically ~12 pages (116 results, 10 per page).
@@ -128,7 +144,8 @@ class QuebecScraper(BaseScraper):
                     break
 
                 try:
-                    page_measurements = self.parse(html)
+                    page_rows = self._parse_rows(html)
+                    page_measurements = [m for _, _, ms in page_rows for m in ms]
                 except Exception as error:
                     self._record_failure(error, "parse", start_time)
                     failure_recorded = True
@@ -144,10 +161,14 @@ class QuebecScraper(BaseScraper):
                     logger.info(f"No measurements on page {page}, stopping.")
                     break
 
-                measurements.extend(page_measurements)
+                all_rows.extend(page_rows)
 
                 # Be nice to the server
                 time.sleep(1)
+
+            # Collisions are checked across all pages: a hospital ID claimed by
+            # more than one source facility is ambiguous and nothing is written.
+            measurements = self._drop_colliding_rows(all_rows)
 
             if not measurements:
                 parse_error = ValueError("No measurements collected from Quebec source")
@@ -246,32 +267,54 @@ class QuebecScraper(BaseScraper):
         Returns:
             List of Measurement objects tagged with Quebec methodology
         """
+        self.match_report.clear()
+        return self._drop_colliding_rows(self._parse_rows(html))
+
+    def _parse_rows(self, html: str) -> list[_FacilityRow]:
+        """Parse an HTML fragment into one row per facility card, before collision checks."""
         soup = BeautifulSoup(html, "html.parser")
-        measurements: list[Measurement] = []
+        rows: list[_FacilityRow] = []
 
         payload_hash = self.hash_payload(html)
         payload_snippet = self.snippet(html)
 
         # Container is div.hospital_element
-        facilities = soup.find_all("div", class_="hospital_element")
+        for facility in soup.find_all("div", class_="hospital_element"):
+            row = self._extract_row(facility, payload_hash, payload_snippet)
+            if row is not None:
+                rows.append(row)
 
-        for facility in facilities:
-            facility_measurements = self._extract_from_facility(
-                facility, payload_hash, payload_snippet
+        return rows
+
+    def _drop_colliding_rows(self, rows: list[_FacilityRow]) -> list[Measurement]:
+        """Drop every facility whose hospital ID was claimed by more than one facility."""
+        claims = [(name, hospital_id) for name, hospital_id, ms in rows if ms]
+        collisions = find_colliding_ids(claims)
+        for hospital_id, names in collisions.items():
+            logger.warning(
+                "Skipping %d source facilities that map to the same hospital ID %s: %s",
+                len(names),
+                hospital_id,
+                "; ".join(names),
             )
-            measurements.extend(facility_measurements)
-
-        return measurements
+            for name in names:
+                self.match_report.skipped.append((name, f"collision on {hospital_id}"))
+        return [m for _, hospital_id, ms in rows if hospital_id not in collisions for m in ms]
 
     def _extract_from_facility(
         self, facility: Tag, payload_hash: str, payload_snippet: str
     ) -> list[Measurement]:
-        """Extract measurements from a facility card.
+        """Extract measurements from a facility card (no cross-facility collision check)."""
+        row = self._extract_row(facility, payload_hash, payload_snippet)
+        return row[2] if row else []
 
-        Extracts both wait time and occupancy measurements if available.
+    def _extract_row(
+        self, facility: Tag, payload_hash: str, payload_snippet: str
+    ) -> _FacilityRow | None:
+        """Extract (name, hospital ID, measurements) from a facility card.
 
-        Returns:
-            List of Measurement objects (may include wait time and/or occupancy)
+        Extracts both wait time and occupancy measurements if available. Returns
+        None when the card has no name or cannot be matched to exactly one hospital.
         """
         measurements: list[Measurement] = []
 
@@ -279,12 +322,12 @@ class QuebecScraper(BaseScraper):
         # <div class="font-weight-bold textual-content">Name</div>
         name_div = facility.find("div", class_="font-weight-bold")
         if not name_div:
-            return measurements
+            return None
 
         hospital_name = name_div.get_text(strip=True)
         hospital_id = self._normalize_hospital_id(hospital_name)
         if not hospital_id:
-            return measurements
+            return None
 
         # 2. Extract metrics from list items
         items = facility.find_all("li", class_="hopital-item")
@@ -330,7 +373,7 @@ class QuebecScraper(BaseScraper):
                 )
             )
 
-        return measurements
+        return hospital_name, hospital_id, measurements
 
     def _extract_wait_time(self, text: str) -> float | None:
         """Extract numeric wait time from text.
@@ -365,37 +408,65 @@ class QuebecScraper(BaseScraper):
         return None
 
     def _normalize_hospital_id(self, name: str) -> str | None:
-        """Convert hospital name to standardized ID.
+        """Convert a source facility name to a hospital ID, or None to skip it.
+
+        Only an exact (case/whitespace-insensitive) match to ``HOSPITAL_MAPPING``
+        resolves to a mapped ID. Aggregate rows and names that only partially
+        overlap a mapped name (for example "Hôpital Notre-Dame-du-Lac" versus
+        "Hôpital Notre-Dame") are skipped and logged rather than guessed. Names
+        unrelated to every mapped name keep the pre-existing behaviour of a
+        generated ``ca-qc-{slug}`` ID.
 
         Args:
-            name: Hospital name from source
+            name: Facility name from the source
 
         Returns:
-            Standardized ID (ca-qc-{slug}) or None if not recognized
+            Hospital ID, or None when the facility must be skipped
         """
-        # Check exact mapping first
-        if name in self.HOSPITAL_MAPPING:
-            return self.HOSPITAL_MAPPING[name]
+        outcome = match_source_name(name, self.HOSPITAL_MAPPING)
 
-        # Try fuzzy matching
-        name_lower = name.lower()
-        for known_name, hospital_id in self.HOSPITAL_MAPPING.items():
-            if known_name.lower() in name_lower or name_lower in known_name.lower():
-                return hospital_id
+        if outcome.status == "exact" and outcome.hospital_id is not None:
+            self.match_report.mapped.append((name, outcome.hospital_id))
+            return outcome.hospital_id
 
-        # Generate ID from name if not in mapping (will need verification)
-        # Normalize accents: ô→o, é→e, à→a, etc.
+        if outcome.status == "aggregate":
+            logger.warning("Skipping aggregate row '%s': not a hospital", name)
+            self.match_report.skipped.append((name, "aggregate row"))
+            return None
+
+        if outcome.status == "ambiguous":
+            logger.warning(
+                "Skipping '%s': does not exactly match a known hospital and overlaps %s",
+                name,
+                ", ".join(outcome.candidates),
+            )
+            self.match_report.skipped.append(
+                (name, "ambiguous; overlaps " + ", ".join(outcome.candidates))
+            )
+            return None
+
+        # No relationship to any mapped hospital: generate an ID from the name
+        # (existing behaviour). Normalize accents: ô→o, é→e, à→a, etc.
         import unicodedata
 
         normalized = unicodedata.normalize("NFKD", name)
         ascii_name = normalized.encode("ascii", "ignore").decode("ascii")
         slug = re.sub(r"[^a-z0-9]+", "-", ascii_name.lower()).strip("-")
 
-        if slug:
-            # We log this but accept it. Data quality monitoring will flag anomalies.
-            return f"ca-qc-{slug}"
+        if not slug:
+            self.match_report.skipped.append((name, "no usable name"))
+            return None
 
-        return None
+        generated_id = f"ca-qc-{slug}"
+        if generated_id in set(self.HOSPITAL_MAPPING.values()):
+            logger.warning(
+                "Skipping '%s': generated ID %s belongs to a mapped hospital", name, generated_id
+            )
+            self.match_report.skipped.append((name, f"generated ID {generated_id} is a mapped ID"))
+            return None
+
+        self.match_report.generated.append((name, generated_id))
+        return generated_id
 
     def _extract_occupancy_percentage(self, text: str) -> float | None:
         """Extract occupancy percentage from text.

@@ -29,6 +29,11 @@ from waittime.core import (
     StatisticType,
 )
 from waittime.scrapers.base import BaseScraper
+from waittime.scrapers.hospital_matching import (
+    MatchReport,
+    find_colliding_ids,
+    match_source_name,
+)
 from waittime.scrapers.observability import (
     DEFAULT_HTTP_CONNECT_TIMEOUT_SECONDS,
     DEFAULT_HTTP_POOL_TIMEOUT_SECONDS,
@@ -79,6 +84,10 @@ class OntarioScraper(BaseScraper):
     }
 
     FALLBACK_HTTP_READ_TIMEOUT_SECONDS = 90.0
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.match_report = MatchReport()
 
     @retry(
         stop=stop_after_attempt(HTTP_FETCH_ATTEMPTS),
@@ -138,7 +147,8 @@ class OntarioScraper(BaseScraper):
             ValueError: If HTML structure is unexpected
         """
         soup = BeautifulSoup(html, "html.parser")
-        measurements: list[Measurement] = []
+        self.match_report.clear()
+        rows_out: list[tuple[str, Measurement]] = []
 
         payload_hash = self.hash_payload(html)
         payload_snippet = self.snippet(html)
@@ -155,7 +165,9 @@ class OntarioScraper(BaseScraper):
                 if len(cells) >= 2:  # Need at least hospital name + wait time
                     measurement = self._extract_from_row(cells, payload_hash, payload_snippet)
                     if measurement:
-                        measurements.append(measurement)
+                        rows_out.append((cells[0].get_text(strip=True), measurement))
+
+        measurements = self._drop_colliding_rows(rows_out)
 
         if not measurements:
             logger.warning(
@@ -163,6 +175,24 @@ class OntarioScraper(BaseScraper):
             )
 
         return measurements
+
+    def _drop_colliding_rows(self, rows: list[tuple[str, Measurement]]) -> list[Measurement]:
+        """Drop every row whose hospital ID was claimed by more than one source row.
+
+        A shared ID means the source rows cannot be told apart, so none of them is
+        written. The skipped names are logged and recorded on ``match_report``.
+        """
+        collisions = find_colliding_ids([(name, m.hospital_id) for name, m in rows])
+        for hospital_id, names in collisions.items():
+            logger.warning(
+                "Skipping %d source rows that map to the same hospital ID %s: %s",
+                len(names),
+                hospital_id,
+                "; ".join(names),
+            )
+            for name in names:
+                self.match_report.skipped.append((name, f"collision on {hospital_id}"))
+        return [m for _, m in rows if m.hospital_id not in collisions]
 
     def _extract_from_row(
         self, cells: list[Any], payload_hash: str, payload_snippet: str
@@ -232,39 +262,68 @@ class OntarioScraper(BaseScraper):
         return None
 
     def _normalize_hospital_id(self, name: str) -> str | None:
-        """Convert hospital name to standardized ID.
+        """Convert a source row name to a hospital ID, or None to skip the row.
+
+        Only an exact (case/whitespace-insensitive) match to ``HOSPITAL_MAPPING``
+        resolves to a mapped ID. Aggregate rows (for example the provincial
+        average) and names that only partially overlap a mapped name (typically a
+        campus of a multi-site corporation) are skipped and logged rather than
+        guessed. Names unrelated to every mapped name keep the pre-existing
+        behaviour of a generated ``ca-on-{slug}`` ID.
 
         Args:
-            name: Hospital name from Ontario Health
+            name: Facility name from Ontario Health
 
         Returns:
-            Standardized ID (ca-on-{slug}) or None if not recognized
+            Hospital ID, or None when the row must be skipped
         """
-        # Check exact mapping first
-        if name in self.HOSPITAL_MAPPING:
-            return self.HOSPITAL_MAPPING[name]
+        outcome = match_source_name(name, self.HOSPITAL_MAPPING)
 
-        # Try fuzzy matching
-        name_lower = name.lower()
-        for known_name, hospital_id in self.HOSPITAL_MAPPING.items():
-            if known_name.lower() in name_lower or name_lower in known_name.lower():
-                return hospital_id
+        if outcome.status == "exact" and outcome.hospital_id is not None:
+            self.match_report.mapped.append((name, outcome.hospital_id))
+            return outcome.hospital_id
 
-        # Generate ID from name if not in mapping (will need verification)
+        if outcome.status == "aggregate":
+            logger.warning("Skipping aggregate row '%s': not a hospital", name)
+            self.match_report.skipped.append((name, "aggregate row"))
+            return None
+
+        if outcome.status == "ambiguous":
+            logger.warning(
+                "Skipping '%s': does not exactly match a known hospital and overlaps %s",
+                name,
+                ", ".join(outcome.candidates),
+            )
+            self.match_report.skipped.append(
+                (name, "ambiguous; overlaps " + ", ".join(outcome.candidates))
+            )
+            return None
+
+        # No relationship to any mapped hospital: generate an ID from the name
+        # (existing behaviour; needs verification downstream).
         import unicodedata
 
         normalized = unicodedata.normalize("NFKD", name)
         ascii_name = normalized.encode("ascii", "ignore").decode("ascii")
         slug = re.sub(r"[^a-z0-9]+", "-", ascii_name.lower()).strip("-")
 
-        if slug:
-            logger.warning(
-                f"Unknown hospital '{name}' - generated ID 'ca-on-{slug}'. "
-                "Needs manual verification."
-            )
-            return f"ca-on-{slug}"
+        if not slug:
+            self.match_report.skipped.append((name, "no usable name"))
+            return None
 
-        return None
+        generated_id = f"ca-on-{slug}"
+        if generated_id in set(self.HOSPITAL_MAPPING.values()):
+            logger.warning(
+                "Skipping '%s': generated ID %s belongs to a mapped hospital", name, generated_id
+            )
+            self.match_report.skipped.append((name, f"generated ID {generated_id} is a mapped ID"))
+            return None
+
+        logger.warning(
+            f"Unknown hospital '{name}' - generated ID '{generated_id}'. Needs manual verification."
+        )
+        self.match_report.generated.append((name, generated_id))
+        return generated_id
 
     def _create_measurement(
         self, hospital_id: str, value: float, payload_hash: str, payload_snippet: str

@@ -1,5 +1,6 @@
 """Unit tests for Ontario scraper."""
 
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 import httpx
@@ -137,13 +138,18 @@ class TestOntarioScraper:
         )
         assert scraper._normalize_hospital_id("Toronto General Hospital") == "ca-on-toronto-general"
 
-    def test_normalize_hospital_id_fuzzy_match(self, scraper):
-        """Normalize hospital name to ID (fuzzy match)."""
-        # Contains "SickKids"
-        assert scraper._normalize_hospital_id("SickKids Emergency") == "ca-on-sickkids"
+    def test_normalize_hospital_id_does_not_fuzzy_match(self, scraper):
+        """Partial overlaps with a mapped name are skipped, not guessed."""
+        assert scraper._normalize_hospital_id("SickKids Emergency") is None
+        assert scraper._normalize_hospital_id("The Ottawa Hospital - Civic") is None
 
-        # Contains "The Ottawa Hospital"
-        assert scraper._normalize_hospital_id("The Ottawa Hospital - Civic") == "ca-on-ottawa-civic"
+    def test_normalize_hospital_id_exact_match_ignores_case_and_spacing(self, scraper):
+        assert scraper._normalize_hospital_id("  toronto  GENERAL hospital ") == (
+            "ca-on-toronto-general"
+        )
+        assert scraper._normalize_hospital_id("Children\u2019s Hospital of Eastern Ontario") == (
+            "ca-on-cheo"
+        )
 
     def test_normalize_hospital_id_generates_slug(self, scraper):
         """Generate slug for unknown hospital."""
@@ -316,3 +322,132 @@ class TestOntarioScraper:
         hospital_ids = {m.hospital_id for m in measurements}
         assert "ca-on-ottawa-civic" in hospital_ids
         assert "ca-on-toronto-general" in hospital_ids
+
+
+FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "scrapers"
+
+MULTI_SITE_IDS = {
+    "ca-on-hamilton-health",
+    "ca-on-william-osler",
+    "ca-on-scarborough",
+    "ca-on-toronto-general",
+    "ca-on-kingston-health",
+}
+
+
+@pytest.mark.unit
+class TestOntarioHospitalIdMatching:
+    """Rows must never share a hospital ID or write aggregates as hospitals."""
+
+    @pytest.fixture
+    def scraper(self):
+        return OntarioScraper(create_ontario_source())
+
+    @pytest.fixture
+    def fixture_html(self):
+        return (FIXTURES / "ontario_ed_table.html").read_text(encoding="utf-8")
+
+    def test_provincial_row_is_never_written_as_a_hospital(self, scraper, fixture_html):
+        measurements = scraper.parse(fixture_html)
+
+        assert ("Ontario", "aggregate row") in scraper.match_report.skipped
+        assert "ca-on-ontario" not in {m.hospital_id for m in measurements}
+        # CHEO carries only its own exact row (2.8 h), not the provincial 1.7 h.
+        cheo = [m for m in measurements if m.hospital_id == "ca-on-cheo"]
+        assert [m.value for m in cheo] == [pytest.approx(2.8 * 60)]
+
+    @pytest.mark.parametrize(
+        "name",
+        ["Ontario", "ONTARIO", " Ontario Average ", "Provincial Average", "Total"],
+    )
+    def test_aggregate_rows_are_skipped(self, scraper, name):
+        html = (
+            f"<table><tr><th>H</th><th>Hours</th></tr><tr><td>{name}</td><td>1.7</td></tr></table>"
+        )
+        assert scraper.parse(html) == []
+        assert scraper.match_report.skipped == [(name.strip(), "aggregate row")] or (
+            scraper.match_report.skipped[0][1] == "aggregate row"
+        )
+
+    def test_name_merely_starting_with_ontario_is_not_an_aggregate(self, scraper):
+        html = (
+            "<table><tr><th>H</th><th>Hours</th></tr>"
+            "<tr><td>Ontario Shores Centre for Mental Health</td><td>1.7</td></tr></table>"
+        )
+        measurements = scraper.parse(html)
+        assert [m.hospital_id for m in measurements] == [
+            "ca-on-ontario-shores-centre-for-mental-health"
+        ]
+
+    def test_multi_campus_rows_do_not_write_to_corporation_ids(self, scraper, fixture_html):
+        measurements = scraper.parse(fixture_html)
+        written = {m.hospital_id for m in measurements}
+
+        assert not (written & MULTI_SITE_IDS)
+        skipped_names = {name for name, _ in scraper.match_report.skipped}
+        assert "Hamilton Health Sciences Corp-Juravinski" in skipped_names
+        assert "William Osler Health System-Civic Site" in skipped_names
+        assert "Kingston Health Sciences Centre-Kingston General" in skipped_names
+        assert "University Health Network-General Site" in skipped_names
+        assert "Scarborough Health Network-Scar.Gen.Site" in skipped_names
+
+    def test_exact_matches_and_unrelated_names_still_resolve(self, scraper, fixture_html):
+        measurements = scraper.parse(fixture_html)
+        by_id = {m.hospital_id: m.value for m in measurements}
+
+        assert by_id["ca-on-sunnybrook"] == pytest.approx(3.1 * 60)
+        assert by_id["ca-on-north-york-general"] == pytest.approx(1.2 * 60)
+        # Unrelated names keep their existing generated IDs (no new behaviour).
+        assert "ca-on-espanola-general-hospital" in by_id
+        assert "ca-on-st-joseph-s-health-care-system-hamilton" in by_id
+
+    def test_no_two_rows_share_a_hospital_id(self, scraper, fixture_html):
+        measurements = scraper.parse(fixture_html)
+        ids = [m.hospital_id for m in measurements]
+        assert len(ids) == len(set(ids))
+        # 21 fixture rows: 1 aggregate + 14 multi-campus skipped.
+        assert len(measurements) == 21 - 1 - 14
+        assert len(scraper.match_report.skipped) == 15
+
+    def test_no_new_hospital_ids_are_introduced_for_skipped_rows(self, scraper, fixture_html):
+        """Skipped campuses must not fall through to generated (auto-created) IDs."""
+        scraper.parse(fixture_html)
+        generated_names = {name for name, _ in scraper.match_report.generated}
+        skipped_names = {name for name, _ in scraper.match_report.skipped}
+        assert not (generated_names & skipped_names)
+        assert not any("Health Sciences Corp" in name for name in generated_names)
+
+    def test_two_rows_with_same_id_are_both_skipped(self, scraper):
+        """Alias spellings of one hospital in the same run are ambiguous."""
+        html = """
+        <table><tr><th>H</th><th>Hours</th></tr>
+        <tr><td>CHEO</td><td>1.0</td></tr>
+        <tr><td>Children's Hospital of Eastern Ontario</td><td>2.0</td></tr>
+        <tr><td>Espanola General Hospital</td><td>1.0</td></tr>
+        </table>"""
+        measurements = scraper.parse(html)
+
+        assert [m.hospital_id for m in measurements] == ["ca-on-espanola-general-hospital"]
+        assert scraper.match_report.skipped == [
+            ("CHEO", "collision on ca-on-cheo"),
+            ("Children's Hospital of Eastern Ontario", "collision on ca-on-cheo"),
+        ]
+
+    def test_two_names_with_same_generated_slug_are_both_skipped(self, scraper):
+        html = """
+        <table><tr><th>H</th><th>Hours</th></tr>
+        <tr><td>Dryden Regional Health Centre</td><td>1.0</td></tr>
+        <tr><td>Dryden  Regional Health Centre.</td><td>2.0</td></tr>
+        </table>"""
+        assert scraper.parse(html) == []
+        assert len(scraper.match_report.skipped) == 2
+
+    def test_generated_id_equal_to_mapped_id_is_skipped(self, scraper):
+        # Slug of this name is "ca-on-ottawa-civic", which belongs to a mapped campus.
+        assert scraper._normalize_hospital_id("Ottawa/Civic") is None
+
+    def test_report_is_reset_between_parses(self, scraper, fixture_html):
+        scraper.parse(fixture_html)
+        scraper.parse("<table></table>")
+        assert scraper.match_report.skipped == []
+        assert scraper.match_report.mapped == []
