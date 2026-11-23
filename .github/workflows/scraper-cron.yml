@@ -25,7 +25,7 @@ concurrency:
 jobs:
   run-scrapers:
     name: Run All Scrapers
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
 
     steps:
