@@ -23,7 +23,6 @@ import {
 import type { RegionOption } from "@/components/RegionSelector";
 import { getFeaturedTestimonial } from "@/content/stakeholderTestimonials";
 
-import { isRecent } from "@/utils/date";
 import { useTranslations } from "next-intl";
 import type { PublicCoverage } from "@/types/coverage";
 import { HEARTBEAT_STALE_THRESHOLD_MINUTES } from "@/utils/live-scraper-sources";
@@ -301,7 +300,7 @@ export function HomePageClient({
       }
 
       // 1. Live Only Filter
-      if (showLiveOnly && !isRecent(hospital.last_updated)) {
+      if (showLiveOnly && hospital.wait_time_status !== "current") {
         return false;
       }
 
@@ -335,7 +334,9 @@ export function HomePageClient({
     });
 
   // Count live hospitals
-  const liveCount = hospitals.filter((h) => isRecent(h.last_updated)).length;
+  const liveCount = hospitals.filter(
+    (h) => h.wait_time_status === "current",
+  ).length;
 
   return (
     <main className="flex flex-col h-screen overflow-hidden bg-muted/20">

@@ -215,4 +215,104 @@ describe("HospitalList", () => {
 
     expect(onRegionChange).toHaveBeenCalledWith("ca-on-region-east");
   });
+
+  describe("wait-time freshness", () => {
+    const base = {
+      city: "Vancouver",
+      province: "BC",
+      is_verified: true,
+      latitude: 49.2,
+      longitude: -123.1,
+      source_id: "bc-phsa",
+    };
+
+    it("shows the LIVE badge and value only for a current value", () => {
+      render(
+        <HospitalList
+          hospitals={[
+            {
+              ...base,
+              id: "c",
+              name: "Current Hospital",
+              current_wait_time: 55,
+              wait_time_status: "current",
+              last_updated: new Date().toISOString(),
+            } as Hospital,
+          ]}
+          selectedId={null}
+          onSelect={vi.fn()}
+        />,
+      );
+      expect(screen.getByText("LIVE")).toBeInTheDocument();
+      expect(screen.getByText("55")).toBeInTheDocument();
+    });
+
+    it("shows No current data and the last report date for a stale value", () => {
+      render(
+        <HospitalList
+          hospitals={[
+            {
+              ...base,
+              id: "s",
+              name: "Delta Hospital",
+              wait_time_status: "stale",
+              last_updated: "2026-06-04T23:33:00.000Z",
+            } as Hospital,
+          ]}
+          selectedId={null}
+          onSelect={vi.fn()}
+        />,
+      );
+      expect(screen.getByText("No current data")).toBeInTheDocument();
+      expect(screen.getByText(/Last reported .*2026/)).toBeInTheDocument();
+      expect(screen.queryByText("LIVE")).not.toBeInTheDocument();
+      expect(screen.queryByText("380")).not.toBeInTheDocument();
+      expect(screen.queryByText("--")).not.toBeInTheDocument();
+    });
+
+    it("labels an Ontario value as a monthly average and never LIVE", () => {
+      render(
+        <HospitalList
+          hospitals={[
+            {
+              ...base,
+              id: "o",
+              name: "Ontario Hospital",
+              province: "ON",
+              source_id: "ontario-health",
+              monthly_average_minutes: 30,
+              wait_time_status: "monthly",
+              // The collector ran a minute ago; that must not make it LIVE.
+              last_updated: new Date().toISOString(),
+            } as Hospital,
+          ]}
+          selectedId={null}
+          onSelect={vi.fn()}
+        />,
+      );
+      expect(screen.queryByText("LIVE")).not.toBeInTheDocument();
+      expect(screen.getByText("Monthly average")).toBeInTheDocument();
+      expect(screen.getByText("30")).toBeInTheDocument();
+      expect(screen.getByText(/Last checked/)).toBeInTheDocument();
+    });
+
+    it("does not show LIVE when the status is missing", () => {
+      render(
+        <HospitalList
+          hospitals={[
+            {
+              ...base,
+              id: "m",
+              name: "No Status Hospital",
+              current_wait_time: 99,
+              last_updated: new Date().toISOString(),
+            } as Hospital,
+          ]}
+          selectedId={null}
+          onSelect={vi.fn()}
+        />,
+      );
+      expect(screen.queryByText("LIVE")).not.toBeInTheDocument();
+    });
+  });
 });

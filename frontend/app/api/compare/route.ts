@@ -8,13 +8,23 @@ import {
   areMethodologiesComparable,
   generateDivergenceBrief,
 } from "@/utils/comparability";
+import {
+  classifyWaitTime,
+  type WaitTimeStatus,
+} from "@/utils/wait-time-freshness";
 
 interface HospitalComparison {
   id: string;
   name: string;
   province: string;
   city: string;
-  wait_time: number;
+  // Present only when the latest measurement is current for its source.
+  wait_time: number | null;
+  // Monthly average from a monthly source (Ontario Health); never a live value.
+  monthly_average_minutes: number | null;
+  wait_time_status: WaitTimeStatus;
+  // Latest stored measurement: the last report for stale values, or the last
+  // check for monthly sources.
   last_updated: string;
   methodology: Methodology;
 }
@@ -41,6 +51,7 @@ async function getHospitalWithMeasurement(
       h.longitude,
       m.value as wait_time,
       m.timestamp_utc as last_updated,
+      m.source_id as measurement_source_id,
       m.metric_family,
       m.start_event,
       m.end_event,
@@ -62,12 +73,20 @@ async function getHospitalWithMeasurement(
   if (result.length === 0) return null;
 
   const row = result[0];
+  const waitTimeStatus = classifyWaitTime({
+    sourceId: row.measurement_source_id,
+    hasValue: row.wait_time != null,
+    latestMeasurement: row.last_updated,
+  });
+  const value = row.wait_time == null ? null : Number(row.wait_time);
   return {
     id: row.id,
     name: row.name,
     province: row.province,
     city: row.city,
-    wait_time: Number(row.wait_time),
+    wait_time: waitTimeStatus === "current" ? value : null,
+    monthly_average_minutes: waitTimeStatus === "monthly" ? value : null,
+    wait_time_status: waitTimeStatus,
     last_updated: new Date(row.last_updated).toISOString(),
     methodology: {
       metric_family: row.metric_family,
@@ -161,14 +180,33 @@ export async function GET(request: NextRequest) {
           dataB.methodology,
         );
 
-        const divergenceBrief = comparable
+        const hasCurrentValues =
+          dataA.wait_time_status === "current" &&
+          dataB.wait_time_status === "current";
+        const unavailableNames = [dataA, dataB]
+          .filter((d) => d.wait_time_status !== "current")
+          .map((d) => d.name);
+
+        // Two values are directly comparable only when both are current and the
+        // methodologies match.
+        const isComparable = comparable && hasCurrentValues;
+        const divergenceParts: string[] = [];
+        const methodologyBrief = comparable
           ? null
           : generateDivergenceBrief(dataA.methodology, dataB.methodology);
+        if (methodologyBrief) divergenceParts.push(methodologyBrief);
+        if (!hasCurrentValues) {
+          divergenceParts.push(
+            `No current value for ${unavailableNames.join(" and ")}: it is either stale or a monthly average, so it cannot be compared with a current wait time.`,
+          );
+        }
+        const divergenceBrief =
+          divergenceParts.length > 0 ? divergenceParts.join(" ") : null;
 
         const response: ComparisonResponse = {
           hospital_a: dataA,
           hospital_b: dataB,
-          comparable,
+          comparable: isComparable,
           divergence_brief: divergenceBrief,
           comparison_timestamp: new Date().toISOString(),
         };

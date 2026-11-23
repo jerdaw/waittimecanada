@@ -231,9 +231,40 @@ Operational note:
 
 `GET /api/compare` returns:
 
-- `comparable: boolean`
+- `comparable: boolean`; `true` only when both hospitals have a current value
+  and identical methodology
 - `divergence_brief: string | null`
 - methodology fields for both hospitals
+- per hospital: `wait_time` (non-null only when the value is current),
+  `monthly_average_minutes`, `wait_time_status`, and `last_updated`
+  (see [Wait-time freshness contract](#wait-time-freshness-contract))
+
+## Wait-time freshness contract
+
+`GET /api/hospitals` and `GET /api/compare` only return a wait time as a
+current value when the hospital's own latest `TIME_TO_PROVIDER` measurement is
+recent for its source. Each hospital carries `wait_time_status`:
+
+| `wait_time_status` | Meaning                                                       | Value fields                                                       |
+| ------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `current`          | Live-estimate source and the measurement is within the cutoff | `current_wait_time` (`wait_time` on compare)                       |
+| `stale`            | Live-estimate source and the measurement is older than cutoff | none; `last_updated` is the date of the last report                |
+| `monthly`          | Monthly source (Ontario Health); never current                | `monthly_average_minutes`; `last_updated` is when it was last read |
+| `none`             | No measurement                                                | none                                                               |
+
+Cutoffs (`utils/wait-time-freshness.ts`): Alberta (`alberta-ahs`), BC
+(`bc-phsa`) and Quebec (`quebec-msss`) are collected hourly, and a value is
+current for up to 120 minutes (two collection intervals, the same threshold as
+the source heartbeat check). The boundary is inclusive. Missing, unparsable or
+future timestamps are `stale`, and an unrecognised source uses the same 120
+minute cutoff. Ontario Health publishes a monthly average, so it is always
+`monthly`; the reporting period is not stored, and `last_updated` is the time of
+the collector run, not the period the figure covers.
+
+Compare responses are cached for up to five minutes, so a value can remain
+`current` for up to five minutes past the cutoff.
+
+Occupancy keeps its separate fail-closed contract (see below).
 
 ## Public health resource contracts
 

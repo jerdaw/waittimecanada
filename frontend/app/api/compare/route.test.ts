@@ -134,4 +134,72 @@ describe("API Route Integration: Compare", () => {
       "Different statistics: MEAN vs ROLLING_AVG",
     );
   });
+
+  describe("wait-time freshness", () => {
+    const minutesAgo = (m: number) =>
+      new Date(Date.now() - m * 60 * 1000).toISOString();
+    const row = (id: string, overrides: Record<string, unknown> = {}) => ({
+      id,
+      name: id,
+      province: "BC",
+      city: "X",
+      metric_family: "TIME_TO_PROVIDER",
+      start_event: "TRIAGE",
+      end_event: "PHYSICIAN",
+      statistic_type: "P90",
+      wait_time: 100,
+      measurement_source_id: "bc-phsa",
+      last_updated: minutesAgo(10),
+      ...overrides,
+    });
+
+    async function compare(a: unknown, b: unknown, ids = ["fa", "fb"]) {
+      mockSql.mockResolvedValueOnce([a]).mockResolvedValueOnce([b]);
+      const res = await GET(
+        new NextRequest(`http://localhost/api/compare?a=${ids[0]}&b=${ids[1]}`),
+      );
+      const body = await res.json();
+      return body.data;
+    }
+
+    test("returns current values for two recent live measurements", async () => {
+      const data = await compare(row("c1"), row("c2"), ["c1", "c2"]);
+      expect(data.hospital_a.wait_time_status).toBe("current");
+      expect(data.hospital_a.wait_time).toBe(100);
+      expect(data.comparable).toBe(true);
+      expect(data.divergence_brief).toBeNull();
+    });
+
+    test("does not return a stale value as a wait time", async () => {
+      const data = await compare(
+        row("s1", { last_updated: "2026-06-04T23:33:00Z", wait_time: 380 }),
+        row("s2"),
+        ["s1", "s2"],
+      );
+      expect(data.hospital_a.wait_time_status).toBe("stale");
+      expect(data.hospital_a.wait_time).toBeNull();
+      expect(data.hospital_a.last_updated).toBe("2026-06-04T23:33:00.000Z");
+      expect(data.hospital_b.wait_time).toBe(100);
+      expect(data.comparable).toBe(false);
+      expect(data.divergence_brief).toMatch(/No current value/);
+    });
+
+    test("returns an Ontario value only as a monthly average", async () => {
+      const data = await compare(
+        row("o1", {
+          province: "ON",
+          statistic_type: "MEAN",
+          measurement_source_id: "ontario-health",
+          last_updated: minutesAgo(1),
+          wait_time: 30,
+        }),
+        row("o2"),
+        ["o1", "o2"],
+      );
+      expect(data.hospital_a.wait_time_status).toBe("monthly");
+      expect(data.hospital_a.wait_time).toBeNull();
+      expect(data.hospital_a.monthly_average_minutes).toBe(30);
+      expect(data.comparable).toBe(false);
+    });
+  });
 });

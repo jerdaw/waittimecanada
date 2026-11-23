@@ -565,6 +565,13 @@ environment-specific paths are kept outside public documentation.
   retained only as an emergency operator control
 - **Freshness Thresholds:** Source-health checks flag stale or failed updates
   when source heartbeats exceed the public freshness threshold
+- **Current vs stale values:** For the hourly live-estimate sources (Alberta,
+  BC, Quebec), a hospital's wait time is shown as current only if its own latest
+  measurement is no more than 120 minutes old. Otherwise the site shows "No
+  current data" and the date it was last reported. Ontario Health publishes a
+  monthly average, so it is shown as a monthly average with a link to the
+  source, never as live; "last checked" is when the collector read the source,
+  not the period the figure covers. See `docs/API.md` for the contract.
 - **Current Status:** See the public status and data-quality pages for current source state
 
 ---

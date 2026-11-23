@@ -26,6 +26,7 @@ import {
 } from "@/utils/equity";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useTranslations } from "next-intl";
+import { WaitTimeFreshnessNote } from "./WaitTimeFreshnessNote";
 
 type Translator = (
   key: string,
@@ -345,6 +346,10 @@ function HospitalPopup({
     hospital.current_wait_time !== undefined &&
     hospital.current_wait_time !== null;
 
+  const isMonthly = hospital.wait_time_status === "monthly";
+  const isStale = hospital.wait_time_status === "stale";
+  const showMethodology = hasData || isMonthly;
+
   const timeStr = formatRelativeTime(hospital.last_updated);
 
   return (
@@ -411,6 +416,25 @@ function HospitalPopup({
                 {status}
               </div>
             </div>
+          ) : isStale || isMonthly ? (
+            <div className="text-center py-2 text-sm text-slate-600">
+              {isMonthly && hospital.monthly_average_minutes !== undefined && (
+                <div className="flex items-baseline justify-center gap-1 mb-1">
+                  <span className="text-3xl font-bold text-slate-700">
+                    {Math.round(hospital.monthly_average_minutes)}
+                  </span>
+                  <span className="text-lg font-medium text-slate-500">
+                    {t("popup.min")}
+                  </span>
+                </div>
+              )}
+              <WaitTimeFreshnessNote
+                status={hospital.wait_time_status}
+                lastUpdated={hospital.last_updated}
+                sourceId={hospital.source_id}
+                detailed={isMonthly}
+              />
+            </div>
           ) : (
             <div className="text-center py-2">
               <div className="text-slate-400 text-sm">
@@ -433,7 +457,7 @@ function HospitalPopup({
         </div>
 
         {/* Methodology information */}
-        {hasData && hospital.metric_family && (
+        {showMethodology && hospital.metric_family && (
           <div className="px-4 pb-3 border-t border-slate-100 pt-3">
             <div className="text-xs text-slate-500 mb-1.5 font-medium">
               {t("popup.methodology")}
@@ -557,7 +581,11 @@ function HospitalPopup({
 
         {/* Footer */}
         <div className="px-4 pb-4 flex items-center justify-between text-xs text-slate-500">
-          <span>{t("popup.updated", { time: timeStr })}</span>
+          {hasData ? (
+            <span>{t("popup.updated", { time: timeStr })}</span>
+          ) : (
+            <span />
+          )}
           <div className="flex items-center gap-1">
             <div
               className="w-2 h-2 rounded-full"

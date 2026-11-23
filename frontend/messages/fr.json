@@ -116,7 +116,6 @@
       "triageToDoctor": "Triage au médecin"
     }
   },
-
   "HospitalList": {
     "liveOnly": "En direct seulement",
     "results": "{count} résultats",
@@ -990,5 +989,18 @@
         "description": "Une attente de 60 minutes en Ontario (Moyenne, Triage→Médecin) est fondamentalement différente d'une attente de 60 minutes au Québec (Moyenne Mobile, Inscription→Fournisseur). Notre plateforme détecte automatiquement ces différences et vous avertit lorsque vous comparez des mesures incompatibles."
       }
     }
+  },
+  "WaitTimeFreshness": {
+    "noCurrentData": "Aucune donnée actuelle",
+    "lastReported": "Dernière donnée publiée le {date}",
+    "monthlyAverage": "Moyenne mensuelle",
+    "monthlyNote": "Publiée chaque mois par la source. Ce n'est pas un temps d'attente en direct.",
+    "monthlyPeriodNote": "La période couverte n'est pas indiquée ici.",
+    "lastChecked": "Dernière vérification le {date}",
+    "lastCheckedNote": "« Dernière vérification » correspond au moment où nous avons consulté la source, et non à la période couverte par la valeur.",
+    "viewSource": "Voir la source (s'ouvre dans un nouvel onglet)",
+    "statusMonthly": "Moyenne mensuelle",
+    "statusNoCurrent": "Aucune donnée actuelle",
+    "min": "min"
   }
 }

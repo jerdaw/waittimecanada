@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Stopped presenting stale or non-live wait times as current. For Alberta, BC and Quebec a hospital's value is current only if its own latest measurement is at most 120 minutes old; otherwise cards, list, map and comparison show "No current data" and the last report date, and `/api/hospitals` and `/api/compare` omit the value and return `wait_time_status`. Ontario Health values are shown as a monthly average with a source link and are never labelled live or counted as live. English and French copy added.
 - Removed the incorrect "CC-BY-4.0" data-licence claim from export metadata, the `X-Data-License` header and the export UI. Exports now state that values remain subject to each source's own terms, replace the header with `X-Data-Terms`, and carry `source_name`, `source_url` and `methodology_url` per row.
 - Displayed the Ontario source as "Ontario Health" and aligned the Terms and Privacy pages and docs.
 

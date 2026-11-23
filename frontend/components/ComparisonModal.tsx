@@ -3,13 +3,18 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DivergenceWarning } from "./DivergenceWarning";
+import { WaitTimeFreshnessNote } from "./WaitTimeFreshnessNote";
+import type { WaitTimeStatus } from "@/utils/wait-time-freshness";
 
 interface Hospital {
   id: string;
   name: string;
   province: string;
   city: string;
-  wait_time: number;
+  // Null unless the value is current for its source.
+  wait_time: number | null;
+  monthly_average_minutes?: number | null;
+  wait_time_status?: WaitTimeStatus;
   last_updated: string;
   methodology: {
     metric_family: string;
@@ -50,6 +55,43 @@ function formatRelativeTime(dateString: string): string {
   const diffHours = Math.floor(diffMins / 60);
   if (diffHours < 24) return `${diffHours}h ago`;
   return date.toLocaleDateString();
+}
+
+function WaitTimeValue({ hospital }: { hospital: Hospital }) {
+  // Fail closed: a number is shown as a wait time only when the API marked it
+  // current. Stale and monthly values get their own explicit labelling.
+  if (hospital.wait_time_status === "current" && hospital.wait_time !== null) {
+    return (
+      <div className="text-center">
+        <div
+          className={`text-4xl font-bold ${getWaitTimeColor(hospital.wait_time)}`}
+        >
+          {Math.round(hospital.wait_time)}
+          <span className="text-lg text-slate-500 font-normal ml-1">min</span>
+        </div>
+        <p className="text-xs text-slate-500 mt-2">
+          Updated {formatRelativeTime(hospital.last_updated)}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="text-center text-sm text-slate-600">
+      {hospital.wait_time_status === "monthly" &&
+        hospital.monthly_average_minutes != null && (
+          <div className="text-3xl font-bold text-slate-700 mb-1">
+            {Math.round(hospital.monthly_average_minutes)}
+            <span className="text-lg text-slate-500 font-normal ml-1">min</span>
+          </div>
+        )}
+      <WaitTimeFreshnessNote
+        status={hospital.wait_time_status === "monthly" ? "monthly" : "stale"}
+        lastUpdated={hospital.last_updated}
+        detailed
+      />
+    </div>
+  );
 }
 
 function MethodologyField({
@@ -247,19 +289,7 @@ export function ComparisonModal({
               </p>
 
               <div className="bg-white rounded-lg p-4 mb-4">
-                <div className="text-center">
-                  <div
-                    className={`text-4xl font-bold ${getWaitTimeColor(data.hospital_a.wait_time)}`}
-                  >
-                    {Math.round(data.hospital_a.wait_time)}
-                    <span className="text-lg text-slate-500 font-normal ml-1">
-                      min
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-2">
-                    Updated {formatRelativeTime(data.hospital_a.last_updated)}
-                  </p>
-                </div>
+                <WaitTimeValue hospital={data.hospital_a} />
               </div>
 
               <div className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2">
@@ -295,19 +325,7 @@ export function ComparisonModal({
               </p>
 
               <div className="bg-white rounded-lg p-4 mb-4">
-                <div className="text-center">
-                  <div
-                    className={`text-4xl font-bold ${getWaitTimeColor(data.hospital_b.wait_time)}`}
-                  >
-                    {Math.round(data.hospital_b.wait_time)}
-                    <span className="text-lg text-slate-500 font-normal ml-1">
-                      min
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-2">
-                    Updated {formatRelativeTime(data.hospital_b.last_updated)}
-                  </p>
-                </div>
+                <WaitTimeValue hospital={data.hospital_b} />
               </div>
 
               <div className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2">

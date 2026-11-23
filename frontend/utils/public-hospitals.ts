@@ -4,6 +4,7 @@ import { getDb } from "@/utils/db";
 import { buildServerCacheKey, getOrSetServerCache } from "@/utils/server-cache";
 import { isCurrentOccupancyAvailable } from "@/utils/occupancy-freshness";
 import { resolveHeartbeatStaleThresholdMinutes } from "@/utils/runtime-freshness";
+import { classifyWaitTime } from "@/utils/wait-time-freshness";
 
 // Current hospital values are never shared-cacheable. Keep only a short
 // in-process coalescing window to avoid repeated identical DB reads while
@@ -56,6 +57,7 @@ async function queryPublicHospitals(
       s.telehealth_number,
       m.value as current_wait_time,
       m.timestamp_utc as last_updated,
+      m.source_id as measurement_source_id,
       m.metric_family,
       m.start_event,
       m.end_event,
@@ -72,6 +74,7 @@ async function queryPublicHospitals(
       SELECT
         value,
         timestamp_utc,
+        source_id,
         metric_family,
         start_event,
         end_event,
@@ -146,6 +149,17 @@ async function queryPublicHospitals(
       staleThresholdMinutes,
     );
 
+    // A value counts as current only if this hospital's own latest measurement
+    // is recent for its source. Monthly sources (Ontario Health) are never
+    // current: their value is exposed as monthly_average_minutes instead.
+    const waitTimeStatus = classifyWaitTime({
+      sourceId: row.measurement_source_id ?? row.source_id,
+      hasValue: row.current_wait_time != null,
+      latestMeasurement: row.last_updated,
+    });
+    const waitTimeMinutes =
+      row.current_wait_time == null ? undefined : Number(row.current_wait_time);
+
     return {
       id: String(row.id),
       name: String(row.name),
@@ -157,9 +171,12 @@ async function queryPublicHospitals(
       is_visible: Boolean(row.is_visible),
       source_id: String(row.source_id),
       current_wait_time:
-        row.current_wait_time == null
-          ? undefined
-          : Number(row.current_wait_time),
+        waitTimeStatus === "current" ? waitTimeMinutes : undefined,
+      monthly_average_minutes:
+        waitTimeStatus === "monthly" ? waitTimeMinutes : undefined,
+      wait_time_status: waitTimeStatus,
+      // For stale hospitals this is the date of the last report; for monthly
+      // sources it is when the collector last checked, not the data period.
       last_updated: toIsoString(row.last_updated),
       metric_family:
         row.metric_family == null ? undefined : String(row.metric_family),

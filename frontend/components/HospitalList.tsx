@@ -4,11 +4,11 @@ import { HospitalCardSkeleton } from "./skeletons/HospitalCardSkeleton";
 import { ExpandedCardDetails } from "./ExpandedCardDetails";
 import { calculateDistance } from "@/utils/distance";
 import { useState, useRef, useEffect } from "react";
-import { isRecent } from "@/utils/date";
 import { ProvinceFilter } from "./ProvinceFilter";
 import { RegionSelector, type RegionOption } from "./RegionSelector";
 import { OccupancyBadge } from "./OccupancyBadge";
 import { useTranslations } from "next-intl";
+import { WaitTimeFreshnessNote } from "./WaitTimeFreshnessNote";
 
 interface HospitalListProps {
   hospitals: Hospital[];
@@ -202,7 +202,12 @@ export function HospitalList({
               const isSelected = hospital.id === selectedId;
               const isExpanded = hospital.id === expandedId;
               const color = getStatusColor(hospital.current_wait_time);
-              const showLiveBadge = isRecent(hospital.last_updated);
+              // "LIVE" only for a value that is current for its source. Monthly
+              // averages and stale values are never labelled live.
+              const showLiveBadge = hospital.wait_time_status === "current";
+              const isNotCurrent =
+                hospital.wait_time_status === "stale" ||
+                hospital.wait_time_status === "monthly";
 
               // Calculate distance if user location is available
               const distance = userLocation
@@ -268,14 +273,36 @@ export function HospitalList({
                     {/* Wait Time & Occupancy */}
                     <div className="flex items-center gap-2 shrink-0">
                       <div className="text-right flex flex-col items-end gap-0.5">
-                        <div>
-                          <span className="text-lg font-bold tabular-nums">
-                            {formatWaitTime(hospital.current_wait_time)}
-                          </span>
-                          <span className="text-xs text-muted-foreground ml-0.5">
-                            {tCard("min")}
-                          </span>
-                        </div>
+                        {isNotCurrent ? (
+                          <div className="text-[11px] text-muted-foreground leading-tight">
+                            {hospital.wait_time_status === "monthly" &&
+                              hospital.monthly_average_minutes !==
+                                undefined && (
+                                <div>
+                                  <span className="text-base font-semibold tabular-nums">
+                                    {formatWaitTime(
+                                      hospital.monthly_average_minutes,
+                                    )}
+                                  </span>
+                                  <span className="ml-0.5">{tCard("min")}</span>
+                                </div>
+                              )}
+                            <WaitTimeFreshnessNote
+                              status={hospital.wait_time_status}
+                              lastUpdated={hospital.last_updated}
+                              sourceId={hospital.source_id}
+                            />
+                          </div>
+                        ) : (
+                          <div>
+                            <span className="text-lg font-bold tabular-nums">
+                              {formatWaitTime(hospital.current_wait_time)}
+                            </span>
+                            <span className="text-xs text-muted-foreground ml-0.5">
+                              {tCard("min")}
+                            </span>
+                          </div>
+                        )}
                         {hospital.occupancy_percentage !== undefined && (
                           <OccupancyBadge
                             percentage={hospital.occupancy_percentage}
