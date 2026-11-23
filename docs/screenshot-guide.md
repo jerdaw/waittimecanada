@@ -49,7 +49,7 @@
 **Filename:** `02-divergence-warning.png`
 
 **Caption for social media:**
-> "The platform explains WHY comparisons are invalid. Ontario's Mean Triage→Physician metric cannot be directly compared with Quebec's Rolling Avg Registration→Physician metric."
+> "The platform explains WHY comparisons are invalid. Ontario's published mean cannot be directly compared with Quebec's estimated waiting time, whose start point and statistic Quebec does not publish."
 
 ---
 

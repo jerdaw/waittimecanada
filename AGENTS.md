@@ -179,7 +179,7 @@ Each provincial scraper (`scrapers/quebec.py`, `scrapers/alberta.py`, etc.) must
        'hospital_id': 'ca-qc-chum',
        'value': 180,  # minutes
        'metric_family': 'TIME_TO_PROVIDER',
-       'start_event': 'REGISTRATION',
+       'start_event': 'REGISTRATION',  # legacy Quebec tag; unsupported by official text (see quebec-methodology.md)
        'end_event': 'PHYSICIAN',
        'statistic_type': 'ROLLING_AVG',
        'raw_payload_hash': payload_hash,
@@ -193,7 +193,7 @@ Each provincial scraper (`scrapers/quebec.py`, `scrapers/alberta.py`, etc.) must
 
 ### Feature A: Methodology Divergence Warning
 When comparing hospitals from different provinces, show prominent warning if ontology doesn't match:
-> "⚠️ Methodology Divergence: Ottawa reports P90 Triage-to-Doctor time. Gatineau reports Average Registration-to-Doctor time. Direct comparison is invalid."
+> "⚠️ Methodology Divergence: Ottawa reports P90 Triage-to-Doctor time. Gatineau reports an estimated wait whose definition is not published. Direct comparison is invalid."
 
 ### Feature B: Access Burden Estimator (Optional)
 Collapsible UI showing `(Distance × Gas Price) + Parking` with disclaimer:

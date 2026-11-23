@@ -11,8 +11,8 @@ Technical Story: Core architectural decision for data model
 ## Context and Problem Statement
 
 Canadian provinces report emergency room wait times using different methodologies:
-- Alberta: Triage-to-Physician (90th percentile)
-- Quebec: Registration-to-Physician (Rolling average)
+- Alberta: Triage-to-Physician (90th percentile) _(update 2026-11-22: AHS publishes a software-modelled mid-acuity estimate, not a percentile. See `backend/docs/methodologies/alberta-methodology.md`)_
+- Quebec: Registration-to-Physician (Rolling average) _(update 2026-11-22: not supported by official sources; the live estimate has no published definition. See `backend/docs/methodologies/quebec-methodology.md`)_
 - Manitoba: Algorithmic estimate (proprietary calculation)
 
 **Problem:** Users will naturally assume these values are directly comparable and make inappropriate comparisons between provinces, leading to misinterpretation and potential poor healthcare decisions.

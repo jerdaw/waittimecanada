@@ -7,9 +7,9 @@ operational posture without exposing private deployment details.
 
 | Province         | Source ID        | Public Methodology Summary                                                                                                                                   |
 | ---------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Quebec           | `quebec-msss`    | Registration-to-physician rolling average; stretcher occupancy where published                                                                               |
+| Quebec           | `quebec-msss`    | Estimated waiting time for non-priority cases to see a doctor (publisher gives no start point, statistic, or window; legacy tags under revalidation); stretcher occupancy where published |
 | Ontario          | `ontario-health` | Monthly mean from triage or registration, whichever is earlier, to first qualifying-provider assessment; legacy runtime event tags remain under revalidation |
-| Alberta          | `alberta-ahs`    | Triage-to-physician point estimate                                                                                                                           |
+| Alberta          | `alberta-ahs`    | Modelled estimate for a mid-acuity patient, triage nurse assessment to physician (legacy tags under revalidation)                                           |
 | British Columbia | `bc-phsa`        | Triage-to-physician P90                                                                                                                                      |
 
 ## Public Reliability Posture

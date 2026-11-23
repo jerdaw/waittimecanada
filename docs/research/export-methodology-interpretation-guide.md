@@ -123,8 +123,8 @@ Inappropriate uses include:
 - claiming one province is faster based only on exported wait values
 - treating a `MEAN`, `P90`, `POINT_ESTIMATE`, and `ROLLING_AVG` as
   interchangeable
-- treating Quebec `REGISTRATION`-started waits and triage-started waits as the
-  same clock
+- treating Quebec's estimate (start point unpublished; stored tag `REGISTRATION`
+  is a legacy value) and triage-started waits as the same clock
 - using the export as medical advice, triage guidance, or care-site
   recommendation logic
 

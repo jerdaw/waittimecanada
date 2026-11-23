@@ -191,7 +191,7 @@ Based on the Wait Time Canada ontology system:
 - Any province using TRIAGE → PHYSICIAN with P90
 
 **BC's wait time metric is NOT COMPARABLE to:**
-- Quebec's metrics (uses REGISTRATION start event, not TRIAGE)
+- Quebec's metrics (the live estimate has no published start point or statistic; see the Quebec note)
 - Alberta (if they use different percentile or patient scope)
 - Any metric using median/mean instead of P90
 
@@ -435,7 +435,7 @@ with sync_playwright() as p:
 |----------|-------------------|-----------------|-----------|-------------------|
 | BC       | TRIAGE            | PHYSICIAN       | P90       | ✅ (reference)    |
 | Ontario  | TRIAGE            | PHYSICIAN       | MEAN      | ⚠️ **PARTIAL**    |
-| Quebec   | REGISTRATION      | PHYSICIAN       | Mean      | ❌ **NO**         |
+| Quebec   | not published (legacy tag: REGISTRATION) | PHYSICIAN | not published (legacy tag: ROLLING_AVG) | ❌ **NO** |
 | Alberta  | TRIAGE            | PHYSICIAN       | POINT_ESTIMATE | ⚠️ **PARTIAL** |
 
 ### Divergence Brief Example
@@ -444,11 +444,11 @@ When comparing Vancouver General Hospital (BC) vs CHUM (Quebec):
 
 > **⚠️ Methodology Divergence**
 > **Vancouver General (BC)** reports the 90th percentile time from triage to physician assessment.
-> **CHUM (Quebec)** reports the average time from registration to physician assessment.
+> **CHUM (Quebec)** reports an estimated waiting time for non-priority cases to see a doctor, with no published start point, statistic, or window.
 >
 > **Why this matters:**
-> - Different start events: Triage happens after registration, making BC times appear shorter
-> - Different statistics: P90 (BC) excludes the longest 10% of waits, while mean (QC) includes all patients
+> - Quebec's definition is unpublished, so its start point and statistic cannot be matched to BC's triage-to-physician 90th percentile
+> - The two figures cannot be shown to measure the same interval or the same patients
 > - **Direct comparison is clinically invalid.** Use this data to understand regional methodology, not to compare facility performance.
 
 ---

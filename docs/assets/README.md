@@ -25,7 +25,13 @@ research, documentation, and `/methods` support material.
   all four ontology dimensions.
 - Ontario, Alberta, and British Columbia share `TRIAGE -> PHYSICIAN` event
   boundaries but still diverge on statistic type.
-- Quebec remains distinct because it starts the clock at `REGISTRATION`.
+- Quebec's stored `REGISTRATION` and `ROLLING_AVG` tags and Alberta's stored
+  `POINT_ESTIMATE` tag are legacy implementation values. A 22 Nov 2026 audit of
+  official sources found no support for the Quebec tags, and found Alberta's
+  figure is a modelled mid-acuity estimate. The generated tables above reproduce
+  the stored tags and are not source-faithful definitions; see the
+  `backend/docs/methodologies/quebec-methodology.md` and
+  `backend/docs/methodologies/alberta-methodology.md` notes.
 
 The pairwise asset uses the repository's shorthand comparability labels:
 
@@ -56,4 +62,4 @@ Ontario,ON,ontario-health,TIME_TO_PROVIDER,TRIAGE,PHYSICIAN,MEAN,Quarterly,Healt
 ## Related Docs
 
 - [backend/docs/methodologies/README.md](../../backend/docs/methodologies/README.md)
-- [backend/docs/methodologies/ontario-methodology.md](../../backend/docs/methodologies/ontario-methodology.md)
+- `backend/docs/methodologies/ontario-methodology.md`

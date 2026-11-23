@@ -14,6 +14,14 @@
 > Official definition:
 > <https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments>
 
+> [!WARNING]
+> **Quebec methodology revalidation required.** The Gatineau column below uses
+> legacy implementation tags. A 22 Nov 2026 audit found that the quebec.ca page
+> labels its figure an "Estimated waiting time for non-priority cases to see a
+> doctor" and publishes no start point, statistic, or averaging window.
+> `REGISTRATION` and `ROLLING_AVG` are not supported by official text. See the
+> `backend/docs/methodologies/quebec-methodology.md`.
+
 ## Summary
 
 Ottawa and Gatineau are one of the clearest examples of why published emergency department wait times cannot be compared safely across provincial systems without methodology review first.
@@ -51,7 +59,7 @@ indicator.
 | Start event | `TRIAGE` | `REGISTRATION` |
 | End event | `PHYSICIAN` | `PHYSICIAN` |
 | Statistic type | `MEAN` | `ROLLING_AVG` |
-| Source posture | Official source; event tags pending revalidation | Current public MSSS emergency room portal |
+| Source posture | Official source; event tags pending revalidation | Current public MSSS emergency room portal; all three tags above are legacy values pending revalidation |
 
 Ontario's official definition uses triage or registration, whichever is
 earlier, through the first qualifying provider assessment. The present ontology
@@ -72,10 +80,10 @@ together, the Ontario side cannot support an exact event-boundary comparison.
 
 2. **Statistic mismatch**
 
-Ontario's public indicator reports a `MEAN`. Quebec reports a `ROLLING_AVG` in
-the current repository mapping. Those are not interchangeable summary
-statistics. Without a shared statistic definition and time window, the numbers
-are not methodologically aligned even apart from the Ontario fidelity gap.
+Ontario's public indicator reports a `MEAN`. Quebec publishes no statistic or
+time window for its live estimate; `ROLLING_AVG` is a legacy repository tag.
+Without a shared, documented statistic and window, the numbers cannot be shown
+to be aligned, even apart from the Ontario fidelity gap.
 
 ## What Wait Time Canada Does With This
 
