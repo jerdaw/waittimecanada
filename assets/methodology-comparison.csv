@@ -1,0 +1,5 @@
+province,province_code,source_id,metric_family,start_event,end_event,statistic_type,update_frequency,data_source,notes
+Ontario,ON,ontario-health,TIME_TO_PROVIDER,TRIAGE,PHYSICIAN,MEAN,Quarterly,Health Quality Ontario,Historical mean TRIAGE → PHYSICIAN wait times from Ontario's official performance reporting.
+Alberta,AB,alberta-ahs,TIME_TO_PROVIDER,TRIAGE,PHYSICIAN,POINT_ESTIMATE,~2 min,Alberta Health Services Wait Times Portal,Real-time point estimate with the fastest public refresh cadence in the active set.
+British Columbia,BC,bc-phsa,TIME_TO_PROVIDER,TRIAGE,PHYSICIAN,P90,~5 min,Provincial Health Services Authority (edwaittimes.ca),P90 TRIAGE → PHYSICIAN reporting; more conservative than mean or point-estimate displays.
+Quebec,QC,quebec-msss,TIME_TO_PROVIDER,REGISTRATION,PHYSICIAN,ROLLING_AVG,Periodic,MSSS Emergency Room Situation Portal,Uses REGISTRATION (not TRIAGE) start event plus a rolling average statistic.

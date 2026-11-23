@@ -1,0 +1,10 @@
+# Copy/adapt example only. It is not installed or enabled by this repository.
+
+[Unit]
+Description=Check the Wait Time Canada collector dispatch slot (dry run)
+
+[Timer]
+OnCalendar=*-*-* *:40:00 UTC
+AccuracySec=1min
+Persistent=false
+Unit=waittime-github-dispatcher.service

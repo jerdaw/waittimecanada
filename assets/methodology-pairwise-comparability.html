@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wait Time Canada - Pairwise Comparability Matrix</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 10px;
+        }
+        .metadata {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        th {
+            background: #e74c3c;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .comparable-yes {
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .comparable-no {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .comparable-partial {
+            background: #fff3cd;
+            color: #856404;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .key-finding {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+            color: #7f8c8d;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Pairwise Province Comparability Matrix</h1>
+        <div class="metadata">
+            <strong>Wait Time Canada</strong> - Health Systems Observatory<br>
+            Generated: 2026-04-16 14:15:55 UTC<br>
+            Comparisons: 6 pairwise combinations (4 provinces)<br>
+            Source: <a href="https://github.com/jerdaw/waittimecanada">github.com/jerdaw/waittimecanada</a>
+        </div>
+
+        <div class="key-finding">
+            <strong>🔬 Key Finding:</strong> No province pair is fully comparable. Ontario and Alberta
+            share TRIAGE → PHYSICIAN event boundaries, but they still diverge on statistic type
+            (MEAN vs POINT_ESTIMATE). <strong>Quebec remains the most methodologically distinct province.</strong>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Province A</th>
+                    <th>Province B</th>
+                    <th>Comparable?</th>
+                    <th>Divergent Fields</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Ontario</strong></td>
+                    <td><strong>Alberta</strong></td>
+                    <td><span class="comparable-partial">Partial</span></td>
+                    <td>statistic_type (MEAN vs POINT_ESTIMATE)</td>
+                    <td>Same metric and event boundaries, but different statistics still block direct comparison (MEAN vs POINT_ESTIMATE).</td>
+                </tr>
+                <tr>
+                    <td><strong>Ontario</strong></td>
+                    <td><strong>British Columbia</strong></td>
+                    <td><span class="comparable-partial">Partial</span></td>
+                    <td>statistic_type (MEAN vs P90)</td>
+                    <td>Same metric and event boundaries, but different statistics still block direct comparison (MEAN vs P90).</td>
+                </tr>
+                <tr>
+                    <td><strong>Ontario</strong></td>
+                    <td><strong>Quebec</strong></td>
+                    <td><span class="comparable-partial">Partial</span></td>
+                    <td>start_event + statistic_type</td>
+                    <td>Clock start and statistic type both differ, making this one of the least aligned province pairs.</td>
+                </tr>
+                <tr>
+                    <td><strong>Alberta</strong></td>
+                    <td><strong>British Columbia</strong></td>
+                    <td><span class="comparable-partial">Partial</span></td>
+                    <td>statistic_type (POINT_ESTIMATE vs P90)</td>
+                    <td>Same metric and event boundaries, but different statistics still block direct comparison (POINT_ESTIMATE vs P90).</td>
+                </tr>
+                <tr>
+                    <td><strong>Alberta</strong></td>
+                    <td><strong>Quebec</strong></td>
+                    <td><span class="comparable-partial">Partial</span></td>
+                    <td>start_event + statistic_type</td>
+                    <td>Clock start and statistic type both differ, making this one of the least aligned province pairs.</td>
+                </tr>
+                <tr>
+                    <td><strong>British Columbia</strong></td>
+                    <td><strong>Quebec</strong></td>
+                    <td><span class="comparable-partial">Partial</span></td>
+                    <td>start_event + statistic_type</td>
+                    <td>Clock start and statistic type both differ, making this one of the least aligned province pairs.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>📊 Comparability Criteria</h2>
+        <p>Two measurements are <strong>directly comparable</strong> if and only if:</p>
+        <pre style="background: #ecf0f1; padding: 15px; border-radius: 4px; overflow-x: auto;">comparable = (
+    measurement_a.metric_family == measurement_b.metric_family AND
+    measurement_a.start_event == measurement_b.start_event AND
+    measurement_a.end_event == measurement_b.end_event AND
+    measurement_a.statistic_type == measurement_b.statistic_type
+)</pre>
+        <p>If any dimension differs, a <strong>divergence brief</strong> must be generated explaining
+        why direct comparison is scientifically invalid.</p>
+
+        <div class="footer">
+            <strong>Citation:</strong><br>
+            Wait Time Canada. (2026). Provincial Emergency Department Wait Time Pairwise Comparability Matrix.
+            Retrieved from https://github.com/jerdaw/waittimecanada<br><br>
+
+            <strong>License:</strong> MIT License<br>
+            <strong>Contact:</strong> See repository for details
+        </div>
+    </div>
+</body>
+</html>
