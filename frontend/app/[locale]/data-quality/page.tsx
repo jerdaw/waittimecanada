@@ -1,4 +1,5 @@
 "use client";
+import { getSourceDisplayName } from "@/utils/dataTerms";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
@@ -380,7 +381,8 @@ export default function DataQualityPage() {
                 >
                   {quality.sources.map((s) => (
                     <option key={s.source_id} value={s.source_id}>
-                      {s.province} - {s.source_name}
+                      {s.province} -{" "}
+                      {getSourceDisplayName(s.source_id, s.source_name)}
                     </option>
                   ))}
                 </select>
@@ -388,11 +390,12 @@ export default function DataQualityPage() {
               {selectedSourceId && (
                 <QualityTrendSection
                   sourceId={selectedSourceId}
-                  sourceName={
+                  sourceName={getSourceDisplayName(
+                    selectedSourceId,
                     quality.sources.find(
                       (s) => s.source_id === selectedSourceId,
-                    )?.source_name || selectedSourceId
-                  }
+                    )?.source_name,
+                  )}
                   t={t}
                 />
               )}

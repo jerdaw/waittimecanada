@@ -87,9 +87,30 @@ Additional optional export params:
 - `page_size` (raw only; integer from 1 to 10,000, default 10,000)
 - `cursor` (raw only; opaque cursor returned by the preceding page)
 
+### Data terms and attribution
+
+The MIT licence covers the software. Exported values come from third-party
+sources and remain subject to each source's own terms; Wait Time Canada does
+not grant a licence to them. Check each source's terms before reusing or
+redistributing exported data.
+
+Every export reports this:
+
+- JSON: `metadata.data_terms` (`notice`, `software_license`,
+  `data_license_granted: false`) and `metadata.sources`, one entry per source
+  in the export with `source_id`, `source_name`, `source_url` and
+  `methodology_url`.
+- CSV: `source_name`, `source_url` and `methodology_url` columns on every row.
+  The CSV body has no terms comment line, so it stays machine-readable; the
+  terms are in the `X-Data-Terms` header and in this documentation.
+- Headers: `X-Data-Terms`. (`X-Data-License` and `metadata.license` were
+  removed; they previously and incorrectly said `CC-BY-4.0`.)
+
+Source names and URLs come from the current source catalog.
+
 Raw measurement exports include each row's stored `source_id`, `raw_payload_hash`,
-and `parser_version`; `raw_payload_snippet` is never exposed. `source_name` and
-`methodology_url` are joined from the current source catalog, so they are not a
+and `parser_version`; `raw_payload_snippet` is never exposed. `source_name`,
+`source_url` and `methodology_url` are joined from the current source catalog, so they are not a
 historical snapshot of source metadata. Aggregate exports may identify their
 aggregate source, but do not include per-measurement hashes or parser versions.
 

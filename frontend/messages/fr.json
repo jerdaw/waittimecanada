@@ -69,7 +69,7 @@
     },
     "provinces": {
       "title": "Données de sources officielles",
-      "on": "Health Quality Ontario",
+      "on": "Ontario Health",
       "qc": "MSSS Québec",
       "ab": "Alberta Health Services",
       "bc": "BC PHSA"
@@ -588,7 +588,7 @@
     "items": {
       "q1": {
         "question": "Are these wait times official?",
-        "answer": "We collect data directly from official provincial health sources (e.g., Health Quality Ontario, Québec MSSS). However, we are an independent observatory, not a government agency. Always rely on professional medical advice. If you have a medical emergency, call 911 immediately."
+        "answer": "We collect data directly from official provincial health sources (e.g., Ontario Health, Québec MSSS). However, we are an independent observatory, not a government agency. Always rely on professional medical advice. If you have a medical emergency, call 911 immediately."
       },
       "q2": {
         "question": "Why do wait times change so quickly?",
@@ -865,7 +865,7 @@
         },
         "q5": {
           "question": "D'où viennent ces données ?",
-          "answer": "Nous agrégeons les données des sources provinciales officielles : Health Quality Ontario pour l'Ontario, Index Santé pour le Québec, et les portails officiels des autorités sanitaires pour les autres provinces. Toutes les sources sont documentées dans nos pages méthodologiques avec des liens vers les sources originales."
+          "answer": "Nous agrégeons les données des sources provinciales officielles : Ontario Health pour l'Ontario, Index Santé pour le Québec, et les portails officiels des autorités sanitaires pour les autres provinces. Toutes les sources sont documentées dans nos pages méthodologiques avec des liens vers les sources originales."
         },
         "q6": {
           "question": "Et si j'ai besoin d'aide médicale maintenant ?",

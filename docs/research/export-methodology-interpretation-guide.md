@@ -44,6 +44,15 @@ Example request:
 curl "http://localhost:3000/api/export?format=json&granularity=monthly&include_methodology=true"
 ```
 
+## Source Terms and Attribution
+
+The wait-time values in an export come from third-party sources and remain
+subject to each source's own terms. Wait Time Canada does not grant a licence
+to them; the MIT licence covers only the software. Check each source's terms
+before reusing or redistributing exported data, and attribute the source. JSON
+exports list each source in `metadata.sources`; every row (CSV and JSON)
+carries `source_name`, `source_url` and `methodology_url` where they exist.
+
 ## JSON Interpretation
 
 JSON exports include a `metadata.methodology_homogeneity` object. Treat that

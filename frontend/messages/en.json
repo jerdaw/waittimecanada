@@ -69,7 +69,7 @@
     },
     "provinces": {
       "title": "Data from official sources",
-      "on": "Health Quality Ontario",
+      "on": "Ontario Health",
       "qc": "Québec MSSS",
       "ab": "Alberta Health Services",
       "bc": "BC PHSA"
@@ -588,7 +588,7 @@
     "items": {
       "q1": {
         "question": "Are these wait times official?",
-        "answer": "We collect data directly from official provincial health sources (e.g., Health Quality Ontario, Quebec MSSS). However, we are an independent observatory, not a government agency. Always rely on professional medical advice. If you have a medical emergency, call 911 immediately."
+        "answer": "We collect data directly from official provincial health sources (e.g., Ontario Health, Quebec MSSS). However, we are an independent observatory, not a government agency. Always rely on professional medical advice. If you have a medical emergency, call 911 immediately."
       },
       "q2": {
         "question": "Why do wait times change so quickly?",
@@ -865,7 +865,7 @@
         },
         "q5": {
           "question": "Where does this data come from?",
-          "answer": "We aggregate data from official provincial sources: Health Quality Ontario for Ontario, Index Santé for Quebec (which uses MSSS data), and official health authority portals for other provinces. All sources are documented in our methodology pages with links to original sources."
+          "answer": "We aggregate data from official provincial sources: Ontario Health for Ontario, Index Santé for Quebec (which uses MSSS data), and official health authority portals for other provinces. All sources are documented in our methodology pages with links to original sources."
         },
         "q6": {
           "question": "What if I need medical help right now?",

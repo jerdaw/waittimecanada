@@ -100,6 +100,7 @@ describe("GET /api/export", () => {
       patient_scope: "ALL",
       source_id: "historical-measurement-source",
       source_name: "Measurement Source Catalog Label",
+      source_url: "https://example.com/source",
       methodology_url: "https://example.com/methodology",
       raw_payload_hash: "a".repeat(64),
       parser_version: "v1.2",
@@ -159,6 +160,7 @@ describe("GET /api/export", () => {
     expect(json.data[0]).toMatchObject({
       source_id: "historical-measurement-source",
       source_name: "Measurement Source Catalog Label",
+      source_url: "https://example.com/source",
       methodology_url: "https://example.com/methodology",
       raw_payload_hash: "a".repeat(64),
       parser_version: "v1.2",
@@ -204,6 +206,7 @@ describe("GET /api/export", () => {
     expect(exportedRow).toMatchObject({
       source_id: "historical-measurement-source",
       source_name: "Measurement Source Catalog Label",
+      source_url: "https://example.com/source",
       methodology_url: "https://example.com/methodology",
       raw_payload_hash: "a".repeat(64),
       parser_version: "v1.2",
@@ -718,5 +721,94 @@ describe("GET /api/export", () => {
     expect(json.error).toBe("Failed to export data");
     expect(json.message).toBe("Internal server error");
     expect(JSON.stringify(json)).not.toContain("PRIVATE_MARKER");
+  });
+
+  describe("data terms and source attribution", () => {
+    const aggregateRow = {
+      period_start: "2026-03-01T00:00:00Z",
+      period_end: "2026-03-02T00:00:00Z",
+      hospital_id: "ca-on-test",
+      hospital_name: "Test Hospital",
+      province: "ON",
+      mean_wait_minutes: 30,
+      sample_count: 3,
+      metric_family: "TIME_TO_PROVIDER",
+      start_event: "TRIAGE",
+      end_event: "PHYSICIAN",
+      statistic_type: "MEAN",
+      source_id: "ontario-health",
+      source_name: "Health Quality Ontario",
+      source_url: "https://example.com/ontario",
+      methodology_url: "https://example.com/methodology",
+    };
+
+    it.each(["raw", "hourly", "daily"])(
+      "does not claim CC-BY and sets X-Data-Terms on %s CSV",
+      async (granularity) => {
+        useFragmentAwareSql([
+          granularity === "raw"
+            ? [makeRawRow("1", undefined, { source_id: "x" })]
+            : [aggregateRow],
+        ]);
+        const response = await GET(
+          createRequest(`/api/export?format=csv&granularity=${granularity}`),
+        );
+        const csv = await response.text();
+
+        expect(response.headers.get("x-data-license")).toBeNull();
+        expect(response.headers.get("x-data-terms")).toMatch(
+          /no licence to source data/i,
+        );
+        expect(csv).not.toMatch(/CC-BY/i);
+        const header =
+          csv.split("\n").find((l) => l.startsWith("source_id")) ??
+          csv.split("\n").find((l) => l.includes("source_id"))!;
+        expect(header).toContain("source_name,source_url,methodology_url");
+      },
+    );
+
+    it.each(["raw", "hourly", "daily"])(
+      "reports terms and per-source attribution in %s JSON metadata",
+      async (granularity) => {
+        useFragmentAwareSql([
+          granularity === "raw"
+            ? [makeRawRow("1", undefined, { source_id: "ontario-health" })]
+            : [aggregateRow],
+        ]);
+        const response = await GET(
+          createRequest(`/api/export?format=json&granularity=${granularity}`),
+        );
+        const json = await response.json();
+
+        expect(JSON.stringify(json)).not.toMatch(/CC-BY/i);
+        expect(json.metadata).not.toHaveProperty("license");
+        expect(response.headers.get("x-data-license")).toBeNull();
+        expect(json.metadata.data_terms).toMatchObject({
+          software_license: "MIT",
+          data_license_granted: false,
+        });
+        expect(json.metadata.data_terms.notice).toMatch(/own terms/);
+        expect(json.metadata.sources).toHaveLength(1);
+        expect(json.metadata.sources[0]).toMatchObject({
+          source_id: "ontario-health",
+          source_name: "Ontario Health",
+          methodology_url: expect.any(String),
+        });
+        expect(json.data[0].source_name).toBe("Ontario Health");
+      },
+    );
+
+    it.each(["raw", "hourly", "daily"])(
+      "selects the source name and URL in the %s export query",
+      async (granularity) => {
+        useFragmentAwareSql([[]]);
+        await GET(
+          createRequest(`/api/export?format=json&granularity=${granularity}`),
+        );
+        expect(getSelectQuery()).toMatch(/s\.url\s+(AS|as)\s+source_url/);
+        expect(getSelectQuery()).toMatch(/s\.name\s+(AS|as)\s+source_name/);
+      },
+    );
+  });
   });
 });
