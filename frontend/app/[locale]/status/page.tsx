@@ -1,5 +1,6 @@
 "use client";
 
+import { getSourceDisplayName } from "@/utils/dataTerms";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
@@ -132,7 +133,7 @@ function SourceCard({
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="font-semibold text-sm text-foreground">
-            {source.source_name}
+            {getSourceDisplayName(source.source_id, source.source_name)}
           </p>
           <p className="text-xs text-muted-foreground">{source.province}</p>
         </div>

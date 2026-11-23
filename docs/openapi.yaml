@@ -15,6 +15,7 @@ info:
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
+    # Software licence only; exported data values remain subject to each source's terms.
 
 servers:
   - url: https://wait-time.ca/api

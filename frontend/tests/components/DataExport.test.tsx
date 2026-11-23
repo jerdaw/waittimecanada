@@ -110,7 +110,13 @@ describe("DataExport", () => {
     expect(
       screen.getByText(/Wait Time Canada.*2026.*Canadian ER Wait Time Data/i),
     ).toBeInTheDocument();
-    expect(screen.getByText(/License: CC-BY-4.0/i)).toBeInTheDocument();
+    expect(screen.queryByText(/CC-BY/i)).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/stay under each source's own terms/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/does not grant a licence to them/i),
+    ).toBeInTheDocument();
   });
 
   describe("province filter", () => {

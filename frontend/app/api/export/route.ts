@@ -5,6 +5,13 @@ import { NO_STORE_HEADERS } from "@/utils/cache";
 import { getPublicApiErrorMessage } from "@/utils/apiErrors";
 
 import { ExportQuerySchema } from "@/utils/validations";
+import {
+  DATA_TERMS_HEADER_VALUE,
+  DATA_TERMS_NOTICE,
+  SOFTWARE_LICENSE,
+  buildSourceAttributions,
+  withSourceDisplayNames,
+} from "@/utils/dataTerms";
 
 const MAX_HOURLY_EXPORT_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 const DEFAULT_RAW_EXPORT_PAGE_SIZE = 10000;
@@ -240,7 +247,7 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      const results = await sql`
+      const queried = await sql`
         SELECT
           date_trunc('hour', m.timestamp_utc) AS period_start,
           date_trunc('hour', m.timestamp_utc) + INTERVAL '1 hour' AS period_end,
@@ -262,6 +269,8 @@ export async function GET(request: NextRequest) {
           m.end_event,
           m.statistic_type,
           m.source_id,
+          s.name AS source_name,
+          s.url AS source_url,
           s.methodology_url
         FROM measurements m
         JOIN hospitals h ON m.hospital_id = h.id
@@ -283,11 +292,14 @@ export async function GET(request: NextRequest) {
           m.end_event,
           m.statistic_type,
           m.source_id,
+          s.name,
+          s.url,
           s.methodology_url
         ORDER BY period_start DESC
         LIMIT 10000
       `;
 
+      const results = withSourceDisplayNames(queried);
       const homogeneity = computeMethodologyHomogeneity(results);
 
       if (format === "json") {
@@ -305,7 +317,12 @@ export async function GET(request: NextRequest) {
                 endDate: hourlyEnd.toISOString(),
               },
               methodology_homogeneity: homogeneity,
-              license: "CC-BY-4.0",
+              data_terms: {
+                notice: DATA_TERMS_NOTICE,
+                software_license: SOFTWARE_LICENSE,
+                data_license_granted: false,
+              },
+              sources: buildSourceAttributions(results),
               citation:
                 "Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set]. https://wait-time.ca",
             },
@@ -334,10 +351,12 @@ export async function GET(request: NextRequest) {
           ? ["metric_family", "start_event", "end_event", "statistic_type"]
           : []),
         "source_id",
+        "source_name",
+        "source_url",
         "methodology_url",
       ];
 
-      const csvRows = [];
+      const csvRows: string[] = [];
       if (!homogeneity.is_homogeneous) {
         csvRows.push(
           `# METHODOLOGY DIVERGENCE WARNING: ${homogeneity.divergence_note}`,
@@ -368,7 +387,7 @@ export async function GET(request: NextRequest) {
         headers: {
           "Content-Type": "text/csv",
           "Content-Disposition": `attachment; filename="${filename}"`,
-          "X-Data-License": "CC-BY-4.0",
+          "X-Data-Terms": DATA_TERMS_HEADER_VALUE,
           "X-Data-Type": "aggregated",
           "X-Granularity": granularity,
           "X-Methodology-Divergence": String(!homogeneity.is_homogeneous),
@@ -382,7 +401,7 @@ export async function GET(request: NextRequest) {
 
     if (granularity !== "raw") {
       // Serve aggregated data from measurement_aggregates table
-      const results = await sql`
+      const queried = await sql`
         SELECT
           ma.period_start,
           ma.period_end,
@@ -404,6 +423,8 @@ export async function GET(request: NextRequest) {
           ma.end_event,
           ma.statistic_type,
           ma.source_id,
+          s.name AS source_name,
+          s.url AS source_url,
           s.methodology_url
         FROM measurement_aggregates ma
         JOIN hospitals h ON ma.hospital_id = h.id
@@ -417,6 +438,7 @@ export async function GET(request: NextRequest) {
         LIMIT 10000
       `;
 
+      const results = withSourceDisplayNames(queried);
       const homogeneity = computeMethodologyHomogeneity(results);
 
       if (format === "json") {
@@ -430,7 +452,12 @@ export async function GET(request: NextRequest) {
               granularity,
               filters: { province, startDate, endDate },
               methodology_homogeneity: homogeneity,
-              license: "CC-BY-4.0",
+              data_terms: {
+                notice: DATA_TERMS_NOTICE,
+                software_license: SOFTWARE_LICENSE,
+                data_license_granted: false,
+              },
+              sources: buildSourceAttributions(results),
               citation:
                 "Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set]. https://wait-time.ca",
             },
@@ -460,10 +487,12 @@ export async function GET(request: NextRequest) {
           ? ["metric_family", "start_event", "end_event", "statistic_type"]
           : []),
         "source_id",
+        "source_name",
+        "source_url",
         "methodology_url",
       ];
 
-      const csvRows = [];
+      const csvRows: string[] = [];
       if (!homogeneity.is_homogeneous) {
         csvRows.push(
           `# METHODOLOGY DIVERGENCE WARNING: ${homogeneity.divergence_note}`,
@@ -495,7 +524,7 @@ export async function GET(request: NextRequest) {
         headers: {
           "Content-Type": "text/csv",
           "Content-Disposition": `attachment; filename="${filename}"`,
-          "X-Data-License": "CC-BY-4.0",
+          "X-Data-Terms": DATA_TERMS_HEADER_VALUE,
           "X-Data-Type": "aggregated",
           "X-Granularity": granularity,
           "X-Methodology-Divergence": String(!homogeneity.is_homogeneous),
@@ -542,6 +571,7 @@ export async function GET(request: NextRequest) {
         m.patient_scope,
         m.source_id,
         s.name as source_name,
+        s.url as source_url,
         s.methodology_url,
         m.raw_payload_hash,
         m.parser_version
@@ -559,12 +589,14 @@ export async function GET(request: NextRequest) {
 
     const hasMore = queriedRows.length > pageSize;
     const pageRows = queriedRows.slice(0, pageSize);
-    const results = pageRows.map(
-      ({
-        export_cursor_id: _cursorId,
-        export_cursor_timestamp: _cursorTimestamp,
-        ...row
-      }: Record<string, unknown>) => row,
+    const results = withSourceDisplayNames(
+      pageRows.map(
+        ({
+          export_cursor_id: _cursorId,
+          export_cursor_timestamp: _cursorTimestamp,
+          ...row
+        }: Record<string, unknown>) => row,
+      ),
     );
     const nextCursor =
       hasMore && pageRows.length > 0
@@ -612,7 +644,12 @@ export async function GET(request: NextRequest) {
             granularity: "raw",
             filters: { province, startDate, endDate },
             methodology_homogeneity: homogeneity,
-            license: "CC-BY-4.0",
+            data_terms: {
+              notice: DATA_TERMS_NOTICE,
+              software_license: SOFTWARE_LICENSE,
+              data_license_granted: false,
+            },
+            sources: buildSourceAttributions(results),
             citation:
               "Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set]. https://wait-time.ca",
           },
@@ -642,12 +679,13 @@ export async function GET(request: NextRequest) {
         : []),
       "source_id",
       "source_name",
+      "source_url",
       "methodology_url",
       "raw_payload_hash",
       "parser_version",
     ];
 
-    const csvRows = [];
+    const csvRows: string[] = [];
     if (!homogeneity.is_homogeneous) {
       csvRows.push(
         `# METHODOLOGY DIVERGENCE WARNING: ${homogeneity.divergence_note}`,
@@ -680,7 +718,7 @@ export async function GET(request: NextRequest) {
       headers: {
         "Content-Type": "text/csv",
         "Content-Disposition": `attachment; filename="${filename}"`,
-        "X-Data-License": "CC-BY-4.0",
+        "X-Data-Terms": DATA_TERMS_HEADER_VALUE,
         "X-Data-Type": "raw",
         "X-Methodology-Divergence": String(!homogeneity.is_homogeneous),
         "X-Methodology-Groups": String(homogeneity.distinct_methodology_groups),

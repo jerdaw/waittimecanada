@@ -515,7 +515,7 @@ environment-specific paths are kept outside public documentation.
 
 - ✅ Link back to official provincial sources
 - ✅ Display data provenance in all visualizations
-- ✅ Citation-ready export formats
+- ✅ Citation-ready export formats with per-source name, source URL and methodology URL
 - ✅ Never claim work from automated tools as human authorship
 
 ---
@@ -603,11 +603,11 @@ MIT License - See [`LICENSE`](LICENSE) for details.
 **Data Sources:**
 
 - Quebec: Ministère de la Santé et des Services sociaux (MSSS)
-- Ontario: Health Ontario
+- Ontario: Ontario Health
 - Alberta: Alberta Health Services (AHS)
 - British Columbia: Provincial Health Services Authority (PHSA)
 
-All data sourced from publicly available provincial health authority websites.
+All data is sourced from publicly available provincial health authority websites. The MIT licence covers this software only. The wait-time values remain subject to each source's own terms; Wait Time Canada does not grant a licence to them, so check each source's terms before reusing or redistributing them. Exports carry the source name, source URL and methodology URL.
 
 ---
 

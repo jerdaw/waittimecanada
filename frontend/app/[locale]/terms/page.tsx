@@ -178,7 +178,10 @@ export default function TermsPage() {
                 <li>
                   Access data quality reports and anomaly detection information
                 </li>
-                <li>Export data for academic or research purposes</li>
+                <li>
+                  Use the export features, keeping in mind that exported values
+                  remain subject to each source&apos;s terms
+                </li>
                 <li>Cite this project in academic work (see CITATION.cff)</li>
               </ul>
               <p className="leading-relaxed mt-3">
@@ -186,8 +189,8 @@ export default function TermsPage() {
               </p>
               <ul className="list-disc ml-6 space-y-1">
                 <li>
-                  Scrape or systematically download data beyond the provided
-                  export features
+                  Scrape or systematically download data from this platform
+                  beyond the provided export features
                 </li>
                 <li>
                   Attempt to reverse-engineer, decompile, or disassemble the
@@ -225,15 +228,17 @@ export default function TermsPage() {
                 for full license terms.
               </p>
               <p className="leading-relaxed">
-                <strong>Data Sources:</strong> Wait time data originates from
-                provincial health authorities and remains subject to their
-                respective terms and licenses. We do not claim ownership of
-                source data.
+                <strong>Data Sources:</strong> Wait time values come from
+                provincial health sources and remain subject to each
+                source&apos;s own terms. We do not own them and do not grant a
+                licence to them, including through exports. Check each
+                source&apos;s terms before reusing or redistributing the data.
+                Exports list the source name, source URL and methodology URL.
               </p>
               <p className="leading-relaxed">
-                <strong>Aggregated Analysis:</strong> Original analysis,
-                methodology documentation, and aggregate statistics produced by
-                this platform are available under the MIT License.
+                <strong>Our Own Material:</strong> The software and our
+                methodology documentation are available under the MIT License.
+                That licence does not extend to the source values they present.
               </p>
             </div>
           </section>
@@ -256,9 +261,9 @@ export default function TermsPage() {
                 See CITATION.cff for structured citation metadata
               </div>
               <p className="leading-relaxed">
-                Always attribute original data sources (Health Quality Ontario,
-                Quebec MSSS, Alberta AHS, BC PHSA) when using or republishing
-                wait time data.
+                Always attribute original data sources (Ontario Health, Quebec
+                MSSS, Alberta AHS, BC PHSA) when using wait time data, and check
+                their terms before republishing it.
               </p>
             </div>
           </section>

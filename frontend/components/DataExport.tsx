@@ -405,7 +405,13 @@ export function DataExport() {
               Wait Time Canada. (2026). Canadian ER Wait Time Data [Data set].
               https://wait-time.ca
             </p>
-            <p className="mt-2">License: CC-BY-4.0 (Attribution Required)</p>
+            <p className="mt-2">
+              Software: MIT. The values come from third-party sources and stay
+              under each source&apos;s own terms; Wait Time Canada does not
+              grant a licence to them. Check each source&apos;s terms before
+              reusing or redistributing. Exports list the source name, source
+              URL and methodology URL for each row.
+            </p>
           </div>
         </div>
       </div>
