@@ -5,6 +5,7 @@ import { BenchmarkCard } from "./BenchmarkCard";
 import { TemporalPatterns } from "./TemporalPatterns";
 import { calculateDistance } from "@/utils/distance";
 import { useTranslations } from "next-intl";
+import { WaitTimeFreshnessNote } from "./WaitTimeFreshnessNote";
 
 interface ExpandedCardDetailsProps {
   hospital: Hospital;
@@ -16,6 +17,7 @@ export function ExpandedCardDetails({
   userLocation,
 }: ExpandedCardDetailsProps) {
   const t = useTranslations("ExpandedCardDetails");
+  const tFreshness = useTranslations("WaitTimeFreshness");
 
   // Format dates
   const updatedDate = hospital.last_updated
@@ -25,9 +27,16 @@ export function ExpandedCardDetails({
     ? updatedDate.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
     : "--";
 
-  const isLive =
-    updatedDate &&
-    new Date().getTime() - updatedDate.getTime() < 30 * 60 * 1000;
+  // "Live" only when the value is current for its source; see
+  // utils/wait-time-freshness.ts.
+  const waitTimeStatus = hospital.wait_time_status;
+  const isLive = waitTimeStatus === "current";
+  const isMonthly = waitTimeStatus === "monthly";
+  const statusLabel = isLive
+    ? t("statusLive")
+    : isMonthly
+      ? tFreshness("statusMonthly")
+      : tFreshness("statusNoCurrent");
 
   // Calculate distance
   const distance = userLocation
@@ -69,10 +78,29 @@ export function ExpandedCardDetails({
                 isLive ? "bg-success" : "bg-warning",
               )}
             />
-            {isLive ? t("statusLive") : t("statusStale")}
+            {statusLabel}
           </div>
         </div>
       </div>
+
+      {(waitTimeStatus === "stale" || isMonthly) && (
+        <div className="mb-4 text-xs text-muted-foreground bg-muted/40 p-3 rounded-xl border border-border/30">
+          {isMonthly && hospital.monthly_average_minutes !== undefined && (
+            <div className="mb-1 text-foreground">
+              <span className="text-base font-semibold tabular-nums">
+                {Math.round(hospital.monthly_average_minutes)}
+              </span>{" "}
+              {tFreshness("min")}
+            </div>
+          )}
+          <WaitTimeFreshnessNote
+            status={waitTimeStatus}
+            lastUpdated={hospital.last_updated}
+            sourceId={hospital.source_id}
+            detailed
+          />
+        </div>
+      )}
 
       {/* Telehealth Info */}
       <div className="mb-4 text-xs bg-gradient-to-r from-accent/5 to-transparent p-3 rounded-xl border border-accent/20">
@@ -172,9 +200,11 @@ export function ExpandedCardDetails({
         </a>
       </div>
 
-      <div className="mt-4 text-[10px] text-center text-muted-foreground">
-        {t("lastUpdated", { time: timeString })}
-      </div>
+      {isLive && (
+        <div className="mt-4 text-[10px] text-center text-muted-foreground">
+          {t("lastUpdated", { time: timeString })}
+        </div>
+      )}
     </div>
   );
 }

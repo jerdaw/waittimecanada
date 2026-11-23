@@ -5,6 +5,7 @@ import { logger } from "@/utils/logger";
 import { checkRateLimit } from "@/utils/rate-limit";
 import { HospitalQuerySchema } from "@/utils/validations";
 import { getPublicHospitals } from "@/utils/public-hospitals";
+import type { WaitTimeStatus } from "@/utils/wait-time-freshness";
 
 export interface Hospital {
   id: string;
@@ -16,7 +17,14 @@ export interface Hospital {
   is_verified: boolean;
   is_visible: boolean;
   source_id: string;
+  // Present only when the hospital's own latest measurement is recent for its
+  // source (see utils/wait-time-freshness.ts). Never a stale or monthly value.
   current_wait_time?: number; // in minutes
+  // Monthly average published by the source (Ontario Health). Not a live value.
+  monthly_average_minutes?: number;
+  wait_time_status?: WaitTimeStatus;
+  // Timestamp of the latest stored measurement. For stale hospitals this is the
+  // last report; for monthly sources it is when the collector last checked.
   last_updated?: string;
   // Methodology fields
   metric_family?: string;

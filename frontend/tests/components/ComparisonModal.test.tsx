@@ -17,6 +17,7 @@ describe("ComparisonModal", () => {
         province: "ON",
         city: "Ottawa",
         wait_time: 120,
+        wait_time_status: "current",
         last_updated: new Date().toISOString(),
         methodology: {
           metric_family: "TIME_TO_PROVIDER",
@@ -31,6 +32,7 @@ describe("ComparisonModal", () => {
         province: "QC",
         city: "Gatineau",
         wait_time: 90,
+        wait_time_status: "current",
         last_updated: new Date().toISOString(),
         methodology: {
           metric_family: "TIME_TO_PROVIDER",
@@ -324,5 +326,100 @@ describe("ComparisonModal", () => {
       expect(screen.getByText("Comparison Failed")).toBeInTheDocument();
       expect(screen.getByText("Hospital not found")).toBeInTheDocument();
     });
+  });
+
+  it("does not show a stale wait time as a number", async () => {
+    (global.fetch as any).mockResolvedValue({
+      json: async () => ({
+        ...mockComparisonDataIncompatible,
+        data: {
+          ...mockComparisonDataIncompatible.data,
+          hospital_a: {
+            ...mockComparisonDataIncompatible.data.hospital_a,
+            wait_time: null,
+            wait_time_status: "stale",
+            last_updated: "2026-06-04T23:33:00.000Z",
+          },
+        },
+      }),
+    });
+
+    render(
+      <ComparisonModal
+        hospitalAId={hospitalAId}
+        hospitalBId={hospitalBId}
+        onClose={mockOnClose}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("No current data")).toBeInTheDocument();
+    });
+    expect(screen.getByText(/Last reported .*2026/)).toBeInTheDocument();
+    expect(screen.queryByText("120")).not.toBeInTheDocument();
+    expect(screen.getByText("90")).toBeInTheDocument();
+  });
+
+  it("shows an Ontario value as a monthly average, not a wait time", async () => {
+    (global.fetch as any).mockResolvedValue({
+      json: async () => ({
+        ...mockComparisonDataIncompatible,
+        data: {
+          ...mockComparisonDataIncompatible.data,
+          hospital_a: {
+            ...mockComparisonDataIncompatible.data.hospital_a,
+            wait_time: null,
+            monthly_average_minutes: 102,
+            wait_time_status: "monthly",
+          },
+        },
+      }),
+    });
+
+    render(
+      <ComparisonModal
+        hospitalAId={hospitalAId}
+        hospitalBId={hospitalBId}
+        onClose={mockOnClose}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Monthly average")).toBeInTheDocument();
+    });
+    expect(screen.getByText("102")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /View source/ }),
+    ).toBeInTheDocument();
+    // Only the other hospital's current value carries an "Updated" line.
+    expect(screen.getAllByText(/^Updated /)).toHaveLength(1);
+  });
+
+  it("fails closed when a hospital has a number but no current status", async () => {
+    (global.fetch as any).mockResolvedValue({
+      json: async () => ({
+        ...mockComparisonDataIncompatible,
+        data: {
+          ...mockComparisonDataIncompatible.data,
+          hospital_a: {
+            ...mockComparisonDataIncompatible.data.hospital_a,
+            wait_time_status: undefined,
+          },
+        },
+      }),
+    });
+
+    render(
+      <ComparisonModal
+        hospitalAId={hospitalAId}
+        hospitalBId={hospitalBId}
+        onClose={mockOnClose}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("No current data")).toBeInTheDocument();
+    });
+    expect(screen.queryByText("120")).not.toBeInTheDocument();
   });
 });

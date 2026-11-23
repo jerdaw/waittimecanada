@@ -30,3 +30,23 @@ describe("public cadence copy", () => {
     expect(JSON.stringify(fr.Hero.stats)).not.toContain("...");
   });
 });
+
+describe("wait-time freshness copy", () => {
+  it("has French equivalents for every English key", () => {
+    const enKeys = Object.keys(en.WaitTimeFreshness).sort();
+    const frKeys = Object.keys(fr.WaitTimeFreshness).sort();
+    expect(frKeys).toEqual(enKeys);
+    for (const key of enKeys) {
+      const value = (fr.WaitTimeFreshness as Record<string, string>)[key];
+      expect(value.trim().length).toBeGreaterThan(0);
+    }
+  });
+
+  it("never calls the Ontario monthly average live", () => {
+    expect(en.WaitTimeFreshness.monthlyAverage).toBe("Monthly average");
+    expect(en.WaitTimeFreshness.monthlyNote).toMatch(/not a live wait time/);
+    expect(fr.WaitTimeFreshness.monthlyNote).toMatch(
+      /pas un temps d'attente en direct/,
+    );
+  });
+});

@@ -212,6 +212,46 @@ describe("Map Component", () => {
     expect(screen.getByText("Test Hospital")).toBeInTheDocument();
   });
 
+  it("shows No current data in the popup for a stale hospital", () => {
+    const stale = {
+      ...mockHospitals[0],
+      current_wait_time: undefined,
+      wait_time_status: "stale" as const,
+      last_updated: "2026-06-04T23:33:00.000Z",
+    };
+    render(
+      <Map {...defaultProps} hospitals={[stale]} selectedId="test-hospital" />,
+    );
+    const popup = screen.getByTestId("map-popup");
+    expect(popup).toHaveTextContent("No current data");
+    expect(popup).toHaveTextContent(/Last reported .*2026/);
+    expect(popup).not.toHaveTextContent(/Updated /);
+  });
+
+  it("shows an Ontario popup value as a monthly average with a source link", () => {
+    const monthly = {
+      ...mockHospitals[0],
+      current_wait_time: undefined,
+      monthly_average_minutes: 30,
+      wait_time_status: "monthly" as const,
+    };
+    render(
+      <Map
+        {...defaultProps}
+        hospitals={[monthly]}
+        selectedId="test-hospital"
+      />,
+    );
+    const popup = screen.getByTestId("map-popup");
+    expect(popup).toHaveTextContent("Monthly average");
+    expect(popup).toHaveTextContent("30");
+    expect(popup).not.toHaveTextContent(/Updated /);
+    expect(screen.getByRole("link", { name: /View source/ })).toHaveAttribute(
+      "href",
+      expect.stringContaining("ontariohealth.ca"),
+    );
+  });
+
   it("displays freshness indicator", () => {
     render(<Map {...defaultProps} lastUpdate="2023-01-01" isStale={true} />);
     expect(screen.getByText("Data may be stale")).toBeInTheDocument();

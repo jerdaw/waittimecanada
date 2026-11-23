@@ -165,6 +165,8 @@ describe("API Route Integration: Hospitals", () => {
     mockSql.unsafe.mockResolvedValueOnce([
       hospitalRow({
         current_wait_time: 42,
+        last_updated: timestampMinutesAgo(10),
+        measurement_source_id: "quebec-msss",
         occupancy_percentage: 108,
         occupancy_updated: timestampMinutesAgo(20),
         occupancy_source_status: "error",
@@ -244,5 +246,90 @@ describe("API Route Integration: Hospitals", () => {
     const data = await res.json();
 
     expect(data.data[0]).not.toHaveProperty("occupancy_percentage");
+  });
+
+  describe("wait-time freshness", () => {
+    async function fetchFirst(province: string, row: Record<string, unknown>) {
+      mockSql.unsafe.mockResolvedValueOnce([hospitalRow(row)]);
+      mockCoverage();
+      const res = await GET(
+        new NextRequest(`http://localhost/api/hospitals?province=${province}`),
+      );
+      const data = await res.json();
+      return data.data[0];
+    }
+
+    test.each([
+      ["alberta-ahs", "AB"],
+      ["bc-phsa", "BC"],
+      ["quebec-msss", "QC"],
+    ])("keeps a recent %s value as current", async (sourceId, province) => {
+      const hospital = await fetchFirst(province, {
+        source_id: sourceId,
+        measurement_source_id: sourceId,
+        current_wait_time: 77,
+        last_updated: timestampMinutesAgo(119),
+      });
+
+      expect(hospital.wait_time_status).toBe("current");
+      expect(hospital.current_wait_time).toBe(77);
+    });
+
+    test.each([
+      ["alberta-ahs", "AB"],
+      ["bc-phsa", "BC"],
+      ["quebec-msss", "QC"],
+    ])(
+      "does not present an old %s value as current",
+      async (sourceId, province) => {
+        const hospital = await fetchFirst(province, {
+          source_id: sourceId,
+          measurement_source_id: sourceId,
+          current_wait_time: 380,
+          last_updated: timestampMinutesAgo(121),
+        });
+
+        expect(hospital.wait_time_status).toBe("stale");
+        expect(hospital).not.toHaveProperty("current_wait_time");
+        expect(hospital).not.toHaveProperty("monthly_average_minutes");
+        // The date of the last report is still available for display.
+        expect(hospital.last_updated).toEqual(expect.any(String));
+      },
+    );
+
+    test("suppresses a months-old BC value (Fraser Health case)", async () => {
+      const hospital = await fetchFirst("BC", {
+        source_id: "bc-phsa",
+        measurement_source_id: "bc-phsa",
+        current_wait_time: 380,
+        last_updated: "2026-06-04T23:33:00Z",
+      });
+
+      expect(hospital.wait_time_status).toBe("stale");
+      expect(hospital).not.toHaveProperty("current_wait_time");
+      expect(hospital.last_updated).toBe("2026-06-04T23:33:00.000Z");
+    });
+
+    test("never returns Ontario monthly values as current, however recent", async () => {
+      const hospital = await fetchFirst("ON", {
+        province: "ON",
+        source_id: "ontario-health",
+        measurement_source_id: "ontario-health",
+        current_wait_time: 30,
+        statistic_type: "MEAN",
+        last_updated: timestampMinutesAgo(1),
+      });
+
+      expect(hospital.wait_time_status).toBe("monthly");
+      expect(hospital).not.toHaveProperty("current_wait_time");
+      expect(hospital.monthly_average_minutes).toBe(30);
+    });
+
+    test("reports no data when there is no measurement", async () => {
+      const hospital = await fetchFirst("QC", {});
+
+      expect(hospital.wait_time_status).toBe("none");
+      expect(hospital).not.toHaveProperty("current_wait_time");
+    });
   });
 });

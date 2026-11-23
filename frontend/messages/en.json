@@ -116,7 +116,6 @@
       "triageToDoctor": "Triage to Doctor"
     }
   },
-
   "HospitalList": {
     "liveOnly": "Live Only",
     "results": "{count} results",
@@ -990,5 +989,18 @@
         "description": "A 60-minute wait in Ontario (Mean, Triage→Physician) is fundamentally different from a 60-minute wait in Quebec (Rolling Avg, Registration→Provider). Our platform automatically detects these differences and warns you when comparing incompatible measurements."
       }
     }
+  },
+  "WaitTimeFreshness": {
+    "noCurrentData": "No current data",
+    "lastReported": "Last reported {date}",
+    "monthlyAverage": "Monthly average",
+    "monthlyNote": "Published monthly by the source. This is not a live wait time.",
+    "monthlyPeriodNote": "The reporting period is not shown here.",
+    "lastChecked": "Last checked {date}",
+    "lastCheckedNote": "\"Last checked\" is when we last read the source, not the period the figure covers.",
+    "viewSource": "View source (opens in a new tab)",
+    "statusMonthly": "Monthly average",
+    "statusNoCurrent": "No current data",
+    "min": "min"
   }
 }

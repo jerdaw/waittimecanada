@@ -20,6 +20,7 @@ const mockHospital = {
   is_visible: true,
   source_id: "test-source",
   current_wait_time: 120,
+  wait_time_status: "current" as const,
   last_updated: new Date().toISOString(),
   telehealth_number: "1-866-555-0123",
 };
@@ -50,12 +51,49 @@ describe("ExpandedCardDetails", () => {
     expect(screen.getByText("Live Data")).toBeInTheDocument();
   });
 
-  it("shows stale data indicator for old data", () => {
+  it("shows no current data and the last report date for a stale value", () => {
     const staleHospital = {
       ...mockHospital,
-      last_updated: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+      current_wait_time: undefined,
+      wait_time_status: "stale" as const,
+      last_updated: "2026-06-04T23:33:00.000Z",
     };
     render(<ExpandedCardDetails hospital={staleHospital} />);
-    expect(screen.getByText("Stale Data")).toBeInTheDocument();
+    expect(screen.queryByText("Live Data")).not.toBeInTheDocument();
+    expect(screen.getAllByText("No current data").length).toBeGreaterThan(0);
+    expect(screen.getByText(/Last reported .*2026/)).toBeInTheDocument();
+  });
+
+  it("labels Ontario as a monthly average with a source link, never live", () => {
+    const ontario = {
+      ...mockHospital,
+      source_id: "ontario-health",
+      current_wait_time: undefined,
+      monthly_average_minutes: 30,
+      wait_time_status: "monthly" as const,
+    };
+    render(<ExpandedCardDetails hospital={ontario} />);
+    expect(screen.queryByText("Live Data")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Monthly average").length).toBeGreaterThan(0);
+    expect(screen.getByText(/^Last checked /)).toBeInTheDocument();
+    expect(
+      screen.getByText(/not the period the figure covers/),
+    ).toBeInTheDocument();
+    // No reporting period is shown or invented.
+    expect(
+      screen.getByText(/reporting period is not shown/i),
+    ).toBeInTheDocument();
+    const link = screen.getByRole("link", { name: /View source/ });
+    expect(link).toHaveAttribute(
+      "href",
+      expect.stringContaining("ontariohealth.ca"),
+    );
+  });
+
+  it("fails closed when the freshness status is missing", () => {
+    const { wait_time_status: _omit, ...withoutStatus } = mockHospital;
+    void _omit;
+    render(<ExpandedCardDetails hospital={withoutStatus} />);
+    expect(screen.queryByText("Live Data")).not.toBeInTheDocument();
   });
 });
