@@ -175,14 +175,12 @@ class TestQuebecScraper:
         assert scraper._normalize_hospital_id("CHUM") == "ca-qc-chum"
         assert scraper._normalize_hospital_id("Jewish General Hospital") == "ca-qc-jewish-general"
 
-    def test_normalize_hospital_id_fuzzy_match(self, scraper):
-        """Normalize hospital name to ID (fuzzy match)."""
-        # Contains "Jewish"
-        assert (
-            scraper._normalize_hospital_id("Hôpital général juif de Montréal")
-            == "ca-qc-jewish-general"
-        )
-        # Contains "Notre-Dame" - should find Hôpital Notre-Dame mapping
+    def test_normalize_hospital_id_does_not_fuzzy_match(self, scraper):
+        """Partial overlaps with a mapped name are skipped, not guessed."""
+        assert scraper._normalize_hospital_id("Hôpital général juif de Montréal") is None
+        assert scraper._normalize_hospital_id("Hôpital Notre-Dame-de-Fatima") is None
+        assert scraper._normalize_hospital_id("Hôpital Notre-Dame-du-Lac") is None
+        # The exact name still resolves.
         assert scraper._normalize_hospital_id("Hôpital Notre-Dame") == "ca-qc-notre-dame"
 
     def test_normalize_hospital_id_generates_slug(self, scraper):
@@ -444,3 +442,91 @@ class TestQuebecScraper:
             measurements_count=1,
             run_duration_ms=ANY,
         )
+
+
+FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "scrapers"
+
+
+def _facility(name: str, wait: str = "Estimated waiting time : 60 min") -> str:
+    return f"""
+    <div class="hospital_element">
+        <div class="font-weight-bold">{name}</div>
+        <ul class="list-unstyled">
+            <li class="hopital-item">{wait}</li>
+            <li class="hopital-item">Occupancy rate: 110%</li>
+        </ul>
+    </div>"""
+
+
+@pytest.mark.unit
+class TestQuebecHospitalIdMatching:
+    """Rows must never share a hospital ID."""
+
+    @pytest.fixture
+    def scraper(self):
+        return QuebecScraper(create_quebec_source())
+
+    def test_notre_dame_siblings_do_not_write_to_notre_dame(self, scraper):
+        html = (FIXTURES / "quebec_notre_dame_fragment.html").read_text(encoding="utf-8")
+        measurements = scraper.parse(html)
+
+        notre_dame = [m for m in measurements if m.hospital_id == "ca-qc-notre-dame"]
+        # One facility ("Hôpital Notre-Dame"): at most one row per metric family.
+        families = [m.metric_family for m in notre_dame]
+        assert len(families) == len(set(families))
+        assert notre_dame, "the exact Hôpital Notre-Dame row must still be written"
+
+        skipped = dict(scraper.match_report.skipped)
+        assert "Hôpital Notre-Dame-de-Fatima" in skipped
+        assert "Hôpital Notre-Dame-du-Lac" in skipped
+        assert "Hôpital Notre-Dame" not in skipped
+        written = {m.hospital_id for m in measurements}
+        assert not any("fatima" in h or "du-lac" in h for h in written)
+
+    def test_exact_matches_and_unrelated_facilities_still_resolve(self, scraper):
+        html = (FIXTURES / "quebec_notre_dame_fragment.html").read_text(encoding="utf-8")
+        written = {m.hospital_id for m in scraper.parse(html)}
+
+        assert "ca-qc-jewish-general" in written
+        assert "ca-qc-enfant-jesus" in written  # explicit alias of an existing mapped hospital
+        assert "ca-qc-centre-de-sante-de-chibougamau" in written  # unrelated: existing slug path
+
+    def test_aggregate_row_is_skipped(self, scraper):
+        measurements = scraper.parse(_facility("Québec") + _facility("CHUM"))
+        assert {m.hospital_id for m in measurements} == {"ca-qc-chum"}
+        assert ("Québec", "aggregate row") in scraper.match_report.skipped
+
+    def test_two_cards_with_same_id_are_both_skipped(self, scraper):
+        html = _facility("CHUM") + _facility("Centre hospitalier universitaire de Montréal")
+        html += _facility("Hôpital Fleury")
+        measurements = scraper.parse(html)
+
+        assert {m.hospital_id for m in measurements} == {"ca-qc-fleury"}
+        assert [r for _, r in scraper.match_report.skipped] == ["collision on ca-qc-chum"] * 2
+
+    def test_collisions_are_detected_across_pages(self):
+        source = create_quebec_source()
+        db = MagicMock()
+        scraper = QuebecScraper(source, db=db)
+        scraper._heartbeat = MagicMock()
+        page1 = _facility("CHUM") + _facility("Hôpital Fleury")
+        page2 = _facility("Centre hospitalier universitaire de Montréal") + _facility(
+            "Hôpital Jean-Talon"
+        )
+
+        with (
+            patch.object(scraper, "_fetch_page", side_effect=[page1, page2, "<html></html>"]),
+            patch("waittime.scrapers.quebec.time.sleep", return_value=None),
+        ):
+            measurements = scraper.run(save_to_db=True)
+
+        assert {m.hospital_id for m in measurements} == {"ca-qc-fleury", "ca-qc-jean-talon"}
+        db.insert_measurements.assert_called_once_with(measurements)
+
+    def test_card_without_metrics_does_not_claim_an_id(self, scraper):
+        empty = '<div class="hospital_element"><div class="font-weight-bold">CHUM</div></div>'
+        measurements = scraper.parse(
+            empty + _facility("Centre hospitalier universitaire de Montréal")
+        )
+        assert {m.hospital_id for m in measurements} == {"ca-qc-chum"}
+        assert scraper.match_report.skipped == []
