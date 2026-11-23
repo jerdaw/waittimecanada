@@ -810,5 +810,4 @@ describe("GET /api/export", () => {
       },
     );
   });
-  });
 });
