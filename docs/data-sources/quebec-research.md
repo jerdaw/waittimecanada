@@ -2,6 +2,19 @@
 
 > Research findings for real-time ED wait time data in Quebec.
 
+> [!WARNING]
+> **Quebec methodology revalidation required.** This is an early research note.
+> Its ontology mapping and Quebec-versus-Ontario comparison below are legacy
+> and are not supported by official text. A 22 Nov 2026 audit found that the
+> quebec.ca page labels its figure an "Estimated waiting time for non-priority
+> cases to see a doctor" and publishes no start point, statistic, or averaging
+> window; "registration" and "rolling average" appear nowhere official. Index
+> Sante's per-hospital fields below are counts (people waiting, stretchers), not
+> a wait time. See the
+> `backend/docs/methodologies/quebec-methodology.md`
+> for official wording and URLs (accessed 22 Nov 2026). Do not backfill or
+> reinterpret stored historical values.
+
 ## Primary Data Sources
 
 ### 1. Index Santé (Recommended for Scraping)
@@ -125,10 +138,10 @@ SOURCE_CONFIG = {
 # Ontology mapping
 ONTOLOGY = {
     "metric_family": "TIME_TO_PROVIDER",  # Estimated wait time
-    "start_event": "REGISTRATION",  # Quebec counts from registration
+    "start_event": "REGISTRATION",  # legacy tag; no official text supports it
     "end_event": "PROVIDER",  # First provider contact
-    "statistic_type": "ROLLING_AVG",  # Averaged estimate
-    "patient_scope": "ALL",
+    "statistic_type": "ROLLING_AVG",  # legacy tag; no official text supports it
+    "patient_scope": "ALL",  # legacy tag; publisher says "non-priority cases"
 }
 ```
 
@@ -170,16 +183,16 @@ def parse_quebec_page(html: str) -> list[dict]:
 | Index Santé Field | Our Ontology | Notes |
 |-------------------|--------------|-------|
 | `en attente de prise en charge` | `value` | Primary wait metric |
-| Hourly estimate | `statistic_type: ROLLING_AVG` | Not real-time |
-| Registration-based | `start_event: REGISTRATION` | Quebec starts from registration |
+| Hourly estimate | `statistic_type: ROLLING_AVG` | Legacy tag; statistic is not published |
+| (none) | `start_event: REGISTRATION` | Legacy tag; start point is not published |
 
 **Important Methodology Differences from Ontario:**
 
 | Aspect | Quebec | Ontario |
 |--------|--------|---------|
-| Start Event | Registration | Triage |
-| Update Frequency | Hourly | Every 15 min |
-| Statistic Type | Rolling Average | Point Estimate |
+| Start Event | Not published (legacy tag: Registration) | Earlier of triage or registration (official; see Ontario note) |
+| Update Frequency | Hourly (open-data file) | Monthly (official) |
+| Statistic Type | Not published (legacy tag: Rolling Average) | Monthly mean (official; see Ontario note) |
 | Primary Metric | Stretcher occupancy | Wait time to MD |
 
 These differences mean **Quebec and Ontario data are NOT directly comparable** and should trigger methodology divergence warnings.

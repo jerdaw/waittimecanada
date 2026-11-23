@@ -66,7 +66,7 @@ Before moving to the next province, the current province must have:
 **Why Quebec Second:**
 1. **Ottawa-Gatineau comparison** - Demonstrates methodology divergence
 2. **Bilingual support** - Showcases Info-Santé vs Health811 routing
-3. **Methodology contrast** - Quebec uses REGISTRATION→PHYSICIAN (vs Ontario's TRIAGE→PHYSICIAN)
+3. **Methodology contrast** - Quebec's live estimate has no published definition (earlier plan assumed REGISTRATION→PHYSICIAN; unsupported per the 2026-11-22 official-source audit)
 
 **Status:** Scraper MVP complete, needs real URL and verification
 

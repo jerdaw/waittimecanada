@@ -24,6 +24,28 @@
 > Official definition:
 > <https://ontariohealth.ca/system/reporting/performance/time-spent-in-emergency-departments>
 
+> [!WARNING]
+> **Quebec and Alberta methodology revalidation required.** An audit of
+> official sources on 22 Nov 2026 found that the Quebec and Alberta tags in
+> this draft do not match what the publishers say. Quebec's quebec.ca page
+> labels its figure an "Estimated waiting time for non-priority cases to see a
+> doctor" and publishes no start point, statistic, or averaging window;
+> "registration" and "rolling average" appear in no official text, and Quebec's
+> retrospective products measure from the end of the first triage. Alberta
+> Health Services describes a software-modelled estimate for a mid-acuity
+> patient (CTAS 1 and 5 excluded), from the triage nurse's assessment to being
+> seen by a physician, refreshed about every 2 minutes. The stored tags
+> (`REGISTRATION`, `ROLLING_AVG`, `POINT_ESTIMATE`, `patient_scope: ALL`) are
+> legacy implementation values pending an ontology and historical-data
+> decision. Source-level Quebec and Alberta statements below, including the
+> table, the "Findings" section, and the Ottawa-Gatineau pair, describe those
+> tags only and are paused. The cross-province conclusion that no pair can be
+> shown to be comparable is unaffected. Official wording and URLs (accessed
+> 22 Nov 2026) are in the
+> `backend/docs/methodologies/quebec-methodology.md` and
+> `backend/docs/methodologies/alberta-methodology.md` methodology
+> notes.
+
 ## Executive Summary
 
 Wait Time Canada audits publicly reported emergency department wait-time data
@@ -86,11 +108,11 @@ As of **2026-03-28**, the repository documents **393 hospital records** across t
 | Province | Primary public metric in live platform | Start event | End event | Statistic type | Operational posture |
 | --- | --- | --- | --- | --- | --- |
 | Ontario | `TIME_TO_PROVIDER` | `TRIAGE`* | `PHYSICIAN`* | `MEAN` | Repository event tags pending official-source revalidation |
-| Quebec | `TIME_TO_PROVIDER` | `REGISTRATION` | `PHYSICIAN` | `ROLLING_AVG` | Rolling average estimate |
-| Alberta | `TIME_TO_PROVIDER` | `TRIAGE` | `PHYSICIAN` | `POINT_ESTIMATE` | Real-time current estimate |
+| Quebec | `TIME_TO_PROVIDER` | `REGISTRATION`* | `PHYSICIAN` | `ROLLING_AVG`* | Estimate for non-priority cases; method not published |
+| Alberta | `TIME_TO_PROVIDER` | `TRIAGE` | `PHYSICIAN` | `POINT_ESTIMATE`* | Software-modelled mid-acuity estimate |
 | British Columbia | `TIME_TO_PROVIDER` | `TRIAGE` | `PHYSICIAN` | `P90` | Percentile-based public wait metric |
 
-This table describes current platform tags. The asterisked Ontario event values
+This table describes current platform tags; asterisked Quebec and Alberta values are legacy tags under revalidation (see the warning above). The asterisked Ontario event values
 do not exactly represent the official composite start and qualifying-provider
 endpoint. The table can explain current platform divergence, but not a final
 source-level Ontario comparison.

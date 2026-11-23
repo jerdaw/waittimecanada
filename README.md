@@ -30,12 +30,15 @@
 
 Provincial health authorities report ER wait times using **fundamentally different methodologies**:
 
-- Quebec starts the clock at **REGISTRATION** (administrative check-in)
+- Quebec's live estimate for "non-priority cases" has **no published start
+  point, statistic, or window**; the platform's `REGISTRATION` and `ROLLING_AVG`
+  tags are legacy values under revalidation
 - Ontario's official indicator starts at **TRIAGE OR REGISTRATION, WHICHEVER
   IS EARLIER**, and ends at the first assessment by a qualifying provider; the
   platform's legacy event tags remain under revalidation
-- Different statistical measures (P90 vs rolling averages)
-- Different patient populations (all vs mid-acuity)
+- Alberta's figure is a software-modelled estimate for a mid-acuity patient
+- Different statistical measures (observed means, percentiles, model-derived estimates)
+- Different patient populations (for example all eligible visits, mid-acuity, or "non-priority cases")
 
 **Direct comparison without methodology awareness is clinically misleading.** This observatory makes those differences transparent.
 
