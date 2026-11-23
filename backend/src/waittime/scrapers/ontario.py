@@ -80,6 +80,10 @@ class OntarioScraper(BaseScraper):
         "Hamilton Health Sciences": "ca-on-hamilton-health",
         "Kingston Health Sciences Centre": "ca-on-kingston-health",
         "Grand River Hospital": "ca-on-grand-river",
+        # Grand River's emergency department is at its Kitchener-Waterloo site; the
+        # source lists it under the corporation name with this suffix. This keeps the
+        # one-to-one mapping the ID had before exact matching was introduced.
+        "Grand River Hospital Corp-Waterloo Site": "ca-on-grand-river",
         "William Osler Health System": "ca-on-william-osler",
     }
 

@@ -369,6 +369,14 @@ class TestOntarioHospitalIdMatching:
             scraper.match_report.skipped[0][1] == "aggregate row"
         )
 
+    def test_grand_river_waterloo_site_keeps_its_hospital_id(self, scraper):
+        html = (
+            "<table><tr><th>H</th><th>Hours</th></tr>"
+            "<tr><td>Grand River Hospital Corp-Waterloo Site</td><td>2.5</td></tr></table>"
+        )
+        measurements = scraper.parse(html)
+        assert [m.hospital_id for m in measurements] == ["ca-on-grand-river"]
+
     def test_name_merely_starting_with_ontario_is_not_an_aggregate(self, scraper):
         html = (
             "<table><tr><th>H</th><th>Hours</th></tr>"
